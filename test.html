@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест P2P з'єднання</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        #log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тест P2P з'єднання для гри "Залишитися на дошці"</h1>
+    
+    <div class="test-section">
+        <h2>Тест WebRTC з'єднання</h2>
+        <p>Цей тест перевіряє можливість встановлення peer-to-peer з'єднання між двома гравцями.</p>
+        
+        <button onclick="testWebRTC()">Тестувати WebRTC</button>
+        <button onclick="testSignaling()">Тестувати Signaling сервер</button>
+        <button onclick="clearLog()">Очистити лог</button>
+        
+        <div id="status" class="status info">Готовий до тестування</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Лог подій</h2>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        const SIGNALING_SERVER = 'wss://signaling-server-1.glitch.me';
+        let signalingSocket = null;
+        let peerConnection = null;
+        let dataChannel = null;
+        
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logElement.appendChild(logEntry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function updateStatus(message, type = 'info') {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        function testWebRTC() {
+            log('Початок тесту WebRTC...');
+            updateStatus('Тестування WebRTC...', 'info');
+            
+            try {
+                const configuration = {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' }
+                    ]
+                };
+                
+                peerConnection = new RTCPeerConnection(configuration);
+                log('RTCPeerConnection створено успішно', 'success');
+                
+                dataChannel = peerConnection.createDataChannel('test', { ordered: true });
+                log('DataChannel створено успішно', 'success');
+                
+                dataChannel.onopen = () => {
+                    log('DataChannel відкрито!', 'success');
+                    updateStatus('WebRTC працює коректно!', 'success');
+                };
+                
+                dataChannel.onmessage = (event) => {
+                    log(`Отримано повідомлення: ${event.data}`, 'info');
+                };
+                
+                dataChannel.onclose = () => {
+                    log('DataChannel закрито', 'info');
+                };
+                
+                dataChannel.onerror = (error) => {
+                    log(`Помилка DataChannel: ${error}`, 'error');
+                };
+                
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        log('ICE candidate згенеровано', 'info');
+                    }
+                };
+                
+                peerConnection.onconnectionstatechange = () => {
+                    log(`Стан з'єднання: ${peerConnection.connectionState}`, 'info');
+                };
+                
+                updateStatus('WebRTC ініціалізовано успішно!', 'success');
+                
+            } catch (error) {
+                log(`Помилка WebRTC: ${error.message}`, 'error');
+                updateStatus('Помилка WebRTC!', 'error');
+            }
+        }
+        
+        function testSignaling() {
+            log('Початок тесту Signaling сервера...');
+            updateStatus('Підключення до Signaling сервера...', 'info');
+            
+            try {
+                signalingSocket = new WebSocket(SIGNALING_SERVER);
+                
+                signalingSocket.onopen = () => {
+                    log('Підключено до Signaling сервера!', 'success');
+                    updateStatus('Signaling сервер доступний!', 'success');
+                    
+                    // Надсилаємо тестове повідомлення
+                    signalingSocket.send(JSON.stringify({
+                        type: 'test',
+                        message: 'Hello from test client'
+                    }));
+                };
+                
+                signalingSocket.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        log(`Отримано від сервера: ${JSON.stringify(data)}`, 'info');
+                    } catch (error) {
+                        log(`Отримано текст: ${event.data}`, 'info');
+                    }
+                };
+                
+                signalingSocket.onclose = () => {
+                    log('З\'єднання з Signaling сервером закрито', 'info');
+                };
+                
+                signalingSocket.onerror = (error) => {
+                    log(`Помилка Signaling сервера: ${error}`, 'error');
+                    updateStatus('Помилка Signaling сервера!', 'error');
+                };
+                
+            } catch (error) {
+                log(`Помилка підключення: ${error.message}`, 'error');
+                updateStatus('Помилка підключення!', 'error');
+            }
+        }
+        
+        // Автоматичний тест при завантаженні
+        window.addEventListener('load', () => {
+            log('Сторінка завантажена. Готовий до тестування.', 'info');
+        });
+    </script>
+</body>
+</html> 
