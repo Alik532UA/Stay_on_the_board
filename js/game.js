@@ -81,23 +81,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const el = computerMoveDisplayEl;
         if (!el) return;
         let html = '';
-        let color = ''; // Default empty
 
+        // Видаляємо всі класи кольорів
+        el.classList.remove('player1-turn', 'player2-turn', 'computer-turn');
+
+        // Встановлюємо клас відповідно до поточного гравця
         if (isComputer) {
-            color = '#d32f2f'; // Computer is always red
-        } else if (isPlayer) {
+            // Якщо це хід комп'ютера, встановлюємо червоний колір
+            el.classList.add('computer-turn');
+        } else if (isPlayerTurn) {
             if (currentGameMode === 'localTwoPlayer') {
-                color = currentPlayer === 1 ? '#1976d2' : '#ff9800'; // Player 1 blue, Player 2 orange
+                el.classList.add(currentPlayer === 1 ? 'player1-turn' : 'player2-turn');
             } else {
-                color = '#1976d2'; // Default player color
+                el.classList.add('player1-turn'); // Default player color
             }
+        } else if (currentGameMode === 'vsComputer' && !isPlayerTurn) {
+            el.classList.add('computer-turn');
         }
 
         el.classList.remove('confirm-btn-active');
         el.onclick = null;
         if (isComputer || isPlayer) {
             if (direction && distance) {
-                html = `<span style="color: ${color}; font-size: 1em; font-weight: bold;">${getDirectionArrow(direction)} ${distance}</span>`;
+                html = `<span style="font-size: 1em; font-weight: bold;">${getDirectionArrow(direction)} ${distance}</span>`;
                 if (isPlayer) {
                     el.classList.add('confirm-btn-active');
                     el.onclick = () => {
@@ -107,9 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
                 }
             } else if (direction) {
-                html = `<span style="color: ${color}; font-size: 2em; font-weight: bold;">${getDirectionArrow(direction)}</span>`;
+                html = `<span style="font-size: 2em; font-weight: bold;">${getDirectionArrow(direction)}</span>`;
             } else if (distance) {
-                html = `<span style="color: ${color}; font-size: 2em; font-weight: bold;">${distance}</span>`;
+                html = `<span style="font-size: 2em; font-weight: bold;">${distance}</span>`;
             }
         }
         el.innerHTML = html;
@@ -384,7 +390,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const reason = `Ви спробували перемістити фігуру на заблоковану клітинку ${directionText}. Гра закінчена!`;
                 console.log('[processPlayerMove] Blocked cell move, ending game', { newRow, newCol });
                 if (isOnlineGame) {
-                    endOnlineGame(reason);
+                    if (typeof endOnlineGame === 'function') {
+                        endOnlineGame(reason);
+                    } else {
+                        endGame(reason, false);
+                    }
                 } else {
                     endGame(reason, false);
                 }
@@ -411,7 +421,6 @@ document.addEventListener('DOMContentLoaded', () => {
             resetSelections(true);
             updateComputerMoveDisplay({}); // Очищаємо центр після ходу гравця
             console.log('[processPlayerMove] Move completed', { row, col, newRow, newCol, points });
-            updateComputerMoveDisplay({});
             if (isOnlineGame) {
                 playerTurnIndicatorEl.textContent = 'Хід суперника';
                 
@@ -420,7 +429,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     direction: selectedDirection,
                     distance: selectedDistance
                 };
-                sendMoveToOpponent(move);
+                if (typeof sendMoveToOpponent === 'function') {
+                    sendMoveToOpponent(move);
+                }
             } else if (currentGameMode === 'vsComputer') {
                 setTimeout(computerMove, 1000);
             } else if (currentGameMode === 'localTwoPlayer') {
@@ -428,6 +439,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const nextPlayerName = (currentPlayer === 1) ? player1Name : player2Name;
                 isPlayerTurn = true;
                 messageAreaEl.textContent = `Хід гравця ${nextPlayerName}. Оберіть напрямок та відстань.`;
+                // Оновлюємо колір фону для нового гравця
+                updateComputerMoveDisplay({});
                 // Оновлюємо доступні ходи для наступного гравця, якщо чекбокс увімкнено
                 if (showMovesCheckbox && showMovesCheckbox.checked) {
                     window.availableMoves = null;
@@ -553,6 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.availableMoves = null;
         }
         isPlayerTurn = true;
+        // Видалено оновлення колір фону - хід комп'ютера залишається видимим
         // Після всіх змін — якщо чекбокс увімкнено, показати доступні ходи для гравця
         if (showMovesCheckbox && showMovesCheckbox.checked) {
             showAvailableMoves();
@@ -572,6 +586,7 @@ document.addEventListener('DOMContentLoaded', () => {
             finalReason = `Гравець ${loserName} програв. ${reason}`;
         }
         updatePlayerGlow();
+        updateComputerMoveDisplay({}); // Скидаємо колір фону
 
         showModal(
             title,
@@ -603,12 +618,12 @@ document.addEventListener('DOMContentLoaded', () => {
             button.dataset.distance = i;
             distanceSelectorEl.appendChild(button);
         }
-        // Вибираємо першу кнопку (відстань 1) за замовчуванням
+        // Вибираємо першу кнопку (відстань 1) за замовчуванням, але не показуємо в центрі
         const firstBtn = distanceSelectorEl.querySelector('.distance-btn');
         if (firstBtn) {
             firstBtn.classList.add('selected');
             selectedDistance = 1;
-            updateComputerMoveDisplay({direction: selectedDirection, distance: selectedDistance, isPlayer: true});
+            // Видалено автоматичний показ вибору гравця - хід комп'ютера залишається видимим
         }
     }
 
@@ -628,7 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.target.classList.add('selected');
                 selectedDirection = newDirection;
             }
-            updateComputerMoveDisplay({}); // Очищаємо центр перед показом вибору гравця
+            // updateComputerMoveDisplay({}); // Видалено очищення центру
             updateComputerMoveDisplay({direction: selectedDirection, distance: selectedDistance, isPlayer: true});
         }
     }
@@ -638,7 +653,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.distance-btn').forEach(btn => btn.classList.remove('selected'));
             e.target.classList.add('selected');
             selectedDistance = parseInt(e.target.dataset.distance);
-            updateComputerMoveDisplay({}); // Очищаємо центр перед показом вибору гравця
+            // updateComputerMoveDisplay({}); // Видалено очищення центру
             updateComputerMoveDisplay({direction: selectedDirection, distance: selectedDistance, isPlayer: true});
         }
     }

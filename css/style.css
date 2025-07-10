@@ -746,6 +746,85 @@ h1 {
     white-space: normal;
     /* Залишаю лише border-radius і box-shadow */
     border: none !important;
+    transition: background-color 0.3s ease;
+}
+
+/* Кольори для різних гравців */
+#computer-move-display.player1-turn {
+    background: #e3f2fd !important; /* Light blue for player 1 */
+}
+
+#computer-move-display.player2-turn {
+    background: #fff3e0 !important; /* Light orange for player 2 */
+}
+
+#computer-move-display.computer-turn {
+    background: #ffebee !important; /* Light red for computer */
+}
+
+/* Кольори для темної теми */
+[data-theme="dark"] #computer-move-display.player1-turn {
+    background: #1a237e !important; /* Dark blue for player 1 */
+}
+
+[data-theme="dark"] #computer-move-display.player2-turn {
+    background: #e65100 !important; /* Dark orange for player 2 */
+}
+
+[data-theme="dark"] #computer-move-display.computer-turn {
+    background: #b71c1c !important; /* Dark red for computer */
+}
+
+/* Кольори для PEAK стилю */
+[data-style="peak"] #computer-move-display.player1-turn {
+    background: rgba(0, 255, 136, 0.2) !important; /* Light green for player 1 */
+}
+
+[data-style="peak"] #computer-move-display.player2-turn {
+    background: rgba(255, 107, 53, 0.2) !important; /* Light orange for player 2 */
+}
+
+[data-style="peak"] #computer-move-display.computer-turn {
+    background: rgba(139, 92, 246, 0.2) !important; /* Light purple for computer */
+}
+
+/* Кольори для CS2 стилю */
+[data-style="cs2"] #computer-move-display.player1-turn {
+    background: rgba(102, 192, 244, 0.2) !important; /* Light blue for player 1 */
+}
+
+[data-style="cs2"] #computer-move-display.player2-turn {
+    background: rgba(255, 215, 0, 0.2) !important; /* Light gold for player 2 */
+}
+
+[data-style="cs2"] #computer-move-display.computer-turn {
+    background: rgba(194, 50, 50, 0.2) !important; /* Light red for computer */
+}
+
+/* Кольори для темної теми в PEAK стилі */
+[data-theme="dark"][data-style="peak"] #computer-move-display.player1-turn {
+    background: rgba(0, 255, 136, 0.3) !important; /* Darker green for player 1 */
+}
+
+[data-theme="dark"][data-style="peak"] #computer-move-display.player2-turn {
+    background: rgba(255, 107, 53, 0.3) !important; /* Darker orange for player 2 */
+}
+
+[data-theme="dark"][data-style="peak"] #computer-move-display.computer-turn {
+    background: rgba(139, 92, 246, 0.3) !important; /* Darker purple for computer */
+}
+
+/* Кольори для темної теми в CS2 стилі */
+[data-theme="dark"][data-style="cs2"] #computer-move-display.player1-turn {
+    background: rgba(102, 192, 244, 0.3) !important; /* Darker blue for player 1 */
+}
+
+[data-theme="dark"][data-style="cs2"] #computer-move-display.player2-turn {
+    background: rgba(255, 215, 0, 0.3) !important; /* Darker gold for player 2 */
+}
+
+[data-theme="dark"][data-style="cs2"] #computer-move-display.computer-turn {
+    background: rgba(194, 50, 50, 0.3) !important; /* Darker red for computer */
 }
 #computer-move-display span {
     max-width: 100%;
@@ -759,6 +838,7 @@ h1 {
     line-height: 1;
     font-size: 1em;
     overflow: hidden;
+    color: white !important; /* Білий колір тексту для всіх випадків */
 }
 
 #computer-move-display .arrow {
