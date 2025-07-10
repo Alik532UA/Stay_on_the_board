@@ -2,6 +2,7 @@
 
 export function showModal(title, bodyHTML, buttons = [], modalOverlay, modalTitle, modalBody, modalFooter) {
     modalTitle.textContent = title;
+    modalTitle.style.textAlign = 'center';
     modalBody.innerHTML = bodyHTML;
     modalFooter.innerHTML = '';
     buttons.forEach(button => {
@@ -83,17 +84,55 @@ export function resetSelections() {
 }
 
 export function showMainMenu(showModal, t, showRules, showControlsInfo, showBoardSizeSelection, showOnlineGameMenu) {
+    // Показати ігровий контейнер (виправлення)
+    const gameContainer = document.getElementById('game-container');
+    if (gameContainer) gameContainer.style.display = '';
+    function showStub(title) {
+        showModal(title, '<p style="text-align:center;">' + t('common.inDevelopment') + '</p>', [
+            { text: t('common.back'), class: 'primary', onClick: () => showMainMenu(showModal, t, showRules, showControlsInfo, showBoardSizeSelection, showOnlineGameMenu) }
+        ]);
+    }
     showModal(
-        'Stay on the Board',
-        `<div style="text-align:center;font-size:1.1em;font-weight:500;margin-bottom:18px;color:var(--text-accent);">${t('mainMenu.title')}</div>`,
-        [
-            { text: t('mainMenu.playVsComputer'), class: "secondary", onClick: showBoardSizeSelection },
-            { text: t('mainMenu.playOnline'), class: "primary", onClick: showOnlineGameMenu },
-            { text: t('mainMenu.controls'), onClick: showControlsInfo },
-            { text: t('mainMenu.rules'), onClick: showRules }
-        ]
+        '',
+        `<div style="text-align:center;font-size:2em;font-weight:bold;color:var(--text-accent);margin-bottom:10px;">${t('mainMenu.gameTitle')}</div><div style="text-align:center;font-size:1.1em;font-weight:500;margin-bottom:18px;color:var(--text-accent);">${t('mainMenu.menu')}</div>` +
+        `<div id="main-menu-buttons">
+            <button class="modal-button secondary" id="btn-vs-computer">${t('mainMenu.playVsComputer')}</button>
+            <button class="modal-button secondary" id="btn-local-game">${t('mainMenu.localGame')}</button>
+            <button class="modal-button secondary" id="btn-online">${t('mainMenu.playOnline')}</button>
+            <button class="modal-button secondary" id="btn-controls">${t('mainMenu.controls')}</button>
+            <button class="modal-button secondary" id="btn-rules">${t('mainMenu.rules')}</button>
+        </div>`,
+        []
     );
+    // Додаємо обробники кнопок
+    setTimeout(() => {
+        const btnVsComputer = document.getElementById('btn-vs-computer');
+        const btnLocalGame = document.getElementById('btn-local-game');
+        const btnOnline = document.getElementById('btn-online');
+        const btnControls = document.getElementById('btn-controls');
+        const btnRules = document.getElementById('btn-rules');
+        const btnDonate = document.getElementById('btn-donate');
+        if (btnVsComputer) btnVsComputer.onclick = () => showBoardSizeSelection(showModal, t, showMainMenu, showRules, showControlsInfo, showOnlineGameMenu);
+        if (btnLocalGame) {
+            btnLocalGame.disabled = true;
+            btnLocalGame.classList.add('disabled');
+        }
+        if (btnOnline) {
+            btnOnline.disabled = true;
+            btnOnline.classList.add('disabled');
+        }
+        if (btnControls) btnControls.onclick = () => showControlsInfo(showModal, t, showMainMenu);
+        if (btnRules) btnRules.onclick = () => showRules(showModal, t, showMainMenu);
+        if (btnDonate) btnDonate.onclick = () => showStub(t('mainMenu.donate'));
+    }, 0);
 }
+
+// Показувати ігровий контейнер при закритті меню
+export function hideMainMenu() {
+    const gameContainer = document.getElementById('game-container');
+    if (gameContainer) gameContainer.style.display = '';
+}
+window.hideMainMenu = hideMainMenu;
 
 export function showOnlineGameMenu(showModal, t, hideModal, createRoom, joinRoom, showMainMenu) {
     showModal(t('onlineMenu.title'), `<p>${t('onlineMenu.description')}</p>`, [
@@ -109,9 +148,9 @@ export function showRules(showModal, t, showMainMenu) {
     );
 }
 
-export function showControlsInfo(showModal, t, hideModal) {
+export function showControlsInfo(showModal, t, showMainMenu) {
     showModal(t('controls.title'), `<p>${t('controls.desc')}</p><ul><li><b>${t('controls.arrows')}</b> - ${t('controls.direction')}</li><li><b>${t('controls.numbers')}</b> - ${t('controls.distance')}</li><li><b>${t('controls.confirmBtn')}</b> - ${t('controls.confirmMove')}</li><li><b>${t('controls.noMovesBtn')}</b> - ${t('controls.noMoves')}</li><li><b>${t('controls.hideBoard')}</b> - ${t('controls.memoryMode')}</li><li><b>${t('controls.blockedMode')}</b> - ${t('controls.blockedModeDesc')}</li></ul>`,
-        [{ text: t('common.ok'), class: "primary", onClick: hideModal }]
+        [{ text: t('common.ok'), class: "primary", onClick: showMainMenu }]
     );
 }
 
@@ -125,7 +164,7 @@ export function showBoardSizeSelection(showModal, t, showMainMenu, showRules, sh
 }
 
 export function initStyle(styleSelect) {
-    const savedStyle = localStorage.getItem('style') || 'classic';
+    const savedStyle = localStorage.getItem('style') || 'cs2';
     document.documentElement.setAttribute('data-style', savedStyle);
     if (styleSelect) styleSelect.value = savedStyle;
 }
@@ -138,13 +177,11 @@ export function changeStyle(styleSelect) {
 
 export function initTheme() {
     const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // За замовчуванням завжди dark
     if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
-    } else if (prefersDark) {
-        document.documentElement.setAttribute('data-theme', 'dark');
     } else {
-        document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.setAttribute('data-theme', 'dark');
     }
 }
 

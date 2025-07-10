@@ -5,34 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Залишитися на дошці</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <style>
+        .icon-btn {
+            text-decoration: none !important;
+        }
+    </style>
 </head>
 <body>
     <div id="top-controls">
-        <div id="theme-toggle">
-            <button id="light-theme-btn" title="Світла тема">☀️</button>
-            <button id="dark-theme-btn" title="Темна тема">🌙</button>
+        <button id="theme-style-btn" class="icon-btn" title="Тема та стиль">
+            <span id="theme-style-icon">🌗</span>
+        </button>
+        <div id="theme-style-dropdown" class="custom-dropdown hidden">
+            <div class="dropdown-section">
+                <ul id="theme-style-options" class="theme-style-list">
+                    <li class="theme-style-row" data-style="classic">
+                        <button class="theme-btn light" data-theme="light">☀️</button>
+                        <span class="theme-style-name">Ubuntu</span>
+                        <button class="theme-btn dark" data-theme="dark">🌙</button>
+                    </li>
+                    <li class="theme-style-row" data-style="peak">
+                        <button class="theme-btn light" data-theme="light">☀️</button>
+                        <span class="theme-style-name">PEAK</span>
+                        <button class="theme-btn dark" data-theme="dark">🌙</button>
+                    </li>
+                    <li class="theme-style-row" data-style="cs2">
+                        <button class="theme-btn light" data-theme="light">☀️</button>
+                        <span class="theme-style-name">CS 2</span>
+                        <button class="theme-btn dark" data-theme="dark">🌙</button>
+                    </li>
+                    <li class="theme-style-row" data-style="glass">
+                        <button class="theme-btn light" data-theme="light">☀️</button>
+                        <span class="theme-style-name">Glassmorphism</span>
+                        <button class="theme-btn dark" data-theme="dark">🌙</button>
+                    </li>
+                    <li class="theme-style-row" data-style="material">
+                        <button class="theme-btn light" data-theme="light">☀️</button>
+                        <span class="theme-style-name">Material You</span>
+                        <button class="theme-btn dark" data-theme="dark">🌙</button>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div id="style-toggle">
-            <select id="style-select">
-                <option value="classic">Класичний</option>
-                <option value="peak">PEAK</option>
-                <option value="cs2">CS 2</option>
-                <option value="glass">Glassmorphism</option>
-                <option value="material">Material You</option>
-            </select>
+        <button id="lang-btn" class="icon-btn" title="Мова">
+            <span id="lang-flag"></span>
+        </button>
+        <div id="lang-dropdown" class="custom-dropdown hidden">
+            <ul id="lang-options" class="lang-dropdown-list">
+                <li class="lang-option" data-lang="uk"><span class="flag flag-uk"></span></li>
+                <li class="lang-option" data-lang="en"><span class="flag flag-en"></span></li>
+                <li class="lang-option" data-lang="crh"><span class="flag flag-crh"></span></li>
+            </ul>
         </div>
-        <div id="lang-toggle">
-            <select id="lang-select">
-                <option value="uk">Українська</option>
-                <option value="en">English</option>
-                <option value="crh">Qırımtatarca</option>
-            </select>
-        </div>
+        <a href="https://send.monobank.ua/jar/8TPmFKQTCK/" target="_blank" id="donate-btn" class="icon-btn" title="Підтримати проєкт">
+            <span>💰</span>
+        </a>
     </div>
     
     <div id="game-container">
         <header>
-            <h1>Залишитися на дошці</h1>
+            <h1 style="text-align: center;">Залишитися на дошці</h1>
             <div class="score-panel">
                 <span>Очки: <span id="score-display">0</span></span>
                 <span class="online-users">👥 Онлайн: <span id="online-count">1</span></span>
@@ -41,18 +78,25 @@
         
         <div id="board-options">
             <label for="hide-board-checkbox">
+                Приховати дошку
                 <span class="ios-switch">
                     <input type="checkbox" id="hide-board-checkbox">
                     <span class="slider"></span>
                 </span>
-                Приховати дошку
             </label>
             <label for="blocked-mode-checkbox">
+                Режим заблокованих клітинок
                 <span class="ios-switch">
                     <input type="checkbox" id="blocked-mode-checkbox">
                     <span class="slider"></span>
                 </span>
-                Режим заблокованих клітинок
+            </label>
+            <label for="show-moves-checkbox">
+                Показувати доступні ходи
+                <span class="ios-switch">
+                    <input type="checkbox" id="show-moves-checkbox">
+                    <span class="slider"></span>
+                </span>
             </label>
         </div>
 
@@ -104,7 +148,7 @@
     <!-- Модальне вікно -->
     <div id="modal-overlay" class="visible">
         <div id="modal-content">
-            <h2 id="modal-title">Головне меню</h2>
+            <h2 id="modal-title">Menu</h2>
             <div id="modal-body"></div>
             <div class="modal-footer"></div>
         </div>
@@ -115,6 +159,7 @@
       import en from './lang/en.js';
       import crh from './lang/crh.js';
       window.translationsAll = { uk, en, crh };
+      window.translations = window.translationsAll[localStorage.getItem('lang') || 'uk'];
     </script>
     <script type="module" src="js/game.js"></script>
 </body>

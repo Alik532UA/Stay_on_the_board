@@ -1,11 +1,16 @@
 export default {
   mainMenu: {
-    title: "Main Menu",
+    gameTitle: "Stay on the Board",
+    menu: "Menu",
+    title: "Menu",
     welcome: "Welcome!",
     rules: "Rules",
     controls: "Controls",
     playVsComputer: "Play vs Computer",
-    playOnline: "Play Online"
+    playOnline: "Play Online",
+    localGame: "Local Game",
+    donate: "Donate",
+    ubuntu: "Ubuntu"
   },
   onlineMenu: {
     title: "Online Game",
@@ -53,6 +58,7 @@ export default {
   common: {
     back: "Back",
     ok: "OK",
-    backToMenu: "Back to menu"
+    backToMenu: "Back to menu",
+    inDevelopment: "This feature is in development."
   }
 }; 

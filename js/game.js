@@ -5,7 +5,7 @@ import { t, loadLanguage, updateUIWithLanguage } from './localization.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     function loadLanguage(lang) {
-        translations = window.translationsAll[lang];
+        window.translations = window.translationsAll[lang];
         currentLang = lang;
         localStorage.setItem('lang', lang);
         updateUIWithLanguage();
@@ -13,21 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateUIWithLanguage() {
         // Оновлюємо головне меню, якщо воно відкрите
-        if (!modalOverlay.classList.contains('hidden') && modalTitle.textContent === t('mainMenu.title')) {
-            showMainMenu();
+        if (!modalOverlay.classList.contains('hidden')) {
+            openMainMenu();
         }
-        // Можна додати оновлення інших елементів UI
-    }
-
-    function updateThemeButtons() {
-        const theme = document.documentElement.getAttribute('data-theme') || 'light';
-        if (theme === 'dark') {
-            darkThemeBtn.classList.add('active');
-            lightThemeBtn.classList.remove('active');
-        } else {
-            lightThemeBtn.classList.add('active');
-            darkThemeBtn.classList.remove('active');
-        }
+        // Оновлюємо підписи поза модалкою
+        messageAreaEl.textContent = t('mainMenu.welcome');
+        playerTurnIndicatorEl.textContent = t('mainMenu.playerTurn') || '';
+        opponentNameEl.textContent = t('mainMenu.opponent') || '';
+        // Можна додати інші елементи, якщо потрібно
     }
 
     // --- Глобальні змінні та посилання на DOM-елементи ---
@@ -47,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isConnected = false; // Чи підключені гравці
     let waitingForOpponent = false; // Очікування суперника
     let signalingSocket = null; // WebSocket для signaling
-    const version = "0.0.6 (Real P2P Multiplayer)";
+    const version = "0.1";
 
     // Безкоштовний signaling сервер
     const SIGNALING_SERVER = 'wss://signaling-server-1.glitch.me';
@@ -67,6 +60,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const styleSelect = document.getElementById('style-select');
     const computerMoveDisplayEl = document.getElementById('computer-move-display');
     const onlineCountEl = document.getElementById('online-count');
+    const showMovesCheckbox = document.getElementById('show-moves-checkbox');
+
+    function updateComputerMoveDisplay({direction, distance, isComputer, isPlayer}) {
+        const el = computerMoveDisplayEl;
+        if (!el) return;
+        let html = '';
+        let color = isComputer ? '#d32f2f' : (isPlayer ? '#1976d2' : '');
+        el.classList.remove('confirm-btn-active');
+        el.onclick = null;
+        if (isComputer || isPlayer) {
+            if (direction && distance) {
+                html = `<span style="color: ${color}; font-size: 1em; font-weight: bold;">${getDirectionArrow(direction)} ${distance}</span>`;
+                if (isPlayer) {
+                    el.classList.add('confirm-btn-active');
+                    el.onclick = () => {
+                        if (selectedDirection && selectedDistance) {
+                            confirmMoveBtn.click();
+                        }
+                    };
+                }
+            } else if (direction) {
+                html = `<span style="color: ${color}; font-size: 2em; font-weight: bold;">${getDirectionArrow(direction)}</span>`;
+            } else if (distance) {
+                html = `<span style="color: ${color}; font-size: 2em; font-weight: bold;">${distance}</span>`;
+            }
+        }
+        el.innerHTML = html;
+    }
 
     // Елементи для онлайн гри
     const onlineGamePanelEl = document.getElementById('online-game-panel');
@@ -88,19 +109,137 @@ document.addEventListener('DOMContentLoaded', () => {
     const lightThemeBtn = document.getElementById('light-theme-btn');
     const darkThemeBtn = document.getElementById('dark-theme-btn');
 
-    // Ensure: lightThemeBtn sets 'light', darkThemeBtn sets 'dark'
-    lightThemeBtn.addEventListener('click', () => {
-        document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.setItem('theme', 'light');
-        updateThemeButtons();
-    });
-    darkThemeBtn.addEventListener('click', () => {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
-        updateThemeButtons();
+    // --- Нові топ-контроли ---
+    const themeStyleBtn = document.getElementById('theme-style-btn');
+    const themeStyleDropdown = document.getElementById('theme-style-dropdown');
+    const styleOptionsList = document.getElementById('style-options');
+    const styleOptions = styleOptionsList ? styleOptionsList.querySelectorAll('.style-option') : [];
+    const langBtn = document.getElementById('lang-btn');
+    const langDropdown = document.getElementById('lang-dropdown');
+    const langFlag = document.getElementById('lang-flag');
+    const langOptions = document.querySelectorAll('.lang-option');
+    const flagMap = { uk: 'flag-uk', en: 'flag-en', crh: 'flag-crh' };
+
+    // Відкрити/закрити дропдауни
+    if (themeStyleBtn && themeStyleDropdown) {
+        themeStyleBtn.addEventListener('click', (e) => {
+            themeStyleDropdown.classList.toggle('hidden');
+            langDropdown.classList.add('hidden');
+            e.stopPropagation();
+        });
+    }
+    if (langBtn && langDropdown) {
+        langBtn.addEventListener('click', (e) => {
+            langDropdown.classList.toggle('hidden');
+            themeStyleDropdown.classList.add('hidden');
+            e.stopPropagation();
+        });
+    }
+    document.addEventListener('click', (e) => {
+        if (!themeStyleDropdown.contains(e.target) && e.target !== themeStyleBtn) themeStyleDropdown.classList.add('hidden');
+        if (!langDropdown.contains(e.target) && e.target !== langBtn) langDropdown.classList.add('hidden');
     });
 
-    updateThemeButtons();
+    // Тема
+    function updateThemeButtons() {
+        document.getElementById('theme-style-icon').textContent = '🌗';
+        updateThemeStyleDropdownActive();
+    }
+    if (lightThemeBtn && darkThemeBtn) {
+        lightThemeBtn.addEventListener('click', () => {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            updateThemeButtons();
+        });
+        darkThemeBtn.addEventListener('click', () => {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            updateThemeButtons();
+        });
+        updateThemeButtons();
+    }
+
+    // Стиль
+    const styleNames = {
+        classic: { uk: 'Ubuntu', en: 'Ubuntu', crh: 'Ubuntu' },
+        peak: { uk: 'PEAK', en: 'PEAK', crh: 'PEAK' },
+        cs2: { uk: 'CS 2', en: 'CS 2', crh: 'CS 2' },
+        glass: { uk: 'Glassmorphism', en: 'Glassmorphism', crh: 'Glassmorphism' },
+        material: { uk: 'Material You', en: 'Material You', crh: 'Material You' }
+    };
+    function updateStyleDropdownLang() {
+        const lang = localStorage.getItem('lang') || 'uk';
+        styleOptions.forEach(opt => {
+            const style = opt.getAttribute('data-style');
+            if (styleNames[style]) opt.textContent = styleNames[style][lang];
+        });
+        updateThemeStyleDropdownActive();
+    }
+    if (styleOptionsList) {
+        styleOptions.forEach(opt => {
+            opt.addEventListener('click', () => {
+                const style = opt.getAttribute('data-style');
+                localStorage.setItem('style', style);
+                document.documentElement.setAttribute('data-style', style);
+                themeStyleDropdown.classList.add('hidden');
+            });
+        });
+        updateStyleDropdownLang();
+    }
+    // Оновлювати підписи стилів при зміні мови
+    if (langBtn) {
+        langBtn.addEventListener('click', updateStyleDropdownLang);
+    }
+
+    // Мова
+    function updateLangFlag() {
+        const lang = localStorage.getItem('lang') || 'uk';
+        langFlag.className = 'flag ' + (flagMap[lang] || 'flag-uk');
+        langOptions.forEach(opt => {
+            opt.classList.toggle('selected', opt.getAttribute('data-lang') === lang);
+        });
+    }
+    langOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+            const lang = opt.getAttribute('data-lang');
+            localStorage.setItem('lang', lang);
+            alert('Зміни мови застосуються після перезавантаження сторінки.\nLanguage changes will apply after page reload.\nTilni deñiştirmek içün saifeni qayta yükleñiz.');
+            updateLangFlag();
+            langDropdown.classList.add('hidden');
+            // loadLanguage(lang); // якщо потрібно одразу застосовувати
+        });
+    });
+    updateLangFlag();
+
+    // --- Дропдаун тема+стиль (нова логіка) ---
+    const themeStyleRows = document.querySelectorAll('.theme-style-row');
+    function updateThemeStyleDropdownActive() {
+        const currentStyle = localStorage.getItem('style') || 'classic';
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        themeStyleRows.forEach(row => {
+            const style = row.getAttribute('data-style');
+            row.querySelectorAll('.theme-btn').forEach(btn => {
+                const btnTheme = btn.getAttribute('data-theme');
+                btn.classList.toggle('active', style === currentStyle && btnTheme === currentTheme);
+            });
+        });
+    }
+    themeStyleRows.forEach(row => {
+        const style = row.getAttribute('data-style');
+        row.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.getAttribute('data-theme');
+                localStorage.setItem('style', style);
+                localStorage.setItem('theme', theme);
+                document.documentElement.setAttribute('data-style', style);
+                document.documentElement.setAttribute('data-theme', theme);
+                updateThemeButtons();
+                updateThemeStyleDropdownActive();
+                themeStyleDropdown.classList.add('hidden');
+            });
+        });
+    });
+    updateThemeStyleDropdownActive();
 
     // --- Основні функції гри ---
 
@@ -154,40 +293,50 @@ document.addEventListener('DOMContentLoaded', () => {
         const startRow = Math.floor(Math.random() * numberCells);
         const startCol = Math.floor(Math.random() * numberCells);
         board[startRow][startCol] = 1;
+        console.log('[startGame] board after placing piece:', board);
         
         hideBoardCheckbox.checked = false;
         gameBoardEl.classList.remove('board-hidden');
         renderBoard();
         generateDistanceButtons();
-        resetSelections();
+        resetSelections(true);
         hideModal();
         
         const modeText = blockedMode ? " (режим заблокованих клітинок)" : "";
         messageAreaEl.textContent = `Ваш хід: оберіть напрямок та відстань.${modeText}`;
         visualControlsEl.classList.remove('hidden');
-        computerMoveDisplayEl.innerHTML = "Хід<br>Комп'ютера";
+        updateComputerMoveDisplay({});
     }
 
     function processPlayerMove() {
-        if (!isPlayerTurn) return;
+        console.log('[processPlayerMove] called', { isPlayerTurn, selectedDirection, selectedDistance });
+        if (!isPlayerTurn) {
+            console.log('[processPlayerMove] Not player turn');
+            return;
+        }
         if (!selectedDirection || !selectedDistance) {
+            console.log('[processPlayerMove] Direction or distance not selected', { selectedDirection, selectedDistance });
             messageAreaEl.textContent = "Будь ласка, оберіть напрямок ТА відстань!";
             return;
         }
-        const piecePos = findPiece();
-        if (!piecePos) return;
+        const piecePos = findPiece(board, numberCells);
+        console.log('[processPlayerMove] piecePos', piecePos);
+        if (!piecePos) {
+            console.log('[processPlayerMove] No piece found');
+            return;
+        }
         const { row, col } = piecePos;
         const { dr, dc } = getDirectionDelta(selectedDirection);
         const newRow = row + dr * selectedDistance;
         const newCol = col + dc * selectedDistance;
-        
+        console.log('[processPlayerMove] Calculated new position', { newRow, newCol });
         // Перевіряємо чи нова позиція в межах дошки
         if (newRow >= 0 && newRow < numberCells && newCol >= 0 && newCol < numberCells) {
             // Перевіряємо чи клітинка заблокована (в режимі заблокованих клітинок)
             if (blockedMode && blockedCells.some(pos => pos.row === newRow && pos.col === newCol)) {
                 const directionText = getDirectionText(selectedDirection);
                 const reason = `Ви спробували перемістити фігуру на заблоковану клітинку ${directionText}. Гра закінчена!`;
-                
+                console.log('[processPlayerMove] Blocked cell move, ending game', { newRow, newCol });
                 if (isOnlineGame) {
                     endOnlineGame(reason);
                 } else {
@@ -195,10 +344,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 return;
             }
-            
             // Блокуємо поточну клітинку якщо увімкнено режим
             if (blockedMode) {
                 blockedCells.push({ row, col });
+                console.log('[processPlayerMove] Blocked current cell', { row, col });
             }
             
             // Очищаємо візуалізацію доступних ходів
@@ -212,7 +361,11 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlayerTurn = false;
             messageAreaEl.textContent = "";
             resetSelections();
-            
+            generateDistanceButtons();
+            resetSelections(true);
+            updateComputerMoveDisplay({}); // Очищаємо центр після ходу гравця
+            console.log('[processPlayerMove] Move completed', { row, col, newRow, newCol, points });
+            updateComputerMoveDisplay({});
             if (isOnlineGame) {
                 playerTurnIndicatorEl.textContent = 'Хід суперника';
                 
@@ -225,10 +378,14 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 setTimeout(computerMove, 1000);
             }
+            // Після всіх змін — якщо чекбокс увімкнено, показати доступні ходи для наступного ходу
+            if (showMovesCheckbox && showMovesCheckbox.checked) {
+                showAvailableMoves();
+            }
         } else {
             const directionText = getDirectionText(selectedDirection);
             const reason = `Ви спробували перемістити фігуру на ${selectedDistance} клітин(ку) ${directionText} і вийшли за межі дошки.`;
-            
+            console.log('[processPlayerMove] Out of bounds', { newRow, newCol });
             if (isOnlineGame) {
                 endOnlineGame(reason);
             } else {
@@ -240,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkNoMoves() {
         if (!isPlayerTurn) return;
         
-        if (hasValidMoves()) {
+        if (hasValidMoves(board, blockedCells, blockedMode, numberCells)) {
             const reason = "Ви заявили про відсутність ходів, але у вас є можливі ходи. Гра закінчена!";
             if (isOnlineGame) {
                 endOnlineGame(reason);
@@ -267,7 +424,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function showAvailableMoves() {
         if (!isPlayerTurn) return;
         
-        const validMoves = getAllValidMoves();
+        window.availableMoves = null;
+        window.showingAvailableMoves = false;
+        const validMoves = getAllValidMoves(board, blockedCells, blockedMode, numberCells);
         if (validMoves.length === 0) {
             messageAreaEl.textContent = "Немає доступних ходів!";
             return;
@@ -284,28 +443,20 @@ document.addEventListener('DOMContentLoaded', () => {
         
         messageAreaEl.textContent = movesText;
         
-        // Автоматично приховуємо через 5 секунд
-        setTimeout(() => {
-            window.showingAvailableMoves = false;
-            window.availableMoves = null;
-            renderBoard();
-            if (isOnlineGame && isPlayerTurn) {
-                messageAreaEl.textContent = "Ваш хід!";
-            }
-        }, 5000);
+        // Не приховуємо доступні ходи автоматично, вони залишаються поки увімкнено чекбокс
     }
 
     function computerMove() {
         if (isPlayerTurn) return;
         
-        const validMoves = getAllValidMoves();
+        const validMoves = getAllValidMoves(board, blockedCells, blockedMode, numberCells);
         if (validMoves.length === 0) {
             endGame("Комп'ютер не може зробити хід. Ви перемогли!");
             return;
         }
         
         const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
-        const piecePos = findPiece();
+        const piecePos = findPiece(board, numberCells);
         if (!piecePos) return;
         
         const { row, col } = piecePos;
@@ -322,18 +473,28 @@ document.addEventListener('DOMContentLoaded', () => {
         board[newRow][newCol] = 1;
         
         renderBoard();
+        generateDistanceButtons();
+        resetSelections(true);
         
         const directionText = getDirectionText(randomMove.direction);
         messageAreaEl.textContent = `Комп'ютер зробив хід: ${directionText} на ${randomMove.distance} клітинку.`;
+        updateComputerMoveDisplay({direction: randomMove.direction, distance: randomMove.distance, isComputer: true});
         
+        // Оновлюємо доступні ходи для гравця, якщо чекбокс увімкнено
+        if (showMovesCheckbox && showMovesCheckbox.checked) {
+            window.availableMoves = null;
+            window.showingAvailableMoves = false;
+            showAvailableMoves();
+        } else {
+            window.showingAvailableMoves = false;
+            window.availableMoves = null;
+        }
         isPlayerTurn = true;
-        computerMoveDisplayEl.innerHTML = "Хід<br>Комп'ютера";
-        
-        setTimeout(() => {
-            if (!isOnlineGame && isPlayerTurn) {
-                messageAreaEl.textContent = "Ваш хід!";
-            }
-        }, 2000);
+        // Після всіх змін — якщо чекбокс увімкнено, показати доступні ходи для гравця
+        if (showMovesCheckbox && showMovesCheckbox.checked) {
+            showAvailableMoves();
+        }
+        // setTimeout видалено, центр не очищається автоматично
     }
 
     function endGame(reason) {
@@ -343,8 +504,8 @@ document.addEventListener('DOMContentLoaded', () => {
             "Гра закінчена!",
             `<p>${reason}</p><p><strong>Кількість набраних очок: ${points}</strong></p><p>Версія гри: ${version}</p>`,
             [
-                { text: "Грати знову", class: "primary", onClick: showMainMenu },
-                { text: "Закрити", onClick: hideModal }
+                { text: "Вибрати розмір дошки", class: "primary", onClick: openBoardSizeSelection },
+                { text: "Меню", onClick: openMainMenu }
             ]
         );
     }
@@ -366,13 +527,33 @@ document.addEventListener('DOMContentLoaded', () => {
             button.dataset.distance = i;
             distanceSelectorEl.appendChild(button);
         }
+        // Вибираємо першу кнопку (відстань 1) за замовчуванням
+        const firstBtn = distanceSelectorEl.querySelector('.distance-btn');
+        if (firstBtn) {
+            firstBtn.classList.add('selected');
+            selectedDistance = 1;
+            updateComputerMoveDisplay({direction: selectedDirection, distance: selectedDistance, isPlayer: true});
+        }
     }
 
     function handleDirectionSelect(e) {
         if (e.target.classList.contains('control-btn')) {
-            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('selected'));
-            e.target.classList.add('selected');
-            selectedDirection = parseInt(e.target.dataset.direction);
+            const newDirection = parseInt(e.target.dataset.direction);
+            if (selectedDirection === newDirection) {
+                // Якщо натиснуто ту ж стрілку — збільшуємо відстань
+                selectedDistance = (selectedDistance % (numberCells - 1)) + 1;
+                // Підсвічуємо відповідну кнопку відстані
+                document.querySelectorAll('.distance-btn').forEach(btn => {
+                    btn.classList.toggle('selected', parseInt(btn.dataset.distance) === selectedDistance);
+                });
+            } else {
+                // Звичайна логіка вибору напрямку
+                document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('selected'));
+                e.target.classList.add('selected');
+                selectedDirection = newDirection;
+            }
+            updateComputerMoveDisplay({}); // Очищаємо центр перед показом вибору гравця
+            updateComputerMoveDisplay({direction: selectedDirection, distance: selectedDistance, isPlayer: true});
         }
     }
 
@@ -381,13 +562,16 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.distance-btn').forEach(btn => btn.classList.remove('selected'));
             e.target.classList.add('selected');
             selectedDistance = parseInt(e.target.dataset.distance);
+            updateComputerMoveDisplay({}); // Очищаємо центр перед показом вибору гравця
+            updateComputerMoveDisplay({direction: selectedDirection, distance: selectedDistance, isPlayer: true});
         }
     }
 
-    function resetSelections() {
+    function resetSelections(skipDistanceReset) {
         selectedDirection = null;
-        selectedDistance = null;
+        if (!skipDistanceReset) selectedDistance = null;
         document.querySelectorAll('.control-btn, .distance-btn').forEach(btn => btn.classList.remove('selected'));
+        updateComputerMoveDisplay({});
     }
 
     function showModal(title, bodyHTML, buttons = []) {
@@ -406,7 +590,12 @@ document.addEventListener('DOMContentLoaded', () => {
         modalOverlay.classList.remove('hidden');
     }
 
-    function hideModal() { modalOverlay.classList.add('hidden'); }
+    function hideModal() {
+        modalOverlay.classList.add('hidden');
+        const gameContainer = document.getElementById('game-container');
+        if (gameContainer) gameContainer.style.display = '';
+        if (typeof window.hideMainMenu === 'function') window.hideMainMenu();
+    }
 
     // --- Замість локальних функцій меню, використовуємо імпортовані ---
     // showMainMenu, showOnlineGameMenu, showRules, showControlsInfo, showBoardSizeSelection
@@ -429,7 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showRules(showModal, t, openMainMenu);
     }
     function openControlsInfo() {
-        showControlsInfo(showModal, t, hideModal);
+        showControlsInfo(showModal, t, openMainMenu);
     }
     function openOnlineGameMenu() {
         showOnlineGameMenu(showModal, t, hideModal, createRoom, joinRoom, openMainMenu);
@@ -441,24 +630,33 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmMoveBtn.addEventListener('click', processPlayerMove);
     noMovesBtn.addEventListener('click', checkNoMoves);
     debugMovesBtn.addEventListener('click', showAvailableMoves);
-    styleSelect.addEventListener('change', () => changeStyle(styleSelect));
+    // styleSelect.addEventListener('change', () => changeStyle(styleSelect)); // Більше не потрібно
     hideBoardCheckbox.addEventListener('change', toggleBoardVisibility);
     blockedModeCheckbox.addEventListener('change', () => {
         blockedMode = blockedModeCheckbox.checked;
-        
         window.showingAvailableMoves = false;
         window.availableMoves = null;
         renderBoard();
-        
         if (blockedMode) {
             messageAreaEl.textContent = "Режим заблокованих клітинок увімкнено! Клітинки стануть недоступними після ходу.";
         } else {
             messageAreaEl.textContent = "Режим заблокованих клітинок вимкнено.";
         }
     });
+    if (showMovesCheckbox) {
+        showMovesCheckbox.addEventListener('change', () => {
+            if (showMovesCheckbox.checked) {
+                showAvailableMoves();
+            } else {
+                window.showingAvailableMoves = false;
+                window.availableMoves = null;
+                renderBoard();
+            }
+        });
+    }
 
     // Ініціалізуємо тему та стиль
-    initStyle(styleSelect);
+    // initStyle(styleSelect); // Більше не потрібно
     initTheme();
     
     // Ініціалізуємо систему користувачів онлайн
@@ -468,3 +666,4 @@ document.addEventListener('DOMContentLoaded', () => {
     openMainMenu();
     window.global_startGame = startGame;
 });
+

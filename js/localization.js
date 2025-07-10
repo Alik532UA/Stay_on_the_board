@@ -1,10 +1,16 @@
 // localization.js — локалізація
 
-export let currentLang = localStorage.getItem('lang') || 'en';
+export let currentLang = localStorage.getItem('lang') || 'uk';
 export let translations = window.translationsAll[currentLang];
 
 export function t(path) {
-    return path.split('.').reduce((obj, key) => obj && obj[key], translations) || path;
+  const translations = window.translations;
+  const value = path.split('.').reduce((obj, key) => obj && obj[key], translations);
+  if (!value) {
+    console.warn('[i18n] No translation for', path, 'in', translations);
+    return `[no translation: ${path}]`;
+  }
+  return value;
 }
 
 export function loadLanguage(lang, updateUIWithLanguage) {

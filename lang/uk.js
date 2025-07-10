@@ -1,11 +1,15 @@
 export default {
   mainMenu: {
+    gameTitle: "Залишитися на дошці",
+    menu: "Меню",
     title: "Головне меню",
     welcome: "Ласкаво просимо!",
     rules: "Правила",
     controls: "Керування",
     playVsComputer: "Грати з комп'ютером",
-    playOnline: "Грати онлайн"
+    playOnline: "Грати онлайн",
+    localGame: "Локальна гра",
+    donate: "Донат"
   },
   onlineMenu: {
     title: "Онлайн гра",
@@ -53,6 +57,7 @@ export default {
   common: {
     back: "Назад",
     ok: "Зрозуміло",
-    backToMenu: "Назад до меню"
+    backToMenu: "Назад до меню",
+    inDevelopment: "Ця функція ще в розробці."
   }
 }; 

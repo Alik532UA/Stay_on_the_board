@@ -1,11 +1,16 @@
 export default {
   mainMenu: {
+    gameTitle: "Tahtada qal",
+    menu: "Menü",
     title: "Ana Menü",
     welcome: "Qos keldiñiz!",
     rules: "Qaydalar",
     controls: "Idare",
     playVsComputer: "Kompyuterge qarşı oynamaq",
-    playOnline: "Onlayn oyna"
+    playOnline: "Onlayn oyna",
+    localGame: "Mahalliy oyun",
+    donate: "Bağış",
+    ubuntu: "Ubuntu"
   },
   onlineMenu: {
     title: "Onlayn Oyun",
@@ -53,6 +58,7 @@ export default {
   common: {
     back: "Qayt",
     ok: "Anladım",
-    backToMenu: "Menüge qayt"
+    backToMenu: "Menüge qayt",
+    inDevelopment: "Bu funksiya daa işlenilmekte."
   }
 }; 
