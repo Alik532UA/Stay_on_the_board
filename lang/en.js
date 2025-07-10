@@ -45,10 +45,13 @@ export default {
     confirmMove: "make the selected move.",
     noMovesBtn: "'No moves left' button",
     noMoves: "declare no possible moves.",
-    hideBoard: "'Hide board' checkbox",
+    hideBoard: "Show board",
     memoryMode: "for memory mode.",
+    showMoves: "Show available moves",
     blockedMode: "'Blocked cells mode' checkbox",
-    blockedModeDesc: "cells become unavailable after a move."
+    blockedModeDesc: "cells become unavailable after a move.",
+    speechEnabled: "'Speech enabled' checkbox",
+    speechEnabledDesc: "voice announcement of computer moves."
   },
   boardSize: {
     title: "Board Size Selection",
@@ -66,6 +69,8 @@ export default {
     back: "Back",
     ok: "OK",
     backToMenu: "Back to menu",
-    inDevelopment: "This feature is in development."
+    inDevelopment: "This feature is in development.",
+    confirmMove: "Confirm Move",
+    noMoves: "I have no moves"
   }
 }; 

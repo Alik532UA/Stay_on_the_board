@@ -87,7 +87,7 @@
             <!-- Клітинки дошки будуть згенеровані тут -->
         </div>
         <div id="show-moves-checkbox-wrapper">
-            <label for="show-moves-checkbox">
+            <label for="show-moves-checkbox" id="show-moves-label">
                 Показувати доступні ходи
                 <span class="ios-switch">
                     <input type="checkbox" id="show-moves-checkbox">
@@ -96,20 +96,38 @@
             </label>
         </div>
         <div id="board-options">
-            <label for="show-board-checkbox">
+            <label for="show-board-checkbox" id="show-board-label">
                 Показати дошку
                 <span class="ios-switch">
                     <input type="checkbox" id="show-board-checkbox" checked>
                     <span class="slider"></span>
                 </span>
             </label>
-            <label for="blocked-mode-checkbox">
+            <label for="blocked-mode-checkbox" id="blocked-mode-label">
                 Режим заблокованих клітинок
                 <span class="ios-switch">
                     <input type="checkbox" id="blocked-mode-checkbox">
                     <span class="slider"></span>
                 </span>
             </label>
+            <div class="speech-controls-container">
+                <label for="speech-enabled-checkbox" id="speech-enabled-label">
+                    Озвучування ходів
+                    <span class="ios-switch">
+                        <input type="checkbox" id="speech-enabled-checkbox">
+                        <span class="slider"></span>
+                    </span>
+                </label>
+                <button id="voice-settings-toggle" title="Налаштування голосів">
+                    ⚙️
+                </button>
+            </div>
+            <div id="voice-settings">
+                <h4>Налаштування голосів:</h4>
+                <div id="voice-selectors">
+                    <!-- Селектори голосів будуть додані тут -->
+                </div>
+            </div>
         </div>
         <div id="visual-controls" class="hidden">
             <div id="player1-glow" class="player-glow"></div>

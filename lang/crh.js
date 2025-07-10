@@ -38,10 +38,13 @@ export default {
     confirmMove: "saylanğan hareketni yapmaq.",
     noMovesBtn: "'Yürüyecek yolım yoq' düymesi",
     noMoves: "yürüyecek yol yoqlığını bildirmek.",
-    hideBoard: "'Tahtanı gizle' qutucığı",
+    hideBoard: "Tahtanı köster",
     memoryMode: "hatırlama rejimi içün.",
+    showMoves: "Mümkün hareketlerini köster",
     blockedMode: "'Bloklanğan hucre rejimi' qutucığı",
-    blockedModeDesc: "hareketten soñ hucreler kullanılmaz olur."
+    blockedModeDesc: "hareketten soñ hucreler kullanılmaz olur.",
+    speechEnabled: "'Sesli bildirim' qutucığı",
+    speechEnabledDesc: "kompyuter hareketlerini sesli bildirmek."
   },
   boardSize: {
     title: "Tahta Ölçüsini Sayla",
@@ -59,7 +62,9 @@ export default {
     back: "Qayt",
     ok: "Anladım",
     backToMenu: "Menüge qayt",
-    inDevelopment: "Bu funksiya daa işlenilmekte."
+    inDevelopment: "Bu funksiya daa işlenilmekte.",
+    confirmMove: "Hareketni tasdiqla",
+    noMoves: "Yürüyecek yolım yoq"
   },
   localGame: {
     enterNames: "Oyuncılarnıñ adlarını kirsetiñiz",

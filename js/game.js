@@ -9,6 +9,7 @@ import {
     toggleTheme, initOnlineUsers, showPlayerNameInput
 } from './ui.js';
 import { t, loadLanguage, updateUIWithLanguage } from './localization.js';
+import { speakMove, speakGameMessage, stopSpeaking, isSpeechEnabled, initVoices, getAvailableVoices, getVoicesForLanguage, setVoiceForLanguage, getCurrentVoice } from './speech.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     function loadLanguage(lang) {
@@ -16,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
         currentLang = lang;
         localStorage.setItem('lang', lang);
         updateUIWithLanguage();
+        
+        // Оновлюємо озвучування, якщо воно увімкнено
+        if (speechEnabled) {
+            stopSpeaking(); // Зупиняємо поточне озвучування при зміні мови
+        }
     }
 
     function updateUIWithLanguage() {
@@ -27,6 +33,34 @@ document.addEventListener('DOMContentLoaded', () => {
         messageAreaEl.textContent = t('mainMenu.welcome');
         playerTurnIndicatorEl.textContent = t('mainMenu.playerTurn') || '';
         opponentNameEl.textContent = t('mainMenu.opponent') || '';
+        
+        // Оновлюємо підписи чекбоксів
+        if (speechEnabledLabel) {
+            speechEnabledLabel.textContent = t('controls.speechEnabled');
+        }
+        // Оновлюємо інші підписи чекбоксів
+        const showBoardLabel = document.getElementById('show-board-label');
+        if (showBoardLabel) {
+            showBoardLabel.textContent = t('controls.hideBoard');
+        }
+        const blockedModeLabel = document.getElementById('blocked-mode-label');
+        if (blockedModeLabel) {
+            blockedModeLabel.textContent = t('controls.blockedMode');
+        }
+        const showMovesLabel = document.getElementById('show-moves-label');
+        if (showMovesLabel) {
+            showMovesLabel.textContent = t('controls.showMoves');
+        }
+        
+        // Оновлюємо кнопки
+        const confirmMoveBtn = document.getElementById('confirm-move-btn');
+        if (confirmMoveBtn) {
+            confirmMoveBtn.textContent = t('common.confirmMove');
+        }
+        const noMovesBtn = document.getElementById('no-moves-btn');
+        if (noMovesBtn) {
+            noMovesBtn.textContent = t('common.noMoves');
+        }
         // Можна додати інші елементи, якщо потрібно
     }
 
@@ -55,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let player2Name = 'Гравець 2';
 
     let firstMoveDone = false;
+    let speechEnabled = false; // Стан озвучування
 
     // Безкоштовний signaling сервер
     const SIGNALING_SERVER = 'wss://signaling-server-1.glitch.me';
@@ -74,8 +109,145 @@ document.addEventListener('DOMContentLoaded', () => {
     const computerMoveDisplayEl = document.getElementById('computer-move-display');
     const onlineCountEl = document.getElementById('online-count');
     const showMovesCheckbox = document.getElementById('show-moves-checkbox');
+    const speechEnabledCheckbox = document.getElementById('speech-enabled-checkbox');
+    const speechEnabledLabel = document.getElementById('speech-enabled-label');
+    const voiceSettingsToggle = document.getElementById('voice-settings-toggle');
+    const voiceSettings = document.getElementById('voice-settings');
+    const voiceSelectors = document.getElementById('voice-selectors');
     const player1Glow = document.getElementById('player1-glow');
     const player2Glow = document.getElementById('player2-glow');
+
+    // Ініціалізація озвучування
+    function initSpeech() {
+        if (isSpeechEnabled()) {
+            initVoices();
+            // Завантажуємо збережений стан
+            const savedSpeechState = localStorage.getItem('speechEnabled');
+            speechEnabled = savedSpeechState === 'true';
+            if (speechEnabledCheckbox) {
+                speechEnabledCheckbox.checked = speechEnabled;
+            }
+            
+            // Приховуємо налаштування голосів за замовчуванням
+            if (voiceSettings) {
+                voiceSettings.style.display = 'none';
+            }
+            
+            // Додаємо обробники подій
+            if (speechEnabledCheckbox) {
+                speechEnabledCheckbox.addEventListener('change', handleSpeechToggle);
+            }
+            
+            if (voiceSettingsToggle) {
+                voiceSettingsToggle.addEventListener('click', toggleVoiceSettings);
+            }
+        } else {
+            // Якщо озвучування не підтримується, приховуємо чекбокс
+            if (speechEnabledCheckbox && speechEnabledLabel) {
+                speechEnabledCheckbox.style.display = 'none';
+                speechEnabledLabel.style.display = 'none';
+            }
+            if (voiceSettings) {
+                voiceSettings.style.display = 'none';
+            }
+            if (voiceSettingsToggle) {
+                voiceSettingsToggle.style.display = 'none';
+            }
+        }
+    }
+
+    // Функція для створення селекторів голосів
+    function createVoiceSelectors() {
+        if (!voiceSelectors || !isSpeechEnabled()) return;
+        
+        const languages = [
+            { code: 'uk', name: 'Українська' },
+            { code: 'en', name: 'English' },
+            { code: 'crh', name: 'Кримськотатарська' }
+        ];
+        
+        voiceSelectors.innerHTML = '';
+        
+        languages.forEach(lang => {
+            const voices = getVoicesForLanguage(lang.code);
+            const currentVoice = getCurrentVoice(lang.code);
+            
+            if (voices.length > 0) {
+                const container = document.createElement('div');
+                
+                const label = document.createElement('label');
+                label.textContent = lang.name;
+                
+                const select = document.createElement('select');
+                
+                // Додаємо опції
+                voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    option.selected = currentVoice && currentVoice.name === voice.name;
+                    select.appendChild(option);
+                });
+                
+                // Обробник зміни голосу
+                select.addEventListener('change', (e) => {
+                    const success = setVoiceForLanguage(lang.code, e.target.value);
+                    if (success) {
+                        console.log(`[Speech] Голос для ${lang.name} змінено на: ${e.target.value}`);
+                    }
+                });
+                
+                container.appendChild(label);
+                container.appendChild(select);
+                voiceSelectors.appendChild(container);
+            }
+        });
+    }
+
+    // Функція для перемикання видимості налаштувань голосів
+    function toggleVoiceSettings() {
+        if (!voiceSettings || !speechEnabled) return;
+        
+        const isVisible = voiceSettings.style.display === 'block';
+        voiceSettings.style.display = isVisible ? 'none' : 'block';
+        
+        // Змінюємо стиль кнопки для індикації стану
+        if (voiceSettingsToggle) {
+            voiceSettingsToggle.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(90deg)';
+            voiceSettingsToggle.style.background = isVisible ? 'transparent' : 'var(--control-bg)';
+        }
+        
+        // Якщо показуємо налаштування, створюємо селектори
+        if (!isVisible) {
+            setTimeout(createVoiceSelectors, 100);
+        }
+    }
+
+    // Обробник зміни стану озвучування
+    function handleSpeechToggle() {
+        if (speechEnabledCheckbox) {
+            speechEnabled = speechEnabledCheckbox.checked;
+            localStorage.setItem('speechEnabled', speechEnabled.toString());
+            
+            // Приховуємо налаштування голосів при вимкненні озвучування
+            if (voiceSettings) {
+                voiceSettings.style.display = 'none';
+            }
+            
+            // Скидаємо стиль кнопки налаштувань
+            if (voiceSettingsToggle) {
+                voiceSettingsToggle.style.transform = 'rotate(0deg)';
+                voiceSettingsToggle.style.background = 'transparent';
+            }
+            
+            if (speechEnabled) {
+                console.log('[Speech] Озвучування увімкнено');
+            } else {
+                console.log('[Speech] Озвучування вимкнено');
+                stopSpeaking();
+            }
+        }
+    }
 
     function updateComputerMoveDisplay({direction, distance, isComputer, isPlayer}) {
         const el = computerMoveDisplayEl;
@@ -556,6 +728,12 @@ document.addEventListener('DOMContentLoaded', () => {
         messageAreaEl.textContent = `Комп'ютер зробив хід: ${directionText} на ${randomMove.distance} клітинку.`;
         updateComputerMoveDisplay({direction: randomMove.direction, distance: randomMove.distance, isComputer: true});
         
+        // Озвучуємо хід комп'ютера, якщо увімкнено
+        if (speechEnabled) {
+            const currentLang = localStorage.getItem('lang') || 'uk';
+            speakMove(randomMove.direction, randomMove.distance, currentLang);
+        }
+        
         // Оновлюємо доступні ходи для гравця, якщо чекбокс увімкнено
         if (showMovesCheckbox && showMovesCheckbox.checked) {
             window.availableMoves = null;
@@ -587,6 +765,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updatePlayerGlow();
         updateComputerMoveDisplay({}); // Скидаємо колір фону
+        
+        // Озвучуємо результат гри, якщо увімкнено
+        if (speechEnabled) {
+            const currentLang = localStorage.getItem('lang') || 'uk';
+            const message = isWin ? "Перемога!" : "Гра закінчена!";
+            speakGameMessage(message, currentLang);
+        }
 
         showModal(
             title,
@@ -774,9 +959,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
+
     // Ініціалізуємо тему та стиль
     // initStyle(styleSelect); // Більше не потрібно
     initTheme();
+    
+    // Ініціалізуємо озвучування
+    initSpeech();
     
     // Ініціалізуємо систему користувачів онлайн
     initOnlineUsers(onlineCountEl);

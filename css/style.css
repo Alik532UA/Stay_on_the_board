@@ -2145,6 +2145,97 @@ html body #board-options {
     margin: 0;
 }
 
+/* Стилі для контейнера керування озвучуванням */
+.speech-controls-container {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 8px !important;
+}
+
+/* Стилі для кнопки налаштувань голосів */
+#voice-settings-toggle {
+    background: none !important;
+    border: none !important;
+    font-size: 1.2em !important;
+    cursor: pointer !important;
+    padding: 5px !important;
+    border-radius: 4px !important;
+    transition: all 0.2s ease !important;
+    color: var(--text-primary) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    box-shadow: none !important;
+}
+
+#voice-settings-toggle:hover {
+    background: var(--control-bg) !important;
+    transform: scale(1.1) !important;
+}
+
+#voice-settings-toggle:active {
+    transform: scale(0.95) !important;
+}
+
+/* Стилі для панелі налаштувань голосів */
+#voice-settings {
+    display: none;
+    margin-top: 10px !important;
+    padding: 12px !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--unified-radius) !important;
+    background: var(--bg-secondary) !important;
+    box-shadow: var(--unified-shadow) !important;
+    transition: all 0.3s ease !important;
+}
+
+#voice-settings h4 {
+    margin: 0 0 10px 0 !important;
+    font-size: 0.9em !important;
+    color: var(--text-accent) !important;
+    font-weight: bold !important;
+}
+
+#voice-selectors {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+#voice-selectors > div {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 4px 0 !important;
+}
+
+#voice-selectors label {
+    font-size: 0.9em !important;
+    font-weight: bold !important;
+    color: var(--text-primary) !important;
+    min-width: 80px !important;
+}
+
+#voice-selectors select {
+    flex: 1 !important;
+    padding: 4px 8px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--border-color) !important;
+    background: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    font-size: 0.8em !important;
+    transition: border-color 0.2s ease !important;
+}
+
+#voice-selectors select:focus {
+    border-color: var(--control-selected) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px var(--control-selected) !important;
+}
+
 html body #game-board {
     border: none !important;
     box-shadow: none !important;
@@ -2207,4 +2298,36 @@ html body #game-board {
 body {
     background-color: var(--background-primary);
     color: var(--text-primary);
+}
+
+@media (max-width: 600px) {
+  #voice-settings {
+    padding: 8px !important;
+    font-size: 0.95em !important;
+  }
+  #voice-selectors {
+    gap: 10px !important;
+  }
+  #voice-selectors > div {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 2px !important;
+    padding: 2px 0 !important;
+  }
+  #voice-selectors label {
+    min-width: 0 !important;
+    font-size: 1em !important;
+    margin-bottom: 2px !important;
+  }
+  #voice-selectors select {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 1em !important;
+    padding: 6px 8px !important;
+    box-sizing: border-box !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    max-width: 100% !important;
+  }
 }
