@@ -44,7 +44,7 @@ export default {
   },
   boardSize: {
     title: "Вибір розміру дошки",
-    select: "Встановіть розмір дошки (від 2 до 9):"
+    select: "Встановіть розмір дошки \n(від 2 до 9):"
   },
   online: {
     createRoomStatus: "Створення кімнати...",

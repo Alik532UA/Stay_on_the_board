@@ -84,6 +84,9 @@ export function resetSelections() {
 }
 
 export function showMainMenu(showModal, t, showRules, showControlsInfo, showBoardSizeSelection, showOnlineGameMenu) {
+    // Показати топ-контроли тільки в головному меню
+    const topControls = document.getElementById('top-controls');
+    if (topControls) topControls.classList.remove('hidden');
     // Показати ігровий контейнер (виправлення)
     const gameContainer = document.getElementById('game-container');
     if (gameContainer) gameContainer.style.display = '';
@@ -129,12 +132,18 @@ export function showMainMenu(showModal, t, showRules, showControlsInfo, showBoar
 
 // Показувати ігровий контейнер при закритті меню
 export function hideMainMenu() {
+    // Сховати топ-контроли, якщо вони є
+    const topControls = document.getElementById('top-controls');
+    if (topControls) topControls.classList.add('hidden');
     const gameContainer = document.getElementById('game-container');
     if (gameContainer) gameContainer.style.display = '';
 }
 window.hideMainMenu = hideMainMenu;
 
 export function showOnlineGameMenu(showModal, t, hideModal, createRoom, joinRoom, showMainMenu) {
+    // Сховати топ-контроли, якщо вони є
+    const topControls = document.getElementById('top-controls');
+    if (topControls) topControls.classList.add('hidden');
     showModal(t('onlineMenu.title'), `<p>${t('onlineMenu.description')}</p>`, [
         { text: t('onlineMenu.createRoom'), class: "primary", onClick: () => { hideModal(); createRoom(); }},
         { text: t('onlineMenu.joinRoom'), class: "secondary", onClick: () => { hideModal(); joinRoom(); }},
@@ -143,24 +152,50 @@ export function showOnlineGameMenu(showModal, t, hideModal, createRoom, joinRoom
 }
 
 export function showRules(showModal, t, showMainMenu) {
+    // Сховати топ-контроли, якщо вони є
+    const topControls = document.getElementById('top-controls');
+    if (topControls) topControls.classList.add('hidden');
     showModal(t('rules.title'), `<p>${t('rules.goal')}</p><p><strong>${t('rules.blockedModeTitle')}</strong> ${t('rules.blockedModeDesc')}</p><p><strong>${t('rules.noMovesBtnTitle')}</strong> ${t('rules.noMovesBtnDesc')}</p>`,
         [{ text: t('common.back'), class: "primary", onClick: showMainMenu }]
     );
 }
 
 export function showControlsInfo(showModal, t, showMainMenu) {
+    // Сховати топ-контроли, якщо вони є
+    const topControls = document.getElementById('top-controls');
+    if (topControls) topControls.classList.add('hidden');
     showModal(t('controls.title'), `<p>${t('controls.desc')}</p><ul><li><b>${t('controls.arrows')}</b> - ${t('controls.direction')}</li><li><b>${t('controls.numbers')}</b> - ${t('controls.distance')}</li><li><b>${t('controls.confirmBtn')}</b> - ${t('controls.confirmMove')}</li><li><b>${t('controls.noMovesBtn')}</b> - ${t('controls.noMoves')}</li><li><b>${t('controls.hideBoard')}</b> - ${t('controls.memoryMode')}</li><li><b>${t('controls.blockedMode')}</b> - ${t('controls.blockedModeDesc')}</li></ul>`,
         [{ text: t('common.ok'), class: "primary", onClick: showMainMenu }]
     );
 }
 
 export function showBoardSizeSelection(showModal, t, showMainMenu, showRules, showControlsInfo, showOnlineGameMenu) {
-    let body = `<p>${t('boardSize.select')}</p><div id="board-size-selector" style="display:flex; flex-wrap:wrap; gap:10px;">`;
+    // Сховати топ-контроли, якщо вони є
+    const topControls = document.getElementById('top-controls');
+    if (topControls) topControls.classList.add('hidden');
+    let body = `<p class="board-size-label">${t('boardSize.select')}</p><div id="board-size-selector" style="display:flex; flex-wrap:wrap; gap:10px;">`;
     for (let i = 2; i <= 9; i++) {
         body += `<button class="modal-button secondary" onclick="window.global_startGame(${i})">${i}x${i}</button>`;
     }
     body += `</div>`;
     showModal(t('boardSize.title'), body, [{ text: t('common.backToMenu'), onClick: () => showMainMenu(showModal, t, showRules, showControlsInfo, showBoardSizeSelection, showOnlineGameMenu) }]);
+    // Після відображення модалки підганяємо розмір тексту
+    setTimeout(() => {
+        const label = document.querySelector('.board-size-label');
+        if (label) fitTextToContainer(label, 12, 32);
+    }, 0);
+}
+
+// Функція для підгонки розміру тексту під ширину контейнера
+function fitTextToContainer(element, minFontSize = 10, maxFontSize = 32) {
+    let fontSize = maxFontSize;
+    element.style.fontSize = fontSize + "px";
+    element.style.whiteSpace = "nowrap";
+    element.style.overflow = "hidden";
+    while (element.scrollWidth > element.clientWidth && fontSize > minFontSize) {
+        fontSize--;
+        element.style.fontSize = fontSize + "px";
+    }
 }
 
 export function initStyle(styleSelect) {

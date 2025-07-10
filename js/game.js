@@ -40,7 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let isConnected = false; // Чи підключені гравці
     let waitingForOpponent = false; // Очікування суперника
     let signalingSocket = null; // WebSocket для signaling
-    const version = "0.1";
+    const version = "0.1.1";
+
+    let firstMoveDone = false;
 
     // Безкоштовний signaling сервер
     const SIGNALING_SERVER = 'wss://signaling-server-1.glitch.me';
@@ -48,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameBoardEl = document.getElementById('game-board');
     const scoreDisplayEl = document.getElementById('score-display');
     const messageAreaEl = document.getElementById('message-area');
-    const hideBoardCheckbox = document.getElementById('hide-board-checkbox');
+    const showBoardCheckbox = document.getElementById('show-board-checkbox');
     const blockedModeCheckbox = document.getElementById('blocked-mode-checkbox');
     
     const visualControlsEl = document.getElementById('visual-controls');
@@ -56,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const distanceSelectorEl = document.getElementById('distance-selector');
     const confirmMoveBtn = document.getElementById('confirm-move-btn');
     const noMovesBtn = document.getElementById('no-moves-btn');
-    const debugMovesBtn = document.getElementById('debug-moves-btn');
     const styleSelect = document.getElementById('style-select');
     const computerMoveDisplayEl = document.getElementById('computer-move-display');
     const onlineCountEl = document.getElementById('online-count');
@@ -295,7 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
         board[startRow][startCol] = 1;
         console.log('[startGame] board after placing piece:', board);
         
-        hideBoardCheckbox.checked = false;
+        // При старті гри дошка завжди показана:
+        showBoardCheckbox.checked = true;
         gameBoardEl.classList.remove('board-hidden');
         renderBoard();
         generateDistanceButtons();
@@ -306,6 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageAreaEl.textContent = `Ваш хід: оберіть напрямок та відстань.${modeText}`;
         visualControlsEl.classList.remove('hidden');
         updateComputerMoveDisplay({});
+        firstMoveDone = false;
     }
 
     function processPlayerMove() {
@@ -392,6 +395,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 endGame(reason);
             }
         }
+        if (!firstMoveDone) {
+            showBoardCheckbox.checked = false;
+            toggleBoardVisibility();
+            firstMoveDone = true;
+        }
     }
 
     function checkNoMoves() {
@@ -441,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
             movesText += `${index + 1}. ${move.directionText} на ${move.distance} клітинку\n`;
         });
         
-        messageAreaEl.textContent = movesText;
+        // messageAreaEl.textContent = movesText; // Не показуємо доступні ходи у message-area
         
         // Не приховуємо доступні ходи автоматично, вони залишаються поки увімкнено чекбокс
     }
@@ -511,10 +519,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleBoardVisibility() {
-        if (hideBoardCheckbox.checked) {
+        const showMovesWrapper = document.getElementById('show-moves-checkbox-wrapper');
+        if (!showBoardCheckbox.checked) {
             gameBoardEl.classList.add('board-hidden');
+            if (showMovesWrapper) showMovesWrapper.style.display = 'none';
         } else {
             gameBoardEl.classList.remove('board-hidden');
+            if (showMovesWrapper) showMovesWrapper.style.display = '';
         }
     }
 
@@ -629,9 +640,8 @@ document.addEventListener('DOMContentLoaded', () => {
     distanceSelectorEl.addEventListener('click', handleDistanceSelect);
     confirmMoveBtn.addEventListener('click', processPlayerMove);
     noMovesBtn.addEventListener('click', checkNoMoves);
-    debugMovesBtn.addEventListener('click', showAvailableMoves);
     // styleSelect.addEventListener('change', () => changeStyle(styleSelect)); // Більше не потрібно
-    hideBoardCheckbox.addEventListener('change', toggleBoardVisibility);
+    showBoardCheckbox.addEventListener('change', toggleBoardVisibility);
     blockedModeCheckbox.addEventListener('change', () => {
         blockedMode = blockedModeCheckbox.checked;
         window.showingAvailableMoves = false;
@@ -665,5 +675,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Оновлений виклик головного меню:
     openMainMenu();
     window.global_startGame = startGame;
+
+    const menuBtn = document.getElementById('menu-btn');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', openMainMenu);
+    }
 });
 

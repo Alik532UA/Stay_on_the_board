@@ -62,25 +62,44 @@
                 <li class="lang-option" data-lang="crh"><span class="flag flag-crh"></span></li>
             </ul>
         </div>
-        <a href="https://send.monobank.ua/jar/8TPmFKQTCK/" target="_blank" id="donate-btn" class="icon-btn" title="Підтримати проєкт">
+        
+        <a href="https://send.monobank.ua/jar/8TPmFKQTCK/" target="_blank"  id="donate-btn" class="icon-btn" title="Підтримати проєкт">
             <span>💰</span>
         </a>
+        <script>
+        // Динамічно змінюємо посилання для donate-btn залежно від пристрою
+        (function() {
+            var btn = document.getElementById('donate-btn');
+            if (!btn) return;
+            var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            btn.href = isMobile
+                ? 'https://send.monobank.ua/jar/8TPmFKQTCK'
+                : 'https://send.monobank.ua/jar/8TPmFKQTCK/';
+        })();
+        </script>
     </div>
     
     <div id="game-container">
         <header>
             <h1 style="text-align: center;">Залишитися на дошці</h1>
-            <div class="score-panel">
-                <span>Очки: <span id="score-display">0</span></span>
-                <span class="online-users">👥 Онлайн: <span id="online-count">1</span></span>
-            </div>
         </header>
-        
-        <div id="board-options">
-            <label for="hide-board-checkbox">
-                Приховати дошку
+        <div id="game-board">
+            <!-- Клітинки дошки будуть згенеровані тут -->
+        </div>
+        <div id="show-moves-checkbox-wrapper">
+            <label for="show-moves-checkbox">
+                Показувати доступні ходи
                 <span class="ios-switch">
-                    <input type="checkbox" id="hide-board-checkbox">
+                    <input type="checkbox" id="show-moves-checkbox">
+                    <span class="slider"></span>
+                </span>
+            </label>
+        </div>
+        <div id="board-options">
+            <label for="show-board-checkbox">
+                Показати дошку
+                <span class="ios-switch">
+                    <input type="checkbox" id="show-board-checkbox" checked>
                     <span class="slider"></span>
                 </span>
             </label>
@@ -91,58 +110,37 @@
                     <span class="slider"></span>
                 </span>
             </label>
-            <label for="show-moves-checkbox">
-                Показувати доступні ходи
-                <span class="ios-switch">
-                    <input type="checkbox" id="show-moves-checkbox">
-                    <span class="slider"></span>
-                </span>
-            </label>
         </div>
-
-        <div id="game-board">
-            <!-- Клітинки дошки будуть згенеровані тут -->
-        </div>
-
-        <div id="ui-panel">
-            <p id="message-area">Вітаємо! Оберіть режим гри в головному меню.</p>
-            
-            <!-- ОНОВЛЕНА ПАНЕЛЬ ОНЛАЙН ГРИ -->
-            <div id="online-game-panel" class="hidden">
-                <div id="connection-status">
-                    <span id="connection-indicator">🔴</span>
-                    <span id="connection-text">Не підключено</span>
-                </div>
-                
-                <div id="game-info" class="hidden">
-                    <span id="player-turn-indicator">Ваш хід</span>
-                    <span id="opponent-name">Суперник</span>
-                </div>
+        <div id="visual-controls" class="hidden">
+            <div id="direction-grid">
+                <button class="control-btn" data-direction="7">↖</button>
+                <button class="control-btn" data-direction="8">↑</button>
+                <button class="control-btn" data-direction="9">↗</button>
+                <button class="control-btn" data-direction="4">←</button>
+                <div id="computer-move-display">Хід<br>Комп'ютера</div>
+                <button class="control-btn" data-direction="6">→</button>
+                <button class="control-btn" data-direction="1">↙</button>
+                <button class="control-btn" data-direction="2">↓</button>
+                <button class="control-btn" data-direction="3">↘</button>
             </div>
-            
-            <div id="visual-controls" class="hidden">
-                <div id="direction-grid">
-                    <button class="control-btn" data-direction="7">↖</button>
-                    <button class="control-btn" data-direction="8">↑</button>
-                    <button class="control-btn" data-direction="9">↗</button>
-                    <button class="control-btn" data-direction="4">←</button>
-                    <div id="computer-move-display">Хід<br>Комп'ютера</div>
-                    <button class="control-btn" data-direction="6">→</button>
-                    <button class="control-btn" data-direction="1">↙</button>
-                    <button class="control-btn" data-direction="2">↓</button>
-                    <button class="control-btn" data-direction="3">↘</button>
-                </div>
-
-                <p class="controls-label">Оберіть відстань:</p>
-                <div id="distance-selector">
-                    <!-- Кнопки відстані будуть згенеровані тут -->
-                </div>
-
-                <button id="confirm-move-btn">Підтвердити хід</button>
-                <button id="no-moves-btn">Мені немає куди ходити</button>
-                <button id="debug-moves-btn">Показати доступні ходи</button>
+            <p class="controls-label">Оберіть відстань:</p>
+            <div id="distance-selector">
+                <!-- Кнопки відстані будуть згенеровані тут -->
             </div>
+            <button id="confirm-move-btn">Підтвердити хід</button>
+            <button id="no-moves-btn">Мені немає куди ходити</button>
         </div>
+        <p id="message-area">Вітаємо! Оберіть режим гри в головному меню.</p>
+        <div class="score-panel">
+            <span>Очки: <span id="score-display">0</span></span>
+            <span class="online-users">👥 Онлайн: <span id="online-count">1</span></span>
+        </div>
+        <!-- Все інше, що було у game-container, залишаємо нижче -->
+        <div id="ui-panel" style="display:none"><!-- приховано, щоб не дублювати message-area та visual-controls --></div>
+        <div id="online-game-panel" class="hidden"><!-- перенесено у visual-controls --></div>
+        <button id="menu-btn" class="icon-btn" title="Вийти в меню" aria-label="Вийти в меню" style="position: absolute; left: 50%; transform: translateX(-50%); top: 0px; z-index: 10;">
+            🏠
+        </button>
     </div>
 
     <!-- Модальне вікно -->
