@@ -14,7 +14,7 @@ import { speakMove, speakGameMessage, stopSpeaking, isSpeechEnabled, initVoices,
 document.addEventListener('DOMContentLoaded', () => {
     function loadLanguage(lang) {
         window.translations = window.translationsAll[lang];
-        currentLang = lang;
+        // currentLang = lang; // видалено, бо не оголошено
         localStorage.setItem('lang', lang);
         updateUIWithLanguage();
         
@@ -51,6 +51,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (showMovesLabel) {
             showMovesLabel.textContent = t('controls.showMoves');
         }
+        // Оновлюємо підпис "Оберіть відстань:"
+        const selectDistanceLabel = document.getElementById('select-distance-label');
+        if (selectDistanceLabel) {
+            selectDistanceLabel.textContent = t('ui.selectDistance');
+        }
+        // Оновлюємо підпис "Очки:"
+        const scoreLabel = document.getElementById('score-label');
+        if (scoreLabel) {
+            scoreLabel.childNodes[0].textContent = t('ui.score') + ': ';
+        }
+        // Оновлюємо підпис "Онлайн:"
+        const onlineLabel = document.getElementById('online-label');
+        if (onlineLabel) {
+            // Зберігаємо іконку
+            const icon = onlineLabel.querySelector('span');
+            onlineLabel.innerHTML = '';
+            if (icon) onlineLabel.appendChild(icon);
+            onlineLabel.appendChild(document.createTextNode(' ' + t('ui.online') + ': '));
+            const onlineCount = document.getElementById('online-count');
+            if (onlineCount) onlineLabel.appendChild(onlineCount);
+        }
         
         // Оновлюємо кнопки
         const confirmMoveBtn = document.getElementById('confirm-move-btn');
@@ -81,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isConnected = false; // Чи підключені гравці
     let waitingForOpponent = false; // Очікування суперника
     let signalingSocket = null; // WebSocket для signaling
-    const version = "0.1.2";
+    const version = "0.1.3";
 
     let currentGameMode = 'vsComputer'; // 'vsComputer' або 'localTwoPlayer'
     let currentPlayer = 1; // 1 або 2 для режиму localTwoPlayer
@@ -322,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const langDropdown = document.getElementById('lang-dropdown');
     const langFlag = document.getElementById('lang-flag');
     const langOptions = document.querySelectorAll('.lang-option');
-    const flagMap = { uk: 'flag-uk', en: 'flag-en', crh: 'flag-crh' };
+    const flagMap = { uk: 'flag-uk', en: 'flag-en', crh: 'flag-crh', nl: 'flag-nl' };
 
     // Відкрити/закрити дропдауни
     if (themeStyleBtn && themeStyleDropdown) {
@@ -365,11 +386,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Стиль
     const styleNames = {
-        classic: { uk: 'Ubuntu', en: 'Ubuntu', crh: 'Ubuntu' },
-        peak: { uk: 'PEAK', en: 'PEAK', crh: 'PEAK' },
-        cs2: { uk: 'CS 2', en: 'CS 2', crh: 'CS 2' },
-        glass: { uk: 'Glassmorphism', en: 'Glassmorphism', crh: 'Glassmorphism' },
-        material: { uk: 'Material You', en: 'Material You', crh: 'Material You' }
+        classic: { uk: 'Ubuntu', en: 'Ubuntu', crh: 'Ubuntu', nl: 'Ubuntu' },
+        peak: { uk: 'PEAK', en: 'PEAK', crh: 'PEAK', nl: 'PEAK' },
+        cs2: { uk: 'CS 2', en: 'CS 2', crh: 'CS 2', nl: 'CS 2' },
+        glass: { uk: 'Glassmorphism', en: 'Glassmorphism', crh: 'Glassmorphism', nl: 'Glassmorphism' },
+        material: { uk: 'Material You', en: 'Material You', crh: 'Material You', nl: 'Material You' }
     };
     function updateStyleDropdownLang() {
         const lang = localStorage.getItem('lang') || 'uk';
@@ -406,11 +427,11 @@ document.addEventListener('DOMContentLoaded', () => {
     langOptions.forEach(opt => {
         opt.addEventListener('click', () => {
             const lang = opt.getAttribute('data-lang');
-            localStorage.setItem('lang', lang);
-            alert('Зміни мови застосуються після перезавантаження сторінки.\nLanguage changes will apply after page reload.\nTilni deñiştirmek içün saifeni qayta yükleñiz.');
+            // localStorage.setItem('lang', lang);
+            loadLanguage(lang); // одразу застосовуємо переклад
+            alert('Зміни мови застосуються після перезавантаження сторінки.\nLanguage changes will apply after page reload.\nTilni deñiştirmek içün saifeni qayta yükleñiz.\nTaalwijzigingen worden toegepast na het herladen van de pagina.');
             updateLangFlag();
             langDropdown.classList.add('hidden');
-            // loadLanguage(lang); // якщо потрібно одразу застосовувати
         });
     });
     updateLangFlag();
@@ -1020,4 +1041,30 @@ document.addEventListener('keydown', function(e) {
         e.preventDefault();
     }
 });
+
+const APP_VERSION = "0.1.3";
+(function checkAppVersionAndClearCacheIfNeeded() {
+    try {
+        const storedVersion = localStorage.getItem('appVersion');
+        if (storedVersion && storedVersion !== APP_VERSION) {
+            // Очищення localStorage, sessionStorage
+            localStorage.clear();
+            sessionStorage.clear();
+            // Очищення cookies
+            document.cookie.split(';').forEach(function(c) {
+                document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
+            });
+            // Оновлюємо версію
+            localStorage.setItem('appVersion', APP_VERSION);
+            // Перезавантаження сторінки
+            window.location.reload();
+        } else {
+            // Якщо версія не збережена або співпадає, просто оновлюємо версію
+            localStorage.setItem('appVersion', APP_VERSION);
+        }
+    } catch (e) {
+        // Якщо щось пішло не так, не блокуємо завантаження сайту
+        console.error('Version check/cache clear error:', e);
+    }
+})();
 

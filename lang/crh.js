@@ -10,7 +10,8 @@ export default {
     playOnline: "Onlayn oyna",
     localGame: "Mahalliy oyun",
     donate: "Bağış",
-    ubuntu: "Ubuntu"
+    ubuntu: "Ubuntu",
+    clearCache: "Keşi temizle"
   },
   onlineMenu: {
     title: "Onlayn Oyun",
@@ -72,5 +73,17 @@ export default {
     player2Name: "2-nci Oyuncınıñ Adı:",
     player1DefaultName: "1-inci Oyunci",
     player2DefaultName: "2-nci Oyunci"
+  },
+  ui: {
+    showMoves: "Mümkün hareketlerini köster",
+    showBoard: "Tahtanı köster",
+    blockedMode: "Bloklanğan hucre rejimi",
+    speechEnabled: "Sesli bildirim",
+    selectDistance: "Mesafeni sayla:",
+    confirmMove: "Hareketni tasdiqla",
+    noMoves: "Yürüyecek yolım yoq",
+    yourMove: "Sizniñ yürüviñiz: istiqamet ve mesafeni saylañız.",
+    score: "Oçko",
+    online: "Onlayn"
   }
 }; 

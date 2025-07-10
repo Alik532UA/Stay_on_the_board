@@ -104,6 +104,7 @@ export function showMainMenu(showModal, t, showRules, showControlsInfo, onVsComp
             <button class="modal-button secondary" id="btn-online">${t('mainMenu.playOnline')}</button>
             <button class="modal-button secondary" id="btn-controls">${t('mainMenu.controls')}</button>
             <button class="modal-button secondary" id="btn-rules">${t('mainMenu.rules')}</button>
+            <button class="modal-button danger" id="btn-clear-cache">${t('mainMenu.clearCache')}</button>
         </div>`,
         []
     );
@@ -115,6 +116,7 @@ export function showMainMenu(showModal, t, showRules, showControlsInfo, onVsComp
         const btnControls = document.getElementById('btn-controls');
         const btnRules = document.getElementById('btn-rules');
         const btnDonate = document.getElementById('btn-donate');
+        const btnClearCache = document.getElementById('btn-clear-cache');
         if (btnVsComputer && onVsComputer) btnVsComputer.onclick = onVsComputer;
         if (btnLocalGame && onLocalGame) btnLocalGame.onclick = onLocalGame;
 
@@ -125,6 +127,17 @@ export function showMainMenu(showModal, t, showRules, showControlsInfo, onVsComp
         if (btnControls) btnControls.onclick = () => showControlsInfo(showModal, t, () => showMainMenu(showModal, t, showRules, showControlsInfo, onVsComputer, onLocalGame, onOnline, onDonate));
         if (btnRules) btnRules.onclick = () => showRules(showModal, t, () => showMainMenu(showModal, t, showRules, showControlsInfo, onVsComputer, onLocalGame, onOnline, onDonate));
         if (btnDonate && onDonate) btnDonate.onclick = () => showStub(t('mainMenu.donate'));
+        if (btnClearCache) btnClearCache.onclick = () => {
+            // Очищення localStorage, sessionStorage
+            localStorage.clear();
+            sessionStorage.clear();
+            // Очищення cookies
+            document.cookie.split(';').forEach(function(c) {
+                document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
+            });
+            // Перезавантаження сторінки
+            window.location.reload();
+        };
     }, 0);
 }
 

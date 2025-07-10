@@ -10,7 +10,8 @@ export default {
     playOnline: "Play Online",
     localGame: "Local Game",
     donate: "Donate",
-    ubuntu: "Ubuntu"
+    ubuntu: "Ubuntu",
+    clearCache: "Clear cache"
   },
   onlineMenu: {
     title: "Online Game",
@@ -72,5 +73,17 @@ export default {
     inDevelopment: "This feature is in development.",
     confirmMove: "Confirm Move",
     noMoves: "I have no moves"
+  },
+  ui: {
+    showMoves: "Show available moves",
+    showBoard: "Show board",
+    blockedMode: "Blocked cells mode",
+    speechEnabled: "Speech enabled",
+    selectDistance: "Select distance:",
+    confirmMove: "Confirm Move",
+    noMoves: "I have no moves",
+    yourMove: "Your move: select direction and distance.",
+    score: "Score",
+    online: "Online"
   }
 }; 

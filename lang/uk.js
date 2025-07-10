@@ -10,7 +10,8 @@ export default {
     playOnline: "Грати онлайн",
     localGame: "Локальна гра",
     donate: "Донат",
-    startGame: "Почати гру"
+    startGame: "Почати гру",
+    clearCache: "Очистити кеш"
   },
   onlineMenu: {
     title: "Онлайн гра",
@@ -72,5 +73,17 @@ export default {
     inDevelopment: "Ця функція ще в розробці.",
     confirmMove: "Підтвердити хід",
     noMoves: "Мені немає куди ходити"
+  },
+  ui: {
+    showMoves: "Показувати доступні ходи",
+    showBoard: "Показати дошку",
+    blockedMode: "Режим заблокованих клітинок",
+    speechEnabled: "Озвучування ходів",
+    selectDistance: "Оберіть відстань:",
+    confirmMove: "Підтвердити хід",
+    noMoves: "Мені немає куди ходити",
+    yourMove: "Ваш хід: оберіть напрямок та відстань.",
+    score: "Очки",
+    online: "Онлайн"
   }
 }; 
