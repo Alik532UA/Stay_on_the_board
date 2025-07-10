@@ -1,6 +1,13 @@
 // === МОВНА ПІДТРИМКА ===
-import { findPiece, hasValidMoves, getAllValidMoves, getDirectionDelta, getDirectionText, getDirectionArrow } from './game-core.js';
-import { showModal, hideModal, renderBoard, toggleBoardVisibility, generateDistanceButtons, handleDirectionSelect, handleDistanceSelect, resetSelections, showMainMenu, showOnlineGameMenu, showRules, showControlsInfo, showBoardSizeSelection, initStyle, changeStyle, initTheme, toggleTheme, initOnlineUsers } from './ui.js';
+import {
+    findPiece, hasValidMoves, getAllValidMoves, getDirectionDelta, getDirectionText, getDirectionArrow
+} from './game-core.js';
+import {
+    showModal, hideModal, renderBoard, toggleBoardVisibility, generateDistanceButtons,
+    handleDirectionSelect, handleDistanceSelect, resetSelections, showMainMenu, showOnlineGameMenu,
+    showRules, showControlsInfo, showBoardSizeSelection, initStyle, changeStyle, initTheme,
+    toggleTheme, initOnlineUsers, showPlayerNameInput
+} from './ui.js';
 import { t, loadLanguage, updateUIWithLanguage } from './localization.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -40,7 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let isConnected = false; // Чи підключені гравці
     let waitingForOpponent = false; // Очікування суперника
     let signalingSocket = null; // WebSocket для signaling
-    const version = "0.1.1";
+    const version = "0.1.2";
+
+    let currentGameMode = 'vsComputer'; // 'vsComputer' або 'localTwoPlayer'
+    let currentPlayer = 1; // 1 або 2 для режиму localTwoPlayer
+    let player1Name = 'Гравець 1';
+    let player2Name = 'Гравець 2';
 
     let firstMoveDone = false;
 
@@ -62,12 +74,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const computerMoveDisplayEl = document.getElementById('computer-move-display');
     const onlineCountEl = document.getElementById('online-count');
     const showMovesCheckbox = document.getElementById('show-moves-checkbox');
+    const player1Glow = document.getElementById('player1-glow');
+    const player2Glow = document.getElementById('player2-glow');
 
     function updateComputerMoveDisplay({direction, distance, isComputer, isPlayer}) {
         const el = computerMoveDisplayEl;
         if (!el) return;
         let html = '';
-        let color = isComputer ? '#d32f2f' : (isPlayer ? '#1976d2' : '');
+        let color = ''; // Default empty
+
+        if (isComputer) {
+            color = '#d32f2f'; // Computer is always red
+        } else if (isPlayer) {
+            if (currentGameMode === 'localTwoPlayer') {
+                color = currentPlayer === 1 ? '#1976d2' : '#ff9800'; // Player 1 blue, Player 2 orange
+            } else {
+                color = '#1976d2'; // Default player color
+            }
+        }
+
         el.classList.remove('confirm-btn-active');
         el.onclick = null;
         if (isComputer || isPlayer) {
@@ -279,7 +304,19 @@ document.addEventListener('DOMContentLoaded', () => {
         scoreDisplayEl.textContent = points;
     }
 
-    function startGame(size) {
+    function updatePlayerGlow() {
+        if (currentGameMode !== 'localTwoPlayer' || !isPlayerTurn) {
+            player1Glow.classList.remove('visible');
+            player2Glow.classList.remove('visible');
+            return;
+        }
+
+        player1Glow.classList.toggle('visible', currentPlayer === 1);
+        player2Glow.classList.toggle('visible', currentPlayer === 2);
+    }
+
+    function startGame(size, gameMode = 'vsComputer') {
+        currentGameMode = gameMode;
         numberCells = size;
         points = 0;
         isPlayerTurn = true;
@@ -305,10 +342,16 @@ document.addEventListener('DOMContentLoaded', () => {
         hideModal();
         
         const modeText = blockedMode ? " (режим заблокованих клітинок)" : "";
-        messageAreaEl.textContent = `Ваш хід: оберіть напрямок та відстань.${modeText}`;
+        if (currentGameMode === 'localTwoPlayer') {
+            currentPlayer = 1;
+            messageAreaEl.textContent = `Хід гравця ${player1Name}: оберіть напрямок та відстань.${modeText}`;
+        } else {
+            messageAreaEl.textContent = `Ваш хід: оберіть напрямок та відстань.${modeText}`;
+        }
         visualControlsEl.classList.remove('hidden');
         updateComputerMoveDisplay({});
         firstMoveDone = false;
+        updatePlayerGlow();
     }
 
     function processPlayerMove() {
@@ -343,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isOnlineGame) {
                     endOnlineGame(reason);
                 } else {
-                    endGame(reason);
+                    endGame(reason, false);
                 }
                 return;
             }
@@ -378,9 +421,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     distance: selectedDistance
                 };
                 sendMoveToOpponent(move);
-            } else {
+            } else if (currentGameMode === 'vsComputer') {
                 setTimeout(computerMove, 1000);
+            } else if (currentGameMode === 'localTwoPlayer') {
+                currentPlayer = (currentPlayer === 1) ? 2 : 1;
+                const nextPlayerName = (currentPlayer === 1) ? player1Name : player2Name;
+                isPlayerTurn = true;
+                messageAreaEl.textContent = `Хід гравця ${nextPlayerName}. Оберіть напрямок та відстань.`;
+                // Оновлюємо доступні ходи для наступного гравця, якщо чекбокс увімкнено
+                if (showMovesCheckbox && showMovesCheckbox.checked) {
+                    window.availableMoves = null;
+                    window.showingAvailableMoves = false;
+                    showAvailableMoves();
+                }
             }
+            updatePlayerGlow();
             // Після всіх змін — якщо чекбокс увімкнено, показати доступні ходи для наступного ходу
             if (showMovesCheckbox && showMovesCheckbox.checked) {
                 showAvailableMoves();
@@ -392,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isOnlineGame) {
                 endOnlineGame(reason);
             } else {
-                endGame(reason);
+                endGame(reason, false);
             }
         }
         if (!firstMoveDone) {
@@ -410,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isOnlineGame) {
                 endOnlineGame(reason);
             } else {
-                endGame(reason);
+                endGame(reason, false);
             }
         } else {
             const reason = "Ви правильно визначили відсутність ходів. Ви перемогли!";
@@ -424,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 endOnlineGame(reason);
             } else {
-                endGame(reason);
+                endGame(reason, true); // true означає, що гравець переміг
             }
         }
     }
@@ -505,14 +560,24 @@ document.addEventListener('DOMContentLoaded', () => {
         // setTimeout видалено, центр не очищається автоматично
     }
 
-    function endGame(reason) {
+    function endGame(reason, isWin = false) {
         isPlayerTurn = false;
         visualControlsEl.classList.add('hidden');
+
+        let title = isWin ? "Перемога!" : "Гра закінчена!";
+        let finalReason = reason;
+
+        if (currentGameMode === 'localTwoPlayer' && !isWin) {
+            const loserName = (currentPlayer === 1) ? player1Name : player2Name;
+            finalReason = `Гравець ${loserName} програв. ${reason}`;
+        }
+        updatePlayerGlow();
+
         showModal(
-            "Гра закінчена!",
-            `<p>${reason}</p><p><strong>Кількість набраних очок: ${points}</strong></p><p>Версія гри: ${version}</p>`,
+            title,
+            `<p>${finalReason}</p><p><strong>Кількість набраних очок: ${points}</strong></p><p>Версія гри: ${version}</p>`,
             [
-                { text: "Вибрати розмір дошки", class: "primary", onClick: openBoardSizeSelection },
+                { text: "Вибрати розмір дошки", class: "primary", onClick: () => openBoardSizeSelection(currentGameMode) },
                 { text: "Меню", onClick: openMainMenu }
             ]
         );
@@ -617,14 +682,43 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Меню-функції з замиканнями для коректної навігації ---
     function openMainMenu() {
         showMainMenu(
-            showModal, t, openRules, openControlsInfo, openBoardSizeSelection, openOnlineGameMenu
+            showModal,
+            t,
+            openRules,
+            openControlsInfo,
+            () => openBoardSizeSelection('vsComputer'),
+            () => openBoardSizeSelection('localTwoPlayer'),
+            openOnlineGameMenu,
+            () => { /* Логіка для донату, якщо потрібна */ }
         );
     }
-    function openBoardSizeSelection() {
-        showBoardSizeSelection(
-            showModal, t, openMainMenu, openRules, openControlsInfo, openOnlineGameMenu
-        );
+    function openBoardSizeSelection(gameMode = 'vsComputer') {
+        if (gameMode === 'localTwoPlayer') {
+            // Спочатку вибір розміру, потім імена
+            showBoardSizeSelection(
+                showModal,
+                t,
+                (size) => openPlayerNameInput(size, gameMode), // callback, що викликає ввід імен
+                openMainMenu
+            );
+        } else {
+            showBoardSizeSelection(
+                showModal,
+                t,
+                (size) => startGame(size, gameMode), // callback, що одразу стартує гру
+                openMainMenu
+            );
+        }
     }
+
+    function openPlayerNameInput(size, gameMode) {
+        showPlayerNameInput(showModal, t, (p1Name, p2Name) => {
+            player1Name = p1Name;
+            player2Name = p2Name;
+            startGame(size, gameMode);
+        });
+    }
+
     function openRules() {
         showRules(showModal, t, openMainMenu);
     }

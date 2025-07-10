@@ -83,7 +83,7 @@ export function resetSelections() {
     document.querySelectorAll('.control-btn, .distance-btn').forEach(btn => btn.classList.remove('selected'));
 }
 
-export function showMainMenu(showModal, t, showRules, showControlsInfo, showBoardSizeSelection, showOnlineGameMenu) {
+export function showMainMenu(showModal, t, showRules, showControlsInfo, onVsComputer, onLocalGame, onOnline, onDonate) {
     // Показати топ-контроли тільки в головному меню
     const topControls = document.getElementById('top-controls');
     if (topControls) topControls.classList.remove('hidden');
@@ -92,7 +92,7 @@ export function showMainMenu(showModal, t, showRules, showControlsInfo, showBoar
     if (gameContainer) gameContainer.style.display = '';
     function showStub(title) {
         showModal(title, '<p style="text-align:center;">' + t('common.inDevelopment') + '</p>', [
-            { text: t('common.back'), class: 'primary', onClick: () => showMainMenu(showModal, t, showRules, showControlsInfo, showBoardSizeSelection, showOnlineGameMenu) }
+            { text: t('common.back'), class: 'primary', onClick: () => showMainMenu(showModal, t, showRules, showControlsInfo, onVsComputer, onLocalGame, onOnline, onDonate) }
         ]);
     }
     showModal(
@@ -115,18 +115,16 @@ export function showMainMenu(showModal, t, showRules, showControlsInfo, showBoar
         const btnControls = document.getElementById('btn-controls');
         const btnRules = document.getElementById('btn-rules');
         const btnDonate = document.getElementById('btn-donate');
-        if (btnVsComputer) btnVsComputer.onclick = () => showBoardSizeSelection(showModal, t, showMainMenu, showRules, showControlsInfo, showOnlineGameMenu);
-        if (btnLocalGame) {
-            btnLocalGame.disabled = true;
-            btnLocalGame.classList.add('disabled');
-        }
+        if (btnVsComputer && onVsComputer) btnVsComputer.onclick = onVsComputer;
+        if (btnLocalGame && onLocalGame) btnLocalGame.onclick = onLocalGame;
+
         if (btnOnline) {
             btnOnline.disabled = true;
             btnOnline.classList.add('disabled');
         }
-        if (btnControls) btnControls.onclick = () => showControlsInfo(showModal, t, showMainMenu);
-        if (btnRules) btnRules.onclick = () => showRules(showModal, t, showMainMenu);
-        if (btnDonate) btnDonate.onclick = () => showStub(t('mainMenu.donate'));
+        if (btnControls) btnControls.onclick = () => showControlsInfo(showModal, t, () => showMainMenu(showModal, t, showRules, showControlsInfo, onVsComputer, onLocalGame, onOnline, onDonate));
+        if (btnRules) btnRules.onclick = () => showRules(showModal, t, () => showMainMenu(showModal, t, showRules, showControlsInfo, onVsComputer, onLocalGame, onOnline, onDonate));
+        if (btnDonate && onDonate) btnDonate.onclick = () => showStub(t('mainMenu.donate'));
     }, 0);
 }
 
@@ -169,21 +167,57 @@ export function showControlsInfo(showModal, t, showMainMenu) {
     );
 }
 
-export function showBoardSizeSelection(showModal, t, showMainMenu, showRules, showControlsInfo, showOnlineGameMenu) {
+export function showBoardSizeSelection(showModal, t, onSizeSelect, onBack) {
     // Сховати топ-контроли, якщо вони є
     const topControls = document.getElementById('top-controls');
     if (topControls) topControls.classList.add('hidden');
-    let body = `<p class="board-size-label">${t('boardSize.select')}</p><div id="board-size-selector" style="display:flex; flex-wrap:wrap; gap:10px;">`;
-    for (let i = 2; i <= 9; i++) {
-        body += `<button class="modal-button secondary" onclick="window.global_startGame(${i})">${i}x${i}</button>`;
-    }
-    body += `</div>`;
-    showModal(t('boardSize.title'), body, [{ text: t('common.backToMenu'), onClick: () => showMainMenu(showModal, t, showRules, showControlsInfo, showBoardSizeSelection, showOnlineGameMenu) }]);
+    const body = `<p class="board-size-label">${t('boardSize.select')}</p><div id="board-size-selector" style="display:flex; flex-wrap:wrap; gap:10px;"></div>`;
+
+    // Використовуємо setTimeout, щоб DOM встиг оновитися
+    setTimeout(() => {
+        const selector = document.getElementById('board-size-selector');
+        if (!selector) return;
+        selector.innerHTML = ''; // Очищаємо, щоб уникнути дублікатів
+        for (let i = 2; i <= 9; i++) {
+            const button = document.createElement('button');
+            button.className = 'modal-button secondary';
+            button.textContent = `${i}x${i}`;
+            button.onclick = () => onSizeSelect(i);
+            selector.appendChild(button);
+        }
+    }, 0);
+
+    showModal(t('boardSize.title'), body, [{ text: t('common.backToMenu'), onClick: onBack }]);
     // Після відображення модалки підганяємо розмір тексту
     setTimeout(() => {
         const label = document.querySelector('.board-size-label');
         if (label) fitTextToContainer(label, 12, 32);
     }, 0);
+}
+
+export function showPlayerNameInput(showModal, t, callback) {
+    const body = `
+        <div class="player-name-input-container">
+            <label for="player1-name" class="modal-label">${t('localGame.player1Name')}</label>
+            <input type="text" id="player1-name" class="modal-input" value="${t('localGame.player1DefaultName')}">
+        </div>
+        <div class="player-name-input-container">
+            <label for="player2-name" class="modal-label">${t('localGame.player2Name')}</label>
+            <input type="text" id="player2-name" class="modal-input" value="${t('localGame.player2DefaultName')}">
+        </div>
+    `;
+    const buttons = [
+        {
+            text: t('mainMenu.startGame'),
+            class: 'primary',
+            onClick: () => {
+                const player1Name = document.getElementById('player1-name').value || t('localGame.player1DefaultName');
+                const player2Name = document.getElementById('player2-name').value || t('localGame.player2DefaultName');
+                callback(player1Name, player2Name);
+            }
+        }
+    ];
+    showModal(t('localGame.enterNames'), body, buttons);
 }
 
 // Функція для підгонки розміру тексту під ширину контейнера

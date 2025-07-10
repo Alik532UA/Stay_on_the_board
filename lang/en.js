@@ -19,6 +19,13 @@ export default {
     joinRoom: "Join Room",
     back: "Back"
   },
+  localGame: {
+    enterNames: "Enter Player Names",
+    player1Name: "Player 1 Name:",
+    player2Name: "Player 2 Name:",
+    player1DefaultName: "Player 1",
+    player2DefaultName: "Player 2"
+  },
   rules: {
     title: "Game Rules",
     goal: "The goal is to keep the piece on the board as long as possible. You and the computer take turns moving the piece. If your move takes the piece off the board, you lose.",

@@ -60,5 +60,12 @@ export default {
     ok: "Anladım",
     backToMenu: "Menüge qayt",
     inDevelopment: "Bu funksiya daa işlenilmekte."
+  },
+  localGame: {
+    enterNames: "Oyuncılarnıñ adlarını kirsetiñiz",
+    player1Name: "1-inci Oyuncınıñ Adı:",
+    player2Name: "2-nci Oyuncınıñ Adı:",
+    player1DefaultName: "1-inci Oyunci",
+    player2DefaultName: "2-nci Oyunci"
   }
 }; 
