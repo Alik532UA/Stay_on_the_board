@@ -197,13 +197,9 @@ export function showBoardSizeSelection(showModal, t, onSizeSelect, onBack) {
 
 export function showPlayerNameInput(showModal, t, callback) {
     const body = `
-        <div class="player-name-input-container">
-            <label for="player1-name" class="modal-label">${t('localGame.player1Name')}</label>
-            <input type="text" id="player1-name" class="modal-input" value="${t('localGame.player1DefaultName')}">
-        </div>
-        <div class="player-name-input-container">
-            <label for="player2-name" class="modal-label">${t('localGame.player2Name')}</label>
-            <input type="text" id="player2-name" class="modal-input" value="${t('localGame.player2DefaultName')}">
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 18px; margin: 24px 0 12px 0;">
+            <input type="text" id="player1-name" class="modal-input player-name-inline" style="text-align:center; width: 44%; max-width: 180px; font-size: 1.15em; border: 2px solid var(--control-selected); border-radius: 10px;" value="${t('localGame.player1DefaultName')}">
+            <input type="text" id="player2-name" class="modal-input player-name-inline" style="text-align:center; width: 44%; max-width: 180px; font-size: 1.15em; border: 2px solid var(--control-selected); border-radius: 10px;" value="${t('localGame.player2DefaultName')}">
         </div>
     `;
     const buttons = [

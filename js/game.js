@@ -791,3 +791,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+document.addEventListener('keydown', function(e) {
+    // Якщо фокус у полі вводу, не реагуємо
+    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
+    // NUMPAD: 97-105 (1-9), 101 (5)
+    const keyToDir = {
+        103: 7, // NUM 7
+        104: 8, // NUM 8
+        105: 9, // NUM 9
+        100: 4, // NUM 4
+        102: 6, // NUM 6
+        97: 1,  // NUM 1
+        98: 2,  // NUM 2
+        99: 3,  // NUM 3
+        // Літери
+        81: 7, // Q
+        87: 8, // W
+        69: 9, // E
+        65: 4, // A
+        68: 6, // D
+        90: 1, // Z
+        83: 2, // S
+        88: 2, // X (альтернатива для ↓)
+        67: 3  // C
+    };
+    if (e.keyCode in keyToDir) {
+        const dir = keyToDir[e.keyCode];
+        const btn = document.getElementById('dir-' + dir);
+        if (btn) btn.click();
+        e.preventDefault();
+    } else if (e.keyCode === 101 || e.key === 'Enter' || e.key === ' ' ) { // NUM 5, Enter, Space
+        const confirmBtn = document.getElementById('confirm-move-btn');
+        if (confirmBtn) confirmBtn.click();
+        e.preventDefault();
+    } else if (e.key === 'Backspace') {
+        const noMovesBtn = document.getElementById('no-moves-btn');
+        if (noMovesBtn) noMovesBtn.click();
+        e.preventDefault();
+    }
+});
+

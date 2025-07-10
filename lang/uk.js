@@ -9,7 +9,8 @@ export default {
     playVsComputer: "Грати з комп'ютером",
     playOnline: "Грати онлайн",
     localGame: "Локальна гра",
-    donate: "Донат"
+    donate: "Донат",
+    startGame: "Почати гру"
   },
   onlineMenu: {
     title: "Онлайн гра",
