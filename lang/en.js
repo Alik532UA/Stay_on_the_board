@@ -11,7 +11,8 @@ export default {
     localGame: "Local Game",
     donate: "Donate",
     ubuntu: "Ubuntu",
-    clearCache: "Clear cache"
+    clearCache: "Clear cache",
+    startGame: "Start Game"
   },
   onlineMenu: {
     title: "Online Game",
@@ -83,7 +84,25 @@ export default {
     confirmMove: "Confirm Move",
     noMoves: "I have no moves",
     yourMove: "Your move: select direction and distance.",
+    playerMove: "Player {player}: select direction and distance.",
+    selectDirectionAndDistance: "Please select direction AND distance!",
+    noAvailableMoves: "No available moves!",
+    computerNoMovesWin: "The computer cannot move. You win!",
     score: "Score",
-    online: "Online"
+    online: "Online",
+    computerMove: "Computer made a move: {direction} by {distance} cell(s)."
+  },
+  end: {
+    blockedCell: "You tried to move the piece to a blocked cell {direction}. Game over!",
+    outOfBounds: "You tried to move the piece {distance} cell(s) {direction} and went off the board.",
+    noMovesFalse: "You claimed no moves, but you still have possible moves. Game over!",
+    noMovesTrue: "You correctly claimed no moves. You win!",
+    winTitle: "Victory!",
+    loseTitle: "Game Over!",
+    playerLost: "Player {player} lost. {reason}",
+    score: "Score: {score}",
+    version: "Game version: {version}",
+    chooseBoardSize: "Choose board size",
+    menu: "Menu"
   }
 }; 

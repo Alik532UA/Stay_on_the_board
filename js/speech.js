@@ -22,6 +22,12 @@ const speechSettings = {
         rate: 0.8,
         pitch: 1.0,
         volume: 0.8
+    },
+    nl: {
+        voice: null,
+        rate: 0.9,
+        pitch: 1.0,
+        volume: 0.8
     }
 };
 
@@ -43,16 +49,15 @@ function getVoicesForLanguage(lang) {
     if (!isSpeechSupported) return [];
     
     const voices = speechSynthesis.getVoices();
-    const langPrefixes = {
-        uk: ['uk'],
-        en: ['en'],
-        crh: ['tr', 'en']
-    };
-    
-    const prefixes = langPrefixes[lang] || ['en'];
-    return voices.filter(voice => 
-        prefixes.some(prefix => voice.lang.startsWith(prefix))
-    );
+    if (lang === 'crh') {
+        // Кримськотатарська — шукаємо турецькі голоси
+        return voices.filter(v => v.lang && v.lang.startsWith('tr'));
+    }
+    if (lang === 'nl') {
+        // Нідерландська — шукаємо nl голоси
+        return voices.filter(v => v.lang && v.lang.startsWith('nl'));
+    }
+    return voices.filter(v => v.lang && v.lang.startsWith(lang));
 }
 
 // Функція для встановлення конкретного голосу для мови
@@ -88,6 +93,11 @@ function getMoveText(direction, distance, lang = 'uk') {
             '1': "aşağı-sol", '2': "aşağı", '3': "aşağı-sağ",
             '4': "sol", '6': "sağ",
             '7': "yukarı-sol", '8': "yukarı", '9': "yukarı-sağ"
+        },
+        nl: {
+            '1': "omlaag-links", '2': "omlaag", '3': "omlaag-rechts",
+            '4': "links", '6': "rechts",
+            '7': "omhoog-links", '8': "omhoog", '9': "omhoog-rechts"
         }
     };
 
@@ -103,6 +113,10 @@ function getMoveText(direction, distance, lang = 'uk') {
         crh: {
             '1': 'bir', '2': 'eki', '3': 'üç', '4': 'dört', '5': 'beş',
             '6': 'altı', '7': 'yedi', '8': 'sekiz', '9': 'doquz'
+        },
+        nl: {
+            '1': 'een', '2': 'twee', '3': 'drie', '4': 'vier', '5': 'vijf',
+            '6': 'zes', '7': 'zeven', '8': 'acht', '9': 'negen'
         }
     };
 
@@ -116,6 +130,8 @@ function getMoveText(direction, distance, lang = 'uk') {
         case 'en':
             return `${numberText} ${directionText}`;
         case 'crh':
+            return `${numberText} ${directionText}`;
+        case 'nl':
             return `${numberText} ${directionText}`;
         default:
             return `${numberText} ${directionText}`;
@@ -131,7 +147,7 @@ function initVoices() {
         const voices = speechSynthesis.getVoices();
         
         // Завантажуємо збережені вибори голосів
-        ['uk', 'en', 'crh'].forEach(lang => {
+        ['uk', 'en', 'crh', 'nl'].forEach(lang => {
             const savedVoiceName = localStorage.getItem(`speech_voice_${lang}`);
             if (savedVoiceName) {
                 const savedVoice = voices.find(v => v.name === savedVoiceName);
@@ -145,7 +161,8 @@ function initVoices() {
             const langPrefixes = {
                 uk: ['uk'],
                 en: ['en'],
-                crh: ['tr', 'en']
+                crh: ['tr', 'en'],
+                nl: ['nl']
             };
             
             const prefixes = langPrefixes[lang];
@@ -173,7 +190,8 @@ function initVoices() {
         console.log('[Speech] Голоси ініціалізовані:', {
             uk: speechSettings.uk.voice?.name,
             en: speechSettings.en.voice?.name,
-            crh: speechSettings.crh.voice?.name
+            crh: speechSettings.crh.voice?.name,
+            nl: speechSettings.nl.voice?.name
         });
     };
 }

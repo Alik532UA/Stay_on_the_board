@@ -13,7 +13,10 @@ import { speakMove, speakGameMessage, stopSpeaking, isSpeechEnabled, initVoices,
 
 document.addEventListener('DOMContentLoaded', () => {
     function loadLanguage(lang) {
+        console.log('[loadLanguage] Loading language:', lang);
+        console.log('[loadLanguage] Available translations:', Object.keys(window.translationsAll));
         window.translations = window.translationsAll[lang];
+        console.log('[loadLanguage] Set translations to:', window.translations);
         // currentLang = lang; // видалено, бо не оголошено
         localStorage.setItem('lang', lang);
         updateUIWithLanguage();
@@ -25,31 +28,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateUIWithLanguage() {
+        console.log('[updateUIWithLanguage] Updating UI with language');
         // Оновлюємо головне меню, якщо воно відкрите
-        if (!modalOverlay.classList.contains('hidden')) {
+        if (typeof modalOverlay !== 'undefined' && !modalOverlay.classList.contains('hidden')) {
             openMainMenu();
         }
         // Оновлюємо підписи поза модалкою
-        messageAreaEl.textContent = t('mainMenu.welcome');
-        playerTurnIndicatorEl.textContent = t('mainMenu.playerTurn') || '';
-        opponentNameEl.textContent = t('mainMenu.opponent') || '';
-        
+        if (typeof messageAreaEl !== 'undefined' && messageAreaEl) {
+            messageAreaEl.textContent = t('mainMenu.welcome');
+        }
+        if (typeof playerTurnIndicatorEl !== 'undefined' && playerTurnIndicatorEl) {
+            playerTurnIndicatorEl.textContent = t('mainMenu.playerTurn') || '';
+        }
+        if (typeof opponentNameEl !== 'undefined' && opponentNameEl) {
+            opponentNameEl.textContent = t('mainMenu.opponent') || '';
+        }
         // Оновлюємо підписи чекбоксів
-        if (speechEnabledLabel) {
-            speechEnabledLabel.textContent = t('controls.speechEnabled');
+        if (typeof speechEnabledLabel !== 'undefined' && speechEnabledLabel) {
+            if (speechEnabledLabel.childNodes.length > 0) {
+                speechEnabledLabel.childNodes[0].textContent = t('controls.speechEnabled') + ' ';
+            } else {
+                speechEnabledLabel.textContent = t('controls.speechEnabled');
+            }
         }
         // Оновлюємо інші підписи чекбоксів
         const showBoardLabel = document.getElementById('show-board-label');
         if (showBoardLabel) {
-            showBoardLabel.textContent = t('controls.hideBoard');
+            if (showBoardLabel.childNodes.length > 0) {
+                showBoardLabel.childNodes[0].textContent = t('controls.hideBoard') + ' ';
+            } else {
+                showBoardLabel.textContent = t('controls.hideBoard');
+            }
         }
         const blockedModeLabel = document.getElementById('blocked-mode-label');
         if (blockedModeLabel) {
-            blockedModeLabel.textContent = t('controls.blockedMode');
+            if (blockedModeLabel.childNodes.length > 0) {
+                blockedModeLabel.childNodes[0].textContent = t('controls.blockedMode') + ' ';
+            } else {
+                blockedModeLabel.textContent = t('controls.blockedMode');
+            }
         }
         const showMovesLabel = document.getElementById('show-moves-label');
         if (showMovesLabel) {
-            showMovesLabel.textContent = t('controls.showMoves');
+            if (showMovesLabel.childNodes.length > 0) {
+                showMovesLabel.childNodes[0].textContent = t('controls.showMoves') + ' ';
+            } else {
+                showMovesLabel.textContent = t('controls.showMoves');
+            }
         }
         // Оновлюємо підпис "Оберіть відстань:"
         const selectDistanceLabel = document.getElementById('select-distance-label');
@@ -58,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         // Оновлюємо підпис "Очки:"
         const scoreLabel = document.getElementById('score-label');
-        if (scoreLabel) {
+        if (scoreLabel && scoreLabel.childNodes.length > 0) {
             scoreLabel.childNodes[0].textContent = t('ui.score') + ': ';
         }
         // Оновлюємо підпис "Онлайн:"
@@ -72,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const onlineCount = document.getElementById('online-count');
             if (onlineCount) onlineLabel.appendChild(onlineCount);
         }
-        
         // Оновлюємо кнопки
         const confirmMoveBtn = document.getElementById('confirm-move-btn');
         if (confirmMoveBtn) {
@@ -82,6 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (noMovesBtn) {
             noMovesBtn.textContent = t('common.noMoves');
         }
+        // Оновлюємо іконку прапора
+        if (typeof updateLangFlag === 'function') updateLangFlag();
+        // Переконатися, що обробник події для voiceSettingsToggle присутній
+        if (typeof voiceSettingsToggle !== 'undefined' && voiceSettingsToggle && !voiceSettingsToggle._listenerAdded) {
+            voiceSettingsToggle.addEventListener('click', toggleVoiceSettings);
+            voiceSettingsToggle._listenerAdded = true;
+        }
+        if (typeof window.updateGameTitle === 'function') window.updateGameTitle();
         // Можна додати інші елементи, якщо потрібно
     }
 
@@ -102,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isConnected = false; // Чи підключені гравці
     let waitingForOpponent = false; // Очікування суперника
     let signalingSocket = null; // WebSocket для signaling
-    const version = "0.1.3";
+    const version = "0.1.4";
 
     let currentGameMode = 'vsComputer'; // 'vsComputer' або 'localTwoPlayer'
     let currentPlayer = 1; // 1 або 2 для режиму localTwoPlayer
@@ -184,7 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const languages = [
             { code: 'uk', name: 'Українська' },
             { code: 'en', name: 'English' },
-            { code: 'crh', name: 'Кримськотатарська' }
+            { code: 'crh', name: 'Кримськотатарська' },
+            { code: 'nl', name: 'Nederlands' }
         ];
         
         voiceSelectors.innerHTML = '';
@@ -227,8 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функція для перемикання видимості налаштувань голосів
     function toggleVoiceSettings() {
-        if (!voiceSettings || !speechEnabled) return;
-        
+        if (!voiceSettings) return;
         const isVisible = voiceSettings.style.display === 'block';
         voiceSettings.style.display = isVisible ? 'none' : 'block';
         
@@ -419,18 +451,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Мова
     function updateLangFlag() {
         const lang = localStorage.getItem('lang') || 'uk';
+        console.log('[updateLangFlag] Current lang:', lang);
+        console.log('[updateLangFlag] Flag map:', flagMap);
+        console.log('[updateLangFlag] Flag class:', 'flag ' + (flagMap[lang] || 'flag-uk'));
         langFlag.className = 'flag ' + (flagMap[lang] || 'flag-uk');
         langOptions.forEach(opt => {
             opt.classList.toggle('selected', opt.getAttribute('data-lang') === lang);
         });
+        console.log('[updateLangFlag] Updated flag element:', langFlag);
     }
     langOptions.forEach(opt => {
         opt.addEventListener('click', () => {
             const lang = opt.getAttribute('data-lang');
-            // localStorage.setItem('lang', lang);
+            console.log('[langOption] Clicked on language:', lang);
             loadLanguage(lang); // одразу застосовуємо переклад
-            alert('Зміни мови застосуються після перезавантаження сторінки.\nLanguage changes will apply after page reload.\nTilni deñiştirmek içün saifeni qayta yükleñiz.\nTaalwijzigingen worden toegepast na het herladen van de pagina.');
-            updateLangFlag();
             langDropdown.classList.add('hidden');
         });
     });
@@ -540,12 +574,12 @@ document.addEventListener('DOMContentLoaded', () => {
         resetSelections(true);
         hideModal();
         
-        const modeText = blockedMode ? " (режим заблокованих клітинок)" : "";
+        const modeText = blockedMode ? ' (' + t('ui.blockedMode') + ')' : '';
         if (currentGameMode === 'localTwoPlayer') {
             currentPlayer = 1;
-            messageAreaEl.textContent = `Хід гравця ${player1Name}: оберіть напрямок та відстань.${modeText}`;
+            messageAreaEl.textContent = t('ui.playerMove', { player: player1Name, mode: modeText });
         } else {
-            messageAreaEl.textContent = `Ваш хід: оберіть напрямок та відстань.${modeText}`;
+            messageAreaEl.textContent = t('ui.yourMove') + modeText;
         }
         visualControlsEl.classList.remove('hidden');
         updateComputerMoveDisplay({});
@@ -560,8 +594,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         if (!selectedDirection || !selectedDistance) {
-            console.log('[processPlayerMove] Direction or distance not selected', { selectedDirection, selectedDistance });
-            messageAreaEl.textContent = "Будь ласка, оберіть напрямок ТА відстань!";
+            messageAreaEl.textContent = t('ui.selectDirectionAndDistance');
             return;
         }
         const piecePos = findPiece(board, numberCells);
@@ -580,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Перевіряємо чи клітинка заблокована (в режимі заблокованих клітинок)
             if (blockedMode && blockedCells.some(pos => pos.row === newRow && pos.col === newCol)) {
                 const directionText = getDirectionText(selectedDirection);
-                const reason = `Ви спробували перемістити фігуру на заблоковану клітинку ${directionText}. Гра закінчена!`;
+                const reason = t('end.blockedCell', { direction: directionText });
                 console.log('[processPlayerMove] Blocked cell move, ending game', { newRow, newCol });
                 if (isOnlineGame) {
                     if (typeof endOnlineGame === 'function') {
@@ -631,7 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentPlayer = (currentPlayer === 1) ? 2 : 1;
                 const nextPlayerName = (currentPlayer === 1) ? player1Name : player2Name;
                 isPlayerTurn = true;
-                messageAreaEl.textContent = `Хід гравця ${nextPlayerName}. Оберіть напрямок та відстань.`;
+                messageAreaEl.textContent = t('ui.playerMove', { player: nextPlayerName, mode: '' });
                 // Оновлюємо колір фону для нового гравця
                 updateComputerMoveDisplay({});
                 // Оновлюємо доступні ходи для наступного гравця, якщо чекбокс увімкнено
@@ -648,7 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             const directionText = getDirectionText(selectedDirection);
-            const reason = `Ви спробували перемістити фігуру на ${selectedDistance} клітин(ку) ${directionText} і вийшли за межі дошки.`;
+            const reason = t('end.outOfBounds', { distance: selectedDistance, direction: directionText });
             console.log('[processPlayerMove] Out of bounds', { newRow, newCol });
             if (isOnlineGame) {
                 endOnlineGame(reason);
@@ -667,14 +700,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isPlayerTurn) return;
         
         if (hasValidMoves(board, blockedCells, blockedMode, numberCells)) {
-            const reason = "Ви заявили про відсутність ходів, але у вас є можливі ходи. Гра закінчена!";
+            const reason = t('end.noMovesFalse');
             if (isOnlineGame) {
                 endOnlineGame(reason);
             } else {
                 endGame(reason, false);
             }
         } else {
-            const reason = "Ви правильно визначили відсутність ходів. Ви перемогли!";
+            const reason = t('end.noMovesTrue');
             if (isOnlineGame) {
                 // Надсилаємо повідомлення супернику
                 if (dataChannel && dataChannel.readyState === 'open') {
@@ -697,7 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.showingAvailableMoves = false;
         const validMoves = getAllValidMoves(board, blockedCells, blockedMode, numberCells);
         if (validMoves.length === 0) {
-            messageAreaEl.textContent = "Немає доступних ходів!";
+            messageAreaEl.textContent = t('ui.noAvailableMoves');
             return;
         }
         
@@ -720,7 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const validMoves = getAllValidMoves(board, blockedCells, blockedMode, numberCells);
         if (validMoves.length === 0) {
-            endGame("Комп'ютер не може зробити хід. Ви перемогли!");
+            endGame(t('ui.computerNoMovesWin'));
             return;
         }
         
@@ -746,7 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetSelections(true);
         
         const directionText = getDirectionText(randomMove.direction);
-        messageAreaEl.textContent = `Комп'ютер зробив хід: ${directionText} на ${randomMove.distance} клітинку.`;
+        messageAreaEl.textContent = t('ui.computerMove', { direction: directionText, distance: randomMove.distance });
         updateComputerMoveDisplay({direction: randomMove.direction, distance: randomMove.distance, isComputer: true});
         
         // Озвучуємо хід комп'ютера, якщо увімкнено
@@ -777,12 +810,12 @@ document.addEventListener('DOMContentLoaded', () => {
         isPlayerTurn = false;
         visualControlsEl.classList.add('hidden');
 
-        let title = isWin ? "Перемога!" : "Гра закінчена!";
+        let title = isWin ? t('end.winTitle') : t('end.loseTitle');
         let finalReason = reason;
 
         if (currentGameMode === 'localTwoPlayer' && !isWin) {
             const loserName = (currentPlayer === 1) ? player1Name : player2Name;
-            finalReason = `Гравець ${loserName} програв. ${reason}`;
+            finalReason = t('end.playerLost', { player: loserName, reason });
         }
         updatePlayerGlow();
         updateComputerMoveDisplay({}); // Скидаємо колір фону
@@ -790,16 +823,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Озвучуємо результат гри, якщо увімкнено
         if (speechEnabled) {
             const currentLang = localStorage.getItem('lang') || 'uk';
-            const message = isWin ? "Перемога!" : "Гра закінчена!";
+            const message = isWin ? t('end.winTitle') : t('end.loseTitle');
             speakGameMessage(message, currentLang);
         }
 
         showModal(
             title,
-            `<p>${finalReason}</p><p><strong>Кількість набраних очок: ${points}</strong></p><p>Версія гри: ${version}</p>`,
+            `<p>${finalReason}</p><p><strong>${t('end.score', { score: points })}</strong></p><p>${t('end.version', { version })}</p>`,
             [
-                { text: "Вибрати розмір дошки", class: "primary", onClick: () => openBoardSizeSelection(currentGameMode) },
-                { text: "Меню", onClick: openMainMenu }
+                { text: t('end.chooseBoardSize'), class: "primary", onClick: () => openBoardSizeSelection(currentGameMode) },
+                { text: t('end.menu'), onClick: openMainMenu }
             ]
         );
     }
@@ -992,6 +1025,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ініціалізуємо систему користувачів онлайн
     initOnlineUsers(onlineCountEl);
     
+    // Ініціалізуємо прапор мови
+    updateLangFlag();
+    
     // Оновлений виклик головного меню:
     openMainMenu();
     window.global_startGame = startGame;
@@ -1042,7 +1078,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-const APP_VERSION = "0.1.3";
+const APP_VERSION = "0.1.4";
 (function checkAppVersionAndClearCacheIfNeeded() {
     try {
         const storedVersion = localStorage.getItem('appVersion');

@@ -11,7 +11,8 @@ export default {
     localGame: "Lokaal Spel",
     donate: "Doneren",
     ubuntu: "Ubuntu",
-    clearCache: "Cache wissen"
+    clearCache: "Cache wissen",
+    startGame: "Spel Starten"
   },
   onlineMenu: {
     title: "Online Spel",
@@ -83,7 +84,25 @@ export default {
     confirmMove: "Zet Bevestigen",
     noMoves: "Ik heb geen zetten",
     yourMove: "Jouw zet: kies richting en afstand.",
+    playerMove: "Zet van {player}: kies richting en afstand.",
+    selectDirectionAndDistance: "Selecteer richting EN afstand!",
+    noAvailableMoves: "Geen beschikbare zetten!",
+    computerNoMovesWin: "De computer kan niet bewegen. Je wint!",
     score: "Punten",
-    online: "Online"
+    online: "Online",
+    computerMove: "De computer heeft een zet gedaan: {direction} over {distance} vak(ken)."
+  },
+  end: {
+    blockedCell: "Je probeerde het stuk naar een geblokkeerde cel {direction} te verplaatsen. Spel afgelopen!",
+    outOfBounds: "Je probeerde het stuk {distance} vak(ken) {direction} te verplaatsen en ging van het bord af.",
+    noMovesFalse: "Je gaf aan geen zetten te hebben, maar er zijn nog mogelijke zetten. Spel afgelopen!",
+    noMovesTrue: "Je hebt correct aangegeven dat er geen zetten zijn. Je wint!",
+    winTitle: "Gewonnen!",
+    loseTitle: "Spel afgelopen!",
+    playerLost: "Speler {player} heeft verloren. {reason}",
+    score: "Aantal behaalde punten: {score}",
+    version: "Spelversie: {version}",
+    chooseBoardSize: "Bordgrootte kiezen",
+    menu: "Menu"
   }
 }; 

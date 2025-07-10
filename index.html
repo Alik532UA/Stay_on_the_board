@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Залишитися на дошці</title>
+    <title id="page-title">Залишитися на дошці</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css?family=Ubuntu:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
@@ -82,7 +82,7 @@
     
     <div id="game-container">
         <header>
-            <h1 style="text-align: center;">Залишитися на дошці</h1>
+            <h1 id="game-title" style="text-align: center;">Залишитися на дошці</h1>
         </header>
         <div id="game-board">
             <!-- Клітинки дошки будуть згенеровані тут -->
@@ -180,6 +180,14 @@
       import nl from './lang/nl.js';
       window.translationsAll = { uk, en, crh, nl };
       window.translations = window.translationsAll[localStorage.getItem('lang') || 'uk'];
+      // Динамічно оновлюємо заголовок і title при зміні мови
+      function updateGameTitle() {
+        const t = window.translations;
+        document.getElementById('game-title').textContent = t.mainMenu.gameTitle;
+        document.getElementById('page-title').textContent = t.mainMenu.gameTitle;
+      }
+      window.updateGameTitle = updateGameTitle;
+      updateGameTitle();
     </script>
     <script type="module" src="js/game.js"></script>
 </body>

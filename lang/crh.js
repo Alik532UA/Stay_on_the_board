@@ -11,7 +11,8 @@ export default {
     localGame: "Mahalliy oyun",
     donate: "Bağış",
     ubuntu: "Ubuntu",
-    clearCache: "Keşi temizle"
+    clearCache: "Keşi temizle",
+    startGame: "Oyun Başlat"
   },
   onlineMenu: {
     title: "Onlayn Oyun",
@@ -83,7 +84,25 @@ export default {
     confirmMove: "Hareketni tasdiqla",
     noMoves: "Yürüyecek yolım yoq",
     yourMove: "Sizniñ yürüviñiz: istiqamet ve mesafeni saylañız.",
+    playerMove: "{player} oyuncınıñ yürüvi: istiqamet ve mesafeni saylañız.",
+    selectDirectionAndDistance: "İstiqamet VE mesafeni saylañız!",
+    noAvailableMoves: "Mümkün hareket yoq!",
+    computerNoMovesWin: "Kompyuter hareket etip bilmey. Siz utasız!",
     score: "Oçko",
-    online: "Onlayn"
+    online: "Onlayn",
+    computerMove: "Kompyuter hareket yaptı: {direction} {distance} hucre."
+  },
+  end: {
+    blockedCell: "Taşnı bloklanğan hucrege {direction} köçürmek istegeniñiz. Oyun bitti!",
+    outOfBounds: "Taşnı {distance} hucre {direction} köçürmek istegeniñiz ve tahta dışına çıqtıñız.",
+    noMovesFalse: "Yürüyecek yol yoqlığını bildirdiñiz, amma mümkün yollar bar. Oyun bitti!",
+    noMovesTrue: "Yürüyecek yol yoqlığını doğru bildirdiñiz. Siz utasız!",
+    winTitle: "Qalebe!",
+    loseTitle: "Oyun bitti!",
+    playerLost: "{player} oyuncı utıldı. {reason}",
+    score: "Qazanılğan oçko: {score}",
+    version: "Oyun versiyası: {version}",
+    chooseBoardSize: "Tahta ölçe sayla",
+    menu: "Menü"
   }
 }; 
