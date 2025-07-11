@@ -43,6 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let isConnected = false; // Чи підключені гравці
     let waitingForOpponent = false; // Очікування суперника
     let signalingSocket = null; // WebSocket для signaling
+    let guestGameStarted = false; // Додаю прапорець для гостя
+    let hostGameStarted = false; // прапорець для хоста
 
     // === PeerJS Online ===
     let peerInstance = null;      // Поточний Peer
@@ -523,32 +525,72 @@ document.addEventListener('DOMContentLoaded', () => {
         player2Glow.classList.toggle('visible', currentPlayer === 2);
     }
 
+    function showGameModal() {
+        const gc = document.getElementById('game-container');
+        if (gc) gc.style.display = '';
+        // Формуємо HTML для ігрового модального вікна
+        const body = `
+            <h2 id='modal-game-title' style='text-align:center;margin-bottom:12px;'>Stay on the Board</h2>
+            <div id="modal-game-board"></div>
+            <div id="modal-board-options"></div>
+            <div id="modal-show-moves"></div>
+            <div id="modal-visual-controls"></div>
+            <div id="modal-message-area"></div>
+            <div id="modal-score-panel"></div>
+        `;
+        showModal('', body, [
+            { text: 'Головне меню', class: 'danger', onClick: openMainMenu }
+        ]);
+        // Переносимо DOM-елементи у модалку
+        const modalBody = document.getElementById('modal-body');
+        if (modalBody) {
+            const gb = document.getElementById('game-board');
+            const sm = document.getElementById('show-moves-checkbox-wrapper');
+            const bo = document.getElementById('board-options');
+            const vc = document.getElementById('visual-controls');
+            const ma = document.getElementById('message-area');
+            const sp = document.querySelector('.score-panel');
+            if (gb) document.getElementById('modal-game-board').appendChild(gb);
+            if (sm) document.getElementById('modal-show-moves').appendChild(sm);
+            if (bo) document.getElementById('modal-board-options').appendChild(bo);
+            if (vc) document.getElementById('modal-visual-controls').appendChild(vc);
+            if (ma) document.getElementById('modal-message-area').appendChild(ma);
+            if (sp) document.getElementById('modal-score-panel').appendChild(sp);
+        }
+    }
+
+    function hideGameModal() {
+        const gc = document.getElementById('game-container');
+        if (gc) gc.style.display = 'none';
+        hideModal();
+    }
+
+    // Модифікуємо startGame
     function startGame(size, gameMode = 'vsComputer') {
+        hideModal();
+        showGameModal();
+        document.getElementById('game-container').style.display = 'none';
         currentGameMode = gameMode;
         numberCells = size;
         points = 0;
         isPlayerTurn = true;
         blockedMode = blockedModeCheckbox.checked;
-        board = Array(numberCells).fill(0).map(() => Array(numberCells).fill(0));
-        blockedCells = []; // Очищаємо заблоковані клітинки
-        
-        // Очищаємо візуалізацію доступних ходів
+        if (gameMode === 'onlineGuest') {
+            // Не генеруємо нову дошку, використовуємо board/blockedCells як є
+        } else {
+            board = Array(numberCells).fill(0).map(() => Array(numberCells).fill(0));
+            blockedCells = [];
+            const startRow = Math.floor(Math.random() * numberCells);
+            const startCol = Math.floor(Math.random() * numberCells);
+            board[startRow][startCol] = 1;
+        }
         window.showingAvailableMoves = false;
         window.availableMoves = null;
-        
-        const startRow = Math.floor(Math.random() * numberCells);
-        const startCol = Math.floor(Math.random() * numberCells);
-        board[startRow][startCol] = 1;
-        console.log('[startGame] board after placing piece:', board);
-        
-        // При старті гри дошка завжди показана:
         showBoardCheckbox.checked = true;
         gameBoardEl.classList.remove('board-hidden');
         renderBoard();
         generateDistanceButtons();
         resetSelections(true);
-        hideModal();
-        
         const modeText = blockedMode ? ' (' + t('ui.blockedMode') + ')' : '';
         if (currentGameMode === 'localTwoPlayer') {
             currentPlayer = 1;
@@ -572,6 +614,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fromCell = cells[getCellIndex(fromRow, fromCol)];
         const toCell = cells[getCellIndex(toRow, toCol)];
         if (!fromCell || !toCell) {
+            if (confirmMoveBtn) confirmMoveBtn.removeAttribute('disabled');
             callback();
             return;
         }
@@ -1115,7 +1158,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function showJoinByIdModal() {
             showModal(t('onlineMenu.joinByIdTitle'),
-                `<input id='join-room-id-input' class='modal-input' style='width:80%;margin:16px auto;display:block;text-align:center;font-size:1.2em;border-radius:8px;border:2px solid var(--control-selected);' placeholder='ROOM_ID'>`,
+                `<div style='display:flex;gap:8px;align-items:center;justify-content:center;'>
+                    <input id='join-room-id-input' class='modal-input' style='width:80%;margin:16px auto;display:block;text-align:center;font-size:1.2em;border-radius:8px;border:2px solid var(--control-selected);' placeholder='ROOM_ID'>
+                    <button id='paste-join-room-id-btn' class='modal-button secondary' title='Вставити з буфера'>📋</button>
+                </div>`,
                 [
                     {
                         text: t('onlineMenu.joinByIdConfirm'), class: 'primary',
@@ -1130,6 +1176,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     { text: t('common.back'), onClick: openOnlineGameMenu }
                 ]
             );
+            setTimeout(() => {
+                const pasteBtn = document.getElementById('paste-join-room-id-btn');
+                if (pasteBtn) {
+                    pasteBtn.onclick = async () => {
+                        try {
+                            const text = await navigator.clipboard.readText();
+                            document.getElementById('join-room-id-input').value = text.trim().toUpperCase();
+                        } catch (e) {
+                            alert('Clipboard error');
+                        }
+                    };
+                }
+            }, 0);
         }
 
         const body = `
@@ -1155,6 +1214,28 @@ document.addEventListener('DOMContentLoaded', () => {
             sendPeerMessage(peerConn, { type: 'move', ...move });
         };
 
+        conn.on('open', () => {
+            // Якщо ми гість — одразу надсилаємо handshake
+            if (!isHost) {
+                sendPeerMessage(conn, { type: 'handshake', boardSize: numberCells || pendingBoardSize || 0 });
+            } else {
+                // Якщо хост і вже вибрано розмір — одразу надсилаємо стартову дошку
+                if (numberCells > 0 && board && board.length && !hostGameStarted) {
+                    sendPeerMessage(conn, {
+                        type: 'initBoard',
+                        numberCells,
+                        points,
+                        blockedMode,
+                        board,
+                        blockedCells
+                    });
+                    hostGameStarted = true;
+                    hideModal();
+                    startGame(numberCells, 'onlineHost');
+                }
+            }
+        });
+
         conn.on('data', (raw) => {
             let data;
             try { data = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch (e) { data = raw; }
@@ -1162,17 +1243,31 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.type === 'handshake') {
                 console.log('[Online] Handshake отримано', data);
                 if (isHost) {
-                    // Хост отримав підтвердження від гостя
-                    if (pendingBoardSize) {
-                        hideModal();
-                        startGame(pendingBoardSize, 'onlineHost');
-                        pendingBoardSize = null;
-                    }
+                    // Хост отримав handshake від гостя — надсилає стартову дошку
+                    sendPeerMessage(conn, {
+                        type: 'initBoard',
+                        numberCells,
+                        points,
+                        blockedMode,
+                        board,
+                        blockedCells
+                    });
                 } else {
-                    // Гість запускає гру
-                    if (!numberCells && data.boardSize && data.boardSize >= 2) {
-                        startGame(data.boardSize, 'onlineGuest');
-                    }
+                    // Гість отримав handshake з розміром дошки — чекає initBoard
+                }
+            } else if (data.type === 'initBoard') {
+                // Гість отримав стартовий стан дошки
+                if (!guestGameStarted) {
+                    guestGameStarted = true;
+                    numberCells = data.numberCells;
+                    points = data.points;
+                    blockedMode = data.blockedMode;
+                    board = data.board;
+                    blockedCells = data.blockedCells;
+                    window.showingAvailableMoves = false;
+                    window.availableMoves = null;
+                    hideModal();
+                    startGame(numberCells, 'onlineGuest');
                 }
             } else if (data.type === 'move') {
                 console.log('[Online] Отримано хід суперника', data);
@@ -1216,63 +1311,87 @@ document.addEventListener('DOMContentLoaded', () => {
     // === Хост створює кімнату ===
     function createRoom() {
         const defaultName = generateRandomRoomName();
+        // Обʼєднане вікно: одразу вибір розміру дошки, без поля для назви
         const body = `
-            <p style="text-align:center;">Введіть назву кімнати</p>
-            <input type="text" id="room-name-input" class="modal-input" style="width:100%;text-align:center;max-width:160px;font-size:1.2em;letter-spacing:1px;text-transform:uppercase;" value="${defaultName}" maxlength="12">
+            <h2 style='text-align:center;margin-bottom:12px;'>${t('onlineMenu.createRoom')}</h2>
+            <div style='text-align:center;margin-bottom:10px;'>ID кімнати: <b id='room-id-to-copy'>${defaultName}</b> <button id='copy-room-id-btn' class='modal-button secondary' style='margin-left:8px;padding:2px 10px;font-size:1em;'>📋</button></div>
+            <p class="board-size-label">${t('boardSize.select')}</p>
+            <div id="board-size-selector" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;"></div>
         `;
         showModal(t('onlineMenu.createRoom'), body, [
-            {
-                text: t('onlineMenu.createRoom'),
-                class: 'primary',
-                onClick: () => {
-                    const name = (document.getElementById('room-name-input').value || '').trim().toUpperCase();
-                    if (!name) {
-                        alert('Вкажіть назву');
-                        return;
-                    }
-                    hideModal();
-                    hostWithName(name);
-                }
-            },
             { text: t('common.back'), onClick: openOnlineGameMenu }
         ]);
-
-        function hostWithName(roomName) {
+        setTimeout(() => {
+            const selector = document.getElementById('board-size-selector');
+            if (!selector) return;
+            selector.innerHTML = '';
+            for (let i = 2; i <= 9; i++) {
+                const button = document.createElement('button');
+                button.className = 'modal-button secondary';
+                button.textContent = `${i}x${i}`;
+                button.onclick = () => {
+                    hideModal();
+                    hostWithName(defaultName, i);
+                };
+                selector.appendChild(button);
+            }
+            // Додаю логіку копіювання ID
+            const copyBtn = document.getElementById('copy-room-id-btn');
+            if (copyBtn) {
+                copyBtn.onclick = async () => {
+                    try {
+                        await navigator.clipboard.writeText(defaultName);
+                        copyBtn.textContent = 'Скопійовано!';
+                        setTimeout(() => { copyBtn.textContent = '📋'; }, 1200);
+                    } catch (e) {
+                        alert('Clipboard error');
+                    }
+                };
+            }
+        }, 0);
+        function hostWithName(roomName, size) {
             const { roomId, peer } = createPeerHost(roomName, (conn) => {
-                console.log('[Online] Гість підʼєднався');
                 setupPeerConnHandlers(conn);
-                sendPeerMessage(conn, { type: 'handshake', boardSize: numberCells || 0 });
+                sendPeerMessage(conn, { type: 'handshake', boardSize: size });
             }, (err) => {
                 alert('PeerJS error: ' + err);
             });
-
             peerInstance = peer;
             onlineRoomId = roomId;
             isOnlineGame = true;
             isHost = true;
-
-            // Вибір розміру дошки
+            createdRoomId = roomId;
+            // Генеруємо стартову дошку для онлайн-гри
+            numberCells = size;
+            points = 0;
+            blockedMode = blockedModeCheckbox.checked;
+            board = Array(numberCells).fill(0).map(() => Array(numberCells).fill(0));
+            blockedCells = [];
+            window.showingAvailableMoves = false;
+            window.availableMoves = null;
+            const startRow = Math.floor(Math.random() * numberCells);
+            const startCol = Math.floor(Math.random() * numberCells);
+            board[startRow][startCol] = 1;
+            // Показуємо повідомлення про очікування суперника + roomId
+            showModal('Очікуємо гравця', `<p style="text-align:center;">Кімната <b id='room-id-to-copy'>${roomId}</b><br><button id='copy-room-id-btn' class='modal-button secondary' style='margin-top:8px;'>Скопіювати ID</button><br>Очікуємо підключення...</p>`, [
+                { text: t('onlineMenu.back'), onClick: openMainMenu }
+            ]);
             setTimeout(() => {
-                showBoardSizeSelection(
-                    showModal,
-                    t,
-                    (size) => {
-                        pendingBoardSize = size;
-                        // Показуємо повідомлення про очікування суперника
-                        showModal('Очікуємо гравця', `<p style="text-align:center;">Кімната <b>${roomId}</b><br>Очікуємо підключення...</p>`, [
-                            { text: t('onlineMenu.back'), onClick: openMainMenu }
-                        ]);
-                        if (peerConn) {
-                            sendPeerMessage(peerConn, { type: 'handshake', boardSize: size });
-                            hideModal();
-                            startGame(size, 'onlineHost');
+                const copyBtn = document.getElementById('copy-room-id-btn');
+                if (copyBtn) {
+                    copyBtn.onclick = async () => {
+                        try {
+                            await navigator.clipboard.writeText(roomId);
+                            copyBtn.textContent = 'Скопійовано!';
+                            setTimeout(() => { copyBtn.textContent = 'Скопіювати ID'; }, 1200);
+                        } catch (e) {
+                            alert('Clipboard error');
                         }
-                    },
-                    openMainMenu
-                );
+                    };
+                }
             }, 0);
+            // Видаляю автозапуск startGame тут — тепер старт лише після підключення гостя
         }
-
         function generateRandomRoomName() {
             return generateRoomId(); // використовую ту ж функцію, 6 символів
         }
@@ -1284,7 +1403,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const body = `
             <p style="text-align:center;">${t('online.enterRoomCode')}</p>
             <input type="text" id="player-name-input-online" class="modal-input" placeholder="Ваше ім'я" style="width:100%;text-align:center;max-width:180px;font-size:1.15em;margin-bottom:12px;">
-            <input type="text" id="room-code-input" class="modal-input" style="width:100%;text-align:center;max-width:140px;font-size:1.4em;letter-spacing:2px;text-transform:uppercase;" maxlength="6">
+            <div style="display:flex;gap:8px;align-items:center;justify-content:center;">
+                <input type="text" id="room-code-input" class="modal-input" style="width:100%;text-align:center;max-width:140px;font-size:1.4em;letter-spacing:2px;text-transform:uppercase;" maxlength="6">
+                <button id="paste-room-id-btn" class="modal-button secondary" title="Вставити з буфера">📋</button>
+            </div>
         `;
         showModal(t('onlineMenu.joinRoom'), body, [
             {
@@ -1306,6 +1428,20 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             { text: t('common.back'), onClick: openOnlineGameMenu }
         ]);
+
+        setTimeout(() => {
+            const pasteBtn = document.getElementById('paste-room-id-btn');
+            if (pasteBtn) {
+                pasteBtn.onclick = async () => {
+                    try {
+                        const text = await navigator.clipboard.readText();
+                        document.getElementById('room-code-input').value = text.trim().toUpperCase();
+                    } catch (e) {
+                        alert('Clipboard error');
+                    }
+                };
+            }
+        }, 0);
 
         function attemptJoin(code) {
             showModal(t('online.connecting'), `<p style="text-align:center;">${t('online.connectingToRoom', { roomId: code })}</p>`, []);

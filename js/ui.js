@@ -87,9 +87,9 @@ export function showMainMenu(showModal, t, showRules, showControlsInfo, onVsComp
     // Показати топ-контроли тільки в головному меню
     const topControls = document.getElementById('top-controls');
     if (topControls) topControls.classList.remove('hidden');
-    // Показати ігровий контейнер (виправлення)
+    // Приховати ігровий контейнер у головному меню
     const gameContainer = document.getElementById('game-container');
-    if (gameContainer) gameContainer.style.display = '';
+    if (gameContainer) gameContainer.style.display = 'none';
     function showStub(title) {
         showModal(title, '<p style="text-align:center;">' + t('common.inDevelopment') + '</p>', [
             { text: t('common.back'), class: 'primary', onClick: () => showMainMenu(showModal, t, showRules, showControlsInfo, onVsComputer, onLocalGame, onOnline, onDonate) }
