@@ -539,6 +539,7 @@ h1 {
 
 /* Стилі для дошки */
 #game-board {
+    position: relative;
     display: grid;
     gap: 0; /* Гарантує відсутність проміжків між клітинками */
     margin: 0 auto;
@@ -572,14 +573,15 @@ h1 {
     left: 50%;
     transform: translate(-50%, -50%);
     color: #ff0000;
-    font-size: 1.5em;
+    font-size: 0.7em;
     font-weight: bold;
     text-shadow: 0 0 3px rgba(255, 0, 0, 0.5);
 }
 
 .cell-available {
     position: relative;
-    animation: availablePulse 2s ease-in-out infinite;
+    /* animation: none !important; */
+    box-shadow: none !important;
 }
 
 .cell-available::after {
@@ -587,22 +589,126 @@ h1 {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) scale(1);
     color: #00ff00;
-    font-size: 1.2em;
+    font-size: 0.7em;
     font-weight: bold;
     text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
     z-index: 10;
+    opacity: 1;
+    transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1), transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    animation: availablePulseMark 1.11s ease-in-out infinite;
+}
+[data-theme="dark"] .cell-available::after {
+    color: #4caf50;
+    text-shadow: 0 0 5px rgba(76, 175, 80, 0.7);
+    animation: availablePulseMarkDark 1.11s ease-in-out infinite;
+}
+[data-style="peak"] .cell-available::after {
+    color: #00ff88;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.8);
+    animation: availablePulseMarkPeak 1.11s ease-in-out infinite;
+}
+[data-style="cs2"] .cell-available::after {
+    color: #66c0f4;
+    text-shadow: 0 0 8px rgba(102, 192, 244, 0.8);
+    animation: availablePulseMarkCS2 1.11s ease-in-out infinite;
+}
+@keyframes availablePulseMark {
+    0%, 100% {
+        text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        text-shadow: 0 0 18px rgba(0, 255, 0, 0.9);
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+@keyframes availablePulseMarkDark {
+    0%, 100% {
+        text-shadow: 0 0 5px rgba(76, 175, 80, 0.7);
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        text-shadow: 0 0 18px rgba(76, 175, 80, 0.9);
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+@keyframes availablePulseMarkPeak {
+    0%, 100% {
+        text-shadow: 0 0 8px rgba(0, 255, 136, 0.8);
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        text-shadow: 0 0 24px rgba(0, 255, 136, 1);
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+@keyframes availablePulseMarkCS2 {
+    0%, 100% {
+        text-shadow: 0 0 8px rgba(102, 192, 244, 0.8);
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        text-shadow: 0 0 24px rgba(102, 192, 244, 1);
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.cell-available.cell-available-fade::after {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+}
+.cell-available.cell-available-appear::after {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+.cell-available:not(.cell-available-appear)::after {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
 }
 
 @keyframes availablePulse {
-    0%, 100% { 
-        box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+    0%, 100% {
+        box-shadow: 0 0 3px rgba(0, 255, 0, 0.2);
         transform: scale(1);
     }
-    50% { 
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
-        transform: scale(1.05);
+    50% {
+        box-shadow: 0 0 7px rgba(0, 255, 0, 0.4);
+        transform: scale(1.025);
+    }
+}
+
+@keyframes availablePulseDark {
+    0%, 100% {
+        box-shadow: 0 0 3px rgba(76, 175, 80, 0.2);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 7px rgba(76, 175, 80, 0.4);
+        transform: scale(1.025);
+    }
+}
+
+@keyframes availablePulsePeak {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(0, 255, 136, 0.2);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+        transform: scale(1.03);
+    }
+}
+
+@keyframes availablePulseCS2 {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(102, 192, 244, 0.2);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(102, 192, 244, 0.4);
+        transform: scale(1.03);
     }
 }
 
@@ -2332,3 +2438,27 @@ body {
     max-width: 100% !important;
   }
 }
+
+.piece-animating {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    font-size: 2.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    pointer-events: none;
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1), top 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--piece-color);
+    text-shadow: 0 0 5px var(--piece-shadow);
+}
+
+/* --- Очищення пульсації клітинки у всіх темах --- */
+[data-theme="dark"] .cell-available,
+[data-style="peak"] .cell-available,
+[data-style="cs2"] .cell-available {
+    animation: none !important;
+    box-shadow: none !important;
+}
+/* --- Видаляю або коментую старі keyframes, якщо не використовуються для ::after --- */

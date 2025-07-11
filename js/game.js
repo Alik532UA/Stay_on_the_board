@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isConnected = false; // Чи підключені гравці
     let waitingForOpponent = false; // Очікування суперника
     let signalingSocket = null; // WebSocket для signaling
-    const version = "0.1.4";
+    const version = "0.1.5";
 
     let currentGameMode = 'vsComputer'; // 'vsComputer' або 'localTwoPlayer'
     let currentPlayer = 1; // 1 або 2 для режиму localTwoPlayer
@@ -587,6 +587,54 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePlayerGlow();
     }
 
+    function animatePieceMove(fromRow, fromCol, toRow, toCol, callback) {
+        if (confirmMoveBtn) confirmMoveBtn.setAttribute('disabled', true);
+        // Знайти позицію дошки на сторінці
+        const boardRect = gameBoardEl.getBoundingClientRect();
+        // Знайти всі клітинки
+        const cells = gameBoardEl.querySelectorAll('.cell');
+        const getCellIndex = (row, col) => row * numberCells + col;
+        const fromCell = cells[getCellIndex(fromRow, fromCol)];
+        const toCell = cells[getCellIndex(toRow, toCol)];
+        if (!fromCell || !toCell) {
+            callback();
+            return;
+        }
+        // Вирахувати координати
+        const fromRect = fromCell.getBoundingClientRect();
+        const toRect = toCell.getBoundingClientRect();
+        // Створити анімовану фігуру
+        const animPiece = document.createElement('div');
+        animPiece.className = 'piece-animating';
+        animPiece.textContent = '♛';
+        // Початкові координати
+        animPiece.style.left = (fromRect.left - boardRect.left) + 'px';
+        animPiece.style.top = (fromRect.top - boardRect.top) + 'px';
+        animPiece.style.position = 'absolute';
+        animPiece.style.width = fromCell.offsetWidth + 'px';
+        animPiece.style.height = fromCell.offsetHeight + 'px';
+        // Додаємо до дошки
+        gameBoardEl.appendChild(animPiece);
+        // Форсуємо reflow
+        void animPiece.offsetWidth;
+        // Кінцеві координати
+        animPiece.style.left = (toRect.left - boardRect.left) + 'px';
+        animPiece.style.top = (toRect.top - boardRect.top) + 'px';
+        // Після завершення анімації
+        animPiece.addEventListener('transitionend', () => {
+            animPiece.remove();
+            if (confirmMoveBtn) confirmMoveBtn.removeAttribute('disabled');
+            callback();
+        }, { once: true });
+    }
+
+    function fadeAvailableCells() {
+        document.querySelectorAll('.cell-available').forEach(cell => {
+            cell.classList.remove('cell-available-appear'); // Забрати клас появи для коректної анімації зникнення
+            cell.classList.add('cell-available-fade');
+        });
+    }
+
     function processPlayerMove() {
         console.log('[processPlayerMove] called', { isPlayerTurn, selectedDirection, selectedDistance });
         if (!isPlayerTurn) {
@@ -636,48 +684,115 @@ document.addEventListener('DOMContentLoaded', () => {
             window.showingAvailableMoves = false;
             window.availableMoves = null;
             
-            board[row][col] = 0;
-            board[newRow][newCol] = 1;
-            points++;
-            renderBoard();
-            isPlayerTurn = false;
-            messageAreaEl.textContent = "";
-            resetSelections();
-            generateDistanceButtons();
-            resetSelections(true);
-            updateComputerMoveDisplay({}); // Очищаємо центр після ходу гравця
-            console.log('[processPlayerMove] Move completed', { row, col, newRow, newCol, points });
-            if (isOnlineGame) {
-                playerTurnIndicatorEl.textContent = 'Хід суперника';
-                
-                // Надсилаємо хід супернику
-                const move = {
-                    direction: selectedDirection,
-                    distance: selectedDistance
-                };
-                if (typeof sendMoveToOpponent === 'function') {
-                    sendMoveToOpponent(move);
+            fadeAvailableCells(); // Плавно приховати галочки одразу після підтвердження ходу
+            const boardIsVisible = !gameBoardEl.classList.contains('board-hidden');
+            if (boardIsVisible) {
+                // Очистити стару клітинку перед анімацією
+                const cells = gameBoardEl.querySelectorAll('.cell');
+                const getCellIndex = (row, col) => row * numberCells + col;
+                const fromCell = cells[getCellIndex(row, col)];
+                if (fromCell) {
+                    fromCell.textContent = '';
+                    fromCell.classList.remove('piece');
                 }
-            } else if (currentGameMode === 'vsComputer') {
-                setTimeout(computerMove, 1000);
-            } else if (currentGameMode === 'localTwoPlayer') {
-                currentPlayer = (currentPlayer === 1) ? 2 : 1;
-                const nextPlayerName = (currentPlayer === 1) ? player1Name : player2Name;
-                isPlayerTurn = true;
-                messageAreaEl.textContent = t('ui.playerMove', { player: nextPlayerName, mode: '' });
-                // Оновлюємо колір фону для нового гравця
-                updateComputerMoveDisplay({});
-                // Оновлюємо доступні ходи для наступного гравця, якщо чекбокс увімкнено
-                if (showMovesCheckbox && showMovesCheckbox.checked) {
-                    window.availableMoves = null;
+                animatePieceMove(row, col, newRow, newCol, () => {
+                    if (blockedMode) {
+                        blockedCells.push({ row, col });
+                    }
                     window.showingAvailableMoves = false;
+                    window.availableMoves = null;
+                    board[row][col] = 0;
+                    board[newRow][newCol] = 1;
+                    points++;
+                    renderBoard();
+                    isPlayerTurn = false;
+                    messageAreaEl.textContent = "";
+                    resetSelections();
+                    generateDistanceButtons();
+                    resetSelections(true);
+                    updateComputerMoveDisplay({});
+                    if (isOnlineGame) {
+                        playerTurnIndicatorEl.textContent = 'Хід суперника';
+                        const move = {
+                            direction: selectedDirection,
+                            distance: selectedDistance
+                        };
+                        if (typeof sendMoveToOpponent === 'function') {
+                            sendMoveToOpponent(move);
+                        }
+                    } else if (currentGameMode === 'vsComputer') {
+                        setTimeout(computerMove, 1000);
+                    } else if (currentGameMode === 'localTwoPlayer') {
+                        currentPlayer = (currentPlayer === 1) ? 2 : 1;
+                        const nextPlayerName = (currentPlayer === 1) ? player1Name : player2Name;
+                        isPlayerTurn = true;
+                        messageAreaEl.textContent = t('ui.playerMove', { player: nextPlayerName, mode: '' });
+                        updateComputerMoveDisplay({});
+                        if (showMovesCheckbox && showMovesCheckbox.checked) {
+                            window.availableMoves = null;
+                            window.showingAvailableMoves = false;
+                            showAvailableMoves();
+                        }
+                    }
+                    updatePlayerGlow();
+                    if (showMovesCheckbox && showMovesCheckbox.checked) {
+                        showAvailableMoves();
+                    }
+                    if (!firstMoveDone) {
+                        showBoardCheckbox.checked = false;
+                        toggleBoardVisibility();
+                        firstMoveDone = true;
+                    }
+                });
+            } else {
+                // Без анімації, якщо дошка прихована
+                if (blockedMode) {
+                    blockedCells.push({ row, col });
+                }
+                window.showingAvailableMoves = false;
+                window.availableMoves = null;
+                board[row][col] = 0;
+                board[newRow][newCol] = 1;
+                points++;
+                renderBoard();
+                isPlayerTurn = false;
+                messageAreaEl.textContent = "";
+                resetSelections();
+                generateDistanceButtons();
+                resetSelections(true);
+                updateComputerMoveDisplay({});
+                if (isOnlineGame) {
+                    playerTurnIndicatorEl.textContent = 'Хід суперника';
+                    const move = {
+                        direction: selectedDirection,
+                        distance: selectedDistance
+                    };
+                    if (typeof sendMoveToOpponent === 'function') {
+                        sendMoveToOpponent(move);
+                    }
+                } else if (currentGameMode === 'vsComputer') {
+                    setTimeout(computerMove, 1000);
+                } else if (currentGameMode === 'localTwoPlayer') {
+                    currentPlayer = (currentPlayer === 1) ? 2 : 1;
+                    const nextPlayerName = (currentPlayer === 1) ? player1Name : player2Name;
+                    isPlayerTurn = true;
+                    messageAreaEl.textContent = t('ui.playerMove', { player: nextPlayerName, mode: '' });
+                    updateComputerMoveDisplay({});
+                    if (showMovesCheckbox && showMovesCheckbox.checked) {
+                        window.availableMoves = null;
+                        window.showingAvailableMoves = false;
+                        showAvailableMoves();
+                    }
+                }
+                updatePlayerGlow();
+                if (showMovesCheckbox && showMovesCheckbox.checked) {
                     showAvailableMoves();
                 }
-            }
-            updatePlayerGlow();
-            // Після всіх змін — якщо чекбокс увімкнено, показати доступні ходи для наступного ходу
-            if (showMovesCheckbox && showMovesCheckbox.checked) {
-                showAvailableMoves();
+                if (!firstMoveDone) {
+                    showBoardCheckbox.checked = false;
+                    toggleBoardVisibility();
+                    firstMoveDone = true;
+                }
             }
         } else {
             const directionText = getDirectionText(selectedDirection);
@@ -688,11 +803,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 endGame(reason, false);
             }
-        }
-        if (!firstMoveDone) {
-            showBoardCheckbox.checked = false;
-            toggleBoardVisibility();
-            firstMoveDone = true;
         }
     }
 
@@ -738,6 +848,13 @@ document.addEventListener('DOMContentLoaded', () => {
         window.showingAvailableMoves = true;
         renderBoard();
         
+        // Анімація появи галочок
+        setTimeout(() => {
+            document.querySelectorAll('.cell-available').forEach(cell => {
+                cell.classList.add('cell-available-appear');
+            });
+        }, 10);
+        
         let movesText = "Доступні ходи:\n";
         validMoves.forEach((move, index) => {
             movesText += `${index + 1}. ${move.directionText} на ${move.distance} клітинку\n`;
@@ -771,39 +888,77 @@ document.addEventListener('DOMContentLoaded', () => {
             blockedCells.push({ row, col });
         }
         
-        board[row][col] = 0;
-        board[newRow][newCol] = 1;
-        
-        renderBoard();
-        generateDistanceButtons();
-        resetSelections(true);
-        
-        const directionText = getDirectionText(randomMove.direction);
-        messageAreaEl.textContent = t('ui.computerMove', { direction: directionText, distance: randomMove.distance });
-        updateComputerMoveDisplay({direction: randomMove.direction, distance: randomMove.distance, isComputer: true});
-        
-        // Озвучуємо хід комп'ютера, якщо увімкнено
-        if (speechEnabled) {
-            const currentLang = localStorage.getItem('lang') || 'uk';
-            speakMove(randomMove.direction, randomMove.distance, currentLang);
-        }
-        
-        // Оновлюємо доступні ходи для гравця, якщо чекбокс увімкнено
-        if (showMovesCheckbox && showMovesCheckbox.checked) {
-            window.availableMoves = null;
-            window.showingAvailableMoves = false;
-            showAvailableMoves();
+        const boardIsVisible = !gameBoardEl.classList.contains('board-hidden');
+        if (boardIsVisible) {
+            // Очистити стару клітинку перед анімацією
+            const cells = gameBoardEl.querySelectorAll('.cell');
+            const getCellIndex = (row, col) => row * numberCells + col;
+            const fromCell = cells[getCellIndex(row, col)];
+            if (fromCell) {
+                fromCell.textContent = '';
+                fromCell.classList.remove('piece');
+            }
+            animatePieceMove(row, col, newRow, newCol, () => {
+                if (blockedMode) {
+                    blockedCells.push({ row, col });
+                }
+                board[row][col] = 0;
+                board[newRow][newCol] = 1;
+                renderBoard();
+                generateDistanceButtons();
+                resetSelections(true);
+                const directionText = getDirectionText(randomMove.direction);
+                messageAreaEl.textContent = t('ui.computerMove', { direction: directionText, distance: randomMove.distance });
+                updateComputerMoveDisplay({direction: randomMove.direction, distance: randomMove.distance, isComputer: true});
+                if (speechEnabled) {
+                    const currentLang = localStorage.getItem('lang') || 'uk';
+                    speakMove(randomMove.direction, randomMove.distance, currentLang);
+                }
+                if (showMovesCheckbox && showMovesCheckbox.checked) {
+                    window.availableMoves = null;
+                    window.showingAvailableMoves = false;
+                    showAvailableMoves();
+                } else {
+                    window.showingAvailableMoves = false;
+                    window.availableMoves = null;
+                }
+                isPlayerTurn = true;
+                updatePlayerGlow();
+                if (showMovesCheckbox && showMovesCheckbox.checked) {
+                    showAvailableMoves();
+                }
+            });
         } else {
-            window.showingAvailableMoves = false;
-            window.availableMoves = null;
+            // Без анімації, якщо дошка прихована
+            if (blockedMode) {
+                blockedCells.push({ row, col });
+            }
+            board[row][col] = 0;
+            board[newRow][newCol] = 1;
+            renderBoard();
+            generateDistanceButtons();
+            resetSelections(true);
+            const directionText = getDirectionText(randomMove.direction);
+            messageAreaEl.textContent = t('ui.computerMove', { direction: directionText, distance: randomMove.distance });
+            updateComputerMoveDisplay({direction: randomMove.direction, distance: randomMove.distance, isComputer: true});
+            if (speechEnabled) {
+                const currentLang = localStorage.getItem('lang') || 'uk';
+                speakMove(randomMove.direction, randomMove.distance, currentLang);
+            }
+            if (showMovesCheckbox && showMovesCheckbox.checked) {
+                window.availableMoves = null;
+                window.showingAvailableMoves = false;
+                showAvailableMoves();
+            } else {
+                window.showingAvailableMoves = false;
+                window.availableMoves = null;
+            }
+            isPlayerTurn = true;
+            updatePlayerGlow();
+            if (showMovesCheckbox && showMovesCheckbox.checked) {
+                showAvailableMoves();
+            }
         }
-        isPlayerTurn = true;
-        // Видалено оновлення колір фону - хід комп'ютера залишається видимим
-        // Після всіх змін — якщо чекбокс увімкнено, показати доступні ходи для гравця
-        if (showMovesCheckbox && showMovesCheckbox.checked) {
-            showAvailableMoves();
-        }
-        // setTimeout видалено, центр не очищається автоматично
     }
 
     function endGame(reason, isWin = false) {
@@ -1078,7 +1233,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-const APP_VERSION = "0.1.4";
+const APP_VERSION = "0.1.5";
 (function checkAppVersionAndClearCacheIfNeeded() {
     try {
         const storedVersion = localStorage.getItem('appVersion');
