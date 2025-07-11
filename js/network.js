@@ -1,12 +1,8 @@
 // network.js — онлайн-логіка (PeerJS, кімнати)
 
-// Конфіг для публічного PeerJS сервера (безкоштовний, не потребує реєстрації)
+// Конфіг для PeerJS Cloud (без host/path/port, бо 0.peerjs.com більше не підтримує listAllPeers)
 const PEER_CONFIG = {
-    host: '0.peerjs.com',
-    port: 443,
-    path: '/peerjs',
-    secure: true,
-    debug: 0
+    debug: 0 // Можна збільшити для дебагу
 };
 
 // Допоміжна функція створення Peer-обʼєкта

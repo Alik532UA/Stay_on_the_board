@@ -19,6 +19,9 @@ export default {
     description: "Play with friends online!",
     createRoom: "Create Room",
     joinRoom: "Join Room",
+    joinById: "Join by ID",
+    joinByIdTitle: "Enter Room ID",
+    joinByIdConfirm: "Join",
     back: "Back"
   },
   localGame: {
