@@ -9,113 +9,22 @@ import {
     toggleTheme, initOnlineUsers, showPlayerNameInput
 } from './ui.js';
 import { t, loadLanguage, updateUIWithLanguage } from './localization.js';
+import { listRooms as fetchPeerRooms, hostRoom as createPeerHost, joinRoom as connectToPeerRoom, sendMessage as sendPeerMessage, generateRoomId } from './network.js';
 import { speakMove, speakGameMessage, stopSpeaking, isSpeechEnabled, initVoices, getAvailableVoices, getVoicesForLanguage, setVoiceForLanguage, getCurrentVoice } from './speech.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    function loadLanguage(lang) {
-        console.log('[loadLanguage] Loading language:', lang);
-        console.log('[loadLanguage] Available translations:', Object.keys(window.translationsAll));
-        window.translations = window.translationsAll[lang];
-        console.log('[loadLanguage] Set translations to:', window.translations);
-        // currentLang = lang; // видалено, бо не оголошено
-        localStorage.setItem('lang', lang);
-        updateUIWithLanguage();
-        
-        // Оновлюємо озвучування, якщо воно увімкнено
-        if (speechEnabled) {
-            stopSpeaking(); // Зупиняємо поточне озвучування при зміні мови
-        }
-    }
+if (!window.translations) {
+    window.translations = window.translationsAll && window.translationsAll['uk'] ? window.translationsAll['uk'] : {};
+}
 
-    function updateUIWithLanguage() {
-        console.log('[updateUIWithLanguage] Updating UI with language');
-        // Оновлюємо головне меню, якщо воно відкрите
-        if (typeof modalOverlay !== 'undefined' && !modalOverlay.classList.contains('hidden')) {
-            openMainMenu();
-        }
-        // Оновлюємо підписи поза модалкою
-        if (typeof messageAreaEl !== 'undefined' && messageAreaEl) {
-            messageAreaEl.textContent = t('mainMenu.welcome');
-        }
-        if (typeof playerTurnIndicatorEl !== 'undefined' && playerTurnIndicatorEl) {
-            playerTurnIndicatorEl.textContent = t('mainMenu.playerTurn') || '';
-        }
-        if (typeof opponentNameEl !== 'undefined' && opponentNameEl) {
-            opponentNameEl.textContent = t('mainMenu.opponent') || '';
-        }
-        // Оновлюємо підписи чекбоксів
-        if (typeof speechEnabledLabel !== 'undefined' && speechEnabledLabel) {
-            if (speechEnabledLabel.childNodes.length > 0) {
-                speechEnabledLabel.childNodes[0].textContent = t('controls.speechEnabled') + ' ';
-            } else {
-                speechEnabledLabel.textContent = t('controls.speechEnabled');
-            }
-        }
-        // Оновлюємо інші підписи чекбоксів
-        const showBoardLabel = document.getElementById('show-board-label');
-        if (showBoardLabel) {
-            if (showBoardLabel.childNodes.length > 0) {
-                showBoardLabel.childNodes[0].textContent = t('controls.hideBoard') + ' ';
-            } else {
-                showBoardLabel.textContent = t('controls.hideBoard');
-            }
-        }
-        const blockedModeLabel = document.getElementById('blocked-mode-label');
-        if (blockedModeLabel) {
-            if (blockedModeLabel.childNodes.length > 0) {
-                blockedModeLabel.childNodes[0].textContent = t('controls.blockedMode') + ' ';
-            } else {
-                blockedModeLabel.textContent = t('controls.blockedMode');
-            }
-        }
-        const showMovesLabel = document.getElementById('show-moves-label');
-        if (showMovesLabel) {
-            if (showMovesLabel.childNodes.length > 0) {
-                showMovesLabel.childNodes[0].textContent = t('controls.showMoves') + ' ';
-            } else {
-                showMovesLabel.textContent = t('controls.showMoves');
-            }
-        }
-        // Оновлюємо підпис "Оберіть відстань:"
-        const selectDistanceLabel = document.getElementById('select-distance-label');
-        if (selectDistanceLabel) {
-            selectDistanceLabel.textContent = t('ui.selectDistance');
-        }
-        // Оновлюємо підпис "Очки:"
-        const scoreLabel = document.getElementById('score-label');
-        if (scoreLabel && scoreLabel.childNodes.length > 0) {
-            scoreLabel.childNodes[0].textContent = t('ui.score') + ': ';
-        }
-        // Оновлюємо підпис "Онлайн:"
-        const onlineLabel = document.getElementById('online-label');
-        if (onlineLabel) {
-            // Зберігаємо іконку
-            const icon = onlineLabel.querySelector('span');
-            onlineLabel.innerHTML = '';
-            if (icon) onlineLabel.appendChild(icon);
-            onlineLabel.appendChild(document.createTextNode(' ' + t('ui.online') + ': '));
-            const onlineCount = document.getElementById('online-count');
-            if (onlineCount) onlineLabel.appendChild(onlineCount);
-        }
-        // Оновлюємо кнопки
-        const confirmMoveBtn = document.getElementById('confirm-move-btn');
-        if (confirmMoveBtn) {
-            confirmMoveBtn.textContent = t('common.confirmMove');
-        }
-        const noMovesBtn = document.getElementById('no-moves-btn');
-        if (noMovesBtn) {
-            noMovesBtn.textContent = t('common.noMoves');
-        }
-        // Оновлюємо іконку прапора
-        if (typeof updateLangFlag === 'function') updateLangFlag();
-        // Переконатися, що обробник події для voiceSettingsToggle присутній
-        if (typeof voiceSettingsToggle !== 'undefined' && voiceSettingsToggle && !voiceSettingsToggle._listenerAdded) {
-            voiceSettingsToggle.addEventListener('click', toggleVoiceSettings);
-            voiceSettingsToggle._listenerAdded = true;
-        }
-        if (typeof window.updateGameTitle === 'function') window.updateGameTitle();
-        // Можна додати інші елементи, якщо потрібно
+document.addEventListener('DOMContentLoaded', () => {
+    // Якщо мова не встановлена у localStorage, явно встановлюємо українську
+    if (!localStorage.getItem('lang')) {
+        localStorage.setItem('lang', 'uk');
     }
+    // Завжди оновлюємо window.translations та currentLang відповідно до localStorage
+    import('./localization.js').then(module => {
+        module.loadLanguage(localStorage.getItem('lang'), module.updateUIWithLanguage);
+    });
 
     // --- Глобальні змінні та посилання на DOM-елементи ---
     let board = [];
@@ -134,6 +43,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let isConnected = false; // Чи підключені гравці
     let waitingForOpponent = false; // Очікування суперника
     let signalingSocket = null; // WebSocket для signaling
+
+    // === PeerJS Online ===
+    let peerInstance = null;      // Поточний Peer
+    let peerConn = null;          // DataConnection з суперником
+    let onlineRoomId = null;      // ID кімнати
+    let pendingBoardSize = null;  // Розмір дошки, вибраний хостом до підключення гостя
+
+    // Заглушки, які використовуються до ініціалізації
+    let sendMoveToOpponent = () => {};
+    let endOnlineGame = (reason) => {
+        console.warn('[OnlineGame] Завершення гри:', reason);
+        endGame(reason, false);
+        if (peerInstance) try { peerInstance.destroy(); } catch (e) {}
+    };
+
     const version = "0.1.5";
 
     let currentGameMode = 'vsComputer'; // 'vsComputer' або 'localTwoPlayer'
@@ -213,28 +137,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function createVoiceSelectors() {
         if (!voiceSelectors || !isSpeechEnabled()) return;
         
+        // Визначаємо поточну мову
+        const lang = localStorage.getItem('lang') || 'uk';
         const languages = [
             { code: 'uk', name: 'Українська' },
             { code: 'en', name: 'English' },
             { code: 'crh', name: 'Кримськотатарська' },
             { code: 'nl', name: 'Nederlands' }
         ];
-        
+        const currentLanguage = languages.find(l => l.code === lang);
         voiceSelectors.innerHTML = '';
-        
-        languages.forEach(lang => {
-            const voices = getVoicesForLanguage(lang.code);
-            const currentVoice = getCurrentVoice(lang.code);
-            
+        if (currentLanguage) {
+            const voices = getVoicesForLanguage(currentLanguage.code);
+            const currentVoice = getCurrentVoice(currentLanguage.code);
             if (voices.length > 0) {
                 const container = document.createElement('div');
-                
                 const label = document.createElement('label');
-                label.textContent = lang.name;
-                
+                label.textContent = currentLanguage.name;
                 const select = document.createElement('select');
-                
-                // Додаємо опції
                 voices.forEach(voice => {
                     const option = document.createElement('option');
                     option.value = voice.name;
@@ -242,20 +162,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     option.selected = currentVoice && currentVoice.name === voice.name;
                     select.appendChild(option);
                 });
-                
-                // Обробник зміни голосу
                 select.addEventListener('change', (e) => {
-                    const success = setVoiceForLanguage(lang.code, e.target.value);
+                    const success = setVoiceForLanguage(currentLanguage.code, e.target.value);
                     if (success) {
-                        console.log(`[Speech] Голос для ${lang.name} змінено на: ${e.target.value}`);
+                        console.log(`[Speech] Голос для ${currentLanguage.name} змінено на: ${e.target.value}`);
                     }
                 });
-                
                 container.appendChild(label);
                 container.appendChild(select);
                 voiceSelectors.appendChild(container);
             }
-        });
+        }
     }
 
     // Функція для перемикання видимості налаштувань голосів
@@ -460,15 +377,73 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         console.log('[updateLangFlag] Updated flag element:', langFlag);
     }
+
+    // ------------------------------------------------------------
+    // Функції для застосування перекладу до статичних елементів UI
+    // ------------------------------------------------------------
+
+    function setLabelText(labelEl, text) {
+        if (!labelEl) return;
+        // Видаляємо існуючі текстові ноди, щоб не дублювати текст
+        Array.from(labelEl.childNodes).forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                labelEl.removeChild(node);
+            }
+        });
+        labelEl.insertAdjacentText('beforeend', ' ' + text);
+    }
+
+    function applyTranslationsToStaticUI() {
+        // Top-controls
+        if (themeStyleBtn) themeStyleBtn.title = t('topControls.themeStyle');
+        if (langBtn) langBtn.title = t('topControls.language');
+        const donateBtn = document.getElementById('donate-btn');
+        if (donateBtn) donateBtn.title = t('topControls.donate');
+
+        // Board options
+        setLabelText(document.getElementById('show-moves-label'), t('board.showMoves'));
+        setLabelText(document.getElementById('show-board-label'), t('board.showBoard'));
+        setLabelText(document.getElementById('blocked-mode-label'), t('board.blockedMode'));
+        setLabelText(document.getElementById('speech-enabled-label'), t('board.speechEnabled'));
+
+        // Voice settings
+        const voiceSettingsTitle = document.getElementById('voice-settings-title');
+        if (voiceSettingsTitle) voiceSettingsTitle.textContent = t('board.voiceSettingsTitle');
+        if (voiceSettingsToggle) voiceSettingsToggle.title = t('board.voiceSettings');
+
+        // Visual controls
+        const selectDistanceLabel = document.getElementById('select-distance-label');
+        if (selectDistanceLabel) selectDistanceLabel.textContent = t('visual.selectDistance');
+        if (confirmMoveBtn) confirmMoveBtn.textContent = t('visual.confirmMove');
+        if (noMovesBtn) noMovesBtn.textContent = t('visual.noMoves');
+
+        // Score panel
+        const scoreLabel = document.getElementById('score-label');
+        if (scoreLabel) scoreLabel.textContent = t('scorePanel.score');
+        const onlineText = document.getElementById('online-text');
+        if (onlineText) onlineText.textContent = t('scorePanel.online');
+
+        // Menu button
+        const menuBtn = document.getElementById('menu-btn');
+        if (menuBtn) {
+            menuBtn.title = t('menu.exit');
+            menuBtn.setAttribute('aria-label', t('menu.exit'));
+        }
+    }
+ 
     langOptions.forEach(opt => {
         opt.addEventListener('click', () => {
             const lang = opt.getAttribute('data-lang');
             console.log('[langOption] Clicked on language:', lang);
-            loadLanguage(lang); // одразу застосовуємо переклад
+            loadLanguage(lang);
+            updateLangFlag();
+            applyTranslationsToStaticUI();
+            updateStyleDropdownLang();
             langDropdown.classList.add('hidden');
         });
     });
     updateLangFlag();
+    applyTranslationsToStaticUI();
 
     // --- Дропдаун тема+стиль (нова логіка) ---
     const themeStyleRows = document.querySelectorAll('.theme-style-row');
@@ -1135,7 +1110,245 @@ document.addEventListener('DOMContentLoaded', () => {
         showControlsInfo(showModal, t, openMainMenu);
     }
     function openOnlineGameMenu() {
-        showOnlineGameMenu(showModal, t, hideModal, createRoom, joinRoom, openMainMenu);
+        const topControls = document.getElementById('top-controls');
+        if (topControls) topControls.classList.add('hidden');
+
+        let rooms = [];
+        let intervalId = null;
+
+        function refreshRooms() {
+            fetchPeerRooms().then(r => {
+                rooms = r;
+                renderModal();
+            });
+        }
+
+        function renderModal() {
+            const listHtml = rooms.length ?
+                `<ul style="list-style:none;padding:0;max-height:180px;overflow-y:auto;">` +
+                rooms.map(id => `<li style="margin:4px 0;"><button class="modal-button secondary" data-room="${id}">${id}</button></li>`).join('') +
+                `</ul>` : `<p style="text-align:center;">(${t('onlineMenu.title')})</p>`;
+
+            const body = `
+                <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
+                    <div id="rooms-container" style="width:100%;">${listHtml}</div>
+                    <button id="refresh-rooms-btn" class="modal-button secondary" style="width:60%;">🔄</button>
+                </div>`;
+
+            showModal(t('onlineMenu.title'), body, [
+                { text: t('onlineMenu.createRoom'), class: 'primary', onClick: () => { hideModal(); clearInterval(intervalId); createRoom(); } },
+                { text: t('onlineMenu.back'), onClick: () => { clearInterval(intervalId); openMainMenu(); } }
+            ]);
+
+            // Призначаємо обробники
+            setTimeout(() => {
+                document.querySelectorAll('#rooms-container button[data-room]').forEach(btn => {
+                    btn.onclick = () => { hideModal(); clearInterval(intervalId); joinRoomById(btn.dataset.room); };
+                });
+                const refreshBtn = document.getElementById('refresh-rooms-btn');
+                if (refreshBtn) refreshBtn.onclick = refreshRooms;
+            }, 0);
+        }
+
+        function joinRoomById(id) {
+            hideModal();
+            joinRoomWithCode(id);
+        }
+
+        // Використовуємо існуючу joinRoom через код
+        function joinRoomWithCode(code) {
+            // Проксі до joinRoom() із попередньою логікою
+            const savedJoinRoom = joinRoom; // function defined below
+            if (savedJoinRoom) {
+                // Показати одразу з'єднання без повторного введення коду
+                hideModal();
+                showModal(t('online.connecting'), `<p style="text-align:center;">${t('online.connectingToRoom', { roomId: code })}</p>`, []);
+                const { peer } = connectToPeerRoom(code, (conn) => {
+                    peerInstance = peer;
+                    onlineRoomId = code;
+                    setupPeerConnHandlers(conn);
+                }, (err) => {
+                    alert('PeerJS error: ' + err);
+                    openMainMenu();
+                });
+            }
+        }
+
+        refreshRooms();
+        intervalId = setInterval(refreshRooms, 2000);
+    }
+
+    function setupPeerConnHandlers(conn) {
+        peerConn = conn;
+        // Функція відправки ходів тепер зрозуміла
+        sendMoveToOpponent = (move) => {
+            sendPeerMessage(peerConn, { type: 'move', ...move });
+        };
+
+        conn.on('data', (raw) => {
+            let data;
+            try { data = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch (e) { data = raw; }
+            if (!data || !data.type) return;
+            if (data.type === 'handshake') {
+                console.log('[Online] Handshake отримано', data);
+                if (isHost) {
+                    // Хост отримав підтвердження від гостя
+                    if (pendingBoardSize) {
+                        hideModal();
+                        startGame(pendingBoardSize, 'onlineHost');
+                        pendingBoardSize = null;
+                    }
+                } else {
+                    // Гість запускає гру
+                    if (!numberCells && data.boardSize && data.boardSize >= 2) {
+                        startGame(data.boardSize, 'onlineGuest');
+                    }
+                }
+            } else if (data.type === 'move') {
+                console.log('[Online] Отримано хід суперника', data);
+                applyOpponentMove(data.direction, data.distance);
+            }
+        });
+
+        conn.on('close', () => {
+            console.warn('[Online] Зʼєднання закрито');
+            endOnlineGame('Зʼєднання перервано');
+        });
+    }
+
+    // Функція для виконання ходу, отриманого від суперника
+    function applyOpponentMove(direction, distance) {
+        isPlayerTurn = false; // Щоб уникнути паралельних ходів
+        const piecePos = findPiece(board, numberCells);
+        if (!piecePos) return;
+        const { dr, dc } = getDirectionDelta(direction);
+        const newRow = piecePos.row + dr * distance;
+        const newCol = piecePos.col + dc * distance;
+        if (newRow < 0 || newRow >= numberCells || newCol < 0 || newCol >= numberCells) {
+            const reason = t('end.outOfBounds', { distance, direction: getDirectionText(direction) });
+            endOnlineGame(reason);
+            return;
+        }
+        // Блокуємо клітинку, з якої рухався противник, якщо це потрібно
+        if (blockedMode) {
+            blockedCells.push({ row: piecePos.row, col: piecePos.col });
+        }
+        board[piecePos.row][piecePos.col] = 0;
+        board[newRow][newCol] = 1;
+        renderBoard();
+        if (showMovesCheckbox && showMovesCheckbox.checked) {
+            showAvailableMoves();
+        }
+        isPlayerTurn = true; // Тепер наш хід
+        messageAreaEl.textContent = 'Ваш хід';
+    }
+
+    // === Хост створює кімнату ===
+    function createRoom() {
+        const defaultName = generateRandomRoomName();
+        const body = `
+            <p style="text-align:center;">Введіть назву кімнати</p>
+            <input type="text" id="room-name-input" class="modal-input" style="width:100%;text-align:center;max-width:160px;font-size:1.2em;letter-spacing:1px;text-transform:uppercase;" value="${defaultName}" maxlength="12">
+        `;
+        showModal(t('onlineMenu.createRoom'), body, [
+            {
+                text: t('onlineMenu.createRoom'),
+                class: 'primary',
+                onClick: () => {
+                    const name = (document.getElementById('room-name-input').value || '').trim().toUpperCase();
+                    if (!name) {
+                        alert('Вкажіть назву');
+                        return;
+                    }
+                    hideModal();
+                    hostWithName(name);
+                }
+            },
+            { text: t('common.back'), onClick: openOnlineGameMenu }
+        ]);
+
+        function hostWithName(roomName) {
+            const { roomId, peer } = createPeerHost(roomName, (conn) => {
+                console.log('[Online] Гість підʼєднався');
+                setupPeerConnHandlers(conn);
+                sendPeerMessage(conn, { type: 'handshake', boardSize: numberCells || 0 });
+            }, (err) => {
+                alert('PeerJS error: ' + err);
+            });
+
+            peerInstance = peer;
+            onlineRoomId = roomId;
+            isOnlineGame = true;
+            isHost = true;
+
+            // Вибір розміру дошки
+            setTimeout(() => {
+                showBoardSizeSelection(
+                    showModal,
+                    t,
+                    (size) => {
+                        pendingBoardSize = size;
+                        // Показуємо повідомлення про очікування суперника
+                        showModal('Очікуємо гравця', `<p style="text-align:center;">Кімната <b>${roomId}</b><br>Очікуємо підключення...</p>`, [
+                            { text: t('onlineMenu.back'), onClick: openMainMenu }
+                        ]);
+                        if (peerConn) {
+                            sendPeerMessage(peerConn, { type: 'handshake', boardSize: size });
+                            hideModal();
+                            startGame(size, 'onlineHost');
+                        }
+                    },
+                    openMainMenu
+                );
+            }, 0);
+        }
+
+        function generateRandomRoomName() {
+            return generateRoomId(); // використовую ту ж функцію, 6 символів
+        }
+    }
+
+    // === Гість приєднується до кімнати ===
+    function joinRoom() {
+        // Просимо код кімнати (6 символів)
+        const body = `
+            <p style="text-align:center;">${t('online.enterRoomCode')}</p>
+            <input type="text" id="player-name-input-online" class="modal-input" placeholder="Ваше ім'я" style="width:100%;text-align:center;max-width:180px;font-size:1.15em;margin-bottom:12px;">
+            <input type="text" id="room-code-input" class="modal-input" style="width:100%;text-align:center;max-width:140px;font-size:1.4em;letter-spacing:2px;text-transform:uppercase;" maxlength="6">
+        `;
+        showModal(t('onlineMenu.joinRoom'), body, [
+            {
+                text: t('onlineMenu.joinRoom'),
+                class: 'primary',
+                onClick: () => {
+                    const code = (document.getElementById('room-code-input').value || '').trim().toUpperCase();
+                    const yourName = (document.getElementById('player-name-input-online').value || '').trim();
+                    if (yourName) {
+                        player1Name = yourName;
+                    }
+                    if (code.length !== 6) {
+                        alert(t('online.invalidRoomCode'));
+                        return;
+                    }
+                    hideModal();
+                    attemptJoin(code);
+                }
+            },
+            { text: t('common.back'), onClick: openOnlineGameMenu }
+        ]);
+
+        function attemptJoin(code) {
+            showModal(t('online.connecting'), `<p style="text-align:center;">${t('online.connectingToRoom', { roomId: code })}</p>`, []);
+            const { peer } = connectToPeerRoom(code, (conn) => {
+                peerInstance = peer;
+                onlineRoomId = code;
+                setupPeerConnHandlers(conn);
+                // Очікуємо handshake з розміром дошки
+            }, (err) => {
+                alert('PeerJS error: ' + err);
+                openMainMenu();
+            });
+        }
     }
 
     // --- Ініціалізація гри та слухачі подій ---
@@ -1182,7 +1395,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Ініціалізуємо прапор мови
     updateLangFlag();
-    
+    applyTranslationsToStaticUI();
+
     // Оновлений виклик головного меню:
     openMainMenu();
     window.global_startGame = startGame;
