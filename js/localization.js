@@ -21,13 +21,24 @@ export function t(path, params) {
 }
 
 export function loadLanguage(lang, updateUIWithLanguage) {
-    translations = window.translationsAll[lang];
+    // Оновлюємо глобальний об'єкт перекладів, щоб інші модулі одразу бачили зміни
+    window.translations = window.translationsAll[lang] || {};
+    translations = window.translations; // синхронізуємо локальну змінну модуля
     currentLang = lang;
     localStorage.setItem('lang', lang);
-    if (typeof updateUIWithLanguage === 'function') updateUIWithLanguage();
+    // Якщо передано колбек для оновлення UI – викликаємо його, але безпечним чином
+    if (typeof updateUIWithLanguage === 'function') {
+        try {
+            updateUIWithLanguage();
+        } catch (e) {
+            console.warn('[i18n] updateUIWithLanguage error:', e);
+        }
+    }
 }
 
 export function updateUIWithLanguage(modalOverlay, modalTitle, showMainMenu, t) {
+    // Якщо параметри не передані – просто виходимо
+    if (!modalOverlay || !modalTitle || !t) return;
     if (!modalOverlay.classList.contains('hidden') && modalTitle.textContent === t('mainMenu.title')) {
         showMainMenu();
     }
