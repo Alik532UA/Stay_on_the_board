@@ -121,8 +121,7 @@ export function showMainMenu(showModal, t, showRules, showControlsInfo, onVsComp
         if (btnLocalGame && onLocalGame) btnLocalGame.onclick = onLocalGame;
 
         if (btnOnline) {
-            btnOnline.disabled = true;
-            btnOnline.classList.add('disabled');
+            if (onOnline) btnOnline.onclick = onOnline;
         }
         if (btnControls) btnControls.onclick = () => showControlsInfo(showModal, t, () => showMainMenu(showModal, t, showRules, showControlsInfo, onVsComputer, onLocalGame, onOnline, onDonate));
         if (btnRules) btnRules.onclick = () => showRules(showModal, t, () => showMainMenu(showModal, t, showRules, showControlsInfo, onVsComputer, onLocalGame, onOnline, onDonate));

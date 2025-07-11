@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <!-- PeerJS (P2P через WebRTC) -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         .icon-btn {
             text-decoration: none !important;
@@ -89,7 +91,6 @@
         </div>
         <div id="show-moves-checkbox-wrapper">
             <label for="show-moves-checkbox" id="show-moves-label">
-                <span id="show-moves-text"></span>
                 <span class="ios-switch">
                     <input type="checkbox" id="show-moves-checkbox">
                     <span class="slider"></span>
@@ -98,14 +99,12 @@
         </div>
         <div id="board-options">
             <label for="show-board-checkbox" id="show-board-label">
-                <span id="show-board-text"></span>
                 <span class="ios-switch">
                     <input type="checkbox" id="show-board-checkbox" checked>
                     <span class="slider"></span>
                 </span>
             </label>
             <label for="blocked-mode-checkbox" id="blocked-mode-label">
-                <span id="blocked-mode-text"></span>
                 <span class="ios-switch">
                     <input type="checkbox" id="blocked-mode-checkbox">
                     <span class="slider"></span>
@@ -113,7 +112,6 @@
             </label>
             <div class="speech-controls-container">
                 <label for="speech-enabled-checkbox" id="speech-enabled-label">
-                    <span id="speech-enabled-text"></span>
                     <span class="ios-switch">
                         <input type="checkbox" id="speech-enabled-checkbox">
                         <span class="slider"></span>
@@ -154,6 +152,7 @@
         <p id="message-area"></p>
         <div class="score-panel">
             <span id="score-label"></span>
+            <span id="score-display"></span>
             <span class="online-users" id="online-label"><span id="online-icon">👥</span> <span id="online-text"></span><span id="online-count">1</span></span>
         </div>
         <!-- Все інше, що було у game-container, залишаємо нижче -->
@@ -179,35 +178,12 @@
       import crh from './lang/crh.js';
       import nl from './lang/nl.js';
       window.translationsAll = { uk, en, crh, nl };
-      window.translations = window.translationsAll[localStorage.getItem('lang') || 'uk'];
-      // Динамічно оновлюємо всі тексти при зміні мови
-      function updateLocalizedTexts() {
-        const t = window.translations;
-        document.getElementById('game-title').textContent = t.mainMenu.gameTitle;
-        document.getElementById('page-title').textContent = t.mainMenu.gameTitle;
-        document.getElementById('theme-style-btn').title = t.topControls.themeStyle;
-        document.getElementById('lang-btn').title = t.topControls.language;
-        document.getElementById('donate-btn').title = t.topControls.donate;
-        document.getElementById('show-moves-text').textContent = t.board.showMoves;
-        document.getElementById('show-board-text').textContent = t.board.showBoard;
-        document.getElementById('blocked-mode-text').textContent = t.board.blockedMode;
-        document.getElementById('speech-enabled-text').textContent = t.board.speechEnabled;
-        document.getElementById('voice-settings-toggle').title = t.board.voiceSettings;
-        document.getElementById('voice-settings-title').textContent = t.board.voiceSettingsTitle;
-        document.getElementById('computer-move-display').innerHTML = t.visual.computerMove;
-        document.getElementById('select-distance-label').textContent = t.visual.selectDistance;
-        document.getElementById('confirm-move-btn').textContent = t.visual.confirmMove;
-        document.getElementById('no-moves-btn').textContent = t.visual.noMoves;
-        document.getElementById('message-area').textContent = t.mainMenu.welcome;
-        document.getElementById('score-label').textContent = t.scorePanel.score + ': ';
-        document.getElementById('online-label').title = t.scorePanel.online;
-        document.getElementById('online-text').textContent = t.scorePanel.online + ': ';
-        document.getElementById('menu-btn').title = t.menu.exit;
-        document.getElementById('menu-btn').ariaLabel = t.menu.exit;
-        document.getElementById('modal-title').textContent = t.menu.menuTitle;
+      // Встановлюємо українську як мову за замовчуванням, якщо не вибрано
+      if (!localStorage.getItem('lang')) {
+        localStorage.setItem('lang', 'uk');
       }
-      window.updateLocalizedTexts = updateLocalizedTexts;
-      updateLocalizedTexts();
+      window.translations = window.translationsAll[localStorage.getItem('lang')];
+      // Оновити підписи одразу після завантаження сторінки
     </script>
     <script type="module" src="js/game.js"></script>
 </body>
