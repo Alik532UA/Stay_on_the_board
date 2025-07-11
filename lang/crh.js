@@ -104,5 +104,32 @@ export default {
     version: "Oyun versiyası: {version}",
     chooseBoardSize: "Tahta ölçe sayla",
     menu: "Menü"
+  },
+  topControls: {
+    themeStyle: "Tema ve stil",
+    language: "Til",
+    donate: "Layiheni destekle"
+  },
+  board: {
+    showMoves: "Mümkün hareketlerini köster",
+    showBoard: "Tahtanı köster",
+    blockedMode: "Bloklanğan hucre rejimi",
+    speechEnabled: "Sesli bildirim",
+    voiceSettings: "Ses ayarları",
+    voiceSettingsTitle: "Ses ayarları:"
+  },
+  visual: {
+    computerMove: "Kompyuterniñ yürüvi<br>",
+    selectDistance: "Mesafeni sayla:",
+    confirmMove: "Hareketni tasdiqla",
+    noMoves: "Yürüyecek yolım yoq"
+  },
+  scorePanel: {
+    score: "Oçko",
+    online: "Onlayn"
+  },
+  menu: {
+    exit: "Menüge qayt",
+    menuTitle: "Menü"
   }
 }; 

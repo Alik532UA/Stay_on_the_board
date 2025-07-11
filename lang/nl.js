@@ -104,5 +104,33 @@ export default {
     version: "Spelversie: {version}",
     chooseBoardSize: "Bordgrootte kiezen",
     menu: "Menu"
+  },
+  // Voeg sectie toe voor tooltips en labels
+  topControls: {
+    themeStyle: "Thema en stijl",
+    language: "Taal",
+    donate: "Project steunen"
+  },
+  board: {
+    showMoves: "Toon beschikbare zetten",
+    showBoard: "Toon bord",
+    blockedMode: "Geblokkeerde cellen modus",
+    speechEnabled: "Spraak ingeschakeld",
+    voiceSettings: "Spraakinstellingen",
+    voiceSettingsTitle: "Spraakinstellingen:"
+  },
+  visual: {
+    computerMove: "Zet van de computer<br>",
+    selectDistance: "Kies afstand:",
+    confirmMove: "Zet bevestigen",
+    noMoves: "Ik heb geen zetten"
+  },
+  scorePanel: {
+    score: "Punten",
+    online: "Online"
+  },
+  menu: {
+    exit: "Terug naar menu",
+    menuTitle: "Menu"
   }
 }; 

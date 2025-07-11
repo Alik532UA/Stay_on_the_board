@@ -3,12 +3,19 @@
 export let currentLang = localStorage.getItem('lang') || 'uk';
 export let translations = window.translationsAll[currentLang];
 
-export function t(path) {
+export function t(path, params) {
   const translations = window.translations;
-  const value = path.split('.').reduce((obj, key) => obj && obj[key], translations);
+  let value = path.split('.').reduce((obj, key) => obj && obj[key], translations);
   if (!value) {
     console.warn('[i18n] No translation for', path, 'in', translations);
     return `[no translation: ${path}]`;
+  }
+  // Якщо передані параметри для підстановки
+  if (params && typeof params === 'object') {
+    Object.keys(params).forEach(key => {
+      // Підміняємо всі входження {key} на значення
+      value = value.replace(new RegExp('\\{' + key + '\\}', 'g'), params[key]);
+    });
   }
   return value;
 }

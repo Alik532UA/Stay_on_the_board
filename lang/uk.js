@@ -99,5 +99,33 @@ export default {
     version: "Версія гри: {version}",
     chooseBoardSize: "Вибрати розмір дошки",
     menu: "Меню"
+  },
+  // Додаю секцію для тултіпів та підписів
+  topControls: {
+    themeStyle: "Тема та стиль",
+    language: "Мова",
+    donate: "Підтримати проєкт"
+  },
+  board: {
+    showMoves: "Показувати доступні ходи",
+    showBoard: "Показати дошку",
+    blockedMode: "Режим заблокованих клітинок",
+    speechEnabled: "Озвучування ходів",
+    voiceSettings: "Налаштування голосів",
+    voiceSettingsTitle: "Налаштування голосів:"
+  },
+  visual: {
+    computerMove: "Хід<br>Комп'ютера",
+    selectDistance: "Оберіть відстань:",
+    confirmMove: "Підтвердити хід",
+    noMoves: "Мені немає куди ходити"
+  },
+  scorePanel: {
+    score: "Очки",
+    online: "Онлайн"
+  },
+  menu: {
+    exit: "Вийти в меню",
+    menuTitle: "Меню"
   }
 }; 

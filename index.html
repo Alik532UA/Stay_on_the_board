@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">Залишитися на дошці</title>
+    <title id="page-title"></title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css?family=Ubuntu:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
 </head>
 <body>
     <div id="top-controls">
-        <button id="theme-style-btn" class="icon-btn" title="Тема та стиль">
+        <button id="theme-style-btn" class="icon-btn" title="">
             <span id="theme-style-icon">🌗</span>
         </button>
         <div id="theme-style-dropdown" class="custom-dropdown hidden">
@@ -52,7 +52,7 @@
                 </ul>
             </div>
         </div>
-        <button id="lang-btn" class="icon-btn" title="Мова">
+        <button id="lang-btn" class="icon-btn" title="">
             <span id="lang-flag"></span>
         </button>
         <div id="lang-dropdown" class="custom-dropdown hidden">
@@ -64,7 +64,7 @@
             </ul>
         </div>
         
-        <a href="https://send.monobank.ua/jar/8TPmFKQTCK/" target="_blank"  id="donate-btn" class="icon-btn" title="Підтримати проєкт">
+        <a href="https://send.monobank.ua/jar/8TPmFKQTCK/" target="_blank"  id="donate-btn" class="icon-btn" title="">
             <span>💰</span>
         </a>
         <script>
@@ -82,14 +82,14 @@
     
     <div id="game-container">
         <header>
-            <h1 id="game-title" style="text-align: center;">Залишитися на дошці</h1>
+            <h1 id="game-title" style="text-align: center;"></h1>
         </header>
         <div id="game-board">
             <!-- Клітинки дошки будуть згенеровані тут -->
         </div>
         <div id="show-moves-checkbox-wrapper">
             <label for="show-moves-checkbox" id="show-moves-label">
-                Показувати доступні ходи
+                <span id="show-moves-text"></span>
                 <span class="ios-switch">
                     <input type="checkbox" id="show-moves-checkbox">
                     <span class="slider"></span>
@@ -98,14 +98,14 @@
         </div>
         <div id="board-options">
             <label for="show-board-checkbox" id="show-board-label">
-                Показати дошку
+                <span id="show-board-text"></span>
                 <span class="ios-switch">
                     <input type="checkbox" id="show-board-checkbox" checked>
                     <span class="slider"></span>
                 </span>
             </label>
             <label for="blocked-mode-checkbox" id="blocked-mode-label">
-                Режим заблокованих клітинок
+                <span id="blocked-mode-text"></span>
                 <span class="ios-switch">
                     <input type="checkbox" id="blocked-mode-checkbox">
                     <span class="slider"></span>
@@ -113,18 +113,18 @@
             </label>
             <div class="speech-controls-container">
                 <label for="speech-enabled-checkbox" id="speech-enabled-label">
-                    Озвучування ходів
+                    <span id="speech-enabled-text"></span>
                     <span class="ios-switch">
                         <input type="checkbox" id="speech-enabled-checkbox">
                         <span class="slider"></span>
                     </span>
                 </label>
-                <button id="voice-settings-toggle" title="Налаштування голосів">
+                <button id="voice-settings-toggle" title="">
                     ⚙️
                 </button>
             </div>
             <div id="voice-settings">
-                <h4>Налаштування голосів:</h4>
+                <h4 id="voice-settings-title"></h4>
                 <div id="voice-selectors">
                     <!-- Селектори голосів будуть додані тут -->
                 </div>
@@ -138,28 +138,28 @@
                 <button class="control-btn" id="dir-8" data-direction="8">↑</button>
                 <button class="control-btn" id="dir-9" data-direction="9">↗</button>
                 <button class="control-btn" id="dir-4" data-direction="4">←</button>
-                <div id="computer-move-display">Хід<br>Комп'ютера</div>
+                <div id="computer-move-display"></div>
                 <button class="control-btn" id="dir-6" data-direction="6">→</button>
                 <button class="control-btn" id="dir-1" data-direction="1">↙</button>
                 <button class="control-btn" id="dir-2" data-direction="2">↓</button>
                 <button class="control-btn" id="dir-3" data-direction="3">↘</button>
             </div>
-            <p class="controls-label" id="select-distance-label">Оберіть відстань:</p>
+            <p class="controls-label" id="select-distance-label"></p>
             <div id="distance-selector">
                 <!-- Кнопки відстані будуть згенеровані тут -->
             </div>
-            <button id="confirm-move-btn">Підтвердити хід</button>
-            <button id="no-moves-btn">Мені немає куди ходити</button>
+            <button id="confirm-move-btn"></button>
+            <button id="no-moves-btn"></button>
         </div>
-        <p id="message-area">Вітаємо! Оберіть режим гри в головному меню.</p>
+        <p id="message-area"></p>
         <div class="score-panel">
-            <span id="score-label">Очки: <span id="score-display">0</span></span>
-            <span class="online-users" id="online-label">👥 Онлайн: <span id="online-count">1</span></span>
+            <span id="score-label"></span>
+            <span class="online-users" id="online-label"><span id="online-icon">👥</span> <span id="online-text"></span><span id="online-count">1</span></span>
         </div>
         <!-- Все інше, що було у game-container, залишаємо нижче -->
         <div id="ui-panel" style="display:none"><!-- приховано, щоб не дублювати message-area та visual-controls --></div>
         <div id="online-game-panel" class="hidden"><!-- перенесено у visual-controls --></div>
-        <button id="menu-btn" class="icon-btn" title="Вийти в меню" aria-label="Вийти в меню" style="position: absolute; left: 50%; transform: translateX(-50%); top: 0px; z-index: 10;">
+        <button id="menu-btn" class="icon-btn" title="" aria-label="" style="position: absolute; left: 50%; transform: translateX(-50%); top: 0px; z-index: 10;">
             🏠
         </button>
     </div>
@@ -180,14 +180,34 @@
       import nl from './lang/nl.js';
       window.translationsAll = { uk, en, crh, nl };
       window.translations = window.translationsAll[localStorage.getItem('lang') || 'uk'];
-      // Динамічно оновлюємо заголовок і title при зміні мови
-      function updateGameTitle() {
+      // Динамічно оновлюємо всі тексти при зміні мови
+      function updateLocalizedTexts() {
         const t = window.translations;
         document.getElementById('game-title').textContent = t.mainMenu.gameTitle;
         document.getElementById('page-title').textContent = t.mainMenu.gameTitle;
+        document.getElementById('theme-style-btn').title = t.topControls.themeStyle;
+        document.getElementById('lang-btn').title = t.topControls.language;
+        document.getElementById('donate-btn').title = t.topControls.donate;
+        document.getElementById('show-moves-text').textContent = t.board.showMoves;
+        document.getElementById('show-board-text').textContent = t.board.showBoard;
+        document.getElementById('blocked-mode-text').textContent = t.board.blockedMode;
+        document.getElementById('speech-enabled-text').textContent = t.board.speechEnabled;
+        document.getElementById('voice-settings-toggle').title = t.board.voiceSettings;
+        document.getElementById('voice-settings-title').textContent = t.board.voiceSettingsTitle;
+        document.getElementById('computer-move-display').innerHTML = t.visual.computerMove;
+        document.getElementById('select-distance-label').textContent = t.visual.selectDistance;
+        document.getElementById('confirm-move-btn').textContent = t.visual.confirmMove;
+        document.getElementById('no-moves-btn').textContent = t.visual.noMoves;
+        document.getElementById('message-area').textContent = t.mainMenu.welcome;
+        document.getElementById('score-label').textContent = t.scorePanel.score + ': ';
+        document.getElementById('online-label').title = t.scorePanel.online;
+        document.getElementById('online-text').textContent = t.scorePanel.online + ': ';
+        document.getElementById('menu-btn').title = t.menu.exit;
+        document.getElementById('menu-btn').ariaLabel = t.menu.exit;
+        document.getElementById('modal-title').textContent = t.menu.menuTitle;
       }
-      window.updateGameTitle = updateGameTitle;
-      updateGameTitle();
+      window.updateLocalizedTexts = updateLocalizedTexts;
+      updateLocalizedTexts();
     </script>
     <script type="module" src="js/game.js"></script>
 </body>

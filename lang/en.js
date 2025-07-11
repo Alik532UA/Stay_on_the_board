@@ -104,5 +104,33 @@ export default {
     version: "Game version: {version}",
     chooseBoardSize: "Choose board size",
     menu: "Menu"
+  },
+  // Add section for tooltips and labels
+  topControls: {
+    themeStyle: "Theme and style",
+    language: "Language",
+    donate: "Support the project"
+  },
+  board: {
+    showMoves: "Show available moves",
+    showBoard: "Show board",
+    blockedMode: "Blocked cells mode",
+    speechEnabled: "Speech enabled",
+    voiceSettings: "Voice settings",
+    voiceSettingsTitle: "Voice settings:"
+  },
+  visual: {
+    computerMove: "Computer's move<br>",
+    selectDistance: "Select distance:",
+    confirmMove: "Confirm move",
+    noMoves: "I have no moves"
+  },
+  scorePanel: {
+    score: "Score",
+    online: "Online"
+  },
+  menu: {
+    exit: "Exit to menu",
+    menuTitle: "Menu"
   }
 }; 

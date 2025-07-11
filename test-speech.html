@@ -53,14 +53,14 @@
         <div>
             <label>Напрямок:</label>
             <select id="direction-select">
-                <option value="1">1 - вниз-ліворуч</option>
-                <option value="2">2 - вниз</option>
-                <option value="3">3 - вниз-праворуч</option>
-                <option value="4">4 - ліворуч</option>
-                <option value="6">6 - праворуч</option>
-                <option value="7">7 - вгору-ліворуч</option>
-                <option value="8">8 - вгору</option>
-                <option value="9">9 - вгору-праворуч</option>
+                <option value="1" data-uk="вниз-ліворуч" data-en="down-left" data-crh="aşağı-sol" data-nl="omlaag-links">1</option>
+                <option value="2" data-uk="вниз" data-en="down" data-crh="aşağı" data-nl="omlaag">2</option>
+                <option value="3" data-uk="вниз-праворуч" data-en="down-right" data-crh="aşağı-sağ" data-nl="omlaag-rechts">3</option>
+                <option value="4" data-uk="ліворуч" data-en="left" data-crh="sol" data-nl="links">4</option>
+                <option value="6" data-uk="праворуч" data-en="right" data-crh="sağ" data-nl="rechts">6</option>
+                <option value="7" data-uk="вгору-ліворуч" data-en="up-left" data-crh="yukarı-sol" data-nl="omhoog-links">7</option>
+                <option value="8" data-uk="вгору" data-en="up" data-crh="yukarı" data-nl="omhoog">8</option>
+                <option value="9" data-uk="вгору-праворуч" data-en="up-right" data-crh="yukarı-sağ" data-nl="omhoog-rechts">9</option>
             </select>
         </div>
         <div>
@@ -79,6 +79,7 @@
                 <option value="uk">Українська</option>
                 <option value="en">English</option>
                 <option value="crh">Кримськотатарська</option>
+                <option value="nl">Nederlands</option>
             </select>
         </div>
         <button onclick="testMoveSpeech()">Озвучити хід</button>
@@ -92,6 +93,7 @@
             <option value="uk">Українська</option>
             <option value="en">English</option>
             <option value="crh">Кримськотатарська</option>
+            <option value="nl">Nederlands</option>
         </select>
         <button onclick="testMessageSpeech()">Озвучити повідомлення</button>
         <div id="message-speech-status" class="status"></div>
@@ -111,6 +113,7 @@
                 <option value="uk">Українська</option>
                 <option value="en">English</option>
                 <option value="crh">Кримськотатарська</option>
+                <option value="nl">Nederlands</option>
             </select>
         </div>
         <div>
@@ -132,6 +135,18 @@
 
     <script type="module">
         import { speakMove, speakGameMessage, stopSpeaking, isSpeechEnabled, initVoices, getMoveText, getAvailableVoices, getVoicesForLanguage, setVoiceForLanguage, getCurrentVoice } from './js/speech.js';
+
+        // --- Додаю автолокалізацію напрямків у селекторі ---
+        function localizeDirections() {
+            const lang = document.getElementById('lang-select').value;
+            const dirSelect = document.getElementById('direction-select');
+            Array.from(dirSelect.options).forEach(opt => {
+                opt.textContent = opt.value + ' - ' + (opt.getAttribute('data-' + lang) || opt.getAttribute('data-uk'));
+            });
+        }
+        document.getElementById('lang-select').addEventListener('change', localizeDirections);
+        localizeDirections();
+        // --- end ---
 
         window.checkSpeechSupport = function() {
             const statusDiv = document.getElementById('speech-support-status');
