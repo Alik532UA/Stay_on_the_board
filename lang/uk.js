@@ -18,6 +18,9 @@ export default {
     description: "Грайте з друзями онлайн!",
     createRoom: "Створити кімнату",
     joinRoom: "Приєднатися до кімнати",
+    joinById: "Підключитися по ID",
+    joinByIdTitle: "Введіть ID кімнати",
+    joinByIdConfirm: "Підключитися",
     back: "Назад"
   },
   localGame: {

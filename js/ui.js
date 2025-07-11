@@ -157,6 +157,27 @@ export function showOnlineGameMenu(showModal, t, hideModal, createRoom, joinRoom
     showModal(t('onlineMenu.title'), `<p>${t('onlineMenu.description')}</p>`, [
         { text: t('onlineMenu.createRoom'), class: "primary", onClick: () => { hideModal(); createRoom(); }},
         { text: t('onlineMenu.joinRoom'), class: "secondary", onClick: () => { hideModal(); joinRoom(); }},
+        {
+            text: t('onlineMenu.joinById'), class: "secondary", onClick: () => {
+                // Показати інпут для введення ID
+                showModal(t('onlineMenu.joinByIdTitle'),
+                    `<input id='join-room-id-input' class='modal-input' style='width:80%;margin:16px auto;display:block;text-align:center;font-size:1.2em;border-radius:8px;border:2px solid var(--control-selected);' placeholder='ROOM_ID'>`,
+                    [
+                        {
+                            text: t('onlineMenu.joinByIdConfirm'), class: 'primary',
+                            onClick: () => {
+                                const id = document.getElementById('join-room-id-input').value.trim();
+                                if (id) {
+                                    hideModal();
+                                    joinRoom(id);
+                                }
+                            }
+                        },
+                        { text: t('common.back'), onClick: showMainMenu }
+                    ]
+                );
+            }
+        },
         { text: t('onlineMenu.back'), onClick: showMainMenu }
     ]);
 }

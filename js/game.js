@@ -1113,69 +1113,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const topControls = document.getElementById('top-controls');
         if (topControls) topControls.classList.add('hidden');
 
-        let rooms = [];
-        let intervalId = null;
-
-        function refreshRooms() {
-            fetchPeerRooms().then(r => {
-                rooms = r;
-                renderModal();
-            });
+        function showJoinByIdModal() {
+            showModal(t('onlineMenu.joinByIdTitle'),
+                `<input id='join-room-id-input' class='modal-input' style='width:80%;margin:16px auto;display:block;text-align:center;font-size:1.2em;border-radius:8px;border:2px solid var(--control-selected);' placeholder='ROOM_ID'>`,
+                [
+                    {
+                        text: t('onlineMenu.joinByIdConfirm'), class: 'primary',
+                        onClick: () => {
+                            const id = document.getElementById('join-room-id-input').value.trim();
+                            if (id) {
+                                hideModal();
+                                joinRoomById(id);
+                            }
+                        }
+                    },
+                    { text: t('common.back'), onClick: openOnlineGameMenu }
+                ]
+            );
         }
 
-        function renderModal() {
-            const listHtml = rooms.length ?
-                `<ul style="list-style:none;padding:0;max-height:180px;overflow-y:auto;">` +
-                rooms.map(id => `<li style="margin:4px 0;"><button class="modal-button secondary" data-room="${id}">${id}</button></li>`).join('') +
-                `</ul>` : `<p style="text-align:center;">(${t('onlineMenu.title')})</p>`;
+        const body = `
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
+                <button id="join-by-id-btn" class="modal-button secondary" style="width:60%;margin-top:8px;">${t('onlineMenu.joinById')}</button>
+            </div>`;
 
-            const body = `
-                <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
-                    <div id="rooms-container" style="width:100%;">${listHtml}</div>
-                    <button id="refresh-rooms-btn" class="modal-button secondary" style="width:60%;">🔄</button>
-                </div>`;
+        showModal(t('onlineMenu.title'), body, [
+            { text: t('onlineMenu.createRoom'), class: 'primary', onClick: () => { hideModal(); createRoom(); } },
+            { text: t('onlineMenu.back'), onClick: openMainMenu }
+        ]);
 
-            showModal(t('onlineMenu.title'), body, [
-                { text: t('onlineMenu.createRoom'), class: 'primary', onClick: () => { hideModal(); clearInterval(intervalId); createRoom(); } },
-                { text: t('onlineMenu.back'), onClick: () => { clearInterval(intervalId); openMainMenu(); } }
-            ]);
-
-            // Призначаємо обробники
-            setTimeout(() => {
-                document.querySelectorAll('#rooms-container button[data-room]').forEach(btn => {
-                    btn.onclick = () => { hideModal(); clearInterval(intervalId); joinRoomById(btn.dataset.room); };
-                });
-                const refreshBtn = document.getElementById('refresh-rooms-btn');
-                if (refreshBtn) refreshBtn.onclick = refreshRooms;
-            }, 0);
-        }
-
-        function joinRoomById(id) {
-            hideModal();
-            joinRoomWithCode(id);
-        }
-
-        // Використовуємо існуючу joinRoom через код
-        function joinRoomWithCode(code) {
-            // Проксі до joinRoom() із попередньою логікою
-            const savedJoinRoom = joinRoom; // function defined below
-            if (savedJoinRoom) {
-                // Показати одразу з'єднання без повторного введення коду
-                hideModal();
-                showModal(t('online.connecting'), `<p style="text-align:center;">${t('online.connectingToRoom', { roomId: code })}</p>`, []);
-                const { peer } = connectToPeerRoom(code, (conn) => {
-                    peerInstance = peer;
-                    onlineRoomId = code;
-                    setupPeerConnHandlers(conn);
-                }, (err) => {
-                    alert('PeerJS error: ' + err);
-                    openMainMenu();
-                });
-            }
-        }
-
-        refreshRooms();
-        intervalId = setInterval(refreshRooms, 2000);
+        setTimeout(() => {
+            const joinByIdBtn = document.getElementById('join-by-id-btn');
+            if (joinByIdBtn) joinByIdBtn.onclick = showJoinByIdModal;
+        }, 0);
     }
 
     function setupPeerConnHandlers(conn) {
@@ -1344,6 +1314,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 onlineRoomId = code;
                 setupPeerConnHandlers(conn);
                 // Очікуємо handshake з розміром дошки
+            }, (err) => {
+                alert('PeerJS error: ' + err);
+                openMainMenu();
+            });
+        }
+    }
+
+    function joinRoomById(id) {
+        joinRoomWithCode(id);
+    }
+    function joinRoomWithCode(code) {
+        // Проксі до joinRoom() із попередньою логікою
+        const savedJoinRoom = joinRoom; // function defined нижче
+        if (savedJoinRoom) {
+            // Показати одразу з'єднання без повторного введення коду
+            hideModal();
+            showModal(t('online.connecting'), `<p style="text-align:center;">${t('online.connectingToRoom', { roomId: code })}</p>`, []);
+            const { peer } = connectToPeerRoom(code, (conn) => {
+                peerInstance = peer;
+                onlineRoomId = code;
+                setupPeerConnHandlers(conn);
             }, (err) => {
                 alert('PeerJS error: ' + err);
                 openMainMenu();
