@@ -1,14 +1,37 @@
 // Основна логіка гри (game-core.js)
 export function createEmptyBoard(size) {
-    return Array(size).fill(0).map(() => Array(size).fill(0));
+    console.log('[GameCore] createEmptyBoard called with size:', size);
+    
+    // Валідація розміру дошки
+    if (size < 2 || size > 9) {
+        console.error('[GameCore] Invalid board size:', size);
+        return null;
+    }
+    
+    const board = Array(size).fill(0).map(() => Array(size).fill(0));
+    console.log('[GameCore] Created empty board with size:', board.length, 'x', board[0].length);
+    return board;
 }
 
-export function findPiece(board, size) {
+export function findPiece(board, player) {
+    console.log('[GameCore] findPiece called with player:', player, 'board size:', board.length);
+    
+    // Валідація вхідних даних
+    if (!Array.isArray(board) || board.length === 0) {
+        console.error('[GameCore] Invalid board in findPiece:', board);
+        return null;
+    }
+    
+    const size = board.length; // Визначаємо розмір з самої дошки
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
-            if (board[i][j] === 1) return { row: i, col: j };
+            if (board[i] && board[i][j] === player) {
+                console.log('[GameCore] Found piece at:', { row: i, col: j });
+                return { row: i, col: j };
+            }
         }
     }
+    console.log('[GameCore] No piece found for player:', player);
     return null;
 }
 
@@ -18,37 +41,69 @@ export function getDirectionDelta(side) {
         '4': { dr: 0, dc: -1 }, '6': { dr: 0, dc: 1 },
         '1': { dr: 1, dc: -1 }, '2': { dr: 1, dc: 0 }, '3': { dr: 1, dc: 1 }
     };
-    return directions[side] || { dr: 0, dc: 0 };
+    const delta = directions[side] || { dr: 0, dc: 0 };
+    console.log('[GameCore] getDirectionDelta:', side, '=', delta);
+    return delta;
 }
 
-export function getAllValidMoves(board, blockedCells, blockedMode, size) {
-    const piecePos = findPiece(board, size);
-    if (!piecePos) return [];
+export function getAllValidMoves(board, row, col, player, blockedCells = [], blockedMode = false) {
+    console.log('[GameCore] getAllValidMoves called with:', { row, col, player, boardSize: board.length });
+    
+    // Валідація вхідних даних
+    if (!Array.isArray(board) || board.length === 0) {
+        console.error('[GameCore] Invalid board in getAllValidMoves:', board);
+        return [];
+    }
+    
+    // Використовуємо передані координати row та col замість пошуку фігури
+    if (row < 0 || row >= board.length || col < 0 || col >= board.length) {
+        console.log('[GameCore] Invalid coordinates, returning empty array');
+        return [];
+    }
+    
     const validMoves = [];
-    const { row, col } = piecePos;
-    const directions = [1, 2, 3, 4, 6, 7, 8, 9];
+    // Перемішуємо напрямки для кращої випадковості
+    const directions = [1, 2, 3, 4, 6, 7, 8, 9].sort(() => Math.random() - 0.5);
+    const size = board.length;
+    
+    console.log('[GameCore] Checking moves for board size:', size, 'from position:', row, col);
+    
     for (const direction of directions) {
         for (let distance = 1; distance < size; distance++) {
             const { dr, dc } = getDirectionDelta(direction);
             const newRow = row + dr * distance;
             const newCol = col + dc * distance;
+            
             if (newRow >= 0 && newRow < size && newCol >= 0 && newCol < size) {
-                if (!blockedMode || !blockedCells.some(pos => pos.row === newRow && pos.col === newCol)) {
-                    validMoves.push({
-                        direction,
-                        distance,
-                        newRow,
-                        newCol
-                    });
+                // Перевіряємо, чи клітинка вільна
+                if (board[newRow][newCol] === 0) {
+                    if (!blockedMode || !blockedCells.some(pos => pos.row === newRow && pos.col === newCol)) {
+                        validMoves.push({
+                            direction,
+                            distance,
+                            newRow,
+                            newCol
+                        });
+                    }
                 }
             }
         }
     }
+    
+    console.log('[GameCore] Found valid moves:', validMoves.length, 'moves');
     return validMoves;
 }
 
-export function hasValidMoves(board, blockedCells, blockedMode, size) {
-    return getAllValidMoves(board, blockedCells, blockedMode, size).length > 0;
+export function hasValidMoves(board, row, col, player, blockedCells = [], blockedMode = false) {
+    // Валідація вхідних даних
+    if (!Array.isArray(board) || board.length === 0) {
+        console.error('[GameCore] Invalid board in hasValidMoves:', board);
+        return false;
+    }
+    
+    const moves = getAllValidMoves(board, row, col, player, blockedCells, blockedMode);
+    console.log('[GameCore] hasValidMoves:', moves.length > 0, 'moves count:', moves.length);
+    return moves.length > 0;
 }
 
 export function getDirectionText(side, lang = null) {
@@ -75,7 +130,9 @@ export function getDirectionText(side, lang = null) {
             '7': "omhoog-links", '8': "omhoog", '9': "omhoog-rechts"
         }
     };
-    return (directionTexts[lang] && directionTexts[lang][side]) || directionTexts.uk[side] || '...';
+    const text = (directionTexts[lang] && directionTexts[lang][side]) || directionTexts.uk[side] || '...';
+    console.log('[GameCore] getDirectionText:', side, lang, '=', text);
+    return text;
 }
 
 export function getDirectionArrow(side) {
@@ -84,5 +141,7 @@ export function getDirectionArrow(side) {
         '4': '←', '6': '→',
         '1': '↙', '2': '↓', '3': '↘'
     };
-    return arrows[side] || '?';
+    const arrow = arrows[side] || '?';
+    console.log('[GameCore] getDirectionArrow:', side, '=', arrow);
+    return arrow;
 } 

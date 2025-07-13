@@ -1,0 +1,134 @@
+/* CS2 стиль - Світла тема */
+[data-style="cs2"] {
+    --bg-primary: #1b2838;
+    --bg-secondary: #2a475e;
+    --text-primary: #ffffff;
+    --text-secondary: #c7d5e0;
+    --text-accent: #66c0f4;
+    --border-color: #4a5f78;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --cell-light: #4a5f78;
+    --cell-dark: #2a475e;
+    --cell-blocked: #1b2838;
+    --piece-color: #ffd700;
+    --piece-shadow: rgba(255, 215, 0, 0.5);
+    --control-bg: #4a5f78;
+    --control-hover: #66c0f4;
+    --control-selected: #ff8000;
+    --computer-display-bg: #2a475e;
+    --computer-display-border: #66c0f4;
+    --computer-display-text: #66c0f4;
+    --confirm-btn-bg: #5c7e10;
+    --confirm-btn-hover: #4a6b0d;
+    --no-moves-btn-bg: #c23232;
+    --no-moves-btn-hover: #a02828;
+    --debug-btn-bg: #8b5cf6;
+    --debug-btn-hover: #7c3aed;
+    --modal-bg: rgba(27, 40, 56, 0.9);
+    --modal-content-bg: #2a475e;
+    --error-color: #c23232;
+    --board-hidden-bg: #4a5f78;
+}
+
+/* CS2 стиль - Темна тема */
+[data-theme="dark"][data-style="cs2"] {
+    --bg-primary: #0f1419;
+    --bg-secondary: #1a2838;
+    --text-primary: #ffffff;
+    --text-secondary: #c7d5e0;
+    --text-accent: #66c0f4;
+    --border-color: #2a475e;
+    --shadow-color: rgba(0, 0, 0, 0.6);
+    --cell-light: #2a475e;
+    --cell-dark: #1a2838;
+    --cell-blocked: #0f1419;
+    --piece-color: #ffd700;
+    --piece-shadow: rgba(255, 215, 0, 0.7);
+    --control-bg: #2a475e;
+    --control-hover: #66c0f4;
+    --control-selected: #66c0f4;
+    --computer-display-bg: #1a2838;
+    --computer-display-border: #66c0f4;
+    --computer-display-text: #66c0f4;
+    --confirm-btn-bg: #5c7e10;
+    --confirm-btn-hover: #4a6b0d;
+    --no-moves-btn-bg: #c23232;
+    --no-moves-btn-hover: #a02828;
+    --debug-btn-bg: #8b5cf6;
+    --debug-btn-hover: #7c3aed;
+    --modal-bg: rgba(15, 20, 25, 0.95);
+    --modal-content-bg: #1a2838;
+    --error-color: #c23232;
+    --board-hidden-bg: #2a475e;
+}
+
+/* Спеціальні ефекти для CS 2 стилю */
+[data-style="cs2"] .cell.piece {
+    animation: cs2Shine 3s ease-in-out infinite;
+}
+
+[data-style="cs2"] .control-btn {
+    border: 2px solid var(--border-color);
+    background: linear-gradient(145deg, var(--control-bg), #3a5f8a);
+}
+
+[data-style="cs2"] .control-btn:hover {
+    background: linear-gradient(145deg, var(--control-hover), #4a6f9a);
+    box-shadow: 0 0 15px var(--control-hover);
+    transform: translateY(-2px);
+}
+
+[data-style="cs2"] .control-btn.selected {
+    background: linear-gradient(145deg, var(--control-selected), #5a7faa);
+    box-shadow: 0 0 20px var(--control-selected);
+    animation: cs2Pulse 1s ease-in-out infinite;
+}
+
+[data-theme="dark"][data-style="cs2"] .cell.piece {
+    animation: cs2ShineDark 3s ease-in-out infinite;
+}
+
+[data-theme="dark"][data-style="cs2"] .control-btn {
+    background: linear-gradient(145deg, var(--control-bg), #1a2838);
+}
+
+[data-theme="dark"][data-style="cs2"] .control-btn:hover {
+    background: linear-gradient(145deg, var(--control-hover), #2a3858);
+    box-shadow: 0 0 20px var(--control-hover);
+    transform: translateY(-3px);
+}
+
+@keyframes cs2ShineDark {
+    0%, 100% { 
+        text-shadow: 0 0 10px var(--piece-shadow), 0 0 20px var(--piece-color);
+        transform: scale(1);
+    }
+    50% { 
+        text-shadow: 0 0 20px var(--piece-shadow), 0 0 40px var(--piece-color), 0 0 60px var(--piece-color);
+        transform: scale(1.05);
+    }
+}
+
+@keyframes cs2Shine {
+    0%, 100% { 
+        text-shadow: 0 0 5px var(--piece-shadow), 0 0 10px var(--piece-color);
+        transform: scale(1);
+    }
+    50% { 
+        text-shadow: 0 0 15px var(--piece-shadow), 0 0 30px var(--piece-color), 0 0 45px var(--piece-color);
+        transform: scale(1.03);
+    }
+}
+
+@keyframes cs2Pulse {
+    0%, 100% { transform: scale(1.05); }
+    50% { transform: scale(1.1); }
+}
+
+/* Стилі для стрілок у CS2 темі */
+[data-style="cs2"] .control-btn,
+[data-style="cs2"] #center-info,
+[data-style="cs2"] .arrow {
+    font-family: 'M PLUS Rounded 1c', sans-serif !important;
+    font-weight: 700;
+} 
