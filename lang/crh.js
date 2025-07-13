@@ -12,7 +12,9 @@ export default {
     donate: "Bağış",
     ubuntu: "Ubuntu",
     clearCache: "Keşi temizle",
-    startGame: "Oyun Başlat"
+    startGame: "Oyun Başlat",
+    theme: "Tema",
+    language: "Til"
   },
   onlineMenu: {
     title: "Onlayn Oyun",

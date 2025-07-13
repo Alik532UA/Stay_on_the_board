@@ -12,7 +12,9 @@ export default {
     donate: "Doneren",
     ubuntu: "Ubuntu",
     clearCache: "Cache wissen",
-    startGame: "Spel Starten"
+    startGame: "Spel Starten",
+    theme: "Thema",
+    language: "Taal"
   },
   onlineMenu: {
     title: "Online Spel",

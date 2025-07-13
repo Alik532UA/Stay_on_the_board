@@ -1,190 +1,20 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title"></title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css?family=Ubuntu:400,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
-    <!-- PeerJS (P2P через WebRTC) -->
-    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-    <style>
-        .icon-btn {
-            text-decoration: none !important;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stay on the board</title>
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
 </head>
 <body>
-    <div id="top-controls">
-        <button id="theme-style-btn" class="icon-btn" title="">
-            <span id="theme-style-icon">🌗</span>
-        </button>
-        <div id="theme-style-dropdown" class="custom-dropdown hidden">
-            <div class="dropdown-section">
-                <ul id="theme-style-options" class="theme-style-list">
-                    <li class="theme-style-row" data-style="classic">
-                        <button class="theme-btn light" data-theme="light">☀️</button>
-                        <span class="theme-style-name">Ubuntu</span>
-                        <button class="theme-btn dark" data-theme="dark">🌙</button>
-                    </li>
-                    <li class="theme-style-row" data-style="peak">
-                        <button class="theme-btn light" data-theme="light">☀️</button>
-                        <span class="theme-style-name">PEAK</span>
-                        <button class="theme-btn dark" data-theme="dark">🌙</button>
-                    </li>
-                    <li class="theme-style-row" data-style="cs2">
-                        <button class="theme-btn light" data-theme="light">☀️</button>
-                        <span class="theme-style-name">CS 2</span>
-                        <button class="theme-btn dark" data-theme="dark">🌙</button>
-                    </li>
-                    <li class="theme-style-row" data-style="glass">
-                        <button class="theme-btn light" data-theme="light">☀️</button>
-                        <span class="theme-style-name">Glassmorphism</span>
-                        <button class="theme-btn dark" data-theme="dark">🌙</button>
-                    </li>
-                    <li class="theme-style-row" data-style="material">
-                        <button class="theme-btn light" data-theme="light">☀️</button>
-                        <span class="theme-style-name">Material You</span>
-                        <button class="theme-btn dark" data-theme="dark">🌙</button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <button id="lang-btn" class="icon-btn" title="">
-            <span id="lang-flag"></span>
-        </button>
-        <div id="lang-dropdown" class="custom-dropdown hidden">
-            <ul id="lang-options" class="lang-dropdown-list">
-                <li class="lang-option" data-lang="uk"><span class="flag flag-uk"></span></li>
-                <li class="lang-option" data-lang="en"><span class="flag flag-en"></span></li>
-                <li class="lang-option" data-lang="crh"><span class="flag flag-crh"></span></li>
-                <li class="lang-option" data-lang="nl"><span class="flag flag-nl"></span></li>
-            </ul>
-        </div>
-        
-        <a href="https://send.monobank.ua/jar/8TPmFKQTCK/" target="_blank"  id="donate-btn" class="icon-btn" title="">
-            <span>💰</span>
-        </a>
-        <script>
-        // Динамічно змінюємо посилання для donate-btn залежно від пристрою
-        (function() {
-            var btn = document.getElementById('donate-btn');
-            if (!btn) return;
-            var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            btn.href = isMobile
-                ? 'https://send.monobank.ua/jar/8TPmFKQTCK'
-                : 'https://send.monobank.ua/jar/8TPmFKQTCK/';
-        })();
-        </script>
-    </div>
-    
-    <div id="game-container">
-        <header>
-            <h1 id="game-title" style="text-align: center;"></h1>
-        </header>
-        <div id="game-board">
-            <!-- Клітинки дошки будуть згенеровані тут -->
-        </div>
-        <div id="show-moves-checkbox-wrapper">
-            <label for="show-moves-checkbox" id="show-moves-label">
-                <span class="ios-switch">
-                    <input type="checkbox" id="show-moves-checkbox">
-                    <span class="slider"></span>
-                </span>
-            </label>
-        </div>
-        <div id="board-options">
-            <label for="show-board-checkbox" id="show-board-label">
-                <span class="ios-switch">
-                    <input type="checkbox" id="show-board-checkbox" checked>
-                    <span class="slider"></span>
-                </span>
-            </label>
-            <label for="blocked-mode-checkbox" id="blocked-mode-label">
-                <span class="ios-switch">
-                    <input type="checkbox" id="blocked-mode-checkbox">
-                    <span class="slider"></span>
-                </span>
-            </label>
-            <div class="speech-controls-container">
-                <label for="speech-enabled-checkbox" id="speech-enabled-label">
-                    <span class="ios-switch">
-                        <input type="checkbox" id="speech-enabled-checkbox">
-                        <span class="slider"></span>
-                    </span>
-                </label>
-                <button id="voice-settings-toggle" title="">
-                    ⚙️
-                </button>
-            </div>
-            <div id="voice-settings">
-                <h4 id="voice-settings-title"></h4>
-                <div id="voice-selectors">
-                    <!-- Селектори голосів будуть додані тут -->
-                </div>
-            </div>
-        </div>
-        <div id="visual-controls" class="hidden">
-            <div id="player1-glow" class="player-glow"></div>
-            <div id="player2-glow" class="player-glow"></div>
-            <div id="direction-grid">
-                <button class="control-btn" id="dir-7" data-direction="7">↖</button>
-                <button class="control-btn" id="dir-8" data-direction="8">↑</button>
-                <button class="control-btn" id="dir-9" data-direction="9">↗</button>
-                <button class="control-btn" id="dir-4" data-direction="4">←</button>
-                <div id="computer-move-display"></div>
-                <button class="control-btn" id="dir-6" data-direction="6">→</button>
-                <button class="control-btn" id="dir-1" data-direction="1">↙</button>
-                <button class="control-btn" id="dir-2" data-direction="2">↓</button>
-                <button class="control-btn" id="dir-3" data-direction="3">↘</button>
-            </div>
-            <p class="controls-label" id="select-distance-label"></p>
-            <div id="distance-selector">
-                <!-- Кнопки відстані будуть згенеровані тут -->
-            </div>
-            <button id="confirm-move-btn"></button>
-            <button id="no-moves-btn"></button>
-        </div>
-        <p id="message-area"></p>
-        <div class="score-panel">
-            <span id="score-label"></span>
-            <span id="score-display"></span>
-            <span class="online-users" id="online-label"><span id="online-icon">👥</span> <span id="online-text"></span><span id="online-count">1</span></span>
-        </div>
-        <!-- Все інше, що було у game-container, залишаємо нижче -->
-        <div id="ui-panel" style="display:none"><!-- приховано, щоб не дублювати message-area та visual-controls --></div>
-        <div id="online-game-panel" class="hidden"><!-- перенесено у visual-controls --></div>
-        <button id="menu-btn" class="icon-btn" title="" aria-label="" style="position: absolute; left: 50%; transform: translateX(-50%); top: 0px; z-index: 10;">
-            🏠
-        </button>
-    </div>
-
-    <!-- Модальне вікно -->
-    <div id="modal-overlay" class="visible">
-        <div id="modal-content">
-            <h2 id="modal-title">Menu</h2>
-            <div id="modal-body"></div>
-            <div class="modal-footer"></div>
-        </div>
-    </div>
-
-    <script type="module">
-      import uk from './lang/uk.js';
-      import en from './lang/en.js';
-      import crh from './lang/crh.js';
-      import nl from './lang/nl.js';
-      window.translationsAll = { uk, en, crh, nl };
-      // Встановлюємо українську як мову за замовчуванням, якщо не вибрано
-      if (!localStorage.getItem('lang')) {
-        localStorage.setItem('lang', 'uk');
-      }
-      window.translations = window.translationsAll[localStorage.getItem('lang')];
-      // Оновити підписи одразу після завантаження сторінки
-    </script>
-    <script type="module" src="js/game.js"></script>
+  <div class="main-container">
+    <div id="app"></div>
+    <div id="game-board-root"></div>
+    <div id="game-controls"></div>
+  </div>
+  <script type="module" src="js/translations-init.js"></script>
+  <script src="js/webrtc-manager.js"></script>
+  <script type="module" src="js/main-new.js"></script>
 </body>
-</html>
+</html> 
