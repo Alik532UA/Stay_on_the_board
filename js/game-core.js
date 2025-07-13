@@ -1,24 +1,26 @@
 // Основна логіка гри (game-core.js)
+import { Logger } from './utils/logger.js';
+
 export function createEmptyBoard(size) {
-    console.log('[GameCore] createEmptyBoard called with size:', size);
+    Logger.debug('[GameCore] createEmptyBoard called with size:', { size });
     
     // Валідація розміру дошки
     if (size < 2 || size > 9) {
-        console.error('[GameCore] Invalid board size:', size);
+        Logger.error('[GameCore] Invalid board size:', { size });
         return null;
     }
     
     const board = Array(size).fill(0).map(() => Array(size).fill(0));
-    console.log('[GameCore] Created empty board with size:', board.length, 'x', board[0].length);
+    Logger.debug('[GameCore] Created empty board with size:', { rows: board.length, cols: board[0].length });
     return board;
 }
 
 export function findPiece(board, player) {
-    console.log('[GameCore] findPiece called with player:', player, 'board size:', board.length);
+    Logger.debug('[GameCore] findPiece called with player:', { player, boardSize: board.length });
     
     // Валідація вхідних даних
     if (!Array.isArray(board) || board.length === 0) {
-        console.error('[GameCore] Invalid board in findPiece:', board);
+        Logger.error('[GameCore] Invalid board in findPiece:', { board });
         return null;
     }
     
@@ -26,12 +28,12 @@ export function findPiece(board, player) {
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
             if (board[i] && board[i][j] === player) {
-                console.log('[GameCore] Found piece at:', { row: i, col: j });
+                Logger.debug('[GameCore] Found piece at:', { row: i, col: j });
                 return { row: i, col: j };
             }
         }
     }
-    console.log('[GameCore] No piece found for player:', player);
+    Logger.debug('[GameCore] No piece found for player:', { player });
     return null;
 }
 
@@ -42,22 +44,22 @@ export function getDirectionDelta(side) {
         '1': { dr: 1, dc: -1 }, '2': { dr: 1, dc: 0 }, '3': { dr: 1, dc: 1 }
     };
     const delta = directions[side] || { dr: 0, dc: 0 };
-    console.log('[GameCore] getDirectionDelta:', side, '=', delta);
+    // Прибираємо надмірне логування - ця функція викликається 8 разів для кожної позиції
     return delta;
 }
 
 export function getAllValidMoves(board, row, col, player, blockedCells = [], blockedMode = false) {
-    console.log('[GameCore] getAllValidMoves called with:', { row, col, player, boardSize: board.length });
+    Logger.debug('[GameCore] getAllValidMoves called with:', { row, col, player, boardSize: board.length });
     
     // Валідація вхідних даних
     if (!Array.isArray(board) || board.length === 0) {
-        console.error('[GameCore] Invalid board in getAllValidMoves:', board);
+        Logger.error('[GameCore] Invalid board in getAllValidMoves:', { board });
         return [];
     }
     
     // Використовуємо передані координати row та col замість пошуку фігури
     if (row < 0 || row >= board.length || col < 0 || col >= board.length) {
-        console.log('[GameCore] Invalid coordinates, returning empty array');
+        Logger.debug('[GameCore] Invalid coordinates, returning empty array');
         return [];
     }
     
@@ -66,7 +68,7 @@ export function getAllValidMoves(board, row, col, player, blockedCells = [], blo
     const directions = [1, 2, 3, 4, 6, 7, 8, 9].sort(() => Math.random() - 0.5);
     const size = board.length;
     
-    console.log('[GameCore] Checking moves for board size:', size, 'from position:', row, col);
+    Logger.debug('[GameCore] Checking moves for board size:', { size, fromPosition: { row, col } });
     
     for (const direction of directions) {
         for (let distance = 1; distance < size; distance++) {
@@ -90,19 +92,19 @@ export function getAllValidMoves(board, row, col, player, blockedCells = [], blo
         }
     }
     
-    console.log('[GameCore] Found valid moves:', validMoves.length, 'moves');
+    Logger.debug('[GameCore] Found valid moves:', { count: validMoves.length });
     return validMoves;
 }
 
 export function hasValidMoves(board, row, col, player, blockedCells = [], blockedMode = false) {
     // Валідація вхідних даних
     if (!Array.isArray(board) || board.length === 0) {
-        console.error('[GameCore] Invalid board in hasValidMoves:', board);
+        Logger.error('[GameCore] Invalid board in hasValidMoves:', { board });
         return false;
     }
     
     const moves = getAllValidMoves(board, row, col, player, blockedCells, blockedMode);
-    console.log('[GameCore] hasValidMoves:', moves.length > 0, 'moves count:', moves.length);
+    Logger.debug('[GameCore] hasValidMoves:', { hasMoves: moves.length > 0, count: moves.length });
     return moves.length > 0;
 }
 
@@ -131,7 +133,7 @@ export function getDirectionText(side, lang = null) {
         }
     };
     const text = (directionTexts[lang] && directionTexts[lang][side]) || directionTexts.uk[side] || '...';
-    console.log('[GameCore] getDirectionText:', side, lang, '=', text);
+    Logger.debug('[GameCore] getDirectionText:', { side, lang, text });
     return text;
 }
 
@@ -142,6 +144,6 @@ export function getDirectionArrow(side) {
         '1': '↙', '2': '↓', '3': '↘'
     };
     const arrow = arrows[side] || '?';
-    console.log('[GameCore] getDirectionArrow:', side, '=', arrow);
+    Logger.debug('[GameCore] getDirectionArrow:', { side, arrow });
     return arrow;
 } 

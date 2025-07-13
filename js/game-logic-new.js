@@ -6,10 +6,11 @@ import { findPiece, hasValidMoves, getAllValidMoves, getDirectionDelta, getDirec
 import { t } from './localization.js';
 import { speakMove, speakGameMessage, stopSpeaking, initVoices, getVoicesForLanguage, setVoiceForLanguage, getCurrentVoice } from './speech.js';
 import { eventBus } from './event-bus.js';
+import { Logger } from './utils/logger.js';
 
 export class GameLogic {
     constructor() {
-        console.log('GameLogic: constructor');
+        Logger.debug('GameLogic: constructor');
         this.isInitialized = false;
         this.gameBoardComponent = null;
         this.gameControlsComponent = null;
@@ -21,7 +22,7 @@ export class GameLogic {
     init() {
         if (this.isInitialized) return;
         
-        console.log('[GameLogic] Initializing...');
+        Logger.info('[GameLogic] Initializing...');
         this.log('Initializing Game Logic');
         
         // Підписуємося на зміни стану гри
@@ -35,7 +36,7 @@ export class GameLogic {
     }
     
     subscribeToGameState() {
-        console.log('GameLogic: subscribeToGameState');
+        Logger.debug('GameLogic: subscribeToGameState');
         // Підписка на зміни стану гри
         stateManager.subscribe('game.isActive', (isActive) => {
             if (isActive) {
@@ -55,11 +56,11 @@ export class GameLogic {
         
         // Підписка на зміни розміру дошки
         stateManager.subscribe('game.boardSize', (newSize) => {
-            console.log('[GameLogic] Board size changed to:', newSize);
+            Logger.info('[GameLogic] Board size changed to:', { newSize });
             
             // Валідація розміру дошки
             if (newSize < 2 || newSize > 9) {
-                console.error('[GameLogic] Invalid board size:', newSize);
+                Logger.error('[GameLogic] Invalid board size:', { newSize });
                 return;
             }
             
@@ -73,7 +74,7 @@ export class GameLogic {
             
             // Перевіряємо, чи дошка була створена успішно
             if (!newBoard) {
-                console.error('[GameLogic] Failed to create board with size:', newSize);
+                Logger.error('[GameLogic] Failed to create board with size:', { newSize });
                 return;
             }
             
@@ -85,7 +86,7 @@ export class GameLogic {
             // Додаткова перевірка через невелику затримку
             setTimeout(() => {
                 const currentBoard = stateManager.getState('game.board');
-                console.log('[GameLogic] Verification after board recreation:', {
+                Logger.debug('[GameLogic] Verification after board recreation:', {
                     expectedSize: newSize,
                     boardExists: Array.isArray(currentBoard),
                     boardLength: currentBoard?.length,
@@ -101,10 +102,10 @@ export class GameLogic {
         
         // Підписка на подію підтвердження ходу через EventBus
         eventBus.on('game:confirmMove', () => {
-            console.log('[GameLogic] game:confirmMove received');
-            console.log('[GameLogic] Calling processPlayerMove');
+            Logger.info('[GameLogic] game:confirmMove received');
+            Logger.debug('[GameLogic] Calling processPlayerMove');
             this.processPlayerMove();
-            console.log('[GameLogic] processPlayerMove completed');
+            Logger.debug('[GameLogic] processPlayerMove completed');
         });
         
         stateManager.subscribe('game.noMoves', (noMoves) => {
@@ -135,7 +136,7 @@ export class GameLogic {
     
     // Ініціалізація мови
     async initSpeech() {
-        console.log('[GameLogic] initSpeech called');
+        Logger.debug('[GameLogic] initSpeech called');
         try {
             await initVoices();
             this.speechEnabled = stateManager.getState('settings.speechEnabled');
@@ -308,33 +309,33 @@ export class GameLogic {
     
     // Оновлення доступних ходів
     updateAvailableMoves() {
-        console.log('[GameLogic] updateAvailableMoves called');
+        Logger.debug('[GameLogic] updateAvailableMoves called');
         const gameState = stateManager.getState('game');
         const board = gameState.board;
         if (!board || !Array.isArray(board)) {
-            console.warn('[GameLogic] updateAvailableMoves: board is not ready');
+            Logger.warn('[GameLogic] updateAvailableMoves: board is not ready');
             return;
         }
         const currentPlayer = gameState.currentPlayer;
         const gameMode = gameState.gameMode;
         const boardSize = gameState.boardSize;
         
-        console.log('[GameLogic] updateAvailableMoves - gameState:', { board, currentPlayer, gameMode, boardSize });
+        Logger.debug('[GameLogic] updateAvailableMoves - gameState:', { currentPlayer, gameMode, boardSize });
         
         // Валідація розміру дошки
         if (boardSize < 2 || boardSize > 9) {
-            console.error('[GameLogic] Invalid board size in updateAvailableMoves:', boardSize);
+            Logger.error('[GameLogic] Invalid board size in updateAvailableMoves:', { boardSize });
             return;
         }
         
         if (!board || board.length === 0) {
-            console.log('[GameLogic] No board or empty board, returning');
+            Logger.debug('[GameLogic] No board or empty board, returning');
             return;
         }
         
         // Перевіряємо, чи розмір дошки відповідає очікуваному
         if (board.length !== boardSize) {
-            console.log('[GameLogic] Board size mismatch, board.length:', board.length, 'expected:', boardSize);
+            Logger.debug('[GameLogic] Board size mismatch, board.length:', { boardLength: board.length, expected: boardSize });
             return;
         }
         
@@ -350,10 +351,10 @@ export class GameLogic {
             piece = findPiece(board, currentPlayer);
         }
         
-        console.log('[GameLogic] Found piece:', piece);
+        Logger.debug('[GameLogic] Found piece:', { piece });
         
         if (!piece) {
-            console.log('[GameLogic] No piece found, returning');
+            Logger.debug('[GameLogic] No piece found, returning');
             return;
         }
         
@@ -363,16 +364,16 @@ export class GameLogic {
         
         // Отримуємо всі доступні ходи для piece 1 у vsComputer з урахуванням заблокованих клітинок
         const moves = getAllValidMoves(board, piece.row, piece.col, logicPlayer, blockedCells, blockedMode);
-        console.log('[GameLogic] updateAvailableMoves - piece at:', piece.row, piece.col, 'logicPlayer:', logicPlayer, 'blockedMode:', blockedMode, 'blockedCells:', blockedCells.length, 'moves:', moves);
+        Logger.debug('[GameLogic] updateAvailableMoves - piece at:', { row: piece.row, col: piece.col, logicPlayer, blockedMode, blockedCellsCount: blockedCells.length, movesCount: moves.length });
         stateManager.setState('game.availableMoves', moves); // завжди повний список
         
         // Перевіряємо поточний стан показу доступних ходів
         const showingAvailableMoves = stateManager.getState('game.showingAvailableMoves');
-        console.log('[GameLogic] updateAvailableMoves - showingAvailableMoves:', showingAvailableMoves, 'moves count:', moves.length);
+        Logger.debug('[GameLogic] updateAvailableMoves - showingAvailableMoves:', { showingAvailableMoves, movesCount: moves.length });
         stateManager.setState('game.highlightedMoves', showingAvailableMoves ? moves : []); // підсвічуємо тільки якщо увімкнено
         this.log('Available moves updated', { moves: moves.length, logicPlayer });
-        console.log('[GameLogic] Available moves set in state:', stateManager.getState('game.availableMoves'));
-        console.log('[GameLogic] Highlighted moves set in state:', stateManager.getState('game.highlightedMoves'));
+        Logger.debug('[GameLogic] Available moves set in state:', { availableMoves: stateManager.getState('game.availableMoves') });
+        Logger.debug('[GameLogic] Highlighted moves set in state:', { highlightedMoves: stateManager.getState('game.highlightedMoves') });
     }
 
     // Оновлення підсвічених ходів для напрямку
@@ -395,11 +396,11 @@ export class GameLogic {
     
     // Перемикання показу доступних ходів
     toggleAvailableMoves(show) {
-        console.log('toggleAvailableMoves called, show =', show);
+        Logger.debug('toggleAvailableMoves called, show =', { show });
         stateManager.setState('game.showingAvailableMoves', show);
         const gameState = stateManager.getState('game');
         if (!gameState.board || !Array.isArray(gameState.board)) {
-            console.warn('[GameLogic] toggleAvailableMoves: board is not ready');
+            Logger.warn('[GameLogic] toggleAvailableMoves: board is not ready');
             return;
         }
         if (show) {
@@ -417,7 +418,7 @@ export class GameLogic {
             stateManager.setState('game.highlightedMoves', []);
             stateManager.setState('game.showingAvailableMoves', false);
         }
-        console.log('[GameLogic] toggleAvailableMoves - final state - showingAvailableMoves:', stateManager.getState('game.showingAvailableMoves'), 'highlightedMoves count:', stateManager.getState('game.highlightedMoves').length);
+        Logger.debug('[GameLogic] toggleAvailableMoves - final state - showingAvailableMoves:', { showingAvailableMoves: stateManager.getState('game.showingAvailableMoves'), highlightedMovesCount: stateManager.getState('game.highlightedMoves').length });
     }
     
     // Перемикання режиму заблокованих клітинок

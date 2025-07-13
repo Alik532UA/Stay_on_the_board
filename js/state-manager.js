@@ -2,6 +2,7 @@
 // Централізоване управління станом додатку
 
 import { viewManager } from './view-manager.js';
+import { Logger } from './utils/logger.js';
 
 const initialState = {
   ui: {
@@ -34,7 +35,7 @@ const initialState = {
 const listeners = {};
 
 function navigateTo(viewName, params = {}) {
-  console.log('[StateManager] navigateTo:', viewName, params);
+  Logger.debug('[StateManager] navigateTo:', { viewName, params });
   setState('ui.currentView', viewName);
   viewManager.navigateTo(viewName, params);
 }
@@ -45,19 +46,19 @@ const stateManager = {
   subscribe,
   navigateTo,
   showModal(title, content, buttons = []) {
-    console.log('[StateManager] showModal:', title);
+    Logger.debug('[StateManager] showModal:', { title });
     setState('ui.modal', { isOpen: true, title, content, buttons });
   },
   hideModal() {
-    console.log('[StateManager] hideModal');
+    Logger.debug('[StateManager] hideModal');
     setState('ui.modal.isOpen', false);
   },
   updateBoard(newBoard) {
-    console.log('[StateManager] updateBoard called with board size:', newBoard.length);
+    Logger.debug('[StateManager] updateBoard called with board size:', { boardSize: newBoard.length });
     this.setState('game.board', newBoard);
   },
   addMoveToHistory(move) {
-    console.log('[StateManager] addMoveToHistory:', move);
+    Logger.debug('[StateManager] addMoveToHistory:', { move });
     const history = this.getState('game.moveHistory') || [];
     history.push(move);
     this.setState('game.moveHistory', history);
@@ -67,7 +68,7 @@ const stateManager = {
 export { stateManager };
 
 export function setState(path, value) {
-  console.log('[StateManager] setState:', path, '=', value);
+  Logger.debug('[StateManager] setState:', { path, value });
   const keys = path.split('.');
   let obj = initialState;
   for (let i = 0; i < keys.length - 1; i++) {
@@ -83,12 +84,12 @@ export function setState(path, value) {
   }
   
   if (listeners[path]) {
-    console.log('[StateManager] Notifying listeners for:', path, 'count:', listeners[path].length);
+    Logger.debug('[StateManager] Notifying listeners for:', { path, count: listeners[path].length });
     listeners[path].forEach(fn => {
       try {
         fn(value);
       } catch (error) {
-        console.error('[StateManager] Error in listener for', path, ':', error);
+        Logger.error('[StateManager] Error in listener for', { path, error: error.message });
       }
     });
   }
@@ -103,7 +104,7 @@ export function setState(path, value) {
         try {
           fn(parentState);
         } catch (error) {
-          console.error('[StateManager] Error in parent listener for', parentPath, ':', error);
+          Logger.error('[StateManager] Error in parent listener for', { parentPath, error: error.message });
         }
       });
     }
@@ -121,7 +122,7 @@ export function getState(path) {
 }
 
 export function subscribe(path, fn) {
-  console.log('[StateManager] subscribe:', path);
+  Logger.debug('[StateManager] subscribe:', { path });
   if (!listeners[path]) listeners[path] = [];
   listeners[path].push(fn);
   // Повертає unsubscribe
@@ -133,7 +134,7 @@ export function subscribe(path, fn) {
 }
 
 stateManager.updateSettings = function (settings) {
-  console.log('[StateManager] updateSettings:', settings);
+  Logger.debug('[StateManager] updateSettings:', { settings });
   let changed = false;
   if (settings.theme && initialState.settings.theme !== settings.theme) {
     initialState.settings.theme = settings.theme;
@@ -171,6 +172,6 @@ stateManager.updateSettings = function (settings) {
     if (listeners['settings.blockedMode']) listeners['settings.blockedMode'].forEach(fn => fn(settings.blockedMode));
     changed = true;
   }
-  console.log('[StateManager] updateSettings changed:', changed);
+  Logger.debug('[StateManager] updateSettings changed:', { changed });
   return changed;
 }; 
