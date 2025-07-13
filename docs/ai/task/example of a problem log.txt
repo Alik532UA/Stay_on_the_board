@@ -1,0 +1,753 @@
+speech.js:77 🎤 Speech manager initialized
+state-manager.js:124 [StateManager] subscribe: settings.speechEnabled
+state-manager.js:124 [StateManager] subscribe: settings.language
+game-logic-new.js:12 GameLogic: constructor
+game-logic-new.js:24 [GameLogic] Initializing...
+game-logic-new.js:870 [GameLogic] Initializing Game Logic {}
+game-logic-new.js:38 GameLogic: subscribeToGameState
+state-manager.js:124 [StateManager] subscribe: game.isActive
+state-manager.js:124 [StateManager] subscribe: game.selectedDirection
+state-manager.js:124 [StateManager] subscribe: game.selectedDistance
+state-manager.js:124 [StateManager] subscribe: game.boardSize
+state-manager.js:124 [StateManager] subscribe: game.noMoves
+state-manager.js:124 [StateManager] subscribe: game.selectedMove
+state-manager.js:124 [StateManager] subscribe: settings.speechEnabled
+state-manager.js:124 [StateManager] subscribe: settings.showMoves
+state-manager.js:124 [StateManager] subscribe: settings.blockedMode
+game-logic-new.js:138 [GameLogic] initSpeech called
+game-logic-new.js:870 [GameLogic] Game Logic initialized {}
+state-manager.js:124 [StateManager] subscribe: ui.modal
+state-manager.js:124 [StateManager] subscribe: ui.modal
+state-manager.js:124 [StateManager] subscribe: ui.modal
+state-manager.js:124 [StateManager] subscribe: ui.currentView
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:59 [MainMenuComponent] bindEvents called
+state-manager.js:124 [StateManager] subscribe: settings.language
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:214 [02:37:19] [INFO] ✅ Глобальні контроли налаштовані
+logger.js:212 [02:37:19] [INFO] Started: App initialization {timestamp: 1752449839670, startTime: 1752449839676}
+logger.js:214 [02:37:19] [INFO] EventBus middleware configured
+logger.js:214 [02:37:19] [INFO] Speech control configured
+logger.js:214 [02:37:19] [INFO] Systems initialized successfully
+logger.js:214 [02:37:19] [INFO] 🚀 Ініціалізація додатку Stay on the board
+logger.js:212  [02:37:19] [WARN] ⚠️ Помилка ініціалізації теми {error: "Cannot set properties of null (setting 'textContent')"}
+outputToConsole @ logger.js:212
+log @ logger.js:84
+warn @ logger.js:115
+initTheme @ main-new.js:319
+init @ main-new.js:266
+App @ main-new.js:87
+(anonymous) @ main-new.js:743
+logger.js:212 [02:37:19] [INFO] ✅ Мова ініціалізована {language: 'uk'}
+logger.js:214 [02:37:19] [INFO] ✅ Глобальні контроли налаштовані
+state-manager.js:124 [StateManager] subscribe: settings.language
+state-manager.js:124 [StateManager] subscribe: settings.theme
+state-manager.js:124 [StateManager] subscribe: settings.style
+state-manager.js:124 [StateManager] subscribe: game.isActive
+state-manager.js:124 [StateManager] subscribe: game.currentPlayer
+state-manager.js:124 [StateManager] subscribe: game.points
+state-manager.js:124 [StateManager] subscribe: ui.error
+logger.js:214 [02:37:19] [INFO] ✅ Обробка помилок налаштована
+logger.js:214 [02:37:19] [INFO] ✅ Моніторинг продуктивності налаштований
+state-manager.js:37 [StateManager] navigateTo: mainMenu {}
+state-manager.js:70 [StateManager] setState: ui.currentView = mainMenu
+state-manager.js:86 [StateManager] Notifying listeners for: ui.currentView count: 1
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:59 [MainMenuComponent] bindEvents called
+state-manager.js:124 [StateManager] subscribe: settings.language
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:214 [02:37:19] [INFO] ✅ Глобальні контроли налаштовані
+view-manager.js:37 [ViewManager] navigateTo: mainMenu {}
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:59 [MainMenuComponent] bindEvents called
+state-manager.js:124 [StateManager] subscribe: settings.language
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:214 [02:37:19] [INFO] ✅ Глобальні контроли налаштовані
+logger.js:214 [02:37:19] [INFO] 🎮 Додаток запущено
+logger.js:214 [02:37:19] [INFO] ✅ Додаток успішно ініціалізовано
+base-component.js:329 [GameControlsComponent] Component created {options: {…}}
+game-controls-component.js:24 [GameControlsComponent.render] boardSize: 3
+game-controls-component.js:26 [GameControlsComponent.render] settings.showMoves: undefined showMoves (final): true
+game-controls-component.js:31 [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: true
+game-controls-component.js:121 [GameControlsComponent] Generated 2 distance buttons for board size 3
+game-controls-component.js:174 [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+game-controls-component.js:179 [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+game-controls-component.js:174 [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+game-controls-component.js:179 [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+state-manager.js:124 [StateManager] subscribe: game.currentPlayer
+state-manager.js:124 [StateManager] subscribe: game.selectedDirection
+state-manager.js:124 [StateManager] subscribe: game.selectedDistance
+state-manager.js:124 [StateManager] subscribe: game.gameMode
+state-manager.js:124 [StateManager] subscribe: settings.showMoves
+state-manager.js:124 [StateManager] subscribe: game.boardSize
+base-component.js:329 [GameControlsComponent] Component initialized {}
+state-manager.js:124 [StateManager] subscribe: game.currentPlayer
+state-manager.js:124 [StateManager] subscribe: game.selectedDirection
+state-manager.js:124 [StateManager] subscribe: game.selectedDistance
+state-manager.js:124 [StateManager] subscribe: game.gameMode
+state-manager.js:124 [StateManager] subscribe: settings.showMoves
+state-manager.js:124 [StateManager] subscribe: game.boardSize
+game-controls-component.js:24 [GameControlsComponent.render] boardSize: 3
+game-controls-component.js:26 [GameControlsComponent.render] settings.showMoves: undefined showMoves (final): true
+game-controls-component.js:31 [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: true
+game-controls-component.js:121 [GameControlsComponent] Generated 2 distance buttons for board size 3
+game-controls-component.js:174 [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+game-controls-component.js:179 [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:214 [02:37:19] [INFO] 🎉 Додаток Stay on the board готовий до роботи
+game-logic-new.js:870 [GameLogic] Speech initialized {enabled: false}
+main-menu-component.js:59 [MainMenuComponent] bindEvents called
+main-menu-component.js:59 [MainMenuComponent] bindEvents called
+main-menu-component.js:59 [MainMenuComponent] bindEvents called
+main-menu-component.js:59 [MainMenuComponent] bindEvents called
+main-menu-component.js:59 [MainMenuComponent] bindEvents called
+main-menu-component.js:59 [MainMenuComponent] bindEvents called
+logger.js:212 [02:37:19] [INFO] 📊 Сторінка завантажена {loadTime: 106}
+state-manager.js:37 [StateManager] navigateTo: gameBoard {gameMode: 'vsComputer'}
+state-manager.js:70 [StateManager] setState: ui.currentView = gameBoard
+state-manager.js:86 [StateManager] Notifying listeners for: ui.currentView count: 1
+ [GameBoardComponent] Component created {options: {…}}
+ [GameBoardComponent] render: boardSize = 3
+ [StateManager] setState: game.gameMode = vsComputer
+ [StateManager] Notifying listeners for: game.gameMode count: 2
+ [GameBoardComponent] Board size mismatch or no board, recreating board
+ [GameCore] createEmptyBoard called with size: 3
+ [GameCore] Created empty board with size: 3 x 3
+ [StateManager] setState: game.board = (3) [Array(3), Array(3), Array(3)]
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: undefined highlightedMoves count: 0 availableMoves count: 0
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: true
+ toggleAvailableMoves called, show = true
+ [StateManager] setState: game.showingAvailableMoves = true
+ [GameLogic] updateAvailableMoves called
+ [GameLogic] updateAvailableMoves - gameState: {board: Array(3), currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+ [GameCore] findPiece called with player: 1 board size: 3
+ [GameCore] Found piece at: {row: 1, col: 2}
+ [GameLogic] Found piece: {row: 1, col: 2}
+ [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+ [GameCore] Checking moves for board size: 3 from position: 1 2
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] Found valid moves: 6 moves
+ [GameLogic] updateAvailableMoves - piece at: 1 2 logicPlayer: 1 blockedMode: false blockedCells: 0 moves: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] setState: game.availableMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] updateAvailableMoves - showingAvailableMoves: true moves count: 6
+ [StateManager] setState: game.highlightedMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+ [GameLogic] Available moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] Highlighted moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: true highlightedMoves count: 6
+ [GameBoardComponent] render: кінець
+ [GameBoardComponent] Component initialized {}
+ [StateManager] subscribe: game.boardSize
+ [StateManager] subscribe: game.board
+ [StateManager] subscribe: game.highlightedMoves
+ [StateManager] subscribe: game.showingAvailableMoves
+ [StateManager] subscribe: settings.showMoves
+ [StateManager] subscribe: game.availableMoves
+ [StateManager] subscribe: game.blockedCells
+ [StateManager] subscribe: settings.blockedMode
+ [GameBoardComponent] render: boardSize = 3
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: true
+ toggleAvailableMoves called, show = true
+ [StateManager] setState: game.showingAvailableMoves = true
+ [StateManager] Notifying listeners for: game.showingAvailableMoves count: 1
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] updateAvailableMoves called
+ [GameLogic] updateAvailableMoves - gameState: {board: Array(3), currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+ [GameCore] findPiece called with player: 1 board size: 3
+ [GameCore] Found piece at: {row: 1, col: 2}
+ [GameLogic] Found piece: {row: 1, col: 2}
+ [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+ [GameCore] Checking moves for board size: 3 from position: 1 2
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] Found valid moves: 6 moves
+ [GameLogic] updateAvailableMoves - piece at: 1 2 logicPlayer: 1 blockedMode: false blockedCells: 0 moves: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] setState: game.availableMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] Notifying listeners for: game.availableMoves count: 1
+ [GameBoardComponent] game.availableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] updateAvailableMoves - showingAvailableMoves: true moves count: 6
+ [StateManager] setState: game.highlightedMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] Notifying listeners for: game.highlightedMoves count: 1
+ [GameBoardComponent] game.highlightedMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+ [GameLogic] Available moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] Highlighted moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: true highlightedMoves count: 6
+ [GameBoardComponent] render: кінець
+ [ViewManager] navigateTo: gameBoard {gameMode: 'vsComputer'}
+ [GameBoardComponent] Component created {options: {…}}
+ [GameBoardComponent] render: boardSize = 3
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: true
+ toggleAvailableMoves called, show = true
+ [StateManager] setState: game.showingAvailableMoves = true
+ [StateManager] Notifying listeners for: game.showingAvailableMoves count: 1
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] updateAvailableMoves called
+ [GameLogic] updateAvailableMoves - gameState: {board: Array(3), currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+ [GameCore] findPiece called with player: 1 board size: 3
+ [GameCore] Found piece at: {row: 1, col: 2}
+ [GameLogic] Found piece: {row: 1, col: 2}
+ [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+ [GameCore] Checking moves for board size: 3 from position: 1 2
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] Found valid moves: 6 moves
+ [GameLogic] updateAvailableMoves - piece at: 1 2 logicPlayer: 1 blockedMode: false blockedCells: 0 moves: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] setState: game.availableMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] Notifying listeners for: game.availableMoves count: 1
+ [GameBoardComponent] game.availableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] updateAvailableMoves - showingAvailableMoves: true moves count: 6
+ [StateManager] setState: game.highlightedMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] Notifying listeners for: game.highlightedMoves count: 1
+ [GameBoardComponent] game.highlightedMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+ [GameLogic] Available moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] Highlighted moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: true highlightedMoves count: 6
+ [GameBoardComponent] render: кінець
+ [GameBoardComponent] Component initialized {}
+ [StateManager] subscribe: game.boardSize
+ [StateManager] subscribe: game.board
+ [StateManager] subscribe: game.highlightedMoves
+ [StateManager] subscribe: game.showingAvailableMoves
+ [StateManager] subscribe: settings.showMoves
+ [StateManager] subscribe: game.availableMoves
+ [StateManager] subscribe: game.blockedCells
+ [StateManager] subscribe: settings.blockedMode
+ [GameBoardComponent] render: boardSize = 3
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: true
+ toggleAvailableMoves called, show = true
+ [StateManager] setState: game.showingAvailableMoves = true
+ [StateManager] Notifying listeners for: game.showingAvailableMoves count: 2
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] updateAvailableMoves called
+ [GameLogic] updateAvailableMoves - gameState: {board: Array(3), currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+ [GameCore] findPiece called with player: 1 board size: 3
+ [GameCore] Found piece at: {row: 1, col: 2}
+ [GameLogic] Found piece: {row: 1, col: 2}
+ [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+ [GameCore] Checking moves for board size: 3 from position: 1 2
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] Found valid moves: 6 moves
+ [GameLogic] updateAvailableMoves - piece at: 1 2 logicPlayer: 1 blockedMode: false blockedCells: 0 moves: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] setState: game.availableMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] Notifying listeners for: game.availableMoves count: 2
+ [GameBoardComponent] game.availableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.availableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] updateAvailableMoves - showingAvailableMoves: true moves count: 6
+ [StateManager] setState: game.highlightedMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] Notifying listeners for: game.highlightedMoves count: 2
+ [GameBoardComponent] game.highlightedMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.highlightedMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+ [GameLogic] Available moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] Highlighted moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: true highlightedMoves count: 6
+ [GameBoardComponent] render: кінець
+ [StateManager] navigateTo: gameBoard {gameMode: 'vsComputer'}
+ [StateManager] setState: ui.currentView = gameBoard
+ [StateManager] Notifying listeners for: ui.currentView count: 1
+ [GameBoardComponent] Component created {options: {…}}
+ [GameBoardComponent] render: boardSize = 3
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: true
+ toggleAvailableMoves called, show = true
+ [StateManager] setState: game.showingAvailableMoves = true
+ [StateManager] Notifying listeners for: game.showingAvailableMoves count: 2
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] updateAvailableMoves called
+ [GameLogic] updateAvailableMoves - gameState: {board: Array(3), currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+ [GameCore] findPiece called with player: 1 board size: 3
+ [GameCore] Found piece at: {row: 1, col: 2}
+ [GameLogic] Found piece: {row: 1, col: 2}
+ [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+ [GameCore] Checking moves for board size: 3 from position: 1 2
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] Found valid moves: 6 moves
+ [GameLogic] updateAvailableMoves - piece at: 1 2 logicPlayer: 1 blockedMode: false blockedCells: 0 moves: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] setState: game.availableMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] Notifying listeners for: game.availableMoves count: 2
+ [GameBoardComponent] game.availableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.availableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] updateAvailableMoves - showingAvailableMoves: true moves count: 6
+ [StateManager] setState: game.highlightedMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] Notifying listeners for: game.highlightedMoves count: 2
+ [GameBoardComponent] game.highlightedMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.highlightedMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+ [GameLogic] Available moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] Highlighted moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: true highlightedMoves count: 6
+ [GameBoardComponent] render: кінець
+ [GameBoardComponent] Component initialized {}
+ [StateManager] subscribe: game.boardSize
+ [StateManager] subscribe: game.board
+ [StateManager] subscribe: game.highlightedMoves
+ [StateManager] subscribe: game.showingAvailableMoves
+ [StateManager] subscribe: settings.showMoves
+ [StateManager] subscribe: game.availableMoves
+ [StateManager] subscribe: game.blockedCells
+ [StateManager] subscribe: settings.blockedMode
+ [GameBoardComponent] render: boardSize = 3
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: true
+ toggleAvailableMoves called, show = true
+ [StateManager] setState: game.showingAvailableMoves = true
+ [StateManager] Notifying listeners for: game.showingAvailableMoves count: 3
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] updateAvailableMoves called
+ [GameLogic] updateAvailableMoves - gameState: {board: Array(3), currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+ [GameCore] findPiece called with player: 1 board size: 3
+ [GameCore] Found piece at: {row: 1, col: 2}
+ [GameLogic] Found piece: {row: 1, col: 2}
+ [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+ [GameCore] Checking moves for board size: 3 from position: 1 2
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+ [GameCore] Found valid moves: 6 moves
+ [GameLogic] updateAvailableMoves - piece at: 1 2 logicPlayer: 1 blockedMode: false blockedCells: 0 moves: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] setState: game.availableMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] Notifying listeners for: game.availableMoves count: 3
+ [GameBoardComponent] game.availableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.availableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.availableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] updateAvailableMoves - showingAvailableMoves: true moves count: 6
+ [StateManager] setState: game.highlightedMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [StateManager] Notifying listeners for: game.highlightedMoves count: 3
+ [GameBoardComponent] game.highlightedMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.highlightedMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.highlightedMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+ [GameLogic] Available moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] Highlighted moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+ [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: true highlightedMoves count: 6
+ [GameBoardComponent] render: кінець
+ [ViewManager] navigateTo: gameBoard {gameMode: 'vsComputer'}
+ [GameBoardComponent] Component created {options: {…}}
+ [GameBoardComponent] render: boardSize = 3
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: true
+ toggleAvailableMoves called, show = true
+ [StateManager] setState: game.showingAvailableMoves = true
+ [StateManager] Notifying listeners for: game.showingAvailableMoves count: 3
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-logic-new.js:311 [GameLogic] updateAvailableMoves called
+game-logic-new.js:322 [GameLogic] updateAvailableMoves - gameState: {board: Array(3), currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+game-core.js:17 [GameCore] findPiece called with player: 1 board size: 3
+game-core.js:29 [GameCore] Found piece at: {row: 1, col: 2}
+game-logic-new.js:353 [GameLogic] Found piece: {row: 1, col: 2}
+game-core.js:50 [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+game-core.js:69 [GameCore] Checking moves for board size: 3 from position: 1 2
+game-core.js:45 [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+game-core.js:45 [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+game-core.js:45 [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+game-core.js:45 [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+game-core.js:45 [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+game-core.js:45 [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+game-core.js:45 [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+game-core.js:45 [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+game-core.js:45 [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+game-core.js:45 [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+game-core.js:45 [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+game-core.js:45 [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+game-core.js:45 [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+game-core.js:45 [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+game-core.js:45 [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+game-core.js:45 [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+game-core.js:93 [GameCore] Found valid moves: 6 moves
+game-logic-new.js:366 [GameLogic] updateAvailableMoves - piece at: 1 2 logicPlayer: 1 blockedMode: false blockedCells: 0 moves: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+state-manager.js:70 [StateManager] setState: game.availableMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+state-manager.js:86 [StateManager] Notifying listeners for: game.availableMoves count: 3
+game-board-component.js:182 [GameBoardComponent] game.availableMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-board-component.js:182 [GameBoardComponent] game.availableMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-board-component.js:182 [GameBoardComponent] game.availableMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-logic-new.js:371 [GameLogic] updateAvailableMoves - showingAvailableMoves: true moves count: 6
+state-manager.js:70 [StateManager] setState: game.highlightedMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+state-manager.js:86 [StateManager] Notifying listeners for: game.highlightedMoves count: 3
+game-board-component.js:137 [GameBoardComponent] game.highlightedMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-board-component.js:137 [GameBoardComponent] game.highlightedMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-board-component.js:137 [GameBoardComponent] game.highlightedMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-logic-new.js:870 [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+game-logic-new.js:374 [GameLogic] Available moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+game-logic-new.js:375 [GameLogic] Highlighted moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+game-logic-new.js:420 [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: true highlightedMoves count: 6
+game-board-component.js:96 [GameBoardComponent] render: кінець
+base-component.js:329 [GameBoardComponent] Component initialized {}
+state-manager.js:124 [StateManager] subscribe: game.boardSize
+state-manager.js:124 [StateManager] subscribe: game.board
+state-manager.js:124 [StateManager] subscribe: game.highlightedMoves
+state-manager.js:124 [StateManager] subscribe: game.showingAvailableMoves
+state-manager.js:124 [StateManager] subscribe: settings.showMoves
+state-manager.js:124 [StateManager] subscribe: game.availableMoves
+state-manager.js:124 [StateManager] subscribe: game.blockedCells
+state-manager.js:124 [StateManager] subscribe: settings.blockedMode
+ [GameBoardComponent] render: boardSize = 3
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: true
+ toggleAvailableMoves called, show = true
+ [StateManager] setState: game.showingAvailableMoves = true
+ [StateManager] Notifying listeners for: game.showingAvailableMoves count: 4
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+ [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+ [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+ [GameBoardComponent] game.showingAvailableMoves changed
+ [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+ [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-logic-new.js:311 [GameLogic] updateAvailableMoves called
+game-logic-new.js:322 [GameLogic] updateAvailableMoves - gameState: {board: Array(3), currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+game-core.js:17 [GameCore] findPiece called with player: 1 board size: 3
+game-core.js:29 [GameCore] Found piece at: {row: 1, col: 2}
+game-logic-new.js:353 [GameLogic] Found piece: {row: 1, col: 2}
+game-core.js:50 [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+game-core.js:69 [GameCore] Checking moves for board size: 3 from position: 1 2
+game-core.js:45 [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+game-core.js:45 [GameCore] getDirectionDelta: 7 = {dr: -1, dc: -1}
+game-core.js:45 [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+game-core.js:45 [GameCore] getDirectionDelta: 8 = {dr: -1, dc: 0}
+game-core.js:45 [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+game-core.js:45 [GameCore] getDirectionDelta: 4 = {dr: 0, dc: -1}
+game-core.js:45 [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+game-core.js:45 [GameCore] getDirectionDelta: 1 = {dr: 1, dc: -1}
+game-core.js:45 [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+game-core.js:45 [GameCore] getDirectionDelta: 3 = {dr: 1, dc: 1}
+game-core.js:45 [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+game-core.js:45 [GameCore] getDirectionDelta: 9 = {dr: -1, dc: 1}
+game-core.js:45 [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+game-core.js:45 [GameCore] getDirectionDelta: 2 = {dr: 1, dc: 0}
+game-core.js:45 [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+game-core.js:45 [GameCore] getDirectionDelta: 6 = {dr: 0, dc: 1}
+game-core.js:93 [GameCore] Found valid moves: 6 moves
+game-logic-new.js:366 [GameLogic] updateAvailableMoves - piece at: 1 2 logicPlayer: 1 blockedMode: false blockedCells: 0 moves: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+state-manager.js:70 [StateManager] setState: game.availableMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+state-manager.js:86 [StateManager] Notifying listeners for: game.availableMoves count: 4
+game-board-component.js:182 [GameBoardComponent] game.availableMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-board-component.js:182 [GameBoardComponent] game.availableMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-board-component.js:182 [GameBoardComponent] game.availableMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-board-component.js:182 [GameBoardComponent] game.availableMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-logic-new.js:371 [GameLogic] updateAvailableMoves - showingAvailableMoves: true moves count: 6
+state-manager.js:70 [StateManager] setState: game.highlightedMoves = (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+state-manager.js:86 [StateManager] Notifying listeners for: game.highlightedMoves count: 4
+game-board-component.js:137 [GameBoardComponent] game.highlightedMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-board-component.js:137 [GameBoardComponent] game.highlightedMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-board-component.js:137 [GameBoardComponent] game.highlightedMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-board-component.js:137 [GameBoardComponent] game.highlightedMoves changed
+game-board-component.js:316 [GameBoardComponent] renderBoard called with boardSize: 3 board length: 3
+game-board-component.js:330 [DIAG] blockedCells для render: [] blockedMode: false
+game-board-component.js:332 [GameBoardComponent] renderBoard - showMoves: true highlightedMoves count: 6 availableMoves count: 6
+game-board-component.js:375 [GameBoardComponent] renderBoard completed, cells created: 9 expected: 9
+game-logic-new.js:870 [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+game-logic-new.js:374 [GameLogic] Available moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+game-logic-new.js:375 [GameLogic] Highlighted moves set in state: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+game-logic-new.js:420 [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: true highlightedMoves count: 6
+game-board-component.js:96 [GameBoardComponent] render: кінець
