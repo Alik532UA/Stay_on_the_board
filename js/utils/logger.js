@@ -17,7 +17,16 @@ class Logger {
         sendToServer: false,
         showTimestamp: true,
         showLevel: true,
-        groupByContext: true
+        groupByContext: true,
+        // Нові налаштування для оптимізації
+        enableConsoleOutput: true,
+        enableStorageOutput: true,
+        enableServerOutput: false,
+        // Умовне логування для різних середовищ
+        isDevelopment: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+        isProduction: window.location.protocol === 'https:' && !window.location.hostname.includes('localhost'),
+        // Швидке вимкнення для тестування
+        quickDisable: false
     };
     
     static logs = [];
@@ -31,6 +40,16 @@ class Logger {
      * @param {string} context - Контекст логування
      */
     static log(level, message, data = {}, context = '') {
+        // Швидке вимкнення для тестування
+        if (this.config.quickDisable) {
+            return;
+        }
+        
+        // Автоматичне налаштування рівня для продакшену
+        if (this.config.isProduction && this.config.level === 'INFO') {
+            this.config.level = 'WARN';
+        }
+        
         if (this.levels[level] > this.levels[this.config.level]) {
             return;
         }
@@ -60,13 +79,18 @@ class Logger {
             this.contexts.get(context).push(logEntry);
         }
         
-        this.outputToConsole(logEntry);
+        // Умовне виведення в консоль
+        if (this.config.enableConsoleOutput) {
+            this.outputToConsole(logEntry);
+        }
         
-        if (this.config.persistToStorage) {
+        // Умовне збереження в localStorage
+        if (this.config.enableStorageOutput && this.config.persistToStorage) {
             this.saveToStorage(logEntry);
         }
         
-        if (this.config.sendToServer) {
+        // Умовна відправка на сервер
+        if (this.config.enableServerOutput && this.config.sendToServer) {
             this.sendToServer(logEntry);
         }
     }
@@ -102,12 +126,16 @@ class Logger {
     }
     
     /**
-     * Логує дебаг інформацію
+     * Логує дебаг інформацію (тільки в режимі розробки)
      * @param {string} message - Повідомлення
      * @param {Object} data - Додаткові дані
      * @param {string} context - Контекст
      */
     static debug(message, data = {}, context = '') {
+        // DEBUG логи тільки в режимі розробки
+        if (!this.config.isDevelopment && !this.config.isProduction) {
+            return;
+        }
         this.log('DEBUG', message, data, context);
     }
     
@@ -229,10 +257,17 @@ class Logger {
      * @param {Object} logEntry - Запис логу
      */
     static sendToServer(logEntry) {
-        // Тут можна реалізувати відправку на сервер
-        // Наприклад, через fetch або WebSocket
-        if (window.eventBus) {
-            window.eventBus.emit('log:server', logEntry);
+        // Реалізація відправки на сервер
+        if (this.config.serverUrl) {
+            fetch(this.config.serverUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(logEntry)
+            }).catch(error => {
+                console.error('Failed to send log to server:', error);
+            });
         }
     }
     
@@ -251,18 +286,19 @@ class Logger {
     }
     
     /**
-     * Очищує логи в localStorage
+     * Очищує логи з localStorage
      */
     static clearStoredLogs() {
         try {
-            localStorage.removeItem('app_logs');
+            const storageKey = 'app_logs';
+            localStorage.removeItem(storageKey);
         } catch (error) {
             console.error('Failed to clear stored logs:', error);
         }
     }
     
     /**
-     * Отримує статистику логування
+     * Отримує статистику логів
      * @returns {Object} Статистика
      */
     static getStats() {
@@ -270,18 +306,17 @@ class Logger {
             total: this.logs.length,
             byLevel: {},
             byContext: {},
-            recent: this.logs.slice(-10)
+            recent: this.logs.slice(-10),
+            config: { ...this.config }
         };
         
         // Підрахунок по рівнях
-        for (const level of Object.keys(this.levels)) {
-            stats.byLevel[level] = this.logs.filter(log => log.level === level).length;
-        }
-        
-        // Підрахунок по контекстах
-        for (const [context, logs] of this.contexts) {
-            stats.byContext[context] = logs.length;
-        }
+        this.logs.forEach(log => {
+            stats.byLevel[log.level] = (stats.byLevel[log.level] || 0) + 1;
+            if (log.context) {
+                stats.byContext[log.context] = (stats.byContext[log.context] || 0) + 1;
+            }
+        });
         
         return stats;
     }
@@ -321,15 +356,15 @@ class Logger {
     
     /**
      * Генерує унікальний ID для логу
-     * @returns {string} Унікальний ID
+     * @returns {string} ID
      */
     static generateLogId() {
-        return `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
     }
     
     /**
      * Отримує стек викликів
-     * @returns {string} Стек викликів
+     * @returns {string} Стек
      */
     static getStackTrace() {
         try {
@@ -354,13 +389,66 @@ class Logger {
         this.logs = [];
         this.contexts.clear();
     }
+    
+    /**
+     * Швидке вимкнення логування для тестування
+     */
+    static disable() {
+        this.config.quickDisable = true;
+    }
+    
+    /**
+     * Швидке включення логування
+     */
+    static enable() {
+        this.config.quickDisable = false;
+    }
+    
+    /**
+     * Встановлює режим продакшену (мінімальне логування)
+     */
+    static setProductionMode() {
+        this.configure({
+            level: 'WARN',
+            enableConsoleOutput: true,
+            enableStorageOutput: false,
+            enableServerOutput: false,
+            showTimestamp: false,
+            showLevel: true,
+            groupByContext: false
+        });
+    }
+    
+    /**
+     * Встановлює режим розробки (максимальне логування)
+     */
+    static setDevelopmentMode() {
+        this.configure({
+            level: 'DEBUG',
+            enableConsoleOutput: true,
+            enableStorageOutput: true,
+            enableServerOutput: false,
+            showTimestamp: true,
+            showLevel: true,
+            groupByContext: true
+        });
+    }
 }
 
-// Експорт для використання в модулях
+// Автоматичне налаштування режиму при ініціалізації
+if (Logger.config.isProduction) {
+    Logger.setProductionMode();
+} else if (Logger.config.isDevelopment) {
+    Logger.setDevelopmentMode();
+}
+
+// Експорт для використання
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = Logger;
 } else {
     window.Logger = Logger;
 } 
+
+export { Logger };
 
 export default Logger; 

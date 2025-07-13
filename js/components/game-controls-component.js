@@ -5,6 +5,7 @@ import { BaseComponent } from './base-component.js';
 import { DOMUtils } from '../utils/dom-utils.js';
 import { stateManager } from '../state-manager.js';
 import { eventBus } from '../event-bus.js';
+import { Logger } from '../utils/logger.js';
 
 export class GameControlsComponent extends BaseComponent {
     constructor(element, options = {}) {
@@ -21,14 +22,14 @@ export class GameControlsComponent extends BaseComponent {
     render() {
         const settings = window.stateManager?.getState('settings') || {};
         const boardSize = window.stateManager?.getState('game.boardSize') || 3;
-        console.log('[GameControlsComponent.render] boardSize:', boardSize);
+        Logger.debug('[GameControlsComponent.render] boardSize:', { boardSize });
         const showMoves = (typeof settings.showMoves === 'undefined') ? true : settings.showMoves;
-        console.log('[GameControlsComponent.render] settings.showMoves:', settings.showMoves, 'showMoves (final):', showMoves);
+        Logger.debug('[GameControlsComponent.render] settings.showMoves:', { showMoves, final: showMoves });
         
         // Синхронізуємо стан гри з налаштуваннями
         const currentShowingMoves = window.stateManager?.getState('game.showingAvailableMoves');
         if (currentShowingMoves !== showMoves) {
-            console.log('[GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves:', showMoves);
+            Logger.debug('[GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves:', { showMoves });
             window.stateManager?.setState('game.showingAvailableMoves', showMoves);
         }
         
@@ -98,13 +99,13 @@ export class GameControlsComponent extends BaseComponent {
     generateDistanceButtons(boardSize = 3) {
         const selector = this.element.querySelector('#distance-selector');
         if (!selector) {
-            console.error('[GameControlsComponent] Distance selector not found');
+            Logger.error('[GameControlsComponent] Distance selector not found');
             return;
         }
         
         // Валідація розміру дошки
         if (boardSize < 2 || boardSize > 9) {
-            console.error('[GameControlsComponent] Invalid board size for distance buttons:', boardSize);
+            Logger.error('[GameControlsComponent] Invalid board size for distance buttons:', { boardSize });
             return;
         }
         
@@ -118,7 +119,7 @@ export class GameControlsComponent extends BaseComponent {
             selector.appendChild(button);
         }
         
-        console.log('[GameControlsComponent] Generated', boardSize - 1, 'distance buttons for board size', boardSize);
+        Logger.debug('[GameControlsComponent] Generated distance buttons:', { count: boardSize - 1, boardSize });
     }
 
     bindCheckboxEvents() {
@@ -128,11 +129,11 @@ export class GameControlsComponent extends BaseComponent {
         });
         this.element.querySelector('#show-moves-checkbox')?.addEventListener('change', (e) => {
             const isChecked = e.target.checked;
-            console.log('[GameControlsComponent] show-moves-checkbox changed to:', isChecked);
+            Logger.info('[GameControlsComponent] show-moves-checkbox changed to:', { isChecked });
             window.stateManager?.setState('settings.showMoves', isChecked);
             window.stateManager?.setState('game.showingAvailableMoves', isChecked);
             window.gameLogic?.toggleAvailableMoves(isChecked); // Додаємо виклик для оновлення підсвічування
-            console.log('[GameControlsComponent] settings.showMoves set to', isChecked);
+            Logger.debug('[GameControlsComponent] settings.showMoves set to', { isChecked });
         });
         this.element.querySelector('#blocked-mode-checkbox')?.addEventListener('change', (e) => {
             window.stateManager?.setState('settings.blockedMode', e.target.checked);
@@ -148,7 +149,7 @@ export class GameControlsComponent extends BaseComponent {
         const showMoves = (typeof settings.showMoves === 'undefined') ? true : settings.showMoves;
         const checkbox = this.element.querySelector('#show-moves-checkbox');
         if (checkbox && checkbox.checked !== showMoves) {
-            console.log('[GameControlsComponent] Forcing checkbox sync:', checkbox.checked, '->', showMoves);
+            Logger.debug('[GameControlsComponent] Forcing checkbox sync:', { from: checkbox.checked, to: showMoves });
             checkbox.checked = showMoves;
         }
     }
@@ -171,12 +172,12 @@ export class GameControlsComponent extends BaseComponent {
         });
         
         // Обробники для основних кнопок
-        console.log('[GameControlsComponent] Adding event listener for confirm-move-btn');
+        Logger.debug('[GameControlsComponent] Adding event listener for confirm-move-btn');
         this.addEventListener('#confirm-move-btn', 'click', () => {
-            console.log('[GameControlsComponent] confirm-move-btn clicked');
+            Logger.info('[GameControlsComponent] confirm-move-btn clicked');
             this.confirmMove();
         });
-        console.log('[GameControlsComponent] Event listener added for confirm-move-btn');
+        Logger.debug('[GameControlsComponent] Event listener added for confirm-move-btn');
         
         this.addEventListener('#no-moves-btn', 'click', () => {
             this.noMoves();
