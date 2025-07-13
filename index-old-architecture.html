@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stay on the board</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Головне меню -->
+    <div id="main-menu" class="view active">
+        <div class="menu-container">
+            <h1 class="game-title">Stay on the board</h1>
+            <div class="menu-buttons">
+                <button id="start-game-btn" class="menu-button primary">
+                    <span class="button-text">Почати гру</span>
+                </button>
+                <button id="settings-btn" class="menu-button">
+                    <span class="button-text">Налаштування</span>
+                </button>
+                <button id="rules-btn" class="menu-button">
+                    <span class="button-text">Правила</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Екран налаштувань -->
+    <div id="settings" class="view">
+        <div class="settings-container">
+            <h2 class="settings-title">Налаштування</h2>
+            <div class="settings-content">
+                <div class="setting-group">
+                    <label class="setting-label">Мова:</label>
+                    <select id="language-select" class="setting-select">
+                        <option value="uk">Українська</option>
+                        <option value="en">English</option>
+                        <option value="nl">Nederlands</option>
+                        <option value="crh">Qırımtatar</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">Тема:</label>
+                    <select id="theme-select" class="setting-select">
+                        <option value="dark">Темна</option>
+                        <option value="light">Світла</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">Стиль:</label>
+                    <select id="style-select" class="setting-select">
+                        <option value="classic">Класичний</option>
+                        <option value="modern">Сучасний</option>
+                        <option value="minimal">Мінімалістичний</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">
+                        <input type="checkbox" id="speech-enabled" class="setting-checkbox">
+                        Увімкнути голосові підказки
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">
+                        <input type="checkbox" id="show-board" class="setting-checkbox" checked>
+                        Показувати дошку
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">
+                        <input type="checkbox" id="show-moves" class="setting-checkbox">
+                        Показувати доступні ходи
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">
+                        <input type="checkbox" id="blocked-mode" class="setting-checkbox">
+                        Режим заблокованих клітинок
+                    </label>
+                </div>
+            </div>
+            <div class="settings-buttons">
+                <button id="save-settings-btn" class="settings-button primary">
+                    <span class="button-text">Зберегти</span>
+                </button>
+                <button id="back-to-menu-btn" class="settings-button">
+                    <span class="button-text">Назад</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ігровий екран -->
+    <div id="game" class="view">
+        <div class="game-container">
+            <!-- Верхні контроли -->
+            <div class="top-controls">
+                <button id="back-to-menu-game-btn" class="control-button">
+                    <span class="button-text">← Меню</span>
+                </button>
+                <div class="game-info">
+                    <span id="current-player" class="player-info"></span>
+                    <span id="score" class="score-info"></span>
+                </div>
+                <div class="theme-controls">
+                    <button id="theme-style-btn" class="control-button">
+                        <span class="button-text">🎨</span>
+                    </button>
+                    <div id="theme-style-dropdown" class="dropdown hidden">
+                        <div class="theme-style-row" data-style="classic">
+                            <button class="theme-btn" data-theme="dark">🌙</button>
+                            <button class="theme-btn" data-theme="light">☀️</button>
+                        </div>
+                        <div class="theme-style-row" data-style="modern">
+                            <button class="theme-btn" data-theme="dark">🌙</button>
+                            <button class="theme-btn" data-theme="light">☀️</button>
+                        </div>
+                        <div class="theme-style-row" data-style="minimal">
+                            <button class="theme-btn" data-theme="dark">🌙</button>
+                            <button class="theme-btn" data-theme="light">☀️</button>
+                        </div>
+                    </div>
+                    <button id="lang-btn" class="control-button">
+                        <span class="button-text">🌍</span>
+                    </button>
+                    <div id="lang-dropdown" class="dropdown hidden">
+                        <div class="lang-option" data-lang="uk">🇺🇦 Українська</div>
+                        <div class="lang-option" data-lang="en">🇬🇧 English</div>
+                        <div class="lang-option" data-lang="nl">🇳🇱 Nederlands</div>
+                        <div class="lang-option" data-lang="crh">🇺🇦 Qırımtatar</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ігрова область -->
+            <div class="game-area">
+                <!-- Ігрова дошка -->
+                <div id="game-board-container" class="board-container">
+                    <!-- Дошка буде створена динамічно -->
+                </div>
+
+                <!-- Контроли гри -->
+                <div id="game-controls-container" class="controls-container">
+                    <!-- Контроли будуть створені динамічно -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальні вікна будуть створені динамічно -->
+
+    <!-- Підключаємо нові системи архітектури -->
+    <script src="js/types.js"></script>
+    <script src="js/event-bus.js"></script>
+    <script src="js/utils/logger.js"></script>
+    <script src="js/utils/cache-manager.js"></script>
+    <script src="js/utils/test-runner.js"></script>
+    
+    <!-- Використовуємо нову покращену архітектуру -->
+    <script type="module" src="js/main-improved-old.js"></script>
+</body>
+</html>

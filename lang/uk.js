@@ -11,7 +11,9 @@ export default {
     localGame: "Локальна гра",
     donate: "Донат",
     startGame: "Почати гру",
-    clearCache: "Очистити кеш"
+    clearCache: "Очистити кеш",
+    theme: "Тема",
+    language: "Мова"
   },
   onlineMenu: {
     title: "Онлайн гра",
@@ -21,7 +23,8 @@ export default {
     joinById: "Підключитися по ID",
     joinByIdTitle: "Введіть ID кімнати",
     joinByIdConfirm: "Підключитися",
-    back: "Назад"
+    back: "Назад",
+    errorCreateRoom: "Помилка створення кімнати"
   },
   localGame: {
     enterNames: "Введіть імена гравців",
@@ -68,6 +71,26 @@ export default {
     invalidRoomCode: "Будь ласка, введіть правильний код кімнати (6 символів).",
     connecting: "Підключення...",
     connectingToRoom: "Підключення до кімнати {roomId}..."
+  },
+  waiting: {
+    title: "Очікуємо гравця",
+    roomId: "Код кімнати",
+    copyId: "Копіювати код",
+    message: "Очікуємо підключення гравця...",
+    back: "Назад"
+  },
+  joinRoom: {
+    title: "Приєднатися до кімнати",
+    playerName: "Ваше ім'я",
+    playerNamePlaceholder: "Введіть ваше ім'я",
+    roomCode: "Код кімнати",
+    paste: "Вставити",
+    join: "Приєднатися",
+    back: "Назад",
+    connecting: "Підключення...",
+    errorNoCode: "Введіть код кімнати",
+    errorInvalidCode: "Код кімнати повинен містити 6 символів",
+    errorConnection: "Помилка підключення до кімнати"
   },
   common: {
     back: "Назад",

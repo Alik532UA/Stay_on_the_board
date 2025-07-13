@@ -1,281 +1,705 @@
-// === МОВНА ПІДТРИМКА ДЛЯ ОЗВУЧУВАННЯ ===
+import { stateManager } from './state-manager.js';
+import Logger from './utils/logger.js';
 
-// Перевіряємо підтримку Web Speech API
-const isSpeechSupported = 'speechSynthesis' in window;
-
-// Налаштування мови для кожного стилю
-const speechSettings = {
-    uk: {
-        voice: null,
-        rate: 0.9,
-        pitch: 1.0,
-        volume: 0.8
-    },
-    en: {
-        voice: null,
-        rate: 0.9,
-        pitch: 1.0,
-        volume: 0.8
-    },
-    crh: {
-        voice: null,
-        rate: 0.8,
-        pitch: 1.0,
-        volume: 0.8
-    },
-    nl: {
-        voice: null,
-        rate: 0.9,
-        pitch: 1.0,
-        volume: 0.8
-    }
-};
-
-// Функція для отримання списку доступних голосів
-function getAvailableVoices() {
-    if (!isSpeechSupported) return [];
-    
-    const voices = speechSynthesis.getVoices();
-    return voices.map(voice => ({
-        name: voice.name,
-        lang: voice.lang,
-        default: voice.default,
-        localService: voice.localService
-    }));
-}
-
-// Функція для отримання голосів для конкретної мови
-function getVoicesForLanguage(lang) {
-    if (!isSpeechSupported) return [];
-    
-    const voices = speechSynthesis.getVoices();
-    if (lang === 'crh') {
-        // Кримськотатарська — шукаємо турецькі голоси
-        return voices.filter(v => v.lang && v.lang.startsWith('tr'));
-    }
-    if (lang === 'nl') {
-        // Нідерландська — шукаємо nl голоси
-        return voices.filter(v => v.lang && v.lang.startsWith('nl'));
-    }
-    return voices.filter(v => v.lang && v.lang.startsWith(lang));
-}
-
-// Функція для встановлення конкретного голосу для мови
-function setVoiceForLanguage(lang, voiceName) {
-    if (!isSpeechSupported) return false;
-    
-    const voices = speechSynthesis.getVoices();
-    const voice = voices.find(v => v.name === voiceName);
-    
-    if (voice && speechSettings[lang]) {
-        speechSettings[lang].voice = voice;
-        // Зберігаємо вибір в localStorage
-        localStorage.setItem(`speech_voice_${lang}`, voiceName);
-        return true;
-    }
-    return false;
-}
-
-// Функція для отримання тексту ходу на різних мовах
-function getMoveText(direction, distance, lang = 'uk') {
-    const directionTexts = {
-        uk: {
-            '1': "вниз-ліворуч", '2': "вниз", '3': "вниз-праворуч",
-            '4': "ліворуч", '6': "праворуч",
-            '7': "вгору-ліворуч", '8': "вгору", '9': "вгору-праворуч"
-        },
-        en: {
-            '1': "down-left", '2': "down", '3': "down-right",
-            '4': "left", '6': "right",
-            '7': "up-left", '8': "up", '9': "up-right"
-        },
-        crh: {
-            '1': "aşağı-sol", '2': "aşağı", '3': "aşağı-sağ",
-            '4': "sol", '6': "sağ",
-            '7': "yukarı-sol", '8': "yukarı", '9': "yukarı-sağ"
-        },
-        nl: {
-            '1': "omlaag-links", '2': "omlaag", '3': "omlaag-rechts",
-            '4': "links", '6': "rechts",
-            '7': "omhoog-links", '8': "omhoog", '9': "omhoog-rechts"
-        }
-    };
-
-    const numberTexts = {
-        uk: {
-            '1': 'один', '2': 'два', '3': 'три', '4': 'чотири', '5': 'п\'ять',
-            '6': 'шість', '7': 'сім', '8': 'вісім', '9': 'дев\'ять'
-        },
-        en: {
-            '1': 'one', '2': 'two', '3': 'three', '4': 'four', '5': 'five',
-            '6': 'six', '7': 'seven', '8': 'eight', '9': 'nine'
-        },
-        crh: {
-            '1': 'bir', '2': 'eki', '3': 'üç', '4': 'dört', '5': 'beş',
-            '6': 'altı', '7': 'yedi', '8': 'sekiz', '9': 'doquz'
-        },
-        nl: {
-            '1': 'een', '2': 'twee', '3': 'drie', '4': 'vier', '5': 'vijf',
-            '6': 'zes', '7': 'zeven', '8': 'acht', '9': 'negen'
-        }
-    };
-
-    const directionText = directionTexts[lang]?.[direction] || directionTexts.uk[direction];
-    const numberText = numberTexts[lang]?.[distance] || numberTexts.uk[distance];
-
-    // Формуємо текст залежно від мови
-    switch (lang) {
-        case 'uk':
-            return `${numberText} ${directionText}`;
-        case 'en':
-            return `${numberText} ${directionText}`;
-        case 'crh':
-            return `${numberText} ${directionText}`;
-        case 'nl':
-            return `${numberText} ${directionText}`;
-        default:
-            return `${numberText} ${directionText}`;
-    }
-}
-
-// Функція для ініціалізації голосів
-function initVoices() {
-    if (!isSpeechSupported) return;
-
-    // Очікуємо завантаження голосів
-    speechSynthesis.onvoiceschanged = () => {
-        const voices = speechSynthesis.getVoices();
+/**
+ * Система голосового управління для гри
+ * @class SpeechManager
+ */
+class SpeechManager {
+    constructor(options = {}) {
+        const {
+            enabled = true,
+            language = 'uk-UA',
+            continuous = false,
+            interimResults = false,
+            maxAlternatives = 1,
+            onResult = null,
+            onError = null,
+            onStart = null,
+            onEnd = null
+        } = options;
         
-        // Завантажуємо збережені вибори голосів
-        ['uk', 'en', 'crh', 'nl'].forEach(lang => {
-            const savedVoiceName = localStorage.getItem(`speech_voice_${lang}`);
-            if (savedVoiceName) {
-                const savedVoice = voices.find(v => v.name === savedVoiceName);
-                if (savedVoice) {
-                    speechSettings[lang].voice = savedVoice;
-                    return; // Якщо знайшли збережений голос, використовуємо його
+        this.enabled = enabled;
+        this.language = language;
+        this.continuous = continuous;
+        this.interimResults = interimResults;
+        this.maxAlternatives = maxAlternatives;
+        
+        this.onResult = onResult;
+        this.onError = onError;
+        this.onStart = onStart;
+        this.onEnd = onEnd;
+        
+        this.recognition = null;
+        this.synthesis = null;
+        this.isListening = false;
+        this.isSpeaking = false;
+        this.isDestroyed = false;
+        
+        this.commands = new Map();
+        this.aliases = new Map();
+        
+        this.init();
+    }
+    
+    /**
+     * Ініціалізує систему розпізнавання мови
+     */
+    init() {
+        if (this.isDestroyed) return;
+        
+        // Перевіряємо підтримку Web Speech API
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            console.warn('Speech recognition not supported');
+            this.enabled = false;
+            return;
+        }
+        
+        // Створюємо екземпляр розпізнавання
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        this.recognition = new SpeechRecognition();
+        
+        // Налаштовуємо параметри
+        this.recognition.continuous = this.continuous;
+        this.recognition.interimResults = this.interimResults;
+        this.recognition.maxAlternatives = this.maxAlternatives;
+        this.recognition.lang = this.language;
+        
+        // Налаштовуємо обробники подій
+        this.setupRecognitionHandlers();
+        
+        // Ініціалізуємо синтез мови
+        this.initSynthesis();
+        
+        // Реєструємо стандартні команди
+        this.registerDefaultCommands();
+        
+        console.log('🎤 Speech manager initialized');
+    }
+    
+    /**
+     * Налаштовує обробники подій розпізнавання
+     */
+    setupRecognitionHandlers() {
+        this.recognition.onstart = () => {
+            this.isListening = true;
+            Logger.info('Speech recognition started');
+            
+            if (this.onStart) {
+                this.onStart();
+            }
+        };
+        
+        this.recognition.onend = () => {
+            this.isListening = false;
+            Logger.info('Speech recognition ended');
+            
+            if (this.onEnd) {
+                this.onEnd();
+            }
+        };
+        
+        this.recognition.onresult = (event) => {
+            const results = event.results;
+            const transcript = results[results.length - 1][0].transcript.trim().toLowerCase();
+            const confidence = results[results.length - 1][0].confidence;
+            
+            Logger.info('Speech recognized', { transcript, confidence });
+            
+            this.processCommand(transcript, confidence);
+            
+            if (this.onResult) {
+                this.onResult(transcript, confidence);
+            }
+        };
+        
+        this.recognition.onerror = (event) => {
+            Logger.error('Speech recognition error', { error: event.error });
+            
+            if (this.onError) {
+                this.onError(event.error);
+            }
+        };
+        
+        this.recognition.onnomatch = () => {
+            Logger.warn('No speech match found');
+        };
+    }
+    
+    /**
+     * Ініціалізує синтез мови
+     */
+    initSynthesis() {
+        if ('speechSynthesis' in window) {
+            this.synthesis = window.speechSynthesis;
+        } else {
+            console.warn('Speech synthesis not supported');
+        }
+    }
+    
+    /**
+     * Реєструє стандартні команди
+     */
+    registerDefaultCommands() {
+        // Команди навігації
+        this.registerCommand('головне меню', () => {
+            stateManager.navigateTo('mainMenu');
+            this.speak('Перехожу до головного меню');
+        });
+        
+        this.registerCommand('налаштування', () => {
+            stateManager.navigateTo('settings');
+            this.speak('Відкриваю налаштування');
+        });
+        
+        this.registerCommand('гра', () => {
+            stateManager.navigateTo('game');
+            this.speak('Починаю гру');
+        });
+        
+        // Команди гри
+        this.registerCommand('новий хід', () => {
+            if (stateManager.getState('game.isActive')) {
+                this.speak('Готовий до нового ходу');
+            }
+        });
+        
+        this.registerCommand('показати ходи', () => {
+            if (stateManager.getState('game.isActive')) {
+                stateManager.setState('game.showingAvailableMoves', true);
+                this.speak('Показую доступні ходи');
+            }
+        });
+        
+        this.registerCommand('сховати ходи', () => {
+            if (stateManager.getState('game.isActive')) {
+                stateManager.setState('game.showingAvailableMoves', false);
+                this.speak('Сховую доступні ходи');
+            }
+        });
+        
+        // Команди для ходів
+        this.registerCommand('вгору', () => {
+            this.handleDirectionCommand('up');
+        });
+        
+        this.registerCommand('вниз', () => {
+            this.handleDirectionCommand('down');
+        });
+        
+        this.registerCommand('ліворуч', () => {
+            this.handleDirectionCommand('left');
+        });
+        
+        this.registerCommand('праворуч', () => {
+            this.handleDirectionCommand('right');
+        });
+        
+        this.registerCommand('по діагоналі', () => {
+            this.handleDirectionCommand('diagonal');
+        });
+        
+        // Команди для відстані
+        for (let i = 1; i <= 5; i++) {
+            this.registerCommand(`${i} крок`, () => {
+                this.handleDistanceCommand(i);
+            });
+            
+            this.registerCommand(`${i} кроків`, () => {
+                this.handleDistanceCommand(i);
+            });
+        }
+        
+        // Команди підтвердження
+        this.registerCommand('підтвердити', () => {
+            this.handleConfirmCommand();
+        });
+        
+        this.registerCommand('так', () => {
+            this.handleConfirmCommand();
+        });
+        
+        this.registerCommand('ні', () => {
+            this.handleCancelCommand();
+        });
+        
+        this.registerCommand('скасувати', () => {
+            this.handleCancelCommand();
+        });
+        
+        // Команди допомоги
+        this.registerCommand('допомога', () => {
+            this.speak('Доступні команди: головне меню, налаштування, гра, новий хід, показати ходи, вгору, вниз, ліворуч, праворуч, по діагоналі, від одного до п\'яти кроків, підтвердити, скасувати');
+        });
+        
+        this.registerCommand('що можна сказати', () => {
+            this.speak('Доступні команди: головне меню, налаштування, гра, новий хід, показати ходи, вгору, вниз, ліворуч, праворуч, по діагоналі, від одного до п\'яти кроків, підтвердити, скасувати');
+        });
+        
+        // Аліаси для команд
+        this.registerAlias('меню', 'головне меню');
+        this.registerAlias('настройки', 'налаштування');
+        this.registerAlias('начать игру', 'гра');
+        this.registerAlias('новый ход', 'новий хід');
+        this.registerAlias('показать ходы', 'показати ходи');
+        this.registerAlias('скрыть ходы', 'сховати ходи');
+        this.registerAlias('вверх', 'вгору');
+        this.registerAlias('вниз', 'вниз');
+        this.registerAlias('влево', 'ліворуч');
+        this.registerAlias('вправо', 'праворуч');
+        this.registerAlias('по диагонали', 'по діагоналі');
+        this.registerAlias('подтвердить', 'підтвердити');
+        this.registerAlias('отменить', 'скасувати');
+        this.registerAlias('помощь', 'допомога');
+    }
+    
+    /**
+     * Реєструє команду
+     * @param {string} phrase - Фраза для розпізнавання
+     * @param {Function} handler - Обробник команди
+     */
+    registerCommand(phrase, handler) {
+        this.commands.set(phrase.toLowerCase(), handler);
+    }
+    
+    /**
+     * Реєструє аліас для команди
+     * @param {string} alias - Аліас
+     * @param {string} command - Основна команда
+     */
+    registerAlias(alias, command) {
+        this.aliases.set(alias.toLowerCase(), command.toLowerCase());
+    }
+    
+    /**
+     * Обробляє розпізнану команду
+     * @param {string} transcript - Розпізнаний текст
+     * @param {number} confidence - Впевненість розпізнавання
+     */
+    processCommand(transcript, confidence) {
+        // Перевіряємо чи є це аліас
+        if (this.aliases.has(transcript)) {
+            transcript = this.aliases.get(transcript);
+        }
+        
+        // Шукаємо найкращий збіг
+        let bestMatch = null;
+        let bestScore = 0;
+        
+        for (const [command, handler] of this.commands) {
+            const score = this.calculateSimilarity(transcript, command);
+            if (score > bestScore && score > 0.7) { // Мінімальний поріг схожості
+                bestScore = score;
+                bestMatch = { command, handler };
+            }
+        }
+        
+        if (bestMatch) {
+            Logger.info('Command executed', { 
+                transcript, 
+                command: bestMatch.command, 
+                confidence, 
+                similarity: bestScore 
+            });
+            
+            try {
+                bestMatch.handler();
+            } catch (error) {
+                Logger.error('Command execution error', { error: error.message });
+                this.speak('Помилка виконання команди');
+            }
+        } else {
+            Logger.warn('No command match found', { transcript, confidence });
+            this.speak('Команда не розпізнана');
+        }
+    }
+    
+    /**
+     * Обчислює схожість між двома рядками
+     * @param {string} str1 - Перший рядок
+     * @param {string} str2 - Другий рядок
+     * @returns {number} Коефіцієнт схожості (0-1)
+     */
+    calculateSimilarity(str1, str2) {
+        const longer = str1.length > str2.length ? str1 : str2;
+        const shorter = str1.length > str2.length ? str2 : str1;
+        
+        if (longer.length === 0) {
+            return 1.0;
+        }
+        
+        const distance = this.levenshteinDistance(longer, shorter);
+        return (longer.length - distance) / longer.length;
+    }
+    
+    /**
+     * Обчислює відстань Левенштейна
+     * @param {string} str1 - Перший рядок
+     * @param {string} str2 - Другий рядок
+     * @returns {number} Відстань Левенштейна
+     */
+    levenshteinDistance(str1, str2) {
+        const matrix = [];
+        
+        for (let i = 0; i <= str2.length; i++) {
+            matrix[i] = [i];
+        }
+        
+        for (let j = 0; j <= str1.length; j++) {
+            matrix[0][j] = j;
+        }
+        
+        for (let i = 1; i <= str2.length; i++) {
+            for (let j = 1; j <= str1.length; j++) {
+                if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    );
                 }
             }
-            
-            // Інакше використовуємо автоматичний вибір
-            const langPrefixes = {
-                uk: ['uk'],
-                en: ['en'],
-                crh: ['tr', 'en'],
-                nl: ['nl']
-            };
-            
-            const prefixes = langPrefixes[lang];
-            let selectedVoice = null;
-            
-            // Спочатку шукаємо голос з потрібною мовою
-            for (const prefix of prefixes) {
-                selectedVoice = voices.find(voice => voice.lang.startsWith(prefix));
-                if (selectedVoice) break;
-            }
-            
-            // Якщо не знайшли, використовуємо англійський як fallback
-            if (!selectedVoice) {
-                selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
-            }
-            
-            // Якщо і англійського немає, беремо перший доступний
-            if (!selectedVoice && voices.length > 0) {
-                selectedVoice = voices[0];
-            }
-            
-            speechSettings[lang].voice = selectedVoice;
-        });
+        }
         
-        console.log('[Speech] Голоси ініціалізовані:', {
-            uk: speechSettings.uk.voice?.name,
-            en: speechSettings.en.voice?.name,
-            crh: speechSettings.crh.voice?.name,
-            nl: speechSettings.nl.voice?.name
-        });
-    };
-}
-
-// Функція для озвучування ходу
-function speakMove(direction, distance, lang = 'uk') {
-    if (!isSpeechSupported) return;
-
-    // Зупиняємо поточне озвучування
-    speechSynthesis.cancel();
-
-    const text = getMoveText(direction, distance, lang);
-    const settings = speechSettings[lang] || speechSettings.uk;
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.voice = settings.voice;
-    utterance.rate = settings.rate;
-    utterance.pitch = settings.pitch;
-    utterance.volume = settings.volume;
-    utterance.lang = settings.voice?.lang || 'uk-UA';
-
-    // Додаємо обробники подій
-    utterance.onstart = () => {
-        console.log(`[Speech] Початок озвучування: "${text}" голосом: ${settings.voice?.name || 'default'}`);
-    };
-
-    utterance.onend = () => {
-        console.log(`[Speech] Закінчення озвучування: "${text}"`);
-    };
-
-    utterance.onerror = (event) => {
-        console.error(`[Speech] Помилка озвучування:`, event.error);
-    };
-
-    // Запускаємо озвучування
-    speechSynthesis.speak(utterance);
-}
-
-// Функція для озвучування повідомлень про гру
-function speakGameMessage(message, lang = 'uk') {
-    if (!isSpeechSupported) return;
-
-    // Зупиняємо поточне озвучування
-    speechSynthesis.cancel();
-
-    const settings = speechSettings[lang] || speechSettings.uk;
-
-    const utterance = new SpeechSynthesisUtterance(message);
-    utterance.voice = settings.voice;
-    utterance.rate = settings.rate;
-    utterance.pitch = settings.pitch;
-    utterance.volume = settings.volume;
-    utterance.lang = settings.voice?.lang || 'uk-UA';
-
-    speechSynthesis.speak(utterance);
-}
-
-// Функція для зупинки озвучування
-function stopSpeaking() {
-    if (isSpeechSupported) {
-        speechSynthesis.cancel();
+        return matrix[str2.length][str1.length];
+    }
+    
+    /**
+     * Починає прослуховування
+     */
+    startListening() {
+        if (!this.enabled || this.isDestroyed) return;
+        
+        try {
+            this.recognition.start();
+            Logger.info('Started listening for voice commands');
+        } catch (error) {
+            Logger.error('Failed to start listening', { error: error.message });
+        }
+    }
+    
+    /**
+     * Зупиняє прослуховування
+     */
+    stopListening() {
+        if (!this.enabled || this.isDestroyed) return;
+        
+        try {
+            this.recognition.stop();
+            Logger.info('Stopped listening for voice commands');
+        } catch (error) {
+            Logger.error('Failed to stop listening', { error: error.message });
+        }
+    }
+    
+    /**
+     * Проговорює текст
+     * @param {string} text - Текст для проговорювання
+     * @param {Object} options - Опції синтезу
+     */
+    speak(text, options = {}) {
+        if (!this.synthesis || this.isDestroyed) return;
+        
+        const {
+            voice = null,
+            rate = 1.0,
+            pitch = 1.0,
+            volume = 1.0,
+            lang = this.language
+        } = options;
+        
+        // Зупиняємо попереднє проговорювання
+        this.synthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = rate;
+        utterance.pitch = pitch;
+        utterance.volume = volume;
+        utterance.lang = lang;
+        
+        if (voice) {
+            utterance.voice = voice;
+        }
+        
+        utterance.onstart = () => {
+            this.isSpeaking = true;
+            Logger.info('Started speaking', { text });
+        };
+        
+        utterance.onend = () => {
+            this.isSpeaking = false;
+            Logger.info('Finished speaking', { text });
+        };
+        
+        utterance.onerror = (event) => {
+            this.isSpeaking = false;
+            Logger.error('Speech synthesis error', { error: event.error, text });
+        };
+        
+        this.synthesis.speak(utterance);
+    }
+    
+    /**
+     * Зупиняє проговорювання
+     */
+    stopSpeaking() {
+        if (this.synthesis) {
+            this.synthesis.cancel();
+            this.isSpeaking = false;
+        }
+    }
+    
+    /**
+     * Отримує доступні голоси
+     * @returns {Array} Список голосів
+     */
+    getVoices() {
+        if (!this.synthesis) return [];
+        
+        return this.synthesis.getVoices().filter(voice => 
+            voice.lang.startsWith('uk') || 
+            voice.lang.startsWith('en') || 
+            voice.lang.startsWith('nl') || 
+            voice.lang.startsWith('crh')
+        );
+    }
+    
+    /**
+     * Обробляє команду напрямку
+     * @param {string} direction - Напрямок
+     */
+    handleDirectionCommand(direction) {
+        if (!stateManager.getState('game.isActive')) {
+            this.speak('Гра не активна');
+            return;
+        }
+        
+        stateManager.setState('game.selectedDirection', direction);
+        this.speak(`Обрано напрямок: ${direction}`);
+    }
+    
+    /**
+     * Обробляє команду відстані
+     * @param {number} distance - Відстань
+     */
+    handleDistanceCommand(distance) {
+        if (!stateManager.getState('game.isActive')) {
+            this.speak('Гра не активна');
+            return;
+        }
+        
+        stateManager.setState('game.selectedDistance', distance);
+        this.speak(`Обрано відстань: ${distance} кроків`);
+    }
+    
+    /**
+     * Обробляє команду підтвердження
+     */
+    handleConfirmCommand() {
+        if (!stateManager.getState('game.isActive')) {
+            this.speak('Гра не активна');
+            return;
+        }
+        
+        const direction = stateManager.getState('game.selectedDirection');
+        const distance = stateManager.getState('game.selectedDistance');
+        
+        if (!direction || !distance) {
+            this.speak('Спочатку оберіть напрямок та відстань');
+            return;
+        }
+        
+        // Тут буде логіка виконання ходу
+        this.speak('Хід підтверджено');
+    }
+    
+    /**
+     * Обробляє команду скасування
+     */
+    handleCancelCommand() {
+        if (!stateManager.getState('game.isActive')) {
+            this.speak('Гра не активна');
+            return;
+        }
+        
+        stateManager.setState('game.selectedDirection', null);
+        stateManager.setState('game.selectedDistance', null);
+        this.speak('Хід скасовано');
+    }
+    
+    /**
+     * Встановлює мову
+     * @param {string} language - Код мови
+     */
+    setLanguage(language) {
+        this.language = language;
+        if (this.recognition) {
+            this.recognition.lang = language;
+        }
+    }
+    
+    /**
+     * Включає/виключає голосове управління
+     * @param {boolean} enabled - Чи увімкнути
+     */
+    setEnabled(enabled) {
+        this.enabled = enabled;
+        
+        if (!enabled && this.isListening) {
+            this.stopListening();
+        }
+        
+        if (!enabled && this.isSpeaking) {
+            this.stopSpeaking();
+        }
+    }
+    
+    /**
+     * Отримує статус системи
+     * @returns {Object} Статус
+     */
+    getStatus() {
+        return {
+            enabled: this.enabled,
+            isListening: this.isListening,
+            isSpeaking: this.isSpeaking,
+            language: this.language,
+            commandsCount: this.commands.size,
+            aliasesCount: this.aliases.size,
+            voicesAvailable: this.getVoices().length
+        };
+    }
+    
+    /**
+     * Отримує статистику використання
+     * @returns {Object} Статистика
+     */
+    getStats() {
+        return {
+            commandsExecuted: 0, // Тут можна додати лічильник
+            recognitionErrors: 0,
+            synthesisErrors: 0
+        };
+    }
+    
+    /**
+     * Знищує екземпляр
+     */
+    destroy() {
+        this.isDestroyed = true;
+        
+        if (this.isListening) {
+            this.stopListening();
+        }
+        
+        if (this.isSpeaking) {
+            this.stopSpeaking();
+        }
+        
+        this.commands.clear();
+        this.aliases.clear();
+        
+        Logger.info('Speech manager destroyed');
     }
 }
 
-// Функція для перевірки підтримки мови
-function isSpeechEnabled() {
-    return isSpeechSupported;
+/**
+ * Повертає вибраний голос для поточної мови
+ * @returns {string} name
+ */
+export function getCurrentVoice() {
+    const lang = stateManager.getState('settings.language');
+    return localStorage.getItem(`voice_${lang}`) || '';
 }
 
-// Функція для отримання поточного голосу для мови
-function getCurrentVoice(lang) {
-    return speechSettings[lang]?.voice || null;
+export function getVoices() { return []; }
+export function getVoicesForLanguage() { return []; }
+
+/**
+ * Озвучує ігрове повідомлення
+ * @param {string} message
+ * @param {Object} options
+ */
+export function speakGameMessage(message, options = {}) {
+    if (window.speechManager) {
+        window.speechManager.speak(message, options);
+    }
 }
 
-// Експортуємо функції
-export {
-    speakMove,
-    speakGameMessage,
-    stopSpeaking,
-    isSpeechEnabled,
-    initVoices,
-    getMoveText,
-    getAvailableVoices,
-    getVoicesForLanguage,
-    setVoiceForLanguage,
-    getCurrentVoice
-}; 
+/**
+ * Озвучує хід
+ * @param {string} moveText
+ * @param {Object} options
+ */
+export function speakMove(moveText, options = {}) {
+    if (window.speechManager) {
+        window.speechManager.speak(moveText, options);
+    }
+}
+
+/**
+ * Зберігає вибраний голос для поточної мови
+ * @param {string} lang
+ * @param {string} voiceName
+ */
+export function setVoiceForLanguage(lang, voiceName) {
+    localStorage.setItem(`voice_${lang}`, voiceName);
+}
+
+/**
+ * Ініціалізує голоси Web Speech API
+ * @returns {Promise<void>}
+ */
+export function initVoices() {
+    return new Promise((resolve) => {
+        if (window.speechSynthesis.getVoices().length !== 0) {
+            resolve();
+        } else {
+            window.speechSynthesis.onvoiceschanged = () => {
+                resolve();
+            };
+        }
+    });
+}
+
+/**
+ * Зупиняє проговорювання
+ */
+export function stopSpeaking() {
+    if (window.speechManager) {
+        window.speechManager.stopSpeaking();
+    }
+}
+
+// Глобальний екземпляр
+window.speechManager = new SpeechManager({
+    enabled: stateManager.getState('settings.speechEnabled'),
+    language: stateManager.getState('settings.language') + '-' + stateManager.getState('settings.language').toUpperCase(),
+    onResult: (transcript, confidence) => {
+        Logger.info('Voice command recognized', { transcript, confidence });
+    },
+    onError: (error) => {
+        Logger.error('Voice recognition error', { error });
+    }
+});
+
+// Підписка на зміни налаштувань
+stateManager.subscribe('settings.speechEnabled', (enabled) => {
+    if (window.speechManager) {
+        window.speechManager.setEnabled(enabled);
+    }
+});
+
+stateManager.subscribe('settings.language', (language) => {
+    if (window.speechManager) {
+        const langCode = language + '-' + language.toUpperCase();
+        window.speechManager.setLanguage(langCode);
+    }
+});
+
+// Експорт для модулів
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = SpeechManager;
+} 
