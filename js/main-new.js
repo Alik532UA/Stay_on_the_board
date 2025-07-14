@@ -50,6 +50,7 @@ class App {
 
         // Підписка на зміни view
         stateManager.subscribe('ui.currentView', (view) => {
+            Logger.debug('[App] ui.currentView changed:', { view });
             switch (view) {
                 case 'mainMenu':
                     this.viewManager.render('mainMenu', MainMenuComponent);
@@ -66,6 +67,7 @@ class App {
         });
         // Рендеримо початковий view
         const initialView = stateManager.getState('ui.currentView');
+        Logger.debug('[App] Initial view:', { initialView });
         if (initialView) {
             switch (initialView) {
                 case 'mainMenu':
@@ -745,8 +747,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.app = app;
 
         // Створюємо singleton-глобальний GameControlsComponent після того, як DOM готовий
-        window.gameControlsComponent = new GameControlsComponent(document.getElementById('game-controls'));
-        window.gameControlsComponent.render();
+        // window.gameControlsComponent = new GameControlsComponent(document.getElementById('game-controls'));
+        // window.gameControlsComponent.render();
 
         Logger.info('🎉 Додаток Stay on the board готовий до роботи');
 

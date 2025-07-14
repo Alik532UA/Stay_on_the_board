@@ -8,6 +8,7 @@ import { t } from '../localization.js';
 export class MainMenuComponent extends BaseComponent {
     constructor(element) {
         super(element);
+        this.eventsBound = false; // Флаг для відстеження чи вже прив'язані події
     }
     
     render() {
@@ -50,19 +51,32 @@ export class MainMenuComponent extends BaseComponent {
                 </div>
             </div>
         `;
+        
+        // Скидаємо флаг при кожному рендері
+        this.eventsBound = false;
+        
         setTimeout(() => {
             this.bindEvents();
         }, 0);
     }
     
     bindEvents() {
+        // Перевіряємо, чи вже прив'язані події
+        if (this.eventsBound) {
+            console.log('[MainMenuComponent] bindEvents already called, skipping');
+            return;
+        }
+        
         console.log('[MainMenuComponent] bindEvents called');
+        this.eventsBound = true; // Позначаємо, що події прив'язані
         // Грати з комп'ютером
         this.element.querySelector('#btn-vs-computer')?.addEventListener('click', () => {
+            console.log('[MainMenuComponent] btn-vs-computer clicked');
             stateManager.navigateTo('gameBoard', { gameMode: 'vsComputer' });
         });
         // Локальна гра
         this.element.querySelector('#btn-local-game')?.addEventListener('click', () => {
+            console.log('[MainMenuComponent] btn-local-game clicked');
             stateManager.navigateTo('gameBoard', { gameMode: 'local' });
         });
         // Грати онлайн
@@ -341,14 +355,17 @@ export class MainMenuComponent extends BaseComponent {
     }
     
     destroy() {
+        console.log('[MainMenuComponent] destroy called');
+        this.eventsBound = false; // Скидаємо флаг
         this.element.innerHTML = '';
     }
     
     subscribeToState() {
+        console.log('[MainMenuComponent] subscribeToState called');
         // Підписка на зміни мови для оновлення тексту
         this.subscribe('settings.language', () => {
+            console.log('[MainMenuComponent] Language changed, re-rendering');
             this.render();
-            this.bindEvents();
         });
     }
     

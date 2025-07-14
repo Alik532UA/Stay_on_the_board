@@ -34,7 +34,7 @@ export class ViewManager {
   }
 
   navigateTo(viewName, params = {}) {
-    console.log('[ViewManager] navigateTo:', viewName, params);
+    console.log('[ViewManager] navigateTo:', { viewName, params });
     
     let ComponentClass;
     
@@ -66,6 +66,8 @@ export class ViewManager {
   }
 
   render(viewName, ComponentClass, params = {}) {
+    console.log('[ViewManager] render:', { viewName, params });
+    
     if (this.currentComponent && this.currentComponent.detachEventListeners) {
       this.currentComponent.detachEventListeners();
     }
@@ -88,6 +90,28 @@ export class ViewManager {
       if (viewName === 'mainMenu' && window.app && typeof window.app.setupGlobalControls === 'function') {
         window.app.setupGlobalControls();
       }
+    }
+    
+    // Показуємо/приховуємо game-controls залежно від view
+    this.toggleGameControls(viewName);
+  }
+  
+  toggleGameControls(viewName) {
+    const gameControlsElement = document.getElementById('game-controls');
+    if (gameControlsElement) {
+      // Показуємо game-controls тільки на ігрових екранах
+      const isGameView = viewName === 'gameBoard' || viewName === 'localGame';
+      gameControlsElement.style.display = isGameView ? 'block' : 'none';
+      
+      console.log('[ViewManager] Game controls visibility:', { viewName, isGameView });
+      
+      // Якщо приховуємо контроли, очищаємо їх вміст
+      if (!isGameView) {
+        gameControlsElement.innerHTML = '';
+        console.log('[ViewManager] Game controls content cleared');
+      }
+    } else {
+      console.error('[ViewManager] Game controls element not found');
     }
   }
 }
