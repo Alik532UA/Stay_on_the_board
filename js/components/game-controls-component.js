@@ -16,6 +16,7 @@ export class GameControlsComponent extends BaseComponent {
         this.centerInfoClickHandler = null;
         this.computerLastMoveDisplay = null; // <--- нове
         this.distanceManuallySelected = false; // Track if distance was manually selected
+        this.isRendered = false; // Додано для захисту від повторного рендеру
         this.subscribeToState(); // <--- Додаємо підписку на зміни стану
     }
     

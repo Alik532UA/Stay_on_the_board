@@ -52,29 +52,21 @@ export class MainMenuComponent extends BaseComponent {
             </div>
         `;
         
-        // Скидаємо флаг при кожному рендері
-        this.eventsBound = false;
-        
+        // --- ВИДАЛЕНО: this.eventsBound = false; ---
         setTimeout(() => {
             this.bindEvents();
         }, 0);
     }
     
     bindEvents() {
-        // Перевіряємо, чи вже прив'язані події
-        if (this.eventsBound) {
-            Logger.debug('[MainMenuComponent] bindEvents already called, skipping');
-            return;
-        }
-        
-        Logger.debug('[MainMenuComponent] bindEvents called');
-        this.eventsBound = true; // Позначаємо, що події прив'язані
-        
-        // Очищаємо попередні обробники подій для уникнення дублювання
+        // --- ДОДАНО: очищення попередніх обробників ---
         this.element.querySelectorAll('button').forEach(btn => {
             btn.replaceWith(btn.cloneNode(true));
         });
-        // --- КНОПКИ ---
+        // --- ВИДАЛЕНО: if (this.eventsBound) { ... return; } ---
+        // --- ВИДАЛЕНО: this.eventsBound = true; ---
+        // --- ВИДАЛЕНО: старий цикл з обробниками ---
+        // --- Далі залишаємо додавання нових обробників ---
         this.element.querySelector('#btn-vs-computer')?.addEventListener('click', () => {
             stateManager.navigateTo('gameBoard', { gameMode: 'vsComputer' });
         });
