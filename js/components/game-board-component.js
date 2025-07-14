@@ -338,6 +338,14 @@ export class GameBoardComponent extends BaseComponent {
         // --- Дістаємо доступні та підсвічені ходи ---
         const availableMoves = stateManager?.getState('game.availableMoves') || [];
         const highlightedMoves = stateManager?.getState('game.highlightedMoves') || [];
+        const showingAvailableMoves = stateManager?.getState('game.showingAvailableMoves') || false;
+        Logger.debug('[GameBoardComponent] renderBoard - moves state:', { 
+            availableMovesCount: availableMoves.length, 
+            highlightedMovesCount: highlightedMoves.length, 
+            showingAvailableMoves,
+            availableMoves: availableMoves.map(m => ({ direction: m.direction, distance: m.distance, newRow: m.newRow, newCol: m.newCol })),
+            highlightedMoves: highlightedMoves.map(m => ({ direction: m.direction, distance: m.distance, newRow: m.newRow, newCol: m.newCol }))
+        });
         gameBoard.innerHTML = '';
         gameBoard.style.gridTemplateColumns = `repeat(${boardSize}, 1fr)`;
         gameBoard.style.gridTemplateRows = `repeat(${boardSize}, 1fr)`;
@@ -367,10 +375,11 @@ export class GameBoardComponent extends BaseComponent {
                     // --- Доступні ходи ---
                     const isHighlighted = highlightedMoves.some(move => move.newRow === row && move.newCol === col);
                     const isAvailable = availableMoves.some(move => move.newRow === row && move.newCol === col);
+                    
                     if (isHighlighted) {
                         cell.classList.add('highlighted-move');
                         cell.innerHTML = '<span class="move-dot move-dot-highlighted"></span>';
-                    } else if (isAvailable) {
+                    } else if (isAvailable && showingAvailableMoves) {
                         cell.classList.add('available-move');
                         cell.innerHTML = '<span class="move-dot"></span>';
                     } else {
