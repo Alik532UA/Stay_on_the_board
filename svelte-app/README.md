@@ -1,8 +1,8 @@
-# sv
+# Stay on the Board - Svelte App
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Це основний Svelte-додаток проекту "Stay on the Board". Всі інші файли в корені репозиторію є документацією.
 
-## Dependencies
+## Залежності
 
 - **@sveltejs/kit** — основний фреймворк для SvelteKit
 - **svelte** — ядро Svelte
@@ -18,37 +18,25 @@ Everything you need to build a Svelte project, powered by [`sv`](https://github.
 - **@testing-library/svelte** — тестування Svelte-компонентів
 - **vitest** — сучасний тест-раннер для unit/e2e тестів
 
-## Creating a project
+## Розробка
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Після встановлення залежностей з `npm install`, запустіть сервер розробки:
 
 ```bash
 npm run dev
 
-# or start the server and open the app in a new browser tab
+# або запустіть сервер і відкрийте додаток в новій вкладці браузера
 npm run dev -- --open
 ```
 
-## Building
+## Збірка
 
-To create a production version of your app:
+Для створення продакшн-версії додатку:
 
 ```bash
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+Ви можете переглянути продакшн-збірку з `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+> Для деплою додатку може знадобитися встановити [адаптер](https://svelte.dev/docs/kit/adapters) для вашої цільової середовища.
