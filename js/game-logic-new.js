@@ -380,7 +380,18 @@ export class GameLogic {
         // Перевіряємо поточний стан показу доступних ходів
         const showingAvailableMoves = stateManager.getState('game.showingAvailableMoves');
         Logger.debug('[GameLogic] updateAvailableMoves - showingAvailableMoves:', { showingAvailableMoves, movesCount: moves.length });
-        stateManager.setState('game.highlightedMoves', showingAvailableMoves ? moves : []); // підсвічуємо тільки якщо увімкнено
+        
+        // Оновлюємо підсвічені ходи тільки якщо є вибраний напрямок і відстань
+        const direction = stateManager.getState('game.selectedDirection');
+        const distance = stateManager.getState('game.selectedDistance');
+        if (direction && distance) {
+            // Якщо є вибраний напрямок і відстань, підсвічуємо тільки цей хід
+            const move = moves.find(m => m.direction === direction && m.distance === distance);
+            stateManager.setState('game.highlightedMoves', move ? [move] : []);
+        } else {
+            // Якщо немає вибраного напрямку або відстані, очищаємо підсвічені ходи
+            stateManager.setState('game.highlightedMoves', []);
+        }
         this.log('Available moves updated', { moves: moves.length, logicPlayer });
         Logger.debug('[GameLogic] Available moves set in state:', { availableMoves: stateManager.getState('game.availableMoves') });
         Logger.debug('[GameLogic] Highlighted moves set in state:', { highlightedMoves: stateManager.getState('game.highlightedMoves') });
@@ -391,8 +402,17 @@ export class GameLogic {
         const gameState = stateManager.getState('game');
         const allMoves = gameState.availableMoves || [];
         const directionMoves = allMoves.filter(move => move.direction === direction);
-        const showingAvailableMoves = stateManager.getState('game.showingAvailableMoves');
-        stateManager.setState('game.highlightedMoves', showingAvailableMoves ? directionMoves : []);
+        
+        // Перевіряємо, чи є також вибрана відстань
+        const distance = stateManager.getState('game.selectedDistance');
+        if (distance) {
+            // Якщо є і напрямок, і відстань, підсвічуємо тільки конкретний хід
+            const move = directionMoves.find(m => m.distance === distance);
+            stateManager.setState('game.highlightedMoves', move ? [move] : []);
+        } else {
+            // Якщо є тільки напрямок, очищаємо підсвічені ходи
+            stateManager.setState('game.highlightedMoves', []);
+        }
     }
 
     // Оновлення підсвічених ходів для дистанції
@@ -400,8 +420,17 @@ export class GameLogic {
         const gameState = stateManager.getState('game');
         const allMoves = gameState.availableMoves || [];
         const distanceMoves = allMoves.filter(move => move.distance === distance);
-        const showingAvailableMoves = stateManager.getState('game.showingAvailableMoves');
-        stateManager.setState('game.highlightedMoves', showingAvailableMoves ? distanceMoves : []);
+        
+        // Перевіряємо, чи є також вибраний напрямок
+        const direction = stateManager.getState('game.selectedDirection');
+        if (direction) {
+            // Якщо є і напрямок, і відстань, підсвічуємо тільки конкретний хід
+            const move = distanceMoves.find(m => m.direction === direction);
+            stateManager.setState('game.highlightedMoves', move ? [move] : []);
+        } else {
+            // Якщо є тільки відстань, очищаємо підсвічені ходи
+            stateManager.setState('game.highlightedMoves', []);
+        }
     }
     
     // Перемикання показу доступних ходів
@@ -413,21 +442,8 @@ export class GameLogic {
             Logger.warn('[GameLogic] toggleAvailableMoves: board is not ready');
             return;
         }
-        if (show) {
-            this.updateAvailableMoves();
-            // Додатково оновлюємо підсвічування для поточного вибору
-            const direction = stateManager.getState('game.selectedDirection');
-            const distance = stateManager.getState('game.selectedDistance');
-            if (direction && distance) {
-                const move = (gameState.availableMoves || []).find(
-                    m => m.direction === direction && m.distance === distance
-                );
-                stateManager.setState('game.highlightedMoves', move ? [move] : []);
-            }
-        } else {
-            stateManager.setState('game.highlightedMoves', []);
-            stateManager.setState('game.showingAvailableMoves', false);
-        }
+        // Оновлюємо доступні ходи та підсвічування
+        this.updateAvailableMoves();
         Logger.debug('[GameLogic] toggleAvailableMoves - final state - showingAvailableMoves:', { showingAvailableMoves: stateManager.getState('game.showingAvailableMoves'), highlightedMovesCount: stateManager.getState('game.highlightedMoves').length });
     }
     
