@@ -387,8 +387,8 @@ describe('Global EventBus', () => {
 // Запускаємо тести якщо файл виконано напряму
 if (typeof window !== 'undefined' && window.currentTestRunner) {
     window.currentTestRunner.run().then(summary => {
-        console.log('EventBus tests completed:', summary);
+        Logger.info('EventBus tests completed:', summary);
     }).catch(error => {
-        console.error('EventBus tests failed:', error);
+        Logger.error('EventBus tests failed:', error);
     });
 } 

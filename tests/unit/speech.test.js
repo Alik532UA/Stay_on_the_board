@@ -473,5 +473,5 @@ describe('SpeechManager', () => {
 
 // Запускаємо тести
 testRunner.run().then(summary => {
-    console.log('Speech tests completed:', summary);
+    Logger.info('Speech tests completed:', summary);
 }); 

@@ -410,8 +410,8 @@ describe('Global DOMCache', () => {
 // Запускаємо тести якщо файл виконано напряму
 if (typeof window !== 'undefined' && window.currentTestRunner) {
     window.currentTestRunner.run().then(summary => {
-        console.log('DOMCache tests completed:', summary);
+        Logger.info('DOMCache tests completed:', summary);
     }).catch(error => {
-        console.error('DOMCache tests failed:', error);
+        Logger.error('DOMCache tests failed:', error);
     });
 } 

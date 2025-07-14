@@ -384,7 +384,7 @@ export class DOMUtils {
             await navigator.clipboard.writeText(text);
             return true;
         } catch (error) {
-            console.error('Failed to copy to clipboard:', error);
+            Logger.error('Failed to copy to clipboard:', error);
             return false;
         }
     }
@@ -393,7 +393,7 @@ export class DOMUtils {
         try {
             return await navigator.clipboard.readText();
         } catch (error) {
-            console.error('Failed to read from clipboard:', error);
+            Logger.error('Failed to read from clipboard:', error);
             return '';
         }
     }
@@ -404,7 +404,7 @@ export class DOMUtils {
             localStorage.setItem(key, JSON.stringify(value));
             return true;
         } catch (error) {
-            console.error('Failed to save to localStorage:', error);
+            Logger.error('Failed to save to localStorage:', error);
             return false;
         }
     }
@@ -414,7 +414,7 @@ export class DOMUtils {
             const item = localStorage.getItem(key);
             return item ? JSON.parse(item) : defaultValue;
         } catch (error) {
-            console.error('Failed to read from localStorage:', error);
+            Logger.error('Failed to read from localStorage:', error);
             return defaultValue;
         }
     }
@@ -424,7 +424,7 @@ export class DOMUtils {
             localStorage.removeItem(key);
             return true;
         } catch (error) {
-            console.error('Failed to remove from localStorage:', error);
+            Logger.error('Failed to remove from localStorage:', error);
             return false;
         }
     }
@@ -555,7 +555,7 @@ export class DOMUtils {
     // Утиліти для роботи з відео
     static playVideo(video) {
         return video.play().catch(error => {
-            console.error('Failed to play video:', error);
+            Logger.error('Failed to play video:', error);
         });
     }
     
@@ -567,7 +567,7 @@ export class DOMUtils {
     static playAudio(src) {
         const audio = new Audio(src);
         return audio.play().catch(error => {
-            console.error('Failed to play audio:', error);
+            Logger.error('Failed to play audio:', error);
         });
     }
     

@@ -7,7 +7,7 @@ export function t(path, params) {
   const translations = window.translations;
   let value = path.split('.').reduce((obj, key) => obj && obj[key], translations);
   if (!value) {
-    console.warn('[i18n] No translation for', path, 'in', translations);
+    Logger.warn('[i18n] No translation for', path, 'in', translations);
     return `[no translation: ${path}]`;
   }
   // Якщо передані параметри для підстановки
@@ -31,7 +31,7 @@ export function loadLanguage(lang, updateUIWithLanguage) {
         try {
             updateUIWithLanguage();
         } catch (e) {
-            console.warn('[i18n] updateUIWithLanguage error:', e);
+            Logger.warn('[i18n] updateUIWithLanguage error:', e);
         }
     }
 }

@@ -32,7 +32,8 @@
     font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
-.control-btn {
+/* === УНІФІКОВАНІ СТИЛІ КНОПОК КЕРУВАННЯ === */
+.control-button {
     background: var(--control-bg);
     border: 2px solid var(--border-color);
     border-radius: 12px;
@@ -48,20 +49,56 @@
     gap: 8px;
     min-height: 44px;
 }
-
-.control-btn:hover, .control-btn:focus {
+.control-button:hover, .control-button:focus {
     background: var(--control-hover);
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px var(--shadow-color);
 }
-
-.control-btn.selected {
+.control-button.selected {
     background: var(--control-selected) !important;
     color: white !important;
     box-shadow: 0 0 15px var(--control-selected);
     transform: scale(1.05);
 }
+.control-button--direction {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5em;
+}
+.control-button--distance {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2em;
+}
+.control-button--confirm {
+    background: var(--confirm-btn-bg);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.control-button--confirm:hover {
+    background: var(--confirm-btn-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+.control-button--no-moves {
+    background: var(--no-moves-btn-bg);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.control-button--no-moves:hover {
+    background: var(--no-moves-btn-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+/* Видаляю дублікати: .control-btn, #confirm-move-btn, .confirm-move-btn, #no-moves-btn, .no-moves-btn */
+/* === Кінець уніфікації кнопок === */
 
 #distance-selector { 
     display: flex; 
@@ -404,3 +441,55 @@
 .settings-icon {
     font-size: 1.1em;
 } 
+
+/* === Додаю стилі для .modal-button (уніфікація з control-button) === */
+.modal-button {
+    background: var(--control-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+    font-weight: bold;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+}
+.modal-button.primary {
+    background: var(--control-selected);
+    color: white;
+    box-shadow: 0 0 15px var(--control-selected);
+}
+.modal-button.secondary {
+    background: var(--control-bg);
+    color: var(--text-primary);
+}
+/* === Кінець стилів для .modal-button === */ 
+
+/* === Стилі для центральної кнопки керування === */
+#center-info.confirm-btn-active {
+    background: var(--confirm-btn-bg);
+    color: #fff;
+    border: 2px solid var(--confirm-btn-bg);
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 0 8px var(--confirm-btn-bg);
+    transition: background 0.2s, color 0.2s;
+}
+#center-info.computer-move-display {
+    background: orange;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+}
+#center-info.direction-distance-state {
+    background: var(--control-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    font-weight: bold;
+}
+/* === Кінець стилів центральної кнопки === */ 

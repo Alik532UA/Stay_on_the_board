@@ -42,17 +42,17 @@ class WebRTCManager {
 
             return new Promise((resolve, reject) => {
                 this.peer.on('open', (id) => {
-                    console.log('[WebRTCManager] Peer відкрито з ID:', id);
+                    Logger.info('[WebRTCManager] Peer відкрито з ID:', id);
                     resolve(id);
                 });
 
                 this.peer.on('error', (error) => {
-                    console.error('[WebRTCManager] Peer помилка:', error);
+                    Logger.error('[WebRTCManager] Peer помилка:', error);
                     reject(error);
                 });
             });
         } catch (error) {
-            console.error('[WebRTCManager] Помилка ініціалізації:', error);
+            Logger.error('[WebRTCManager] Помилка ініціалізації:', error);
             throw error;
         }
     }
@@ -74,13 +74,13 @@ class WebRTCManager {
 
             // Очікуємо підключення гостя
             this.peer.on('connection', (conn) => {
-                console.log('[WebRTCManager] Отримано з\'єднання від гостя');
+                Logger.info('[WebRTCManager] Отримано з\'єднання від гостя');
                 this.setupConnection(conn);
             });
 
-            console.log('[WebRTCManager] Кімната створена:', roomId);
+            Logger.info('[WebRTCManager] Кімната створена:', roomId);
         } catch (error) {
-            console.error('[WebRTCManager] Помилка створення кімнати:', error);
+            Logger.error('[WebRTCManager] Помилка створення кімнати:', error);
             throw error;
         }
     }
@@ -106,9 +106,9 @@ class WebRTCManager {
 
             this.setupConnection(conn);
 
-            console.log('[WebRTCManager] Підключення до кімнати:', roomId);
+            Logger.info('[WebRTCManager] Підключення до кімнати:', roomId);
         } catch (error) {
-            console.error('[WebRTCManager] Помилка підключення до кімнати:', error);
+            Logger.error('[WebRTCManager] Помилка підключення до кімнати:', error);
             throw error;
         }
     }
@@ -121,7 +121,7 @@ class WebRTCManager {
         this.connection = conn;
 
         conn.on('open', () => {
-            console.log('[WebRTCManager] З\'єднання встановлено');
+            Logger.info('[WebRTCManager] З\'єднання встановлено');
             
             // Відправляємо інформацію про гравця
             conn.send({
@@ -136,7 +136,7 @@ class WebRTCManager {
         });
 
         conn.on('data', (data) => {
-            console.log('[WebRTCManager] Отримано дані:', data);
+            Logger.info('[WebRTCManager] Отримано дані:', data);
             
             if (this.onDataReceived) {
                 this.onDataReceived(data);
@@ -144,7 +144,7 @@ class WebRTCManager {
         });
 
         conn.on('close', () => {
-            console.log('[WebRTCManager] З\'єднання закрито');
+            Logger.info('[WebRTCManager] З\'єднання закрито');
             
             if (this.onConnectionClosed) {
                 this.onConnectionClosed();
@@ -152,7 +152,7 @@ class WebRTCManager {
         });
 
         conn.on('error', (error) => {
-            console.error('[WebRTCManager] Помилка з\'єднання:', error);
+            Logger.error('[WebRTCManager] Помилка з\'єднання:', error);
             
             if (this.onError) {
                 this.onError(error);
@@ -168,7 +168,7 @@ class WebRTCManager {
         if (this.connection && this.connection.open) {
             this.connection.send(data);
         } else {
-            console.warn('[WebRTCManager] З\'єднання не встановлено');
+            Logger.warn('[WebRTCManager] З\'єднання не встановлено');
         }
     }
 

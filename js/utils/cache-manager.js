@@ -154,7 +154,7 @@ class DOMCache {
         keysToDelete.forEach(key => this.cache.delete(key));
         
         if (keysToDelete.length > 0) {
-            console.debug(`DOMCache: Cleaned up ${keysToDelete.length} expired entries`);
+            Logger.error(`DOMCache: Cleaned up ${keysToDelete.length} expired entries`);
         }
     }
     

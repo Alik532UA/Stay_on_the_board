@@ -257,7 +257,8 @@ class Validator {
         const validator = this.rules.get(rule) || this.customValidators.get(rule);
         
         if (!validator) {
-            throw new Error(`Unknown validation rule: ${rule}`);
+            Logger.error(`Unknown validation rule: ${rule}`);
+            return false;
         }
         
         return validator(value, ...params);
