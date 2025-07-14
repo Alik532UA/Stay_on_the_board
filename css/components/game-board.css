@@ -41,17 +41,6 @@
     cursor: not-allowed;
     opacity: 0.7;
 }
-.board-cell.blocked-cell::after {
-    content: '\2717';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: calc(var(--cell-size) * 0.4);
-    color: var(--error-color);
-    font-weight: bold;
-    text-shadow: 0 0 5px var(--error-color);
-}
 
 .board-cell.available-move {
     position: relative;
@@ -289,23 +278,24 @@
     filter: drop-shadow(0 2px 6px #0008);
 }
 
-/* Стилі для заблокованих клітинок */
-.board-cell.cell-blocked {
-    background-color: #333 !important;
+/* --- ДОДАНО: УНІФІКОВАНІ СТИЛІ ДЛЯ ЗАБЛОКОВАНИХ КЛІТИНОК --- */
+.board-cell.blocked-cell {
+    background-color: var(--cell-blocked) !important;
     cursor: not-allowed;
     opacity: 0.8;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.board-cell.cell-blocked .blocked-symbol {
-    color: #ff4444;
-    font-size: 1.2em;
+.board-cell.blocked-cell .blocked-x {
+    color: var(--error-color);
+    font-size: 2em;
     font-weight: bold;
-    text-shadow: 0 0 5px #ff4444;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    text-shadow: 0 0 5px var(--error-color);
+    pointer-events: none;
+    user-select: none;
 } 
 
 /* Заблоковані клітинки */
