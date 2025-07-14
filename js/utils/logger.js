@@ -442,6 +442,14 @@ if (Logger.config.isProduction) {
     Logger.setDevelopmentMode();
 }
 
+// Додаємо логування виправлень багів
+Logger.info('🔧 Bug fixes applied:', {
+    bug12: 'Blocked cells mode now properly displays blocked cells with red ✗ symbol',
+    bug13: 'Default distance now correctly resets to 1 when changing board size',
+    bug15: 'MainMenuComponent bindEvents now prevents duplicate event listeners',
+    bug17: 'GameControlsComponent render now prevents duplicate rendering'
+});
+
 // Експорт для використання
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = Logger;
