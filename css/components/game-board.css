@@ -298,30 +298,4 @@
     user-select: none;
 } 
 
-/* Заблоковані клітинки */
-.blocked-cell {
-    background: #111 !important;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.blocked-x {
-    color: #d00;
-    font-size: 2em;
-    font-weight: bold;
-    pointer-events: none;
-    user-select: none;
-}
-
-.blocked-cell:hover {
-    background-color: #000 !important;
-    color: #ff0000 !important;
-}
-
-/* Запобігання клікам на заблоковані клітинки */
-.blocked-cell * {
-    pointer-events: none;
-} 
-
 /* === Кінець уніфікації клітинок === */ 

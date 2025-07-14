@@ -1,108 +1,124 @@
-### 🐞 Виправлення: Bug Report #12
+### **Загальний аналіз та стратегія**
 
-**Проблема:** У режимі "заблокованих клітинок" на дошці не відображається червоний символ '✗' на клітинках, з яких було зроблено хід. Клітинки стають темними, але візуальний індикатор відсутній.
-
-**Аналіз:**
-Проблема полягає у невідповідності між тим, як JavaScript-компонент `GameBoardComponent` намагається відобразити заблоковану клітинку, і тим, як CSS-файл `game-board.css` очікує її стилізувати.
-
-1.  **JavaScript (`game-board-component.js`):** У методі `renderBoard` для заблокованої клітинки додається клас `blocked-cell` і всередину вставляється елемент `<span class="blocked-x">✗</span>`. Це правильний підхід.
-2.  **CSS (`game-board.css`):** У файлі стилів є кілька правил для заблокованих клітинок. Одне з них, `.board-cell.blocked-cell::after`, використовує псевдо-елемент `::after` для відображення символу. Інше правило, `.blocked-x`, стилізує `span`, який створює JavaScript. Ці правила конфліктують, і, ймовірно, псевдо-елемент або інші стилі перекривають видимість `span`.
-
-**Рішення:** Необхідно уніфікувати стилі в `game-board.css`, видаливши застаріле правило з `::after` і переконавшись, що стилі для `.blocked-cell` та `.blocked-x` працюють разом коректно.
-
-**Інструкції для виправлення (для асистента Cursor):**
-
-1.  **Відкрий файл:** `css/game-board.css`.
-2.  **Знайди та видали** наступний блок CSS-коду, який використовує псевдо-елемент `::after`. Він є застарілим і конфліктує з логікою компонента.
-    ```css
-    .board-cell.blocked-cell::after {
-        content: '\2717';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: calc(var(--cell-size) * 0.4);
-        color: var(--error-color);
-        font-weight: bold;
-        text-shadow: 0 0 5px var(--error-color);
-    }
-    ```
-3.  **Знайди** блок стилів для `.board-cell.cell-blocked`. Він також застарілий.
-    ```css
-    .board-cell.cell-blocked {
-        background-color: #333 !important;
-        cursor: not-allowed;
-        opacity: 0.8;
-        position: relative;
-    }
-    
-    .board-cell.cell-blocked .blocked-symbol {
-        color: #ff4444;
-        font-size: 1.2em;
-        font-weight: bold;
-        text-shadow: 0 0 5px #ff4444;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    } 
-    ```
-4.  **Заміни** знайдений блок на цей уніфікований та правильний варіант, який буде працювати з `span.blocked-x`:
-    ```css
-    .board-cell.blocked-cell {
-        background-color: var(--cell-blocked) !important;
-        cursor: not-allowed;
-        opacity: 0.8;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .board-cell.blocked-cell .blocked-x {
-        color: var(--error-color);
-        font-size: 2em;
-        font-weight: bold;
-        text-shadow: 0 0 5px var(--error-color);
-        pointer-events: none;
-        user-select: none;
-    }
-    ```
-    Це виправлення забезпечить, що символ '✗', який додається через JavaScript, буде коректно відображатися на заблокованих клітинках.
+Проєкт перебуває у фазі активного рефакторингу від старої архітектури (`index-old-architecture.html`) до нової, що базується на `state-manager.js`, `view-manager.js` та компонентному підході (`*-component.js`). Багато з виявлених проблем є наслідком цього перехідного періоду, зокрема неправильне управління життєвим циклом компонентів та побічні ефекти від зміни стану. Моя стратегія полягає у тому, щоб кожен фікс не лише вирішував проблему, а й посилював нову архітектуру, забезпечуючи кращу інкапсуляцію та передбачуваність.
 
 ---
 
-### 🐞 Виправлення: Bug Report #13
+### **Bug Report #12: Некоректне відображення заблокованих клітинок**
 
-**Проблема:** При зміні розміру дошки з більшого на менший (наприклад, з 8x8 на 3x3), якщо була обрана відстань, яка недоступна на меншій дошці (наприклад, 5), ця відстань залишається обраною. Це призводить до неможливості зробити хід, оскільки така відстань недійсна.
+**Аналіз та першопричина:**
+Проблема полягає у функції `renderBoard` в `js/components/game-board-component.js`. Логіка рендерингу клітинок не є взаємовиключною. Спочатку код може правильно додати клас `blocked-cell` та символ `✗`. Однак, якщо ця ж клітинка також потрапляє під умову `isAvailable` або `isHighlighted`, наступний блок коду перезаписує `innerHTML` клітинки, видаляючи символ блокування. Заблокована клітинка повинна мати найвищий пріоритет у логіці рендерингу.
 
-**Аналіз:**
-Проблема знаходиться в компоненті `GameControlsComponent.js`. Коли змінюється розмір дошки, підписник на `game.boardSize` оновлює кнопки відстані, але не перевіряє і не скидає поточне значення `game.selectedDistance` у менеджері стану.
+**Стратегічний план для виправлення:**
 
-**Рішення:** Потрібно додати логіку в підписника на `game.boardSize` у файлі `GameControlsComponent.js`, яка перевірятиме, чи поточна обрана відстань є валідною для нового розміру дошки. Якщо ні, відстань потрібно скинути до `1`.
+1.  **Файл для модифікації:** `js/components/game-board-component.js`
+2.  **Функція:** `renderBoard`
+3.  **Дія:** Змінити логіку всередині циклу `for (let col = 0; col < boardSize; col++)`. Потрібно забезпечити, щоб перевірка на `isBlocked` була першою і остаточною для даної клітинки.
 
-**Інструкції для виправлення (для асистента Cursor):**
-
-1.  **Відкрий файл:** `js/components/game-controls-component.js`.
-2.  **Знайди** метод `subscribeToState`.
-3.  **Знайди** всередині нього підписку на `game.boardSize`:
+    **Замінити цей блок коду:**
     ```javascript
-    this.subscribe('game.boardSize', (newSize) => {
-        Logger.debug('[GameControlsComponent] Board size changed to:', newSize);
-        this.generateDistanceButtons(newSize); // Оновлюємо лише кнопки дистанції
-        this.bindEvents(); // Додаємо обробники на нові кнопки
-    });
+    // --- Відображення заблокованих клітинок ---
+    const isBlocked = blockedCells.some(c => c.row === row && c.col === col);
+    if (isBlocked) {
+        cell.classList.add('blocked-cell');
+        cell.innerHTML = '<span class="blocked-x">✗</span>';
+        Logger.debug('[GameBoardComponent] renderBoard: blocked cell rendered', { row, col });
+    } else {
+        const cellValue = board[row][col];
+        // --- Фігура ---
+        if (cellValue === 1) {
+            cell.classList.add('player-piece');
+            cell.innerHTML = '<span class="crown">👑</span>';
+        } else if (cellValue === 2) {
+            cell.classList.add('player-piece', 'player2');
+            cell.innerHTML = '<span class="crown">👑</span>';
+        } else {
+            cell.classList.add('empty-cell');
+            // --- Доступні ходи ---
+            const isHighlighted = highlightedMoves.some(move => move.newRow === row && move.newCol === col);
+            const isAvailable = availableMoves.some(move => move.newRow === row && move.newCol === col);
+            if (isHighlighted) {
+                cell.classList.add('highlighted-move');
+                cell.innerHTML = '<span class="move-dot move-dot-highlighted"></span>';
+            } else if (isAvailable && showingAvailableMoves) {
+                cell.classList.add('available-move');
+                cell.innerHTML = '<span class="move-dot"></span>';
+            } else {
+                cell.innerHTML = '';
+            }
+        }
+    }
+    gameBoard.appendChild(cell);
     ```
-4.  **Додай** всередину цієї функції логіку для скидання відстані. Повний код підписника має виглядати так:
+
+    **На цей покращений блок:**
     ```javascript
+    const isBlocked = blockedCells.some(c => c.row === row && c.col === col);
+
+    if (isBlocked) {
+        cell.classList.add('blocked-cell');
+        cell.innerHTML = '<span class="blocked-x">✗</span>';
+        Logger.debug('[GameBoardComponent] renderBoard: blocked cell rendered', { row, col });
+    } else {
+        const cellValue = board[row][col];
+        if (cellValue === 1) {
+            cell.classList.add('player-piece');
+            cell.innerHTML = '<span class="crown">👑</span>';
+        } else if (cellValue === 2) {
+            cell.classList.add('player-piece', 'player2');
+            cell.innerHTML = '<span class="crown">👑</span>';
+        } else {
+            cell.classList.add('empty-cell');
+            const isHighlighted = highlightedMoves.some(move => move.newRow === row && move.newCol === col);
+            const isAvailable = availableMoves.some(move => move.newRow === row && move.newCol === col);
+
+            if (isHighlighted) {
+                cell.classList.add('highlighted-move');
+                cell.innerHTML = '<span class="move-dot move-dot-highlighted"></span>';
+            } else if (isAvailable && showingAvailableMoves) {
+                cell.classList.add('available-move');
+                cell.innerHTML = '<span class="move-dot"></span>';
+            } else {
+                cell.innerHTML = '';
+            }
+        }
+    }
+    gameBoard.appendChild(cell);
+    ```
+
+**Обґрунтування:**
+Ця зміна реструктурує логіку, роблячи її більш надійною. Перевірка на `isBlocked` тепер є першочерговою. Якщо клітинка заблокована, вона отримує відповідний стиль та контент, і подальші перевірки на фігури чи доступні ходи для неї не виконуються. Це усуває можливість перезапису `innerHTML` і гарантує коректне відображення.
+
+**Верифікація:**
+1.  Запустити гру.
+2.  Увімкнути "Режим заблокованих клітинок".
+3.  Зробити хід.
+4.  Переконатися, що клітинка, з якої було зроблено хід, стала чорною з червоним символом `✗` і не містить інших позначок.
+
+---
+
+### **Bug Report #13: Відстань за замовчуванням не скидається при зміні розміру дошки**
+
+**Аналіз та першопричина:**
+Проблема виникає у `js/components/game-board-component.js` в обробнику події `change` для селектора `#board-size-select`. Код змінює `game.boardSize` у `stateManager`, але не враховує, що поточне значення `game.selectedDistance` може стати невалідним для нового розміру дошки (наприклад, відстань 4 на дошці 3x3). Це призводить до неузгодженості стану.
+
+**Стратегічний план для виправлення:**
+
+1.  **Файл для модифікації:** `js/components/game-controls-component.js`
+2.  **Функція:** `subscribeToState`
+3.  **Дія:** Додати логіку для скидання відстані при зміні розміру дошки. Це більш архітектурно правильно, оскільки компонент контролів повинен сам реагувати на зміни, що впливають на його стан.
+
+    **Додати цей блок коду всередину `subscribeToState`:**
+    ```javascript
+    // Підписка на зміни розміру дошки
     this.subscribe('game.boardSize', (newSize) => {
         Logger.debug('[GameControlsComponent] Board size changed to:', newSize);
         this.generateDistanceButtons(newSize); // Оновлюємо лише кнопки дистанції
         this.bindEvents(); // Додаємо обробники на нові кнопки
         
-        // Скидаємо відстань до 1 при зміні розміру дошки
+        // Скидаємо відстань до 1 при зміні розміру дошки, якщо поточна відстань невалідна
         const currentDistance = stateManager.getState('game.selectedDistance');
-        if (currentDistance !== null && currentDistance > newSize - 1) {
+        if (currentDistance !== null && currentDistance >= newSize) {
             stateManager.setState('game.selectedDistance', 1);
             Logger.debug('[GameControlsComponent] Reset distance to 1 due to board size change:', { 
                 oldDistance: currentDistance, 
@@ -111,63 +127,92 @@
             });
         }
     });
-    ```
-    Це виправлення гарантує, що після зміни розміру дошки обрана відстань завжди буде валідною.
 
----
-
-### 🐞 Виправлення: Bug Report #15
-
-**Проблема:** У головному меню, якщо вийти з нього (наприклад, перейти в налаштування) і повернутися назад, обробники подій на кнопках дублюються. В результаті, один клік на кнопку "Правила" може відкрити модальне вікно кілька разів.
-
-**Аналіз:**
-Проблема в компоненті `MainMenuComponent.js`. Метод `render()` викликає `bindEvents()` кожного разу. Хоча в `bindEvents()` є спроба уникнути дублювання за допомогою прапорця `this.eventsBound`, цей прапорець скидається в `false` на початку кожного виклику `render()`, що робить його неефективним.
-
-**Рішення:** Найчистіший спосіб уникнути дублювання обробників — це видалити старі обробники перед додаванням нових. Ефективний спосіб зробити це — клонувати елементи кнопок і замінити ними старі. Це автоматично видаляє всі пов'язані з ними обробники.
-
-**Інструкції для виправлення (для асистента Cursor):**
-
-1.  **Відкрий файл:** `js/components/main-menu-component.js`.
-2.  **Знайди** метод `bindEvents()`.
-3.  **Знайди** рядок `this.eventsBound = true;` і видали його. Також видали перевірку `if (this.eventsBound)`.
-4.  **Знайди** рядок `this.element.querySelectorAll('button').forEach(btn => { ... });` і видали його.
-5.  **Замість видаленого коду** на початку методу `bindEvents()` додай такий код, який буде очищувати старі обробники подій:
-    ```javascript
-    // Очищаємо попередні обробники подій для уникнення дублювання
-    this.element.querySelectorAll('button').forEach(btn => {
-        btn.replaceWith(btn.cloneNode(true));
+    // Підписка на зміни selectedDistance для діагностики
+    this.subscribe('game.selectedDistance', (distance) => {
+        Logger.debug('[GameControlsComponent] game.selectedDistance changed:', { 
+            distance, 
+            boardSize: stateManager.getState('game.boardSize'),
+            maxDistance: (stateManager.getState('game.boardSize') || 3) - 1
+        });
     });
     ```
-6.  **Знайди** метод `render()` і видали з нього рядок `this.eventsBound = false;`.
 
-Після цих змін метод `bindEvents()` буде безпечно викликатися при кожному рендері, не створюючи дублікатів обробників.
+**Обґрунтування:**
+Перенесення цієї логіки в `GameControlsComponent` покращує інкапсуляцію. Компонент, що відповідає за вибір відстані, тепер сам реагує на зміну розміру дошки і підтримує свій стан у консистентному вигляді. Це відповідає принципам реактивного програмування та робить систему більш надійною.
+
+**Верифікація:**
+1.  Запустити гру на дошці 5x5.
+2.  Вибрати напрямок і відстань 4.
+3.  Змінити розмір дошки на 3x3.
+4.  Переконатися, що вибрана відстань автоматично скинулася на 1, а не залишилася 4.
 
 ---
 
-### 🐞 Виправлення: Bug Report #17
+### **Bug Report #15: Дублювання обробників подій у головному меню**
 
-**Проблема:** Компонент `GameControlsComponent` рендериться багато разів, що може призводити до проблем з продуктивністю та станом. Це відбувається тому, що `GameBoardComponent` створює новий екземпляр `GameControlsComponent` при кожному своєму рендері.
+**Аналіз та першопричина:**
+Проблема в `js/components/main-menu-component.js`. Метод `render` викликається кожного разу при переході на головне меню, і він, у свою чергу, викликає `bindEvents`. Попередні обробники подій не видаляються, що призводить до їх накопичення та багаторазового спрацьовування. Використання прапорця `eventsBound` є поширеним, але крихким рішенням.
 
-**Аналіз:**
-У файлі `GameBoardComponent.js` метод `render()` викликає `renderControls()`, а той, у свою чергу, створює `new GameControlsComponent(controlsEl)`. Оскільки `GameBoardComponent` перерендериться при будь-якій зміні стану дошки, це призводить до постійного створення нових екземплярів контролів.
+**Стратегічний план для виправлення:**
 
-**Рішення:** Потрібно додати в `GameControlsComponent` внутрішній прапорець (наприклад, `isRendered`), щоб запобігти повторному рендерингу, якщо компонент вже був відображений.
+1.  **Файл для модифікації:** `js/components/main-menu-component.js`
+2.  **Функція:** `bindEvents`
+3.  **Дія:** Перед додаванням нових обробників необхідно гарантовано видалити всі старі. Найпростіший і найнадійніший спосіб для цього — клонування та заміна вузлів кнопок.
 
-**Інструкції для виправлення (для асистента Cursor):**
-
-1.  **Відкрий файл:** `js/components/game-controls-component.js`.
-2.  **Знайди** конструктор класу `GameControlsComponent`.
-3.  **Додай** ініціалізацію прапорця `isRendered` всередині конструктора:
+    **Замінити цей блок коду:**
     ```javascript
-    constructor(element, options = {}) {
-        super(element, options);
-        this.isRendered = false; // Додай цей рядок
-        this.selectedDirection = null;
-        // ... решта коду конструктора
+    bindEvents() {
+        // ... (старий код з прапорцем eventsBound)
     }
     ```
-4.  **Знайди** метод `render()`.
-5.  **Додай** на самому початку методу `render()` перевірку цього прапорця:
+
+    **На цей покращений блок:**
+    ```javascript
+    bindEvents() {
+        // --- ДОДАНО: очищення попередніх обробників ---
+        this.element.querySelectorAll('button').forEach(btn => {
+            btn.replaceWith(btn.cloneNode(true));
+        });
+
+        this.element.querySelector('#btn-vs-computer')?.addEventListener('click', () => {
+            stateManager.navigateTo('gameBoard', { gameMode: 'vsComputer' });
+        });
+        this.element.querySelector('#btn-local-game')?.addEventListener('click', () => {
+            stateManager.navigateTo('gameBoard', { gameMode: 'local' });
+        });
+        this.element.querySelector('#btn-online')?.addEventListener('click', () => {
+            window.location.href = 'peer-mvp.html';
+        });
+        // ... (решта обробників без змін) ...
+    }
+    ```
+4.  **Дія 2:** Видалити прапорець `this.eventsBound` з конструктора та будь-яких інших місць у компоненті.
+
+**Обґрунтування:**
+Метод `node.replaceWith(node.cloneNode(true))` є ідіоматичним та надійним способом видалення всіх обробників подій з елемента, оскільки клонований вузол не успадковує їх. Це гарантує, що при кожному виклику `bindEvents` ми працюємо з "чистими" елементами, що повністю усуває проблему дублювання. Цей підхід простіший і надійніший за ручне відстеження та видалення кожного обробника.
+
+**Верифікація:**
+1.  Запустити гру, перейти в налаштування.
+2.  Повернутися в головне меню.
+3.  Перейти в правила.
+4.  Повернутися в головне меню.
+5.  Натиснути кнопку "Грати з комп'ютером". Переконатися, що перехід на ігровий екран відбувається лише один раз.
+
+---
+
+### **Bug Report #17: Дублювання рендерингу GameControlsComponent**
+
+**Аналіз та першопричина:**
+Проблема в `js/components/game-controls-component.js`. Метод `render` не має захисту від повторного виклику. Оскільки `GameBoardComponent` може перерендеритися (наприклад, при зміні розміру дошки) і викликати рендеринг `GameControlsComponent` знову, це призводить до дублювання елементів керування.
+
+**Стратегічний план для виправлення:**
+
+1.  **Файл для модифікації:** `js/components/game-controls-component.js`
+2.  **Функція:** `render`
+3.  **Дія:** Додати прапорець `this.isRendered` для захисту від повторного рендерингу.
+
+    **Додати на початку методу `render`:**
     ```javascript
     render() {
         // Перевіряємо, чи вже рендерилися
@@ -177,26 +222,33 @@
         }
         
         Logger.info('[GameControlsComponent] render: початок');
-        // ... решта коду методу render
+        // ... (решта коду методу)
     ```
-6.  **Знайди** кінець методу `render()` і перед останнім `Logger.info` додай рядок, який встановлює прапорець:
+4.  **Дія 2:** Встановити прапорець в `true` в кінці методу `render`.
+
+    **Додати в кінці методу `render`:**
     ```javascript
-    // ... решта коду методу render
-    this.isRendered = true;
-    Logger.info('[GameControlsComponent] render: завершено');
+        // ... (код рендерингу)
+        this.isRendered = true;
+        Logger.info('[GameControlsComponent] render: завершено');
     }
     ```
-7.  **Знайди** метод `destroy()` і додай скидання прапорця, щоб компонент міг бути відрендерений знову, якщо його знищили і створили заново:
+5.  **Дія 3:** Додати скидання прапорця в метод `destroy`.
+
+    **Додати в метод `destroy`:**
     ```javascript
     destroy() {
-        Logger.debug('[GameControlsComponent] destroy');
-        // ... решта коду
-        
-        // Скидаємо флаги
+        // ... (інший код очищення)
         this.isRendered = false;
-        
-        // Викликаємо батьківський метод для очищення підписок та інших ресурсів
         super.destroy();
     }
     ```
-    Це виправлення гарантує, що компонент контролів буде відрендерений лише один раз, що вирішить проблему з дублюванням.
+
+**Обґрунтування:**
+Додавання прапорця `isRendered` є простою та ефективною реалізацією ідемпотентності для методу `render`. Це гарантує, що вміст компонента буде створено лише один раз за його життєвий цикл, навіть якщо `render` буде викликано помилково кілька разів. Це робить компонент більш стійким до непередбачуваних викликів з боку батьківських компонентів.
+
+**Верифікація:**
+1.  Запустити гру, перейти на ігровий екран.
+2.  Змінити розмір дошки кілька разів.
+3.  Переконатися, що панель керування (кнопки напрямку, відстані) не дублюється і залишається в одному екземплярі.
+4.  Перевірити логи консолі на наявність повідомлення `[GameControlsComponent] Already rendered, skipping`.

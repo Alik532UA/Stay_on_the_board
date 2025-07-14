@@ -8,7 +8,7 @@ import { t } from '../localization.js';
 export class MainMenuComponent extends BaseComponent {
     constructor(element) {
         super(element);
-        this.eventsBound = false; // Флаг для відстеження чи вже прив'язані події
+        // this.eventsBound = false; // Видалено прапорець
     }
     
     render() {
@@ -276,7 +276,7 @@ export class MainMenuComponent extends BaseComponent {
     
     destroy() {
         Logger.debug('[MainMenuComponent] destroy called');
-        this.eventsBound = false; // Скидаємо флаг
+        // this.eventsBound = false; // Видалено прапорець
         this.element.innerHTML = '';
     }
     
