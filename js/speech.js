@@ -50,7 +50,7 @@ class SpeechManager {
         
         // Перевіряємо підтримку Web Speech API
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            console.warn('Speech recognition not supported');
+            Logger.warn('Speech recognition not supported');
             this.enabled = false;
             return;
         }
@@ -74,7 +74,7 @@ class SpeechManager {
         // Реєструємо стандартні команди
         this.registerDefaultCommands();
         
-        console.log('🎤 Speech manager initialized');
+        Logger.info('🎤 Speech manager initialized');
     }
     
     /**
@@ -133,7 +133,7 @@ class SpeechManager {
         if ('speechSynthesis' in window) {
             this.synthesis = window.speechSynthesis;
         } else {
-            console.warn('Speech synthesis not supported');
+            Logger.warn('Speech synthesis not supported');
         }
     }
     

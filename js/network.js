@@ -171,7 +171,7 @@ class NetworkManager {
                         Object.assign(requestConfig, result);
                     }
                 } catch (error) {
-                    console.error('Request middleware error:', error);
+                    Logger.error('Request middleware error:', error);
                 }
             }
         }
@@ -194,7 +194,7 @@ class NetworkManager {
                             Object.assign(response, result);
                         }
                     } catch (error) {
-                        console.error('Response middleware error:', error);
+                        Logger.error('Response middleware error:', error);
                     }
                 }
             }
@@ -253,7 +253,7 @@ class NetworkManager {
                     try {
                         middleware(error, config, attempt);
                     } catch (middlewareError) {
-                        console.error('Error middleware error:', middlewareError);
+                        Logger.error('Error middleware error:', middlewareError);
                     }
                 }
                 

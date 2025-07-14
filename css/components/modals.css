@@ -556,3 +556,81 @@
         flex-direction: column;
     }
 } 
+
+/* === СТИЛІ МОДАЛЬНИХ ВІКОН (перенесено з main-menu.css) === */
+#modal-content {
+    border-radius: var(--unified-radius);
+    box-shadow: var(--unified-shadow);
+}
+#modal-content > .modal-footer:only-child, #modal-content:has(> .modal-footer) {
+    border-radius: 0 0 var(--unified-radius) var(--unified-radius);
+}
+.modal-footer, #modal-content > .modal-footer {
+    padding: 16px 24px 24px;
+    display: flex;
+    gap: var(--modal-footer-gap);
+    justify-content: flex-end;
+    border-top: 1px solid var(--border-color);
+    border-radius: 0 0 var(--unified-radius) var(--unified-radius);
+}
+.modal-footer .modal-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    min-width: 80px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.modal-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    min-width: 80px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.modal-button.primary {
+    background: var(--control-selected);
+    color: white;
+}
+.modal-button.secondary {
+    background: var(--control-bg);
+    color: var(--text-primary);
+}
+.modal-content-center {
+    text-align: center;
+}
+.modal-content-left {
+    text-align: left;
+}
+.modal-buttons-container {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+.modal-input-container {
+    margin-bottom: 16px;
+}
+.modal-input {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1em;
+    margin-bottom: 8px;
+}
+.modal-input:last-child {
+    margin-bottom: 0;
+}
+/* === Кінець стилів модалок === */ 

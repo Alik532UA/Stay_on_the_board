@@ -49,7 +49,7 @@ class Analytics {
         // Відстежуємо події браузера
         this.trackBrowserEvents();
         
-        console.log('📊 Analytics initialized');
+        Logger.info('📊 Analytics initialized');
     }
     
     /**
@@ -94,7 +94,7 @@ class Analytics {
         
         // Логуємо в режимі розробки
         if (process.env.NODE_ENV === 'development') {
-            console.debug('Analytics:', event, data);
+            Logger.debug('Analytics:', event, data);
         }
     }
     
@@ -265,10 +265,10 @@ class Analytics {
                 throw new Error(`HTTP ${response.status}`);
             }
             
-            console.debug(`Analytics: Sent ${eventsToSend.length} events`);
+            Logger.debug(`Analytics: Sent ${eventsToSend.length} events`);
             
         } catch (error) {
-            console.error('Analytics flush error:', error);
+            Logger.error('Analytics flush error:', error);
             
             // Повертаємо події назад в чергу
             this.events.unshift(...eventsToSend);

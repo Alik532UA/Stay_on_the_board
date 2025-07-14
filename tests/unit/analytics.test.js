@@ -344,5 +344,5 @@ describe('Analytics', () => {
 
 // Запускаємо тести
 testRunner.run().then(summary => {
-    console.log('Analytics tests completed:', summary);
+    Logger.info('Analytics tests completed:', summary);
 }); 

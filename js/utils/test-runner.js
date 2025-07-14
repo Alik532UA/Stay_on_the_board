@@ -170,7 +170,7 @@ class TestRunner {
                 try {
                     await this.afterEach();
                 } catch (error) {
-                    console.error('afterEach error:', error);
+                    Logger.error('afterEach error:', error);
                 }
             }
             
@@ -204,34 +204,34 @@ class TestRunner {
      * @param {Object} summary - Зведення результатів
      */
     outputResults(summary) {
-        console.log('\n' + '='.repeat(50));
-        console.log('🧪 TEST RESULTS');
-        console.log('='.repeat(50));
+        Logger.info('\n' + '='.repeat(50));
+        Logger.info('🧪 TEST RESULTS');
+        Logger.info('='.repeat(50));
         
         // Виводимо кожен тест
         for (const result of summary.results) {
             const status = result.status === 'passed' ? '✅' : '❌';
             const duration = `${result.duration}ms`;
             
-            console.log(`${status} ${result.name} (${duration})`);
+            Logger.info(`${status} ${result.name} (${duration})`);
             
             if (result.error) {
-                console.error(`   Error: ${result.error.message}`);
+                Logger.error(`   Error: ${result.error.message}`);
                 if (result.error.stack) {
-                    console.error(`   Stack: ${result.error.stack}`);
+                    Logger.error(`   Stack: ${result.error.stack}`);
                 }
             }
         }
         
         // Виводимо зведення
-        console.log('\n' + '-'.repeat(50));
-        console.log(`📊 SUMMARY:`);
-        console.log(`   Total: ${summary.total}`);
-        console.log(`   Passed: ${summary.passed} ✅`);
-        console.log(`   Failed: ${summary.failed} ❌`);
-        console.log(`   Success Rate: ${summary.successRate.toFixed(1)}%`);
-        console.log(`   Duration: ${summary.duration}ms`);
-        console.log('='.repeat(50) + '\n');
+        Logger.info('\n' + '-'.repeat(50));
+        Logger.info(`📊 SUMMARY:`);
+        Logger.info(`   Total: ${summary.total}`);
+        Logger.info(`   Passed: ${summary.passed} ✅`);
+        Logger.info(`   Failed: ${summary.failed} ❌`);
+        Logger.info(`   Success Rate: ${summary.successRate.toFixed(1)}%`);
+        Logger.info(`   Duration: ${summary.duration}ms`);
+        Logger.info('='.repeat(50) + '\n');
         
         // Якщо є помилки, кидаємо виняток
         if (summary.failed > 0) {
@@ -267,7 +267,7 @@ class TestRunner {
 
 // Глобальні функції для зручності
 window.describe = function(name, fn) {
-    console.log(`\n📁 ${name}`);
+    Logger.info(`\n📁 ${name}`);
     fn();
 };
 

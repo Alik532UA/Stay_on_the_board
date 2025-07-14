@@ -380,8 +380,8 @@ describe('StateManager', () => {
 // Запускаємо тести якщо файл виконано напряму
 if (typeof window !== 'undefined' && window.currentTestRunner) {
     window.currentTestRunner.run().then(summary => {
-        console.log('StateManager tests completed:', summary);
+        Logger.info('StateManager tests completed:', summary);
     }).catch(error => {
-        console.error('StateManager tests failed:', error);
+        Logger.error('StateManager tests failed:', error);
     });
 } 

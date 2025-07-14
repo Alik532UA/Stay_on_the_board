@@ -746,10 +746,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Робимо додаток доступним глобально для дебагу
         window.app = app;
 
-        // Створюємо singleton-глобальний GameControlsComponent після того, як DOM готовий
-        // window.gameControlsComponent = new GameControlsComponent(document.getElementById('game-controls'));
-        // window.gameControlsComponent.render();
-
         Logger.info('🎉 Додаток Stay on the board готовий до роботи');
 
     } catch (error) {

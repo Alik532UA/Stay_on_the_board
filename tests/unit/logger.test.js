@@ -338,8 +338,8 @@ describe('Logger', () => {
 // Запускаємо тести якщо файл виконано напряму
 if (typeof window !== 'undefined' && window.currentTestRunner) {
     window.currentTestRunner.run().then(summary => {
-        console.log('Logger tests completed:', summary);
+        Logger.info('Logger tests completed:', summary);
     }).catch(error => {
-        console.error('Logger tests failed:', error);
+        Logger.error('Logger tests failed:', error);
     });
 } 
