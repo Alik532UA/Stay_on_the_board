@@ -1,0 +1,969 @@
+/* Стилі для головного меню */
+#main-menu-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+#main-menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 40px;
+    width: 100%;
+    max-width: 400px;
+}
+
+#main-menu-buttons .modal-button {
+    padding: 16px 32px;
+    font-size: 1.2em;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--control-bg);
+    color: var(--text-primary);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+#main-menu-buttons .modal-button:hover {
+    background: var(--control-hover);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--shadow-color);
+}
+
+/* Верхні елементи керування */
+#top-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+}
+
+#theme-toggle {
+    display: flex;
+    background: var(--control-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+#theme-toggle button {
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    min-width: 60px;
+}
+
+#theme-toggle button.active {
+    background: var(--control-selected);
+    color: white;
+}
+
+#style-toggle, #lang-toggle {
+    display: flex;
+    align-items: center;
+}
+
+#style-toggle select, #lang-toggle select {
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--control-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    min-width: 120px;
+}
+
+#style-toggle select:focus, #lang-toggle select:focus {
+    outline: none;
+    border-color: var(--control-hover);
+    box-shadow: 0 4px 12px var(--shadow-color), 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Уніфіковані стилі */
+:root {
+    --unified-radius: 18px;
+    --unified-spacing: 24px;
+    --unified-shadow: 0 8px 32px #0008;
+}
+
+#game-container,
+#main-menu-container {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: var(--unified-spacing);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.cell,
+.control-btn,
+.modal-button {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+#modal-content {
+    border-radius: var(--unified-radius);
+    box-shadow: var(--unified-shadow);
+}
+
+#modal-content > .modal-footer:only-child, #modal-content:has(> .modal-footer) {
+    border-radius: 0 0 var(--unified-radius) var(--unified-radius);
+}
+
+.modal-footer, #modal-content > .modal-footer {
+    padding: 16px 24px 24px;
+    display: flex;
+    gap: var(--modal-footer-gap);
+    justify-content: flex-end;
+    border-top: 1px solid var(--border-color);
+    border-radius: 0 0 var(--unified-radius) var(--unified-radius);
+}
+
+.modal-footer .modal-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    min-width: 80px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.modal-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    min-width: 80px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.modal-button.primary {
+    background: var(--control-selected);
+    color: white;
+}
+
+.modal-button.secondary {
+    background: var(--control-bg);
+    color: var(--text-primary);
+}
+
+#visual-controls,
+#ui-panel {
+    margin-top: var(--unified-spacing);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.control-btn,
+.modal-button {
+    background: var(--control-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+    font-weight: bold;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+}
+
+.control-btn.selected,
+.modal-button.primary {
+    background: var(--control-selected);
+    color: white;
+    box-shadow: 0 0 15px var(--control-selected);
+}
+
+.score-panel {
+    background: var(--bg-secondary);
+    padding: 16px 24px;
+    border-radius: var(--unified-radius);
+    box-shadow: var(--unified-shadow);
+    margin-bottom: var(--unified-spacing);
+    text-align: center;
+}
+
+#online-game-panel {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: var(--unified-radius);
+    box-shadow: var(--unified-shadow);
+    margin-top: var(--unified-spacing);
+}
+
+#board-options {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: var(--unified-radius);
+    box-shadow: var(--unified-shadow);
+    margin-top: var(--unified-spacing);
+    text-align: center;
+}
+
+#game-container,
+#main-menu-container {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: var(--unified-spacing);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: all 0.3s ease;
+}
+
+.button, button, .menu-btn, .theme-btn, .lang-btn {
+    background: var(--control-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+    font-weight: bold;
+    font-size: 1em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+}
+
+.button:hover, button:hover, .menu-btn:hover, .theme-btn:hover, .lang-btn:hover {
+    background: var(--control-hover);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+input, select {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text-primary);
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--control-hover);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.modal, .modal-content {
+    background: var(--modal-content-bg);
+    border-radius: var(--unified-radius);
+    box-shadow: var(--unified-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.menu {
+    background: var(--bg-secondary);
+    border-radius: var(--unified-radius);
+    box-shadow: var(--unified-shadow);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+}
+
+/* iOS Switch */
+.ios-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.ios-switch input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ios-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-color);
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.ios-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.ios-switch input:checked + .slider {
+    background-color: var(--control-selected);
+}
+
+.ios-switch input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.ios-switch .slider:active:before {
+    width: 32px;
+}
+
+label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+/* Спеціальні стилі для різних тем */
+[data-style="glass"] #game-container,
+[data-style="glass"] #main-menu-container {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+[data-style="glass"] .modal-button,
+[data-style="glass"] .control-btn {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+[data-style="glass"] .modal-button.primary,
+[data-style="glass"] .control-btn.selected {
+    background: rgba(76, 175, 80, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+[data-style="material"] #game-container,
+[data-style="material"] #main-menu-container {
+    background: var(--bg-primary);
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.05);
+}
+
+[data-style="material"] .modal-button,
+[data-style="material"] .control-btn {
+    background: var(--control-bg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    border: none;
+}
+
+[data-style="material"] .modal-button.primary,
+[data-style="material"] .control-btn.selected {
+    background: var(--control-selected);
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+[data-style="material"] .modal-button.secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+[data-style="material"] .ios-switch .slider {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+[data-style="material"] .ios-switch input:checked + .slider {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+[data-style="material"][data-theme="dark"] #direction-grid {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Кастомний dropdown */
+#custom-style-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-dropdown-btn {
+    background: var(--control-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.custom-dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--unified-shadow);
+    z-index: 1000;
+    margin-top: 4px;
+    overflow: hidden;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.custom-dropdown-list.hidden {
+    display: none;
+}
+
+.style-option {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.style-option:last-child {
+    border-bottom: none;
+}
+
+.style-option:hover, .style-option.selected {
+    background: var(--control-hover);
+    color: white;
+}
+
+.style-classic { background: #f5f5f5; color: #222; font-weight: 500; }
+.style-peak { background: #e3e6fa; color: #2a2a7a; font-family: 'Segoe UI', sans-serif; }
+.style-cs2 { background: #222; color: #ffcc00; font-family: 'Consolas', monospace; }
+.style-glass { background: rgba(255,255,255,0.3); color: #1a1a1a; backdrop-filter: blur(4px); }
+.style-material { background: #e8f5e9; color: #388e3c; font-family: 'Roboto', sans-serif; font-weight: bold; }
+
+/* Дропдаун теми */
+.theme-dropdown {
+    position: absolute;
+    min-width: 320px;
+    background: none;
+    color: #222;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(80,0,80,0.18);
+    border: none;
+    padding: 12px 16px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.theme-dropdown.mobile {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 96vw;
+    max-width: 360px;
+}
+
+.theme-dropdown.desktop {
+    position: absolute;
+    transform: none;
+    width: auto;
+    max-width: 320px;
+}
+
+/* Рядки тем */
+.theme-style-row {
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+}
+
+.theme-style-row[data-style="classic"] {
+    background: rgba(255,140,0,0.4);
+}
+
+.theme-style-row[data-style="peak"] {
+    background: rgba(0,200,80,0.4);
+}
+
+.theme-style-row[data-style="cs2"] {
+    background: rgba(33,150,243,0.4);
+}
+
+.theme-style-row[data-style="glass"] {
+    background: rgba(120,120,120,0.4);
+}
+
+.theme-style-row[data-style="material"] {
+    background: rgba(56,142,60,0.4);
+}
+
+/* Кнопки теми */
+.theme-btn {
+    background: rgba(255,255,255,0.4);
+    color: #222;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theme-btn[data-theme="dark"] {
+    background: rgba(35,39,43,0.5);
+    color: #fff;
+}
+
+.theme-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Назви тем */
+.theme-name {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Дропдаун мов */
+.lang-dropdown {
+    position: absolute;
+    min-width: 180px;
+    background: none;
+    color: #222;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(80,0,80,0.18);
+    border: none;
+    padding: 12px 16px;
+    z-index: 9999;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Опції мов */
+.lang-option {
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.lang-option:hover {
+    transform: scale(1.1);
+}
+
+.lang-option span {
+    display: block;
+}
+
+.lang-flag {
+    border-radius: 4px;
+    overflow: hidden;
+    display: block;
+}
+
+.lang-flag img {
+    border-radius: 4px;
+    overflow: hidden;
+    display: block;
+    object-fit: cover;
+}
+
+/* Overlay для дропдаунів */
+.dropdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9998;
+    transition: opacity 0.2s;
+}
+
+.dropdown-overlay.dark {
+    background: rgba(24,16,32,0.38);
+}
+
+.dropdown-overlay.light {
+    background: rgba(255,255,255,0.32);
+}
+
+.dropdown-overlay.hidden {
+    display: none !important;
+}
+
+/* Модальні вікна */
+.modal-content-center {
+    text-align: center;
+}
+
+.modal-content-left {
+    text-align: left;
+    line-height: 1.6;
+}
+
+.modal-buttons-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.modal-input-container {
+    margin: 20px 0;
+}
+
+.modal-input {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.modal-input:last-child {
+    margin-bottom: 0;
+}
+
+/* Адаптивність */
+@media (max-width: 600px) {
+    #top-controls {
+        top: 10px;
+        right: 10px;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    #theme-toggle button {
+        padding: 10px 12px;
+        min-width: 50px;
+        font-size: 0.9em;
+    }
+    
+    #style-toggle select, #lang-toggle select {
+        padding: 10px 12px;
+        min-width: 100px;
+        font-size: 0.9em;
+    }
+    
+    #main-menu-buttons .modal-button {
+        padding: 14px 24px;
+        font-size: 1.1em;
+    }
+
+    .theme-dropdown {
+        width: 96vw;
+        max-width: 360px;
+    }
+    
+    .lang-dropdown {
+        width: 96vw;
+        max-width: 360px;
+    }
+}
+
+.main-menu-top-icons {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.main-menu-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: none;
+  box-shadow: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.main-menu-icon-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 2em;
+}
+
+.main-menu-icon-svg,
+.main-menu-icon-img {
+  width: 32px;
+  height: 32px;
+  display: block;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.main-menu-title {
+  text-align: center;
+  font-size: 2.4em;
+  font-weight: 800;
+  color: var(--text-accent);
+  margin-bottom: 8px;
+}
+
+.main-menu-subtitle {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: 400;
+  margin-bottom: 28px;
+  color: var(--text-accent);
+}
+
+/* Стилі для локальної гри */
+.local-game-title {
+    text-align: center;
+    font-size: 2em;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.local-game-board {
+    margin: 0 auto 24px auto;
+    width: 320px;
+    height: 320px;
+    background: #222;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px #0002;
+}
+
+.local-game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+/* Стилі для join room */
+.room-code-input {
+    text-transform: uppercase;
+}
+
+/* Стилі для налаштувань */
+.settings-title {
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--text-accent);
+    margin-bottom: 20px;
+}
+
+/* Стилі для UI утиліт */
+.board-size-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.player-names-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.player-name-input {
+    width: 80%;
+    text-align: center;
+}
+
+/* Стилі для помилок */
+.error-container {
+    padding: 20px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+} 
+
+/* === Дропдауни та overlay для головного меню === */
+.dropdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24,16,32,0.38);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9998;
+    transition: opacity 0.2s;
+}
+.dropdown-overlay.light {
+    background: rgba(255,255,255,0.32);
+}
+.dropdown-overlay.hidden {
+    display: none !important;
+}
+.theme-dropdown {
+    position: absolute;
+    min-width: 320px;
+    background: var(--bg-secondary, #fff);
+    color: #222;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(80,0,80,0.18);
+    border: none;
+    padding: 12px 16px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.theme-dropdown.mobile {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 96vw;
+    max-width: 360px;
+}
+.theme-dropdown.desktop {
+    position: absolute;
+    transform: none;
+    width: auto;
+    max-width: 320px;
+}
+.theme-dropdown.hidden {
+    display: none !important;
+}
+.theme-style-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 10px;
+    padding: 4px 0;
+    background: rgba(255,255,255,0.08);
+}
+.theme-style-row[data-style="classic"] { background: rgba(255,140,0,0.4); }
+.theme-style-row[data-style="peak"] { background: rgba(0,200,80,0.4); }
+.theme-style-row[data-style="cs2"] { background: rgba(33,150,243,0.4); }
+.theme-style-row[data-style="glass"] { background: rgba(120,120,120,0.4); }
+.theme-style-row[data-style="material"] { background: rgba(56,142,60,0.4); }
+.theme-btn {
+    background: rgba(255,255,255,0.4);
+    color: #222;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.theme-btn[data-theme="dark"] {
+    background: rgba(35,39,43,0.5);
+    color: #fff;
+}
+.theme-btn.active {
+    box-shadow: 0 0 8px var(--control-selected);
+}
+.theme-name {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    color: #fff;
+}
+.lang-dropdown {
+    position: absolute;
+    min-width: 180px;
+    background: var(--bg-secondary, #fff);
+    color: #222;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(80,0,80,0.18);
+    border: none;
+    padding: 12px 16px;
+    z-index: 9999;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+}
+.lang-dropdown.hidden {
+    display: none !important;
+}
+.lang-option {
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.lang-option.selected, .lang-option:focus {
+    background: var(--control-selected, #ff9800);
+    color: #fff;
+}
+/* === Кінець стилів дропдаунів === */ 
