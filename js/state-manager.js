@@ -28,6 +28,7 @@ const initialState = {
     board: null,
     currentPlayer: 1,
     points: 0,
+    gameMode: null, // Режим гри: 'vsComputer', 'local', 'online'
     // ...інші налаштування
   },
 };
@@ -37,6 +38,14 @@ const listeners = {};
 function navigateTo(viewName, params = {}) {
   Logger.debug('[StateManager] navigateTo:', { viewName, params });
   setState('ui.currentView', viewName);
+  
+  // Обробляємо параметри для гри
+  if (viewName === 'gameBoard' && params.gameMode) {
+    Logger.info('[StateManager] Setting game mode:', { gameMode: params.gameMode });
+    setState('game.gameMode', params.gameMode);
+  }
+  
+  Logger.debug('[StateManager] Calling viewManager.navigateTo');
   viewManager.navigateTo(viewName, params);
 }
 

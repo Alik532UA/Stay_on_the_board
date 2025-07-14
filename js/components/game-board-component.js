@@ -13,6 +13,7 @@ export class GameBoardComponent extends BaseComponent {
     }
 
     render() {
+        Logger.info('[GameBoardComponent] render: початок');
         const boardSize = stateManager?.getState('game.boardSize') || 3;
         Logger.debug('[GameBoardComponent] render: boardSize =', { boardSize });
         
@@ -94,6 +95,9 @@ export class GameBoardComponent extends BaseComponent {
             window.gameControlsComponent.syncCheckboxWithSettings();
         }
         
+        // Рендеримо компонент керування грою
+        this.renderControls();
+        
         Logger.debug('[GameBoardComponent] render: кінець');
     }
     
@@ -111,11 +115,11 @@ export class GameBoardComponent extends BaseComponent {
             // При зміні розміру дошки повністю перерендерюємо компонент
             this.render();
             
-            // Видалено: не рендеримо контролі вручну
-            // if (window.gameControlsComponent) {
-            //     console.log('[GameBoardComponent] Re-rendering controls component due to board size change');
-            //     window.gameControlsComponent.render();
-            // }
+            // Оновлюємо компонент контролів при зміні розміру дошки
+            if (this.controlsComponent) {
+                Logger.debug('[GameBoardComponent] Re-rendering controls component due to board size change');
+                this.controlsComponent.render();
+            }
         });
         
         // Підписка на зміни дошки
@@ -194,7 +198,14 @@ export class GameBoardComponent extends BaseComponent {
         // Підписка на зміни заблокованих клітинок
         this.subscribe('game.blockedCells', () => {
             const gameState = stateManager.getState('game');
-            Logger.debug('[GameBoardComponent] game.blockedCells changed');
+            const blockedCells = gameState.blockedCells || [];
+            const blockedMode = stateManager.getState('settings.blockedMode') || false;
+            
+            Logger.debug('[GameBoardComponent] game.blockedCells changed:', { 
+                blockedCellsCount: blockedCells.length, 
+                blockedCells,
+                blockedMode 
+            });
             
             // Валідація розміру дошки
             if (gameState.boardSize < 2 || gameState.boardSize > 9) {
@@ -208,7 +219,13 @@ export class GameBoardComponent extends BaseComponent {
         // Підписка на зміни режиму заблокованих клітинок
         this.subscribe('settings.blockedMode', () => {
             const gameState = stateManager.getState('game');
-            Logger.debug('[GameBoardComponent] settings.blockedMode changed');
+            const blockedMode = stateManager.getState('settings.blockedMode') || false;
+            const blockedCells = gameState.blockedCells || [];
+            
+            Logger.debug('[GameBoardComponent] settings.blockedMode changed:', { 
+                blockedMode, 
+                blockedCellsCount: blockedCells.length 
+            });
             
             // Валідація розміру дошки
             if (gameState.boardSize < 2 || gameState.boardSize > 9) {
@@ -221,13 +238,15 @@ export class GameBoardComponent extends BaseComponent {
     }
 
     renderControls() {
-        const controlsEl = this.element.querySelector('#game-controls');
+        // Шукаємо елемент контролів в глобальному DOM, а не в елементі компонента
+        const controlsEl = document.getElementById('game-controls');
         if (controlsEl) {
             this.controlsComponent = new GameControlsComponent(controlsEl);
             this.controlsComponent.render();
             window.gameControlsComponent = this.controlsComponent; // Expose globally
+            Logger.debug('[GameBoardComponent] Game controls component rendered successfully');
         } else {
-            Logger.error('[GameBoardComponent] Controls element not found');
+            Logger.error('[GameBoardComponent] Controls element not found in global DOM');
         }
     }
 
@@ -235,6 +254,7 @@ export class GameBoardComponent extends BaseComponent {
         const mainMenuBtn = this.element.querySelector('#btn-main-menu');
         if (mainMenuBtn) {
             mainMenuBtn.addEventListener('click', () => {
+                Logger.info('[GameBoardComponent] Main menu button clicked');
                 stateManager.navigateTo('mainMenu');
             });
         } else {
@@ -245,6 +265,7 @@ export class GameBoardComponent extends BaseComponent {
             boardSizeSelect.addEventListener('change', (e) => {
             const newSize = parseInt(e.target.value);
             Logger.info('[GameBoardComponent] Board size dropdown changed to:', { newSize });
+            console.log('[GameBoardComponent] Board size dropdown changed to:', { newSize });
             
             // Валідація розміру дошки
             if (newSize < 2 || newSize > 9) {
@@ -297,6 +318,8 @@ export class GameBoardComponent extends BaseComponent {
     }
 
     renderBoard(board, boardSize) {
+        Logger.debug('[GameBoardComponent] renderBoard: початок', { boardSize, boardLength: board?.length });
+        
         if (!Array.isArray(board)) {
             Logger.error('[GameBoardComponent] renderBoard: board is not an array:', { board });
             return;
@@ -362,6 +385,7 @@ export class GameBoardComponent extends BaseComponent {
                 if (blockedMode && blockedCells.some(cell => cell.row === i && cell.col === j)) {
                     cell.classList.add('cell-blocked');
                     cell.innerHTML = '<span class="blocked-symbol">✗</span>';
+                    Logger.debug('[GameBoardComponent] Rendered blocked cell:', { row: i, col: j });
                 } else if (board[i] && board[i][j] === 1) {
                     cell.innerHTML = '<span class="game-board-piece crown">👑</span>';
                 } else if (board[i] && board[i][j] === 2) {
@@ -385,6 +409,11 @@ export class GameBoardComponent extends BaseComponent {
         Logger.debug('[GameBoardComponent] destroy');
         if (this.controlsComponent) {
             this.controlsComponent.destroy();
+            this.controlsComponent = null;
+        }
+        // Очищаємо глобальну змінну
+        if (window.gameControlsComponent === this.controlsComponent) {
+            window.gameControlsComponent = null;
         }
         super.destroy();
     }

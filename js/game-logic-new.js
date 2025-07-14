@@ -184,15 +184,25 @@ export class GameLogic {
                 return;
             }
             
-                    // Ставимо фігуру випадково на дошці
-        const randomRow = Math.floor(Math.random() * boardSize);
-        const randomCol = Math.floor(Math.random() * boardSize);
-        board[randomRow][randomCol] = 1;
-        stateManager.setState('game.board', board);
-        console.log('[GameLogic] New board created and set in state');
+            // Ставимо фігуру випадково на дошці
+            const randomRow = Math.floor(Math.random() * boardSize);
+            const randomCol = Math.floor(Math.random() * boardSize);
+            board[randomRow][randomCol] = 1;
+            stateManager.setState('game.board', board);
+            console.log('[GameLogic] New board created and set in state');
+        }
         
-        // Скидаємо заблоковані клітинки при початку нової гри
-        stateManager.setState('game.blockedCells', []);
+        // Ініціалізація заблокованих клітинок при початку нової гри
+        const blockedMode = stateManager.getState('settings.blockedMode') || false;
+        Logger.debug('[GameLogic] onGameStart - blockedMode setting:', { blockedMode });
+        
+        if (blockedMode) {
+            const blockedCells = this.generateBlockedCells(boardSize);
+            stateManager.setState('game.blockedCells', blockedCells);
+            Logger.debug('[GameLogic] onGameStart - initialized blocked cells:', { blockedCellsCount: blockedCells.length });
+        } else {
+            stateManager.setState('game.blockedCells', []);
+            Logger.debug('[GameLogic] onGameStart - cleared blocked cells');
         }
 
         // === ГАРАНТОВАНО ініціалізуємо доступні ходи та підсвічування ===
@@ -200,11 +210,11 @@ export class GameLogic {
         if (piece) {
             // Отримуємо заблоковані клітинки та режим
             const blockedCells = stateManager.getState('game.blockedCells') || [];
-            const blockedMode = stateManager.getState('settings.blockedMode') || false;
+            const currentBlockedMode = stateManager.getState('settings.blockedMode') || false;
             
             // Ініціалізуємо доступні ходи для поточного гравця (player 1) з урахуванням заблокованих клітинок
-            const moves = getAllValidMoves(board, piece.row, piece.col, 1, blockedCells, blockedMode);
-            console.log('[GameLogic] onGameStart - found piece at:', piece.row, piece.col, 'blockedMode:', blockedMode, 'blockedCells:', blockedCells.length, 'available moves:', moves.length);
+            const moves = getAllValidMoves(board, piece.row, piece.col, 1, blockedCells, currentBlockedMode);
+            console.log('[GameLogic] onGameStart - found piece at:', piece.row, piece.col, 'blockedMode:', currentBlockedMode, 'blockedCells:', blockedCells.length, 'available moves:', moves.length);
             stateManager.setState('game.availableMoves', moves);
         } else {
             console.log('[GameLogic] onGameStart - no piece found');
@@ -426,13 +436,17 @@ export class GameLogic {
         const gameState = stateManager.getState('game');
         const board = gameState.board;
         
+        Logger.debug('[GameLogic] toggleBlockedMode called with blocked:', { blocked, boardSize: board?.length });
+        
         if (blocked) {
             // Додаємо заблоковані клітинки
             const blockedCells = this.generateBlockedCells(board.length);
             stateManager.setState('game.blockedCells', blockedCells);
+            Logger.debug('[GameLogic] toggleBlockedMode: added blocked cells:', { blockedCellsCount: blockedCells.length });
         } else {
             // Видаляємо заблоковані клітинки
             stateManager.setState('game.blockedCells', []);
+            Logger.debug('[GameLogic] toggleBlockedMode: cleared blocked cells');
         }
         
         // Оновлюємо доступні ходи з урахуванням заблокованих клітинок
@@ -444,6 +458,8 @@ export class GameLogic {
         const blockedCells = [];
         const numBlocked = Math.floor(boardSize * boardSize * 0.1); // 10% клітинок
         
+        Logger.debug('[GameLogic] generateBlockedCells called with boardSize:', { boardSize, numBlocked });
+        
         for (let i = 0; i < numBlocked; i++) {
             let row, col;
             do {
@@ -454,6 +470,7 @@ export class GameLogic {
             blockedCells.push({ row, col });
         }
         
+        Logger.debug('[GameLogic] generateBlockedCells completed:', { blockedCellsCount: blockedCells.length, blockedCells });
         return blockedCells;
     }
     
@@ -600,10 +617,11 @@ export class GameLogic {
         newBoard[move.newRow][move.newCol] = 1;
         
         // Якщо увімкнено режим заблокованих клітинок, додаємо поточну позицію до заблокованих
+        let updatedBlockedCells = blockedCells;
         if (blockedMode) {
-            const newBlockedCells = [...blockedCells, { row: piece.row, col: piece.col }];
-            stateManager.setState('game.blockedCells', newBlockedCells);
-            console.log('[DIAG] blockedCells після executeMove:', newBlockedCells);
+            updatedBlockedCells = [...blockedCells, { row: piece.row, col: piece.col }];
+            stateManager.setState('game.blockedCells', updatedBlockedCells);
+            console.log('[DIAG] blockedCells після executeMove:', updatedBlockedCells);
         }
         
         console.log('[GameLogic] New board size after move:', newBoard.length);
@@ -614,7 +632,7 @@ export class GameLogic {
         const newPoints = gameState.points + (move.points || 0);
         
         // Перевіряємо, чи є ще ходи для piece 1 з урахуванням заблокованих клітинок
-        const hasMoreMoves = hasValidMoves(newBoard, move.newRow, move.newCol, logicPlayer, blockedCells, blockedMode);
+        const hasMoreMoves = hasValidMoves(newBoard, move.newRow, move.newCol, logicPlayer, updatedBlockedCells, blockedMode);
         if (!hasMoreMoves) {
             // Гра закінчена - визначаємо переможця
             const winner = logicPlayer === 1 ? 2 : 1;
@@ -687,6 +705,13 @@ export class GameLogic {
         console.log('[GameLogic] Looking for moves from position:', piece.row, piece.col, 'for player 1');
         const moves = getAllValidMoves(board, piece.row, piece.col, 1, blockedCells, blockedMode); // <-- FIXED: was 2
         console.log('[GameLogic] Available moves for computer count:', moves.length, 'blockedMode:', blockedMode, 'blockedCells:', blockedCells.length);
+        
+        Logger.debug('[GameLogic] makeComputerMove - blocked cells analysis:', { 
+            blockedMode, 
+            blockedCellsCount: blockedCells.length, 
+            blockedCells,
+            availableMovesCount: moves.length 
+        });
         
         if (moves.length === 0) {
             console.log('[GameLogic] No moves available for computer, player wins');

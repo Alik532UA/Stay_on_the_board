@@ -1,0 +1,496 @@
+speech.js:77 🎤 Speech manager initialized
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'settings.speechEnabled'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+logger.js:214 [03:44:13] [DEBUG] GameLogic: constructor
+logger.js:214 [03:44:13] [INFO] [GameLogic] Initializing...
+game-logic-new.js:896 [GameLogic] Initializing Game Logic {}
+logger.js:214 [03:44:13] [DEBUG] GameLogic: subscribeToGameState
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'game.isActive'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'game.noMoves'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'game.selectedMove'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'settings.speechEnabled'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'settings.blockedMode'}
+logger.js:214 [03:44:13] [DEBUG] [GameLogic] initSpeech called
+game-logic-new.js:896 [GameLogic] Game Logic initialized {}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'ui.currentView'}
+logger.js:212 [03:44:13] [DEBUG] [App] Initial view: {initialView: 'mainMenu'}
+view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:364 [MainMenuComponent] subscribeToState called
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:214 [03:44:13] [INFO] ✅ Глобальні контроли налаштовані
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+view-manager.js:111 [ViewManager] Game controls content cleared
+logger.js:212 [03:44:13] [INFO] Started: App initialization {timestamp: 1752453853029, startTime: 1752453853032}
+logger.js:214 [03:44:13] [INFO] EventBus middleware configured
+logger.js:214 [03:44:13] [INFO] Speech control configured
+logger.js:214 [03:44:13] [INFO] Systems initialized successfully
+logger.js:214 [03:44:13] [INFO] 🚀 Ініціалізація додатку Stay on the board
+logger.js:212  [03:44:13] [WARN] ⚠️ Помилка ініціалізації теми {error: "Cannot set properties of null (setting 'textContent')"}
+outputToConsole @ logger.js:212
+log @ logger.js:84
+warn @ logger.js:115
+initTheme @ main-new.js:321
+init @ main-new.js:268
+App @ main-new.js:89
+(anonymous) @ main-new.js:745
+logger.js:212 [03:44:13] [INFO] ✅ Мова ініціалізована {language: 'uk'}
+logger.js:214 [03:44:13] [INFO] ✅ Глобальні контроли налаштовані
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'settings.theme'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'settings.style'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'game.isActive'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'game.points'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'ui.error'}
+logger.js:214 [03:44:13] [INFO] ✅ Обробка помилок налаштована
+logger.js:214 [03:44:13] [INFO] ✅ Моніторинг продуктивності налаштований
+logger.js:212 [03:44:13] [DEBUG] [StateManager] navigateTo: {viewName: 'mainMenu', params: {…}}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] setState: {path: 'ui.currentView', value: 'mainMenu'}
+logger.js:212 [03:44:13] [DEBUG] [StateManager] Notifying listeners for: {path: 'ui.currentView', count: 1}
+logger.js:212 [03:44:13] [DEBUG] [App] ui.currentView changed: {view: 'mainMenu'}
+view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:364 [MainMenuComponent] subscribeToState called
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:214 [03:44:13] [INFO] ✅ Глобальні контроли налаштовані
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+view-manager.js:111 [ViewManager] Game controls content cleared
+logger.js:214 [03:44:13] [DEBUG] [StateManager] Calling viewManager.navigateTo
+view-manager.js:37 [ViewManager] navigateTo: {viewName: 'mainMenu', params: {…}}
+view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:364 [MainMenuComponent] subscribeToState called
+logger.js:212 [03:44:13] [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:214 [03:44:13] [INFO] ✅ Глобальні контроли налаштовані
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+view-manager.js:111 [ViewManager] Game controls content cleared
+logger.js:214 [03:44:13] [INFO] 🎮 Додаток запущено
+logger.js:214 [03:44:13] [INFO] ✅ Додаток успішно ініціалізовано
+logger.js:214 [03:44:13] [INFO] 🎉 Додаток Stay on the board готовий до роботи
+game-logic-new.js:896 [GameLogic] Speech initialized {enabled: false}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
+logger.js:212 [03:44:13] [INFO] 📊 Сторінка завантажена {loadTime: 24}
+main-menu-component.js:74 [MainMenuComponent] btn-vs-computer clicked
+logger.js:212 [03:44:14] [DEBUG] [StateManager] navigateTo: {viewName: 'gameBoard', params: {…}}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'ui.currentView', value: 'gameBoard'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] Notifying listeners for: {path: 'ui.currentView', count: 1}
+logger.js:212 [03:44:14] [DEBUG] [App] ui.currentView changed: {view: 'gameBoard'}
+view-manager.js:69 [ViewManager] render: {viewName: 'gameBoard', params: {…}}
+base-component.js:329 [GameBoardComponent] Component created {options: {…}}
+logger.js:214 [03:44:14] [INFO] [GameBoardComponent] render: початок
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] render: boardSize = {boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.gameMode', value: 'vsComputer'}
+logger.js:212 [03:44:14] [INFO] [GameBoardComponent] Board size mismatch or no board, recreating board {boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] createEmptyBoard called with size: {size: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] Created empty board with size: {rows: 3, cols: 3}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.board', value: Array(3)}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: undefined, highlightedMovesCount: 0, availableMovesCount: 0}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:14] [DEBUG] toggleAvailableMoves called, show = {show: true}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.showingAvailableMoves', value: true}
+logger.js:214 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves called
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] Found piece at: {row: 1, col: 1}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] Found piece: {piece: {…}}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 1, player: 1, boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] Found valid moves: {count: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 1, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(8)}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(8)}
+game-logic-new.js:896 [GameLogic] Available moves updated {moves: 8, logicPlayer: 1}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(8)}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(8)}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: {showingAvailableMoves: true, highlightedMovesCount: 8}
+base-component.js:329 [GameControlsComponent] Component created {options: {…}}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: початок
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: завершено
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+base-component.js:329 [GameControlsComponent] Component initialized {}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: початок
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: завершено
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] Game controls component rendered successfully
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] render: кінець
+base-component.js:329 [GameBoardComponent] Component initialized {}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.board'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.highlightedMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.showingAvailableMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.availableMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.blockedCells'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'settings.blockedMode'}
+logger.js:214 [03:44:14] [INFO] [GameBoardComponent] render: початок
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] render: boardSize = {boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:14] [DEBUG] toggleAvailableMoves called, show = {show: true}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.showingAvailableMoves', value: true}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] Notifying listeners for: {path: 'game.showingAvailableMoves', count: 1}
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] game.showingAvailableMoves changed
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:214 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves called
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] Found piece at: {row: 1, col: 1}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] Found piece: {piece: {…}}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 1, player: 1, boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] Found valid moves: {count: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 1, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(8)}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 1}
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(8)}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 1}
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+game-logic-new.js:896 [GameLogic] Available moves updated {moves: 8, logicPlayer: 1}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(8)}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(8)}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: {showingAvailableMoves: true, highlightedMovesCount: 8}
+base-component.js:329 [GameControlsComponent] Component created {options: {…}}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: початок
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: завершено
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+base-component.js:329 [GameControlsComponent] Component initialized {}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: початок
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: завершено
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] Game controls component rendered successfully
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] render: кінець
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'gameBoard', isGameView: true}
+logger.js:212 [03:44:14] [INFO] [StateManager] Setting game mode: {gameMode: 'vsComputer'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.gameMode', value: 'vsComputer'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] Notifying listeners for: {path: 'game.gameMode', count: 4}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] game.gameMode changed: {mode: 'vsComputer'}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] updateGameMode: {mode: 'vsComputer'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Computer display element not found
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] game.gameMode changed: {mode: 'vsComputer'}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] updateGameMode: {mode: 'vsComputer'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Computer display element not found
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] game.gameMode changed: {mode: 'vsComputer'}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] updateGameMode: {mode: 'vsComputer'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Computer display element not found
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] game.gameMode changed: {mode: 'vsComputer'}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] updateGameMode: {mode: 'vsComputer'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Computer display element not found
+logger.js:214 [03:44:14] [DEBUG] [StateManager] Calling viewManager.navigateTo
+view-manager.js:37 [ViewManager] navigateTo: {viewName: 'gameBoard', params: {…}}
+view-manager.js:69 [ViewManager] render: {viewName: 'gameBoard', params: {…}}
+base-component.js:329 [GameBoardComponent] Component created {options: {…}}
+logger.js:214 [03:44:14] [INFO] [GameBoardComponent] render: початок
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] render: boardSize = {boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:14] [DEBUG] toggleAvailableMoves called, show = {show: true}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.showingAvailableMoves', value: true}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] Notifying listeners for: {path: 'game.showingAvailableMoves', count: 1}
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] game.showingAvailableMoves changed
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:214 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves called
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] Found piece at: {row: 1, col: 1}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] Found piece: {piece: {…}}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 1, player: 1, boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:212 [03:44:14] [DEBUG] [GameCore] Found valid moves: {count: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 1, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(8)}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 1}
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(8)}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 1}
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+game-logic-new.js:896 [GameLogic] Available moves updated {moves: 8, logicPlayer: 1}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(8)}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(8)}
+logger.js:212 [03:44:14] [DEBUG] [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: {showingAvailableMoves: true, highlightedMovesCount: 8}
+base-component.js:329 [GameControlsComponent] Component created {options: {…}}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: початок
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: завершено
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+base-component.js:329 [GameControlsComponent] Component initialized {}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: початок
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:14] [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:14] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:214 [03:44:14] [INFO] [GameControlsComponent] render: завершено
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] Game controls component rendered successfully
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] render: кінець
+base-component.js:329 [GameBoardComponent] Component initialized {}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.board'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.highlightedMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.showingAvailableMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.availableMoves'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'game.blockedCells'}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] subscribe: {path: 'settings.blockedMode'}
+logger.js:214 [03:44:14] [INFO] [GameBoardComponent] render: початок
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] render: boardSize = {boardSize: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:14] [DEBUG] toggleAvailableMoves called, show = {show: true}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] setState: {path: 'game.showingAvailableMoves', value: true}
+logger.js:212 [03:44:14] [DEBUG] [StateManager] Notifying listeners for: {path: 'game.showingAvailableMoves', count: 2}
+logger.js:214 [03:44:14] [DEBUG] [GameBoardComponent] game.showingAvailableMoves changed
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:14] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:15] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:214 [03:44:15] [DEBUG] [GameBoardComponent] game.showingAvailableMoves changed
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:15] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:214 [03:44:15] [DEBUG] [GameLogic] updateAvailableMoves called
+logger.js:212 [03:44:15] [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+logger.js:212 [03:44:15] [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:212 [03:44:15] [DEBUG] [GameCore] Found piece at: {row: 1, col: 1}
+logger.js:212 [03:44:15] [DEBUG] [GameLogic] Found piece: {piece: {…}}
+logger.js:212 [03:44:15] [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 1, player: 1, boardSize: 3}
+logger.js:212 [03:44:15] [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:212 [03:44:15] [DEBUG] [GameCore] Found valid moves: {count: 8}
+logger.js:212 [03:44:15] [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 1, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(8)}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 2}
+logger.js:214 [03:44:15] [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:15] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:214 [03:44:15] [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:15] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:212 [03:44:15] [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 8}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(8)}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:214 [03:44:15] [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:15] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:214 [03:44:15] [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard: початок {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3}
+logger.js:212 [03:44:15] [DEBUG] [DIAG] blockedCells для render: {blockedCells: Array(0), blockedMode: false}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard - showMoves: {showMoves: true, highlightedMovesCount: 8, availableMovesCount: 8}
+logger.js:212 [03:44:15] [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+game-logic-new.js:896 [GameLogic] Available moves updated {moves: 8, logicPlayer: 1}
+logger.js:212 [03:44:15] [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(8)}
+logger.js:212 [03:44:15] [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(8)}
+logger.js:212 [03:44:15] [DEBUG] [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: {showingAvailableMoves: true, highlightedMovesCount: 8}
+base-component.js:329 [GameControlsComponent] Component created {options: {…}}
+logger.js:214 [03:44:15] [INFO] [GameControlsComponent] render: початок
+logger.js:212 [03:44:15] [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+logger.js:212 [03:44:15] [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+logger.js:212 [03:44:15] [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:15] [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+logger.js:214 [03:44:15] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:15] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:214 [03:44:15] [INFO] [GameControlsComponent] render: завершено
+logger.js:214 [03:44:15] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:15] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+base-component.js:329 [GameControlsComponent] Component initialized {}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:44:15] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:214 [03:44:15] [INFO] [GameControlsComponent] render: початок
+logger.js:212 [03:44:15] [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+logger.js:212 [03:44:15] [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+logger.js:212 [03:44:15] [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:212 [03:44:15] [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+logger.js:214 [03:44:15] [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:214 [03:44:15] [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:214 [03:44:15] [INFO] [GameControlsComponent] render: завершено
+logger.js:214 [03:44:15] [DEBUG] [GameBoardComponent] Game controls component rendered successfully
+logger.js:214 [03:44:15] [DEBUG] [GameBoardComponent] render: кінець
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'gameBoard', isGameView: true}
+main-menu-component.js:73 [Violation] 'click' handler took 1015ms

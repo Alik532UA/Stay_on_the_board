@@ -1,0 +1,91 @@
+speech.js:77 🎤 Speech manager initialized
+ [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'settings.speechEnabled'}
+ [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+ [03:43:35] [DEBUG] GameLogic: constructor
+logger.js:214 [03:43:35] [INFO] [GameLogic] Initializing...
+game-logic-new.js:896 [GameLogic] Initializing Game Logic {}
+ [03:43:35] [DEBUG] GameLogic: subscribeToGameState
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'game.isActive'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'game.noMoves'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'game.selectedMove'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'settings.speechEnabled'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'settings.blockedMode'}
+logger.js:214 [03:43:35] [DEBUG] [GameLogic] initSpeech called
+game-logic-new.js:896 [GameLogic] Game Logic initialized {}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'ui.currentView'}
+logger.js:212 [03:43:35] [DEBUG] [App] Initial view: {initialView: 'mainMenu'}
+view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:364 [MainMenuComponent] subscribeToState called
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:214 [03:43:35] [INFO] ✅ Глобальні контроли налаштовані
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+view-manager.js:111 [ViewManager] Game controls content cleared
+logger.js:212 [03:43:35] [INFO] Started: App initialization {timestamp: 1752453815550, startTime: 1752453815553}
+logger.js:214 [03:43:35] [INFO] EventBus middleware configured
+logger.js:214 [03:43:35] [INFO] Speech control configured
+logger.js:214 [03:43:35] [INFO] Systems initialized successfully
+logger.js:214 [03:43:35] [INFO] 🚀 Ініціалізація додатку Stay on the board
+logger.js:212  [03:43:35] [WARN] ⚠️ Помилка ініціалізації теми {error: "Cannot set properties of null (setting 'textContent')"}
+outputToConsole @ logger.js:212
+log @ logger.js:84
+warn @ logger.js:115
+initTheme @ main-new.js:321
+init @ main-new.js:268
+App @ main-new.js:89
+(anonymous) @ main-new.js:745
+logger.js:212 [03:43:35] [INFO] ✅ Мова ініціалізована {language: 'uk'}
+logger.js:214 [03:43:35] [INFO] ✅ Глобальні контроли налаштовані
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'settings.theme'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'settings.style'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'game.isActive'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'game.points'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'ui.error'}
+logger.js:214 [03:43:35] [INFO] ✅ Обробка помилок налаштована
+logger.js:214 [03:43:35] [INFO] ✅ Моніторинг продуктивності налаштований
+logger.js:212 [03:43:35] [DEBUG] [StateManager] navigateTo: {viewName: 'mainMenu', params: {…}}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] setState: {path: 'ui.currentView', value: 'mainMenu'}
+logger.js:212 [03:43:35] [DEBUG] [StateManager] Notifying listeners for: {path: 'ui.currentView', count: 1}
+logger.js:212 [03:43:35] [DEBUG] [App] ui.currentView changed: {view: 'mainMenu'}
+view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:364 [MainMenuComponent] subscribeToState called
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:214 [03:43:35] [INFO] ✅ Глобальні контроли налаштовані
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+view-manager.js:111 [ViewManager] Game controls content cleared
+logger.js:214 [03:43:35] [DEBUG] [StateManager] Calling viewManager.navigateTo
+view-manager.js:37 [ViewManager] navigateTo: {viewName: 'mainMenu', params: {…}}
+view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:364 [MainMenuComponent] subscribeToState called
+logger.js:212 [03:43:35] [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:214 [03:43:35] [INFO] ✅ Глобальні контроли налаштовані
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+view-manager.js:111 [ViewManager] Game controls content cleared
+logger.js:214 [03:43:35] [INFO] 🎮 Додаток запущено
+logger.js:214 [03:43:35] [INFO] ✅ Додаток успішно ініціалізовано
+logger.js:214 [03:43:35] [INFO] 🎉 Додаток Stay on the board готовий до роботи
+game-logic-new.js:896 [GameLogic] Speech initialized {enabled: false}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
+logger.js:212 [03:43:35] [INFO] 📊 Сторінка завантажена {loadTime: 26}
