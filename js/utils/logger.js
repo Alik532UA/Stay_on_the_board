@@ -462,7 +462,3 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
     window.Logger = Logger;
 } 
-
-export { Logger };
-
-export default Logger; 

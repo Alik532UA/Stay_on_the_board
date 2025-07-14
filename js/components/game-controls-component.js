@@ -5,7 +5,7 @@ import { BaseComponent } from './base-component.js';
 import { DOMUtils } from '../utils/dom-utils.js';
 import { stateManager } from '../state-manager.js';
 import { eventBus } from '../event-bus.js';
-import { Logger } from '../utils/logger.js';
+// import { Logger } from '../utils/logger.js';
 
 export class GameControlsComponent extends BaseComponent {
     constructor(element, options = {}) {
@@ -23,21 +23,21 @@ export class GameControlsComponent extends BaseComponent {
     render() {
         // Перевіряємо, чи вже рендерилися
         if (this.isRendered) {
-            Logger.debug('[GameControlsComponent] Already rendered, skipping');
+            window.Logger.debug('[GameControlsComponent] Already rendered, skipping');
             return;
         }
         
-        Logger.info('[GameControlsComponent] render: початок');
+        window.Logger.info('[GameControlsComponent] render: початок');
         const settings = window.stateManager?.getState('settings') || {};
         const boardSize = window.stateManager?.getState('game.boardSize') || 3;
-        Logger.debug('[GameControlsComponent.render] boardSize:', { boardSize });
+        window.Logger.debug('[GameControlsComponent.render] boardSize:', { boardSize });
         const showMoves = (typeof settings.showMoves === 'undefined') ? true : settings.showMoves;
-        Logger.debug('[GameControlsComponent.render] settings.showMoves:', { showMoves, final: showMoves });
+        window.Logger.debug('[GameControlsComponent.render] settings.showMoves:', { showMoves, final: showMoves });
         
         // Синхронізуємо стан гри з налаштуваннями
         const currentShowingMoves = window.stateManager?.getState('game.showingAvailableMoves');
         if (currentShowingMoves !== showMoves) {
-            Logger.debug('[GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves:', { showMoves });
+            window.Logger.debug('[GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves:', { showMoves });
             window.stateManager?.setState('game.showingAvailableMoves', showMoves);
         }
         
@@ -106,24 +106,24 @@ export class GameControlsComponent extends BaseComponent {
         // Встановлюємо поточний режим гри
         const currentGameMode = window.stateManager?.getState('game.gameMode');
         if (currentGameMode) {
-            Logger.debug('[GameControlsComponent] Setting initial game mode:', { currentGameMode });
+            window.Logger.debug('[GameControlsComponent] Setting initial game mode:', { currentGameMode });
             this.updateGameMode(currentGameMode);
         }
         
         this.isRendered = true;
-        Logger.info('[GameControlsComponent] render: завершено');
+        window.Logger.info('[GameControlsComponent] render: завершено');
     }
 
     generateDistanceButtons(boardSize = 3) {
         const selector = this.element.querySelector('#distance-selector');
         if (!selector) {
-            Logger.error('[GameControlsComponent] Distance selector not found');
+            window.Logger.error('[GameControlsComponent] Distance selector not found');
             return;
         }
         
         // Валідація розміру дошки
         if (boardSize < 2 || boardSize > 9) {
-            Logger.error('[GameControlsComponent] Invalid board size for distance buttons:', { boardSize });
+            window.Logger.error('[GameControlsComponent] Invalid board size for distance buttons:', { boardSize });
             return;
         }
         
@@ -137,7 +137,7 @@ export class GameControlsComponent extends BaseComponent {
             selector.appendChild(button);
         }
         
-        Logger.debug('[GameControlsComponent] Generated distance buttons:', { count: boardSize - 1, boardSize });
+        window.Logger.debug('[GameControlsComponent] Generated distance buttons:', { count: boardSize - 1, boardSize });
     }
 
     bindCheckboxEvents() {
@@ -147,11 +147,11 @@ export class GameControlsComponent extends BaseComponent {
         });
         this.element.querySelector('#show-moves-checkbox')?.addEventListener('change', (e) => {
             const isChecked = e.target.checked;
-            Logger.info('[GameControlsComponent] show-moves-checkbox changed to:', { isChecked });
+            window.Logger.info('[GameControlsComponent] show-moves-checkbox changed to:', { isChecked });
             window.stateManager?.setState('settings.showMoves', isChecked);
             window.stateManager?.setState('game.showingAvailableMoves', isChecked);
             window.gameLogic?.toggleAvailableMoves(isChecked); // Додаємо виклик для оновлення підсвічування
-            Logger.debug('[GameControlsComponent] settings.showMoves set to', { isChecked });
+            window.Logger.debug('[GameControlsComponent] settings.showMoves set to', { isChecked });
         });
         this.element.querySelector('#blocked-mode-checkbox')?.addEventListener('change', (e) => {
             window.stateManager?.setState('settings.blockedMode', e.target.checked);
@@ -167,7 +167,7 @@ export class GameControlsComponent extends BaseComponent {
         const showMoves = (typeof settings.showMoves === 'undefined') ? true : settings.showMoves;
         const checkbox = this.element.querySelector('#show-moves-checkbox');
         if (checkbox && checkbox.checked !== showMoves) {
-            Logger.debug('[GameControlsComponent] Forcing checkbox sync:', { from: checkbox.checked, to: showMoves });
+            window.Logger.debug('[GameControlsComponent] Forcing checkbox sync:', { from: checkbox.checked, to: showMoves });
             checkbox.checked = showMoves;
         }
     }
@@ -197,7 +197,7 @@ export class GameControlsComponent extends BaseComponent {
             });
         }
         this.addEventListener('#confirm-move-btn', 'click', () => {
-            Logger.info('[GameControlsComponent] confirm-move-btn clicked');
+            window.Logger.info('[GameControlsComponent] confirm-move-btn clicked');
             this.confirmMove();
         });
         this.addEventListener('#no-moves-btn', 'click', () => {
@@ -223,7 +223,7 @@ export class GameControlsComponent extends BaseComponent {
         });
         
         this.subscribe('game.gameMode', (mode) => {
-            Logger.debug('[GameControlsComponent] game.gameMode changed:', { mode });
+            window.Logger.debug('[GameControlsComponent] game.gameMode changed:', { mode });
             this.updateGameMode(mode);
         });
         
@@ -240,15 +240,15 @@ export class GameControlsComponent extends BaseComponent {
         
         // Підписка на зміни розміру дошки
         this.subscribe('game.boardSize', (newSize) => {
-            Logger.debug('[GameControlsComponent] Board size changed to:', newSize);
+            window.Logger.debug('[GameControlsComponent] Board size changed to:', newSize);
             this.generateDistanceButtons(newSize); // Оновлюємо лише кнопки дистанції
             this.bindEvents(); // Додаємо обробники на нові кнопки
             
             // Скидаємо відстань до 1 при зміні розміру дошки, якщо поточна відстань невалідна
-            const currentDistance = stateManager.getState('game.selectedDistance');
+            const currentDistance = window.stateManager.getState('game.selectedDistance');
             if (currentDistance !== null && currentDistance >= newSize) {
-                stateManager.setState('game.selectedDistance', 1);
-                Logger.debug('[GameControlsComponent] Reset distance to 1 due to board size change:', { 
+                window.stateManager.setState('game.selectedDistance', 1);
+                window.Logger.debug('[GameControlsComponent] Reset distance to 1 due to board size change:', { 
                     oldDistance: currentDistance, 
                     newBoardSize: newSize, 
                     maxDistance: newSize - 1 
@@ -258,19 +258,19 @@ export class GameControlsComponent extends BaseComponent {
         
         // Підписка на зміни selectedDistance для діагностики
         this.subscribe('game.selectedDistance', (distance) => {
-            Logger.debug('[GameControlsComponent] game.selectedDistance changed:', { 
+            window.Logger.debug('[GameControlsComponent] game.selectedDistance changed:', { 
                 distance, 
-                boardSize: stateManager.getState('game.boardSize'),
-                maxDistance: (stateManager.getState('game.boardSize') || 3) - 1
+                boardSize: window.stateManager.getState('game.boardSize'),
+                maxDistance: (window.stateManager.getState('game.boardSize') || 3) - 1
             });
         });
     }
     
     selectDirection(direction) {
         this.computerLastMoveDisplay = null;
-        const boardSize = stateManager.getState('game.boardSize') || 3;
+        const boardSize = window.stateManager.getState('game.boardSize') || 3;
         if (boardSize < 2 || boardSize > 9) {
-            Logger.error('[GameControlsComponent] Invalid board size in selectDirection:', boardSize);
+            window.Logger.error('[GameControlsComponent] Invalid board size in selectDirection:', boardSize);
             return;
         }
         if (this.selectedDirection === direction && this.selectedDistance !== null) {
@@ -278,35 +278,35 @@ export class GameControlsComponent extends BaseComponent {
             const maxDistance = boardSize - 1;
             let newDistance = this.selectedDistance + 1;
             if (newDistance > maxDistance) newDistance = 1;
-            stateManager.setState('game.selectedDistance', newDistance);
+            window.stateManager.setState('game.selectedDistance', newDistance);
         } else {
             // Новий напрямок — завжди відстань 1
-            stateManager.setState('game.selectedDirection', direction);
-            stateManager.setState('game.selectedDistance', 1);
+            window.stateManager.setState('game.selectedDirection', direction);
+            window.stateManager.setState('game.selectedDistance', 1);
         }
         setTimeout(() => {
-            const finalDistance = stateManager.getState('game.selectedDistance');
-            Logger.debug('[GameControlsComponent] Final state after selectDirection:', { direction, selectedDistance: finalDistance });
+            const finalDistance = window.stateManager.getState('game.selectedDistance');
+            window.Logger.debug('[GameControlsComponent] Final state after selectDirection:', { direction, selectedDistance: finalDistance });
         }, 10);
     }
     
     selectDistance(distance) {
         this.computerLastMoveDisplay = null;
         this.distanceManuallySelected = true; // Позначаємо, що відстань вибрана вручну
-        stateManager.setState('game.selectedDistance', distance);
+        window.stateManager.setState('game.selectedDistance', distance);
     }
     
     confirmMove() {
-        Logger.info('[GameControlsComponent] confirmMove called');
-        Logger.info('[GameControlsComponent] EventBus available:', !!eventBus);
-        Logger.info('[GameControlsComponent] Emitting game:confirmMove event');
-        eventBus.emit('game:confirmMove');
-        Logger.info('[GameControlsComponent] Event emitted');
+        window.Logger.info('[GameControlsComponent] confirmMove called');
+        window.Logger.info('[GameControlsComponent] EventBus available:', !!window.eventBus);
+        window.Logger.info('[GameControlsComponent] Emitting game:confirmMove event');
+        window.eventBus.emit('game:confirmMove');
+        window.Logger.info('[GameControlsComponent] Event emitted');
     }
     
     noMoves() {
         // Відправляємо сигнал про відсутність ходів в State Manager
-        stateManager.setState('game.noMoves', true);
+        window.stateManager.setState('game.noMoves', true);
     }
     
     updatePlayerGlow() {
@@ -394,18 +394,18 @@ export class GameControlsComponent extends BaseComponent {
     }
     
     updateGameMode(mode) {
-        Logger.debug('[GameControlsComponent] updateGameMode:', { mode });
+        window.Logger.debug('[GameControlsComponent] updateGameMode:', { mode });
         const computerDisplay = this.element.querySelector('#computer-move-display');
         if (computerDisplay) {
             if (mode === 'vsComputer') {
                 computerDisplay.style.display = 'flex';
-                Logger.debug('[GameControlsComponent] Computer display shown');
+                window.Logger.debug('[GameControlsComponent] Computer display shown');
             } else {
                 computerDisplay.style.display = 'none';
-                Logger.debug('[GameControlsComponent] Computer display hidden');
+                window.Logger.debug('[GameControlsComponent] Computer display hidden');
             }
         } else {
-            Logger.debug('[GameControlsComponent] Computer display element not found');
+            window.Logger.debug('[GameControlsComponent] Computer display element not found');
         }
     }
     
@@ -499,7 +499,7 @@ export class GameControlsComponent extends BaseComponent {
     
     // Очищення ресурсів
     destroy() {
-        Logger.debug('[GameControlsComponent] destroy');
+        window.Logger.debug('[GameControlsComponent] destroy');
         // Видаляємо обробники подій
         if (this.centerInfoClickHandler) {
             const centerInfo = this.element.querySelector('#center-info');
