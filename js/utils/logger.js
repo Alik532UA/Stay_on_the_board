@@ -11,29 +11,29 @@ class Logger {
     };
     
     static config = {
-        level: 'INFO',
-        maxLogs: 1000,
-        persistToStorage: true,
+        level: 'WARN', // Оптимізовано: тільки попередження та помилки
+        maxLogs: 200, // Зменшено для кращої продуктивності
+        persistToStorage: false, // Вимкнено для продуктивності
         sendToServer: false,
-        showTimestamp: true,
+        showTimestamp: false, // Вимкнено для продуктивності
         showLevel: true,
-        groupByContext: true,
+        groupByContext: false, // Вимкнено для продуктивності
         // Нові налаштування для оптимізації
-        enableConsoleOutput: true,
-        enableStorageOutput: true,
+        enableConsoleOutput: true, // Увімкнено тільки консоль
+        enableStorageOutput: false, // Вимкнено для продуктивності
         enableServerOutput: false,
         // Умовне логування для різних середовищ
         isDevelopment: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
         isProduction: window.location.protocol === 'https:' && !window.location.hostname.includes('localhost'),
         // Швидке вимкнення для тестування
-        quickDisable: false
+        quickDisable: false // Вимкнено для нормальної роботи
     };
     
     static logs = [];
     static contexts = new Map();
     
     /**
-     * Логує повідомлення
+     * Логує повідомлення (оптимізована версія)
      * @param {string} level - Рівень логування
      * @param {string} message - Повідомлення
      * @param {Object} data - Додаткові дані
@@ -45,53 +45,32 @@ class Logger {
             return;
         }
         
-        // Автоматичне налаштування рівня для продакшену
-        if (this.config.isProduction && this.config.level === 'INFO') {
-            this.config.level = 'WARN';
-        }
-        
+        // Швидка перевірка рівня логування
         if (this.levels[level] > this.levels[this.config.level]) {
             return;
         }
         
+        // Оптимізоване створення запису логу
         const logEntry = {
             level,
             message,
             data,
             context,
-            timestamp: new Date().toISOString(),
-            id: this.generateLogId(),
-            stack: this.getStackTrace()
+            timestamp: Date.now(), // Використовуємо timestamp замість ISO string
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2) // Спрощений ID
         };
         
+        // Додаємо в масив логів
         this.logs.push(logEntry);
         
-        // Обмежуємо кількість логів
+        // Обмежуємо кількість логів (тільки якщо потрібно)
         if (this.logs.length > this.config.maxLogs) {
             this.logs.shift();
         }
         
-        // Групуємо по контексту
-        if (this.config.groupByContext && context) {
-            if (!this.contexts.has(context)) {
-                this.contexts.set(context, []);
-            }
-            this.contexts.get(context).push(logEntry);
-        }
-        
-        // Умовне виведення в консоль
+        // Тільки виведення в консоль (найшвидший варіант)
         if (this.config.enableConsoleOutput) {
-            this.outputToConsole(logEntry);
-        }
-        
-        // Умовне збереження в localStorage
-        if (this.config.enableStorageOutput && this.config.persistToStorage) {
-            this.saveToStorage(logEntry);
-        }
-        
-        // Умовна відправка на сервер
-        if (this.config.enableServerOutput && this.config.sendToServer) {
-            this.sendToServer(logEntry);
+            this.outputToConsoleFast(logEntry);
         }
     }
     
@@ -147,7 +126,10 @@ class Logger {
      */
     static start(operation, data = {}, context = '') {
         const startTime = Date.now();
-        this.log('INFO', `Started: ${operation}`, { ...data, startTime }, context);
+        // Логуємо тільки якщо рівень INFO або вище
+        if (this.levels['INFO'] <= this.levels[this.config.level]) {
+            this.log('INFO', `Started: ${operation}`, { ...data, startTime }, context);
+        }
         return startTime;
     }
     
@@ -160,7 +142,10 @@ class Logger {
      */
     static end(operation, startTime, data = {}, context = '') {
         const duration = Date.now() - startTime;
-        this.log('INFO', `Completed: ${operation}`, { ...data, duration }, context);
+        // Логуємо тільки якщо рівень INFO або вище
+        if (this.levels['INFO'] <= this.levels[this.config.level]) {
+            this.log('INFO', `Completed: ${operation}`, { ...data, duration }, context);
+        }
     }
     
     /**
@@ -184,7 +169,28 @@ class Logger {
     }
     
     /**
-     * Виводить лог в консоль
+     * Виводить лог в консоль (оптимізована версія)
+     * @param {Object} logEntry - Запис логу
+     */
+    static outputToConsoleFast(logEntry) {
+        const { level, message, data, context } = logEntry;
+        
+        // Швидке формування виводу
+        let output = `[${level}]`;
+        if (context) output += ` [${context}]`;
+        output += ` ${message}`;
+        
+        // Швидкий вивід в консоль
+        const consoleMethod = this.getConsoleMethod(level);
+        if (data && Object.keys(data).length > 0) {
+            consoleMethod(output, data);
+        } else {
+            consoleMethod(output);
+        }
+    }
+    
+    /**
+     * Виводить лог в консоль (повна версія)
      * @param {Object} logEntry - Запис логу
      */
     static outputToConsole(logEntry) {
