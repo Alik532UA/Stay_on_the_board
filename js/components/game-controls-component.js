@@ -179,7 +179,6 @@ export class GameControlsComponent extends BaseComponent {
                 this.selectDirection(direction);
             });
         });
-        
         // Обробники для кнопок дистанції
         this.element.querySelectorAll('[data-distance]').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -187,15 +186,19 @@ export class GameControlsComponent extends BaseComponent {
                 this.selectDistance(distance);
             });
         });
-        
-        // Обробники для основних кнопок
-        Logger.debug('[GameControlsComponent] Adding event listener for confirm-move-btn');
+        // Обробник для центральної кнопки — додається один раз
+        const centerInfo = this.element.querySelector('#center-info');
+        if (centerInfo) {
+            centerInfo.addEventListener('click', () => {
+                if (centerInfo.classList.contains('confirm-btn-active')) {
+                    this.confirmMove();
+                }
+            });
+        }
         this.addEventListener('#confirm-move-btn', 'click', () => {
             Logger.info('[GameControlsComponent] confirm-move-btn clicked');
             this.confirmMove();
         });
-        Logger.debug('[GameControlsComponent] Event listener added for confirm-move-btn');
-        
         this.addEventListener('#no-moves-btn', 'click', () => {
             this.noMoves();
         });
@@ -236,7 +239,7 @@ export class GameControlsComponent extends BaseComponent {
         
         // Підписка на зміни розміру дошки
         this.subscribe('game.boardSize', (newSize) => {
-            console.log('[GameControlsComponent] Board size changed to:', newSize);
+            Logger.debug('[GameControlsComponent] Board size changed to:', newSize);
             this.generateDistanceButtons(newSize); // Оновлюємо лише кнопки дистанції
             this.bindEvents(); // Додаємо обробники на нові кнопки
             
@@ -264,67 +267,25 @@ export class GameControlsComponent extends BaseComponent {
     
     selectDirection(direction) {
         this.computerLastMoveDisplay = null;
-        
-        // Отримуємо розмір дошки з валідацією
         const boardSize = stateManager.getState('game.boardSize') || 3;
         if (boardSize < 2 || boardSize > 9) {
-            console.error('[GameControlsComponent] Invalid board size in selectDirection:', boardSize);
+            Logger.error('[GameControlsComponent] Invalid board size in selectDirection:', boardSize);
             return;
         }
-        
-        Logger.debug('[GameControlsComponent] selectDirection called:', { 
-            direction, 
-            boardSize, 
-            currentSelectedDirection: this.selectedDirection, 
-            currentSelectedDistance: this.selectedDistance,
-            distanceManuallySelected: this.distanceManuallySelected 
-        });
-        
-        // Якщо вибираємо той самий напрямок знову, збільшуємо відстань на 1
         if (this.selectedDirection === direction && this.selectedDistance !== null) {
-            const maxDistance = boardSize - 1; // Максимальна відстань = розмір дошки - 1
-            
-            Logger.debug('[GameControlsComponent] Same direction selected, checking distance:', { 
-                currentDistance: this.selectedDistance, 
-                maxDistance 
-            });
-            
-            if (this.selectedDistance >= maxDistance) {
-                // Якщо досягли максимальної відстані, скидаємо до 1
-                stateManager.setState('game.selectedDistance', 1);
-                this.distanceManuallySelected = false; // Скидаємо флаг, бо відстань змінилася автоматично
-                Logger.debug('[GameControlsComponent] Reset distance to 1 (max reached)');
-            } else {
-                // Інакше збільшуємо на 1
-                const newDistance = this.selectedDistance + 1;
-                stateManager.setState('game.selectedDistance', newDistance);
-                this.distanceManuallySelected = false; // Скидаємо флаг, бо відстань змінилася автоматично
-                Logger.debug('[GameControlsComponent] Increased distance to:', { newDistance });
-            }
+            // Збільшуємо відстань циклічно
+            const maxDistance = boardSize - 1;
+            let newDistance = this.selectedDistance + 1;
+            if (newDistance > maxDistance) newDistance = 1;
+            stateManager.setState('game.selectedDistance', newDistance);
         } else {
-            // Якщо вибираємо новий напрямок
+            // Новий напрямок — завжди відстань 1
             stateManager.setState('game.selectedDirection', direction);
-            
-            Logger.debug('[GameControlsComponent] New direction selected, checking manual selection:', { 
-                distanceManuallySelected: this.distanceManuallySelected 
-            });
-            
-            // Скидаємо відстань до 1 тільки якщо вона не була вибрана вручну
-            if (!this.distanceManuallySelected) {
-                stateManager.setState('game.selectedDistance', 1);
-                Logger.debug('[GameControlsComponent] Reset distance to 1 (new direction, not manually selected)');
-            } else {
-                Logger.debug('[GameControlsComponent] Keeping current distance (manually selected)');
-            }
+            stateManager.setState('game.selectedDistance', 1);
         }
-        
-        // Логуємо фінальний стан
         setTimeout(() => {
             const finalDistance = stateManager.getState('game.selectedDistance');
-            Logger.debug('[GameControlsComponent] Final state after selectDirection:', { 
-                direction, 
-                selectedDistance: finalDistance 
-            });
+            Logger.debug('[GameControlsComponent] Final state after selectDirection:', { direction, selectedDistance: finalDistance });
         }, 10);
     }
     
@@ -335,11 +296,11 @@ export class GameControlsComponent extends BaseComponent {
     }
     
     confirmMove() {
-        console.log('[GameControlsComponent] confirmMove called');
-        console.log('[GameControlsComponent] EventBus available:', !!eventBus);
-        console.log('[GameControlsComponent] Emitting game:confirmMove event');
+        Logger.info('[GameControlsComponent] confirmMove called');
+        Logger.info('[GameControlsComponent] EventBus available:', !!eventBus);
+        Logger.info('[GameControlsComponent] Emitting game:confirmMove event');
         eventBus.emit('game:confirmMove');
-        console.log('[GameControlsComponent] Event emitted');
+        Logger.info('[GameControlsComponent] Event emitted');
     }
     
     noMoves() {
@@ -396,67 +357,38 @@ export class GameControlsComponent extends BaseComponent {
     updateCenterInfo() {
         const centerInfo = this.element.querySelector('#center-info');
         if (!centerInfo) return;
-        
-        // Видаляємо попередні обробники подій
-        centerInfo.removeEventListener('click', this.centerInfoClickHandler);
-        
-        // Скидаємо всі стилі
         centerInfo.classList.remove('confirm-btn-active', 'computer-move-display', 'direction-distance-state');
-        centerInfo.style.cursor = 'default';
-        centerInfo.style.border = 'none';
-        centerInfo.style.backgroundColor = '';
-        
-        // Якщо користувач нічого не вибрав, але є хід комп'ютера — показуємо його
-        if (
-            this.selectedDirection === null &&
-            this.selectedDistance === null &&
-            this.computerLastMoveDisplay
-        ) {
+        // --- Всі стилі через CSS ---
+        if (this.selectedDirection === null && this.selectedDistance === null && this.computerLastMoveDisplay) {
             centerInfo.textContent = this.computerLastMoveDisplay;
             centerInfo.classList.add('computer-move-display');
-            centerInfo.style.backgroundColor = 'orange';
-            centerInfo.style.border = 'none';
             return;
         }
-
         if (this.selectedDirection !== null) {
             let arrow = '';
             switch (this.selectedDirection) {
-                case 1: arrow = '↙'; break;
-                case 2: arrow = '↓'; break;
-                case 3: arrow = '↘'; break;
-                case 4: arrow = '←'; break;
-                case 6: arrow = '→'; break;
-                case 7: arrow = '↖'; break;
-                case 8: arrow = '↑'; break;
-                case 9: arrow = '↗'; break;
+                case 1: arrow = '\u2199'; break;
+                case 2: arrow = '\u2193'; break;
+                case 3: arrow = '\u2198'; break;
+                case 4: arrow = '\u2190'; break;
+                case 6: arrow = '\u2192'; break;
+                case 7: arrow = '\u2196'; break;
+                case 8: arrow = '\u2191'; break;
+                case 9: arrow = '\u2197'; break;
                 default: arrow = '?';
             }
-            
-            // Якщо вибрана і відстань, показуємо обидва значення і робимо кнопкою
             if (this.selectedDistance !== null) {
                 centerInfo.textContent = `${arrow}${this.selectedDistance}`;
                 centerInfo.classList.add('confirm-btn-active');
-                centerInfo.style.cursor = 'pointer';
-                
-                // Додаємо обробник подій для підтвердження ходу
-                this.centerInfoClickHandler = () => {
-                    this.confirmMove();
-                };
-                centerInfo.addEventListener('click', this.centerInfoClickHandler);
             } else {
                 centerInfo.textContent = arrow;
                 centerInfo.classList.add('direction-distance-state');
             }
         } else if (this.selectedDistance !== null) {
-            // Якщо вибрана тільки відстань, показуємо її
             centerInfo.textContent = this.selectedDistance.toString();
             centerInfo.classList.add('direction-distance-state');
         } else {
-            // Початковий стан - нічого не показуємо
             centerInfo.textContent = '';
-            centerInfo.style.border = 'none';
-            centerInfo.style.backgroundColor = '';
         }
     }
     
@@ -566,7 +498,7 @@ export class GameControlsComponent extends BaseComponent {
     
     // Очищення ресурсів
     destroy() {
-        console.log('[GameControlsComponent] destroy');
+        Logger.debug('[GameControlsComponent] destroy');
         // Видаляємо обробники подій
         if (this.centerInfoClickHandler) {
             const centerInfo = this.element.querySelector('#center-info');

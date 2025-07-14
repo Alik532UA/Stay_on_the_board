@@ -391,5 +391,5 @@ describe('NetworkError', () => {
 
 // Запускаємо тести
 testRunner.run().then(summary => {
-    console.log('Network tests completed:', summary);
+    Logger.info('Network tests completed:', summary);
 }); 

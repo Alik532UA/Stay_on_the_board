@@ -47,14 +47,14 @@ class LoggingOptimizer {
      */
     static applyPreset(presetName) {
         if (!this.presets[presetName]) {
-            console.error(`Пресет "${presetName}" не знайдено. Доступні:`, Object.keys(this.presets));
+            Logger.error(`Пресет "${presetName}" не знайдено. Доступні:`, Object.keys(this.presets));
             return;
         }
         
         const preset = this.presets[presetName];
         Logger.configure(preset);
         
-        console.log(`✅ Застосовано пресет "${presetName}"`);
+        Logger.info(`✅ Застосовано пресет "${presetName}"`);
         this.showCurrentStatus();
     }
     
@@ -65,13 +65,13 @@ class LoggingOptimizer {
         const config = Logger.config;
         const stats = Logger.getStats();
         
-        console.log('📊 Стан логування:');
-        console.log(`   Рівень: ${config.level}`);
-        console.log(`   Швидке вимкнення: ${config.quickDisable ? '✅' : '❌'}`);
-        console.log(`   Консоль: ${config.enableConsoleOutput ? '✅' : '❌'}`);
-        console.log(`   Збереження: ${config.enableStorageOutput ? '✅' : '❌'}`);
-        console.log(`   Кількість логів: ${stats.total}`);
-        console.log(`   Логи по рівнях:`, stats.byLevel);
+        Logger.info('📊 Стан логування:');
+        Logger.info(`   Рівень: ${config.level}`);
+        Logger.info(`   Швидке вимкнення: ${config.quickDisable ? '✅' : '❌'}`);
+        Logger.info(`   Консоль: ${config.enableConsoleOutput ? '✅' : '❌'}`);
+        Logger.info(`   Збереження: ${config.enableStorageOutput ? '✅' : '❌'}`);
+        Logger.info(`   Кількість логів: ${stats.total}`);
+        Logger.info(`   Логи по рівнях:`, stats.byLevel);
     }
     
     /**
@@ -79,7 +79,7 @@ class LoggingOptimizer {
      */
     static disable() {
         Logger.config.quickDisable = true;
-        console.log('🚫 Логування вимкнено');
+        Logger.info('🚫 Логування вимкнено');
     }
     
     /**
@@ -87,7 +87,7 @@ class LoggingOptimizer {
      */
     static enable() {
         Logger.config.quickDisable = false;
-        console.log('✅ Логування увімкнено');
+        Logger.info('✅ Логування увімкнено');
     }
     
     /**
@@ -96,7 +96,7 @@ class LoggingOptimizer {
      */
     static setLevel(level) {
         Logger.config.level = level;
-        console.log(`📝 Рівень логування встановлено: ${level}`);
+        Logger.info(`📝 Рівень логування встановлено: ${level}`);
     }
     
     /**
@@ -104,7 +104,7 @@ class LoggingOptimizer {
      */
     static clear() {
         Logger.clear();
-        console.log('🗑️ Всі логи очищено');
+        Logger.info('🗑️ Всі логи очищено');
     }
     
     /**
@@ -112,14 +112,14 @@ class LoggingOptimizer {
      */
     static stats() {
         const stats = Logger.getStats();
-        console.log('📈 Статистика логів:', stats);
+        Logger.info('📈 Статистика логів:', stats);
     }
     
     /**
      * Тестує продуктивність з різними налаштуваннями
      */
     static performanceTest() {
-        console.log('🏃 Запуск тесту продуктивності...');
+        Logger.info('🏃 Запуск тесту продуктивності...');
         
         const iterations = 1000;
         const results = {};
@@ -162,11 +162,11 @@ class LoggingOptimizer {
         results.withDebug = performance.now() - startTime4;
         
         // Результати
-        console.log('📊 Результати тесту продуктивності:');
-        console.log(`   Без логування: ${results.withoutLogging.toFixed(2)}ms`);
-        console.log(`   З ERROR: ${results.withError.toFixed(2)}ms (+${((results.withError - results.withoutLogging) / results.withoutLogging * 100).toFixed(1)}%)`);
-        console.log(`   З INFO: ${results.withInfo.toFixed(2)}ms (+${((results.withInfo - results.withoutLogging) / results.withoutLogging * 100).toFixed(1)}%)`);
-        console.log(`   З DEBUG: ${results.withDebug.toFixed(2)}ms (+${((results.withDebug - results.withoutLogging) / results.withoutLogging * 100).toFixed(1)}%)`);
+        Logger.info('📊 Результати тесту продуктивності:');
+        Logger.info(`   Без логування: ${results.withoutLogging.toFixed(2)}ms`);
+        Logger.info(`   З ERROR: ${results.withError.toFixed(2)}ms (+${((results.withError - results.withoutLogging) / results.withoutLogging * 100).toFixed(1)}%)`);
+        Logger.info(`   З INFO: ${results.withInfo.toFixed(2)}ms (+${((results.withInfo - results.withoutLogging) / results.withoutLogging * 100).toFixed(1)}%)`);
+        Logger.info(`   З DEBUG: ${results.withDebug.toFixed(2)}ms (+${((results.withDebug - results.withoutLogging) / results.withoutLogging * 100).toFixed(1)}%)`);
     }
     
     /**
@@ -194,11 +194,11 @@ if (typeof Logger !== 'undefined') {
     LoggingOptimizer.autoOptimize();
     
     // Додаємо команди в консоль
-    console.log('🔧 LoggingOptimizer завантажено. Доступні команди:');
-    console.log('   LoggingOptimizer.disable() - вимкнути логування');
-    console.log('   LoggingOptimizer.enable() - увімкнути логування');
-    console.log('   LoggingOptimizer.setLevel("ERROR") - встановити рівень');
-    console.log('   LoggingOptimizer.applyPreset("performance") - застосувати пресет');
-    console.log('   LoggingOptimizer.performanceTest() - тест продуктивності');
-    console.log('   LoggingOptimizer.stats() - статистика');
+    Logger.info('🔧 LoggingOptimizer завантажено. Доступні команди:');
+    Logger.info('   LoggingOptimizer.disable() - вимкнути логування');
+    Logger.info('   LoggingOptimizer.enable() - увімкнути логування');
+    Logger.info('   LoggingOptimizer.setLevel("ERROR") - встановити рівень');
+    Logger.info('   LoggingOptimizer.applyPreset("performance") - застосувати пресет');
+    Logger.info('   LoggingOptimizer.performanceTest() - тест продуктивності');
+    Logger.info('   LoggingOptimizer.stats() - статистика');
 } 

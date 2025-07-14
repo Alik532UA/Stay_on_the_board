@@ -453,5 +453,5 @@ describe('Validator', () => {
 
 // Запускаємо тести
 testRunner.run().then(summary => {
-    console.log('Validator tests completed:', summary);
+    Logger.info('Validator tests completed:', summary);
 }); 

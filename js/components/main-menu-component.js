@@ -63,145 +63,107 @@ export class MainMenuComponent extends BaseComponent {
     bindEvents() {
         // Перевіряємо, чи вже прив'язані події
         if (this.eventsBound) {
-            console.log('[MainMenuComponent] bindEvents already called, skipping');
+            Logger.debug('[MainMenuComponent] bindEvents already called, skipping');
             return;
         }
         
-        console.log('[MainMenuComponent] bindEvents called');
+        Logger.debug('[MainMenuComponent] bindEvents called');
         this.eventsBound = true; // Позначаємо, що події прив'язані
         
         // Очищаємо попередні обробники подій для уникнення дублювання
         this.element.querySelectorAll('button').forEach(btn => {
             btn.replaceWith(btn.cloneNode(true));
         });
-        // Грати з комп'ютером
+        // --- КНОПКИ ---
         this.element.querySelector('#btn-vs-computer')?.addEventListener('click', () => {
-            console.log('[MainMenuComponent] btn-vs-computer clicked');
             stateManager.navigateTo('gameBoard', { gameMode: 'vsComputer' });
         });
-        // Локальна гра
         this.element.querySelector('#btn-local-game')?.addEventListener('click', () => {
-            console.log('[MainMenuComponent] btn-local-game clicked');
             stateManager.navigateTo('gameBoard', { gameMode: 'local' });
         });
-        // Грати онлайн
         this.element.querySelector('#btn-online')?.addEventListener('click', () => {
-            // Temporary MVP redirect
             window.location.href = 'peer-mvp.html';
         });
-        // Налаштування
         this.element.querySelector('#btn-settings')?.addEventListener('click', () => {
             stateManager.navigateTo('settings');
         });
-        // Керування
         this.element.querySelector('#btn-controls')?.addEventListener('click', () => {
             this.showControlsInfo();
         });
-        // Правила
         this.element.querySelector('#btn-rules')?.addEventListener('click', () => {
             this.showRules();
         });
-        // Очистити кеш
         this.element.querySelector('#btn-clear-cache')?.addEventListener('click', () => {
             localStorage.clear();
             location.reload();
         });
-
-        // --- Нова логіка дропдауну тем ---
+        // --- ДРОПДАУН ТЕМИ ---
         const themeBtn = this.element.querySelector('#theme-style-btn');
         if (themeBtn) {
             themeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // Overlay
                 let overlay = document.getElementById('dropdown-overlay');
                 if (!overlay) {
                     overlay = document.createElement('div');
                     overlay.id = 'dropdown-overlay';
-                    overlay.style.position = 'fixed';
-                    overlay.style.top = '0';
-                    overlay.style.left = '0';
-                    overlay.style.width = '100vw';
-                    overlay.style.height = '100vh';
-                    overlay.style.background = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'rgba(24,16,32,0.38)' : 'rgba(255,255,255,0.32)';
-                    overlay.style.backdropFilter = 'blur(8px)';
-                    overlay.style.webkitBackdropFilter = 'blur(8px)';
-                    overlay.style.zIndex = '9998';
-                    overlay.style.transition = 'opacity 0.2s';
+                    overlay.className = 'dropdown-overlay' + (document.documentElement.getAttribute('data-theme') === 'dark' ? '' : ' light');
                     document.body.appendChild(overlay);
                 } else {
-                    overlay.style.display = 'block';
-                    overlay.style.background = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'rgba(24,16,32,0.38)' : 'rgba(255,255,255,0.32)';
+                    overlay.classList.remove('hidden');
+                    overlay.className = 'dropdown-overlay' + (document.documentElement.getAttribute('data-theme') === 'dark' ? '' : ' light');
                 }
                 overlay.onclick = () => {
-                    dropdown.style.display = 'none';
-                    overlay.style.display = 'none';
+                    dropdown.classList.add('hidden');
+                    overlay.classList.add('hidden');
                     document.removeEventListener('mousedown', closeHandler);
                     document.removeEventListener('keydown', escHandler);
                 };
-
                 let dropdown = document.getElementById('theme-style-dropdown-new');
                 if (!dropdown) {
                     dropdown = document.createElement('div');
                     dropdown.id = 'theme-style-dropdown-new';
-                    dropdown.style.position = 'absolute';
-                    dropdown.style.minWidth = '320px';
-                    dropdown.style.background = 'none';
-                    dropdown.style.color = '#222';
-                    dropdown.style.borderRadius = '12px';
-                    dropdown.style.boxShadow = '0 8px 32px 0 rgba(80,0,80,0.18)';
-                    dropdown.style.border = 'none';
-                    dropdown.style.padding = '12px 16px';
-                    dropdown.style.zIndex = '9999';
-                    dropdown.style.display = 'flex';
-                    dropdown.style.flexDirection = 'column';
-                    dropdown.style.gap = '8px';
+                    dropdown.className = 'theme-dropdown';
                     dropdown.innerHTML = `
-                        <div class="theme-style-row" data-style="classic" style="background:rgba(255,140,0,0.4);border-radius:10px;">
-                            <button class="theme-btn" data-theme="light" style="background:rgba(255,255,255,0.4);color:#222;">☀️</button>
-                            <span style="flex:1;text-align:center;font-weight:600;color:#fff;">Ubuntu</span>
-                            <button class="theme-btn" data-theme="dark" style="background:rgba(35,39,43,0.5);color:#fff;">🌙</button>
+                        <div class="theme-style-row" data-style="classic">
+                            <button class="theme-btn" data-theme="light">☀️</button>
+                            <span class="theme-name">Ubuntu</span>
+                            <button class="theme-btn" data-theme="dark">🌙</button>
                         </div>
-                        <div class="theme-style-row" data-style="peak" style="background:rgba(0,200,80,0.4);border-radius:10px;">
-                            <button class="theme-btn" data-theme="light" style="background:rgba(255,255,255,0.4);color:#222;">☀️</button>
-                            <span style="flex:1;text-align:center;font-weight:600;color:#fff;">PEAK</span>
-                            <button class="theme-btn" data-theme="dark" style="background:rgba(35,39,43,0.5);color:#fff;">🌙</button>
+                        <div class="theme-style-row" data-style="peak">
+                            <button class="theme-btn" data-theme="light">☀️</button>
+                            <span class="theme-name">PEAK</span>
+                            <button class="theme-btn" data-theme="dark">🌙</button>
                         </div>
-                        <div class="theme-style-row" data-style="cs2" style="background:rgba(33,150,243,0.4);border-radius:10px;">
-                            <button class="theme-btn" data-theme="light" style="background:rgba(255,255,255,0.4);color:#222;">☀️</button>
-                            <span style="flex:1;text-align:center;font-weight:600;color:#fff;">CS&nbsp;2</span>
-                            <button class="theme-btn" data-theme="dark" style="background:rgba(35,39,43,0.5);color:#fff;">🌙</button>
+                        <div class="theme-style-row" data-style="cs2">
+                            <button class="theme-btn" data-theme="light">☀️</button>
+                            <span class="theme-name">CS&nbsp;2</span>
+                            <button class="theme-btn" data-theme="dark">🌙</button>
                         </div>
-                        <div class="theme-style-row" data-style="glass" style="background:rgba(120,120,120,0.4);border-radius:10px;">
-                            <button class="theme-btn" data-theme="light" style="background:rgba(255,255,255,0.4);color:#222;">☀️</button>
-                            <span style="flex:1;text-align:center;font-weight:600;color:#fff;">Glassmorphism</span>
-                            <button class="theme-btn" data-theme="dark" style="background:rgba(35,39,43,0.5);color:#fff;">🌙</button>
+                        <div class="theme-style-row" data-style="glass">
+                            <button class="theme-btn" data-theme="light">☀️</button>
+                            <span class="theme-name">Glassmorphism</span>
+                            <button class="theme-btn" data-theme="dark">🌙</button>
                         </div>
-                        <div class="theme-style-row" data-style="material" style="background:rgba(56,142,60,0.4);border-radius:10px;">
-                            <button class="theme-btn" data-theme="light" style="background:rgba(255,255,255,0.4);color:#222;">☀️</button>
-                            <span style="flex:1;text-align:center;font-weight:600;color:#fff;">Material You</span>
-                            <button class="theme-btn" data-theme="dark" style="background:rgba(35,39,43,0.5);color:#fff;">🌙</button>
+                        <div class="theme-style-row" data-style="material">
+                            <button class="theme-btn" data-theme="light">☀️</button>
+                            <span class="theme-name">Material You</span>
+                            <button class="theme-btn" data-theme="dark">🌙</button>
                         </div>
                     `;
                     document.body.appendChild(dropdown);
                 }
-                // Позиціонування під кнопкою або по центру на мобільних
+                // Позиціонування
                 if (window.innerWidth <= 600) {
-                    dropdown.style.position = 'fixed';
-                    dropdown.style.top = '50%';
-                    dropdown.style.left = '50%';
-                    dropdown.style.transform = 'translate(-50%, -50%)';
-                    dropdown.style.width = '96vw';
-                    dropdown.style.maxWidth = '360px';
+                    dropdown.classList.add('mobile');
+                    dropdown.classList.remove('desktop');
                 } else {
-                    dropdown.style.position = 'absolute';
-                    dropdown.style.transform = '';
-                    dropdown.style.width = '';
-                    dropdown.style.maxWidth = '320px';
+                    dropdown.classList.add('desktop');
+                    dropdown.classList.remove('mobile');
                     const rect = themeBtn.getBoundingClientRect();
                     dropdown.style.top = `${rect.bottom + window.scrollY + 8}px`;
-                    dropdown.style.left = `${rect.left + window.scrollX + rect.width/2 - dropdown.offsetWidth/2}px`;
+                    dropdown.style.left = `${rect.left + window.scrollX + rect.width/2 - 160}px`;
                 }
-                dropdown.style.display = 'flex';
+                dropdown.classList.remove('hidden');
                 // Обробник вибору теми/стилю
                 dropdown.querySelectorAll('.theme-style-row .theme-btn').forEach(btn => {
                     btn.onclick = (ev) => {
@@ -211,15 +173,15 @@ export class MainMenuComponent extends BaseComponent {
                         document.documentElement.setAttribute('data-theme', theme);
                         localStorage.setItem('style', style);
                         localStorage.setItem('theme', theme);
-                        dropdown.style.display = 'none';
-                        overlay.style.display = 'none';
+                        dropdown.classList.add('hidden');
+                        overlay.classList.add('hidden');
                     };
                 });
                 // Закриття по кліку поза меню
                 const closeHandler = (ev) => {
                     if (!dropdown.contains(ev.target) && ev.target !== themeBtn) {
-                        dropdown.style.display = 'none';
-                        overlay.style.display = 'none';
+                        dropdown.classList.add('hidden');
+                        overlay.classList.add('hidden');
                         document.removeEventListener('mousedown', closeHandler);
                         document.removeEventListener('keydown', escHandler);
                     }
@@ -227,8 +189,8 @@ export class MainMenuComponent extends BaseComponent {
                 // Закриття по Esc
                 const escHandler = (ev) => {
                     if (ev.key === 'Escape') {
-                        dropdown.style.display = 'none';
-                        overlay.style.display = 'none';
+                        dropdown.classList.add('hidden');
+                        overlay.classList.add('hidden');
                         document.removeEventListener('mousedown', closeHandler);
                         document.removeEventListener('keydown', escHandler);
                     }
@@ -239,86 +201,47 @@ export class MainMenuComponent extends BaseComponent {
                 }, 0);
             });
         }
-        // --- Нова логіка дропдауну мов ---
+        // --- ДРОПДАУН МОВИ ---
         const langBtn = this.element.querySelector('#lang-select-btn');
         if (langBtn) {
             langBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // Додаємо overlay
                 let overlay = document.getElementById('dropdown-overlay');
                 if (!overlay) {
                     overlay = document.createElement('div');
                     overlay.id = 'dropdown-overlay';
-                    overlay.style.position = 'fixed';
-                    overlay.style.top = '0';
-                    overlay.style.left = '0';
-                    overlay.style.width = '100vw';
-                    overlay.style.height = '100vh';
-                    overlay.style.background = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'rgba(24,16,32,0.38)' : 'rgba(255,255,255,0.32)';
-                    overlay.style.backdropFilter = 'blur(8px)';
-                    overlay.style.webkitBackdropFilter = 'blur(8px)';
-                    overlay.style.zIndex = '9998';
-                    overlay.style.transition = 'opacity 0.2s';
+                    overlay.className = 'dropdown-overlay' + (document.documentElement.getAttribute('data-theme') === 'dark' ? '' : ' light');
                     document.body.appendChild(overlay);
                 } else {
-                    overlay.style.display = 'block';
-                    overlay.style.background = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'rgba(24,16,32,0.38)' : 'rgba(255,255,255,0.32)';
+                    overlay.classList.remove('hidden');
+                    overlay.className = 'dropdown-overlay' + (document.documentElement.getAttribute('data-theme') === 'dark' ? '' : ' light');
                 }
                 overlay.onclick = () => {
-                    dropdown.style.display = 'none';
-                    overlay.style.display = 'none';
+                    dropdown.classList.add('hidden');
+                    overlay.classList.add('hidden');
                     document.removeEventListener('mousedown', closeHandler);
                     document.removeEventListener('keydown', escHandler);
                 };
-
                 let dropdown = document.getElementById('lang-dropdown-new');
                 if (!dropdown) {
                     dropdown = document.createElement('div');
                     dropdown.id = 'lang-dropdown-new';
-                    dropdown.style.position = 'absolute';
-                    dropdown.style.minWidth = '180px';
-                    dropdown.style.background = 'none'; // Без білого фону
-                    dropdown.style.color = '#222';
-                    dropdown.style.borderRadius = '12px';
-                    dropdown.style.boxShadow = '0 8px 32px 0 rgba(80,0,80,0.18)';
-                    dropdown.style.border = 'none'; // Без бордера
-                    dropdown.style.padding = '12px 16px';
-                    dropdown.style.zIndex = '9999';
-                    dropdown.style.display = 'flex';
-                    dropdown.style.gap = '12px';
-                    dropdown.style.justifyContent = 'center';
-                    dropdown.style.alignItems = 'center';
+                    dropdown.className = 'lang-dropdown';
                     dropdown.innerHTML = `
-                        <button class="lang-option-new" data-lang="uk" title="Українська"><span><svg width="32" height="24" viewBox="0 0 32 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius:4px;overflow:hidden;display:block;"><rect width="32" height="12" y="0" fill="#0057B7"/><rect width="32" height="12" y="12" fill="#FFD700"/></svg></span></button>
-                        <button class="lang-option-new" data-lang="en" title="English">
-                          <span>
-                            <svg width="32" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 30">
-                              <clipPath id="t">
-                                <path d="M25,15h25v15zv15h-25zh-25v-15zv-15h25z"/>
-                              </clipPath>
-                              <path d="M0,0v30h50v-30z" fill="#012169"/>
-                              <path d="M0,0 50,30M50,0 0,30" stroke="#fff" stroke-width="6"/>
-                              <path d="M0,0 50,30M50,0 0,30" clip-path="url(#t)" stroke="#C8102E" stroke-width="4"/>
-                              <path d="M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z" fill="#C8102E" stroke="#FFF" stroke-width="2"/>
-                            </svg>
-                          </span>
-                        </button>
-                        <button class="lang-option-new" data-lang="crh" title="Qırımtatarca">
-                          <span>
-                            <svg width="32" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 27 18"><path d="m0 0h27v18H0" fill="#0cf"/><path d="m4.7 6.1h2.7m-1.4-3.6v3.6m-4-1h1.3v-2.6h5.4v2.6h1.3" fill="none" stroke="#ff0"/></svg>
-                          </span>
-                        </button>
-                        <button class="lang-option-new" data-lang="nl" title="Nederlands"><span><svg width="32" height="24" viewBox="0 0 32 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius:4px;overflow:hidden;display:block;"><rect width="32" height="8" y="0" fill="#21468B"/><rect width="32" height="8" y="8" fill="#FFF"/><rect width="32" height="8" y="16" fill="#AE1C28"/></svg></span></button>
+                        <button class="lang-option" data-lang="uk" title="Українська"><span>🇺🇦</span></button>
+                        <button class="lang-option" data-lang="en" title="English"><span>🇬🇧</span></button>
+                        <button class="lang-option" data-lang="crh" title="Qırımtatarca"><span>🏴</span></button>
+                        <button class="lang-option" data-lang="nl" title="Nederlands"><span>🇳🇱</span></button>
                     `;
                     document.body.appendChild(dropdown);
                 }
-                // Позиціонування під кнопкою
+                // Позиціонування
                 const rect = langBtn.getBoundingClientRect();
                 dropdown.style.top = `${rect.bottom + window.scrollY + 8}px`;
-                dropdown.style.left = `${rect.left + window.scrollX + rect.width/2 - dropdown.offsetWidth/2}px`;
-                dropdown.style.display = 'flex';
+                dropdown.style.left = `${rect.left + window.scrollX + rect.width/2 - 90}px`;
+                dropdown.classList.remove('hidden');
                 // Обробник вибору мови
-                dropdown.querySelectorAll('.lang-option-new').forEach(btn => {
+                dropdown.querySelectorAll('.lang-option').forEach(btn => {
                     btn.onclick = (ev) => {
                         const lang = btn.getAttribute('data-lang');
                         localStorage.setItem('lang', lang);
@@ -328,8 +251,8 @@ export class MainMenuComponent extends BaseComponent {
                 // Закриття по кліку поза меню
                 const closeHandler = (ev) => {
                     if (!dropdown.contains(ev.target) && ev.target !== langBtn) {
-                        dropdown.style.display = 'none';
-                        overlay.style.display = 'none';
+                        dropdown.classList.add('hidden');
+                        overlay.classList.add('hidden');
                         document.removeEventListener('mousedown', closeHandler);
                         document.removeEventListener('keydown', escHandler);
                     }
@@ -337,8 +260,8 @@ export class MainMenuComponent extends BaseComponent {
                 // Закриття по Esc
                 const escHandler = (ev) => {
                     if (ev.key === 'Escape') {
-                        dropdown.style.display = 'none';
-                        overlay.style.display = 'none';
+                        dropdown.classList.add('hidden');
+                        overlay.classList.add('hidden');
                         document.removeEventListener('mousedown', closeHandler);
                         document.removeEventListener('keydown', escHandler);
                     }
@@ -349,7 +272,7 @@ export class MainMenuComponent extends BaseComponent {
                 }, 0);
             });
         }
-        // --- Динамічний donate-btn ---
+        // --- DONATE ---
         const donateBtn = this.element.querySelector('#donate-btn');
         if (donateBtn) {
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -360,16 +283,16 @@ export class MainMenuComponent extends BaseComponent {
     }
     
     destroy() {
-        console.log('[MainMenuComponent] destroy called');
+        Logger.debug('[MainMenuComponent] destroy called');
         this.eventsBound = false; // Скидаємо флаг
         this.element.innerHTML = '';
     }
     
     subscribeToState() {
-        console.log('[MainMenuComponent] subscribeToState called');
+        Logger.debug('[MainMenuComponent] subscribeToState called');
         // Підписка на зміни мови для оновлення тексту
         this.subscribe('settings.language', () => {
-            console.log('[MainMenuComponent] Language changed, re-rendering');
+            Logger.debug('[MainMenuComponent] Language changed, re-rendering');
             this.render();
         });
     }

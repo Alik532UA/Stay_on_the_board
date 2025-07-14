@@ -65,9 +65,9 @@ export class GameBoardComponent extends BaseComponent {
             const randomCol = Math.floor(Math.random() * boardSize);
             newBoard[randomRow][randomCol] = 1;
             stateManager.setState('game.board', newBoard);
-            this.renderBoard(newBoard, boardSize);
+            this.renderBoard(newBoard, boardSize, currentGameState.blockedCells || []);
         } else {
-            this.renderBoard(currentGameState.board, currentGameState.boardSize);
+            this.renderBoard(currentGameState.board, currentGameState.boardSize, currentGameState.blockedCells || []);
         }
         
         // Якщо дошка ще не ініціалізована, ініціалізуємо гру через GameLogic
@@ -91,9 +91,9 @@ export class GameBoardComponent extends BaseComponent {
         }
         
         // Синхронізуємо компонент керування
-        if (window.gameControlsComponent) {
-            window.gameControlsComponent.syncCheckboxWithSettings();
-        }
+        // if (window.gameControlsComponent) {
+        //     window.gameControlsComponent.syncCheckboxWithSettings();
+        // }
         
         // Рендеримо компонент керування грою
         this.renderControls();
@@ -198,8 +198,8 @@ export class GameBoardComponent extends BaseComponent {
         // Підписка на зміни заблокованих клітинок
         this.subscribe('game.blockedCells', () => {
             const gameState = stateManager.getState('game');
-            const blockedCells = gameState.blockedCells || [];
             const blockedMode = stateManager.getState('settings.blockedMode') || false;
+            const blockedCells = gameState.blockedCells || [];
             
             Logger.debug('[GameBoardComponent] game.blockedCells changed:', { 
                 blockedCellsCount: blockedCells.length, 
@@ -213,7 +213,7 @@ export class GameBoardComponent extends BaseComponent {
                 return;
             }
             
-            this.renderBoard(gameState.board, gameState.boardSize);
+            this.renderBoard(gameState.board, gameState.boardSize, blockedCells);
         });
         
         // Підписка на зміни режиму заблокованих клітинок
@@ -233,7 +233,7 @@ export class GameBoardComponent extends BaseComponent {
                 return;
             }
             
-            this.renderBoard(gameState.board, gameState.boardSize);
+            this.renderBoard(gameState.board, gameState.boardSize, blockedCells);
         });
     }
 
@@ -243,7 +243,7 @@ export class GameBoardComponent extends BaseComponent {
         if (controlsEl) {
             this.controlsComponent = new GameControlsComponent(controlsEl);
             this.controlsComponent.render();
-            window.gameControlsComponent = this.controlsComponent; // Expose globally
+            // window.gameControlsComponent = this.controlsComponent; // Expose globally — ВИДАЛЕНО
             Logger.debug('[GameBoardComponent] Game controls component rendered successfully');
         } else {
             Logger.error('[GameBoardComponent] Controls element not found in global DOM');
@@ -265,7 +265,6 @@ export class GameBoardComponent extends BaseComponent {
             boardSizeSelect.addEventListener('change', (e) => {
             const newSize = parseInt(e.target.value);
             Logger.info('[GameBoardComponent] Board size dropdown changed to:', { newSize });
-            console.log('[GameBoardComponent] Board size dropdown changed to:', { newSize });
             
             // Валідація розміру дошки
             if (newSize < 2 || newSize > 9) {
@@ -317,8 +316,8 @@ export class GameBoardComponent extends BaseComponent {
         // TODO: Додати логіку для кнопки "Зробити хід" якщо потрібно
     }
 
-    renderBoard(board, boardSize) {
-        Logger.debug('[GameBoardComponent] renderBoard called with boardSize:', { boardSize, boardLength: board?.length });
+    renderBoard(board, boardSize, blockedCells = []) {
+        Logger.debug('[GameBoardComponent] renderBoard called with boardSize:', { boardSize, boardLength: board?.length, blockedCellsCount: blockedCells.length, blockedCells });
         
         const gameBoard = this.element.querySelector('#game-board');
         if (!gameBoard) {
@@ -332,7 +331,7 @@ export class GameBoardComponent extends BaseComponent {
             const randomCol = Math.floor(Math.random() * boardSize);
             newBoard[randomRow][randomCol] = 1;
             stateManager.setState('game.board', newBoard);
-            this.renderBoard(newBoard, boardSize);
+            this.renderBoard(newBoard, boardSize, currentGameState.blockedCells || []);
             return;
         }
         // --- Дістаємо доступні та підсвічені ходи ---
@@ -362,28 +361,35 @@ export class GameBoardComponent extends BaseComponent {
                 } else {
                     cell.classList.add('cell-dark');
                 }
-                const cellValue = board[row][col];
-                // --- Фігура ---
-                if (cellValue === 1) {
-                    cell.classList.add('player-piece');
-                    cell.innerHTML = '<span class="crown">👑</span>';
-                } else if (cellValue === 2) {
-                    cell.classList.add('player-piece', 'player2');
-                    cell.innerHTML = '<span class="crown">👑</span>';
+                // --- Відображення заблокованих клітинок ---
+                const isBlocked = blockedCells.some(c => c.row === row && c.col === col);
+                if (isBlocked) {
+                    cell.classList.add('blocked-cell');
+                    cell.innerHTML = '<span class="blocked-x">✗</span>';
+                    Logger.debug('[GameBoardComponent] renderBoard: blocked cell rendered', { row, col });
                 } else {
-                    cell.classList.add('empty-cell');
-                    // --- Доступні ходи ---
-                    const isHighlighted = highlightedMoves.some(move => move.newRow === row && move.newCol === col);
-                    const isAvailable = availableMoves.some(move => move.newRow === row && move.newCol === col);
-                    
-                    if (isHighlighted) {
-                        cell.classList.add('highlighted-move');
-                        cell.innerHTML = '<span class="move-dot move-dot-highlighted"></span>';
-                    } else if (isAvailable && showingAvailableMoves) {
-                        cell.classList.add('available-move');
-                        cell.innerHTML = '<span class="move-dot"></span>';
+                    const cellValue = board[row][col];
+                    // --- Фігура ---
+                    if (cellValue === 1) {
+                        cell.classList.add('player-piece');
+                        cell.innerHTML = '<span class="crown">👑</span>';
+                    } else if (cellValue === 2) {
+                        cell.classList.add('player-piece', 'player2');
+                        cell.innerHTML = '<span class="crown">👑</span>';
                     } else {
-                        cell.innerHTML = '';
+                        cell.classList.add('empty-cell');
+                        // --- Доступні ходи ---
+                        const isHighlighted = highlightedMoves.some(move => move.newRow === row && move.newCol === col);
+                        const isAvailable = availableMoves.some(move => move.newRow === row && move.newCol === col);
+                        if (isHighlighted) {
+                            cell.classList.add('highlighted-move');
+                            cell.innerHTML = '<span class="move-dot move-dot-highlighted"></span>';
+                        } else if (isAvailable && showingAvailableMoves) {
+                            cell.classList.add('available-move');
+                            cell.innerHTML = '<span class="move-dot"></span>';
+                        } else {
+                            cell.innerHTML = '';
+                        }
                     }
                 }
                 gameBoard.appendChild(cell);
@@ -400,9 +406,9 @@ export class GameBoardComponent extends BaseComponent {
             this.controlsComponent = null;
         }
         // Очищаємо глобальну змінну
-        if (window.gameControlsComponent === this.controlsComponent) {
-            window.gameControlsComponent = null;
-        }
+        // if (window.gameControlsComponent === this.controlsComponent) { // ВИДАЛЕНО
+        //     window.gameControlsComponent = null; // ВИДАЛЕНО
+        // } // ВИДАЛЕНО
         super.destroy();
     }
 } 

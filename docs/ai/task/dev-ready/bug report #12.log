@@ -1,0 +1,1081 @@
+VM2179 logger.js:466  Uncaught SyntaxError: Unexpected token 'export' (at VM2179 logger.js:466:1)
+[NEW] Explain Console errors by using Copilot in Edge: click
+         
+         to explain an error. 
+        Learn more
+        Don't show again
+logger.js:186 [INFO] 🔧 Bug fixes applied: {bug12: 'Blocked cells mode now properly displays blocked cells with red ✗ symbol', bug13: 'Default distance now correctly resets to 1 when changing board size', bug15: 'MainMenuComponent bindEvents now prevents duplicate event listeners', bug17: 'GameControlsComponent render now prevents duplicate rendering'}
+speech.js:77 🎤 Speech manager initialized
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.speechEnabled'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+logger.js:188 [DEBUG] GameLogic: constructor
+logger.js:188 [INFO] [GameLogic] Initializing...
+game-logic-new.js:940 [GameLogic] Initializing Game Logic {}
+logger.js:188 [DEBUG] GameLogic: subscribeToGameState
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.isActive'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.noMoves'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedMove'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.speechEnabled'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.blockedMode'}
+logger.js:188 [DEBUG] [GameLogic] initSpeech called
+game-logic-new.js:940 [GameLogic] Game Logic initialized {}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'ui.currentView'}
+logger.js:186 [DEBUG] [App] Initial view: {initialView: 'mainMenu'}
+view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:369 [MainMenuComponent] subscribeToState called
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:188 [INFO] ✅ Глобальні контроли налаштовані
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+view-manager.js:111 [ViewManager] Game controls content cleared
+logger.js:186 [INFO] Started: App initialization {timestamp: 1752486746952, startTime: 1752486746953}
+logger.js:188 [INFO] EventBus middleware configured
+logger.js:188 [INFO] Speech control configured
+logger.js:188 [INFO] Systems initialized successfully
+logger.js:188 [INFO] 🚀 Ініціалізація додатку Stay on the board
+logger.js:186  [WARN] ⚠️ Помилка ініціалізації теми {error: "Cannot set properties of null (setting 'textContent')"}
+outputToConsoleFast @ logger.js:186
+log @ logger.js:73
+warn @ logger.js:94
+initTheme @ main-new.js:321
+init @ main-new.js:268
+App @ main-new.js:89
+(anonymous) @ main-new.js:745
+logger.js:186 [INFO] ✅ Мова ініціалізована {language: 'uk'}
+logger.js:188 [INFO] ✅ Глобальні контроли налаштовані
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.theme'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.style'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.isActive'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.points'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'ui.error'}
+logger.js:188 [INFO] ✅ Обробка помилок налаштована
+logger.js:188 [INFO] ✅ Моніторинг продуктивності налаштований
+logger.js:186 [DEBUG] [StateManager] navigateTo: {viewName: 'mainMenu', params: {…}}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'ui.currentView', value: 'mainMenu'}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'ui.currentView', count: 1}
+logger.js:186 [DEBUG] [App] ui.currentView changed: {view: 'mainMenu'}
+view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:369 [MainMenuComponent] subscribeToState called
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:188 [INFO] ✅ Глобальні контроли налаштовані
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+view-manager.js:111 [ViewManager] Game controls content cleared
+logger.js:188 [DEBUG] [StateManager] Calling viewManager.navigateTo
+view-manager.js:37 [ViewManager] navigateTo: {viewName: 'mainMenu', params: {…}}
+view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+base-component.js:329 [MainMenuComponent] Component created {options: {…}}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:369 [MainMenuComponent] subscribeToState called
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
+base-component.js:329 [MainMenuComponent] Component initialized {}
+logger.js:188 [INFO] ✅ Глобальні контроли налаштовані
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+view-manager.js:111 [ViewManager] Game controls content cleared
+logger.js:188 [INFO] 🎮 Додаток запущено
+logger.js:188 [INFO] ✅ Додаток успішно ініціалізовано
+logger.js:188 [INFO] 🎉 Додаток Stay on the board готовий до роботи
+game-logic-new.js:940 [GameLogic] Speech initialized {enabled: false}
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+index.html:1  Error handling response: TypeError: Cannot read properties of undefined (reading 'features')
+    at chrome-extension://jjkchpdmjjdmalgembblgafllbpcjlei/mcafee_wa_contentplg.js:2719:35
+index.html:1  Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
+main-menu-component.js:70 [MainMenuComponent] bindEvents called
+main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
+logger.js:186 [INFO] 📊 Сторінка завантажена {loadTime: 11}
+main-menu-component.js:79 [MainMenuComponent] btn-vs-computer clicked
+logger.js:186 [DEBUG] [StateManager] navigateTo: {viewName: 'gameBoard', params: {…}}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'ui.currentView', value: 'gameBoard'}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'ui.currentView', count: 1}
+logger.js:186 [DEBUG] [App] ui.currentView changed: {view: 'gameBoard'}
+view-manager.js:69 [ViewManager] render: {viewName: 'gameBoard', params: {…}}
+ [GameBoardComponent] Component created {options: {…}}
+ [INFO] [GameBoardComponent] render: початок
+ [DEBUG] [GameBoardComponent] render: boardSize = {boardSize: 3}
+ [DEBUG] [StateManager] setState: {path: 'game.gameMode', value: 'vsComputer'}
+ [INFO] [GameBoardComponent] Board size mismatch or no board, recreating board {boardSize: 3}
+ [DEBUG] [GameCore] createEmptyBoard called with size: {size: 3}
+ [DEBUG] [GameCore] Created empty board with size: {rows: 3, cols: 3}
+ [DEBUG] [StateManager] setState: {path: 'game.board', value: Array(3)}
+ [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 0, highlightedMovesCount: 0, showingAvailableMoves: false, availableMoves: Array(0), highlightedMoves: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+ [DEBUG] [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+ [DEBUG] toggleAvailableMoves called, show = {show: true}
+ [DEBUG] [StateManager] setState: {path: 'game.showingAvailableMoves', value: true}
+ [DEBUG] [GameLogic] updateAvailableMoves called
+ [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+ [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+ [DEBUG] [GameCore] Found piece at: {row: 1, col: 2}
+ [DEBUG] [GameLogic] Found piece: {piece: {…}}
+ [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+ [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+ [DEBUG] [GameCore] Found valid moves: {count: 6}
+ [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 2, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+ [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(6)}
+ [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 6}
+ [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(0)}
+ [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+ [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(6)}
+ [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(0)}
+ [DEBUG] [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: {showingAvailableMoves: true, highlightedMovesCount: 0}
+ [GameControlsComponent] Component created {options: {…}}
+ [INFO] [GameControlsComponent] render: початок
+ [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+ [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+ [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+ [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+ [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+ [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+ [INFO] [GameControlsComponent] render: завершено
+ [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+ [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+ [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+ [GameControlsComponent] Component initialized {}
+ [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+ [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+ [DEBUG] [GameControlsComponent] Already rendered, skipping
+ [DEBUG] [GameBoardComponent] Game controls component rendered successfully
+ [DEBUG] [GameBoardComponent] render: кінець
+ [GameBoardComponent] Component initialized {}
+ [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.board'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.highlightedMoves'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.showingAvailableMoves'}
+ [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.availableMoves'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.blockedCells'}
+ [DEBUG] [StateManager] subscribe: {path: 'settings.blockedMode'}
+ [INFO] [GameBoardComponent] render: початок
+ [DEBUG] [GameBoardComponent] render: boardSize = {boardSize: 3}
+ [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+ [DEBUG] [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+ [DEBUG] toggleAvailableMoves called, show = {show: true}
+ [DEBUG] [StateManager] setState: {path: 'game.showingAvailableMoves', value: true}
+ [DEBUG] [StateManager] Notifying listeners for: {path: 'game.showingAvailableMoves', count: 1}
+ [DEBUG] [GameBoardComponent] game.showingAvailableMoves changed
+ [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+ [DEBUG] [GameLogic] updateAvailableMoves called
+ [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+ [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+ [DEBUG] [GameCore] Found piece at: {row: 1, col: 2}
+ [DEBUG] [GameLogic] Found piece: {piece: {…}}
+ [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+ [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+ [DEBUG] [GameCore] Found valid moves: {count: 6}
+ [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 2, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+ [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(6)}
+ [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 1}
+ [DEBUG] [GameBoardComponent] game.availableMoves changed
+ [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+ [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 6}
+ [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(0)}
+ [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 1}
+ [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+ [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+ [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+ [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(6)}
+ [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(0)}
+ [DEBUG] [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: {showingAvailableMoves: true, highlightedMovesCount: 0}
+ [GameControlsComponent] Component created {options: {…}}
+ [INFO] [GameControlsComponent] render: початок
+ [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+ [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+ [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+ [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+ [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+ [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+ [INFO] [GameControlsComponent] render: завершено
+ [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+ [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+ [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+ [GameControlsComponent] Component initialized {}
+ [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+ [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+ [DEBUG] [GameControlsComponent] Already rendered, skipping
+ [DEBUG] [GameBoardComponent] Game controls component rendered successfully
+ [DEBUG] [GameBoardComponent] render: кінець
+ [ViewManager] Game controls visibility: {viewName: 'gameBoard', isGameView: true}
+ [INFO] [StateManager] Setting game mode: {gameMode: 'vsComputer'}
+ [DEBUG] [StateManager] setState: {path: 'game.gameMode', value: 'vsComputer'}
+ [DEBUG] [StateManager] Notifying listeners for: {path: 'game.gameMode', count: 4}
+ [DEBUG] [GameControlsComponent] game.gameMode changed: {mode: 'vsComputer'}
+ [DEBUG] [GameControlsComponent] updateGameMode: {mode: 'vsComputer'}
+ [DEBUG] [GameControlsComponent] Computer display element not found
+ [DEBUG] [GameControlsComponent] game.gameMode changed: {mode: 'vsComputer'}
+ [DEBUG] [GameControlsComponent] updateGameMode: {mode: 'vsComputer'}
+ [DEBUG] [GameControlsComponent] Computer display element not found
+ [DEBUG] [GameControlsComponent] game.gameMode changed: {mode: 'vsComputer'}
+ [DEBUG] [GameControlsComponent] updateGameMode: {mode: 'vsComputer'}
+ [DEBUG] [GameControlsComponent] Computer display element not found
+ [DEBUG] [GameControlsComponent] game.gameMode changed: {mode: 'vsComputer'}
+ [DEBUG] [GameControlsComponent] updateGameMode: {mode: 'vsComputer'}
+ [DEBUG] [GameControlsComponent] Computer display element not found
+ [DEBUG] [StateManager] Calling viewManager.navigateTo
+ [ViewManager] navigateTo: {viewName: 'gameBoard', params: {…}}
+ [ViewManager] render: {viewName: 'gameBoard', params: {…}}
+ [GameBoardComponent] Component created {options: {…}}
+ [INFO] [GameBoardComponent] render: початок
+ [DEBUG] [GameBoardComponent] render: boardSize = {boardSize: 3}
+ [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+ [DEBUG] [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+ [DEBUG] toggleAvailableMoves called, show = {show: true}
+ [DEBUG] [StateManager] setState: {path: 'game.showingAvailableMoves', value: true}
+ [DEBUG] [StateManager] Notifying listeners for: {path: 'game.showingAvailableMoves', count: 1}
+ [DEBUG] [GameBoardComponent] game.showingAvailableMoves changed
+ [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+ [DEBUG] [GameLogic] updateAvailableMoves called
+ [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+ [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+ [DEBUG] [GameCore] Found piece at: {row: 1, col: 2}
+ [DEBUG] [GameLogic] Found piece: {piece: {…}}
+ [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+ [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+ [DEBUG] [GameCore] Found valid moves: {count: 6}
+ [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 2, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+ [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(6)}
+ [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 1}
+ [DEBUG] [GameBoardComponent] game.availableMoves changed
+ [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+ [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 6}
+ [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(0)}
+ [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 1}
+ [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+ [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+ [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+ [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(6)}
+ [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(0)}
+ [DEBUG] [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: {showingAvailableMoves: true, highlightedMovesCount: 0}
+ [GameControlsComponent] Component created {options: {…}}
+ [INFO] [GameControlsComponent] render: початок
+ [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+ [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+ [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+ [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+ [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+ [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+ [INFO] [GameControlsComponent] render: завершено
+ [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+ [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+ [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+ [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+base-component.js:329 [GameControlsComponent] Component initialized {}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:188 [DEBUG] [GameControlsComponent] Already rendered, skipping
+logger.js:188 [DEBUG] [GameBoardComponent] Game controls component rendered successfully
+logger.js:188 [DEBUG] [GameBoardComponent] render: кінець
+base-component.js:329 [GameBoardComponent] Component initialized {}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.board'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.highlightedMoves'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.showingAvailableMoves'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.availableMoves'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.blockedCells'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.blockedMode'}
+logger.js:188 [INFO] [GameBoardComponent] render: початок
+logger.js:186 [DEBUG] [GameBoardComponent] render: boardSize = {boardSize: 3}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:186 [DEBUG] toggleAvailableMoves called, show = {show: true}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.showingAvailableMoves', value: true}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.showingAvailableMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.showingAvailableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.showingAvailableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameLogic] updateAvailableMoves called
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Found piece at: {row: 1, col: 2}
+logger.js:186 [DEBUG] [GameLogic] Found piece: {piece: {…}}
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 6}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 2, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(6)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 6}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(0)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+game-logic-new.js:940 [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+logger.js:186 [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(6)}
+logger.js:186 [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameLogic] toggleAvailableMoves - final state - showingAvailableMoves: {showingAvailableMoves: true, highlightedMovesCount: 0}
+base-component.js:329 [GameControlsComponent] Component created {options: {…}}
+logger.js:188 [INFO] [GameControlsComponent] render: початок
+logger.js:186 [DEBUG] [GameControlsComponent.render] boardSize: {boardSize: 3}
+logger.js:186 [DEBUG] [GameControlsComponent.render] settings.showMoves: {showMoves: true, final: true}
+logger.js:186 [DEBUG] [GameControlsComponent.render] Syncing game.showingAvailableMoves with settings.showMoves: {showMoves: true}
+logger.js:186 [DEBUG] [GameControlsComponent] Generated distance buttons: {count: 2, boardSize: 3}
+logger.js:188 [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:188 [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:188 [INFO] [GameControlsComponent] render: завершено
+logger.js:188 [DEBUG] [GameControlsComponent] Adding event listener for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#confirm-move-btn', event: 'click'}
+logger.js:188 [DEBUG] [GameControlsComponent] Event listener added for confirm-move-btn
+base-component.js:329 [GameControlsComponent] Event listener added successfully {selector: '#no-moves-btn', event: 'click'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+base-component.js:329 [GameControlsComponent] Component initialized {}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.currentPlayer'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.gameMode'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.boardSize'}
+logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDistance'}
+logger.js:188 [DEBUG] [GameControlsComponent] Already rendered, skipping
+logger.js:188 [DEBUG] [GameBoardComponent] Game controls component rendered successfully
+logger.js:188 [DEBUG] [GameBoardComponent] render: кінець
+view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'gameBoard', isGameView: true}
+logger.js:186 [DEBUG] [GameControlsComponent] selectDirection called: {direction: 4, boardSize: 3, currentSelectedDirection: null, currentSelectedDistance: null, distanceManuallySelected: false}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDirection', value: 4}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDirection', count: 9}
+game-logic-new.js:283 [GameLogic] onDirectionSelected called with: 4
+game-logic-new.js:940 [GameLogic] Direction selected {direction: 4}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(0)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameControlsComponent] New direction selected, checking manual selection: {distanceManuallySelected: false}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDistance', value: 1}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDistance', count: 17}
+game-logic-new.js:305 [GameLogic] onDistanceSelected called with: 1
+game-logic-new.js:940 [GameLogic] Distance selected {distance: 1}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(1)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:188 [DEBUG] [GameControlsComponent] Reset distance to 1 (new direction, not manually selected)
+logger.js:186 [DEBUG] [GameControlsComponent] selectDirection called: {direction: 4, boardSize: 3, currentSelectedDirection: 4, currentSelectedDistance: 1, distanceManuallySelected: false}
+logger.js:186 [DEBUG] [GameControlsComponent] Same direction selected, checking distance: {currentDistance: 1, maxDistance: 2}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDistance', value: 2}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDistance', count: 17}
+game-logic-new.js:305 [GameLogic] onDistanceSelected called with: 2
+game-logic-new.js:940 [GameLogic] Distance selected {distance: 2}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(1)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 2, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 2, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 2, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 2, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 2, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 2, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 2, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 2, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] Increased distance to: {newDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] Final state after selectDirection: {direction: 4, selectedDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] Final state after selectDirection: {direction: 4, selectedDistance: 2}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDistance', value: 1}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDistance', count: 17}
+game-logic-new.js:305 [GameLogic] onDistanceSelected called with: 1
+game-logic-new.js:940 [GameLogic] Distance selected {distance: 1}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(1)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDistance', value: 1}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDistance', count: 17}
+game-logic-new.js:305 [GameLogic] onDistanceSelected called with: 1
+game-logic-new.js:940 [GameLogic] Distance selected {distance: 1}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(1)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+game-controls-component.js:338 [GameControlsComponent] confirmMove called
+game-controls-component.js:339 [GameControlsComponent] EventBus available: true
+game-controls-component.js:340 [GameControlsComponent] Emitting game:confirmMove event
+logger.js:186 [DEBUG] Event emitted {event: 'game:confirmMove', data: {…}, timestamp: 1752487206522}
+logger.js:188 [INFO] [GameLogic] game:confirmMove received
+logger.js:188 [DEBUG] [GameLogic] Calling processPlayerMove
+ [GameLogic] processPlayerMove called
+ [DEBUG] [blockedCells =] [GameLogic] processPlayerMove: blockedMode =
+ [GameLogic] direction: 4 distance: 1 availableMoves count: 6
+ [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+ [DEBUG] [GameCore] Found piece at: {row: 1, col: 2}
+ [GameLogic] Board size: 3 New position: 1 1
+ [GameLogic] found move: {direction: 4, distance: 1, newRow: 1, newCol: 1}
+ [GameLogic] executeMove called with: {direction: 4, distance: 1, newRow: 1, newCol: 1}
+ [DEBUG] [blockedCells до =] [GameLogic] executeMove: blockedMode =
+ [GameLogic] Current player: 1 Game mode: vsComputer Board size: 3
+ [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+ [DEBUG] [GameCore] Found piece at: {row: 1, col: 2}
+ [GameLogic] Found piece at: 1 2
+ [GameLogic] Original board size: 3
+ [GameLogic] Moving piece from: 1 2 to: 1 1
+ [DIAG] executeMove: blockedMode = false blockedCells до = []
+ [GameLogic] New board size after move: 3
+ [DEBUG] [StateManager] setState: {path: 'game.board', value: Array(3)}
+ [DEBUG] [StateManager] Notifying listeners for: {path: 'game.board', count: 2}
+ [DEBUG] [GameBoardComponent] game.board changed, boardSize: {boardSize: 3}
+ [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameBoardComponent] game.board changed, boardSize: {boardSize: 3}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 1, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 8}
+logger.js:186 [DEBUG] [GameCore] hasValidMoves: {hasMoves: true, count: 8}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.points', value: 0}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.points', count: 1}
+logger.js:186 [INFO] 📊 Очки оновлено {points: 0}
+logger.js:186 [DEBUG] [StateManager] addMoveToHistory: {move: {…}}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.moveHistory', value: Array(1)}
+game-logic-new.js:695 [GameLogic] Updating available moves after move execution
+logger.js:188 [DEBUG] [GameLogic] updateAvailableMoves called
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Found piece at: {row: 1, col: 1}
+logger.js:186 [DEBUG] [GameLogic] Found piece: {piece: {…}}
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 1, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 8}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 1, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(8)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 8, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(8), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 8, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(8), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 8}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(1)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 8, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(8), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 8, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(8), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+game-logic-new.js:940 [GameLogic] Available moves updated {moves: 8, logicPlayer: 1}
+logger.js:186 [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(8)}
+logger.js:186 [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(1)}
+game-logic-new.js:885 [GameLogic] showGameMessage called
+game-logic-new.js:905 [GameLogic] showGameMessage - currentPlayer: 1 gameMode: vsComputer message: Ваш хід
+game-logic-new.js:913 [GameLogic] Message area not found
+game-logic-new.js:699 [GameLogic] After move execution - currentPlayer: 1
+game-logic-new.js:940 [GameLogic] Move executed {move: {…}, newPoints: 0}
+game-logic-new.js:705 [GameLogic] Move execution completed
+game-logic-new.js:599 [GameLogic] Game mode: vsComputer
+game-logic-new.js:600 [GameLogic] Current player after executeMove: 1
+game-logic-new.js:603 [GameLogic] Setting currentPlayer to 2 for computer turn
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.currentPlayer', value: 2}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.currentPlayer', count: 9}
+logger.js:186 [INFO] 👤 Поточний гравець {player: 2}
+logger.js:188 [DEBUG] [GameLogic] updateAvailableMoves called
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 2, gameMode: 'vsComputer', boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Found piece at: {row: 1, col: 1}
+logger.js:186 [DEBUG] [GameLogic] Found piece: {piece: {…}}
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 1, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 8}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 1, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(8)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 8, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(8), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 8, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(8), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 8}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(1)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 8, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(8), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 8, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(8), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+game-logic-new.js:940 [GameLogic] Available moves updated {moves: 8, logicPlayer: 1}
+logger.js:186 [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(8)}
+logger.js:186 [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(1)}
+game-logic-new.js:606 [GameLogic] Current player after setting to 2: 2
+game-logic-new.js:607 [GameLogic] Scheduling computer move in 300ms
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDirection', value: null}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDirection', count: 9}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDistance', value: null}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDistance', count: 17}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:188 [DEBUG] [GameLogic] processPlayerMove completed
+game-controls-component.js:342 [GameControlsComponent] Event emitted
+game-logic-new.js:730 [GameLogic] makeComputerMove called
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Found piece at: {row: 1, col: 1}
+game-logic-new.js:741 [GameLogic] Found piece at: 1 1
+game-logic-new.js:744 [GameLogic] Board state size: 3
+game-logic-new.js:749 [GameLogic] Looking for moves from position: 1 1 for player 1
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 1, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 8}
+game-logic-new.js:751 [GameLogic] Available moves for computer count: 8 blockedMode: false blockedCells: 0
+logger.js:186 [DEBUG] [GameLogic] makeComputerMove - blocked cells analysis: {blockedMode: false, blockedCellsCount: 0, blockedCells: Array(0), availableMovesCount: 8}
+game-logic-new.js:793 [GameLogic] selectBestMove called with moves count: 8
+game-logic-new.js:803 [GameLogic] Shuffled moves count: 8
+game-logic-new.js:809 [GameLogic] Random index: 6 Selected move: {direction: 3, distance: 1, newRow: 2, newCol: 2}
+game-logic-new.js:768 [GameLogic] Selected best move: {direction: 3, distance: 1, newRow: 2, newCol: 2}
+game-logic-new.js:777 [GameLogic] Executing computer move: {direction: 3, distance: 1, newRow: 2, newCol: 2}
+game-logic-new.js:619 [GameLogic] executeMove called with: {direction: 3, distance: 1, newRow: 2, newCol: 2}
+logger.js:188 [DEBUG] [blockedCells до =] [GameLogic] executeMove: blockedMode =
+game-logic-new.js:626 [GameLogic] Current player: 2 Game mode: vsComputer Board size: 3
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Found piece at: {row: 1, col: 1}
+game-logic-new.js:645 [GameLogic] Found piece at: 1 1
+game-logic-new.js:649 [GameLogic] Original board size: 3
+game-logic-new.js:650 [GameLogic] Moving piece from: 1 1 to: 2 2
+game-logic-new.js:655 [DIAG] executeMove: blockedMode = false blockedCells до = []
+game-logic-new.js:671 [GameLogic] New board size after move: 3
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.board', value: Array(3)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.board', count: 2}
+logger.js:186 [DEBUG] [GameBoardComponent] game.board changed, boardSize: {boardSize: 3}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 8, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(8), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameBoardComponent] game.board changed, boardSize: {boardSize: 3}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 8, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(8), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 2, col: 2, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 6}
+logger.js:186 [DEBUG] [GameCore] hasValidMoves: {hasMoves: true, count: 6}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.points', value: 0}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.points', count: 1}
+logger.js:186 [INFO] 📊 Очки оновлено {points: 0}
+logger.js:186 [DEBUG] [StateManager] addMoveToHistory: {move: {…}}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.moveHistory', value: Array(2)}
+game-logic-new.js:695 [GameLogic] Updating available moves after move execution
+logger.js:188 [DEBUG] [GameLogic] updateAvailableMoves called
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 2, gameMode: 'vsComputer', boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Found piece at: {row: 2, col: 2}
+logger.js:186 [DEBUG] [GameLogic] Found piece: {piece: {…}}
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 2, col: 2, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 6}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 2, col: 2, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(6)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 6}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(0)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+game-logic-new.js:940 [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+logger.js:186 [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(6)}
+logger.js:186 [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(0)}
+game-logic-new.js:885 [GameLogic] showGameMessage called
+game-logic-new.js:905 [GameLogic] showGameMessage - currentPlayer: 2 gameMode: vsComputer message: Хід комп'ютера
+game-logic-new.js:913 [GameLogic] Message area not found
+game-logic-new.js:699 [GameLogic] After move execution - currentPlayer: 2
+game-logic-new.js:940 [GameLogic] Move executed {move: {…}, newPoints: 0}
+game-logic-new.js:705 [GameLogic] Move execution completed
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.currentPlayer', value: 1}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.currentPlayer', count: 9}
+logger.js:186 [INFO] 👤 Поточний гравець {player: 1}
+game-logic-new.js:787 [GameLogic] Computer move completed, returning turn to player
+game-logic-new.js:788 [GameLogic] Current player after computer move: 1
+logger.js:186 [DEBUG] [GameControlsComponent] selectDirection called: {direction: 8, boardSize: 3, currentSelectedDirection: null, currentSelectedDistance: null, distanceManuallySelected: true}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDirection', value: 8}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDirection', count: 9}
+game-logic-new.js:283 [GameLogic] onDirectionSelected called with: 8
+game-logic-new.js:940 [GameLogic] Direction selected {direction: 8}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(0)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameControlsComponent] New direction selected, checking manual selection: {distanceManuallySelected: true}
+logger.js:188 [DEBUG] [GameControlsComponent] Keeping current distance (manually selected)
+logger.js:186 [DEBUG] [GameControlsComponent] selectDirection called: {direction: 8, boardSize: 3, currentSelectedDirection: 8, currentSelectedDistance: null, distanceManuallySelected: true}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDirection', value: 8}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDirection', count: 9}
+game-logic-new.js:283 [GameLogic] onDirectionSelected called with: 8
+game-logic-new.js:940 [GameLogic] Direction selected {direction: 8}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(0)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameControlsComponent] New direction selected, checking manual selection: {distanceManuallySelected: true}
+logger.js:188 [DEBUG] [GameControlsComponent] Keeping current distance (manually selected)
+logger.js:186 [DEBUG] [GameControlsComponent] Final state after selectDirection: {direction: 8, selectedDistance: null}
+logger.js:186 [DEBUG] [GameControlsComponent] Final state after selectDirection: {direction: 8, selectedDistance: null}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDistance', value: 1}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDistance', count: 17}
+game-logic-new.js:305 [GameLogic] onDistanceSelected called with: 1
+game-logic-new.js:940 [GameLogic] Distance selected {distance: 1}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(1)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDistance', value: 1}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDistance', count: 17}
+game-logic-new.js:305 [GameLogic] onDistanceSelected called with: 1
+game-logic-new.js:940 [GameLogic] Distance selected {distance: 1}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(1)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: 1, boardSize: 3, maxDistance: 2}
+game-controls-component.js:338 [GameControlsComponent] confirmMove called
+game-controls-component.js:339 [GameControlsComponent] EventBus available: true
+game-controls-component.js:340 [GameControlsComponent] Emitting game:confirmMove event
+logger.js:186 [DEBUG] Event emitted {event: 'game:confirmMove', data: {…}, timestamp: 1752487210392}
+logger.js:188 [INFO] [GameLogic] game:confirmMove received
+logger.js:188 [DEBUG] [GameLogic] Calling processPlayerMove
+game-logic-new.js:519 [GameLogic] processPlayerMove called
+logger.js:188 [DEBUG] [blockedCells =] [GameLogic] processPlayerMove: blockedMode =
+game-logic-new.js:525 [GameLogic] direction: 8 distance: 1 availableMoves count: 6
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+ [DEBUG] [GameCore] Found piece at: {row: 2, col: 2}
+ [GameLogic] Board size: 3 New position: 1 2
+ [GameLogic] found move: {direction: 8, distance: 1, newRow: 1, newCol: 2}
+ [GameLogic] executeMove called with: {direction: 8, distance: 1, newRow: 1, newCol: 2}
+ [DEBUG] [blockedCells до =] [GameLogic] executeMove: blockedMode =
+ [GameLogic] Current player: 1 Game mode: vsComputer Board size: 3
+ [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+ [DEBUG] [GameCore] Found piece at: {row: 2, col: 2}
+ [GameLogic] Found piece at: 2 2
+ [GameLogic] Original board size: 3
+ [GameLogic] Moving piece from: 2 2 to: 1 2
+ [DIAG] executeMove: blockedMode = false blockedCells до = []
+ [GameLogic] New board size after move: 3
+ [DEBUG] [StateManager] setState: {path: 'game.board', value: Array(3)}
+ [DEBUG] [StateManager] Notifying listeners for: {path: 'game.board', count: 2}
+ [DEBUG] [GameBoardComponent] game.board changed, boardSize: {boardSize: 3}
+ [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+ [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameBoardComponent] game.board changed, boardSize: {boardSize: 3}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 6}
+logger.js:186 [DEBUG] [GameCore] hasValidMoves: {hasMoves: true, count: 6}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.points', value: 0}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.points', count: 1}
+logger.js:186 [INFO] 📊 Очки оновлено {points: 0}
+logger.js:186 [DEBUG] [StateManager] addMoveToHistory: {move: {…}}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.moveHistory', value: Array(3)}
+game-logic-new.js:695 [GameLogic] Updating available moves after move execution
+logger.js:188 [DEBUG] [GameLogic] updateAvailableMoves called
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 1, gameMode: 'vsComputer', boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Found piece at: {row: 1, col: 2}
+logger.js:186 [DEBUG] [GameLogic] Found piece: {piece: {…}}
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 6}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 2, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(6)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 6}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(1)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+game-logic-new.js:940 [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+logger.js:186 [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(6)}
+logger.js:186 [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(1)}
+game-logic-new.js:885 [GameLogic] showGameMessage called
+game-logic-new.js:905 [GameLogic] showGameMessage - currentPlayer: 1 gameMode: vsComputer message: Ваш хід
+game-logic-new.js:913 [GameLogic] Message area not found
+game-logic-new.js:699 [GameLogic] After move execution - currentPlayer: 1
+game-logic-new.js:940 [GameLogic] Move executed {move: {…}, newPoints: 0}
+game-logic-new.js:705 [GameLogic] Move execution completed
+game-logic-new.js:599 [GameLogic] Game mode: vsComputer
+game-logic-new.js:600 [GameLogic] Current player after executeMove: 1
+game-logic-new.js:603 [GameLogic] Setting currentPlayer to 2 for computer turn
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.currentPlayer', value: 2}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.currentPlayer', count: 9}
+logger.js:186 [INFO] 👤 Поточний гравець {player: 2}
+logger.js:188 [DEBUG] [GameLogic] updateAvailableMoves called
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 2, gameMode: 'vsComputer', boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Found piece at: {row: 1, col: 2}
+logger.js:186 [DEBUG] [GameLogic] Found piece: {piece: {…}}
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 6}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 1, col: 2, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(6)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 6}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(1)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+game-logic-new.js:940 [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+logger.js:186 [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(6)}
+logger.js:186 [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(1)}
+game-logic-new.js:606 [GameLogic] Current player after setting to 2: 2
+game-logic-new.js:607 [GameLogic] Scheduling computer move in 300ms
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDirection', value: null}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDirection', count: 9}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.selectedDistance', value: null}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.selectedDistance', count: 17}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:186 [DEBUG] [GameControlsComponent] game.selectedDistance changed: {distance: null, boardSize: 3, maxDistance: 2}
+logger.js:188 [DEBUG] [GameLogic] processPlayerMove completed
+game-controls-component.js:342 [GameControlsComponent] Event emitted
+game-logic-new.js:730 [GameLogic] makeComputerMove called
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Found piece at: {row: 1, col: 2}
+game-logic-new.js:741 [GameLogic] Found piece at: 1 2
+game-logic-new.js:744 [GameLogic] Board state size: 3
+game-logic-new.js:749 [GameLogic] Looking for moves from position: 1 2 for player 1
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 1, col: 2, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 6}
+game-logic-new.js:751 [GameLogic] Available moves for computer count: 6 blockedMode: false blockedCells: 0
+logger.js:186 [DEBUG] [GameLogic] makeComputerMove - blocked cells analysis: {blockedMode: false, blockedCellsCount: 0, blockedCells: Array(0), availableMovesCount: 6}
+game-logic-new.js:793 [GameLogic] selectBestMove called with moves count: 6
+game-logic-new.js:803 [GameLogic] Shuffled moves count: 6
+game-logic-new.js:809 [GameLogic] Random index: 4 Selected move: {direction: 2, distance: 1, newRow: 2, newCol: 2}
+game-logic-new.js:768 [GameLogic] Selected best move: {direction: 2, distance: 1, newRow: 2, newCol: 2}
+game-logic-new.js:777 [GameLogic] Executing computer move: {direction: 2, distance: 1, newRow: 2, newCol: 2}
+game-logic-new.js:619 [GameLogic] executeMove called with: {direction: 2, distance: 1, newRow: 2, newCol: 2}
+logger.js:188 [DEBUG] [blockedCells до =] [GameLogic] executeMove: blockedMode =
+game-logic-new.js:626 [GameLogic] Current player: 2 Game mode: vsComputer Board size: 3
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Found piece at: {row: 1, col: 2}
+game-logic-new.js:645 [GameLogic] Found piece at: 1 2
+game-logic-new.js:649 [GameLogic] Original board size: 3
+game-logic-new.js:650 [GameLogic] Moving piece from: 1 2 to: 2 2
+game-logic-new.js:655 [DIAG] executeMove: blockedMode = false blockedCells до = []
+game-logic-new.js:671 [GameLogic] New board size after move: 3
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.board', value: Array(3)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.board', count: 2}
+logger.js:186 [DEBUG] [GameBoardComponent] game.board changed, boardSize: {boardSize: 3}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameBoardComponent] game.board changed, boardSize: {boardSize: 3}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 2, col: 2, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 6}
+logger.js:186 [DEBUG] [GameCore] hasValidMoves: {hasMoves: true, count: 6}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.points', value: 0}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.points', count: 1}
+logger.js:186 [INFO] 📊 Очки оновлено {points: 0}
+logger.js:186 [DEBUG] [StateManager] addMoveToHistory: {move: {…}}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.moveHistory', value: Array(4)}
+game-logic-new.js:695 [GameLogic] Updating available moves after move execution
+logger.js:188 [DEBUG] [GameLogic] updateAvailableMoves called
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - gameState: {currentPlayer: 2, gameMode: 'vsComputer', boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] findPiece called with player: {player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Found piece at: {row: 2, col: 2}
+logger.js:186 [DEBUG] [GameLogic] Found piece: {piece: {…}}
+logger.js:186 [DEBUG] [GameCore] getAllValidMoves called with: {row: 2, col: 2, player: 1, boardSize: 3}
+logger.js:186 [DEBUG] [GameCore] Checking moves for board size: {size: 3, fromPosition: {…}}
+logger.js:186 [DEBUG] [GameCore] Found valid moves: {count: 6}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - piece at: {row: 2, col: 2, logicPlayer: 1, blockedMode: false, blockedCellsCount: 0, …}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.availableMoves', value: Array(6)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.availableMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.availableMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 1, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(1)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:186 [DEBUG] [GameLogic] updateAvailableMoves - showingAvailableMoves: {showingAvailableMoves: true, movesCount: 6}
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.highlightedMoves', value: Array(0)}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.highlightedMoves', count: 2}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+logger.js:188 [DEBUG] [GameBoardComponent] game.highlightedMoves changed
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard called with boardSize: {boardSize: 3, boardLength: 3, blockedCellsCount: 0, blockedCells: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard - moves state: {availableMovesCount: 6, highlightedMovesCount: 0, showingAvailableMoves: true, availableMoves: Array(6), highlightedMoves: Array(0)}
+logger.js:186 [DEBUG] [GameBoardComponent] renderBoard completed, cells created: {cellsCreated: 9, expected: 9}
+game-logic-new.js:940 [GameLogic] Available moves updated {moves: 6, logicPlayer: 1}
+logger.js:186 [DEBUG] [GameLogic] Available moves set in state: {availableMoves: Array(6)}
+logger.js:186 [DEBUG] [GameLogic] Highlighted moves set in state: {highlightedMoves: Array(0)}
+game-logic-new.js:885 [GameLogic] showGameMessage called
+game-logic-new.js:905 [GameLogic] showGameMessage - currentPlayer: 2 gameMode: vsComputer message: Хід комп'ютера
+game-logic-new.js:913 [GameLogic] Message area not found
+game-logic-new.js:699 [GameLogic] After move execution - currentPlayer: 2
+game-logic-new.js:940 [GameLogic] Move executed {move: {…}, newPoints: 0}
+game-logic-new.js:705 [GameLogic] Move execution completed
+logger.js:186 [DEBUG] [StateManager] setState: {path: 'game.currentPlayer', value: 1}
+logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'game.currentPlayer', count: 9}
+logger.js:186 [INFO] 👤 Поточний гравець {player: 1}
+game-logic-new.js:787 [GameLogic] Computer move completed, returning turn to player
+game-logic-new.js:788 [GameLogic] Current player after computer move: 1
