@@ -3,283 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тест логування - Stay on the Board</title>
-    <link rel="stylesheet" href="css/main.css">
+    <title>Тест Впливу Логування на Продуктивність</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
         .test-panel {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 15px;
+            background: white;
+            padding: 20px;
             border-radius: 8px;
-            font-family: monospace;
-            font-size: 12px;
-            z-index: 9999;
-            max-width: 300px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .log-counter {
-            margin: 5px 0;
-            padding: 5px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-        }
-        .test-button {
-            background: #4CAF50;
+        .button {
+            background: #007bff;
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             margin: 5px;
         }
-        .test-button:hover {
-            background: #45a049;
+        .button:hover {
+            background: #0056b3;
         }
-        .clear-button {
-            background: #f44336;
+        .button.danger {
+            background: #dc3545;
         }
-        .clear-button:hover {
-            background: #da190b;
+        .button.danger:hover {
+            background: #c82333;
+        }
+        .button.success {
+            background: #28a745;
+        }
+        .button.success:hover {
+            background: #218838;
+        }
+        .results {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.enabled {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.disabled {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
 <body>
+    <h1>Тест Впливу Логування на Продуктивність</h1>
+    
     <div class="test-panel">
-        <h4>🧪 Тест логування</h4>
-        <div class="log-counter">
-            <strong>Логи при завантаженні:</strong> <span id="load-logs">0</span>
-        </div>
-        <div class="log-counter">
-            <strong>Логи при переході в гру:</strong> <span id="game-logs">0</span>
-        </div>
-        <div class="log-counter">
-            <strong>Всього логів:</strong> <span id="total-logs">0</span>
-        </div>
-        <button class="test-button" onclick="startLoggingTest()">Почати тест</button>
-        <button class="test-button clear-button" onclick="clearLogs()">Очистити</button>
-        <button class="test-button" onclick="showLogDetails()">Деталі логів</button>
-        <button class="test-button" onclick="testOptimization()">Тест оптимізації</button>
-        <button class="test-button" onclick="applyOptimization()">Застосувати оптимізацію</button>
+        <h2>Поточний Стан Логування</h2>
+        <div id="logging-status" class="status"></div>
+        
+        <h3>Швидке Керування</h3>
+        <button class="button success" onclick="enableLogging()">Увімкнути Логування</button>
+        <button class="button danger" onclick="disableLogging()">Вимкнути Логування</button>
+        <button class="button" onclick="setLogLevel('ERROR')">Тільки Помилки</button>
+        <button class="button" onclick="setLogLevel('WARN')">Помилки + Попередження</button>
+        <button class="button" onclick="setLogLevel('INFO')">Всі Крім Debug</button>
+        <button class="button" onclick="setLogLevel('DEBUG')">Всі Логи</button>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Тест Продуктивності</h2>
+        <p>Цей тест вимірює час виконання операцій з різними налаштуваннями логування.</p>
+        
+        <button class="button" onclick="runPerformanceTest()">Запустити Тест</button>
+        <button class="button" onclick="clearResults()">Очистити Результати</button>
+        
+        <div id="test-results" class="results"></div>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Тест Гри</h2>
+        <p>Тестування продуктивності з реальною грою.</p>
+        
+        <button class="button" onclick="testGamePerformance()">Тест Гри</button>
+        <button class="button" onclick="openGame()">Відкрити Гру</button>
+        
+        <div id="game-results" class="results"></div>
     </div>
 
-    <!-- Підключаємо основні скрипти -->
     <script src="js/utils/logger.js"></script>
-    <script src="js/utils/logging-optimizer.js"></script>
-    <script src="js/event-bus.js"></script>
-    <script src="js/state-manager.js"></script>
-    <script src="js/utils/dom-utils.js"></script>
-    <script src="js/utils/cache-manager.js"></script>
-    <script src="js/utils/validator.js"></script>
-    <script src="js/utils/analytics.js"></script>
-    <script src="js/speech.js"></script>
-    <script src="js/network.js"></script>
-    <script src="js/webrtc-manager.js"></script>
-    <script src="js/view-manager.js"></script>
-    <script src="js/game-core.js"></script>
-    <script src="js/game-logic-new.js"></script>
-    <script src="js/components/base-component.js"></script>
-    <script src="js/components/modal-component.js"></script>
-    <script src="js/components/main-menu-component.js"></script>
-    <script src="js/components/local-game-component.js"></script>
-    <script src="js/components/game-board-component.js"></script>
-    <script src="js/components/game-controls-component.js"></script>
-    <script src="js/components/settings-component.js"></script>
-    <script src="js/components/online-menu-component.js"></script>
-    <script src="js/components/join-room-component.js"></script>
-    <script src="js/components/waiting-for-player-component.js"></script>
-    <script src="js/main-new.js"></script>
-
     <script>
-        // Тестовий скрипт для перевірки логування
-        let loadLogCount = 0;
-        let gameLogCount = 0;
-        let totalLogCount = 0;
-        let originalConsoleLog = console.log;
-        let originalConsoleInfo = console.info;
-        let originalConsoleWarn = console.warn;
-        let originalConsoleError = console.error;
-        let originalConsoleDebug = console.debug;
-
-        // Перехоплюємо всі логи
-        function interceptLogs() {
-            console.log = function(...args) {
-                totalLogCount++;
-                updateLogCounters();
-                originalConsoleLog.apply(console, args);
-            };
+        // Функції керування логуванням
+        function updateStatus() {
+            const status = document.getElementById('logging-status');
+            const config = Logger.config;
             
-            console.info = function(...args) {
-                totalLogCount++;
-                updateLogCounters();
-                originalConsoleInfo.apply(console, args);
-            };
+            let statusText = `Рівень: ${config.level}\n`;
+            statusText += `Швидке вимкнення: ${config.quickDisable ? 'Увімкнено' : 'Вимкнено'}\n`;
+            statusText += `Консоль: ${config.enableConsoleOutput ? 'Увімкнено' : 'Вимкнено'}\n`;
+            statusText += `Збереження: ${config.enableStorageOutput ? 'Увімкнено' : 'Вимкнено'}\n`;
+            statusText += `Кількість логів: ${Logger.logs.length}`;
             
-            console.warn = function(...args) {
-                totalLogCount++;
-                updateLogCounters();
-                originalConsoleWarn.apply(console, args);
-            };
-            
-            console.error = function(...args) {
-                totalLogCount++;
-                updateLogCounters();
-                originalConsoleError.apply(console, args);
-            };
-            
-            console.debug = function(...args) {
-                totalLogCount++;
-                updateLogCounters();
-                originalConsoleDebug.apply(console, args);
-            };
+            status.textContent = statusText;
+            status.className = `status ${config.quickDisable ? 'disabled' : 'enabled'}`;
         }
-
-        function updateLogCounters() {
-            document.getElementById('load-logs').textContent = loadLogCount;
-            document.getElementById('game-logs').textContent = gameLogCount;
-            document.getElementById('total-logs').textContent = totalLogCount;
+        
+        function enableLogging() {
+            Logger.config.quickDisable = false;
+            Logger.config.enableConsoleOutput = true;
+            Logger.config.enableStorageOutput = true;
+            updateStatus();
         }
-
-        function startLoggingTest() {
-            // Скидаємо лічильники
-            loadLogCount = 0;
-            gameLogCount = 0;
-            totalLogCount = 0;
-            updateLogCounters();
-
-            // Включаємо перехоплення логів
-            interceptLogs();
-
-            // Запускаємо додаток
-            console.log('🧪 Початок тесту логування...');
-            
-            // Імітуємо завантаження сторінки
-            setTimeout(() => {
-                loadLogCount = totalLogCount;
-                updateLogCounters();
-                console.log('📊 Логи при завантаженні:', loadLogCount);
-                
-                // Імітуємо перехід в гру з комп'ютером
-                setTimeout(() => {
-                    const currentTotal = totalLogCount;
-                    gameLogCount = currentTotal - loadLogCount;
-                    updateLogCounters();
-                    console.log('🎮 Логи при переході в гру:', gameLogCount);
-                    console.log('📊 Всього логів:', totalLogCount);
-                    
-                    // Аналіз результатів
-                    analyzeResults();
-                }, 1000);
-            }, 1000);
+        
+        function disableLogging() {
+            Logger.config.quickDisable = true;
+            Logger.config.enableConsoleOutput = false;
+            Logger.config.enableStorageOutput = false;
+            updateStatus();
         }
-
-        function analyzeResults() {
-            console.log('\n📋 АНАЛІЗ РЕЗУЛЬТАТІВ:');
-            console.log('='.repeat(50));
-            
-            if (loadLogCount > 50) {
-                console.warn('⚠️ Забагато логів при завантаженні:', loadLogCount);
-            } else {
-                console.log('✅ Нормальна кількість логів при завантаженні:', loadLogCount);
-            }
-            
-            if (gameLogCount > 30) {
-                console.warn('⚠️ Забагато логів при переході в гру:', gameLogCount);
-            } else {
-                console.log('✅ Нормальна кількість логів при переході в гру:', gameLogCount);
-            }
-            
-            if (totalLogCount > 100) {
-                console.warn('⚠️ Загалом забагато логів:', totalLogCount);
-            } else {
-                console.log('✅ Загальна кількість логів в нормі:', totalLogCount);
-            }
-            
-            console.log('='.repeat(50));
+        
+        function setLogLevel(level) {
+            Logger.config.level = level;
+            updateStatus();
         }
-
-        function clearLogs() {
-            loadLogCount = 0;
-            gameLogCount = 0;
-            totalLogCount = 0;
-            updateLogCounters();
-            console.clear();
-            console.log('🧹 Логи очищено');
-        }
-
-        function showLogDetails() {
-            console.log('\n📊 ДЕТАЛЬНА СТАТИСТИКА ЛОГІВ:');
-            console.log('='.repeat(50));
-            console.log('Логи при завантаженні:', loadLogCount);
-            console.log('Логи при переході в гру:', gameLogCount);
-            console.log('Всього логів:', totalLogCount);
+        
+        // Тест продуктивності
+        function runPerformanceTest() {
+            const results = document.getElementById('test-results');
+            let output = '=== ТЕСТ ПРОДУКТИВНОСТІ ===\n\n';
             
-            if (window.Logger) {
-                const loggerStats = Logger.getStats();
-                console.log('Статистика Logger:', loggerStats);
-            }
-            
-            console.log('='.repeat(50));
-        }
-
-        function testOptimization() {
-            console.log('\n🔧 ТЕСТ ОПТИМІЗАЦІЇ ЛОГУВАННЯ:');
-            console.log('='.repeat(50));
-            
-            if (window.LoggingOptimizer) {
-                const analysis = LoggingOptimizer.analyzeLogging();
-                console.log('Результат аналізу:', analysis);
-                
-                if (analysis.recommendations.length > 0) {
-                    console.log('\n📋 РЕКОМЕНДАЦІЇ:');
-                    analysis.recommendations.forEach((rec, index) => {
-                        console.log(`${index + 1}. ${rec}`);
-                    });
-                } else {
-                    console.log('✅ Логування в нормі, оптимізація не потрібна');
+            // Тест 1: Без логування
+            disableLogging();
+            const timeWithoutLogging = measureOperation(() => {
+                for (let i = 0; i < 1000; i++) {
+                    // Симуляція операцій гри
+                    const board = Array(5).fill().map(() => Array(5).fill(0));
+                    const moves = calculateMoves(board, 2, 2);
                 }
-            } else {
-                console.error('❌ LoggingOptimizer не знайдено');
-            }
+            });
             
-            console.log('='.repeat(50));
-        }
-
-        function applyOptimization() {
-            console.log('\n⚡ ЗАСТОСУВАННЯ ОПТИМІЗАЦІЇ:');
-            console.log('='.repeat(50));
-            
-            if (window.LoggingOptimizer && window.Logger) {
-                // Аналізуємо поточне логування
-                const analysis = LoggingOptimizer.analyzeLogging();
-                
-                if (analysis.recommendations.length > 0) {
-                    // Застосовуємо рекомендації
-                    LoggingOptimizer.applyRecommendations(analysis.recommendations);
-                    
-                    // Оптимізуємо компоненти
-                    LoggingOptimizer.optimizeAllComponents();
-                    
-                    console.log('✅ Оптимізація застосована');
-                    console.log('📊 Нова конфігурація Logger:', Logger.config);
-                } else {
-                    console.log('ℹ️ Оптимізація не потрібна');
+            // Тест 2: З логуванням ERROR
+            setLogLevel('ERROR');
+            enableLogging();
+            const timeWithErrorLogging = measureOperation(() => {
+                for (let i = 0; i < 1000; i++) {
+                    Logger.error('Test error', { iteration: i });
+                    const board = Array(5).fill().map(() => Array(5).fill(0));
+                    const moves = calculateMoves(board, 2, 2);
                 }
-            } else {
-                console.error('❌ LoggingOptimizer або Logger не знайдено');
+            });
+            
+            // Тест 3: З логуванням INFO
+            setLogLevel('INFO');
+            const timeWithInfoLogging = measureOperation(() => {
+                for (let i = 0; i < 1000; i++) {
+                    Logger.info('Test info', { iteration: i });
+                    const board = Array(5).fill().map(() => Array(5).fill(0));
+                    const moves = calculateMoves(board, 2, 2);
+                }
+            });
+            
+            // Тест 4: З логуванням DEBUG
+            setLogLevel('DEBUG');
+            const timeWithDebugLogging = measureOperation(() => {
+                for (let i = 0; i < 1000; i++) {
+                    Logger.debug('Test debug', { iteration: i });
+                    const board = Array(5).fill().map(() => Array(5).fill(0));
+                    const moves = calculateMoves(board, 2, 2);
+                }
+            });
+            
+            output += `Без логування: ${timeWithoutLogging.toFixed(2)}ms\n`;
+            output += `З ERROR логуванням: ${timeWithErrorLogging.toFixed(2)}ms\n`;
+            output += `З INFO логуванням: ${timeWithInfoLogging.toFixed(2)}ms\n`;
+            output += `З DEBUG логуванням: ${timeWithDebugLogging.toFixed(2)}ms\n\n`;
+            
+            output += `Вплив ERROR: +${((timeWithErrorLogging - timeWithoutLogging) / timeWithoutLogging * 100).toFixed(1)}%\n`;
+            output += `Вплив INFO: +${((timeWithInfoLogging - timeWithoutLogging) / timeWithoutLogging * 100).toFixed(1)}%\n`;
+            output += `Вплив DEBUG: +${((timeWithDebugLogging - timeWithoutLogging) / timeWithoutLogging * 100).toFixed(1)}%\n`;
+            
+            results.textContent = output;
+        }
+        
+        function measureOperation(operation) {
+            const start = performance.now();
+            operation();
+            const end = performance.now();
+            return end - start;
+        }
+        
+        function calculateMoves(board, row, col) {
+            const moves = [];
+            const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
+            
+            for (let [dr, dc] of directions) {
+                for (let distance = 1; distance <= 3; distance++) {
+                    const newRow = row + dr * distance;
+                    const newCol = col + dc * distance;
+                    
+                    if (newRow >= 0 && newRow < board.length && 
+                        newCol >= 0 && newCol < board[0].length) {
+                        moves.push({ row: newRow, col: newCol, direction: [dr, dc], distance });
+                    }
+                }
             }
             
-            console.log('='.repeat(50));
+            return moves;
         }
-
-        // Автоматично запускаємо тест при завантаженні
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                console.log('🧪 Тест логування готовий до запуску');
-                console.log('Натисніть "Почати тест" для перевірки');
-            }, 2000);
-        });
+        
+        function clearResults() {
+            document.getElementById('test-results').textContent = '';
+            document.getElementById('game-results').textContent = '';
+        }
+        
+        function testGamePerformance() {
+            const results = document.getElementById('game-results');
+            let output = '=== ТЕСТ ПРОДУКТИВНОСТІ ГРИ ===\n\n';
+            
+            // Тест без логування
+            disableLogging();
+            const timeWithoutLogging = measureOperation(() => {
+                simulateGameOperations();
+            });
+            
+            // Тест з логуванням
+            enableLogging();
+            setLogLevel('INFO');
+            const timeWithLogging = measureOperation(() => {
+                simulateGameOperations();
+            });
+            
+            output += `Без логування: ${timeWithoutLogging.toFixed(2)}ms\n`;
+            output += `З логуванням: ${timeWithLogging.toFixed(2)}ms\n`;
+            output += `Вплив логування: +${((timeWithLogging - timeWithoutLogging) / timeWithoutLogging * 100).toFixed(1)}%\n`;
+            output += `Кількість логів: ${Logger.logs.length}\n`;
+            
+            results.textContent = output;
+        }
+        
+        function simulateGameOperations() {
+            // Симуляція операцій гри
+            for (let i = 0; i < 100; i++) {
+                Logger.info('Game operation', { operation: 'move', player: i % 2 + 1 });
+                
+                // Симуляція оновлення дошки
+                const board = Array(5).fill().map(() => Array(5).fill(0));
+                board[2][2] = 1;
+                
+                // Симуляція обчислення ходів
+                const moves = calculateMoves(board, 2, 2);
+                
+                // Симуляція рендерингу
+                for (let row = 0; row < board.length; row++) {
+                    for (let col = 0; col < board[row].length; col++) {
+                        if (moves.some(m => m.row === row && m.col === col)) {
+                            Logger.debug('Rendering move', { row, col });
+                        }
+                    }
+                }
+            }
+        }
+        
+        function openGame() {
+            window.open('index.html', '_blank');
+        }
+        
+        // Ініціалізація
+        updateStatus();
     </script>
 </body>
 </html> 
