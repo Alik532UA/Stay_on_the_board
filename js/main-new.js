@@ -20,6 +20,7 @@ import { GameBoardComponent } from './components/game-board-component.js';
 import { LocalGameComponent } from './components/local-game-component.js';
 import { OnlineMenuComponent } from './components/online-menu-component.js';
 import { GameControlsComponent } from './components/game-controls-component.js';
+import { Logger } from './utils/logger.js';
 
 window.translationsAll = {
   uk,
@@ -29,6 +30,8 @@ window.translationsAll = {
 };
 
 window.gameLogic = gameLogic;
+window.eventBus = eventBus;
+window.Logger = Logger;
 
 // === КЛАС ГОЛОВНОГО ДОДАТКУ ===
 class App {

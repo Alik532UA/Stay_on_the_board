@@ -6,6 +6,8 @@
   import GameControls from './GameControls.svelte';
   import Modal from './Modal.svelte';
   import { get } from 'svelte/store';
+  import { onMount } from 'svelte';
+  import { _ } from 'svelte-i18n';
   let boardSizes = Array.from({length:8},(_,i)=>i+2);
   /** @type {number} */
   let boardSize;
@@ -29,6 +31,17 @@
   $: availableMoves = $appState.availableMoves;
   $: blockedCells = $appState.blockedCells;
   $: blockModeEnabled = $appState.blockModeEnabled;
+
+  // Виношу виклики $_() на верхній рівень
+  $: playerTitle = $_('gameBoard.player');
+  $: mainMenuTitle = $_('gameBoard.mainMenu');
+
+  onMount(() => {
+    if (!board || !Array.isArray(board) || board.length === 0) {
+      logStore.addLog('Дошка не ініціалізована, створюю дефолтну 3x3', 'warn');
+      setBoardSize(3);
+    }
+  });
 
   function goToMainMenu() {
     logStore.addLog('Повернення до головного меню', 'info');
@@ -72,8 +85,8 @@
 
 <div class="game-board-container">
   <div class="game-board-top-row">
-    <button class="main-menu-btn" title="Головне меню" on:click={goToMainMenu}>
-      <img src="/MainMenu.png" alt="Головне меню" class="main-menu-btn-img" />
+    <button class="main-menu-btn" title={mainMenuTitle} on:click={goToMainMenu}>
+      <img src="/MainMenu.png" alt={mainMenuTitle} class="main-menu-btn-img" />
     </button>
     <select class="board-size-select" bind:value={boardSize} on:change={onBoardSizeChange}>
       {#each boardSizes as n}
@@ -82,48 +95,26 @@
     </select>
   </div>
   <div class="board-bg-wrapper">
-    <div class="game-board">
-      {#if board}
-        {#each board as row, rowIdx}
-          <div class="board-row">
-            {#each row as cell, colIdx}
-              <div class="board-cell {isAvailable(rowIdx, colIdx) ? 'available' : ''} {isBlocked(rowIdx, colIdx) ? 'blocked' : ''}"
-                   on:click={() => onCellClick(rowIdx, colIdx)}
-                   on:contextmenu={(e) => onCellRightClick(e, rowIdx, colIdx)}>
-                {#if rowIdx === playerRow && colIdx === playerCol}
-                  <span class="player-piece">●</span>
-                {/if}
-                {#if isBlocked(rowIdx, colIdx)}
-                  <span class="blocked-mark">✖</span>
-                {/if}
-              </div>
-            {/each}
+    <div class="game-board" style="--board-size: {boardSize}">
+      {#each Array(boardSize) as _, rowIdx}
+        {#each Array(boardSize) as _, colIdx}
+          <div
+            class="board-cell {((rowIdx + colIdx) % 2 === 0) ? 'light' : 'dark'}"
+          >
+            {#if rowIdx === playerRow && colIdx === playerCol}
+              <span class="crown" title={playerTitle}>👑</span>
+            {/if}
+            {#if isAvailable(rowIdx, colIdx)}
+              <span class="move-dot"></span>
+            {/if}
           </div>
         {/each}
-      {/if}
+      {/each}
     </div>
   </div>
   <GameControls />
+  <Modal />
 </div>
-<Modal />
 
 <style>
-  .board-cell.available {
-    background: #d0f0d0;
-    cursor: pointer;
-  }
-  .board-cell.blocked {
-    background: #bbb;
-    cursor: not-allowed;
-    position: relative;
-  }
-  .blocked-mark {
-    color: #333;
-    font-size: 1.2em;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-  }
 </style> 

@@ -1,6 +1,7 @@
 <script>
   import { modalStore } from '../stores/modalStore.js';
   import { logStore } from '../stores/logStore.js';
+  import { _ } from 'svelte-i18n';
   $: modal = $modalStore;
 
   /**
@@ -16,7 +17,7 @@
 </script>
 
 {#if modal.isOpen}
-  <div class="modal-overlay" on:click={onOverlayClick}>
+  <div class="modal-overlay" role="button" tabindex="0" aria-label={$_('modal.close')} on:click={onOverlayClick} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && onOverlayClick(e)}>
     <div class="modal-window">
       <div class="modal-title">{modal.title}</div>
       <div class="modal-content">{modal.content}</div>
@@ -25,7 +26,7 @@
           <button class={btn.primary ? 'primary' : ''} on:click={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}>{btn.text}</button>
         {/each}
         {#if !modal.buttons.length}
-          <button on:click={() => { logStore.addLog('Закриття модального вікна (OK)', 'info'); modalStore.closeModal(); }}>OK</button>
+          <button on:click={() => { logStore.addLog('Закриття модального вікна (OK)', 'info'); modalStore.closeModal(); }}>{$_('modal.ok')}</button>
         {/if}
       </div>
     </div>

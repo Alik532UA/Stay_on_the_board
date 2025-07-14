@@ -2,7 +2,7 @@
 // Централізоване управління станом додатку
 
 import { viewManager } from './view-manager.js';
-// import { Logger } from './utils/logger.js';
+import { Logger } from './utils/logger.js';
 
 const initialState = {
   ui: {
@@ -36,16 +36,16 @@ const initialState = {
 const listeners = {};
 
 function navigateTo(viewName, params = {}) {
-  window.Logger.debug('[StateManager] navigateTo:', { viewName, params });
+  Logger.debug('[StateManager] navigateTo:', { viewName, params });
   setState('ui.currentView', viewName);
   
   // Обробляємо параметри для гри
   if (viewName === 'gameBoard' && params.gameMode) {
-    window.Logger.info('[StateManager] Setting game mode:', { gameMode: params.gameMode });
+    Logger.info('[StateManager] Setting game mode:', { gameMode: params.gameMode });
     setState('game.gameMode', params.gameMode);
   }
   
-  window.Logger.debug('[StateManager] Calling viewManager.navigateTo');
+  Logger.debug('[StateManager] Calling viewManager.navigateTo');
   viewManager.navigateTo(viewName, params);
 }
 
@@ -55,19 +55,19 @@ const stateManager = {
   subscribe,
   navigateTo,
   showModal(title, content, buttons = []) {
-    window.Logger.debug('[StateManager] showModal:', { title });
+    Logger.debug('[StateManager] showModal:', { title });
     setState('ui.modal', { isOpen: true, title, content, buttons });
   },
   hideModal() {
-    window.Logger.debug('[StateManager] hideModal');
+    Logger.debug('[StateManager] hideModal');
     setState('ui.modal.isOpen', false);
   },
   updateBoard(newBoard) {
-    window.Logger.debug('[StateManager] updateBoard called with board size:', { boardSize: newBoard.length });
+    Logger.debug('[StateManager] updateBoard called with board size:', { boardSize: newBoard.length });
     this.setState('game.board', newBoard);
   },
   addMoveToHistory(move) {
-    window.Logger.debug('[StateManager] addMoveToHistory:', { move });
+    Logger.debug('[StateManager] addMoveToHistory:', { move });
     const history = this.getState('game.moveHistory') || [];
     history.push(move);
     this.setState('game.moveHistory', history);
@@ -76,8 +76,13 @@ const stateManager = {
 
 export { stateManager };
 
+// Додаємо як глобальний об'єкт для сумісності
+if (typeof window !== 'undefined') {
+    window.stateManager = stateManager;
+}
+
 export function setState(path, value) {
-  window.Logger.debug('[StateManager] setState:', { path, value });
+  Logger.debug('[StateManager] setState:', { path, value });
   const keys = path.split('.');
   let obj = initialState;
   for (let i = 0; i < keys.length - 1; i++) {
@@ -93,12 +98,12 @@ export function setState(path, value) {
   }
   
   if (listeners[path]) {
-    window.Logger.debug('[StateManager] Notifying listeners for:', { path, count: listeners[path].length });
+    Logger.debug('[StateManager] Notifying listeners for:', { path, count: listeners[path].length });
     listeners[path].forEach(fn => {
       try {
         fn(value);
       } catch (error) {
-        window.Logger.error('[StateManager] Error in listener for', { path, error: error.message });
+        Logger.error('[StateManager] Error in listener for', { path, error: error.message });
       }
     });
   }
@@ -113,7 +118,7 @@ export function setState(path, value) {
         try {
           fn(parentState);
         } catch (error) {
-          window.Logger.error('[StateManager] Error in parent listener for', { parentPath, error: error.message });
+          Logger.error('[StateManager] Error in parent listener for', { parentPath, error: error.message });
         }
       });
     }
@@ -131,7 +136,7 @@ export function getState(path) {
 }
 
 export function subscribe(path, fn) {
-  window.Logger.debug('[StateManager] subscribe:', { path });
+  Logger.debug('[StateManager] subscribe:', { path });
   if (!listeners[path]) listeners[path] = [];
   listeners[path].push(fn);
   // Повертає unsubscribe

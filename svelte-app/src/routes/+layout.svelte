@@ -1,31 +1,47 @@
+<svelte:head>
+	<title>Stay on the Board</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Мультиплатформова настільна гра з підтримкою онлайн-режиму, локалізації та сучасного UI/UX." />
+	<link rel="icon" href="/favicon-32px.ico" sizes="32x32" />
+	<link rel="icon" href="/favicon-16px.ico" sizes="16x16" />
+	<link rel="canonical" href="https://stay-on-the-board.com/" />
+	<meta property="og:title" content="Stay on the Board" />
+	<meta property="og:description" content="Мультиплатформова настільна гра з підтримкою онлайн-режиму, локалізації та сучасного UI/UX." />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://stay-on-the-board.com/" />
+	<meta property="og:image" content="/logo-circle.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Stay on the Board" />
+	<meta name="twitter:description" content="Мультиплатформова настільна гра з підтримкою онлайн-режиму, локалізації та сучасного UI/UX." />
+	<meta name="twitter:image" content="/logo-circle.png" />
+</svelte:head>
+
 <script lang="ts">
 	import Header from './Header.svelte';
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { settingsStore } from '../stores/settingsStore.js';
 	import { get } from 'svelte/store';
-
-	let { children } = $props();
-
-	onMount(() => {
-		const settings = get(settingsStore);
-		document.documentElement.setAttribute('data-theme', settings.theme);
-		document.documentElement.setAttribute('data-style', settings.style);
-	});
+	import '../lib/i18n/init.js';
 </script>
 
 <div class="app">
-	<Header />
+	{#if false}
+		<Header />
+	{/if}
 
 	<main>
-		{@render children()}
+		<slot />
 	</main>
 
-	<footer>
-		<p>
-			visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to learn about SvelteKit
-		</p>
-	</footer>
+	{#if false}
+		<footer>
+			<p>
+				visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to learn about SvelteKit
+			</p>
+		</footer>
+	{/if}
 </div>
 
 <style>

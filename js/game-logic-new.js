@@ -10,7 +10,10 @@ import { eventBus } from './event-bus.js';
 
 export class GameLogic {
     constructor() {
-        window.Logger.debug('GameLogic: constructor');
+        window.Logger.info('[GameLogic] Constructor called');
+        window.Logger.info('[GameLogic] EventBus available in constructor:', !!eventBus);
+        window.Logger.info('[GameLogic] EventBus type in constructor:', typeof eventBus);
+        
         this.isInitialized = false;
         this.gameBoardComponent = null;
         this.gameControlsComponent = null;
@@ -23,6 +26,9 @@ export class GameLogic {
         if (this.isInitialized) return;
         
         window.Logger.info('[GameLogic] Initializing...');
+        window.Logger.info('[GameLogic] EventBus available in init:', !!eventBus);
+        window.Logger.info('[GameLogic] EventBus type in init:', typeof eventBus);
+        
         this.log('Initializing Game Logic');
         
         // Підписуємося на зміни стану гри
@@ -33,6 +39,7 @@ export class GameLogic {
         
         this.isInitialized = true;
         this.log('Game Logic initialized');
+        window.Logger.info('[GameLogic] Initialization completed');
     }
     
     subscribeToGameState() {
@@ -101,12 +108,26 @@ export class GameLogic {
         });
         
         // Підписка на подію підтвердження ходу через EventBus
-        eventBus.on('game:confirmMove', () => {
-            window.Logger.info('[GameLogic] game:confirmMove received');
-            window.Logger.debug('[GameLogic] Calling processPlayerMove');
-            this.processPlayerMove();
-            window.Logger.debug('[GameLogic] processPlayerMove completed');
-        });
+        window.Logger.info('[GameLogic] Subscribing to game:confirmMove event');
+        window.Logger.info('[GameLogic] EventBus available:', !!eventBus);
+        window.Logger.info('[GameLogic] EventBus type:', typeof eventBus);
+        
+        if (!eventBus) {
+            window.Logger.error('[GameLogic] EventBus is not available for subscription!');
+            return;
+        }
+        
+        try {
+            eventBus.on('game:confirmMove', () => {
+                window.Logger.info('[GameLogic] game:confirmMove received');
+                window.Logger.debug('[GameLogic] Calling processPlayerMove');
+                this.processPlayerMove();
+                window.Logger.debug('[GameLogic] processPlayerMove completed');
+            });
+            window.Logger.info('[GameLogic] Successfully subscribed to game:confirmMove event');
+        } catch (error) {
+            window.Logger.error('[GameLogic] Error subscribing to game:confirmMove event:', error);
+        }
         
         stateManager.subscribe('game.noMoves', (noMoves) => {
             if (noMoves) {
@@ -946,4 +967,9 @@ export class GameLogic {
 }
 
 // Експортуємо єдиний екземпляр
-export const gameLogic = new GameLogic(); 
+export const gameLogic = new GameLogic();
+
+// Додаємо як глобальний об'єкт для сумісності
+if (typeof window !== 'undefined') {
+    window.gameLogic = gameLogic;
+} 

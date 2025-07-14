@@ -89,4 +89,9 @@ class EventBus {
 }
 
 // Створюємо та експортуємо єдиний екземпляр EventBus
-export const eventBus = new EventBus(); 
+export const eventBus = new EventBus();
+
+// Додаємо як глобальний об'єкт для сумісності
+if (typeof window !== 'undefined') {
+    window.eventBus = eventBus;
+} 

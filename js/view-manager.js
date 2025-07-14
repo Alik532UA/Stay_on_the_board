@@ -12,6 +12,7 @@ import { OnlineMenuComponent } from './components/online-menu-component.js';
 import { WaitingForPlayerComponent } from './components/waiting-for-player-component.js';
 import { JoinRoomComponent } from './components/join-room-component.js';
 import { gameLogic } from './game-logic-new.js';
+import { Logger } from './utils/logger.js';
 
 export class ViewManager {
   constructor() {
@@ -34,7 +35,7 @@ export class ViewManager {
   }
 
   navigateTo(viewName, params = {}) {
-    Logger.debug('[ViewManager] navigateTo:', { viewName, params });
+    window.Logger.debug('[ViewManager] navigateTo:', { viewName, params });
     
     let ComponentClass;
     
@@ -58,7 +59,7 @@ export class ViewManager {
         ComponentClass = JoinRoomComponent;
         break;
       default:
-        Logger.error('[ViewManager] Невідомий view:', viewName);
+        window.Logger.error('[ViewManager] Невідомий view:', viewName);
         return;
     }
     
@@ -66,7 +67,7 @@ export class ViewManager {
   }
 
   render(viewName, ComponentClass, params = {}) {
-    Logger.debug('[ViewManager] render:', { viewName, params });
+    window.Logger.debug('[ViewManager] render:', { viewName, params });
     
     if (this.currentComponent && this.currentComponent.detachEventListeners) {
       this.currentComponent.detachEventListeners();
@@ -103,17 +104,22 @@ export class ViewManager {
       const isGameView = viewName === 'gameBoard' || viewName === 'localGame';
       gameControlsElement.style.display = isGameView ? 'block' : 'none';
       
-      Logger.debug('[ViewManager] Game controls visibility:', { viewName, isGameView });
+      window.Logger.debug('[ViewManager] Game controls visibility:', { viewName, isGameView });
       
       // Якщо приховуємо контроли, очищаємо їх вміст
       if (!isGameView) {
         gameControlsElement.innerHTML = '';
-        Logger.debug('[ViewManager] Game controls content cleared');
+        window.Logger.debug('[ViewManager] Game controls content cleared');
       }
     } else {
-      Logger.error('[ViewManager] Game controls element not found');
+      window.Logger.error('[ViewManager] Game controls element not found');
     }
   }
 }
 
-export const viewManager = new ViewManager(); 
+export const viewManager = new ViewManager();
+
+// Додаємо як глобальний об'єкт для сумісності
+if (typeof window !== 'undefined') {
+    window.viewManager = viewManager;
+} 

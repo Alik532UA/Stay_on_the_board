@@ -299,9 +299,21 @@ export class GameControlsComponent extends BaseComponent {
     confirmMove() {
         window.Logger.info('[GameControlsComponent] confirmMove called');
         window.Logger.info('[GameControlsComponent] EventBus available:', !!window.eventBus);
+        window.Logger.info('[GameControlsComponent] EventBus type:', typeof window.eventBus);
+        window.Logger.info('[GameControlsComponent] EventBus methods:', Object.getOwnPropertyNames(window.eventBus || {}));
         window.Logger.info('[GameControlsComponent] Emitting game:confirmMove event');
-        window.eventBus.emit('game:confirmMove');
-        window.Logger.info('[GameControlsComponent] Event emitted');
+        
+        if (!window.eventBus) {
+            window.Logger.error('[GameControlsComponent] EventBus is not available!');
+            return;
+        }
+        
+        try {
+            window.eventBus.emit('game:confirmMove');
+            window.Logger.info('[GameControlsComponent] Event emitted successfully');
+        } catch (error) {
+            window.Logger.error('[GameControlsComponent] Error emitting event:', error);
+        }
     }
     
     noMoves() {

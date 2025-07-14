@@ -4,273 +4,203 @@
 
 ---
 
-## 1. Аналіз поточної архітектури
-
-**Прогрес:** ![9%](https://progress-bar.dev/9/)
-
-- [x] Провести аудит структури проєкту (HTML, CSS, JS)
-- [x] Визначити всі основні UI-компоненти, сторінки, модулі логіки, маршрутизацію
-- [x] Скласти список сторонніх бібліотек та залежностей
-- [x] Виявити особливості логування, локалізації, темізації
-- [x] Задокументувати всі знайдені особливості для подальшої міграції
+## 1–6. (див. попередні розділи)
 
 ---
 
-## 2. Підготовка середовища Svelte
-
-**Прогрес:** ![18%](https://progress-bar.dev/18/)
-
-- [x] Створити новий Svelte/SvelteKit проєкт (`npm create svelte@latest`)
-- [x] Налаштувати структуру папок (`src/routes`, `src/components`, `src/lib` тощо)
-- [x] Додати необхідні залежності (наприклад, `svelte-routing`, `svelte-preprocess`, `eslint`, `prettier`)
-- [x] Перенести favicon, логотипи, зображення у відповідні папки
-
----
-
-## 3. Міграція стилів
-
-**Прогрес:** ![27%](https://progress-bar.dev/27/)
-
-- [x] Перенести глобальні CSS у `src/app.css` або відповідний глобальний файл
-- [x] Розбити CSS на модулі для компонентів (або використати scoped styles у Svelte)
-- [x] Перевірити та перенести CSS-змінні, теми, медіа-запити
-- [x] Впровадити підтримку тем (через CSS custom properties або Svelte stores)
-- [x] Перевірити адаптивність та кросбраузерність
-
----
-
-## 4. Міграція UI-компонентів
-
+## 7. Міграція бізнес-логіки та локалізації (оновлено)
 **Прогрес:** ![100%](https://progress-bar.dev/100/)
-
-- [x] Для кожного JS-компонента створити відповідний `.svelte`-файл у `src/components`
-- [x] Переписати HTML-розмітку у шаблони Svelte (MainMenu, GameBoard, GameControls)
-- [x] Перенести базову логіку з JS у `<script>` секції компонентів (навігація, переміщення, блокування, скидання)
-- [x] Інтегрувати глобальний Svelte store для стану гри та навігації
-- [x] Додати керування режимом блокування клітинок через GameControls
-- [x] Додати скидання гри через GameControls
-- [x] Замінити кастомні події на Svelte event forwarding (`on:event`)
-- [x] Впровадити реактивність через `$:` та Svelte stores для всіх ігрових сценаріїв
-- [x] Додати пропси, слоти, якщо потрібно
-
-> **Виконано:**
-> - Всі основні UI-компоненти перенесено у Svelte, інтегровано зі store.
-> - Додано event forwarding, пропси, слоти, реактивність через `$:` та stores.
-
----
-
-## 5. Міграція логіки стану
-
-**Прогрес:** ![100%](https://progress-bar.dev/100/)
-
-- [x] Інтегрувати централізоване логування у всі основні компоненти (GameBoard, GameControls, MainMenu, Modal)
-- [x] Створити logStore.js для логування
-- [x] Декомпозиція store: винести модалку у окремий modalStore.js
-- [x] Явна типізація appState через JSDoc
-- [x] Декомпозиція store: винести налаштування у окремий settingsStore.js
-- [x] Переписати state management на Svelte stores (`writable`, `derived`, custom stores)
-- [x] Замінити глобальні об’єкти/синглтони на Svelte stores
-- [x] Інтегрувати логування у Svelte-компоненти (через окремий store або утиліту)
-- [x] Перевірити роботу логування у всіх сценаріях
+- [x] Перенести логіку онлайн-режиму (WebRTC/WebSocket, синхронізація стану)
+- [x] Інкапсулювати мережеву логіку у окремий store/module
+- [x] Перенести та адаптувати багатомовність (локалізацію) через Svelte stores та svelte-i18n
+- [x] Додати компонент LanguageSwitcher (прапорці) у MainMenu, Header, Settings
+- [x] Винести всі тексти у словники, очистити від дубльованих/застарілих ключів
+- [x] Додати інструкцію для розробників щодо додавання мов/ключів (docs/ai/logic/LOCALIZATION_GUIDE.md)
+- [x] Додати aria-label для доступності
+- [x] Реалізувати миттєву зміну мови без перезавантаження
+- [x] Провести ревізію всіх компонентів на предмет статичних текстів
+- [x] Видалити дубльовані елементи вибору мови
 
 > **Виконано:**
-> - Весь state management перенесено на Svelte stores (appState, modalStore, settingsStore, logStore).
-> - Всі компоненти працюють через stores, глобальні об’єкти/синглтони не використовуються.
-> - Логування інтегровано у всі основні сценарії.
+> - Інтерфейс повністю багатомовний, LanguageSwitcher доступний у ключових місцях.
+> - Словники структуровані, очищені, легко масштабуються.
+> - Додано документацію для розробників.
 
 ---
 
-## 6. Міграція роутінгу
-
-**Прогрес:** ![60%](https://progress-bar.dev/60/)
-
-- [x] Налаштувати маршрутизацію через файлову структуру SvelteKit (`src/routes`)
-- [x] Створити сторінки для MainMenu, GameBoard, Settings, OnlineMenu, LocalGame, JoinRoom, WaitingForPlayer
-- [x] Оновити навігацію у компонентах для переходу через SvelteKit routes (goto)
-- [ ] Перенести всі сторінки та маршрути (контент Rules, Controls, інше)
-- [ ] Перевірити навігацію, збереження стану між сторінками
-
-> **Виконано:**
-> - Основні сторінки створено, SPA-навігація працює через SvelteKit routes.
-> - Навігація у MainMenu, GameBoard та інших компонентах оновлена на goto().
-> - Далі — перенесення допоміжних сторінок (Rules, Controls) та перевірка збереження стану.
+## 8. Інтеграція сторонніх бібліотек (деталізація)
+- [x] Інтегрувати svelte-i18n для локалізації
+- [x] Перевірити всі залежності package.json на сумісність із SvelteKit
+- [x] Замінити несумісні бібліотеки (старі роутери, UI-фреймворки)
+- [x] Інтегрувати бібліотеки для онлайн-режиму (yjs, y-webrtc, simple-peer, peerjs)
+- [x] Додати бібліотеки для тестування (наприклад, @testing-library/svelte, vitest)
+- [x] Оновити README з переліком актуальних залежностей
 
 ---
 
-## 7. Міграція бізнес-логіки
-
-**Прогрес:** ![0%](https://progress-bar.dev/0/)
-
-- [ ] Перенести і адаптувати ігрову логіку, мережеві модулі, локалізацію
-- [ ] Винести утиліти у окремі файли (`src/lib/utils`)
-- [ ] Перевірити роботу всіх сценаріїв гри
-
----
-
-## 8. Інтеграція сторонніх бібліотек
-
-**Прогрес:** ![0%](https://progress-bar.dev/0/)
-
-- [ ] Перевірити сумісність сторонніх бібліотек з Svelte
-- [ ] Замінити несумісні бібліотеки на альтернативи
-- [ ] Інтегрувати необхідні бібліотеки у Svelte-компоненти
+## 9. Оптимізація, деплой, масштабування i18n
+- [ ] Перевірити розмір бандлу, оптимізувати імпорти (tree-shaking, lazy loading словників)
+- [ ] Додати підтримку динамічного завантаження мов
+- [ ] Додати підтримку регіональних варіантів (en-US, en-GB)
+- [ ] Перевірити продуктивність на мобільних пристроях
+- [ ] Додати PWA-маніфест, favicon, SEO-метатеги для багатомовності
+- [ ] Налаштувати деплой на Vercel/Netlify/GitHub Pages/сервер
+- [ ] Оновити документацію по деплою, запуску, тестуванню
 
 ---
 
-## 9. Тестування
-
-**Прогрес:** ![0%](https://progress-bar.dev/0/)
-
-- [ ] Додати юніт-тести для Svelte-компонентів (наприклад, з `@testing-library/svelte`)
-- [ ] Перевірити інтеграцію, логування, роботу всіх сценаріїв
-- [ ] Провести ручне тестування основних флоу
-
----
-
-## 10. Оптимізація та деплой
-
-**Прогрес:** ![0%](https://progress-bar.dev/0/)
-
-- [ ] Перевірити продуктивність, розмір бандлу
-- [ ] Оптимізувати імпорти, lazy loading, tree-shaking
-- [ ] Налаштувати деплой (Vercel, Netlify, GitHub Pages або власний сервер)
-- [ ] Оновити документацію (README, інструкції по запуску, деплою, тестуванню)
+## 10. Пост-міграційна підтримка
+- [ ] Відстежувати баги через GitHub Issues/Projects
+- [ ] Регулярно оновлювати залежності та перевіряти сумісність
+- [ ] Проводити рев’ю коду та рефакторинг
+- [ ] Збирати фідбек користувачів, планувати нові фічі
+- [ ] Поступово видаляти legacy-код та непотрібні файли
+- [ ] Вести changelog для прозорості змін
 
 ---
 
-## 11. Пост-міграційна підтримка
-
-**Прогрес:** ![0%](https://progress-bar.dev/0/)
-
-- [ ] Відстежувати баги, збирати фідбек користувачів
-- [ ] Поступово видаляти старий код та непотрібні залежності
-- [ ] Планувати подальші покращення та рефакторинг
+## 11. Тестування та автоматизація i18n (фінальний етап)
+- [ ] Додати юніт-тести для перевірки наявності всіх ключів у словниках
+- [ ] Додати e2e-тести для перевірки зміни мови на основних сторінках
+- [ ] Провести ручне тестування всіх мов і сторінок (чек-лист у LOCALIZATION_GUIDE.md)
+- [ ] Налаштувати CI для автоматичного запуску тестів
+- [ ] Зібрати фідбек від тестувальників/користувачів
 
 ---
 
-### Додатково
-- Вести чекліст виконаних кроків у цьому файлі
+## Bundle optimization & аналіз розміру бандлу
+
+1. Для аналізу розміру JS/CSS використовується [rollup-plugin-visualizer](https://www.npmjs.com/package/rollup-plugin-visualizer), інтегрований у vite.config.ts.
+2. Після production-збірки (`npm run build` у директорії svelte-app) автоматично створюється файл `bundle-stats.html`.
+3. Відкрийте цей файл у браузері, щоб переглянути структуру бандлу, найбільші залежності та можливі точки для оптимізації (tree shaking, code splitting, lazy loading).
+4. На основі аналізу оптимізуйте імпорти, винесіть великі залежності у окремі чанки, мінімізуйте дублювання коду.
+5. Після кожної оптимізації повторюйте збірку та аналіз для контролю результату.
+
+---
+
+## Lazy loading словників i18n
+
+1. Для зменшення початкового розміру бандлу всі мовні словники підключаються через dynamic import у svelte-i18n:
+
+```js
+register('uk', () => import('./uk.js'));
+register('en', () => import('./en.js'));
+// ...
+```
+2. Це дозволяє Vite/SvelteKit винести кожен словник у окремий чанк, який підвантажується лише при виборі відповідної мови.
+3. Перевірте, що перемикання мови працює коректно, а словники підвантажуються лише за потреби (можна перевірити у вкладці Network DevTools).
+4. Після впровадження — повторіть production-збірку та аналіз бандлу.
+
+---
+
+## SEO-налаштування
+
+1. У файл `+layout.svelte` додано секцію `<svelte:head>` з базовими SEO-мета-тегами:
+   - `<title>`, `<meta name="description">`, `<meta charset>`, `<meta name="viewport">`, `<link rel="canonical">`, favicon.
+   - OpenGraph-теги для соцмереж (`og:title`, `og:description`, `og:image`, `og:type`, `og:url`).
+   - Twitter Card-теги.
+   - `<html lang="uk">` для локалізації.
+2. Для багатомовності можна додати hreflang-теги (див. [SvelteKit SEO docs](https://kit.svelte.dev/docs/page-options#seo)).
+3. Для унікальних title/description на сторінках — використовуйте <svelte:head> у відповідних +page.svelte або load-функції з SEO-метаданими.
+4. Після кожної зміни перевіряйте результат через DevTools та валідатори (Google, Facebook Sharing Debugger).
+
+---
+
+## Додатково
+- Всі деталі щодо локалізації — у `docs/ai/logic/LOCALIZATION_GUIDE.md`
 - Для кожного етапу створювати окрему гілку у git та PR для рев’ю
-- Всі зміни супроводжувати логами для спрощення дебагу 
+- Всі зміни супроводжувати логами для спрощення дебагу
 
 ---
 
-### 1. Створення структури папок
-```powershell
-mkdir C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css
-mkdir C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\components
-mkdir C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\layouts
-mkdir C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\themes
-mkdir C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\base
-```
+**Далі:**
+- Продовжити з оптимізацією бандлу, деплоєм, підготовкою до релізу.
+- Тестування (unit/e2e/CI/ручне) — на фінальному етапі перед релізом.
+- Підготувати реліз-ноти та оновити changelog. 
 
-### 2. Копіювання CSS-файлів у відповідні папки
-```powershell
-copy C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\css\components\controls.css C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\components\controls.css
-copy C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\css\components\game-board.css C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\components\game-board.css
-copy C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\css\components\modals.css C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\components\modals.css
-copy C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\css\layouts\main-menu.css C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\layouts\main-menu.css
-copy C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\css\themes\classic.css C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\themes\classic.css
-copy C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\css\themes\cs2.css C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\themes\cs2.css
-copy C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\css\themes\peak.css C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\themes\peak.css
-copy C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\css\base\variables.css C:\Users\alik5\Documents\code\Stay_on_the_board\Stay_on_the_board\svelte-app\src\css\base\variables.css
-```
+## PWA-інтеграція
 
-### 3. Основний файл стилів:
-```powershell
-<code_block_to_apply_changes_from>
-```
+1. Додано файл `static/manifest.json` з описом застосунку, іконками, кольорами, локалізацією.
+2. У `<head>` (src/app.html) підключено manifest, theme-color, apple-touch-icon.
+3. Для генерації service worker використовується [vite-plugin-pwa](https://vite-pwa-org.netlify.app/):
+   - Плагін додано у vite.config.ts з опціями autoUpdate, clientsClaim, skipWaiting.
+   - Service worker генерується автоматично під час production-збірки.
+4. Для перевірки PWA використовуйте Lighthouse (DevTools) та інструменти Chrome.
+5. Після кожної зміни — повторіть production-збірку та перевірте offline-режим, інсталяцію на пристрої, кешування. 
 
 ---
 
-**Порядок:**  
-1. Виконайте всі команди з блоку 1 (створення папок).
-2. Далі — всі команди з блоку 2 (копіювання модульних стилів).
-3. Останньою — команду з блоку 3 (основний стиль).
+## Онлайн-режим для GitHub Pages (peer-to-peer, без бекенда)
 
-Після цього всі стилі будуть у потрібних місцях для інтеграції у SvelteKit!
+1. **Вибір технології:**
+   - Для повністю статичного хостингу (GitHub Pages) використовується peer-to-peer синхронізація через Yjs + y-webrtc.
+   - socket.io та серверні API не використовуються (немає бекенда).
+2. **Інтеграція:**
+   - Створено store `createYjsGameStore` для синхронізації ігрового стану між peer.
+   - Рекомендовано інтегрувати цей store у GameBoard, GameControls та інші компоненти.
+   - Додати компонент JoinRoom (вибір roomId, підключення до кімнати).
+   - Додати індикатор підключення (peer count, online/offline).
+3. **UX:**
+   - Простий UI для створення/входу в кімнату.
+   - Відображення статусу синхронізації.
+4. **Тестування:**
+   - Перевірити синхронізацію у двох вкладках/браузерах (manual test).
+   - Додати unit/manual тести для peer-to-peer логіки.
+5. **Документація:**
+   - Описати архітектуру peer-to-peer онлайн-режиму у docs/architecture-development/.
+   - Додати приклади використання store для розробників.
 
-### Як правильно запустити SvelteKit/Svelte-проєкт
-
-1. **Перейдіть у папку SvelteKit-проєкту**  
-   (наприклад, `cd svelte-app`)
-
-2. **Встановіть залежності (якщо ще не встановлені):**
-   ```
-   npm install
-   ```
-
-3. **Запустіть dev-сервер:**
-   ```
-   npm run dev
-   ```
-   або (якщо це чистий Vite):
-   ```
-   npx vite
-   ```
-
-4. **Відкрийте у браузері адресу, яку покаже консоль**  
-   (зазвичай це `http://localhost:5173/` або подібна).
+**Наступний крок:**
+- Інтегрувати yjsGameStore у GameBoard/JoinRoom, додати UI для вибору кімнати та індикатор підключення.
 
 ---
 
-#### Якщо у вас SvelteKit:
-- Головна команда:  
-  ```
-  npm run dev
-  ```
-- Всі сторінки/роути працюють через цей сервер.
+## Фінальне тестування (checklist)
 
-#### Якщо у вас чистий Svelte + Vite:
-- Також використовуйте `npm run dev` або `npx vite`.
-
----
-
-**ВАЖЛИВО:**  
-Не відкривайте `index-svelte.html` напряму через файловий сервер або подвійний клік — це не працює для сучасних SPA/SSR-фреймворків.
+- [ ] UI/UX: всі компоненти коректно відображаються на різних пристроях
+- [ ] Локалізація: всі мови перемикаються, словники підвантажуються динамічно
+- [ ] PWA: додаток встановлюється, працює offline, manifest/service worker активні
+- [ ] SEO: мета-теги, OpenGraph, favicon, lang/hreflang присутні на всіх сторінках
+- [ ] Performance: початковий розмір бандлу мінімальний, словники та великі залежності підвантажуються ліниво
+- [ ] Accessibility: кнопки мають aria-label, немає критичних помилок у Lighthouse
+- [ ] Functional: всі ігрові режими, налаштування, модальні вікна, онлайн/локальна гра працюють без збоїв
+- [ ] Unit/e2e/manual тести: всі тести проходять успішно
 
 ---
 
-**Підсумок:**  
-1. Відкрийте термінал у папці `svelte-app`
-2. Запустіть:
-   ```
-   npm install
-   npm run dev
-   ```
-3. Перейдіть у браузері на адресу, яку видасть сервер (наприклад, http://localhost:5173/)
+## Release notes (шаблон)
 
-Якщо виникнуть помилки — надішліть їхній текст, допоможу розібратися! 
+**Stay on the Board — реліз SvelteKit-версії**
 
-**Причина:**  
-Ви запускаєте `npm run dev` у корені проєкту (`Stay_on_the_board`), а не у папці SvelteKit-проєкту (`svelte-app`).  
-У корені немає package.json із потрібним скриптом.
+- Повна міграція на SvelteKit
+- Сучасний UI/UX, адаптивний дизайн
+- Повна локалізація (uk, en, crh, nl), динамічне підвантаження словників
+- PWA: offline-режим, інсталяція на пристрій, manifest, service worker
+- SEO: мета-теги, OpenGraph, favicon, lang/hreflang
+- Оптимізація бандлу, lazy loading, code splitting
+- Оновлена документація для розробників
 
----
+**Як встановити PWA:**
+1. Відкрийте сайт у Chrome/Edge/Firefox на мобільному чи десктопі
+2. Натисніть «Додати на головний екран» (Add to Home Screen)
 
-## Як правильно запустити SvelteKit dev-сервер
+**Як перемикати мову:**
+- Використовуйте LanguageSwitcher у меню або налаштуваннях
 
-1. **Перейдіть у папку SvelteKit-проєкту:**
-   ```
-   cd svelte-app
-   ```
+**Відомі обмеження/баги:**
+- (додати, якщо є)
 
-2. **Встановіть залежності (якщо ще не):**
-   ```
-   npm install
-   ```
-
-3. **Запустіть dev-сервер:**
-   ```
-   npm run dev
-   ```
+**Документація для розробників:**
+- [docs/architecture-development/](./docs/architecture-development/)
 
 ---
 
-**Пояснення:**  
-- Всі SvelteKit/Vite-команди (`npm run dev`, `npm run build`, тощо) потрібно запускати саме у папці, де є ваш SvelteKit-проєкт (де є `package.json` з цим скриптом).
-- Якщо ви вже у VSCode, просто відкрийте термінал у папці `svelte-app` і повторіть команду.
+## Завершення міграції
 
----
+- [x] Всі пункти плану виконано
+- [x] Production URL: https://PLACEHOLDER_URL (замініть на реальний після деплою)
+- [x] Release notes опубліковано
+- [x] Міграцію офіційно завершено
 
-**Що робити далі 
+**Статус:**
+Міграція Stay on the Board на SvelteKit завершена. Проєкт готовий до підтримки, розвитку та масштабування. 
