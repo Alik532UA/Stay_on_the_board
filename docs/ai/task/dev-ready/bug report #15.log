@@ -1,16 +1,19 @@
-VM866 logger.js:466  Uncaught SyntaxError: Unexpected token 'export' (at VM866 logger.js:466:1)
+index.html:1  Error handling response: TypeError: Cannot read properties of undefined (reading 'features')
+    at chrome-extension://jjkchpdmjjdmalgembblgafllbpcjlei/mcafee_wa_contentplg.js:2719:35
+index.html:1  Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
 [NEW] Explain Console errors by using Copilot in Edge: click
          
          to explain an error. 
         Learn more
         Don't show again
+VM769 logger.js:466  Uncaught SyntaxError: Unexpected token 'export' (at VM769 logger.js:466:1)
 logger.js:186 [INFO] 🔧 Bug fixes applied: {bug12: 'Blocked cells mode now properly displays blocked cells with red ✗ symbol', bug13: 'Default distance now correctly resets to 1 when changing board size', bug15: 'MainMenuComponent bindEvents now prevents duplicate event listeners', bug17: 'GameControlsComponent render now prevents duplicate rendering'}
-speech.js:77 🎤 Speech manager initialized
+logger.js:188 [INFO] 🎤 Speech manager initialized
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.speechEnabled'}
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
 logger.js:188 [DEBUG] GameLogic: constructor
 logger.js:188 [INFO] [GameLogic] Initializing...
-game-logic-new.js:912 [GameLogic] Initializing Game Logic {}
+logger.js:188 [DEBUG] [GameLogic] Initializing Game Logic
 logger.js:188 [DEBUG] GameLogic: subscribeToGameState
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.isActive'}
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'game.selectedDirection'}
@@ -22,22 +25,21 @@ logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.speechEnabled'}
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.showMoves'}
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.blockedMode'}
 logger.js:188 [DEBUG] [GameLogic] initSpeech called
-game-logic-new.js:912 [GameLogic] Game Logic initialized {}
+logger.js:188 [DEBUG] [GameLogic] Game Logic initialized
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'ui.modal'}
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'ui.currentView'}
 logger.js:186 [DEBUG] [App] Initial view: {initialView: 'mainMenu'}
-view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+logger.js:186 [DEBUG] [ViewManager] render: {viewName: 'mainMenu', params: {…}}
 base-component.js:329 [MainMenuComponent] Component created {options: {…}}
-main-menu-component.js:70 [MainMenuComponent] bindEvents called
-main-menu-component.js:369 [MainMenuComponent] subscribeToState called
+logger.js:188 [DEBUG] [MainMenuComponent] subscribeToState called
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
 base-component.js:329 [MainMenuComponent] Component initialized {}
 logger.js:188 [INFO] ✅ Глобальні контроли налаштовані
-view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
-view-manager.js:111 [ViewManager] Game controls content cleared
-logger.js:186 [INFO] Started: App initialization {timestamp: 1752484156314, startTime: 1752484156316}
+logger.js:186 [DEBUG] [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+logger.js:188 [DEBUG] [ViewManager] Game controls content cleared
+logger.js:186 [INFO] Started: App initialization {timestamp: 1752490661564, startTime: 1752490661565}
 logger.js:188 [INFO] EventBus middleware configured
 logger.js:188 [INFO] Speech control configured
 logger.js:188 [INFO] Systems initialized successfully
@@ -65,37 +67,26 @@ logger.js:186 [DEBUG] [StateManager] navigateTo: {viewName: 'mainMenu', params: 
 logger.js:186 [DEBUG] [StateManager] setState: {path: 'ui.currentView', value: 'mainMenu'}
 logger.js:186 [DEBUG] [StateManager] Notifying listeners for: {path: 'ui.currentView', count: 1}
 logger.js:186 [DEBUG] [App] ui.currentView changed: {view: 'mainMenu'}
-view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+logger.js:186 [DEBUG] [ViewManager] render: {viewName: 'mainMenu', params: {…}}
 base-component.js:329 [MainMenuComponent] Component created {options: {…}}
-main-menu-component.js:70 [MainMenuComponent] bindEvents called
-main-menu-component.js:369 [MainMenuComponent] subscribeToState called
+logger.js:188 [DEBUG] [MainMenuComponent] subscribeToState called
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
 base-component.js:329 [MainMenuComponent] Component initialized {}
 logger.js:188 [INFO] ✅ Глобальні контроли налаштовані
-view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
-view-manager.js:111 [ViewManager] Game controls content cleared
+logger.js:186 [DEBUG] [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+logger.js:188 [DEBUG] [ViewManager] Game controls content cleared
 logger.js:188 [DEBUG] [StateManager] Calling viewManager.navigateTo
-view-manager.js:37 [ViewManager] navigateTo: {viewName: 'mainMenu', params: {…}}
-view-manager.js:69 [ViewManager] render: {viewName: 'mainMenu', params: {…}}
+logger.js:186 [DEBUG] [ViewManager] navigateTo: {viewName: 'mainMenu', params: {…}}
+logger.js:186 [DEBUG] [ViewManager] render: {viewName: 'mainMenu', params: {…}}
 base-component.js:329 [MainMenuComponent] Component created {options: {…}}
-main-menu-component.js:70 [MainMenuComponent] bindEvents called
-main-menu-component.js:369 [MainMenuComponent] subscribeToState called
+logger.js:188 [DEBUG] [MainMenuComponent] subscribeToState called
 logger.js:186 [DEBUG] [StateManager] subscribe: {path: 'settings.language'}
 base-component.js:329 [MainMenuComponent] Component initialized {}
 logger.js:188 [INFO] ✅ Глобальні контроли налаштовані
-view-manager.js:106 [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
-view-manager.js:111 [ViewManager] Game controls content cleared
+logger.js:186 [DEBUG] [ViewManager] Game controls visibility: {viewName: 'mainMenu', isGameView: false}
+logger.js:188 [DEBUG] [ViewManager] Game controls content cleared
 logger.js:188 [INFO] 🎮 Додаток запущено
 logger.js:188 [INFO] ✅ Додаток успішно ініціалізовано
 logger.js:188 [INFO] 🎉 Додаток Stay on the board готовий до роботи
-game-logic-new.js:912 [GameLogic] Speech initialized {enabled: false}
-main-menu-component.js:70 [MainMenuComponent] bindEvents called
-main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
-main-menu-component.js:70 [MainMenuComponent] bindEvents called
-main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
-main-menu-component.js:70 [MainMenuComponent] bindEvents called
-main-menu-component.js:66 [MainMenuComponent] bindEvents already called, skipping
-logger.js:186 [INFO] 📊 Сторінка завантажена {loadTime: 11}
-index.html:1  Error handling response: TypeError: Cannot read properties of undefined (reading 'features')
-    at chrome-extension://jjkchpdmjjdmalgembblgafllbpcjlei/mcafee_wa_contentplg.js:2719:35
-index.html:1  Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+logger.js:186 [DEBUG] [GameLogic] Speech initialized {enabled: false}
+logger.js:186 [INFO] 📊 Сторінка завантажена {loadTime: 8}
