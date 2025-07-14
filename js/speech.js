@@ -1,5 +1,5 @@
 import { stateManager } from './state-manager.js';
-import Logger from './utils/logger.js';
+// import Logger from './utils/logger.js';
 
 /**
  * Система голосового управління для гри
@@ -50,7 +50,7 @@ class SpeechManager {
         
         // Перевіряємо підтримку Web Speech API
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            Logger.warn('Speech recognition not supported');
+            window.Logger.warn('Speech recognition not supported');
             this.enabled = false;
             return;
         }
@@ -74,7 +74,7 @@ class SpeechManager {
         // Реєструємо стандартні команди
         this.registerDefaultCommands();
         
-        Logger.info('🎤 Speech manager initialized');
+        window.Logger.info('🎤 Speech manager initialized');
     }
     
     /**
@@ -83,7 +83,7 @@ class SpeechManager {
     setupRecognitionHandlers() {
         this.recognition.onstart = () => {
             this.isListening = true;
-            Logger.info('Speech recognition started');
+            window.Logger.info('Speech recognition started');
             
             if (this.onStart) {
                 this.onStart();
@@ -92,7 +92,7 @@ class SpeechManager {
         
         this.recognition.onend = () => {
             this.isListening = false;
-            Logger.info('Speech recognition ended');
+            window.Logger.info('Speech recognition ended');
             
             if (this.onEnd) {
                 this.onEnd();
@@ -104,7 +104,7 @@ class SpeechManager {
             const transcript = results[results.length - 1][0].transcript.trim().toLowerCase();
             const confidence = results[results.length - 1][0].confidence;
             
-            Logger.info('Speech recognized', { transcript, confidence });
+            window.Logger.info('Speech recognized', { transcript, confidence });
             
             this.processCommand(transcript, confidence);
             
@@ -114,7 +114,7 @@ class SpeechManager {
         };
         
         this.recognition.onerror = (event) => {
-            Logger.error('Speech recognition error', { error: event.error });
+            window.Logger.error('Speech recognition error', { error: event.error });
             
             if (this.onError) {
                 this.onError(event.error);
@@ -122,7 +122,7 @@ class SpeechManager {
         };
         
         this.recognition.onnomatch = () => {
-            Logger.warn('No speech match found');
+            window.Logger.warn('No speech match found');
         };
     }
     
@@ -133,7 +133,7 @@ class SpeechManager {
         if ('speechSynthesis' in window) {
             this.synthesis = window.speechSynthesis;
         } else {
-            Logger.warn('Speech synthesis not supported');
+            window.Logger.warn('Speech synthesis not supported');
         }
     }
     
@@ -295,7 +295,7 @@ class SpeechManager {
         }
         
         if (bestMatch) {
-            Logger.info('Command executed', { 
+            window.Logger.info('Command executed', { 
                 transcript, 
                 command: bestMatch.command, 
                 confidence, 
@@ -305,11 +305,11 @@ class SpeechManager {
             try {
                 bestMatch.handler();
             } catch (error) {
-                Logger.error('Command execution error', { error: error.message });
+                window.Logger.error('Command execution error', { error: error.message });
                 this.speak('Помилка виконання команди');
             }
         } else {
-            Logger.warn('No command match found', { transcript, confidence });
+            window.Logger.warn('No command match found', { transcript, confidence });
             this.speak('Команда не розпізнана');
         }
     }
@@ -374,9 +374,9 @@ class SpeechManager {
         
         try {
             this.recognition.start();
-            Logger.info('Started listening for voice commands');
+            window.Logger.info('Started listening for voice commands');
         } catch (error) {
-            Logger.error('Failed to start listening', { error: error.message });
+            window.Logger.error('Failed to start listening', { error: error.message });
         }
     }
     
@@ -388,9 +388,9 @@ class SpeechManager {
         
         try {
             this.recognition.stop();
-            Logger.info('Stopped listening for voice commands');
+            window.Logger.info('Stopped listening for voice commands');
         } catch (error) {
-            Logger.error('Failed to stop listening', { error: error.message });
+            window.Logger.error('Failed to stop listening', { error: error.message });
         }
     }
     
@@ -425,17 +425,17 @@ class SpeechManager {
         
         utterance.onstart = () => {
             this.isSpeaking = true;
-            Logger.info('Started speaking', { text });
+            window.Logger.info('Started speaking', { text });
         };
         
         utterance.onend = () => {
             this.isSpeaking = false;
-            Logger.info('Finished speaking', { text });
+            window.Logger.info('Finished speaking', { text });
         };
         
         utterance.onerror = (event) => {
             this.isSpeaking = false;
-            Logger.error('Speech synthesis error', { error: event.error, text });
+            window.Logger.error('Speech synthesis error', { error: event.error, text });
         };
         
         this.synthesis.speak(utterance);
@@ -601,7 +601,7 @@ class SpeechManager {
         this.commands.clear();
         this.aliases.clear();
         
-        Logger.info('Speech manager destroyed');
+        window.Logger.info('Speech manager destroyed');
     }
 }
 
@@ -678,10 +678,10 @@ window.speechManager = new SpeechManager({
     enabled: stateManager.getState('settings.speechEnabled'),
     language: stateManager.getState('settings.language') + '-' + stateManager.getState('settings.language').toUpperCase(),
     onResult: (transcript, confidence) => {
-        Logger.info('Voice command recognized', { transcript, confidence });
+        window.Logger.info('Voice command recognized', { transcript, confidence });
     },
     onError: (error) => {
-        Logger.error('Voice recognition error', { error });
+        window.Logger.error('Voice recognition error', { error });
     }
 });
 
