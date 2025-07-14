@@ -369,7 +369,6 @@ export class GameBoardComponent extends BaseComponent {
                     Logger.debug('[GameBoardComponent] renderBoard: blocked cell rendered', { row, col });
                 } else {
                     const cellValue = board[row][col];
-                    // --- Фігура ---
                     if (cellValue === 1) {
                         cell.classList.add('player-piece');
                         cell.innerHTML = '<span class="crown">👑</span>';
@@ -378,7 +377,6 @@ export class GameBoardComponent extends BaseComponent {
                         cell.innerHTML = '<span class="crown">👑</span>';
                     } else {
                         cell.classList.add('empty-cell');
-                        // --- Доступні ходи ---
                         const isHighlighted = highlightedMoves.some(move => move.newRow === row && move.newCol === col);
                         const isAvailable = availableMoves.some(move => move.newRow === row && move.newCol === col);
                         if (isHighlighted) {

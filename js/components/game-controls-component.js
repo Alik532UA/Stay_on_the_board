@@ -244,9 +244,9 @@ export class GameControlsComponent extends BaseComponent {
             this.generateDistanceButtons(newSize); // Оновлюємо лише кнопки дистанції
             this.bindEvents(); // Додаємо обробники на нові кнопки
             
-            // Скидаємо відстань до 1 при зміні розміру дошки
+            // Скидаємо відстань до 1 при зміні розміру дошки, якщо поточна відстань невалідна
             const currentDistance = stateManager.getState('game.selectedDistance');
-            if (currentDistance !== null && currentDistance > newSize - 1) {
+            if (currentDistance !== null && currentDistance >= newSize) {
                 stateManager.setState('game.selectedDistance', 1);
                 Logger.debug('[GameControlsComponent] Reset distance to 1 due to board size change:', { 
                     oldDistance: currentDistance, 
