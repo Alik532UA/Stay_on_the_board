@@ -1,15 +1,23 @@
 <script>
-  import { appState, toggleBlockMode, toggleShowMoves, toggleShowBoard, toggleSpeech, setDirection, setDistance, confirmMove, noMoves } from '../stores/gameStore.js';
+  import { appState, toggleBlockMode, toggleShowMoves, toggleShowBoard, toggleSpeech, setDirection, setDistance, confirmMove, noMoves, resetGame } from '../stores/gameStore.js';
   import { modalStore } from '../stores/modalStore.js';
   import { logStore } from '../stores/logStore.js';
   import { _ } from 'svelte-i18n';
   $: blockModeEnabled = typeof $appState.blockModeEnabled === 'boolean' ? $appState.blockModeEnabled : false;
-  $: showMoves = typeof $appState.showMoves === 'boolean' ? $appState.showMoves : true;
-  $: showBoard = typeof $appState.showBoard === 'boolean' ? $appState.showBoard : true;
-  $: speechEnabled = typeof $appState.speechEnabled === 'boolean' ? $appState.speechEnabled : false;
+  $: showMoves = typeof $appState.settings?.showMoves === 'boolean' ? $appState.settings.showMoves : true;
+  $: showBoard = typeof $appState.settings?.showBoard === 'boolean' ? $appState.settings.showBoard : true;
+  $: speechEnabled = typeof $appState.settings?.speechEnabled === 'boolean' ? $appState.settings.speechEnabled : false;
   $: selectedDirection = $appState.selectedDirection || null;
   $: selectedDistance = $appState.selectedDistance || null;
   $: availableDistances = $appState.availableDistances || [1,2];
+  $: buttonDisabled = !selectedDirection || !selectedDistance;
+  
+  // Логування зміни стану кнопки
+  $: console.log('[GameControls] Button state changed:', {
+    selectedDirection,
+    selectedDistance,
+    buttonDisabled
+  });
 
   /**
    * @typedef {Object} ModalButton
@@ -36,9 +44,22 @@
   function onShowMovesChange() { toggleShowMoves(); }
   function onShowBoardChange() { toggleShowBoard(); }
   function onSpeechChange() { toggleSpeech(); }
+  /**
+   * @param {string} dir
+   */
   function onDirectionClick(dir) { setDirection(dir); }
+  /**
+   * @param {number} dist
+   */
   function onDistanceClick(dist) { setDistance(dist); }
-  function onConfirmMove() { confirmMove(); }
+  function onConfirmMove() { 
+    console.log('[GameControls] Confirm move button clicked', {
+      selectedDirection,
+      selectedDistance,
+      buttonDisabled
+    });
+    confirmMove(); 
+  }
   function onNoMoves() { noMoves(); }
 </script>
 
@@ -85,7 +106,7 @@
     </div>
   </div>
   <div class="action-btns">
-    <button class="confirm-btn" on:click={onConfirmMove} disabled={!selectedDirection || !selectedDistance}>{$_('gameControls.confirm')}</button>
+    <button class="confirm-btn" on:click={onConfirmMove} disabled={buttonDisabled}>{$_('gameControls.confirm')}</button>
     <button class="no-moves-btn" on:click={onNoMoves}>{$_('gameControls.noMoves')}</button>
   </div>
 </div>
@@ -229,6 +250,17 @@
   color: #222;
   outline: none;
   transform: scale(1.04);
+}
+.confirm-btn:disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  transform: none;
+}
+.confirm-btn:disabled:hover {
+  background: #ccc;
+  color: #666;
+  transform: none;
 }
 .no-moves-btn {
   background: #ffb300;

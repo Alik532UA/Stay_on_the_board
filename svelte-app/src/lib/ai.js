@@ -11,6 +11,11 @@
  * @returns {Move[]}
  */
 export function getAllValidMoves(board, blockedCells, boardSize) {
+  console.log('[getAllValidMoves] Function called', {
+    boardSize,
+    blockedCellsCount: blockedCells.length
+  });
+  
   const directions = [
     { dr: -1, dc: -1, dir: '7' }, { dr: -1, dc: 0, dir: '8' }, { dr: -1, dc: 1, dir: '9' },
     { dr: 0, dc: -1, dir: '4' }, { dr: 0, dc: 1, dir: '6' },
@@ -23,7 +28,14 @@ export function getAllValidMoves(board, blockedCells, boardSize) {
       if (board[r][c] === 1) piece = { row: r, col: c };
     }
   }
-  if (!piece) return [];
+  
+  console.log('[getAllValidMoves] Piece found:', piece);
+  
+  if (!piece) {
+    console.log('[getAllValidMoves] No piece found on board');
+    return [];
+  }
+  
   const moves = [];
   for (const { dr, dc, dir } of directions) {
     for (let dist = 1; dist < boardSize; dist++) {
@@ -34,6 +46,8 @@ export function getAllValidMoves(board, blockedCells, boardSize) {
       moves.push({ row: nr, col: nc, direction: dir, distance: dist });
     }
   }
+  
+  console.log('[getAllValidMoves] Generated moves:', moves);
   return moves;
 }
 
@@ -45,7 +59,22 @@ export function getAllValidMoves(board, blockedCells, boardSize) {
  * @returns {Move|null}
  */
 export function getRandomComputerMove(board, blockedCells, boardSize) {
+  console.log('[getRandomComputerMove] Function called', {
+    boardSize,
+    blockedCellsCount: blockedCells.length
+  });
+  
   const moves = getAllValidMoves(board, blockedCells, boardSize);
-  if (!moves.length) return null;
-  return moves[Math.floor(Math.random() * moves.length)];
+  
+  console.log('[getRandomComputerMove] Available moves:', moves);
+  
+  if (!moves.length) {
+    console.log('[getRandomComputerMove] No valid moves available');
+    return null;
+  }
+  
+  const selectedMove = moves[Math.floor(Math.random() * moves.length)];
+  console.log('[getRandomComputerMove] Selected move:', selectedMove);
+  
+  return selectedMove;
 } 
