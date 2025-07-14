@@ -318,91 +318,70 @@ export class GameBoardComponent extends BaseComponent {
     }
 
     renderBoard(board, boardSize) {
-        Logger.debug('[GameBoardComponent] renderBoard: початок', { boardSize, boardLength: board?.length });
+        Logger.debug('[GameBoardComponent] renderBoard called with boardSize:', { boardSize, boardLength: board?.length });
         
-        if (!Array.isArray(board)) {
-            Logger.error('[GameBoardComponent] renderBoard: board is not an array:', { board });
+        const gameBoard = this.element.querySelector('#game-board');
+        if (!gameBoard) {
+            Logger.error('[GameBoardComponent] Game board element not found');
             return;
         }
-        
-        // Валідація розміру дошки
-        if (boardSize < 2 || boardSize > 9) {
-            Logger.error('[GameBoardComponent] renderBoard: invalid board size:', { boardSize });
+        if (!Array.isArray(board) || board.length !== boardSize) {
+            Logger.error('[GameBoardComponent] Invalid board array in renderBoard, auto-fix:', { board, boardSize });
+            const newBoard = createEmptyBoard(boardSize);
+            const randomRow = Math.floor(Math.random() * boardSize);
+            const randomCol = Math.floor(Math.random() * boardSize);
+            newBoard[randomRow][randomCol] = 1;
+            stateManager.setState('game.board', newBoard);
+            this.renderBoard(newBoard, boardSize);
             return;
         }
-        
-        const boardEl = this.element.querySelector('#game-board');
-        if (!boardEl) {
-            Logger.error('[GameBoardComponent] renderBoard: board element not found');
-            return;
-        }
-        
-        Logger.debug('[GameBoardComponent] renderBoard called with boardSize:', { boardSize, boardLength: board.length });
-        
-        // Очищаємо дошку
-        boardEl.innerHTML = '';
-        
-        // Встановлюємо grid layout
-        boardEl.style.gridTemplateColumns = `repeat(${boardSize}, 1fr)`;
-        boardEl.style.gridTemplateRows = `repeat(${boardSize}, 1fr)`;
-        
-        const highlightedMoves = stateManager.getState('game.highlightedMoves') || [];
-        const showMoves = stateManager.getState('game.showingAvailableMoves');
-        const availableMoves = stateManager.getState('game.availableMoves') || [];
-        const blockedCells = stateManager.getState('game.blockedCells') || [];
-        const blockedMode = stateManager.getState('settings.blockedMode') || false;
-        Logger.debug('[DIAG] blockedCells для render:', { blockedCells, blockedMode });
-        
-        Logger.debug('[GameBoardComponent] renderBoard - showMoves:', { showMoves, highlightedMovesCount: highlightedMoves.length, availableMovesCount: availableMoves.length });
-        
-        // Якщо показ ходів увімкнено, але highlightedMoves порожній, використовуємо availableMoves
-        let movesToShow = showMoves ? (highlightedMoves.length > 0 ? highlightedMoves : availableMoves) : [];
-        
-        // Додаткова перевірка: якщо показ ходів увімкнено, але movesToShow порожній, спробуємо обчислити ходи
-        if (showMoves && movesToShow.length === 0) {
-            Logger.debug('[GameBoardComponent] No moves to show, trying to compute available moves');
-            const piece = findPiece(board, 1);
-            if (piece) {
-                const computedMoves = getAllValidMoves(board, piece.row, piece.col, 1);
-                Logger.debug('[GameBoardComponent] Computed moves:', { count: computedMoves.length });
-                movesToShow = computedMoves;
-            }
-        }
-        
-        // Створюємо клітинки
+        // --- Дістаємо доступні та підсвічені ходи ---
+        const availableMoves = stateManager?.getState('game.availableMoves') || [];
+        const highlightedMoves = stateManager?.getState('game.highlightedMoves') || [];
+        gameBoard.innerHTML = '';
+        gameBoard.style.gridTemplateColumns = `repeat(${boardSize}, 1fr)`;
+        gameBoard.style.gridTemplateRows = `repeat(${boardSize}, 1fr)`;
         let cellsCreated = 0;
-        for (let i = 0; i < boardSize; i++) {
-            for (let j = 0; j < boardSize; j++) {
+        const expectedCells = boardSize * boardSize;
+        for (let row = 0; row < boardSize; row++) {
+            for (let col = 0; col < boardSize; col++) {
                 const cell = document.createElement('div');
-                cell.className = `game-board-cell ${(i + j) % 2 === 0 ? 'light' : 'dark'}`;
-
-                const isAvailable = showMoves && movesToShow.some(m => m.newRow === i && m.newCol === j);
-                if (isAvailable) {
-                    cell.classList.add('cell-available');
+                cell.className = 'board-cell';
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+                if ((row + col) % 2 === 0) {
+                    cell.classList.add('cell-light');
+                } else {
+                    cell.classList.add('cell-dark');
                 }
-
-                // === Перевірка заблокованої клітинки ПЕРША ===
-                if (blockedMode && blockedCells.some(cell => cell.row === i && cell.col === j)) {
-                    cell.classList.add('cell-blocked');
-                    cell.innerHTML = '<span class="blocked-symbol">✗</span>';
-                    Logger.debug('[GameBoardComponent] Rendered blocked cell:', { row: i, col: j });
-                } else if (board[i] && board[i][j] === 1) {
-                    cell.innerHTML = '<span class="game-board-piece crown">👑</span>';
-                } else if (board[i] && board[i][j] === 2) {
-                    cell.innerHTML = '<span class="game-board-piece black">⚫</span>';
+                const cellValue = board[row][col];
+                // --- Фігура ---
+                if (cellValue === 1) {
+                    cell.classList.add('player-piece');
+                    cell.innerHTML = '<span class="crown">👑</span>';
+                } else if (cellValue === 2) {
+                    cell.classList.add('player-piece', 'player2');
+                    cell.innerHTML = '<span class="crown">👑</span>';
+                } else {
+                    cell.classList.add('empty-cell');
+                    // --- Доступні ходи ---
+                    const isHighlighted = highlightedMoves.some(move => move.newRow === row && move.newCol === col);
+                    const isAvailable = availableMoves.some(move => move.newRow === row && move.newCol === col);
+                    if (isHighlighted) {
+                        cell.classList.add('highlighted-move');
+                        cell.innerHTML = '<span class="move-dot move-dot-highlighted"></span>';
+                    } else if (isAvailable) {
+                        cell.classList.add('available-move');
+                        cell.innerHTML = '<span class="move-dot"></span>';
+                    } else {
+                        cell.innerHTML = '';
+                    }
                 }
-
-                boardEl.appendChild(cell);
+                gameBoard.appendChild(cell);
                 cellsCreated++;
             }
         }
-        
-        Logger.debug('[GameBoardComponent] renderBoard completed, cells created:', { cellsCreated, expected: boardSize * boardSize });
-        
-        // Додаткова перевірка
-        if (cellsCreated !== boardSize * boardSize) {
-            Logger.error('[GameBoardComponent] renderBoard: cell count mismatch:', { cellsCreated, expected: boardSize * boardSize });
-        }
+        Logger.debug('[GameBoardComponent] renderBoard completed, cells created:', { cellsCreated, expected: expectedCells });
     }
     
     destroy() {

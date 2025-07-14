@@ -69,6 +69,11 @@ export class MainMenuComponent extends BaseComponent {
         
         console.log('[MainMenuComponent] bindEvents called');
         this.eventsBound = true; // Позначаємо, що події прив'язані
+        
+        // Очищаємо попередні обробники подій для уникнення дублювання
+        this.element.querySelectorAll('button').forEach(btn => {
+            btn.replaceWith(btn.cloneNode(true));
+        });
         // Грати з комп'ютером
         this.element.querySelector('#btn-vs-computer')?.addEventListener('click', () => {
             console.log('[MainMenuComponent] btn-vs-computer clicked');
