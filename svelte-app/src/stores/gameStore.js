@@ -131,13 +131,31 @@ export function updateSettings(newSettings) {
 }
 
 /**
+ * @param {string} mode
+ */
+export function setGameMode(mode) {
+  console.log('[setGameMode] Setting game mode:', mode);
+  appState.update(state => ({ ...state, gameMode: mode }));
+}
+
+/**
  * @param {number} newSize
  */
 export function setBoardSize(newSize) {
+  console.log('[setBoardSize] Function called with size:', newSize);
+  
   const { row, col } = getRandomCell(newSize);
   appState.update(state => {
     const board = createEmptyBoard(newSize);
     board[row][col] = 1;
+    
+    console.log('[setBoardSize] Setting up new game', {
+      boardSize: newSize,
+      playerRow: row,
+      playerCol: col,
+      gameMode: state.gameMode
+    });
+    
     return {
       ...state,
       boardSize: newSize,
@@ -222,15 +240,66 @@ export function resetGame() {
  * Виконує хід комп'ютера у режимі vsComputer
  */
 export function makeComputerMove() {
-  setTimeout(() => {
+  console.log('[makeComputerMove] Function called');
+  
+  // Перевіряємо, чи ми в браузері
+  if (typeof window === 'undefined') {
+    console.log('[makeComputerMove] Not in browser environment, skipping computer move');
+    return;
+  }
+  
+  // Використовуємо requestAnimationFrame замість setTimeout для кращої інтеграції з браузером
+  const executeMove = () => {
     const current = get(appState);
+    console.log('[makeComputerMove] Current state:', {
+      playerRow: current.playerRow,
+      playerCol: current.playerCol,
+      boardSize: current.boardSize,
+      blockedCells: current.blockedCells
+    });
+    
     const move = getRandomComputerMove(current.board, current.blockedCells, current.boardSize);
+    
     if (move) {
-      movePlayer(move.row, move.col);
-      if (current.blockModeEnabled) {
-        toggleBlockCell(move.row, move.col);
-      }
+      console.log('[makeComputerMove] Computer move selected:', move);
+      
+      // Виконуємо хід комп'ютера напряму, без використання movePlayer
+      appState.update(state => {
+        const newBoard = state.board.map(row => row.slice());
+        newBoard[state.playerRow][state.playerCol] = 0;
+        newBoard[move.row][move.col] = 1;
+        
+        console.log('[makeComputerMove] Computer move executed successfully', {
+          from: [state.playerRow, state.playerCol],
+          to: [move.row, move.col]
+        });
+        
+        const newState = {
+          ...state,
+          board: newBoard,
+          playerRow: move.row,
+          playerCol: move.col,
+          availableMoves: getAvailableMoves(move.row, move.col, state.boardSize, state.blockedCells)
+        };
+        
+        // Якщо увімкнено режим блокування, блокуємо клітинку
+        if (state.blockModeEnabled) {
+          console.log('[makeComputerMove] Blocking cell after computer move');
+          const newBlockedCells = [...state.blockedCells, { row: move.row, col: move.col }];
+          newState.blockedCells = newBlockedCells;
+          newState.availableMoves = getAvailableMoves(move.row, move.col, state.boardSize, newBlockedCells);
+        }
+        
+        return newState;
+      });
+    } else {
+      console.log('[makeComputerMove] No valid moves available for computer');
     }
+  };
+  
+  // Затримка 600мс перед виконанням ходу
+  setTimeout(() => {
+    requestAnimationFrame(executeMove);
   }, 600);
 }
 
@@ -256,17 +325,38 @@ export function toggleSpeech() {
  * @param {string} dir
  */
 export function setDirection(dir) {
+  console.log('[setDirection] Setting direction:', dir);
   appState.update(state => ({ ...state, selectedDirection: dir }));
 }
 /**
  * @param {number} dist
  */
 export function setDistance(dist) {
+  console.log('[setDistance] Setting distance:', dist);
   appState.update(state => ({ ...state, selectedDistance: dist }));
 }
 export function confirmMove() {
+  // Перевіряємо, чи ми в браузері
+  if (typeof window === 'undefined') {
+    console.log('[confirmMove] Not in browser environment, skipping move');
+    return;
+  }
+  
   const state = get(appState);
-  if (!state.selectedDirection || !state.selectedDistance) return;
+  
+  // Додаємо логування для відстеження проблеми
+  console.log('[confirmMove] Function called', {
+    selectedDirection: state.selectedDirection,
+    selectedDistance: state.selectedDistance,
+    playerRow: state.playerRow,
+    playerCol: state.playerCol,
+    boardSize: state.boardSize
+  });
+  
+  if (!state.selectedDirection || !state.selectedDistance) {
+    console.log('[confirmMove] Missing direction or distance, returning early');
+    return;
+  }
 
   // Обчислення нових координат (8 напрямків)
   /** @type {Direction|null} */
@@ -277,24 +367,71 @@ export function confirmMove() {
   ) {
     dir = /** @type {Direction} */ (state.selectedDirection);
   }
-  const [dr, dc] = dir ? dirMap[dir] : [0, 0];
+  
+  if (!dir) {
+    console.log('[confirmMove] Invalid direction:', state.selectedDirection);
+    return;
+  }
+  
+  const [dr, dc] = dirMap[dir];
   const newRow = state.playerRow + dr * state.selectedDistance;
   const newCol = state.playerCol + dc * state.selectedDistance;
+
+  console.log('[confirmMove] Calculated new position', {
+    direction: dir,
+    directionVector: [dr, dc],
+    distance: state.selectedDistance,
+    newRow,
+    newCol,
+    boardSize: state.boardSize
+  });
 
   // Перевірка меж дошки
   if (
     newRow >= 0 && newRow < state.boardSize &&
     newCol >= 0 && newCol < state.boardSize
   ) {
-    movePlayer(newRow, newCol);
+    console.log('[confirmMove] Position is within board bounds, executing move');
+    
+    // Перевірка, чи клітинка не заблокована
+    const isBlocked = state.blockedCells.some(cell => cell.row === newRow && cell.col === newCol);
+    if (isBlocked) {
+      console.log('[confirmMove] Target cell is blocked, move cancelled');
+      return;
+    }
+    
+    // Виконуємо хід напряму, без використання movePlayer
+    appState.update(s => {
+      const newBoard = s.board.map(row => row.slice());
+      newBoard[s.playerRow][s.playerCol] = 0;
+      newBoard[newRow][newCol] = 1;
+      
+      console.log('[confirmMove] Move executed successfully', {
+        from: [s.playerRow, s.playerCol],
+        to: [newRow, newCol]
+      });
+      
+      return {
+        ...s,
+        board: newBoard,
+        playerRow: newRow,
+        playerCol: newCol,
+        selectedDirection: null,
+        selectedDistance: null,
+        availableMoves: getAvailableMoves(newRow, newCol, s.boardSize, s.blockedCells)
+      };
+    });
+    
+    // Якщо гра проти комп'ютера, виконуємо хід комп'ютера
+    if (state.gameMode === 'vsComputer') {
+      console.log('[confirmMove] Game mode is vsComputer, making computer move');
+      makeComputerMove();
+    } else {
+      console.log('[confirmMove] Game mode is not vsComputer:', state.gameMode);
+    }
+  } else {
+    console.log('[confirmMove] Position is outside board bounds, move cancelled');
   }
-
-  // Скидання вибору
-  appState.update(s => ({
-    ...s,
-    selectedDirection: null,
-    selectedDistance: null
-  }));
 }
 export function noMoves() {
   // Тут має бути логіка для ситуації "немає куди ходити"
