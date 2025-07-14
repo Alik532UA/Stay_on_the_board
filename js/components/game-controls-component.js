@@ -20,6 +20,12 @@ export class GameControlsComponent extends BaseComponent {
     }
     
     render() {
+        // Перевіряємо, чи вже рендерилися
+        if (this.isRendered) {
+            Logger.debug('[GameControlsComponent] Already rendered, skipping');
+            return;
+        }
+        
         Logger.info('[GameControlsComponent] render: початок');
         const settings = window.stateManager?.getState('settings') || {};
         const boardSize = window.stateManager?.getState('game.boardSize') || 3;
@@ -103,6 +109,7 @@ export class GameControlsComponent extends BaseComponent {
             this.updateGameMode(currentGameMode);
         }
         
+        this.isRendered = true;
         Logger.info('[GameControlsComponent] render: завершено');
     }
 
@@ -232,6 +239,17 @@ export class GameControlsComponent extends BaseComponent {
             console.log('[GameControlsComponent] Board size changed to:', newSize);
             this.generateDistanceButtons(newSize); // Оновлюємо лише кнопки дистанції
             this.bindEvents(); // Додаємо обробники на нові кнопки
+            
+            // Скидаємо відстань до 1 при зміні розміру дошки
+            const currentDistance = stateManager.getState('game.selectedDistance');
+            if (currentDistance !== null && currentDistance > newSize - 1) {
+                stateManager.setState('game.selectedDistance', 1);
+                Logger.debug('[GameControlsComponent] Reset distance to 1 due to board size change:', { 
+                    oldDistance: currentDistance, 
+                    newBoardSize: newSize, 
+                    maxDistance: newSize - 1 
+                });
+            }
         });
         
         // Підписка на зміни selectedDistance для діагностики
@@ -556,6 +574,10 @@ export class GameControlsComponent extends BaseComponent {
                 centerInfo.removeEventListener('click', this.centerInfoClickHandler);
             }
         }
+        
+        // Скидаємо флаги
+        this.isRendered = false;
+        
         // Викликаємо батьківський метод для очищення підписок та інших ресурсів
         super.destroy();
     }

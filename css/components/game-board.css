@@ -26,8 +26,16 @@
     user-select: none;
 }
 
-.cell-light { background-color: var(--cell-light); }
-.cell-dark { background-color: var(--cell-dark); }
+.cell-light {
+    background: #a98a7b;
+    border-radius: 12px;
+    transition: background 0.2s, border-radius 0.2s;
+}
+.cell-dark {
+    background: #6d4c41;
+    border-radius: 12px;
+    transition: background 0.2s, border-radius 0.2s;
+}
 .cell-blocked { 
     background-color: var(--cell-blocked);
     cursor: not-allowed;
@@ -212,13 +220,79 @@
 
 .game-board {
     display: grid;
-    gap: 8px;
-    background: transparent;
-    border-radius: 18px;
-    box-shadow: 0 4px 32px #0003;
-    padding: 8px;
-    aspect-ratio: 1 / 1;
+    width: 100%;
+    height: 100%;
+    min-width: 240px;
+    min-height: 240px;
+    aspect-ratio: 1/1;
+    background: #2d0036;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px 0 rgba(80,0,80,0.22), 0 1.5px 8px 0 #0002;
+    overflow: hidden;
+    transition: box-shadow 0.3s;
 }
+
+.board-cell {
+    border: 1px solid #2d0036;
+    box-sizing: border-box;
+    min-width: 32px;
+    min-height: 32px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7em;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s, border-radius 0.2s;
+    position: relative;
+    z-index: 1;
+    border-radius: 12px;
+}
+
+.board-cell:hover {
+    box-shadow: 0 0 8px 2px #ffb30055;
+    transform: scale(1.06);
+}
+
+.crown {
+    font-size: 2.1em;
+    filter: drop-shadow(0 0 8px #fff8) drop-shadow(0 0 4px #ffb300cc);
+    animation: crown-pop 0.4s cubic-bezier(.68,-0.55,.27,1.55);
+}
+
+@keyframes crown-pop {
+    0% { transform: scale(0.5) rotate(-20deg); opacity: 0; }
+    60% { transform: scale(1.2) rotate(8deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* --- ОЧИЩЕННЯ СТАРИХ СТИЛІВ --- */
+
+/* --- ЛИШЕ КРАПКА --- */
+.move-dot {
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    margin: auto;
+}
+
+.move-dot-highlighted {
+    display: none !important;
+}
+@keyframes dot-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    80% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes dot-pop-highlighted {
+    0% { transform: scale(0.5); opacity: 0; }
+    80% { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+} 
 
 .game-board-cell {
     width: 100%;
@@ -270,4 +344,61 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+} 
+
+/* Заблоковані клітинки */
+.blocked-cell {
+    background-color: #000 !important;
+    color: #ff0000 !important;
+    font-weight: bold !important;
+    font-size: 1.2em !important;
+    cursor: not-allowed !important;
+    position: relative;
+}
+
+.blocked-cell .blocked-symbol {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #ff0000;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.blocked-cell:hover {
+    background-color: #000 !important;
+    color: #ff0000 !important;
+}
+
+/* Запобігання клікам на заблоковані клітинки */
+.blocked-cell * {
+    pointer-events: none;
+} 
+
+.move-dot {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: none;
+    margin: 0 auto;
+    animation: none;
+    transition: none;
+}
+
+.move-dot-highlighted {
+    display: none !important;
+}
+@keyframes dot-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    80% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes dot-pop-highlighted {
+    0% { transform: scale(0.5); opacity: 0; }
+    80% { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
 } 
