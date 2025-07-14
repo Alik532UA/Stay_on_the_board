@@ -135,8 +135,17 @@ export class SettingsComponent extends BaseComponent {
         });
         
         this.addEventListener('#blocked-mode-checkbox', 'change', (e) => {
-            stateManager.setState('settings.blockedMode', e.target.checked);
-            console.log('[DIAG] settings.blockedMode після кліку:', e.target.checked);
+            const blockedMode = e.target.checked;
+            stateManager.setState('settings.blockedMode', blockedMode);
+            console.log('[DIAG] settings.blockedMode після кліку:', blockedMode);
+            
+            // Додатково викликаємо toggleBlockedMode для ініціалізації заблокованих клітинок
+            if (window.gameLogic && typeof window.gameLogic.toggleBlockedMode === 'function') {
+                window.gameLogic.toggleBlockedMode(blockedMode);
+                console.log('[DIAG] toggleBlockedMode викликано з:', blockedMode);
+            } else {
+                console.log('[DIAG] gameLogic.toggleBlockedMode недоступний');
+            }
         });
         
         this.addEventListener('#speech-enabled-checkbox', 'change', (e) => {

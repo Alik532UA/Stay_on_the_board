@@ -20,6 +20,7 @@ export class GameControlsComponent extends BaseComponent {
     }
     
     render() {
+        Logger.info('[GameControlsComponent] render: початок');
         const settings = window.stateManager?.getState('settings') || {};
         const boardSize = window.stateManager?.getState('game.boardSize') || 3;
         Logger.debug('[GameControlsComponent.render] boardSize:', { boardSize });
@@ -94,6 +95,15 @@ export class GameControlsComponent extends BaseComponent {
         this.bindCheckboxEvents();
         this.syncCheckboxWithSettings();
         this.bindEvents();
+        
+        // Встановлюємо поточний режим гри
+        const currentGameMode = window.stateManager?.getState('game.gameMode');
+        if (currentGameMode) {
+            Logger.debug('[GameControlsComponent] Setting initial game mode:', { currentGameMode });
+            this.updateGameMode(currentGameMode);
+        }
+        
+        Logger.info('[GameControlsComponent] render: завершено');
     }
 
     generateDistanceButtons(boardSize = 3) {
@@ -202,6 +212,7 @@ export class GameControlsComponent extends BaseComponent {
         });
         
         this.subscribe('game.gameMode', (mode) => {
+            Logger.debug('[GameControlsComponent] game.gameMode changed:', { mode });
             this.updateGameMode(mode);
         });
         
@@ -222,6 +233,15 @@ export class GameControlsComponent extends BaseComponent {
             this.generateDistanceButtons(newSize); // Оновлюємо лише кнопки дистанції
             this.bindEvents(); // Додаємо обробники на нові кнопки
         });
+        
+        // Підписка на зміни selectedDistance для діагностики
+        this.subscribe('game.selectedDistance', (distance) => {
+            Logger.debug('[GameControlsComponent] game.selectedDistance changed:', { 
+                distance, 
+                boardSize: stateManager.getState('game.boardSize'),
+                maxDistance: (stateManager.getState('game.boardSize') || 3) - 1
+            });
+        });
     }
     
     selectDirection(direction) {
@@ -234,28 +254,60 @@ export class GameControlsComponent extends BaseComponent {
             return;
         }
         
+        Logger.debug('[GameControlsComponent] selectDirection called:', { 
+            direction, 
+            boardSize, 
+            currentSelectedDirection: this.selectedDirection, 
+            currentSelectedDistance: this.selectedDistance,
+            distanceManuallySelected: this.distanceManuallySelected 
+        });
+        
         // Якщо вибираємо той самий напрямок знову, збільшуємо відстань на 1
         if (this.selectedDirection === direction && this.selectedDistance !== null) {
             const maxDistance = boardSize - 1; // Максимальна відстань = розмір дошки - 1
+            
+            Logger.debug('[GameControlsComponent] Same direction selected, checking distance:', { 
+                currentDistance: this.selectedDistance, 
+                maxDistance 
+            });
             
             if (this.selectedDistance >= maxDistance) {
                 // Якщо досягли максимальної відстані, скидаємо до 1
                 stateManager.setState('game.selectedDistance', 1);
                 this.distanceManuallySelected = false; // Скидаємо флаг, бо відстань змінилася автоматично
+                Logger.debug('[GameControlsComponent] Reset distance to 1 (max reached)');
             } else {
                 // Інакше збільшуємо на 1
-                stateManager.setState('game.selectedDistance', this.selectedDistance + 1);
+                const newDistance = this.selectedDistance + 1;
+                stateManager.setState('game.selectedDistance', newDistance);
                 this.distanceManuallySelected = false; // Скидаємо флаг, бо відстань змінилася автоматично
+                Logger.debug('[GameControlsComponent] Increased distance to:', { newDistance });
             }
         } else {
             // Якщо вибираємо новий напрямок
             stateManager.setState('game.selectedDirection', direction);
             
+            Logger.debug('[GameControlsComponent] New direction selected, checking manual selection:', { 
+                distanceManuallySelected: this.distanceManuallySelected 
+            });
+            
             // Скидаємо відстань до 1 тільки якщо вона не була вибрана вручну
             if (!this.distanceManuallySelected) {
                 stateManager.setState('game.selectedDistance', 1);
+                Logger.debug('[GameControlsComponent] Reset distance to 1 (new direction, not manually selected)');
+            } else {
+                Logger.debug('[GameControlsComponent] Keeping current distance (manually selected)');
             }
         }
+        
+        // Логуємо фінальний стан
+        setTimeout(() => {
+            const finalDistance = stateManager.getState('game.selectedDistance');
+            Logger.debug('[GameControlsComponent] Final state after selectDirection:', { 
+                direction, 
+                selectedDistance: finalDistance 
+            });
+        }, 10);
     }
     
     selectDistance(distance) {
@@ -391,13 +443,18 @@ export class GameControlsComponent extends BaseComponent {
     }
     
     updateGameMode(mode) {
+        Logger.debug('[GameControlsComponent] updateGameMode:', { mode });
         const computerDisplay = this.element.querySelector('#computer-move-display');
         if (computerDisplay) {
             if (mode === 'vsComputer') {
                 computerDisplay.style.display = 'flex';
+                Logger.debug('[GameControlsComponent] Computer display shown');
             } else {
                 computerDisplay.style.display = 'none';
+                Logger.debug('[GameControlsComponent] Computer display hidden');
             }
+        } else {
+            Logger.debug('[GameControlsComponent] Computer display element not found');
         }
     }
     
