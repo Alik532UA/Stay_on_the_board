@@ -6,11 +6,11 @@ import { findPiece, hasValidMoves, getAllValidMoves, getDirectionDelta, getDirec
 import { t } from './localization.js';
 import { speakMove, speakGameMessage, stopSpeaking, initVoices, getVoicesForLanguage, setVoiceForLanguage, getCurrentVoice } from './speech.js';
 import { eventBus } from './event-bus.js';
-import { Logger } from './utils/logger.js';
+// import { Logger } from './utils/logger.js';
 
 export class GameLogic {
     constructor() {
-        Logger.debug('GameLogic: constructor');
+        window.Logger.debug('GameLogic: constructor');
         this.isInitialized = false;
         this.gameBoardComponent = null;
         this.gameControlsComponent = null;
@@ -22,7 +22,7 @@ export class GameLogic {
     init() {
         if (this.isInitialized) return;
         
-        Logger.info('[GameLogic] Initializing...');
+        window.Logger.info('[GameLogic] Initializing...');
         this.log('Initializing Game Logic');
         
         // Підписуємося на зміни стану гри
@@ -36,7 +36,7 @@ export class GameLogic {
     }
     
     subscribeToGameState() {
-        Logger.debug('GameLogic: subscribeToGameState');
+        window.Logger.debug('GameLogic: subscribeToGameState');
         // Підписка на зміни стану гри
         stateManager.subscribe('game.isActive', (isActive) => {
             if (isActive) {
@@ -56,11 +56,11 @@ export class GameLogic {
         
         // Підписка на зміни розміру дошки
         stateManager.subscribe('game.boardSize', (newSize) => {
-            Logger.info('[GameLogic] Board size changed to:', { newSize });
+            window.Logger.info('[GameLogic] Board size changed to:', { newSize });
             
             // Валідація розміру дошки
             if (newSize < 2 || newSize > 9) {
-                Logger.error('[GameLogic] Invalid board size:', { newSize });
+                window.Logger.error('[GameLogic] Invalid board size:', { newSize });
                 return;
             }
             
@@ -74,7 +74,7 @@ export class GameLogic {
             
             // Перевіряємо, чи дошка була створена успішно
             if (!newBoard) {
-                Logger.error('[GameLogic] Failed to create board with size:', { newSize });
+                window.Logger.error('[GameLogic] Failed to create board with size:', { newSize });
                 return;
             }
             
@@ -86,7 +86,7 @@ export class GameLogic {
             // Додаткова перевірка через невелику затримку
             setTimeout(() => {
                 const currentBoard = stateManager.getState('game.board');
-                Logger.debug('[GameLogic] Verification after board recreation:', {
+                window.Logger.debug('[GameLogic] Verification after board recreation:', {
                     expectedSize: newSize,
                     boardExists: Array.isArray(currentBoard),
                     boardLength: currentBoard?.length,
@@ -102,10 +102,10 @@ export class GameLogic {
         
         // Підписка на подію підтвердження ходу через EventBus
         eventBus.on('game:confirmMove', () => {
-            Logger.info('[GameLogic] game:confirmMove received');
-            Logger.debug('[GameLogic] Calling processPlayerMove');
+            window.Logger.info('[GameLogic] game:confirmMove received');
+            window.Logger.debug('[GameLogic] Calling processPlayerMove');
             this.processPlayerMove();
-            Logger.debug('[GameLogic] processPlayerMove completed');
+            window.Logger.debug('[GameLogic] processPlayerMove completed');
         });
         
         stateManager.subscribe('game.noMoves', (noMoves) => {
@@ -136,7 +136,7 @@ export class GameLogic {
     
     // Ініціалізація мови
     async initSpeech() {
-        Logger.debug('[GameLogic] initSpeech called');
+        window.Logger.debug('[GameLogic] initSpeech called');
         try {
             await initVoices();
             this.speechEnabled = stateManager.getState('settings.speechEnabled');
@@ -148,39 +148,39 @@ export class GameLogic {
     
     // Обробка початку гри
     onGameStart() {
-        Logger.debug('[GameLogic] onGameStart called');
+        window.Logger.debug('[GameLogic] onGameStart called');
         const gameState = stateManager.getState('game');
         const settings = stateManager.getState('settings');
         const gameMode = gameState.gameMode;
-        Logger.debug('[GameLogic] onGameStart: blockedMode =', stateManager.getState('settings.blockedMode'), 'blockedCells =', gameState.blockedCells);
+        window.Logger.debug('[GameLogic] onGameStart: blockedMode =', stateManager.getState('settings.blockedMode'), 'blockedCells =', gameState.blockedCells);
 
         // Явно вмикаємо показ доступних ходів для vsComputer
         if (gameMode === 'vsComputer') {
             stateManager.setState('settings.showMoves', true);
-            Logger.debug('[onGameStart] Встановлено settings.showMoves = true для vsComputer');
+            window.Logger.debug('[onGameStart] Встановлено settings.showMoves = true для vsComputer');
         }
         // Перевіряємо після встановлення
-        Logger.debug('[onGameStart] settings.showMoves (після):', stateManager.getState('settings.showMoves'));
+        window.Logger.debug('[onGameStart] settings.showMoves (після):', stateManager.getState('settings.showMoves'));
 
         const boardSize = stateManager.getState('game.boardSize') || 3;
-        Logger.debug('[GameLogic] onGameStart, boardSize =', boardSize);
+        window.Logger.debug('[GameLogic] onGameStart, boardSize =', boardSize);
         this.log('Game started', { gameState });
 
         // Валідація розміру дошки
         if (boardSize < 2 || boardSize > 9) {
-            Logger.error('[GameLogic] Invalid board size in onGameStart:', boardSize);
+            window.Logger.error('[GameLogic] Invalid board size in onGameStart:', boardSize);
             return;
         }
 
         // --- Ініціалізація дошки, якщо порожня або неправильного розміру ---
         let board = gameState.board;
         if (!board || !Array.isArray(board) || board.length !== boardSize) {
-            Logger.debug('[GameLogic] Creating new board with size:', boardSize);
+            window.Logger.debug('[GameLogic] Creating new board with size:', boardSize);
             board = createEmptyBoard(boardSize);
             
             // Перевіряємо, чи дошка була створена успішно
             if (!board) {
-                Logger.error('[GameLogic] Failed to create board with size:', boardSize);
+                window.Logger.error('[GameLogic] Failed to create board with size:', boardSize);
                 return;
             }
             
@@ -189,23 +189,23 @@ export class GameLogic {
             const randomCol = Math.floor(Math.random() * boardSize);
             board[randomRow][randomCol] = 1;
             stateManager.setState('game.board', board);
-            Logger.debug('[GameLogic] New board created and set in state');
+            window.Logger.debug('[GameLogic] New board created and set in state');
         }
         
         // Ініціалізація заблокованих клітинок при початку нової гри
         const blockedMode = stateManager.getState('settings.blockedMode') || false;
-        Logger.debug('[GameLogic] onGameStart - blockedMode setting:', { blockedMode });
+        window.Logger.debug('[GameLogic] onGameStart - blockedMode setting:', { blockedMode });
         let blockedCells = stateManager.getState('game.blockedCells') || [];
         if (blockedMode && (!blockedCells || blockedCells.length === 0)) {
             blockedCells = this.generateBlockedCells(boardSize);
-            Logger.debug('[GameLogic] onGameStart: generated blockedCells (fallback) =', blockedCells);
+            window.Logger.debug('[GameLogic] onGameStart: generated blockedCells (fallback) =', blockedCells);
             stateManager.setState('game.blockedCells', blockedCells);
-            Logger.debug('[GameLogic] onGameStart - initialized blocked cells (fallback):', { blockedCellsCount: blockedCells.length });
+            window.Logger.debug('[GameLogic] onGameStart - initialized blocked cells (fallback):', { blockedCellsCount: blockedCells.length });
         } else if (!blockedMode) {
             stateManager.setState('game.blockedCells', []);
-            Logger.debug('[GameLogic] onGameStart - cleared blocked cells');
+            window.Logger.debug('[GameLogic] onGameStart - cleared blocked cells');
         }
-        Logger.debug('[GameLogic] onGameStart: blockedCells after setState =', stateManager.getState('game').blockedCells);
+        window.Logger.debug('[GameLogic] onGameStart: blockedCells after setState =', stateManager.getState('game').blockedCells);
 
         // === ГАРАНТОВАНО ініціалізуємо доступні ходи та підсвічування ===
         const piece = findPiece(board, 1);
@@ -216,16 +216,16 @@ export class GameLogic {
             
             // Ініціалізуємо доступні ходи для поточного гравця (player 1) з урахуванням заблокованих клітинок
             const moves = getAllValidMoves(board, piece.row, piece.col, 1, blockedCells, currentBlockedMode);
-            Logger.debug('[GameLogic] onGameStart - found piece at:', piece.row, piece.col, 'blockedMode:', currentBlockedMode, 'blockedCells:', blockedCells.length, 'available moves:', moves.length);
+            window.Logger.debug('[GameLogic] onGameStart - found piece at:', piece.row, piece.col, 'blockedMode:', currentBlockedMode, 'blockedCells:', blockedCells.length, 'available moves:', moves.length);
             stateManager.setState('game.availableMoves', moves);
         } else {
-            Logger.debug('[GameLogic] onGameStart - no piece found');
+            window.Logger.debug('[GameLogic] onGameStart - no piece found');
             stateManager.setState('game.availableMoves', []);
         }
         
         // Встановлюємо стан показу доступних ходів відповідно до налаштувань
         const showMoves = stateManager.getState('settings.showMoves');
-        Logger.debug('[GameLogic] onGameStart - settings.showMoves:', showMoves);
+        window.Logger.debug('[GameLogic] onGameStart - settings.showMoves:', showMoves);
         stateManager.setState('game.showingAvailableMoves', showMoves);
         
         // Оновлюємо доступні ходи та підсвічування
@@ -248,10 +248,10 @@ export class GameLogic {
         setTimeout(() => {
             const finalShowMoves = stateManager.getState('settings.showMoves');
             const finalShowingMoves = stateManager.getState('game.showingAvailableMoves');
-            Logger.debug('[GameLogic] Final sync check - settings.showMoves:', finalShowMoves, 'game.showingAvailableMoves:', finalShowingMoves);
+            window.Logger.debug('[GameLogic] Final sync check - settings.showMoves:', finalShowMoves, 'game.showingAvailableMoves:', finalShowingMoves);
             
             if (finalShowMoves !== finalShowingMoves) {
-                Logger.debug('[GameLogic] Fixing sync mismatch');
+                window.Logger.debug('[GameLogic] Fixing sync mismatch');
                 stateManager.setState('game.showingAvailableMoves', finalShowMoves);
             }
         }, 100);
@@ -261,7 +261,7 @@ export class GameLogic {
     
     // Обробка закінчення гри
     onGameEnd() {
-        Logger.debug('[GameLogic] onGameEnd called');
+        window.Logger.debug('[GameLogic] onGameEnd called');
         this.log('Game ended');
         
         // Зупиняємо мову
@@ -279,7 +279,7 @@ export class GameLogic {
     onDirectionSelected(direction) {
         if (!direction) return;
         
-        Logger.debug('[GameLogic] onDirectionSelected called with:', direction);
+        window.Logger.debug('[GameLogic] onDirectionSelected called with:', direction);
         this.log('Direction selected', { direction });
 
         const distance = stateManager.getState('game.selectedDistance');
@@ -301,7 +301,7 @@ export class GameLogic {
     onDistanceSelected(distance) {
         if (!distance) return;
         
-        Logger.debug('[GameLogic] onDistanceSelected called with:', distance);
+        window.Logger.debug('[GameLogic] onDistanceSelected called with:', distance);
         this.log('Distance selected', { distance });
         
         const direction = stateManager.getState('game.selectedDirection');
@@ -321,33 +321,33 @@ export class GameLogic {
     
     // Оновлення доступних ходів
     updateAvailableMoves() {
-        Logger.debug('[GameLogic] updateAvailableMoves called');
+        window.Logger.debug('[GameLogic] updateAvailableMoves called');
         const gameState = stateManager.getState('game');
         const board = gameState.board;
         if (!board || !Array.isArray(board)) {
-            Logger.warn('[GameLogic] updateAvailableMoves: board is not ready');
+            window.Logger.warn('[GameLogic] updateAvailableMoves: board is not ready');
             return;
         }
         const currentPlayer = gameState.currentPlayer;
         const gameMode = gameState.gameMode;
         const boardSize = gameState.boardSize;
         
-        Logger.debug('[GameLogic] updateAvailableMoves - gameState:', { currentPlayer, gameMode, boardSize });
+        window.Logger.debug('[GameLogic] updateAvailableMoves - gameState:', { currentPlayer, gameMode, boardSize });
         
         // Валідація розміру дошки
         if (boardSize < 2 || boardSize > 9) {
-            Logger.error('[GameLogic] Invalid board size in updateAvailableMoves:', { boardSize });
+            window.Logger.error('[GameLogic] Invalid board size in updateAvailableMoves:', { boardSize });
             return;
         }
         
         if (!board || board.length === 0) {
-            Logger.debug('[GameLogic] No board or empty board, returning');
+            window.Logger.debug('[GameLogic] No board or empty board, returning');
             return;
         }
         
         // Перевіряємо, чи розмір дошки відповідає очікуваному
         if (board.length !== boardSize) {
-            Logger.debug('[GameLogic] Board size mismatch, board.length:', { boardLength: board.length, expected: boardSize });
+            window.Logger.debug('[GameLogic] Board size mismatch, board.length:', { boardLength: board.length, expected: boardSize });
             return;
         }
         
@@ -363,10 +363,10 @@ export class GameLogic {
             piece = findPiece(board, currentPlayer);
         }
         
-        Logger.debug('[GameLogic] Found piece:', { piece });
+        window.Logger.debug('[GameLogic] Found piece:', { piece });
         
         if (!piece) {
-            Logger.debug('[GameLogic] No piece found, returning');
+            window.Logger.debug('[GameLogic] No piece found, returning');
             return;
         }
         
@@ -376,12 +376,12 @@ export class GameLogic {
         
         // Отримуємо всі доступні ходи для piece 1 у vsComputer з урахуванням заблокованих клітинок
         const moves = getAllValidMoves(board, piece.row, piece.col, logicPlayer, blockedCells, blockedMode);
-        Logger.debug('[GameLogic] updateAvailableMoves - piece at:', { row: piece.row, col: piece.col, logicPlayer, blockedMode, blockedCellsCount: blockedCells.length, movesCount: moves.length });
+        window.Logger.debug('[GameLogic] updateAvailableMoves - piece at:', { row: piece.row, col: piece.col, logicPlayer, blockedMode, blockedCellsCount: blockedCells.length, movesCount: moves.length });
         stateManager.setState('game.availableMoves', moves); // завжди повний список
         
         // Перевіряємо поточний стан показу доступних ходів
         const showingAvailableMoves = stateManager.getState('game.showingAvailableMoves');
-        Logger.debug('[GameLogic] updateAvailableMoves - showingAvailableMoves:', { showingAvailableMoves, movesCount: moves.length });
+        window.Logger.debug('[GameLogic] updateAvailableMoves - showingAvailableMoves:', { showingAvailableMoves, movesCount: moves.length });
         
         // Оновлюємо підсвічені ходи тільки якщо є вибраний напрямок і відстань
         const direction = stateManager.getState('game.selectedDirection');
@@ -395,8 +395,8 @@ export class GameLogic {
             stateManager.setState('game.highlightedMoves', []);
         }
         this.log('Available moves updated', { moves: moves.length, logicPlayer });
-        Logger.debug('[GameLogic] Available moves set in state:', { availableMoves: stateManager.getState('game.availableMoves') });
-        Logger.debug('[GameLogic] Highlighted moves set in state:', { highlightedMoves: stateManager.getState('game.highlightedMoves') });
+        window.Logger.debug('[GameLogic] Available moves set in state:', { availableMoves: stateManager.getState('game.availableMoves') });
+        window.Logger.debug('[GameLogic] Highlighted moves set in state:', { highlightedMoves: stateManager.getState('game.highlightedMoves') });
     }
 
     // Оновлення підсвічених ходів для напрямку
@@ -437,16 +437,16 @@ export class GameLogic {
     
     // Перемикання показу доступних ходів
     toggleAvailableMoves(show) {
-        Logger.debug('toggleAvailableMoves called, show =', { show });
+        window.Logger.debug('toggleAvailableMoves called, show =', { show });
         stateManager.setState('game.showingAvailableMoves', show);
         const gameState = stateManager.getState('game');
         if (!gameState.board || !Array.isArray(gameState.board)) {
-            Logger.warn('[GameLogic] toggleAvailableMoves: board is not ready');
+            window.Logger.warn('[GameLogic] toggleAvailableMoves: board is not ready');
             return;
         }
         // Оновлюємо доступні ходи та підсвічування
         this.updateAvailableMoves();
-        Logger.debug('[GameLogic] toggleAvailableMoves - final state - showingAvailableMoves:', { showingAvailableMoves: stateManager.getState('game.showingAvailableMoves'), highlightedMovesCount: stateManager.getState('game.highlightedMoves').length });
+        window.Logger.debug('[GameLogic] toggleAvailableMoves - final state - showingAvailableMoves:', { showingAvailableMoves: stateManager.getState('game.showingAvailableMoves'), highlightedMovesCount: stateManager.getState('game.highlightedMoves').length });
     }
     
     // Перемикання режиму заблокованих клітинок
@@ -454,19 +454,19 @@ export class GameLogic {
         const gameState = stateManager.getState('game');
         const board = gameState.board;
         
-        Logger.debug('[GameLogic] toggleBlockedMode called with blocked:', { blocked, boardSize: board?.length });
+        window.Logger.debug('[GameLogic] toggleBlockedMode called with blocked:', { blocked, boardSize: board?.length });
         
         if (blocked) {
             let blockedCells = stateManager.getState('game.blockedCells') || [];
             if (!blockedCells || blockedCells.length === 0) {
                 blockedCells = this.generateBlockedCells(board.length);
-                Logger.debug('[GameLogic] toggleBlockedMode: generated blockedCells =', blockedCells);
+                window.Logger.debug('[GameLogic] toggleBlockedMode: generated blockedCells =', blockedCells);
             }
             stateManager.setState('game.blockedCells', blockedCells);
-            Logger.debug('[GameLogic] toggleBlockedMode: added blocked cells:', { blockedCellsCount: blockedCells.length });
+            window.Logger.debug('[GameLogic] toggleBlockedMode: added blocked cells:', { blockedCellsCount: blockedCells.length });
         } else {
             stateManager.setState('game.blockedCells', []);
-            Logger.debug('[GameLogic] toggleBlockedMode: cleared blocked cells');
+            window.Logger.debug('[GameLogic] toggleBlockedMode: cleared blocked cells');
         }
         
         // Оновлюємо доступні ходи з урахуванням заблокованих клітинок
@@ -478,7 +478,7 @@ export class GameLogic {
         const blockedCells = [];
         const numBlocked = Math.floor(boardSize * boardSize * 0.1); // 10% клітинок
         
-        Logger.debug('[GameLogic] generateBlockedCells called with boardSize:', { boardSize, numBlocked });
+        window.Logger.debug('[GameLogic] generateBlockedCells called with boardSize:', { boardSize, numBlocked });
         
         for (let i = 0; i < numBlocked; i++) {
             let row, col;
@@ -490,7 +490,7 @@ export class GameLogic {
             blockedCells.push({ row, col });
         }
         
-        Logger.debug('[GameLogic] generateBlockedCells completed:', { blockedCellsCount: blockedCells.length, blockedCells });
+        window.Logger.debug('[GameLogic] generateBlockedCells completed:', { blockedCellsCount: blockedCells.length, blockedCells });
         return blockedCells;
     }
     
@@ -515,13 +515,13 @@ export class GameLogic {
     
     // Обробка ходу гравця
     processPlayerMove() {
-        Logger.debug('[GameLogic] processPlayerMove called');
+        window.Logger.debug('[GameLogic] processPlayerMove called');
         const gameState = stateManager.getState('game');
-        Logger.debug('[GameLogic] processPlayerMove: blockedMode =', stateManager.getState('settings.blockedMode'), 'blockedCells =', gameState.blockedCells);
+        window.Logger.debug('[GameLogic] processPlayerMove: blockedMode =', stateManager.getState('settings.blockedMode'), 'blockedCells =', gameState.blockedCells);
         const direction = gameState.selectedDirection;
         const distance = gameState.selectedDistance;
         const availableMoves = gameState.availableMoves;
-        Logger.debug('[GameLogic] direction:', direction, 'distance:', distance, 'availableMoves count:', availableMoves?.length);
+        window.Logger.debug('[GameLogic] direction:', direction, 'distance:', distance, 'availableMoves count:', availableMoves?.length);
         if (!direction || !distance) {
             this.showError('Будь ласка, виберіть напрямок та дистанцію');
             return;
@@ -546,7 +546,7 @@ export class GameLogic {
         const newRow = piece.row + dr * distance;
         const newCol = piece.col + dc * distance;
         const boardSize = board.length;
-        Logger.debug('[GameLogic] Board size:', boardSize, 'New position:', newRow, newCol);
+        window.Logger.debug('[GameLogic] Board size:', boardSize, 'New position:', newRow, newCol);
         if (newRow < 0 || newRow >= boardSize || newCol < 0 || newCol >= boardSize) {
             // === Покажемо модалку з помилкою, не завершуємо гру ===
             const dirText = getDirectionText(direction, gameState.language || 'uk');
@@ -566,7 +566,7 @@ export class GameLogic {
         if (blockedMode && blockedCells.some(c => c.row === newRow && c.col === newCol)) {
             const dirText = getDirectionText(direction, gameState.language || 'uk');
             const msg = `Цей хід неможливий. Ви намагаєтеся перемістити фігуру на заблоковану клітинку (${newRow + 1}, ${newCol + 1}) ${dirText}.`;
-            Logger.warn('[GameLogic] Спроба ходу на заблоковану клітинку — показуємо помилку', { newRow, newCol, direction, distance });
+            window.Logger.warn('[GameLogic] Спроба ходу на заблоковану клітинку — показуємо помилку', { newRow, newCol, direction, distance });
             stateManager.showModal('Помилка', msg, [
                 { text: 'OK', class: 'primary' }
             ]);
@@ -578,22 +578,22 @@ export class GameLogic {
         }
         // === КІНЕЦЬ ВИПРАВЛЕННЯ ===
         const move = availableMoves.find(m => m.direction === direction && m.distance === distance);
-        Logger.debug('[GameLogic] found move:', move);
+        window.Logger.debug('[GameLogic] found move:', move);
         if (!move) {
             this.showError('Недійсний хід');
             return;
         }
         this.executeMove(move);
         const mode = stateManager.getState('game.gameMode');
-        Logger.debug('[GameLogic] Game mode:', mode);
-        Logger.debug('[GameLogic] Current player after executeMove:', stateManager.getState('game.currentPlayer'));
+        window.Logger.debug('[GameLogic] Game mode:', mode);
+        window.Logger.debug('[GameLogic] Current player after executeMove:', stateManager.getState('game.currentPlayer'));
         if (mode === 'vsComputer') {
             // Після ходу гравця одразу передаємо хід комп'ютеру
-            Logger.debug('[GameLogic] Setting currentPlayer to 2 for computer turn');
+            window.Logger.debug('[GameLogic] Setting currentPlayer to 2 for computer turn');
             stateManager.setState('game.currentPlayer', 2);
             this.updateAvailableMoves(); // Оновлюємо доступні ходи для комп'ютера
-            Logger.debug('[GameLogic] Current player after setting to 2:', stateManager.getState('game.currentPlayer'));
-            Logger.debug('[GameLogic] Scheduling computer move in 300ms');
+            window.Logger.debug('[GameLogic] Current player after setting to 2:', stateManager.getState('game.currentPlayer'));
+            window.Logger.debug('[GameLogic] Scheduling computer move in 300ms');
             setTimeout(() => this.makeComputerMove(), 300); // невелика затримка для плавності
         } else {
             // Для локальної гри — стандартна зміна гравця
@@ -605,14 +605,14 @@ export class GameLogic {
     
     // Виконання ходу
     executeMove(move) {
-        Logger.debug('[GameLogic] executeMove called with:', move);
+        window.Logger.debug('[GameLogic] executeMove called with:', move);
         const gameState = stateManager.getState('game');
-        Logger.debug('[GameLogic] executeMove: blockedMode =', stateManager.getState('settings.blockedMode'), 'blockedCells до =', gameState.blockedCells);
+        window.Logger.debug('[GameLogic] executeMove: blockedMode =', stateManager.getState('settings.blockedMode'), 'blockedCells до =', gameState.blockedCells);
         const board = gameState.board;
         const currentPlayer = gameState.currentPlayer;
         const gameMode = gameState.gameMode;
         
-        Logger.debug('[GameLogic] Current player:', currentPlayer, 'Game mode:', gameMode, 'Board size:', board.length);
+        window.Logger.debug('[GameLogic] Current player:', currentPlayer, 'Game mode:', gameMode, 'Board size:', board.length);
         
         // Знаходимо фігуру на дошці
         let piece;
@@ -627,21 +627,21 @@ export class GameLogic {
         }
         
         if (!piece) {
-            Logger.debug('[GameLogic] No piece found, cannot execute move');
+            window.Logger.debug('[GameLogic] No piece found, cannot execute move');
             return;
         }
         
-        Logger.debug('[GameLogic] Found piece at:', piece.row, piece.col);
+        window.Logger.debug('[GameLogic] Found piece at:', piece.row, piece.col);
         
         // Створюємо нову дошку (глибоке клонування)
         const newBoard = board.map(row => [...row]);
-        Logger.debug('[GameLogic] Original board size:', board.length);
-        Logger.debug('[GameLogic] Moving piece from:', piece.row, piece.col, 'to:', move.newRow, move.newCol);
+        window.Logger.debug('[GameLogic] Original board size:', board.length);
+        window.Logger.debug('[GameLogic] Moving piece from:', piece.row, piece.col, 'to:', move.newRow, move.newCol);
         
         // Оголошення blockedCells і blockedMode тут
         const blockedCells = gameState.blockedCells || [];
         const blockedMode = stateManager.getState('settings.blockedMode') || false;
-        Logger.debug('[DIAG] executeMove: blockedMode =', blockedMode, 'blockedCells до =', blockedCells);
+        window.Logger.debug('[DIAG] executeMove: blockedMode =', blockedMode, 'blockedCells до =', blockedCells);
         
         // Видаляємо фігуру з поточної позиції
         newBoard[piece.row][piece.col] = 0;
@@ -652,12 +652,12 @@ export class GameLogic {
         let updatedBlockedCells = blockedCells;
         if (blockedMode) {
             updatedBlockedCells = [...blockedCells, { row: piece.row, col: piece.col }];
-            Logger.debug('[GameLogic] executeMove: додаємо заблоковану клітинку', { row: piece.row, col: piece.col });
+            window.Logger.debug('[GameLogic] executeMove: додаємо заблоковану клітинку', { row: piece.row, col: piece.col });
             stateManager.setState('game.blockedCells', updatedBlockedCells);
-            Logger.debug('[GameLogic] executeMove: blockedCells після =', updatedBlockedCells);
+            window.Logger.debug('[GameLogic] executeMove: blockedCells після =', updatedBlockedCells);
         }
         
-        Logger.debug('[GameLogic] New board size after move:', newBoard.length);
+        window.Logger.debug('[GameLogic] New board size after move:', newBoard.length);
         
         // Оновлюємо масив дошки окремо для реактивності
         stateManager.setState('game.board', JSON.parse(JSON.stringify(newBoard)));
@@ -681,22 +681,22 @@ export class GameLogic {
             points: move.points || 0
         });
         // Оновлюємо доступні ходи
-        Logger.debug('[GameLogic] Updating available moves after move execution');
+        window.Logger.debug('[GameLogic] Updating available moves after move execution');
         this.updateAvailableMoves();
         // Показуємо повідомлення
         this.showGameMessage();
-        Logger.debug('[GameLogic] After move execution - currentPlayer:', stateManager.getState('game.currentPlayer'));
+        window.Logger.debug('[GameLogic] After move execution - currentPlayer:', stateManager.getState('game.currentPlayer'));
         // Мовна підтримка
         if (this.speechEnabled) {
             this.speakMove(move);
         }
         this.log('Move executed', { move, newPoints });
-        Logger.debug('[GameLogic] Move execution completed');
+        window.Logger.debug('[GameLogic] Move execution completed');
     }
     
     // Перемикання гравця
     switchPlayer() {
-        Logger.debug('[GameLogic] switchPlayer called');
+        window.Logger.debug('[GameLogic] switchPlayer called');
         const gameState = stateManager.getState('game');
         const currentPlayer = gameState.currentPlayer;
         const gameMode = gameState.gameMode;
@@ -716,30 +716,30 @@ export class GameLogic {
     
     // Хід комп'ютера
     makeComputerMove() {
-        Logger.debug('[GameLogic] makeComputerMove called');
+        window.Logger.debug('[GameLogic] makeComputerMove called');
         const gameState = stateManager.getState('game');
         const board = gameState.board;
         
         // Знаходимо фігуру на дошці (в грі з комп'ютером є тільки одна фігура)
         const piece = findPiece(board, 1);
         if (!piece) {
-            Logger.debug('[GameLogic] No piece found on board');
+            window.Logger.debug('[GameLogic] No piece found on board');
             return;
         }
         
-        Logger.debug('[GameLogic] Found piece at:', piece.row, piece.col);
+        window.Logger.debug('[GameLogic] Found piece at:', piece.row, piece.col);
         
         // Отримуємо всі доступні ходи для комп'ютера (має бути player 1, бо фігура одна)
-        Logger.debug('[GameLogic] Board state size:', board.length);
+        window.Logger.debug('[GameLogic] Board state size:', board.length);
         // Отримуємо заблоковані клітинки та режим
         const blockedCells = gameState.blockedCells || [];
         const blockedMode = stateManager.getState('settings.blockedMode') || false;
         
-        Logger.debug('[GameLogic] Looking for moves from position:', piece.row, piece.col, 'for player 1');
+        window.Logger.debug('[GameLogic] Looking for moves from position:', piece.row, piece.col, 'for player 1');
         const moves = getAllValidMoves(board, piece.row, piece.col, 1, blockedCells, blockedMode); // <-- FIXED: was 2
-        Logger.debug('[GameLogic] Available moves for computer count:', moves.length, 'blockedMode:', blockedMode, 'blockedCells:', blockedCells.length);
+        window.Logger.debug('[GameLogic] Available moves for computer count:', moves.length, 'blockedMode:', blockedMode, 'blockedCells:', blockedCells.length);
         
-        Logger.debug('[GameLogic] makeComputerMove - blocked cells analysis:', { 
+        window.Logger.debug('[GameLogic] makeComputerMove - blocked cells analysis:', { 
             blockedMode, 
             blockedCellsCount: blockedCells.length, 
             blockedCells,
@@ -747,23 +747,23 @@ export class GameLogic {
         });
         
         if (moves.length === 0) {
-            Logger.debug('[GameLogic] No moves available for computer, player wins');
+            window.Logger.debug('[GameLogic] No moves available for computer, player wins');
             this.endGame(1); // Гравець перемагає
             return;
         }
         
         // Вибираємо випадковий хід
         const bestMove = this.selectBestMove(moves);
-        Logger.debug('[GameLogic] Selected best move:', bestMove);
+        window.Logger.debug('[GameLogic] Selected best move:', bestMove);
         
         if (!bestMove) {
-            Logger.debug('[GameLogic] No move selected, ending game');
+            window.Logger.debug('[GameLogic] No move selected, ending game');
             this.endGame(1); // Гравець перемагає
             return;
         }
         
         // Виконуємо хід
-        Logger.debug('[GameLogic] Executing computer move:', bestMove);
+        window.Logger.debug('[GameLogic] Executing computer move:', bestMove);
         this.executeMove(bestMove);
         
         // Показуємо хід комп'ютера в центрі керування
@@ -774,35 +774,35 @@ export class GameLogic {
         
         // Після ходу комп'ютера повертаємо чергу гравцю
         stateManager.setState('game.currentPlayer', 1);
-        Logger.debug('[GameLogic] Computer move completed, returning turn to player');
-        Logger.debug('[GameLogic] Current player after computer move:', stateManager.getState('game.currentPlayer'));
+        window.Logger.debug('[GameLogic] Computer move completed, returning turn to player');
+        window.Logger.debug('[GameLogic] Current player after computer move:', stateManager.getState('game.currentPlayer'));
     }
     
     // Вибір випадкового ходу для комп'ютера
     selectBestMove(moves) {
-        Logger.debug('[GameLogic] selectBestMove called with moves count:', moves.length);
+        window.Logger.debug('[GameLogic] selectBestMove called with moves count:', moves.length);
         
         if (moves.length === 0) {
-            Logger.debug('[GameLogic] No moves available');
+            window.Logger.debug('[GameLogic] No moves available');
             return null;
         }
         
         // Покращений випадковий алгоритм з додатковим перемішуванням
         // Спочатку перемішуємо масив ходів для кращої випадковості
         const shuffledMoves = [...moves].sort(() => Math.random() - 0.5);
-        Logger.debug('[GameLogic] Shuffled moves count:', shuffledMoves.length);
+        window.Logger.debug('[GameLogic] Shuffled moves count:', shuffledMoves.length);
         
         // Вибираємо випадковий хід з перемішаного масиву
         const randomIndex = Math.floor(Math.random() * shuffledMoves.length);
         const selectedMove = shuffledMoves[randomIndex];
         
-        Logger.debug('[GameLogic] Random index:', randomIndex, 'Selected move:', selectedMove);
+        window.Logger.debug('[GameLogic] Random index:', randomIndex, 'Selected move:', selectedMove);
         return selectedMove;
     }
     
     // Перевірка відсутності ходів
     checkNoMoves() {
-        Logger.debug('[GameLogic] checkNoMoves called');
+        window.Logger.debug('[GameLogic] checkNoMoves called');
         const gameState = stateManager.getState('game');
         const currentPlayer = gameState.currentPlayer;
         const board = gameState.board;
@@ -840,7 +840,7 @@ export class GameLogic {
     
     // Закінчення гри
     endGame(winner) {
-        Logger.debug('[GameLogic] endGame called with winner:', winner);
+        window.Logger.debug('[GameLogic] endGame called with winner:', winner);
         const gameState = stateManager.getState('game');
         const player1Name = (gameState.playerNames && gameState.playerNames.p1) ? gameState.playerNames.p1 : 'Гравець 1';
         const player2Name = (gameState.playerNames && gameState.playerNames.p2) ? gameState.playerNames.p2 : 'Гравець 2';
@@ -872,7 +872,7 @@ export class GameLogic {
     
     // Показ повідомлення гри
     showGameMessage() {
-        Logger.debug('[GameLogic] showGameMessage called');
+        window.Logger.debug('[GameLogic] showGameMessage called');
         const gameState = stateManager.getState('game');
         const currentPlayer = gameState.currentPlayer;
         const gameMode = gameState.gameMode;
@@ -892,27 +892,27 @@ export class GameLogic {
             message = `Хід гравця: ${currentPlayerName}`;
         }
         
-        Logger.debug('[GameLogic] showGameMessage - currentPlayer:', currentPlayer, 'gameMode:', gameMode, 'message:', message);
+        window.Logger.debug('[GameLogic] showGameMessage - currentPlayer:', currentPlayer, 'gameMode:', gameMode, 'message:', message);
         
         // Оновлюємо повідомлення в UI
         const messageArea = document.getElementById('message-area');
         if (messageArea) {
             messageArea.textContent = message;
-            Logger.debug('[GameLogic] Message updated in UI:', message);
+            window.Logger.debug('[GameLogic] Message updated in UI:', message);
         } else {
-            Logger.debug('[GameLogic] Message area not found');
+            window.Logger.debug('[GameLogic] Message area not found');
         }
     }
     
     // Показ помилки
     showError(message) {
-        Logger.debug('[GameLogic] showError:', message);
+        window.Logger.debug('[GameLogic] showError:', message);
         stateManager.showModal('Помилка', message, [{ text: 'OK', class: 'primary' }]);
     }
     
     // Мовна підтримка для ходів
     speakMove(move) {
-        Logger.debug('[GameLogic] speakMove called with:', move);
+        window.Logger.debug('[GameLogic] speakMove called with:', move);
         const directionText = getDirectionText(move.direction);
         const message = `Хід ${directionText} на відстань ${move.distance}`;
         speakMove(message);
@@ -920,19 +920,19 @@ export class GameLogic {
     
     // Ініціалізація компонентів
     initComponents() {
-        Logger.debug('[GameLogic] initComponents called');
+        window.Logger.debug('[GameLogic] initComponents called');
         // Цей метод буде викликатися, коли компоненти будуть готові
         // Поки що залишаємо порожнім
     }
     
     // Логування
     log(message, data = {}) {
-        Logger.debug(`[GameLogic] ${message}`, data);
+        window.Logger.debug(`[GameLogic] ${message}`, data);
     }
     
     // Очищення ресурсів
     destroy() {
-        Logger.debug('[GameLogic] Destroying...');
+        window.Logger.debug('[GameLogic] Destroying...');
         this.log('Destroying Game Logic');
         
         // Зупиняємо мову
@@ -941,7 +941,7 @@ export class GameLogic {
         }
         
         this.isInitialized = false;
-        Logger.debug('[GameLogic] Destroyed');
+        window.Logger.debug('[GameLogic] Destroyed');
     }
 }
 

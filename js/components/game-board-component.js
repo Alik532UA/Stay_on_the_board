@@ -4,7 +4,7 @@ import { stateManager } from '../state-manager.js';
 import { t } from '../localization.js';
 import { GameControlsComponent } from './game-controls-component.js';
 import { createEmptyBoard, findPiece, getAllValidMoves } from '../game-core.js';
-import { Logger } from '../utils/logger.js';
+// import { Logger } from '../utils/logger.js';
 
 export class GameBoardComponent extends BaseComponent {
     constructor(element) {
@@ -13,13 +13,13 @@ export class GameBoardComponent extends BaseComponent {
     }
 
     render() {
-        Logger.info('[GameBoardComponent] render: початок');
+        window.Logger.info('[GameBoardComponent] render: початок');
         const boardSize = stateManager?.getState('game.boardSize') || 3;
-        Logger.debug('[GameBoardComponent] render: boardSize =', { boardSize });
+        window.Logger.debug('[GameBoardComponent] render: boardSize =', { boardSize });
         
         // Валідація розміру дошки
         if (boardSize < 2 || boardSize > 9) {
-            Logger.error('[GameBoardComponent] Invalid board size in render:', { boardSize });
+            window.Logger.error('[GameBoardComponent] Invalid board size in render:', { boardSize });
             return;
         }
         
@@ -51,13 +51,13 @@ export class GameBoardComponent extends BaseComponent {
         
         // Перевіряємо, чи дошка відповідає поточному розміру
         if (!Array.isArray(currentGameState.board) || currentGameState.board.length !== boardSize) {
-            Logger.info('[GameBoardComponent] Board size mismatch or no board, recreating board', { boardSize });
+            window.Logger.info('[GameBoardComponent] Board size mismatch or no board, recreating board', { boardSize });
             // Створюємо нову дошку з правильним розміром
             const newBoard = createEmptyBoard(boardSize);
             
             // Перевіряємо, чи дошка була створена успішно
             if (!newBoard) {
-                Logger.error('[GameBoardComponent] Failed to create board with size:', { boardSize });
+                window.Logger.error('[GameBoardComponent] Failed to create board with size:', { boardSize });
                 return;
             }
             
@@ -81,7 +81,7 @@ export class GameBoardComponent extends BaseComponent {
         const currentShowingMoves = window.stateManager?.getState('game.showingAvailableMoves');
         
         if (currentShowingMoves !== showMoves) {
-            Logger.debug('[GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves:', { showMoves });
+            window.Logger.debug('[GameBoardComponent] Syncing game.showingAvailableMoves with settings.showMoves:', { showMoves });
             window.stateManager?.setState('game.showingAvailableMoves', showMoves);
         }
         
@@ -98,17 +98,17 @@ export class GameBoardComponent extends BaseComponent {
         // Рендеримо компонент керування грою
         this.renderControls();
         
-        Logger.debug('[GameBoardComponent] render: кінець');
+        window.Logger.debug('[GameBoardComponent] render: кінець');
     }
     
     subscribeToGameState() {
         // Підписка на зміни розміру дошки - використовуємо BaseComponent.subscribe
         this.subscribe('game.boardSize', (size) => {
-            Logger.debug('[GameBoardComponent] game.boardSize changed to:', { size });
+            window.Logger.debug('[GameBoardComponent] game.boardSize changed to:', { size });
             
             // Валідація розміру дошки
             if (size < 2 || size > 9) {
-                Logger.error('[GameBoardComponent] Invalid board size in subscription:', { size });
+                window.Logger.error('[GameBoardComponent] Invalid board size in subscription:', { size });
                 return;
             }
             
@@ -117,7 +117,7 @@ export class GameBoardComponent extends BaseComponent {
             
             // Оновлюємо компонент контролів при зміні розміру дошки
             if (this.controlsComponent) {
-                Logger.debug('[GameBoardComponent] Re-rendering controls component due to board size change');
+                window.Logger.debug('[GameBoardComponent] Re-rendering controls component due to board size change');
                 this.controlsComponent.render();
             }
         });
@@ -125,11 +125,11 @@ export class GameBoardComponent extends BaseComponent {
         // Підписка на зміни дошки
         this.subscribe('game.board', (board) => {
             const boardSize = stateManager.getState('game.boardSize');
-            Logger.debug('[GameBoardComponent] game.board changed, boardSize:', { boardSize });
+            window.Logger.debug('[GameBoardComponent] game.board changed, boardSize:', { boardSize });
             
             // Валідація розміру дошки
             if (boardSize < 2 || boardSize > 9) {
-                Logger.error('[GameBoardComponent] Invalid board size in board subscription:', { boardSize });
+                window.Logger.error('[GameBoardComponent] Invalid board size in board subscription:', { boardSize });
                 return;
             }
             
@@ -139,11 +139,11 @@ export class GameBoardComponent extends BaseComponent {
         // Підписка на зміни підсвічених ходів
         this.subscribe('game.highlightedMoves', () => {
             const gameState = stateManager.getState('game');
-            Logger.debug('[GameBoardComponent] game.highlightedMoves changed');
+            window.Logger.debug('[GameBoardComponent] game.highlightedMoves changed');
             
             // Валідація розміру дошки
             if (gameState.boardSize < 2 || gameState.boardSize > 9) {
-                Logger.error('[GameBoardComponent] Invalid board size in highlightedMoves subscription:', { boardSize: gameState.boardSize });
+                window.Logger.error('[GameBoardComponent] Invalid board size in highlightedMoves subscription:', { boardSize: gameState.boardSize });
                 return;
             }
             
@@ -153,11 +153,11 @@ export class GameBoardComponent extends BaseComponent {
         // Підписка на зміни показу доступних ходів
         this.subscribe('game.showingAvailableMoves', () => {
             const gameState = stateManager.getState('game');
-            Logger.debug('[GameBoardComponent] game.showingAvailableMoves changed');
+            window.Logger.debug('[GameBoardComponent] game.showingAvailableMoves changed');
             
             // Валідація розміру дошки
             if (gameState.boardSize < 2 || gameState.boardSize > 9) {
-                Logger.error('[GameBoardComponent] Invalid board size in showingAvailableMoves subscription:', { boardSize: gameState.boardSize });
+                window.Logger.error('[GameBoardComponent] Invalid board size in showingAvailableMoves subscription:', { boardSize: gameState.boardSize });
                 return;
             }
             
@@ -167,14 +167,14 @@ export class GameBoardComponent extends BaseComponent {
         // Додаткова підписка на зміни налаштувань показу ходів
         this.subscribe('settings.showMoves', (showMoves) => {
             const gameState = stateManager.getState('game');
-            Logger.debug('[GameBoardComponent] settings.showMoves changed to:', { showMoves });
+            window.Logger.debug('[GameBoardComponent] settings.showMoves changed to:', { showMoves });
             
             // Синхронізуємо стан гри
             stateManager.setState('game.showingAvailableMoves', showMoves);
             
             // Валідація розміру дошки
             if (gameState.boardSize < 2 || gameState.boardSize > 9) {
-                Logger.error('[GameBoardComponent] Invalid board size in settings.showMoves subscription:', { boardSize: gameState.boardSize });
+                window.Logger.error('[GameBoardComponent] Invalid board size in settings.showMoves subscription:', { boardSize: gameState.boardSize });
                 return;
             }
             
@@ -184,11 +184,11 @@ export class GameBoardComponent extends BaseComponent {
         // Підписка на зміни доступних ходів
         this.subscribe('game.availableMoves', () => {
             const gameState = stateManager.getState('game');
-            Logger.debug('[GameBoardComponent] game.availableMoves changed');
+            window.Logger.debug('[GameBoardComponent] game.availableMoves changed');
             
             // Валідація розміру дошки
             if (gameState.boardSize < 2 || gameState.boardSize > 9) {
-                Logger.error('[GameBoardComponent] Invalid board size in availableMoves subscription:', { boardSize: gameState.boardSize });
+                window.Logger.error('[GameBoardComponent] Invalid board size in availableMoves subscription:', { boardSize: gameState.boardSize });
                 return;
             }
             
@@ -201,7 +201,7 @@ export class GameBoardComponent extends BaseComponent {
             const blockedMode = stateManager.getState('settings.blockedMode') || false;
             const blockedCells = gameState.blockedCells || [];
             
-            Logger.debug('[GameBoardComponent] game.blockedCells changed:', { 
+            window.Logger.debug('[GameBoardComponent] game.blockedCells changed:', { 
                 blockedCellsCount: blockedCells.length, 
                 blockedCells,
                 blockedMode 
@@ -209,7 +209,7 @@ export class GameBoardComponent extends BaseComponent {
             
             // Валідація розміру дошки
             if (gameState.boardSize < 2 || gameState.boardSize > 9) {
-                Logger.error('[GameBoardComponent] Invalid board size in blockedCells subscription:', { boardSize: gameState.boardSize });
+                window.Logger.error('[GameBoardComponent] Invalid board size in blockedCells subscription:', { boardSize: gameState.boardSize });
                 return;
             }
             
@@ -222,14 +222,14 @@ export class GameBoardComponent extends BaseComponent {
             const blockedMode = stateManager.getState('settings.blockedMode') || false;
             const blockedCells = gameState.blockedCells || [];
             
-            Logger.debug('[GameBoardComponent] settings.blockedMode changed:', { 
+            window.Logger.debug('[GameBoardComponent] settings.blockedMode changed:', { 
                 blockedMode, 
                 blockedCellsCount: blockedCells.length 
             });
             
             // Валідація розміру дошки
             if (gameState.boardSize < 2 || gameState.boardSize > 9) {
-                Logger.error('[GameBoardComponent] Invalid board size in blockedMode subscription:', { boardSize: gameState.boardSize });
+                window.Logger.error('[GameBoardComponent] Invalid board size in blockedMode subscription:', { boardSize: gameState.boardSize });
                 return;
             }
             
@@ -244,9 +244,9 @@ export class GameBoardComponent extends BaseComponent {
             this.controlsComponent = new GameControlsComponent(controlsEl);
             this.controlsComponent.render();
             // window.gameControlsComponent = this.controlsComponent; // Expose globally — ВИДАЛЕНО
-            Logger.debug('[GameBoardComponent] Game controls component rendered successfully');
+            window.Logger.debug('[GameBoardComponent] Game controls component rendered successfully');
         } else {
-            Logger.error('[GameBoardComponent] Controls element not found in global DOM');
+            window.Logger.error('[GameBoardComponent] Controls element not found in global DOM');
         }
     }
 
@@ -254,21 +254,21 @@ export class GameBoardComponent extends BaseComponent {
         const mainMenuBtn = this.element.querySelector('#btn-main-menu');
         if (mainMenuBtn) {
             mainMenuBtn.addEventListener('click', () => {
-                Logger.info('[GameBoardComponent] Main menu button clicked');
+                window.Logger.info('[GameBoardComponent] Main menu button clicked');
                 stateManager.navigateTo('mainMenu');
             });
         } else {
-            Logger.error('[GameBoardComponent] Main menu button not found');
+            window.Logger.error('[GameBoardComponent] Main menu button not found');
         }
         const boardSizeSelect = this.element.querySelector('#board-size-select');
         if (boardSizeSelect) {
             boardSizeSelect.addEventListener('change', (e) => {
             const newSize = parseInt(e.target.value);
-            Logger.info('[GameBoardComponent] Board size dropdown changed to:', { newSize });
+            window.Logger.info('[GameBoardComponent] Board size dropdown changed to:', { newSize });
             
             // Валідація розміру дошки
             if (newSize < 2 || newSize > 9) {
-                Logger.error('[GameBoardComponent] Invalid board size:', { newSize });
+                window.Logger.error('[GameBoardComponent] Invalid board size:', { newSize });
                 return;
             }
             
@@ -280,7 +280,7 @@ export class GameBoardComponent extends BaseComponent {
             setTimeout(() => {
                 const actualSize = stateManager.getState('game.boardSize');
                 if (actualSize !== newSize) {
-                    Logger.error('[GameBoardComponent] Board size change failed:', { actualSize, expected: newSize });
+                    window.Logger.error('[GameBoardComponent] Board size change failed:', { actualSize, expected: newSize });
                 }
             }, 10);
             
@@ -288,7 +288,7 @@ export class GameBoardComponent extends BaseComponent {
             setTimeout(() => {
                 const currentBoardSize = stateManager.getState('game.boardSize');
                 const currentBoard = stateManager.getState('game.board');
-                Logger.debug('[GameBoardComponent] Verification after board size change:', {
+                window.Logger.debug('[GameBoardComponent] Verification after board size change:', {
                     expectedSize: newSize,
                     actualSize: currentBoardSize,
                     boardExists: Array.isArray(currentBoard),
@@ -299,7 +299,7 @@ export class GameBoardComponent extends BaseComponent {
                 const boardElement = this.element.querySelector('#game-board');
                 if (boardElement) {
                     const computedStyle = window.getComputedStyle(boardElement);
-                    Logger.debug('[GameBoardComponent] Board element styles:', {
+                    window.Logger.debug('[GameBoardComponent] Board element styles:', {
                         gridTemplateColumns: computedStyle.gridTemplateColumns,
                         gridTemplateRows: computedStyle.gridTemplateRows,
                         childElementCount: boardElement.children.length
@@ -307,25 +307,25 @@ export class GameBoardComponent extends BaseComponent {
                 }
             }, 50);
             
-            Logger.debug('[GameBoardComponent] Board size change processed');
+            window.Logger.debug('[GameBoardComponent] Board size change processed');
             // НЕ викликаємо тут this.render()!
             });
         } else {
-            Logger.error('[GameBoardComponent] Board size select not found');
+            window.Logger.error('[GameBoardComponent] Board size select not found');
         }
         // TODO: Додати логіку для кнопки "Зробити хід" якщо потрібно
     }
 
     renderBoard(board, boardSize, blockedCells = []) {
-        Logger.debug('[GameBoardComponent] renderBoard called with boardSize:', { boardSize, boardLength: board?.length, blockedCellsCount: blockedCells.length, blockedCells });
+        window.Logger.debug('[GameBoardComponent] renderBoard called with boardSize:', { boardSize, boardLength: board?.length, blockedCellsCount: blockedCells.length, blockedCells });
         
         const gameBoard = this.element.querySelector('#game-board');
         if (!gameBoard) {
-            Logger.error('[GameBoardComponent] Game board element not found');
+            window.Logger.error('[GameBoardComponent] Game board element not found');
             return;
         }
         if (!Array.isArray(board) || board.length !== boardSize) {
-            Logger.error('[GameBoardComponent] Invalid board array in renderBoard, auto-fix:', { board, boardSize });
+            window.Logger.error('[GameBoardComponent] Invalid board array in renderBoard, auto-fix:', { board, boardSize });
             const newBoard = createEmptyBoard(boardSize);
             const randomRow = Math.floor(Math.random() * boardSize);
             const randomCol = Math.floor(Math.random() * boardSize);
@@ -338,7 +338,7 @@ export class GameBoardComponent extends BaseComponent {
         const availableMoves = stateManager?.getState('game.availableMoves') || [];
         const highlightedMoves = stateManager?.getState('game.highlightedMoves') || [];
         const showingAvailableMoves = stateManager?.getState('game.showingAvailableMoves') || false;
-        Logger.debug('[GameBoardComponent] renderBoard - moves state:', { 
+        window.Logger.debug('[GameBoardComponent] renderBoard - moves state:', { 
             availableMovesCount: availableMoves.length, 
             highlightedMovesCount: highlightedMoves.length, 
             showingAvailableMoves,
@@ -366,7 +366,7 @@ export class GameBoardComponent extends BaseComponent {
                 if (isBlocked) {
                     cell.classList.add('blocked-cell');
                     cell.innerHTML = '<span class="blocked-x">✗</span>';
-                    Logger.debug('[GameBoardComponent] renderBoard: blocked cell rendered', { row, col });
+                    window.Logger.debug('[GameBoardComponent] renderBoard: blocked cell rendered', { row, col });
                 } else {
                     const cellValue = board[row][col];
                     if (cellValue === 1) {
@@ -394,11 +394,11 @@ export class GameBoardComponent extends BaseComponent {
                 cellsCreated++;
             }
         }
-        Logger.debug('[GameBoardComponent] renderBoard completed, cells created:', { cellsCreated, expected: expectedCells });
+        window.Logger.debug('[GameBoardComponent] renderBoard completed, cells created:', { cellsCreated, expected: expectedCells });
     }
     
     destroy() {
-        Logger.debug('[GameBoardComponent] destroy');
+        window.Logger.debug('[GameBoardComponent] destroy');
         if (this.controlsComponent) {
             this.controlsComponent.destroy();
             this.controlsComponent = null;
