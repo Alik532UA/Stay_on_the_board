@@ -461,4 +461,12 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = Logger;
 } else {
     window.Logger = Logger;
-} 
+}
+
+// Додаємо як глобальний об'єкт для сумісності
+if (typeof window !== 'undefined') {
+    window.Logger = Logger;
+}
+
+// Експорт для ES6 модулів
+export { Logger }; 

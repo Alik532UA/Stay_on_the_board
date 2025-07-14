@@ -2,6 +2,22 @@
 
 Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
+## Dependencies
+
+- **@sveltejs/kit** — основний фреймворк для SvelteKit
+- **svelte** — ядро Svelte
+- **vite** — білдер та дев-сервер
+- **@sveltejs/adapter-auto** — адаптер для деплою
+- **svelte-i18n** — локалізація (i18n)
+- **@fontsource/fira-mono** — шрифт
+- **@neoconfetti/svelte** — анімації конфетті
+- **eslint, prettier, typescript, svelte-check, svelte-preprocess** — інструменти якості коду
+- **rollup-plugin-visualizer** — аналізатор бандлу
+- **yjs, y-webrtc** — peer-to-peer бібліотеки для синхронізації ігрового стану
+- **simple-peer, peerjs** — бібліотеки для peer-to-peer WebRTC-зʼєднань
+- **@testing-library/svelte** — тестування Svelte-компонентів
+- **vitest** — сучасний тест-раннер для unit/e2e тестів
+
 ## Creating a project
 
 If you're seeing this, you've probably already done this step. Congrats!
