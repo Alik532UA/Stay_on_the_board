@@ -1,4 +1,8 @@
+<script>
+import { _ } from 'svelte-i18n';
+</script>
 <div class="online-menu">
-  <h2>Онлайн-меню</h2>
+  <h2>{$_('onlineMenu.title')}</h2>
   <!-- Додайте тут розмітку онлайн-меню -->
-</div> 
+</div>
+// New key needed: onlineMenu.title 

@@ -60,35 +60,64 @@ function getAvailableMoves(row, col, size, blockedCells = []) {
  * @property {string} language
  * @property {string} theme
  * @property {string} style
- * @property {{ showMoves: boolean, language: string, theme: string, style: string }} settings
+ * @property {{ showMoves: boolean, showBoard: boolean, speechEnabled: boolean, language: string, theme: string, style: string }} settings
  * @property {number[][]} board
  * @property {number} playerRow
  * @property {number} playerCol
  * @property {{row: number, col: number}[]} blockedCells
  * @property {{row: number, col: number}[]} availableMoves
  * @property {boolean} blockModeEnabled
+ * @property {string|null} selectedDirection
+ * @property {number|null} selectedDistance
+ * @property {number[]} availableDistances
  */
+
+/**
+ * @typedef {'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right'} Direction
+ */
+
+/** @type {Record<Direction, [number, number]>} */
+const dirMap = {
+  'up': [-1, 0],
+  'down': [1, 0],
+  'left': [0, -1],
+  'right': [0, 1],
+  'up-left': [-1, -1],
+  'up-right': [-1, 1],
+  'down-left': [1, -1],
+  'down-right': [1, 1]
+};
+
+const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+const lang = isBrowser ? localStorage.getItem('lang') : null;
+const theme = isBrowser ? localStorage.getItem('theme') : null;
+const style = isBrowser ? localStorage.getItem('style') : null;
 
 /** @type {import('svelte/store').Writable<AppState>} */
 export const appState = writable({
   currentView: 'mainMenu',
   boardSize: 3,
   gameMode: 'vsComputer',
-  language: localStorage.getItem('lang') || 'uk',
-  theme: localStorage.getItem('theme') || 'dark',
-  style: localStorage.getItem('style') || 'classic',
+  language: lang || 'uk',
+  theme: theme || 'dark',
+  style: style || 'classic',
   settings: {
     showMoves: true,
-    language: localStorage.getItem('lang') || 'uk',
-    theme: localStorage.getItem('theme') || 'dark',
-    style: localStorage.getItem('style') || 'classic',
+    showBoard: true,
+    speechEnabled: false,
+    language: lang || 'uk',
+    theme: theme || 'dark',
+    style: style || 'classic',
   },
   board: createEmptyBoard(3),
   playerRow: 1,
   playerCol: 1,
   blockedCells: [],
   availableMoves: getAvailableMoves(1, 1, 3, []),
-  blockModeEnabled: false
+  blockModeEnabled: false,
+  selectedDirection: null,
+  selectedDistance: null,
+  availableDistances: [1,2],
 });
 
 /**
@@ -203,4 +232,71 @@ export function makeComputerMove() {
       }
     }
   }, 600);
+}
+
+export function toggleShowMoves() {
+  appState.update(state => ({
+    ...state,
+    settings: { ...state.settings, showMoves: !state.settings.showMoves }
+  }));
+}
+export function toggleShowBoard() {
+  appState.update(state => ({
+    ...state,
+    settings: { ...state.settings, showBoard: !(state.settings.showBoard ?? true) }
+  }));
+}
+export function toggleSpeech() {
+  appState.update(state => ({
+    ...state,
+    settings: { ...state.settings, speechEnabled: !(state.settings.speechEnabled ?? false) }
+  }));
+}
+/**
+ * @param {string} dir
+ */
+export function setDirection(dir) {
+  appState.update(state => ({ ...state, selectedDirection: dir }));
+}
+/**
+ * @param {number} dist
+ */
+export function setDistance(dist) {
+  appState.update(state => ({ ...state, selectedDistance: dist }));
+}
+export function confirmMove() {
+  const state = get(appState);
+  if (!state.selectedDirection || !state.selectedDistance) return;
+
+  // Обчислення нових координат (8 напрямків)
+  /** @type {Direction|null} */
+  let dir = null;
+  if (
+    typeof state.selectedDirection === 'string' &&
+    Object.prototype.hasOwnProperty.call(dirMap, state.selectedDirection)
+  ) {
+    dir = /** @type {Direction} */ (state.selectedDirection);
+  }
+  const [dr, dc] = dir ? dirMap[dir] : [0, 0];
+  const newRow = state.playerRow + dr * state.selectedDistance;
+  const newCol = state.playerCol + dc * state.selectedDistance;
+
+  // Перевірка меж дошки
+  if (
+    newRow >= 0 && newRow < state.boardSize &&
+    newCol >= 0 && newCol < state.boardSize
+  ) {
+    movePlayer(newRow, newCol);
+  }
+
+  // Скидання вибору
+  appState.update(s => ({
+    ...s,
+    selectedDirection: null,
+    selectedDistance: null
+  }));
+}
+export function noMoves() {
+  // Тут має бути логіка для ситуації "немає куди ходити"
+  console.log('Гравець повідомив: немає куди ходити');
 } 

@@ -3,9 +3,38 @@
   import { settingsStore } from '../stores/settingsStore.js';
   import { logStore } from '../stores/logStore.js';
   import { goto } from '$app/navigation';
+  import { _ , isLoading, locale } from 'svelte-i18n';
+  // Language dropdown logic (inline, замість LanguageSwitcher)
+  let showLangDropdown = false;
+  const languages = [
+    { code: 'uk', svg: `<svg width="32" height="24" viewBox="0 0 32 24"><rect width="32" height="12" y="0" fill="#0057B7"/><rect width="32" height="12" y="12" fill="#FFD700"/></svg>` },
+    { code: 'en', svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 30" width="32" height="24">
+	<clipPath id="t">
+		<path d="M25,15h25v15zv15h-25zh-25v-15zv-15h25z"/>
+	</clipPath>
+	<path d="M0,0v30h50v-30z" fill="#012169"/>
+	<path d="M0,0 50,30M50,0 0,30" stroke="#fff" stroke-width="6"/>
+	<path d="M0,0 50,30M50,0 0,30" clip-path="url(#t)" stroke="#C8102E" stroke-width="4"/>
+	<path d="M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z" fill="#C8102E" stroke="#FFF" stroke-width="2"/>
+</svg>` },
+    { code: 'crh', svg: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 350 195"><path fill="#00a3dd" d="M0 0h350v195H0z"/><path d="M40 30v30H30v10h20V40h20v30H60v10h30V70H80V40h20v30h20V60h-10V30Z" style="fill:#f8d80e"/></svg>` },
+    { code: 'nl', svg: `<svg width="32" height="24" viewBox="0 0 32 24"><rect width="32" height="8" y="0" fill="#21468b"/><rect width="32" height="8" y="8" fill="#fff"/><rect width="32" height="8" y="16" fill="#ae1c28"/></svg>` }
+  ];
+  function selectLang(lang) {
+    logStore.addLog(`Зміна мови: ${lang}`, 'info');
+    settingsStore.updateSettings({ language: lang });
+    localStorage.setItem('language', lang);
+    locale.set(lang);
+    showLangDropdown = false;
+  }
+  function toggleLangDropdown() {
+    showLangDropdown = !showLangDropdown;
+  }
+  function closeLangDropdown() {
+    showLangDropdown = false;
+  }
   $: settings = $settingsStore;
   let showThemeDropdown = false;
-  let showLangDropdown = false;
 
   /**
    * @param {string} route
@@ -33,79 +62,88 @@
     showThemeDropdown = false;
   }
 
-  /**
-   * @param {string} lang
-   */
-  function selectLang(lang) {
-    logStore.addLog(`Зміна мови: ${lang}`, 'info');
-    settingsStore.updateSettings({ language: lang });
-    location.reload();
+  function closeDropdowns() {
+    showThemeDropdown = false;
+    showLangDropdown = false;
   }
 </script>
 
 <main class="main-menu">
-  <div class="main-menu-top-icons">
-    <button class="main-menu-icon" title="Тема" on:click={() => showThemeDropdown = !showThemeDropdown}>
-      <span class="main-menu-icon-inner">🎨</span>
-    </button>
-    <button class="main-menu-icon" title="Мова" on:click={() => showLangDropdown = !showLangDropdown}>
-      <span class="main-menu-icon-inner">
-        <svg class="main-menu-icon-svg" width="32" height="24" viewBox="0 0 32 24" fill="none">
-          <rect width="32" height="12" y="0" fill="#0057B7"/>
-          <rect width="32" height="12" y="12" fill="#FFD700"/>
-        </svg>
-      </span>
-    </button>
-    <a class="main-menu-icon" href="#" target="_blank" rel="noopener noreferrer" title="Підтримати проєкт">
-      <span class="main-menu-icon-inner">
-        <img src="/coin_1fa99.png" alt="Donate" class="main-menu-icon-img" />
-      </span>
-    </a>
-  </div>
+  {#if $isLoading}
+    <div class="main-menu-loading">Завантаження перекладу...</div>
+  {:else}
+    <div class="main-menu-top-icons">
+      <button class="main-menu-icon" title={$_('mainMenu.theme')} aria-label={$_('mainMenu.theme')} on:click={() => showThemeDropdown = !showThemeDropdown}>
+        <span class="main-menu-icon-inner">🎨</span>
+      </button>
+      <button class="main-menu-icon" title={$_('mainMenu.language')} aria-label={$_('mainMenu.language')} on:click={toggleLangDropdown}>
+        <span class="main-menu-icon-inner">
+          <svg class="main-menu-icon-svg" width="32" height="24" viewBox="0 0 32 24" fill="none">
+            <rect width="32" height="12" y="0" fill="#0057B7"/>
+            <rect width="32" height="12" y="12" fill="#FFD700"/>
+          </svg>
+        </span>
+      </button>
+      {#if showLangDropdown}
+        <div class="lang-dropdown main-menu-lang-dropdown" tabindex="0" on:blur={closeLangDropdown}>
+          {#each languages as lang}
+            <button class="lang-option" on:click={() => selectLang(lang.code)} aria-label={lang.code}>
+              {@html lang.svg}
+            </button>
+          {/each}
+        </div>
+      {/if}
+      <button class="main-menu-icon" title={$_('mainMenu.donate')} aria-label={$_('mainMenu.donate')} on:click={() => window.open('https://send.monobank.ua/jar/4gQw2v6v2z', '_blank', 'noopener,noreferrer')}>
+        <span class="main-menu-icon-inner">
+          <img src="/coin_1fa99.png" alt="Donate" class="main-menu-icon-img" />
+        </span>
+      </button>
+    </div>
 
-  {#if showThemeDropdown}
-    <div class="theme-dropdown">
-      <div class="theme-style-row" data-style="classic">
-        <button on:click={() => selectTheme('classic', 'light')}>☀️ Ubuntu</button>
-        <button on:click={() => selectTheme('classic', 'dark')}>🌙 Ubuntu</button>
+    {#if showThemeDropdown || showLangDropdown}
+      <div class="dropdown-backdrop" role="button" tabindex="0" aria-label={$_('mainMenu.closeDropdowns')} on:click={closeDropdowns} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && closeDropdowns()}></div>
+    {/if}
+
+    {#if showThemeDropdown}
+      <div class="theme-dropdown" role="menu" tabindex="0" aria-label={$_('mainMenu.themeDropdown')} on:click|stopPropagation on:keydown={(e) => (e.key === 'Escape') && closeDropdowns()}>
+        <div class="theme-style-row" data-style="classic">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('classic', 'light')}>☀️</button>
+          <span class="theme-name">{$_('mainMenu.themeName.ubuntu')}</span>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('classic', 'dark')}>🌙</button>
+        </div>
+        <div class="theme-style-row" data-style="peak">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('peak', 'light')}>☀️</button>
+          <span class="theme-name">{$_('mainMenu.themeName.peak')}</span>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('peak', 'dark')}>🌙</button>
+        </div>
+        <div class="theme-style-row" data-style="cs2">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('cs2', 'light')}>☀️</button>
+          <span class="theme-name">{$_('mainMenu.themeName.cs2')}</span>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('cs2', 'dark')}>🌙</button>
+        </div>
+        <div class="theme-style-row" data-style="glass">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('glass', 'light')}>☀️</button>
+          <span class="theme-name">{$_('mainMenu.themeName.glass')}</span>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('glass', 'dark')}>🌙</button>
+        </div>
+        <div class="theme-style-row" data-style="material">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('material', 'light')}>☀️</button>
+          <span class="theme-name">{$_('mainMenu.themeName.material')}</span>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('material', 'dark')}>🌙</button>
+        </div>
       </div>
-      <div class="theme-style-row" data-style="peak">
-        <button on:click={() => selectTheme('peak', 'light')}>☀️ PEAK</button>
-        <button on:click={() => selectTheme('peak', 'dark')}>🌙 PEAK</button>
-      </div>
-      <div class="theme-style-row" data-style="cs2">
-        <button on:click={() => selectTheme('cs2', 'light')}>☀️ CS2</button>
-        <button on:click={() => selectTheme('cs2', 'dark')}>🌙 CS2</button>
-      </div>
-      <div class="theme-style-row" data-style="glass">
-        <button on:click={() => selectTheme('glass', 'light')}>☀️ Glassmorphism</button>
-        <button on:click={() => selectTheme('glass', 'dark')}>🌙 Glassmorphism</button>
-      </div>
-      <div class="theme-style-row" data-style="material">
-        <button on:click={() => selectTheme('material', 'light')}>☀️ Material You</button>
-        <button on:click={() => selectTheme('material', 'dark')}>🌙 Material You</button>
-      </div>
+    {/if}
+
+    <div class="main-menu-title">{$_('mainMenu.title')}</div>
+    <div class="main-menu-subtitle">{$_('mainMenu.menu')}</div>
+    <div id="main-menu-buttons">
+      <button class="modal-button secondary" on:click={() => navigateTo('/game')}>{$_('mainMenu.playVsComputer')}</button>
+      <button class="modal-button secondary" on:click={() => navigateTo('/local')}>{$_('mainMenu.localGame')}</button>
+      <button class="modal-button secondary" on:click={() => navigateTo('/online')}>{$_('mainMenu.playOnline')}</button>
+      <button class="modal-button secondary" on:click={() => navigateTo('/settings')}>{$_('mainMenu.settings')}</button>
+      <button class="modal-button secondary" on:click={() => navigateTo('/controls')}>{$_('mainMenu.controls')}</button>
+      <button class="modal-button secondary" on:click={() => navigateTo('/rules')}>{$_('mainMenu.rules')}</button>
+      <button class="modal-button danger" on:click={clearCache}>{$_('mainMenu.clearCache')}</button>
     </div>
   {/if}
-
-  {#if showLangDropdown}
-    <div class="lang-dropdown">
-      <button on:click={() => selectLang('uk')}>🇺🇦 Українська</button>
-      <button on:click={() => selectLang('en')}>🇬🇧 English</button>
-      <button on:click={() => selectLang('crh')}>🏴 Qırımtatarca</button>
-      <button on:click={() => selectLang('nl')}>🇳🇱 Nederlands</button>
-    </div>
-  {/if}
-
-  <div class="main-menu-title">Залишитися на дошці</div>
-  <div class="main-menu-subtitle">Меню</div>
-  <div id="main-menu-buttons">
-    <button class="modal-button secondary" on:click={() => navigateTo('/game')}>Грати з комп'ютером</button>
-    <button class="modal-button secondary" on:click={() => navigateTo('/local')}>Локальна гра</button>
-    <button class="modal-button secondary" on:click={() => navigateTo('/online')}>Грати онлайн</button>
-    <button class="modal-button secondary" on:click={() => navigateTo('/settings')}>Налаштування</button>
-    <button class="modal-button secondary" on:click={() => navigateTo('/controls')}>Керування</button>
-    <button class="modal-button secondary" on:click={() => navigateTo('/rules')}>Правила</button>
-    <button class="modal-button danger" on:click={clearCache}>Очистити кеш</button>
-  </div>
 </main> 

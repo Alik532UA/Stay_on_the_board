@@ -1,5 +1,7 @@
 <script>
   import { settingsStore } from '../stores/settingsStore.js';
+  import { _ } from 'svelte-i18n';
+  import LanguageSwitcher from './LanguageSwitcher.svelte';
   $: settings = $settingsStore;
 
   /**
@@ -14,38 +16,30 @@
 </script>
 
 <div class="settings">
-  <h2>Налаштування</h2>
+  <h2>{$_('settings.title')}</h2>
+  <LanguageSwitcher />
   <form class="settings-form">
     <label>
-      <input type="checkbox" name="showMoves" checked={settings.showMoves} on:change={onChange} /> Показувати доступні ходи
+      <input type="checkbox" name="showMoves" checked={settings.showMoves} on:change={onChange} /> {$_('settings.showMoves')}
     </label>
     <br /><br />
+    <!-- Language selection removed: now handled by LanguageSwitcher -->
     <label>
-      Мова:
-      <select name="language" bind:value={settings.language} on:change={onChange}>
-        <option value="uk">Українська</option>
-        <option value="en">English</option>
-        <option value="crh">Qırımtatarca</option>
-        <option value="nl">Nederlands</option>
-      </select>
-    </label>
-    <br /><br />
-    <label>
-      Тема:
+      {$_('settings.theme')}:
       <select name="theme" bind:value={settings.theme} on:change={onChange}>
-        <option value="dark">Темна</option>
-        <option value="light">Світла</option>
+        <option value="dark">{$_('settings.themeDark')}</option>
+        <option value="light">{$_('settings.themeLight')}</option>
       </select>
     </label>
     <br /><br />
     <label>
-      Стиль:
+      {$_('settings.style')}:
       <select name="style" bind:value={settings.style} on:change={onChange}>
-        <option value="classic">Classic</option>
-        <option value="peak">Peak</option>
-        <option value="cs2">CS2</option>
-        <option value="glass">Glassmorphism</option>
-        <option value="material">Material You</option>
+        <option value="classic">{$_('settings.styleClassic')}</option>
+        <option value="peak">{$_('settings.stylePeak')}</option>
+        <option value="cs2">{$_('settings.styleCS2')}</option>
+        <option value="glass">{$_('settings.styleGlass')}</option>
+        <option value="material">{$_('settings.styleMaterial')}</option>
       </select>
     </label>
   </form>
