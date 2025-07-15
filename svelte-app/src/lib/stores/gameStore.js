@@ -484,7 +484,7 @@ function calculateFinalScore(state) {
   const noMovesBonus = finishedByNoMovesButton ? boardSize : 0;
   // 4. Бонус за перестрибування
   const jumpBonus = jumpedBlockedCells;
-  const totalScore = baseScore + sizeBonus + blockModeBonus + noMovesBonus + jumpBonus; // штраф вже враховано в baseScore
+  const totalScore = baseScore + sizeBonus + blockModeBonus + noMovesBonus + jumpBonus - totalPenalty;
   return {
     baseScore,
     totalPenalty, // НОВЕ
@@ -689,7 +689,7 @@ export function confirmMove() {
     selectedDistance === lastComputerMove.distance &&
     selectedDirection === oppositeDirections[lastComputerMove.direction]
   ) {
-    scoreChange = -2;
+    // scoreChange = -2; // Цей рядок видалено згідно нової логіки
     penaltyApplied = 2;
     console.log('[confirmMove] Penalty applied for reverse move.');
   }
@@ -710,7 +710,7 @@ export function confirmMove() {
     return {
       ...s,
       ...moveUpdates,
-      score: s.score + scoreChange,
+      score: s.score + scoreChange, // Збільшуємо базовий рахунок на 1 за кожен успішний хід
       penaltyPoints: s.penaltyPoints + penaltyApplied,
       movesInBlockMode: blockModeEnabled ? s.movesInBlockMode + 1 : s.movesInBlockMode,
       jumpedBlockedCells: s.jumpedBlockedCells + jumpedCount,
