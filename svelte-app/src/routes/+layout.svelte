@@ -21,7 +21,7 @@
 	import Header from './Header.svelte';
 	import '../app.css';
 	import { onMount } from 'svelte';
-	import { settingsStore } from '../stores/settingsStore.js';
+	import { settingsStore } from '$lib/stores/settingsStore.js';
 	import { get } from 'svelte/store';
 	import '../lib/i18n/init.js';
 
