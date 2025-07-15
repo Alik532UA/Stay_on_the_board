@@ -24,6 +24,11 @@
 	import { settingsStore } from '../stores/settingsStore.js';
 	import { get } from 'svelte/store';
 	import '../lib/i18n/init.js';
+
+	onMount(() => {
+		document.documentElement.setAttribute('data-theme', 'dark');
+		document.documentElement.setAttribute('data-style', 'classic');
+	});
 </script>
 
 <div class="app">

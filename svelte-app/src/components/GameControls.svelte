@@ -3,6 +3,39 @@
   import { modalStore } from '../stores/modalStore.js';
   import { logStore } from '../stores/logStore.js';
   import { _ } from 'svelte-i18n';
+  import { onMount } from 'svelte';
+  $: isPlayerTurn = $appState.currentPlayer === 1;
+  $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
+  // Для відображення стрілки за напрямком
+  const directionArrows = {
+    'up-left': '↖',
+    'up': '↑',
+    'up-right': '↗',
+    'left': '←',
+    'right': '→',
+    'down-left': '↙',
+    'down': '↓',
+    'down-right': '↘',
+  };
+  function getCentralText() {
+    if (typeof computerLastMoveDisplay === 'object' && computerLastMoveDisplay !== null && typeof computerLastMoveDisplay.direction === 'string') {
+      const dir = directionArrows[computerLastMoveDisplay.direction] || '';
+      const dist = typeof computerLastMoveDisplay.distance === 'number' ? computerLastMoveDisplay.distance : '';
+      return `${dir}${dist}`;
+    }
+    if (selectedDirection && selectedDistance) {
+      return `${directionArrows[selectedDirection] || ''}${selectedDistance}`;
+    }
+    if (selectedDirection) {
+      return directionArrows[selectedDirection];
+    }
+    return '•';
+  }
+  function onCentralClick() {
+    if (selectedDirection && selectedDistance && isPlayerTurn) {
+      onConfirmMove();
+    }
+  }
   $: blockModeEnabled = typeof $appState.blockModeEnabled === 'boolean' ? $appState.blockModeEnabled : false;
   $: showMoves = typeof $appState.settings?.showMoves === 'boolean' ? $appState.settings.showMoves : true;
   $: showBoard = typeof $appState.settings?.showBoard === 'boolean' ? $appState.settings.showBoard : true;
@@ -18,6 +51,68 @@
     selectedDistance,
     buttonDisabled
   });
+
+  // --- CENTRAL BUTTON STATE LOGIC ---
+  $: centerInfoState = (() => {
+    // 1. Початковий стан: нічого не вибрано, немає ходу комп'ютера
+    if (!selectedDirection && !selectedDistance && !computerLastMoveDisplay) {
+      return { class: '', content: '', clickable: false, aria: 'Порожньо' };
+    }
+    // 2. Показ ходу комп'ютера
+    if (!selectedDirection && !selectedDistance && typeof computerLastMoveDisplay === 'object' && computerLastMoveDisplay !== null) {
+      let dir = '';
+      let dist = '';
+      if (typeof computerLastMoveDisplay.direction === 'string' && directionArrows.hasOwnProperty(computerLastMoveDisplay.direction)) {
+        dir = directionArrows[computerLastMoveDisplay.direction];
+      }
+      if (typeof computerLastMoveDisplay.distance === 'number') {
+        dist = computerLastMoveDisplay.distance;
+      }
+      return {
+        class: 'computer-move-display',
+        content: `${dir}${dist}`,
+        clickable: false,
+        aria: `Хід комп'ютера: ${dir}${dist}`
+      };
+    }
+    // 3. Тільки напрямок
+    if (selectedDirection && !selectedDistance) {
+      let dir = '';
+      if (typeof selectedDirection === 'string' && directionArrows.hasOwnProperty(selectedDirection)) {
+        dir = directionArrows[selectedDirection];
+      }
+      return {
+        class: 'direction-distance-state',
+        content: dir,
+        clickable: false,
+        aria: `Вибрано напрямок: ${dir}`
+      };
+    }
+    // 4. Тільки відстань
+    if (!selectedDirection && selectedDistance) {
+      return {
+        class: 'direction-distance-state',
+        content: selectedDistance,
+        clickable: false,
+        aria: `Вибрано відстань: ${selectedDistance}`
+      };
+    }
+    // 5. Підтверджуваний хід (напрямок + відстань)
+    if (selectedDirection && selectedDistance) {
+      let dir = '';
+      if (typeof selectedDirection === 'string' && directionArrows.hasOwnProperty(selectedDirection)) {
+        dir = directionArrows[selectedDirection];
+      }
+      return {
+        class: 'confirm-btn-active',
+        content: `${dir}${selectedDistance}`,
+        clickable: isPlayerTurn,
+        aria: `Підтвердити хід: ${dir}${selectedDistance}`
+      };
+    }
+    // fallback
+    return { class: '', content: '', clickable: false, aria: '' };
+  })();
 
   /**
    * @typedef {Object} ModalButton
@@ -65,11 +160,13 @@
 
 <div class="game-controls-panel">
   <div class="toggles">
-    <label class="switch">
-      <input type="checkbox" bind:checked={showMoves} on:change={onShowMovesChange} />
-      <span class="slider"></span>
-      {$_('gameControls.showMoves')}
-    </label>
+    {#if showBoard}
+      <label class="switch">
+        <input type="checkbox" bind:checked={showMoves} on:change={onShowMovesChange} />
+        <span class="slider"></span>
+        {$_('gameControls.showMoves')}
+      </label>
+    {/if}
     <label class="switch">
       <input type="checkbox" bind:checked={showBoard} on:change={onShowBoardChange} />
       <span class="slider"></span>
@@ -86,16 +183,26 @@
       {$_('gameControls.speech')} <span style="font-size:1.1em;">&#9881;</span>
     </label>
   </div>
-  <div class="directions">
-    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => onDirectionClick('up-left')}>↖️</button>
-    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" on:click={() => onDirectionClick('up')}>⬆️</button>
-    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" on:click={() => onDirectionClick('up-right')}>↗️</button>
-    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" on:click={() => onDirectionClick('left')}>⬅️</button>
-    <button class="dir-btn" on:click={() => onDirectionClick('center')} disabled>•</button>
-    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" on:click={() => onDirectionClick('right')}>➡️</button>
-    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" on:click={() => onDirectionClick('down-left')}>↙️</button>
-    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" on:click={() => onDirectionClick('down')}>⬇️</button>
-    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" on:click={() => onDirectionClick('down-right')}>↘️</button>
+  <div class="directions directions-3x3">
+    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => onDirectionClick('up-left')}>↖</button>
+    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" on:click={() => onDirectionClick('up')}>↑</button>
+    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" on:click={() => onDirectionClick('up-right')}>↗</button>
+    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" on:click={() => onDirectionClick('left')}>←</button>
+    <button
+      id="center-info"
+      class="control-btn center-info {centerInfoState.class}"
+      type="button"
+      aria-label={centerInfoState.aria}
+      on:click={centerInfoState.clickable ? onCentralClick : undefined}
+      tabindex="0"
+      disabled={!centerInfoState.clickable}
+    >
+      {centerInfoState.content}
+    </button>
+    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" on:click={() => onDirectionClick('right')}>→</button>
+    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" on:click={() => onDirectionClick('down-left')}>↙</button>
+    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" on:click={() => onDirectionClick('down')}>↓</button>
+    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" on:click={() => onDirectionClick('down-right')}>↘</button>
   </div>
   <div class="distance-select">
     <div>{$_('gameControls.selectDistance')}</div>
@@ -106,8 +213,14 @@
     </div>
   </div>
   <div class="action-btns">
-    <button class="confirm-btn" on:click={onConfirmMove} disabled={buttonDisabled}>{$_('gameControls.confirm')}</button>
-    <button class="no-moves-btn" on:click={onNoMoves}>{$_('gameControls.noMoves')}</button>
+    <button class="confirm-btn" on:click={onConfirmMove} disabled={buttonDisabled} title={$_('gameControls.confirm')}>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right:8px;vertical-align:middle;"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      {$_('gameControls.confirm')}
+    </button>
+    <button class="no-moves-btn" on:click={onNoMoves} title={$_('gameControls.noMoves')}>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right:8px;vertical-align:middle;"><path d="M18 6L6 18M6 6l12 12" stroke="#222" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      {$_('gameControls.noMoves')}
+    </button>
   </div>
 </div>
 
@@ -122,6 +235,10 @@
   align-items: center;
   gap: 18px;
   min-width: 320px;
+  /* Glassmorphism */
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px 0 rgba(80,0,80,0.18);
+  border: 1.5px solid rgba(255,255,255,0.18);
 }
 .toggles {
   display: flex;
@@ -164,119 +281,197 @@
 .switch input[type="checkbox"]:checked + .slider:before {
   transform: translateX(16px);
 }
-.directions {
+.directions-3x3 {
   display: grid;
-  grid-template-columns: repeat(3, 44px);
-  grid-template-rows: repeat(3, 44px);
-  gap: 8px;
-  margin: 10px 0;
+  grid-template-columns: repeat(3, 54px);
+  grid-template-rows: repeat(3, 54px);
+  gap: 14px;
+  margin: 18px 0 10px 0;
+  justify-content: center;
+}
+.dir-btn, .central-btn, .dist-btn {
+  font-family: 'M PLUS Rounded 1c', sans-serif !important;
+  border-radius: 12px;
 }
 .dir-btn {
-  width: 44px;
-  height: 44px;
-  font-size: 1.5em;
+  width: 54px;
+  height: 54px;
+  font-size: 1.7em;
   border: none;
-  border-radius: 8px;
-  background: #2d0036;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.13);
   color: #fff;
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+  transition: background 0.25s, box-shadow 0.25s, color 0.2s, transform 0.15s;
+  box-shadow: 0 2px 16px 0 rgba(80,0,80,0.10);
+  backdrop-filter: blur(6px);
+  outline: none;
+  position: relative;
+  z-index: 1;
 }
 .dir-btn:focus, .dir-btn:hover {
-  background: #ff9800;
-  color: #222;
-  outline: none;
-  transform: scale(1.08);
+  background: rgba(255,152,0,0.25);
+  color: #ff9800;
+  transform: scale(1.10);
+  box-shadow: 0 4px 24px 0 #ff980088;
 }
 .dir-btn[disabled] {
   background: transparent;
   color: #bbb;
   cursor: default;
+  box-shadow: none;
 }
-.dir-btn.active,
-.dist-btn.active {
-  background: #ff9800;
-  color: #222;
+.dir-btn.active {
+  background: rgba(255,152,0,0.45);
+  color: #fff;
   font-weight: bold;
-  box-shadow: 0 0 0 2px #fff8;
+  box-shadow: 0 0 0 3px #ff9800cc, 0 4px 24px 0 #ff980088;
+  transform: scale(1.12);
+}
+.central-btn {
+  font-size: 1.3em;
+  background: rgba(67,160,71,0.13);
+  color: #222;
+  border: 2.5px solid #43a047;
+  border-radius: 12px;
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+  box-shadow: 0 0 0 0 #43a047;
+  z-index: 2;
+  backdrop-filter: blur(8px);
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.central-btn.active-confirm {
+  background: #43a047cc;
+  color: #fff;
+  animation: pulse-green 1s infinite alternate;
+  border: 2.5px solid #43a047;
+  box-shadow: 0 0 16px 4px #43a04799, 0 4px 24px 0 #43a04744;
+  cursor: pointer;
+}
+.central-btn.show-move {
+  background: #ff9800cc;
+  color: #fff;
+  border: 2.5px solid #ff9800;
+  animation: none;
+  box-shadow: 0 0 16px 4px #ff980099, 0 4px 24px 0 #ff980044;
+}
+@keyframes pulse-green {
+  0% { box-shadow: 0 0 0 0 #43a04799, 0 4px 24px 0 #43a04744; }
+  100% { box-shadow: 0 0 24px 8px #43a04799, 0 4px 24px 0 #43a04744; }
 }
 .distance-select {
   width: 100%;
   text-align: center;
-  margin: 10px 0 0 0;
+  margin: 18px 0 0 0;
 }
 .distance-btns {
   display: flex;
-  gap: 12px;
+  gap: 18px;
   justify-content: center;
-  margin-top: 6px;
-}
-.dist-btn {
-  background: #2d0036;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 18px;
-  font-size: 1.1em;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-}
-.dist-btn:focus, .dist-btn:hover {
-  background: #ff9800;
-  color: #222;
-  outline: none;
-  transform: scale(1.08);
-}
-.action-btns {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
   margin-top: 10px;
 }
-.confirm-btn {
-  background: #43a047;
+.dist-btn {
+  background: rgba(255,255,255,0.13);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 10px 0;
-  font-size: 1.1em;
-  font-weight: 600;
+  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.2em;
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+  transition: background 0.22s, color 0.18s, box-shadow 0.22s, transform 0.15s;
+  box-shadow: 0 2px 12px 0 rgba(80,0,80,0.10);
+  backdrop-filter: blur(6px);
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dist-btn:focus, .dist-btn:hover {
+  background: rgba(255,152,0,0.25);
+  color: #ff9800;
+  transform: scale(1.10);
+  box-shadow: 0 4px 16px 0 #ff980088;
+}
+.dist-btn.active {
+  background: rgba(255,152,0,0.45);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 0 0 3px #ff9800cc, 0 4px 16px 0 #ff980088;
+  transform: scale(1.12);
+}
+/* --- Improved action-btns --- */
+.action-btns {
+  display: flex;
+  flex-direction: row;
+  gap: 22px;
+  width: 100%;
+  margin-top: 18px;
+  justify-content: center;
+  align-items: stretch;
+  background: rgba(255,255,255,0.10);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px 0 rgba(80,0,80,0.10);
+  backdrop-filter: blur(8px);
+  padding: 14px 0 10px 0;
+}
+@media (max-width: 600px) {
+  .action-btns {
+    flex-direction: column;
+    gap: 14px;
+    padding: 10px 0 6px 0;
+  }
+}
+.confirm-btn, .no-moves-btn {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.18em;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  min-height: 54px;
+  min-width: 0;
+  padding: 0 0.5em;
+  box-shadow: 0 2px 16px 0 rgba(80,0,80,0.10);
+  transition: background 0.22s, color 0.18s, box-shadow 0.22s, transform 0.15s;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+}
+.confirm-btn {
+  background: linear-gradient(90deg, #43a047 60%, #66bb6a 100%);
+  color: #fff;
+  box-shadow: 0 4px 24px 0 #43a04733;
 }
 .confirm-btn:focus, .confirm-btn:hover {
-  background: #66bb6a;
-  color: #222;
+  background: linear-gradient(90deg, #66bb6a 60%, #43a047 100%);
+  color: #fff;
   outline: none;
-  transform: scale(1.04);
+  transform: scale(1.045);
+  box-shadow: 0 6px 32px 0 #43a04755;
 }
 .confirm-btn:disabled {
   background: #ccc;
   color: #666;
   cursor: not-allowed;
   transform: none;
-}
-.confirm-btn:disabled:hover {
-  background: #ccc;
-  color: #666;
-  transform: none;
+  box-shadow: none;
 }
 .no-moves-btn {
-  background: #ffb300;
+  background: linear-gradient(90deg, #ffb300 60%, #ffe082 100%);
   color: #222;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 0;
-  font-size: 1.1em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 4px 24px 0 #ffb30033;
 }
 .no-moves-btn:focus, .no-moves-btn:hover {
-  background: #ffe082;
+  background: linear-gradient(90deg, #ffe082 60%, #ffb300 100%);
   color: #222;
   outline: none;
-  transform: scale(1.04);
+  transform: scale(1.045);
+  box-shadow: 0 6px 32px 0 #ffb30055;
 }
 </style> 

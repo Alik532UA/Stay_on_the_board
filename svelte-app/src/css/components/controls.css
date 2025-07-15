@@ -493,3 +493,15 @@
     font-weight: bold;
 }
 /* === Кінець стилів центральної кнопки === */ 
+
+.clear-cache-btn {
+  width: 64px;
+  height: 64px;
+  /* інші стилі за потреби */
+  border-radius: 12px !important;
+}
+.clear-cache-btn svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+} 
