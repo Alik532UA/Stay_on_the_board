@@ -563,7 +563,7 @@ export function makeComputerMove() {
       console.log('[makeComputerMove] No valid moves available for computer. Player wins!');
       // Показуємо меню з вибором: продовжити або завершити з бонусом
       modalStore.showModal({
-        title: 'Комп\'ютер не може зробити хід. Ви перемогли!',
+        title: 'Комп\'ютер не може зробити хід',
         content: 'Ви можете очистити поле і продовжити гру, або завершити її зараз і отримати бонусні бали.',
         buttons: [
           {
@@ -572,7 +572,7 @@ export function makeComputerMove() {
           },
           {
             text: `Завершити (+${current.boardSize} балів)`,
-            primary: true,
+            customClass: 'blue-btn',
             onClick: finishGameWithBonus
           }
         ]
@@ -802,11 +802,14 @@ export function noMoves() {
       buttons: [
         {
           text: `Продовжити`,
+          primary: true,
+          isHot: true,
+          hotKey: 'Enter',
           onClick: continueGameAndClearBlocks
         },
         {
           text: `Завершити (+${state.boardSize} балів)`,
-          primary: true,
+          customClass: 'blue-btn',
           onClick: finishGameWithBonus
         }
       ]
