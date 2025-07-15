@@ -12,6 +12,10 @@
    * @param {Event} e
    */
   function onOverlayClick(e) {
+    // Якщо це "критичне" модальне вікно (2 кнопки, обидві з onClick), не закриваємо по overlay
+    if (modal.buttons && modal.buttons.length === 2 && modal.buttons.every(btn => typeof btn.onClick === 'function')) {
+      return;
+    }
     const target = /** @type {HTMLElement|null} */(e.target);
     if (target && target.classList.contains('modal-overlay')) {
       logStore.addLog('Закриття модального вікна (overlay)', 'info');
@@ -24,9 +28,15 @@
   <div class="modal-overlay" role="button" tabindex="0" aria-label={$_('modal.close')} on:click={onOverlayClick} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && onOverlayClick(e)}>
     <div class="modal-window">
       <div class="modal-header">
+        {#if modal.title && (modal.title.includes('перемогли') || modal.title.includes('Комп'))}
+          <span class="modal-victory-icon">👑</span>
+        {/if}
         <h2 class="modal-title">{modal.title}</h2>
-        <button class="modal-close" on:click={() => { logStore.addLog('Закриття модального вікна (X)', 'info'); modalStore.closeModal(); }}>&times;</button>
+        {#if !(modal.buttons && modal.buttons.length === 2 && modal.buttons.every(btn => typeof btn.onClick === 'function'))}
+          <button class="modal-close" on:click={() => { logStore.addLog('Закриття модального вікна (X)', 'info'); modalStore.closeModal(); }}>&times;</button>
+        {/if}
       </div>
+      <!-- subtitle прибрано -->
       <div class="modal-content">
         {#if details}
           <!-- Новий деталізований вигляд -->
@@ -65,7 +75,7 @@
             <span class="score-value">{modal.content.score}</span>
           </div>
         {:else}
-          {modal.content}
+          <div class="modal-info">{modal.content}</div>
         {/if}
       </div>
       <div class="modal-buttons">
@@ -84,12 +94,22 @@
 .modal-overlay {
   position: fixed;
   left: 0; top: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.3);
+  background: rgba(30, 16, 40, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.2s;
 }
+.modal-victory-icon {
+  font-size: 2.5em;
+  margin-right: 12px;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 8px #ffeb3b88);
+}
+/* .modal-subtitle видалено */
 .modal-window {
   /* Видаляємо фон, бо тепер .modal-content відповідає за glassmorphism */
   border-radius: 18px;
@@ -105,18 +125,22 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 2px 16px 0 rgba(80,0,80,0.10);
   border-radius: 18px;
-  padding: 0;
-  max-width: 90vw;
+  padding: 32px 28px 18px 28px;
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
   max-height: 90vh;
-  width: 420px;
   overflow: hidden;
   position: relative;
   color: var(--text-primary, #fff);
   transform: scale(0.95);
   opacity: 0;
   animation: modalFadeIn 0.3s ease-out forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 @keyframes modalFadeIn {
   to {
@@ -131,15 +155,18 @@
   box-shadow: none;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 8px;
 }
 .modal-title {
   margin: 0;
-  font-size: 1.6em;
-  font-weight: 700;
-  color: var(--text-primary, #fff);
+  font-size: 2em;
+  font-weight: 800;
+  color: #fffde7;
   text-align: center;
   flex: 1;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
 }
 .modal-close {
   color: rgba(255, 255, 255, 0.7);
@@ -183,18 +210,44 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 20px;
   padding-bottom: 24px;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
 }
 .modal-buttons button {
   margin: 0 8px;
-  padding: 6px 18px;
-  font-size: 1em;
-  border-radius: 6px;
+  padding: 8px 26px;
+  font-size: 1.08em;
+  border-radius: 8px;
   border: none;
-  background: #eee;
+  background: #fff;
+  color: #222;
   cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  font-weight: 600;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+  outline: none;
+  min-width: 120px;
+  text-align: center;
+  border: 1.5px solid #eee;
+}
+.modal-buttons button:focus {
+  border: 1.5px solid #4caf50;
+}
+.modal-buttons button:hover {
+  background: #f5f5f5;
+  color: #111;
+  box-shadow: 0 4px 16px 0 #4caf5020;
 }
 .modal-buttons button.primary {
   background: #4caf50;
+  color: #fff;
+  box-shadow: 0 2px 12px 0 #4caf5040;
+  font-weight: 700;
+  border: 1.5px solid #388e3c;
+}
+.modal-buttons button.primary:hover {
+  background: #43a047;
   color: #fff;
 }
 .reason {
@@ -202,6 +255,11 @@
   color: var(--text-secondary, #ccc);
   margin-bottom: 20px;
   margin-top: 32px;
+}
+.modal-content p, .modal-content .reason {
+  margin: 0 0 16px 0;
+  text-align: center;
+  font-size: 1.08em;
 }
 .score-breakdown {
   text-align: left;
@@ -228,5 +286,17 @@
 .score-breakdown .penalty span {
   color: #f44336;
   font-weight: bold;
+}
+.modal-info {
+  background: rgba(30, 16, 40, 0.32);
+  color: #fff;
+  border-radius: 10px;
+  padding: 12px 18px 10px 18px;
+  margin: 0 0 18px 0;
+  font-size: 1.08em;
+  text-align: center;
+  box-shadow: none;
+  border: none;
+  max-width: 95vw;
 }
 </style> 
