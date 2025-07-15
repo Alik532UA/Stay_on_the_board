@@ -1,6 +1,6 @@
 <script>
   import '../css/layouts/main-menu.css';
-  import { settingsStore } from '../../stores/settingsStore.js';
+  import { settingsStore } from '$lib/stores/settingsStore.js';
   import { logStore } from '../stores/logStore.js';
   import { goto } from '$app/navigation';
   import { _ , isLoading, locale } from 'svelte-i18n';

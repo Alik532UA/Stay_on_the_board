@@ -1,6 +1,6 @@
 <script>
   import { appState, toggleBlockMode, toggleShowMoves, toggleShowBoard, toggleSpeech, setDirection, setDistance, confirmMove, noMoves, resetGame, availableDistances } from '../stores/gameStore.js';
-  import { modalStore } from '../stores/modalStore.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
