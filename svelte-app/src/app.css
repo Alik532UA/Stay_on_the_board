@@ -1,23 +1,25 @@
 /* Головний CSS файл - імпорт всіх модульних стилів */
 
+/* Централізований імпорт усіх стилів */
+@import url('./lib/css/base/variables.css');
+@import url('./lib/css/themes/ubuntu.css');
+@import url('./lib/css/themes/peak.css');
+@import url('./lib/css/themes/cs2.css');
+@import url('./lib/css/components/game-board.css');
+@import url('./lib/css/components/controls.css');
+@import url('./lib/css/components/modals.css');
+@import url('./lib/css/layouts/main-menu.css');
+
 /* Імпорт шрифту M PLUS Rounded 1c */
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap');
 
 /* Базові змінні та налаштування */
-@import url('./css/base/variables.css');
 
 /* Теми */
-@import url('./css/themes/ubuntu.css');
-@import url('./css/themes/peak.css');
-@import url('./css/themes/cs2.css');
 
 /* Компоненти */
-@import url('./css/components/game-board.css');
-@import url('./css/components/controls.css');
-@import url('./css/components/modals.css');
 
 /* Макети */
-@import url('./css/layouts/main-menu.css');
 
 /* Базові стилі */
 body {

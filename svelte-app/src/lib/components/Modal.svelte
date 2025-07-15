@@ -1,5 +1,5 @@
 <script>
-  import { modalStore } from '../stores/modalStore.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
   $: modal = $modalStore;

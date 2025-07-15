@@ -1,7 +1,7 @@
 <script>
   import { locale } from 'svelte-i18n';
   import { settingsStore } from '../stores/settingsStore.js';
-  import { logStore } from '../stores/logStore.js';
+  import { logStore } from '$lib/stores/logStore.js';
   let showDropdown = false;
   const languages = [
     { code: 'uk', label: 'Українська', flag: '🇺🇦' },

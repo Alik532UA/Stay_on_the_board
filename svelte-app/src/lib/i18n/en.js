@@ -82,5 +82,24 @@ export default {
   },
   localGame: {
     title: "Local Game"
+  },
+  speech: {
+    player: "Player",
+    computer: "Computer",
+    move: "moves",
+    on: "for",
+    cell: "cell",
+    cells: "cells",
+    cells_many: "cells",
+    directions: {
+      'up': 'up',
+      'down': 'down',
+      'left': 'left',
+      'right': 'right',
+      'up-left': 'diagonally up-left',
+      'up-right': 'diagonally up-right',
+      'down-left': 'diagonally down-left',
+      'down-right': 'diagonally down-right'
+    }
   }
 }; 

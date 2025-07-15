@@ -15,38 +15,51 @@ export function getAllValidMoves(board, blockedCells, boardSize) {
     boardSize,
     blockedCellsCount: blockedCells.length
   });
-  
+
   const directions = [
     { dr: -1, dc: -1, dir: '7' }, { dr: -1, dc: 0, dir: '8' }, { dr: -1, dc: 1, dir: '9' },
     { dr: 0, dc: -1, dir: '4' }, { dr: 0, dc: 1, dir: '6' },
     { dr: 1, dc: -1, dir: '1' }, { dr: 1, dc: 0, dir: '2' }, { dr: 1, dc: 1, dir: '3' }
   ];
-  // Знаходимо фігуру (1)
+
   let piece = null;
   for (let r = 0; r < boardSize; r++) {
     for (let c = 0; c < boardSize; c++) {
-      if (board[r][c] === 1) piece = { row: r, col: c };
+      if (board[r][c] === 1) {
+        piece = { row: r, col: c };
+        break;
+      }
     }
+    if (piece) break;
   }
-  
+
   console.log('[getAllValidMoves] Piece found:', piece);
-  
+
   if (!piece) {
     console.log('[getAllValidMoves] No piece found on board');
     return [];
   }
-  
+
   const moves = [];
   for (const { dr, dc, dir } of directions) {
     for (let dist = 1; dist < boardSize; dist++) {
       const nr = piece.row + dr * dist;
       const nc = piece.col + dc * dist;
-      if (nr < 0 || nc < 0 || nr >= boardSize || nc >= boardSize) break;
-      if (blockedCells.some(cell => cell.row === nr && cell.col === nc)) break;
-      moves.push({ row: nr, col: nc, direction: dir, distance: dist });
+
+      // Перевіряємо, чи не вийшли ми за межі дошки
+      if (nr < 0 || nc < 0 || nr >= boardSize || nc >= boardSize) {
+        break;
+      }
+
+      // КЛЮЧОВЕ ВИПРАВЛЕННЯ: не break при заблокованій клітинці, а просто не додаємо її як хід
+      const isBlocked = blockedCells.some(cell => cell.row === nr && cell.col === nc);
+      if (!isBlocked) {
+        moves.push({ row: nr, col: nc, direction: dir, distance: dist });
+      }
+      // цикл продовжується навіть якщо клітинка заблокована
     }
   }
-  
+
   console.log('[getAllValidMoves] Generated moves:', moves);
   return moves;
 }

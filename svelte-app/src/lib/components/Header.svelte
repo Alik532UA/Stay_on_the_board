@@ -3,7 +3,7 @@
 	import logo from '$lib/images/svelte-logo.svg';
 	import github from '$lib/images/github.svg';
 	import { _ } from 'svelte-i18n';
-	import LanguageSwitcher from '../lib/components/LanguageSwitcher.svelte';
+	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 </script>
 
 <header>
