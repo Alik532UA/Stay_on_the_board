@@ -1,5 +1,5 @@
 <script>
-  import GameBoard from '../../components/GameBoard.svelte';
+  import GameBoard from '$lib/components/GameBoard.svelte';
 </script>
 
 <GameBoard /> 

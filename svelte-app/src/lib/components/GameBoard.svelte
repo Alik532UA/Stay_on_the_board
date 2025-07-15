@@ -3,13 +3,13 @@
   import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove } from '../stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { goto } from '$app/navigation';
-  import GameControls from './GameControls.svelte';
-  import Modal from './Modal.svelte';
+  import GameControls from '$lib/components/GameControls.svelte';
+  import Modal from '$lib/components/Modal.svelte';
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
   import { _ } from 'svelte-i18n';
   import { uiState, closeVoiceSettingsModal } from '../stores/uiStore.js';
-  import VoiceSettingsModal from './VoiceSettingsModal.svelte';
+  import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
   import { settingsStore } from '../stores/settingsStore.js';
   // Функція очищення кешу
   function clearCache() {
@@ -90,12 +90,20 @@
     setBoardSize(newSize);
   }
 
+  /**
+   * @param {number} row
+   * @param {number} col
+   */
   function isAvailable(row, col) {
     const result = $appState.availableMoves && $appState.availableMoves.some(move => move.row === row && move.col === col);
     console.log('[isAvailable] row:', row, 'col:', col, 'result:', result, 'availableMoves:', $appState.availableMoves);
     return result;
   }
 
+  /**
+   * @param {number} row
+   * @param {number} col
+   */
   function isBlocked(row, col) {
     const result = blockedCells && blockedCells.some(cell => Number(cell.row) === Number(row) && Number(cell.col) === Number(col));
     console.log('[isBlocked]', {row, col, blockedCells, result});
@@ -104,6 +112,8 @@
 
   /**
    * Перевіряє, чи є клітинка заблокованою.
+   * @param {number} row
+   * @param {number} col
    */
   function isCellBlocked(row, col) {
     return !!(blockedCells && blockedCells.some(cell => cell.row === row && cell.col === col));
@@ -236,6 +246,9 @@
   </div>
   <div class="score-panel">
     Рахунок: {$appState.score}
+    {#if $appState.penaltyPoints > 0}
+      <span class="penalty-display">-{$appState.penaltyPoints}</span>
+    {/if}
   </div>
   {#if showBoard}
     {#key `${$appState.boardSize}-${$appState.gameId}`}
@@ -250,8 +263,12 @@
                 class:player-piece={ rowIdx === playerRow && colIdx === playerCol }
                 class:blocked-cell={ isCellBlocked(rowIdx, colIdx) }
                 class:available={ showMoves && isAvailable(rowIdx, colIdx) && currentPlayer === 1 }
+                role="button"
+                tabindex="0"
+                aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
                 on:click={() => onCellClick(rowIdx, colIdx)}
                 on:contextmenu={(e) => onCellRightClick(e, rowIdx, colIdx)}
+                on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') onCellClick(rowIdx, colIdx); }}
               >
                 {#if isCellBlocked(rowIdx, colIdx)}
                   <span class="blocked-x">✗</span>
@@ -274,13 +291,10 @@
   <div style="color: #ff9800; font-size: 0.95em; margin: 8px 0 0 0; text-align: center;">
     blockedCells: {JSON.stringify(blockedCells)}
   </div>
-  <GameControls {showBoard} />
+  <GameControls />
   <Modal />
   {#if $uiState.isVoiceSettingsModalOpen}
-    <VoiceSettingsModal
-      langCode={$settingsStore.language}
-      close={closeVoiceSettingsModal}
-    />
+    <VoiceSettingsModal close={closeVoiceSettingsModal} />
   {/if}
 </div>
 
@@ -317,5 +331,10 @@
     max-width: 340px;
     margin-left: auto;
     margin-right: auto;
+  }
+  .penalty-display {
+    color: #f44336; /* Червоний колір для штрафів */
+    font-weight: bold;
+    margin-left: 8px;
   }
 </style> 
