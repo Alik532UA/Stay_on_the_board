@@ -12,10 +12,16 @@ const isBrowser = typeof window !== 'undefined' && typeof window.localStorage !=
 
 const defaultSettings = {
   showMoves: true,
-  language: isBrowser ? localStorage.getItem('lang') || 'uk' : 'uk',
-  theme: isBrowser ? localStorage.getItem('theme') || 'dark' : 'dark',
-  style: isBrowser ? localStorage.getItem('style') || 'classic' : 'classic',
+  language: 'uk',
+  theme: 'dark',
+  style: 'classic',
 };
+
+if (isBrowser) {
+  // Очищаємо старі налаштування теми та стилю, щоб форсувати дефолт
+  localStorage.setItem('theme', 'dark');
+  localStorage.setItem('style', 'classic');
+}
 
 const { subscribe, set, update } = writable(/** @type {SettingsState} */ ({ ...defaultSettings }));
 
