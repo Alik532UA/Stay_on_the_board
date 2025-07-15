@@ -1,0 +1,2 @@
+Де регулювати ширину для game-controls-panel ?
+треба зробити ширину як у елемента board-bg-wrapper
