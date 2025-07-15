@@ -1,10 +1,10 @@
 <script>
-  import { appState, toggleBlockMode, toggleShowMoves, toggleShowBoard, toggleSpeech, setDirection, setDistance, confirmMove, noMoves, resetGame, availableDistances } from '../stores/gameStore.js';
-  import { modalStore } from '../stores/modalStore.js';
+  import { appState, toggleBlockMode, toggleShowMoves, toggleShowBoard, toggleSpeech, setDirection, setDistance, confirmMove, noMoves, resetGame, availableDistances } from '$lib/stores/gameStore.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
-  import { openVoiceSettingsModal } from '../stores/uiStore.js';
+  import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
   $: isPlayerTurn = $appState.currentPlayer === 1;
   $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
   // Для відображення стрілки за напрямком
