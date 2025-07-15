@@ -561,11 +561,21 @@ export function makeComputerMove() {
       }
     } else {
       console.log('[makeComputerMove] No valid moves available for computer. Player wins!');
-      appState.update(state => ({ ...state, isGameOver: true }));
+      // Показуємо меню з вибором: продовжити або завершити з бонусом
       modalStore.showModal({
-        title: 'Перемога!',
-        content: 'Комп\'ютер не може зробити хід. Ви перемогли!',
-        buttons: [{ text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal }]
+        title: 'Комп\'ютер не може зробити хід. Ви перемогли!',
+        content: 'Ви можете очистити поле і продовжити гру, або завершити її зараз і отримати бонусні бали.',
+        buttons: [
+          {
+            text: `Продовжити`,
+            onClick: continueGameAndClearBlocks
+          },
+          {
+            text: `Завершити (+${current.boardSize} балів)`,
+            primary: true,
+            onClick: finishGameWithBonus
+          }
+        ]
       });
     }
   };
