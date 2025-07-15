@@ -203,6 +203,10 @@
       case 'N':
         noMoves();
         break;
+      case 'Backspace':
+        logStore.addLog('[handleKeydown] Натиснуто Backspace — заявити "немає ходів"', 'info');
+        noMoves();
+        break;
         
       default:
         handled = false; // Ми не обробили цю клавішу

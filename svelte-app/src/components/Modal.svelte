@@ -8,6 +8,25 @@
     ? /** @type {any} */ (modal.content.scoreDetails)
     : null;
 
+  /** @type {HTMLButtonElement|null} */
+  let hotBtn = null;
+  $: if (modal.isOpen && modal.buttons && modal.buttons.length) {
+    // @ts-ignore: кастомне поле isHot
+    const idx = modal.buttons.findIndex(b => b.isHot);
+    if (idx !== -1 && hotBtn && typeof hotBtn.focus === 'function') {
+      setTimeout(() => { hotBtn.focus(); }, 0);
+    }
+  }
+  function onModalKeydown(/** @type {any} */e) {
+    if (!modal.isOpen || !modal.buttons) return;
+    // @ts-ignore: кастомне поле isHot
+    const idx = modal.buttons.findIndex(b => b.isHot);
+    if (idx !== -1 && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      (modal.buttons[idx].onClick || modalStore.closeModal)();
+    }
+  }
+
   /**
    * @param {Event} e
    */
@@ -21,7 +40,7 @@
 </script>
 
 {#if modal.isOpen}
-  <div class="modal-overlay" role="button" tabindex="0" aria-label={$_('modal.close')} on:click={onOverlayClick} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && onOverlayClick(e)}>
+  <div class="modal-overlay" role="button" tabindex="0" aria-label={$_('modal.close')} on:click={onOverlayClick} on:keydown={onModalKeydown}>
     <div class="modal-window">
       <div class="modal-header">
         <h2 class="modal-title">{modal.title}</h2>
@@ -67,11 +86,26 @@
         {/if}
       </div>
       <div class="modal-buttons">
-        {#each modal.buttons as btn}
-          <button class={btn.primary ? 'primary' : ''} on:click={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}>{btn.text}</button>
+        {#each modal.buttons as btn, i}
+          <button
+            class={
+              (i === 1 ? 'modal-btn-finish ' : '') +
+              (i === 0 ? 'modal-btn-continue ' : '') +
+              'modal-btn-generic'
+            }
+            data-testid={`modal-btn-${i}`}
+            data-role="modal-btn"
+            on:click={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
+            aria-label={btn.text}
+            aria-pressed="false"
+            {#if btn.isHot}
+              bind:this={hotBtn}
+              tabindex="0"
+            {/if}
+          >{btn.text}</button>
         {/each}
         {#if !modal.buttons.length}
-          <button on:click={() => { logStore.addLog('Закриття модального вікна (OK)', 'info'); modalStore.closeModal(); }}>{$_('modal.ok')}</button>
+          <button class="modal-btn-generic" data-testid="modal-btn-ok" data-role="modal-btn" on:click={() => { logStore.addLog('Закриття модального вікна (OK)', 'info'); modalStore.closeModal(); }}>{$_('modal.ok')}</button>
         {/if}
       </div>
     </div>
@@ -187,13 +221,33 @@
   padding: 6px 18px;
   font-size: 1em;
   border-radius: 6px;
-  border: none;
-  background: #eee;
   cursor: pointer;
+  /* Видалено background, color, border, box-shadow */
 }
-.modal-buttons button.primary {
-  background: #4caf50;
-  color: #fff;
+.modal-buttons button:not(.blue-btn) {
+  background: #eee !important;
+  color: #222 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.modal-buttons button.blue-btn {
+  background: #2196f3 !important;
+  color: #fff !important;
+  border: 2.5px solid #1976d2 !important;
+  box-shadow: 0 0 0 2px #1976d233 !important;
+  border-radius: 6px !important;
+  padding: 6px 18px !important;
+  outline: 2.5px solid #1976d2 !important;
+  font-weight: 700 !important;
+  font-size: 1.08em !important;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s, outline 0.18s !important;
+  z-index: 10 !important;
+}
+.modal-buttons button.blue-btn:hover, .modal-buttons button.blue-btn:focus {
+  background: #1976d2 !important;
+  color: #fff !important;
+  outline: 2.5px solid #1565c0 !important;
+  box-shadow: 0 0 0 3px #1565c055 !important;
 }
 .reason {
   font-size: 1.1em;
@@ -226,5 +280,24 @@
 .score-breakdown .penalty span {
   color: #f44336;
   font-weight: bold;
+}
+.modal-btn-finish {
+  background: #2196f3 !important;
+  color: #fff !important;
+  border: 2.5px solid #1976d2 !important;
+  box-shadow: 0 0 0 2px #1976d233 !important;
+  outline: 2.5px solid #1976d2 !important;
+  font-weight: 700 !important;
+  font-size: 1.08em !important;
+  border-radius: 6px !important;
+  padding: 6px 18px !important;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s, outline 0.18s !important;
+  z-index: 10 !important;
+}
+.modal-btn-finish:hover, .modal-btn-finish:focus {
+  background: #1976d2 !important;
+  color: #fff !important;
+  outline: 2.5px solid #1565c0 !important;
+  box-shadow: 0 0 0 3px #1565c055 !important;
 }
 </style> 
