@@ -4,6 +4,12 @@ import { get } from 'svelte/store';
 import { modalStore } from './modalStore.js';
 import { closeModal } from './modalStore.js';
 import { speakMove, langMap } from '$lib/speech.js';
+/**
+ * @typedef {{ [key: string]: string; uk: string; en: string; crh: string; nl: string; }} LangMapType
+ */
+/** @type {LangMapType} */
+// @ts-ignore
+langMap;
 
 /**
  * @param {number} size
@@ -88,23 +94,28 @@ function getAvailableMoves(row, col, size, blockedCells = []) {
  * @property {string} language
  * @property {string} theme
  * @property {string} style
- * @property {{ showMoves: boolean, showBoard: boolean, speechEnabled: boolean, language: string, theme: string, style: string }} settings
+ * @property {{ showMoves: boolean, showBoard: boolean, speechEnabled: boolean, language: string, theme: string, style: string, selectedVoiceURI?: string }} settings
  * @property {number[][]} board
  * @property {number} playerRow
  * @property {number} playerCol
  * @property {{row: number, col: number}[]} blockedCells
  * @property {{row: number, col: number}[]} availableMoves
  * @property {boolean} blockModeEnabled
- * @property {string|null|undefined} selectedDirection
+ * @property {Direction|null|undefined} selectedDirection
  * @property {number|null|undefined} selectedDistance
  * @property {number[]} availableDistances
  * @property {number} currentPlayer
- * @property {{direction:string, distance:number}|null|undefined} lastMove
- * @property {{direction:string, distance:number}|null|undefined} computerLastMoveDisplay
+ * @property {{direction: Direction, distance: number}|null} lastMove
+ * @property {{direction: Direction, distance: number}|null} computerLastMoveDisplay
+ * @property {{direction: Direction, distance: number}|null} lastComputerMove
  * @property {boolean} distanceManuallySelected
  * @property {{row: number, col: number}[]} visitedCells
  * @property {boolean} isGameOver
  * @property {number} score
+ * @property {number} movesInBlockMode
+ * @property {number} jumpedBlockedCells
+ * @property {number} penaltyPoints
+ * @property {boolean} finishedByNoMovesButton
  */
 
 /**
@@ -123,7 +134,7 @@ const dirMap = {
   'down-right': [1, 1]
 };
 
-// Додаю підтримку string чисел ('1'-'9') для ai.js
+/** @type {Record<string, Direction>} */
 const numToDir = {
   '1': 'down-left',
   '2': 'down',
@@ -135,6 +146,7 @@ const numToDir = {
   '9': 'up-right'
 };
 
+/** @type {Record<Direction, Direction>} */
 const oppositeDirections = {
   'up': 'down',
   'down': 'up',
@@ -155,7 +167,7 @@ const style = isBrowser ? localStorage.getItem('style') : null;
 const initialBoardSize = 3;
 const { row: initialRow, col: initialCol } = getRandomCell(initialBoardSize);
 console.log('[appState] Стартова позиція ферзя:', { initialRow, initialCol });
-export const appState = writable({
+export const appState = writable(/** @type {AppState} */({
   currentView: 'mainMenu',
   boardSize: initialBoardSize,
   gameMode: 'vsComputer',
@@ -194,8 +206,8 @@ export const appState = writable({
   jumpedBlockedCells: 0, // НОВЕ
   penaltyPoints: 0, // НОВЕ
   finishedByNoMovesButton: false, // НОВЕ
-  gameId: 0,
-});
+  availableDistances: [], // ДОДАНО для відповідності типу AppState
+}));
 
 /**
  * Похідний стор, який автоматично генерує масив доступних відстаней
@@ -351,14 +363,14 @@ export function movePlayer(newRow, newCol) {
       const dr = newRow - playerRow;
       const dc = newCol - playerCol;
       let direction = null;
-      if (dr < 0 && dc < 0) direction = 'up-left';
-      else if (dr < 0 && dc === 0) direction = 'up';
-      else if (dr < 0 && dc > 0) direction = 'up-right';
-      else if (dr === 0 && dc < 0) direction = 'left';
-      else if (dr === 0 && dc > 0) direction = 'right';
-      else if (dr > 0 && dc < 0) direction = 'down-left';
-      else if (dr > 0 && dc === 0) direction = 'down';
-      else if (dr > 0 && dc > 0) direction = 'down-right';
+      if (dr < 0 && dc < 0) direction = /** @type {Direction} */('up-left');
+      else if (dr < 0 && dc === 0) direction = /** @type {Direction} */('up');
+      else if (dr < 0 && dc > 0) direction = /** @type {Direction} */('up-right');
+      else if (dr === 0 && dc < 0) direction = /** @type {Direction} */('left');
+      else if (dr === 0 && dc > 0) direction = /** @type {Direction} */('right');
+      else if (dr > 0 && dc < 0) direction = /** @type {Direction} */('down-left');
+      else if (dr > 0 && dc === 0) direction = /** @type {Direction} */('down');
+      else if (dr > 0 && dc > 0) direction = /** @type {Direction} */('down-right');
       const distance = Math.max(Math.abs(dr), Math.abs(dc));
       return {
         ...state,
@@ -367,7 +379,7 @@ export function movePlayer(newRow, newCol) {
         playerCol: newCol,
         availableMoves: newAvailableMoves,
         currentPlayer: 2,
-        lastMove: (direction && distance) ? { direction, distance } : null,
+        lastMove: (direction && distance) ? { direction: /** @type {Direction} */(direction), distance } : null,
         blockedCells: state.blockedCells,
         visitedCells: state.visitedCells,
         currentView: state.currentView,
@@ -434,7 +446,6 @@ export function resetGame() {
     board[row][col] = 1;
     return {
       ...state,
-      gameId: state.gameId + 1,
       board,
       playerRow: row,
       playerCol: col,
@@ -468,8 +479,8 @@ export function resetGame() {
 
 /**
  * Розраховує фінальний рахунок з усіма бонусами.
- * @param {object} state - Поточний стан гри ($appState).
- * @returns {{baseScore: number, sizeBonus: number, blockModeBonus: number, noMovesBonus: number, jumpBonus: number, totalScore: number}}
+ * @param {AppState} state - Поточний стан гри ($appState).
+ * @returns {{baseScore: number, totalPenalty: number, sizeBonus: number, blockModeBonus: number, noMovesBonus: number, jumpBonus: number, totalScore: number}}
  */
 function calculateFinalScore(state) {
   const { score, penaltyPoints, boardSize, movesInBlockMode, finishedByNoMovesButton, jumpedBlockedCells } = state;
@@ -528,24 +539,25 @@ export function makeComputerMove() {
         const moveUpdates = performMove(state, move.row, move.col);
 
         // КЛЮЧОВЕ: уніфікуємо напрямок
-        const directionKey = numToDir[move.direction] || move.direction;
+        const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
 
         const newState = {
           ...state,
           ...moveUpdates, // Застосовуємо оновлення
           currentPlayer: 1, // Хід повертається до гравця
           lastMove: null,
-          computerLastMoveDisplay: { direction: directionKey, distance: move.distance },
-          lastComputerMove: { direction: directionKey, distance: move.distance }, // **НОВЕ**
+          computerLastMoveDisplay: { direction: /** @type {Direction} */(directionKey), distance: move.distance },
+          lastComputerMove: { direction: /** @type {Direction} */(directionKey), distance: move.distance }, // **НОВЕ**
         };
         // Блок перевірки на availableMoves.length === 0 ВИДАЛЕНО
         return newState;
       });
       // Озвучування також використовує directionKey
+      const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
       const currentSettings = current.settings;
       if (currentSettings.speechEnabled) {
         const langCode = langMap[currentSettings.language] || 'uk-UA';
-        speakMove('computer', directionKey, move.distance, langCode, currentSettings.selectedVoiceURI);
+        speakMove('computer', directionKey, move.distance, langCode, currentSettings.selectedVoiceURI ?? null);
       }
     } else {
       console.log('[makeComputerMove] No valid moves available for computer. Player wins!');
@@ -607,7 +619,7 @@ export function setDirection(dir) {
     // Випадок 2: Гравець клікнув на той самий напрямок.
     else {
       // Якщо відстань була встановлена вручну, ми не змінюємо її.
-      // Гравець має вибрати інший напрямок, щоб скинути цей стан.
+      // Гравець має вибрати інший напрямок, щоб скинути цей стан. selectedDistance може бути null.
       if (distanceManuallySelected) {
         newDistance = selectedDistance;
         newManuallySelected = true;
@@ -615,7 +627,7 @@ export function setDirection(dir) {
       // Якщо вибір не був ручним, застосовуємо логіку інкременту.
       else {
         // Якщо відстань не встановлена або досягла максимуму, скидаємо на 1.
-        if (selectedDistance === null || selectedDistance >= maxDist) {
+        if (selectedDistance === null || selectedDistance === undefined || selectedDistance >= maxDist) {
           newDistance = 1;
         } 
         // В іншому випадку, просто збільшуємо на 1.
@@ -628,7 +640,7 @@ export function setDirection(dir) {
 
     return {
       ...state,
-      selectedDirection: dir,
+      selectedDirection: /** @type {Direction} */(dir),
       selectedDistance: newDistance,
       distanceManuallySelected: newManuallySelected,
       computerLastMoveDisplay: null // Приховуємо показ ходу комп'ютера при виборі гравця.
@@ -733,7 +745,7 @@ export function confirmMove() {
 export function continueGameAndClearBlocks() {
   appState.update(state => {
     // Очищуємо заблоковані клітинки
-    const newBlockedCells = [];
+    const newBlockedCells = /** @type {{row: number, col: number}[]} */ ([]);
     // Перераховуємо доступні ходи для чистої дошки
     const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, newBlockedCells);
 
@@ -801,6 +813,8 @@ export function noMoves() {
 
 /**
  * Відображає хід комп'ютера в UI (для центральної кнопки)
+ * @param {Direction} direction
+ * @param {number} distance
  */
 export function showComputerMove(direction, distance) {
   appState.update(state => ({

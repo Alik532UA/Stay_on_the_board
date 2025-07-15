@@ -104,10 +104,13 @@ export async function speakMove(actorKey, directionKey, distance, lang, voiceURI
   window.speechSynthesis.speak(utterance);
 }
 
-// Мапінг мов додатку на мови Web Speech API
+/**
+ * @typedef {{ [key: string]: string; uk: string; en: string; crh: string; nl: string; }} LangMapType
+ */
+/** @type {LangMapType} */
 export const langMap = {
   uk: 'uk-UA',
   en: 'en-US',
-  crh: 'tr-TR', // Кримськотатарська не підтримується, використовуємо турецьку як найближчу
+  crh: 'crh-UA',
   nl: 'nl-NL'
 }; 
