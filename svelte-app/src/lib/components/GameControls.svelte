@@ -4,6 +4,7 @@
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
+  import { openVoiceSettingsModal } from '../stores/uiStore.js';
   $: isPlayerTurn = $appState.currentPlayer === 1;
   $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
   // Для відображення стрілки за напрямком
@@ -176,11 +177,25 @@
       <span class="slider"></span>
       {$_('gameControls.blockMode')}
     </label>
-    <label class="switch">
-      <input type="checkbox" bind:checked={speechEnabled} on:change={onSpeechChange} />
-      <span class="slider"></span>
-      {$_('gameControls.speech')} <span style="font-size:1.1em;">&#9881;</span>
-    </label>
+    <div class="checkbox-label">
+      <!-- Частина, що відповідає за перемикач -->
+      <label class="ios-switch-label">
+        <div class="ios-switch">
+          <input type="checkbox" bind:checked={speechEnabled} on:change={onSpeechChange} />
+          <span class="slider"></span>
+        </div>
+        <span>Озвучування ходів</span>
+      </label>
+      <!-- Кнопка налаштувань тепер окремо -->
+      <button
+        class="settings-icon-btn"
+        title="Налаштувати голос"
+        on:click|stopPropagation={openVoiceSettingsModal}
+        disabled={!speechEnabled}
+      >
+        ⚙️
+      </button>
+    </div>
   </div>
   <div class="directions directions-3x3">
     <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => onDirectionClick('up-left')}>↖</button>
@@ -472,5 +487,29 @@
   outline: none;
   transform: scale(1.045);
   box-shadow: 0 6px 32px 0 #ffb30055;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.ios-switch-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+.settings-icon-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  padding: 0 8px;
+}
+.settings-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style> 

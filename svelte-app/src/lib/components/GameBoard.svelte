@@ -8,6 +8,9 @@
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
   import { _ } from 'svelte-i18n';
+  import { uiState, closeVoiceSettingsModal } from '../stores/uiStore.js';
+  import VoiceSettingsModal from './VoiceSettingsModal.svelte';
+  import { settingsStore } from '../stores/settingsStore.js';
   // Функція очищення кешу
   function clearCache() {
     localStorage.clear();
@@ -273,6 +276,12 @@
   </div>
   <GameControls {showBoard} />
   <Modal />
+  {#if $uiState.isVoiceSettingsModalOpen}
+    <VoiceSettingsModal
+      langCode={$settingsStore.language}
+      close={closeVoiceSettingsModal}
+    />
+  {/if}
 </div>
 
 <svelte:window on:keydown={handleKeydown} />

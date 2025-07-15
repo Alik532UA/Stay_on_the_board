@@ -1,9 +1,9 @@
 import { writable, derived } from 'svelte/store';
-import { getRandomComputerMove } from '../lib/ai.js';
+import { getRandomComputerMove } from '$lib/ai.js';
 import { get } from 'svelte/store';
 import { modalStore } from './modalStore.js';
 import { closeModal } from './modalStore.js';
-import { speakMove, langMap } from '../lib/speech.js';
+import { speakMove, langMap } from '$lib/speech.js';
 
 /**
  * @param {number} size
@@ -185,6 +185,7 @@ export const appState = writable({
   currentPlayer: 1, // 1 — гравець, 2 — комп'ютер
   lastMove: null,
   computerLastMoveDisplay: null, // { direction, distance }
+  lastComputerMove: null, // **НОВЕ**
   distanceManuallySelected: false,
   visitedCells: /** @type {{row:number,col:number}[]} */ ([]),
   isGameOver: false,
@@ -325,6 +326,7 @@ export function setBoardSize(newSize) {
       currentPlayer: 1,
       lastMove: null,
       computerLastMoveDisplay: null,
+      lastComputerMove: null,
       score: 0,
       isGameOver: false,
     };
@@ -453,6 +455,7 @@ export function resetGame() {
       currentPlayer: 1,
       lastMove: null,
       computerLastMoveDisplay: null,
+      lastComputerMove: null,
       score: 0,
       movesInBlockMode: 0, // Скидаємо
       jumpedBlockedCells: 0, // Скидаємо
@@ -524,32 +527,25 @@ export function makeComputerMove() {
         // Отримуємо всі основні оновлення стану від нашого хелпера
         const moveUpdates = performMove(state, move.row, move.col);
 
-        // Мапуємо напрямок для UI
-        let directionForDisplay = move.direction;
-        if (numToDir[directionForDisplay]) {
-          directionForDisplay = numToDir[directionForDisplay];
-        }
+        // КЛЮЧОВЕ: уніфікуємо напрямок
+        const directionKey = numToDir[move.direction] || move.direction;
 
         const newState = {
           ...state,
           ...moveUpdates, // Застосовуємо оновлення
           currentPlayer: 1, // Хід повертається до гравця
           lastMove: null,
-          computerLastMoveDisplay: { direction: directionForDisplay, distance: move.distance },
+          computerLastMoveDisplay: { direction: directionKey, distance: move.distance },
+          lastComputerMove: { direction: directionKey, distance: move.distance }, // **НОВЕ**
         };
         // Блок перевірки на availableMoves.length === 0 ВИДАЛЕНО
         return newState;
       });
+      // Озвучування також використовує directionKey
       const currentSettings = current.settings;
       if (currentSettings.speechEnabled) {
         const langCode = langMap[currentSettings.language] || 'uk-UA';
-        speakMove(
-          'computer',
-          move.direction,
-          move.distance,
-          langCode,
-          currentSettings.selectedVoiceURI
-        );
+        speakMove('computer', directionKey, move.distance, langCode, currentSettings.selectedVoiceURI);
       }
     } else {
       console.log('[makeComputerMove] No valid moves available for computer. Player wins!');
@@ -658,7 +654,7 @@ export function confirmMove() {
   const {
     selectedDirection,
     selectedDistance,
-    computerLastMoveDisplay,
+    lastComputerMove, // **НОВЕ**
     playerRow,
     playerCol,
     boardSize,
@@ -687,10 +683,11 @@ export function confirmMove() {
   // --- НОВИЙ КОД: штраф за зворотний хід ---
   let scoreChange = 1;
   let penaltyApplied = 0;
+  // **ОНОВЛЕНА ПЕРЕВІРКА ШТРАФУ**
   if (
-    computerLastMoveDisplay &&
-    selectedDistance === computerLastMoveDisplay.distance &&
-    selectedDirection === oppositeDirections[computerLastMoveDisplay.direction]
+    lastComputerMove &&
+    selectedDistance === lastComputerMove.distance &&
+    selectedDirection === oppositeDirections[lastComputerMove.direction]
   ) {
     scoreChange = -2;
     penaltyApplied = 2;
