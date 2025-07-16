@@ -5,6 +5,7 @@
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
+  import { settingsStore } from '$lib/stores/settingsStore.js';
   $: isPlayerTurn = $appState.currentPlayer === 1;
   $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
   // Для відображення стрілки за напрямком
@@ -40,7 +41,7 @@
   $: blockModeEnabled = typeof $appState.blockModeEnabled === 'boolean' ? $appState.blockModeEnabled : false;
   $: showMoves = typeof $appState.settings?.showMoves === 'boolean' ? $appState.settings.showMoves : true;
   $: showBoard = typeof $appState.settings?.showBoard === 'boolean' ? $appState.settings.showBoard : true;
-  $: speechEnabled = typeof $appState.settings?.speechEnabled === 'boolean' ? $appState.settings.speechEnabled : false;
+  $: speechEnabled = $settingsStore.speechEnabled;
   $: selectedDirection = $appState.selectedDirection || null;
   $: selectedDistance = $appState.selectedDistance || null;
   $: buttonDisabled = !selectedDirection || !selectedDistance;
@@ -163,7 +164,7 @@
     {#if showBoard}
       <label class="ios-switch-label">
         <div class="ios-switch">
-          <input type="checkbox" bind:checked={showMoves} on:change={onShowMovesChange} />
+          <input type="checkbox" checked={showMoves} onchange={onShowMovesChange} />
           <span class="slider"></span>
         </div>
         <span>{$_('gameControls.showMoves')}</span>
@@ -171,28 +172,28 @@
     {/if}
     <label class="ios-switch-label">
       <div class="ios-switch">
-        <input type="checkbox" bind:checked={showBoard} on:change={onShowBoardChange} />
+        <input type="checkbox" checked={showBoard} onchange={onShowBoardChange} />
         <span class="slider"></span>
       </div>
       <span>{$_('gameControls.showBoard')}</span>
     </label>
     <label class="ios-switch-label">
       <div class="ios-switch">
-        <input type="checkbox" bind:checked={blockModeEnabled} on:change={onBlockModeChange} />
+        <input type="checkbox" checked={blockModeEnabled} onchange={onBlockModeChange} />
         <span class="slider"></span>
       </div>
       <span>{$_('gameControls.blockMode')}</span>
     </label>
     <label class="ios-switch-label">
       <div class="ios-switch">
-        <input type="checkbox" bind:checked={speechEnabled} on:change={onSpeechChange} />
+        <input type="checkbox" checked={speechEnabled} onchange={onSpeechChange} />
         <span class="slider"></span>
       </div>
       <span>Озвучування ходів</span>
       <button
         class="settings-icon-btn"
         title="Налаштувати голос"
-        on:click|stopPropagation={openVoiceSettingsModal}
+        onclick={(e) => { e.stopPropagation(); openVoiceSettingsModal(); }}
         disabled={!speechEnabled}
       >
         ⚙️
@@ -200,40 +201,40 @@
     </label>
   </div>
   <div class="directions directions-3x3">
-    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => onDirectionClick('up-left')}>↖</button>
-    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" on:click={() => onDirectionClick('up')}>↑</button>
-    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" on:click={() => onDirectionClick('up-right')}>↗</button>
-    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" on:click={() => onDirectionClick('left')}>←</button>
+    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" onclick={() => onDirectionClick('up-left')}>↖</button>
+    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" onclick={() => onDirectionClick('up')}>↑</button>
+    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" onclick={() => onDirectionClick('up-right')}>↗</button>
+    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" onclick={() => onDirectionClick('left')}>←</button>
     <button
       id="center-info"
       class="control-btn center-info {centerInfoState.class}"
       type="button"
       aria-label={centerInfoState.aria}
-      on:click={centerInfoState.clickable ? onCentralClick : undefined}
+      onclick={centerInfoState.clickable ? onCentralClick : undefined}
       tabindex="0"
       disabled={!centerInfoState.clickable}
     >
       {centerInfoState.content}
     </button>
-    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" on:click={() => onDirectionClick('right')}>→</button>
-    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" on:click={() => onDirectionClick('down-left')}>↙</button>
-    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" on:click={() => onDirectionClick('down')}>↓</button>
-    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" on:click={() => onDirectionClick('down-right')}>↘</button>
+    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" onclick={() => onDirectionClick('right')}>→</button>
+    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" onclick={() => onDirectionClick('down-left')}>↙</button>
+    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" onclick={() => onDirectionClick('down')}>↓</button>
+    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" onclick={() => onDirectionClick('down-right')}>↘</button>
   </div>
   <div class="distance-select">
     <div>{$_('gameControls.selectDistance')}</div>
     <div class="distance-btns">
       {#each $availableDistances as dist}
-        <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" on:click={() => onDistanceClick(dist)}>{dist}</button>
+        <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" onclick={() => onDistanceClick(dist)}>{dist}</button>
       {/each}
     </div>
   </div>
   <div class="action-btns">
-    <button class="confirm-btn" on:click={onConfirmMove} disabled={buttonDisabled} title={$_('gameControls.confirm')}>
+    <button class="confirm-btn" onclick={onConfirmMove} disabled={buttonDisabled} title={$_('gameControls.confirm')}>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right:8px;vertical-align:middle;"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       {$_('gameControls.confirm')}
     </button>
-    <button class="no-moves-btn" on:click={onNoMoves} title="Ходів немає">
+    <button class="no-moves-btn" onclick={onNoMoves} title="Ходів немає">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right:8px;vertical-align:middle;"><path d="M18 6L6 18M6 6l12 12" stroke="#222" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Ходів немає
     </button>
