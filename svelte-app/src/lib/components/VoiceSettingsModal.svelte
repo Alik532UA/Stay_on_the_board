@@ -30,7 +30,7 @@
 </script>
 
 <div class="modal-overlay" onclick={close}>
-  <div class="modal-window">
+  <div class="modal-window" onclick={(e) => e.stopPropagation()}>
     <div class="modal-header">
       <h2 class="modal-title">Налаштування голосу</h2>
       <button class="modal-close" onclick={close}>&times;</button>
