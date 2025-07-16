@@ -4,6 +4,7 @@ import { get } from 'svelte/store';
 import { modalStore } from './modalStore.js';
 import { closeModal } from './modalStore.js';
 import { speakMove, langMap } from '$lib/speech.js';
+import { settingsStore } from './settingsStore.js';
 /**
  * @typedef {{ [key: string]: string; uk: string; en: string; crh: string; nl: string; }} LangMapType
  */
@@ -561,10 +562,11 @@ export function makeComputerMove() {
       });
       // Озвучування також використовує directionKey
       const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
-      const currentSettings = current.settings;
-      if (currentSettings.speechEnabled) {
-        const langCode = langMap[currentSettings.language] || 'uk-UA';
-        speakMove('computer', directionKey, move.distance, langCode, currentSettings.selectedVoiceURI ?? null);
+      // Отримуємо НАЙСВІЖІШІ налаштування безпосередньо перед озвучуванням
+      const latestSettings = get(settingsStore);
+      if (latestSettings.speechEnabled) {
+        const langCode = langMap[latestSettings.language] || 'uk-UA';
+        speakMove('computer', directionKey, move.distance, langCode, latestSettings.selectedVoiceURI ?? null);
       }
     } else {
       console.log('[makeComputerMove] No valid moves available for computer. Player wins!');
@@ -597,22 +599,15 @@ export function makeComputerMove() {
 }
 
 export function toggleShowMoves() {
-  appState.update(state => ({
-    ...state,
-    settings: { ...state.settings, showMoves: !state.settings.showMoves }
-  }));
+  settingsStore.update(settings => ({ ...settings, showMoves: !settings.showMoves }));
 }
 export function toggleShowBoard() {
-  appState.update(state => ({
-    ...state,
-    settings: { ...state.settings, showBoard: !(state.settings.showBoard ?? true) }
-  }));
+  settingsStore.update(settings => ({ ...settings, showBoard: !(settings.showBoard ?? true) }));
 }
 export function toggleSpeech() {
-  appState.update(state => ({
-    ...state,
-    settings: { ...state.settings, speechEnabled: !(state.settings.speechEnabled ?? false) }
-  }));
+  settingsStore.update(settings => {
+    return { ...settings, speechEnabled: !settings.speechEnabled };
+  });
 }
 /**
  * Встановлює напрямок і керує відстанню при повторних кліках.
