@@ -6,6 +6,7 @@ import { writable } from 'svelte/store';
  * @property {string} language
  * @property {string} theme
  * @property {string} style
+ * @property {string|null} selectedVoiceURI // Додаємо для підтримки вибору голосу
  */
 
 const isBrowser = typeof window !== 'undefined';
