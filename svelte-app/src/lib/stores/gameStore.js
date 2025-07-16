@@ -754,7 +754,11 @@ export function confirmMove() {
       computerLastMoveDisplay: null,
     };
   });
-  // speakMove видалено з confirmMove
+  // Додаємо озвучування ходу гравця
+  if (settings.speechEnabled) {
+    const langCode = langMap[settings.language] || 'uk-UA';
+    speakMove('player', dir, selectedDistance, langCode, settings.selectedVoiceURI ?? null);
+  }
   if (state.gameMode === 'vsComputer') {
     makeComputerMove();
   }
