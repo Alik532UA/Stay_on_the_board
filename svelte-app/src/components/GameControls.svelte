@@ -216,10 +216,12 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right:8px;vertical-align:middle;"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       {$_('gameControls.confirm')}
     </button>
-    <button class="no-moves-btn" on:click={onNoMoves} title="Ходів немає">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right:8px;vertical-align:middle;"><path d="M18 6L6 18M6 6l12 12" stroke="#222" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Ходів немає
-    </button>
+    {#if blockModeEnabled}
+      <button class="no-moves-btn" on:click={onNoMoves} title="Ходів немає">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right:8px;vertical-align:middle;"><path d="M18 6L6 18M6 6l12 12" stroke="#222" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ходів немає
+      </button>
+    {/if}
   </div>
 </div>
 
@@ -406,21 +408,13 @@
 /* --- Improved action-btns --- */
 .action-btns {
   display: flex;
-  flex-direction: row;
-  gap: 22px;
-  width: 100%;
-  margin-top: 18px;
-  justify-content: center;
-  align-items: stretch;
-  background: rgba(255,255,255,0.10);
-  border-radius: 16px;
-  box-shadow: 0 4px 24px 0 rgba(80,0,80,0.10);
-  backdrop-filter: blur(8px);
-  padding: 14px 0 10px 0;
+  flex-direction: column !important;
+  gap: 14px;
+  align-items: center;
 }
 @media (max-width: 600px) {
   .action-btns {
-    flex-direction: column;
+    flex-direction: column !important;
     gap: 14px;
     padding: 10px 0 6px 0;
   }
