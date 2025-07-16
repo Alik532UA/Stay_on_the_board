@@ -1,0 +1,37 @@
+{
+  "name": "Stay on the Board",
+  "short_name": "BoardGame",
+  "description": "Мультиплатформова настільна гра з онлайн-режимом, локалізацією та сучасним UI/UX.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a202c",
+  "lang": "uk",
+  "icons": [
+    {
+      "src": "/favicon-64px.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon-48px.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon-32px.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon-16px.ico",
+      "sizes": "16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/logo-circle.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+} 
