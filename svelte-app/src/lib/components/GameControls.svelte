@@ -39,8 +39,8 @@
     }
   }
   $: blockModeEnabled = typeof $appState.blockModeEnabled === 'boolean' ? $appState.blockModeEnabled : false;
-  $: showMoves = typeof $appState.settings?.showMoves === 'boolean' ? $appState.settings.showMoves : true;
-  $: showBoard = typeof $appState.settings?.showBoard === 'boolean' ? $appState.settings.showBoard : true;
+  $: showMoves = $settingsStore.showMoves;
+  $: showBoard = $settingsStore.showBoard;
   $: speechEnabled = $settingsStore.speechEnabled;
   $: selectedDirection = $appState.selectedDirection || null;
   $: selectedDistance = $appState.selectedDistance || null;
@@ -234,10 +234,12 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right:8px;vertical-align:middle;"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       {$_('gameControls.confirm')}
     </button>
-    <button class="no-moves-btn" onclick={onNoMoves} title="Ходів немає">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right:8px;vertical-align:middle;"><path d="M18 6L6 18M6 6l12 12" stroke="#222" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Ходів немає
-    </button>
+    {#if blockModeEnabled}
+      <button class="no-moves-btn" onclick={onNoMoves} title="Ходів немає">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right:8px;vertical-align:middle;"><path d="M18 6L6 18M6 6l12 12" stroke="#222" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ходів немає
+      </button>
+    {/if}
   </div>
 </div>
 
@@ -439,42 +441,37 @@
 }
 /* --- Improved action-btns --- */
 .action-btns {
-  display: flex;
-  flex-direction: row;
-  gap: 22px;
-  width: 100%;
-  margin-top: 18px;
-  justify-content: center;
-  align-items: stretch;
-  background: rgba(255,255,255,0.10);
-  border-radius: 16px;
-  box-shadow: 0 4px 24px 0 rgba(80,0,80,0.10);
-  backdrop-filter: blur(8px);
-  padding: 14px 0 10px 0;
+	display: flex;
+	flex-direction: column; /* ЗАВЖДИ стовпчик */
+	gap: 14px; /* Оптимальна відстань для стовпчика */
+	width: 100%;
+	margin-top: 18px;
+	align-items: center; /* Центруємо кнопки по горизонталі */
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 16px;
+	box-shadow: 0 4px 24px 0 rgba(80, 0, 80, 0.1);
+	backdrop-filter: blur(8px);
+	padding: 14px 10px 10px;
 }
-@media (max-width: 600px) {
-  .action-btns {
-    flex-direction: column;
-    gap: 14px;
-    padding: 10px 0 6px 0;
-  }
-}
+
 .confirm-btn, .no-moves-btn {
-  flex: 1 1 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.18em;
-  font-weight: 700;
-  border: none;
-  border-radius: 12px;
-  min-height: 54px;
-  min-width: 0;
-  padding: 0 0.5em;
-  box-shadow: 0 2px 16px 0 rgba(80,0,80,0.10);
-  transition: background 0.22s, color 0.18s, box-shadow 0.22s, transform 0.15s;
-  cursor: pointer;
-  letter-spacing: 0.01em;
+	flex: 1 1 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.18em;
+	font-weight: 700;
+	border: none;
+	border-radius: 12px;
+	min-height: 54px;
+	min-width: 0px;
+	width: 100%; /* Додано */
+	max-width: 280px; /* Додано */
+	padding: 0 0.5em;
+	box-shadow: 0 2px 16px 0 rgba(80,0,80,0.10);
+	transition: background 0.22s, color 0.18s, box-shadow 0.22s, transform 0.15s;
+	cursor: pointer;
+	letter-spacing: 0.01em;
 }
 .confirm-btn {
   background: linear-gradient(90deg, #43a047 60%, #66bb6a 100%);
