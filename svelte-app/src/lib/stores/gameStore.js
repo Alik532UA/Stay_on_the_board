@@ -520,82 +520,37 @@ function calculateFinalScore(state) {
  */
 export function makeComputerMove() {
   console.log('[makeComputerMove] Function called');
-  
-  // Перевіряємо, чи ми в браузері
-  if (typeof window === 'undefined') {
-    console.log('[makeComputerMove] Not in browser environment, skipping computer move');
-    return;
-  }
-  
-  // Використовуємо requestAnimationFrame замість setTimeout для кращої інтеграції з браузером
-  const executeMove = () => {
-    const current = get(appState);
-    console.log('[makeComputerMove] Current state:', {
-      playerRow: current.playerRow,
-      playerCol: current.playerCol,
-      boardSize: current.boardSize,
-      blockedCells: current.blockedCells
-    });
-    
-    const move = getRandomComputerMove(current.board, current.blockedCells, current.boardSize);
-    
-    if (move) {
-      console.log('[makeComputerMove] Computer move selected:', move);
-      console.log('[makeComputerMove] Перед оновленням: move', move, 'playerRow:', current.playerRow, 'playerCol:', current.playerCol, 'blockedCells:', current.blockedCells);
-      appState.update(state => {
-        // Отримуємо всі основні оновлення стану від нашого хелпера
-        const moveUpdates = performMove(state, move.row, move.col);
-
-        // КЛЮЧОВЕ: уніфікуємо напрямок
-        const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
-
-        const newState = {
-          ...state,
-          ...moveUpdates, // Застосовуємо оновлення
-          currentPlayer: 1, // Хід повертається до гравця
-          lastMove: null,
-          computerLastMoveDisplay: { direction: /** @type {Direction} */(directionKey), distance: move.distance },
-          lastComputerMove: { direction: /** @type {Direction} */(directionKey), distance: move.distance }, // **НОВЕ**
-        };
-        // Блок перевірки на availableMoves.length === 0 ВИДАЛЕНО
-        return newState;
-      });
-      // Озвучування також використовує directionKey
+  const current = get(appState);
+  const move = getRandomComputerMove(current.board, current.blockedCells, current.boardSize);
+  if (move) {
+    appState.update(state => {
+      const moveUpdates = performMove(state, move.row, move.col);
       const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
-      // Отримуємо НАЙСВІЖІШІ налаштування безпосередньо перед озвучуванням
-      const latestSettings = get(settingsStore);
-      if (latestSettings.speechEnabled) {
-        const langCode = langMap[latestSettings.language] || 'uk-UA';
-        speakMove('computer', directionKey, move.distance, langCode, latestSettings.selectedVoiceURI ?? null);
-      }
-    } else {
-      console.log('[makeComputerMove] No valid moves available for computer. Player wins!');
-      // Показуємо меню з вибором: продовжити або завершити з бонусом
-      modalStore.showModal({
-        title: 'Комп\'ютер не може зробити хід',
-        content: 'Ви можете очистити поле і продовжити гру, або завершити її зараз і отримати бонусні бали.',
-        buttons: [
-          {
-            text: `Продовжити`,
-            primary: true,
-            isHot: true,
-            onClick: continueGameAndClearBlocks,
-            customClass: 'green-btn'
-          },
-          {
-            text: `Завершити (+${current.boardSize} балів)`,
-            customClass: 'blue-btn',
-            onClick: finishGameWithBonus
-          }
-        ]
-      });
+      return {
+        ...state,
+        ...moveUpdates,
+        currentPlayer: 1,
+        lastMove: null,
+        computerLastMoveDisplay: { direction: directionKey, distance: move.distance },
+        lastComputerMove: { direction: directionKey, distance: move.distance },
+      };
+    });
+    const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
+    const latestSettings = get(settingsStore);
+    if (latestSettings.speechEnabled) {
+      const langCode = langMap[latestSettings.language] || 'uk-UA';
+      speakMove('computer', directionKey, move.distance, langCode, latestSettings.selectedVoiceURI ?? null);
     }
-  };
-  
-  // Затримка 600мс перед виконанням ходу
-  setTimeout(() => {
-    requestAnimationFrame(executeMove);
-  }, 600);
+  } else {
+    modalStore.showModal({
+      title: 'Комп\'ютер не може зробити хід',
+      content: 'Ви можете очистити поле і продовжити гру, або завершити її зараз і отримати бонусні бали.',
+      buttons: [
+        { text: `Продовжити`, primary: true, isHot: true, onClick: continueGameAndClearBlocks, customClass: 'green-btn' },
+        { text: `Завершити (+${current.boardSize} балів)`, customClass: 'blue-btn', onClick: finishGameWithBonus }
+      ]
+    });
+  }
 }
 
 export function toggleShowMoves() {
@@ -675,13 +630,14 @@ export function setDistance(dist) {
     computerLastMoveDisplay: null
   }));
 }
-export function confirmMove() {
+export async function confirmMove() { // <--- ДОДАНО ASYNC
   if (typeof window === 'undefined') return;
+  
   const state = get(appState);
   const {
     selectedDirection,
     selectedDistance,
-    lastComputerMove, // **НОВЕ**
+    lastComputerMove,
     playerRow,
     playerCol,
     boardSize,
@@ -689,14 +645,19 @@ export function confirmMove() {
     settings,
     blockModeEnabled
   } = state;
+  
   if (!selectedDirection || !selectedDistance) return;
+  
   const dir = /** @type {Direction} */ (selectedDirection);
   if (!dirMap[dir]) return;
+  
   const [dr, dc] = dirMap[dir];
   const newRow = playerRow + dr * selectedDistance;
   const newCol = playerCol + dc * selectedDistance;
+  
   const isOutsideBoard = newRow < 0 || newRow >= boardSize || newCol < 0 || newCol >= boardSize;
   const isCellBlocked = blockedCells.some(cell => cell.row === newRow && cell.col === newCol);
+  
   let jumpedCount = 0;
   if (selectedDistance > 1) {
     for (let i = 1; i < selectedDistance; i++) {
@@ -707,20 +668,18 @@ export function confirmMove() {
       }
     }
   }
-  // --- НОВИЙ КОД: штраф за зворотний хід ---
+  
   let scoreChange = 1;
   let penaltyApplied = 0;
-  // **ОНОВЛЕНА ПЕРЕВІРКА ШТРАФУ**
   if (
     lastComputerMove &&
     selectedDistance === lastComputerMove.distance &&
     selectedDirection === oppositeDirections[lastComputerMove.direction]
   ) {
-    // scoreChange = -2; // Цей рядок видалено згідно нової логіки
     penaltyApplied = 2;
     console.log('[confirmMove] Penalty applied for reverse move.');
   }
-  // --- КІНЕЦЬ НОВОГО КОДУ ---
+  
   if (isOutsideBoard || isCellBlocked) {
     const reason = isOutsideBoard ? 'Ви вийшли за межі дошки.' : 'Ви спробували стати на заблоковану клітинку.';
     const finalScoreDetails = calculateFinalScore(state);
@@ -732,23 +691,29 @@ export function confirmMove() {
     });
     return;
   }
+  
+  // Оновлюємо стан для ходу гравця
   appState.update(s => {
     const moveUpdates = performMove(s, newRow, newCol);
     return {
       ...s,
       ...moveUpdates,
-      score: s.score + scoreChange, // Збільшуємо базовий рахунок на 1 за кожен успішний хід
+      score: s.score + scoreChange,
       penaltyPoints: s.penaltyPoints + penaltyApplied,
       movesInBlockMode: blockModeEnabled ? s.movesInBlockMode + 1 : s.movesInBlockMode,
       jumpedBlockedCells: s.jumpedBlockedCells + jumpedCount,
       selectedDirection: null,
       selectedDistance: null,
       distanceManuallySelected: false,
-      currentPlayer: 2,
+      currentPlayer: 2, // <--- Важливо: змінюємо гравця
       lastMove: null,
       computerLastMoveDisplay: null,
     };
   });
+
+  // КЛЮЧОВЕ ВИПРАВЛЕННЯ: чекаємо наступного "тіку" event loop
+  await new Promise(resolve => setTimeout(resolve, 10));
+
   if (state.gameMode === 'vsComputer') {
     makeComputerMove();
   }
