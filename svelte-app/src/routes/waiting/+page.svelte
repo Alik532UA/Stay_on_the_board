@@ -1,5 +1,5 @@
 <script>
-  import WaitingForPlayer from '../../components/WaitingForPlayer.svelte';
+  import WaitingForPlayer from '$lib/components/WaitingForPlayer.svelte';
 </script>
 
 <WaitingForPlayer /> 
