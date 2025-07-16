@@ -1,0 +1,86 @@
+/* Glass стиль - Світла тема */
+[data-style="glass"][data-theme="light"] {
+    --bg-primary: linear-gradient(120deg, rgba(255,255,255,0.85) 0%, rgba(210,245,255,0.75) 30%, rgba(186,230,253,0.65) 60%, rgba(129,230,217,0.55) 100%);
+    --bg-secondary: rgba(255, 255, 255, 0.55);
+    --text-primary: #1a2a33;
+    --text-secondary: #4b5563;
+    --text-accent: #00e0ff;
+    --border-color: rgba(0, 224, 255, 0.22);
+    --shadow-color: rgba(0, 224, 255, 0.10);
+    --cell-light: rgba(255, 255, 255, 0.6);
+    --cell-dark: rgba(186, 230, 253, 0.22);
+    --control-bg: rgba(255, 255, 255, 0.32);
+    --control-hover: rgba(0, 224, 255, 0.13);
+    --control-selected: #00e0ff;
+    --confirm-btn-bg: #00e0ff;
+    --no-moves-btn-bg: #ff6a88;
+}
+
+/* Glass стиль - Темна тема */
+[data-style="glass"][data-theme="dark"] {
+    --bg-primary: linear-gradient(120deg, rgba(18,32,48,0.92) 0%, rgba(24,40,72,0.85) 40%, rgba(0,36,54,0.80) 80%, rgba(0,224,255,0.13) 100%);
+    --bg-secondary: rgba(24, 40, 72, 0.60);
+    --text-primary: #e6f7ff;
+    --text-secondary: #b6c2cf;
+    --text-accent: #00ffe7;
+    --border-color: rgba(0, 224, 255, 0.15);
+    --shadow-color: rgba(0, 224, 255, 0.13);
+    --cell-light: rgba(0, 224, 255, 0.09);
+    --cell-dark: rgba(24, 40, 72, 0.32);
+    --control-bg: rgba(24, 40, 72, 0.45);
+    --control-hover: rgba(0, 224, 255, 0.13);
+    --control-selected: #00ffe7;
+    --confirm-btn-bg: #00ffe7;
+    --no-moves-btn-bg: #ff6a88;
+}
+
+/* Загальні стилі для glassmorphism, що застосовують ефект розмиття */
+[data-style="glass"] .game-board,
+[data-style="glass"] .game-controls-panel,
+[data-style="glass"] .score-panel,
+[data-style="glass"] .modal-window .modal-content,
+[data-style="glass"] .control-btn,
+[data-style="glass"] .dir-btn,
+[data-style="glass"] .dist-btn,
+[data-style="glass"] .board-size-dropdown-btn,
+[data-style="glass"] .board-size-dropdown-option {
+    background: var(--bg-secondary);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+/* Специфічні налаштування для кнопок, щоб уникнути подвійних рамок */
+[data-style="glass"] .control-btn,
+[data-style="glass"] .dir-btn,
+[data-style="glass"] .dist-btn {
+    border: 1px solid var(--border-color);
+}
+
+/* Поведінка при наведенні та виборі */
+[data-style="glass"] .dir-btn:hover,
+[data-style="glass"] .dist-btn:hover {
+    background: var(--control-hover);
+}
+
+[data-style="glass"] .dir-btn.active,
+[data-style="glass"] .dist-btn.active {
+    background: var(--control-selected);
+    color: #fff;
+    border-color: var(--control-selected);
+}
+
+[data-style="glass"] .confirm-btn,
+[data-style="glass"] .no-moves-btn {
+    border: none;
+    color: #fff;
+}
+
+[data-style="glass"] .confirm-btn {
+    background: var(--confirm-btn-bg);
+}
+
+[data-style="glass"] .no-moves-btn {
+    background: var(--no-moves-btn-bg);
+}
