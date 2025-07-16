@@ -1,65 +1,49 @@
 /* PEAK стиль - Світла тема */
-[data-style="peak"] {
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #1a1a1a;
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --text-accent: #00ff88;
-    --border-color: #333333;
-    --shadow-color: rgba(0, 255, 136, 0.2);
-    --cell-light: #2a2a2a;
-    --cell-dark: #1f1f1f;
-    --cell-blocked: #000000;
-    --piece-color: #00ff88;
-    --piece-shadow: rgba(0, 255, 136, 0.5);
-    --control-bg: #2a2a2a;
-    --control-hover: #00ff88;
-    --control-selected: #ff8000;
-    --computer-display-bg: #1a1a1a;
-    --computer-display-border: #00ff88;
-    --computer-display-text: #00ff88;
-    --confirm-btn-bg: #00ff88;
-    --confirm-btn-hover: #00cc6a;
+[data-style="peak"][data-theme="light"] {
+    --bg-primary: linear-gradient(120deg, #e3fdfd 0%, #e3e6fa 30%, #b8fff9 60%, #c1f7d3 100%);
+    --bg-secondary: #ffffff;
+    --text-primary: #004d40;
+    --text-secondary: #4d6e6a;
+    --text-accent: #00c875;
+    --border-color: #b2dfdb;
+    --shadow-color: rgba(0, 200, 117, 0.18);
+    --cell-light: #f0f0f0;
+    --cell-dark: #e0e0e0;
+    --cell-blocked: #b0b0b0;
+    --piece-color: #00796b;
+    --piece-shadow: rgba(0, 200, 117, 0.5);
+    --control-bg: #e3fdfd;
+    --control-hover: #00c875;
+    --control-selected: #00c875;
+    --confirm-btn-bg: #00c875;
+    --confirm-btn-hover: #00a15e;
     --no-moves-btn-bg: #ff6b35;
     --no-moves-btn-hover: #e55a2b;
-    --debug-btn-bg: #8b5cf6;
-    --debug-btn-hover: #7c3aed;
-    --modal-bg: rgba(0, 0, 0, 0.9);
-    --modal-content-bg: #1a1a1a;
-    --error-color: #ff6b35;
-    --board-hidden-bg: #2a2a2a;
+    --modal-content-bg: #ffffff;
 }
 
 /* PEAK стиль - Темна тема */
-[data-theme="dark"][data-style="peak"] {
-    --bg-primary: #000000;
+[data-style="peak"][data-theme="dark"] {
+    --bg-primary: linear-gradient(120deg, #0a1a14 0%, #00332e 40%, #00ff88 100%);
     --bg-secondary: #0a0a0a;
     --text-primary: #ffffff;
     --text-secondary: #cccccc;
     --text-accent: #00ff88;
     --border-color: #333333;
     --shadow-color: rgba(0, 255, 136, 0.3);
-    --cell-light: #1a1a1a;
-    --cell-dark: #0f0f0f;
+    --cell-light: #2a2a2a;
+    --cell-dark: #1f1f1f;
     --cell-blocked: #000000;
     --piece-color: #00ff88;
     --piece-shadow: rgba(0, 255, 136, 0.7);
-    --control-bg: #1a1a1a;
+    --control-bg: #0a1a14;
     --control-hover: #00ff88;
     --control-selected: #00ff88;
-    --computer-display-bg: #0a0a0a;
-    --computer-display-border: #00ff88;
-    --computer-display-text: #00ff88;
-    --confirm-btn-bg: #00ff88;
-    --confirm-btn-hover: #00cc6a;
+    --confirm-btn-bg: #00c875;
+    --confirm-btn-hover: #00a15e;
     --no-moves-btn-bg: #ff6b35;
     --no-moves-btn-hover: #e55a2b;
-    --debug-btn-bg: #8b5cf6;
-    --debug-btn-hover: #7c3aed;
-    --modal-bg: rgba(0, 0, 0, 0.95);
     --modal-content-bg: #0a0a0a;
-    --error-color: #ff6b35;
-    --board-hidden-bg: #1a1a1a;
 }
 
 /* Спеціальні ефекти для PEAK стилю */
@@ -108,4 +92,4 @@
 [data-style="peak"] .arrow {
     font-family: 'M PLUS Rounded 1c', sans-serif !important;
     font-weight: 700;
-} 
+}

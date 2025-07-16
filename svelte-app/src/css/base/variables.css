@@ -71,3 +71,10 @@
     --error-color: #f44336;
     --board-hidden-bg: #424242;
 } 
+
+/*
+  Для додавання нових тем/стилів використовуйте унікальні градієнти для --bg-primary, наприклад:
+  --bg-primary: linear-gradient(120deg, #f0f2f5 0%, #b3c6ff 100%);
+  --bg-primary: linear-gradient(135deg, #fff 0%, #e0e0e0 100%, #bdbdbd 120%);
+  --bg-primary: radial-gradient(circle at 60% 40%, #ffb300 0%, #ff9800 100%);
+*/ 

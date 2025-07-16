@@ -178,14 +178,14 @@ export const appState = writable(/** @type {AppState} */({
   gameMode: 'vsComputer',
   language: lang || 'uk',
   theme: theme || 'dark',
-  style: style || 'classic',
+  style: style || 'ubuntu',
   settings: {
     showMoves: true,
     showBoard: true,
     speechEnabled: false,
     language: lang || 'uk',
     theme: theme || 'dark',
-    style: style || 'classic',
+    style: style || 'ubuntu',
   },
   board: (() => {
     const b = createEmptyBoard(initialBoardSize);

@@ -271,10 +271,6 @@
       </div>
     {/key}
   {/if}
-  <!-- DEBUG: blockedCells -->
-  <div style="color: #ff9800; font-size: 0.95em; margin: 8px 0 0 0; text-align: center;">
-    blockedCells: {JSON.stringify(blockedCells)}
-  </div>
   <GameControls {showBoard} />
   <Modal />
 </div>

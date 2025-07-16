@@ -2,15 +2,15 @@
 :root {
     /* Класичний стиль - Світла тема (за замовчуванням) */
     --cell-size: 100px;
-    --bg-primary: #f0f2f5;
+    --bg-primary: linear-gradient(135deg, #ece9f7 0%, #b3c6ff 100%);
     --bg-secondary: #fff;
     --text-primary: #333;
     --text-secondary: #555;
     --text-accent: #1a237e;
     --border-color: #bdc3c7;
     --shadow-color: rgba(0, 0, 0, 0.1);
-    --cell-light: #F0D9B5;
-    --cell-dark: #B58863;
+    --cell-light: #f0d9b5;
+    --cell-dark: #b58863;
     --cell-blocked: #858585;
     --piece-color: #3a2a22;
     --piece-shadow: rgba(255, 255, 255, 0.7);

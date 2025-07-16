@@ -18,7 +18,7 @@ const defaultSettings = {
   showBoard: true,
   language: 'uk',
   theme: 'dark',
-  style: 'classic',
+  style: 'ubuntu',
   speechEnabled: false, // <-- ДОДАНО
   selectedVoiceURI: null, // <-- ДОДАНО
 };
@@ -26,7 +26,7 @@ const defaultSettings = {
 if (isBrowser) {
   // Очищаємо старі налаштування теми та стилю, щоб форсувати дефолт
   localStorage.setItem('theme', 'dark');
-  localStorage.setItem('style', 'classic');
+  localStorage.setItem('style', 'ubuntu');
 }
 
 const storedSettings = isBrowser ? {
@@ -40,6 +40,14 @@ const storedSettings = isBrowser ? {
 } : defaultSettings;
 
 const { subscribe, set, update } = writable(storedSettings);
+
+// Реактивно оновлюємо data-theme та data-style на <html> при зміні
+if (isBrowser) {
+  subscribe(settings => {
+    document.documentElement.setAttribute('data-theme', settings.theme);
+    document.documentElement.setAttribute('data-style', settings.style);
+  });
+}
 
 /**
  * @param {Partial<SettingsState>} newSettings

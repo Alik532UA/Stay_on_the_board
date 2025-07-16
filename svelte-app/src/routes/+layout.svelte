@@ -20,15 +20,14 @@
 <script lang="ts">
 	import Header from './Header.svelte';
 	import '../app.css';
-	import { onMount } from 'svelte';
 	import { settingsStore } from '$lib/stores/settingsStore.js';
 	import { get } from 'svelte/store';
 	import '../lib/i18n/init.js';
 
-	onMount(() => {
-		document.documentElement.setAttribute('data-theme', 'dark');
-		document.documentElement.setAttribute('data-style', 'classic');
-	});
+	// onMount(() => {
+	// 	document.documentElement.setAttribute('data-theme', 'dark');
+	// 	document.documentElement.setAttribute('data-style', 'ubuntu');
+	// });
 </script>
 
 <div class="app">
