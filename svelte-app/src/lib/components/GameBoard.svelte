@@ -1,6 +1,6 @@
 <script>
   import '../css/components/game-board.css';
-  import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove, toggleBlockMode, toggleShowBoard } from '$lib/stores/gameStore.js';
+  import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove, toggleBlockMode, toggleShowBoard, toggleSpeech } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { goto } from '$app/navigation';
   import GameControls from '$lib/components/GameControls.svelte';
@@ -91,6 +91,14 @@
   function goToMainMenu() {
     logStore.addLog('Повернення до головного меню', 'info');
     goto('/');
+  }
+
+  function showPenaltyInfo() {
+    modalStore.showModal({
+      titleKey: 'gameBoard.penaltyInfoTitle',
+      contentKey: 'gameBoard.penaltyHint',
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+    });
   }
 
   function onBoardSizeChange(/** @type {Event} */ event) {
@@ -204,6 +212,33 @@
         setDirection('down-right');
         break;
 
+      // Альтернативне керування (QWE/ASD/ZXC)
+      case 'w':
+        setDirection('up');
+        break;
+      case 's':
+      case 'x':
+        setDirection('down');
+        break;
+      case 'a':
+        setDirection('left');
+        break;
+      case 'd':
+        setDirection('right');
+        break;
+      case 'q':
+        setDirection('up-left');
+        break;
+      case 'e':
+        setDirection('up-right');
+        break;
+      case 'z':
+        setDirection('down-left');
+        break;
+      case 'c':
+        setDirection('down-right');
+        break;
+
       // Дії
       case 'Enter':
       case ' ': // Spacebar
@@ -215,8 +250,14 @@
         noMoves();
         break;
       case 'Backspace':
-        logStore.addLog('[handleKeydown] Натиснуто Backspace — заявити "немає ходів"', 'info');
+      case 'Decimal': // Numpad .
+        logStore.addLog(`[handleKeydown] Натиснуто "${event.key}" — заявити "немає ходів"`, 'info');
         noMoves();
+        break;
+      case 'v':
+      case 'V':
+        logStore.addLog('[handleKeydown] Перемкнено озвучування ходів', 'info');
+        toggleSpeech();
         break;
         
       // Налаштування дошки та режимів
@@ -291,7 +332,13 @@
   <div class="score-panel">
     Рахунок: {$appState.score}
     {#if $appState.penaltyPoints > 0}
-      <span class="penalty-display">-{$appState.penaltyPoints}</span>
+      <span 
+        class="penalty-display" 
+        on:click={showPenaltyInfo}
+        title={$_('gameBoard.penaltyHint')}
+        role="button"
+        tabindex="0"
+      >-{$appState.penaltyPoints}</span>
     {/if}
   </div>
   {#if showBoard}
@@ -382,5 +429,18 @@
     color: #f44336; /* Червоний колір для штрафів */
     font-weight: bold;
     margin-left: 8px;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+  .penalty-display:hover {
+    color: #d32f2f;
+    transform: scale(1.1);
+    background: rgba(244, 67, 54, 0.1);
+  }
+  .penalty-display:focus {
+    outline: 2px solid #f44336;
+    outline-offset: 2px;
   }
 </style> 

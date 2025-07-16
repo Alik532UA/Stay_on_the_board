@@ -28,7 +28,9 @@ export default {
   },
   gameBoard: {
     mainMenu: "Hoofdmenu",
-    player: "Speler"
+    player: "Speler",
+    penaltyInfoTitle: "Informatie over strafpunten",
+    penaltyHint: "Ga niet terug naar de cel waarvan de zet net is gemaakt"
   },
   gameControls: {
     ok: "OK",
