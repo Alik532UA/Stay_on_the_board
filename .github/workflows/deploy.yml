@@ -3,10 +3,10 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Запускати при пуші в гілку `gh-pages` (ЗМІНЕНО)
+  # Запускати при пуші в гілку `main` (ПОВЕРНУЛИ НАЗАД)
   push:
     branches:
-      - gh-pages # <-- ОСЬ ТУТ ЗМІНА
+      - main # <-- ПОВЕРНУЛИ НАЗАД
 
   # Дозволяє запускати цей воркфлоу вручну з вкладки Actions
   workflow_dispatch:
