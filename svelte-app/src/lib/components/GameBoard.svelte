@@ -11,6 +11,7 @@
   import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore.js';
   import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
   import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
   // Функція очищення кешу
   function clearCache() {
     localStorage.clear();
@@ -144,6 +145,10 @@
    * @param {KeyboardEvent} event
    */
   function handleKeydown(event) {
+    // ЗАПОБІЖНИК: Якщо модальне вікно відкрите, ігноруємо всі ігрові гарячі клавіші.
+    if (get(modalStore).isOpen) {
+      return;
+    }
     // Ігноруємо гарячі клавіші, якщо фокус на полі вводу
     const target = event.target;
     if (target && typeof target === 'object' && 'tagName' in target) {
