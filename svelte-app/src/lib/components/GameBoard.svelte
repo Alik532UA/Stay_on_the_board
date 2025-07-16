@@ -32,20 +32,6 @@
     location.reload();
   }
   let boardSizes = Array.from({length:8},(_,i)=>i+2); // number[]
-  /** @type {number} */
-  let boardSize;
-  /** @type {number[][]} */
-  let board;
-  /** @type {number} */
-  let playerRow;
-  /** @type {number} */
-  let playerCol;
-  /** @type {{row:number,col:number}[]} */
-  let blockedCells;
-  /** @type {boolean} */
-  let blockModeEnabled;
-  /** @type {number} */
-  let currentPlayer;
   let showBoardSizeDropdown = false;
   function toggleBoardSizeDropdown() {
     showBoardSizeDropdown = !showBoardSizeDropdown;
@@ -61,20 +47,39 @@
     showBoardSizeDropdown = false;
   }
 
-  $: boardSize = Number($appState.boardSize);
-  $: board = $appState.board;
-  $: playerRow = $appState.playerRow;
-  $: playerCol = $appState.playerCol;
-  $: blockedCells = $appState.blockedCells;
-  $: blockModeEnabled = $appState.blockModeEnabled;
-  $: currentPlayer = $appState.currentPlayer;
-  $: showMoves = $settingsStore.showMoves;
-  $: showBoard = $settingsStore.showBoard;
+  let boardSize = $derived(Number($appState.boardSize));
+  let board = $derived($appState.board);
+  let playerRow = $derived($appState.playerRow);
+  let playerCol = $derived($appState.playerCol);
+  let blockedCells = $derived($appState.blockedCells);
+  let blockModeEnabled = $derived($appState.blockModeEnabled);
+  let currentPlayer = $derived($appState.currentPlayer);
+  let showMoves = $derived($settingsStore.showMoves);
+  let showBoard = $derived($settingsStore.showBoard);
+  let visualPiece = $state([{ id: 'queen', row: playerRow, col: playerCol }]);
 
-  $: console.log('[GameBoard] playerRow:', playerRow, 'playerCol:', playerCol, 'availableMoves:', $appState.availableMoves, 'blockedCells:', blockedCells);
+  $effect(() => {
+    console.log('[GameBoard] playerRow:', playerRow, 'playerCol:', playerCol, 'availableMoves:', $appState.availableMoves, 'blockedCells:', blockedCells);
+  });
+  $effect(() => {
+    const logicalRow = playerRow;
+    const logicalCol = playerCol;
+    if (visualPiece[0].row === logicalRow && visualPiece[0].col === logicalCol) {
+      return;
+    }
+    const isPlayersTurnNow = currentPlayer === 1;
+    if (isPlayersTurnNow) {
+      const timer = setTimeout(() => {
+        visualPiece = [{ id: 'queen', row: logicalRow, col: logicalCol }];
+      }, 500);
+      return () => clearTimeout(timer);
+    } else {
+      visualPiece = [{ id: 'queen', row: logicalRow, col: logicalCol }];
+    }
+  });
   // Виношу виклики $_() на верхній рівень
-  $: playerTitle = $_('gameBoard.player');
-  $: mainMenuTitle = $_('gameBoard.mainMenu');
+  let playerTitle = $derived($_('gameBoard.player'));
+  let mainMenuTitle = $derived($_('gameBoard.mainMenu'));
 
   onMount(() => {
     if (!board || !Array.isArray(board) || board.length === 0) {
@@ -100,7 +105,6 @@
    */
   function isAvailable(row, col) {
     const result = $appState.availableMoves && $appState.availableMoves.some(move => move.row === row && move.col === col);
-    console.log('[isAvailable] row:', row, 'col:', col, 'result:', result, 'availableMoves:', $appState.availableMoves);
     return result;
   }
 
@@ -110,7 +114,6 @@
    */
   function isBlocked(row, col) {
     const result = blockedCells && blockedCells.some(cell => Number(cell.row) === Number(row) && Number(cell.col) === Number(col));
-    console.log('[isBlocked]', {row, col, blockedCells, result});
     return result;
   }
 
@@ -301,7 +304,6 @@
                 class="board-cell"
                 class:light={ (rowIdx + colIdx) % 2 === 0 }
                 class:dark={ (rowIdx + colIdx) % 2 !== 0 }
-                class:player-piece={rowIdx === playerRow && colIdx === playerCol}
                 class:blocked-cell={ isCellBlocked(rowIdx, colIdx) }
                 class:available={ showMoves && isAvailable(rowIdx, colIdx) && currentPlayer === 1 }
                 role="button"
@@ -314,15 +316,21 @@
                 {#if isCellBlocked(rowIdx, colIdx)}
                   <span class="blocked-x">✗</span>
                 {:else}
-                  {#if rowIdx === playerRow && colIdx === playerCol}
-                    <SvgIcons name="queen" />
-                  {/if}
                   {#if isAvailable(rowIdx, colIdx) && currentPlayer === 1 && showMoves}
                     <span class="move-dot"></span>
                   {/if}
                 {/if}
               </div>
             {/each}
+          {/each}
+          {#each visualPiece as piece (piece.id)}
+            <div
+              class="player-piece"
+              style="top: calc(var(--cell-size) * {piece.row}); left: calc(var(--cell-size) * {piece.col});"
+              animate:flip={{ duration: 600, easing: quintOut }}
+            >
+              <SvgIcons name="queen" />
+            </div>
           {/each}
         </div>
       </div>
