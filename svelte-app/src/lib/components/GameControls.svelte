@@ -26,7 +26,7 @@
       return `${dir}${dist}`;
     }
     if (selectedDirection && selectedDistance) {
-      return `${directionArrows[selectedDirection] || ''}${selectedDistance}`;
+      return `${directionArrows[selectedDirection] || ''}${String(selectedDistance)}`;
     }
     if (selectedDirection) {
       return directionArrows[selectedDirection];
@@ -93,7 +93,7 @@
     if (!selectedDirection && selectedDistance) {
       return {
         class: 'direction-distance-state',
-        content: selectedDistance,
+        content: String(selectedDistance),
         clickable: false,
         aria: `Вибрано відстань: ${selectedDistance}`
       };
@@ -106,7 +106,7 @@
       }
       return {
         class: 'confirm-btn-active',
-        content: `${dir}${selectedDistance}`,
+        content: `${dir}${String(selectedDistance)}`,
         clickable: isPlayerTurn,
         aria: `Підтвердити хід: ${dir}${selectedDistance}`
       };
@@ -214,7 +214,7 @@
       tabindex="0"
       disabled={!centerInfoState.clickable}
     >
-      {centerInfoState.content}
+      {String(centerInfoState.content)}
     </button>
     <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" onclick={() => onDirectionClick('right')}>→</button>
     <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" onclick={() => onDirectionClick('down-left')}>↙</button>
@@ -225,7 +225,7 @@
     <div>{$_('gameControls.selectDistance')}</div>
     <div class="distance-btns">
       {#each $availableDistances as dist}
-        <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" onclick={() => onDistanceClick(dist)}>{dist}</button>
+        <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" onclick={() => onDistanceClick(dist)} value={String(dist)} id={String(dist)}>{String(dist)}</button>
       {/each}
     </div>
   </div>
