@@ -1,22 +1,58 @@
 <script>
-  import { modalStore } from '$lib/stores/modalStore.js';
+  import { modalState, modalStore } from '$lib/stores/modalStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
-  $: modal = $modalStore;
-  // Додаю реактивну змінну для scoreDetails
-  $: details = (typeof modal.content === 'object' && modal.content !== null && modal.content.scoreDetails)
-    ? /** @type {any} */ (modal.content.scoreDetails)
-    : null;
 
-  /** @type {HTMLButtonElement|null} */
-  let hotBtn = null;
+  const modal_data = $derived(modalState);
+
+  // Додаю реактивну змінну для scoreDetails за допомогою руни $derived
+  const details = $derived(() => (typeof $modal_data.content === 'object' && $modal_data.content !== null && $modal_data.content.scoreDetails)
+    ? /** @type {any} */ ($modal_data.content.scoreDetails)
+    : null);
+
+  /**
+   * @typedef {Object} ModalContent
+   * @property {string} [reason]
+   * @property {number} [score]
+   * @property {any} [scoreDetails]
+   */
+
+  /** @type {HTMLButtonElement | null} */
+  let hotBtn = $state(null);
+
+  $effect(() => {
+    if ($modal_data.isOpen && hotBtn) {
+      setTimeout(() => {
+        hotBtn?.focus();
+      }, 50);
+    }
+  });
+
+  function onModalKeydown(/** @type {any} */e) {
+    if (!$modal_data.isOpen || !$modal_data.buttons) return;
+
+    // @ts-ignore: кастомне поле isHot
+    const idx = $modal_data.buttons.findIndex(b => b.isHot);
+
+    if (idx !== -1 && (e.key === 'Enter' || e.key === ' ' || e.key === '5')) {
+      e.preventDefault();
+      e.stopPropagation(); // Додатково зупиняємо спливання події
+
+      const button = $modal_data.buttons[idx];
+      if (button && typeof button.onClick === 'function') {
+        button.onClick();
+      } else {
+        modalStore.closeModal();
+      }
+    }
+  }
 
   /**
    * @param {Event} e
    */
   function onOverlayClick(e) {
     // Якщо це "критичне" модальне вікно (2 кнопки, обидві з onClick), не закриваємо по overlay
-    if (modal.buttons && modal.buttons.length === 2 && modal.buttons.every(btn => typeof btn.onClick === 'function')) {
+    if ($modal_data.buttons && $modal_data.buttons.length === 2 && $modal_data.buttons.every(btn => typeof btn.onClick === 'function')) {
       return;
     }
     const target = /** @type {HTMLElement|null} */(e.target);
@@ -27,62 +63,62 @@
   }
 </script>
 
-{#if modal.isOpen}
-  <div class="modal-overlay" role="button" tabindex="0" aria-label={$_('modal.close')} on:click={onOverlayClick} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && onOverlayClick(e)}>
+{#if $modal_data.isOpen}
+  <div class="modal-overlay" role="button" tabindex="0" aria-label={$_('modal.close')} onclick={onOverlayClick} onkeydown={onModalKeydown}>
     <div class="modal-window">
       <div class="modal-header">
-        {#if modal.title && (modal.title.includes('перемогли') || modal.title.includes('Комп'))}
+        {#if $modal_data.title && ($modal_data.title.includes('перемогли') || $modal_data.title.includes('Комп'))}
           <span class="modal-victory-icon">👑</span>
         {/if}
-        <h2 class="modal-title">{modal.title}</h2>
-        {#if !(modal.buttons && modal.buttons.length === 2 && modal.buttons.every(btn => typeof btn.onClick === 'function'))}
-          <button class="modal-close" on:click={() => { logStore.addLog('Закриття модального вікна (X)', 'info'); modalStore.closeModal(); }}>&times;</button>
+        <h2 class="modal-title">{$modal_data.title}</h2>
+        {#if !(($modal_data.buttons && $modal_data.buttons.length === 2 && $modal_data.buttons.every(btn => typeof btn.onClick === 'function')))}
+          <button class="modal-close" onclick={() => { logStore.addLog('Закриття модального вікна (X)', 'info'); modalStore.closeModal(); }}>&times;</button>
         {/if}
       </div>
       <!-- subtitle прибрано -->
       <div class="modal-content">
         {#if details}
           <!-- Новий деталізований вигляд -->
-          {#if typeof modal.content === 'object' && modal.content !== null}
-            <p class="reason">{modal.content.reason}</p>
+          {#if typeof $modal_data.content === 'object' && $modal_data.content !== null}
+            <p class="reason">{$modal_data.content.reason}</p>
           {/if}
           <div class="score-breakdown">
-            <div>Базовий рахунок: <span>{details.baseScore}</span></div>
+            <div>Базовий рахунок: <span>{details().baseScore}</span></div>
             
-            {#if details.sizeBonus > 0}
-              <div>Бонус за розмір дошки: <span>+{details.sizeBonus}</span></div>
+            {#if details().sizeBonus > 0}
+              <div>Бонус за розмір дошки: <span>+{details().sizeBonus}</span></div>
             {/if}
-            {#if details.blockModeBonus > 0}
-              <div>Бонус за режим блокування: <span>+{details.blockModeBonus}</span></div>
+            {#if details().blockModeBonus > 0}
+              <div>Бонус за режим блокування: <span>+{details().blockModeBonus}</span></div>
             {/if}
-            {#if details.jumpBonus > 0}
-              <div>Бонус за стрибки: <span>+{details.jumpBonus}</span></div>
+            {#if details().jumpBonus > 0}
+              <div>Бонус за стрибки: <span>+{details().jumpBonus}</span></div>
             {/if}
-            {#if details.noMovesBonus > 0}
-              <div>Бонус "Ходів немає": <span>+{details.noMovesBonus}</span></div>
+            {#if details().noMovesBonus > 0}
+              <div>Бонус "Ходів немає": <span>+{details().noMovesBonus}</span></div>
             {/if}
             
-            {#if details.totalPenalty > 0}
-              <div class="penalty">Штраф за зворотні ходи: <span>-{details.totalPenalty}</span></div>
+            {#if details().totalPenalty > 0}
+              <div class="penalty">Штраф за зворотні ходи: <span>-{details().totalPenalty}</span></div>
             {/if}
           </div>
           <div class="final-score-container">
             <span class="score-label">Підсумковий рахунок:</span>
-            <span class="score-value">{details.totalScore}</span>
+            <span class="score-value">{details().totalScore}</span>
           </div>
-        {:else if typeof modal.content === 'object' && modal.content !== null && modal.content.score}
+        {:else if typeof $modal_data.content === 'object' && $modal_data.content !== null && $modal_data.content.score}
           <!-- Старий вигляд з рахунком -->
-          <p class="reason">{modal.content.reason}</p>
+          <p class="reason">{$modal_data.content.reason}</p>
           <div class="final-score-container">
             <span class="score-label">Ваш рахунок:</span>
-            <span class="score-value">{modal.content.score}</span>
+            <span class="score-value">{$modal_data.content.score}</span>
           </div>
         {:else}
-          <div class="modal-info">{modal.content}</div>
+          <div class="modal-info">{$modal_data.content}</div>
         {/if}
       </div>
       <div class="modal-buttons">
-        {#each modal.buttons as btn, i}
+        {#each $modal_data.buttons as btn, i}
           {#if btn.isHot}
             <button
               class="modal-btn-generic"
@@ -91,7 +127,7 @@
               class:green-btn={btn.customClass === 'green-btn'}
               data-testid={`modal-btn-${i}`}
               data-role="modal-btn"
-              on:click={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
+              onclick={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
               aria-label={btn.text}
               aria-pressed="false"
               bind:this={hotBtn}
@@ -105,15 +141,15 @@
               class:green-btn={btn.customClass === 'green-btn'}
               data-testid={`modal-btn-${i}`}
               data-role="modal-btn"
-              on:click={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
+              onclick={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
               aria-label={btn.text}
               aria-pressed="false"
               tabindex="-1"
             >{btn.text}</button>
           {/if}
         {/each}
-        {#if !modal.buttons.length}
-          <button class="modal-btn-generic" data-testid="modal-btn-ok" data-role="modal-btn" on:click={() => { logStore.addLog('Закриття модального вікна (OK)', 'info'); modalStore.closeModal(); }}>{$_('modal.ok')}</button>
+        {#if !$modal_data.buttons.length}
+          <button class="modal-btn-generic" data-testid="modal-btn-ok" data-role="modal-btn" onclick={() => { logStore.addLog('Закриття модального вікна (OK)', 'info'); modalStore.closeModal(); }}>{$_('modal.ok')}</button>
         {/if}
       </div>
     </div>
