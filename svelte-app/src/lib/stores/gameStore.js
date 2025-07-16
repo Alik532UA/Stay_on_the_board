@@ -78,6 +78,9 @@ function getAvailableMoves(row, col, size, blockedCells = []) {
  * @property {string} text
  * @property {boolean} [primary]
  * @property {() => void} [onClick]
+ * @property {string} [customClass] // Додаю для стилізації кнопок
+ * @property {boolean} [isHot] // Додаю для фокусу
+ * @property {string} [hotKey] // <-- ДОДАНО
  */
 /**
  * @typedef {Object} ModalState
@@ -785,7 +788,8 @@ export function finishGameWithBonus() {
       scoreDetails: finalScoreDetails
     },
     buttons: [
-      { text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal }
+      { text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal },
+      { text: `Завершити (+${state.boardSize} балів)`, customClass: 'blue-btn', onClick: finishGameWithBonus }
     ]
   });
 }
@@ -805,7 +809,8 @@ export function noMoves() {
           primary: true,
           isHot: true,
           hotKey: 'Enter',
-          onClick: continueGameAndClearBlocks
+          onClick: continueGameAndClearBlocks,
+          customClass: 'green-btn'
         },
         {
           text: `Завершити (+${state.boardSize} балів)`,
