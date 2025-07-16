@@ -82,30 +82,30 @@
           {#if typeof $modal_data.content === 'object' && $modal_data.content !== null}
             <p class="reason">{$modal_data.content.reason}</p>
           {/if}
-          <div class="score-breakdown">
-            <div>Базовий рахунок: <span>{details().baseScore}</span></div>
-            
-            {#if details().sizeBonus > 0}
-              <div>Бонус за розмір дошки: <span>+{details().sizeBonus}</span></div>
-            {/if}
-            {#if details().blockModeBonus > 0}
-              <div>Бонус за режим блокування: <span>+{details().blockModeBonus}</span></div>
-            {/if}
-            {#if details().jumpBonus > 0}
-              <div>Бонус за стрибки: <span>+{details().jumpBonus}</span></div>
-            {/if}
-            {#if details().noMovesBonus > 0}
-              <div>Бонус "Ходів немає": <span>+{details().noMovesBonus}</span></div>
-            {/if}
-            
-            {#if details().totalPenalty > 0}
-              <div class="penalty">Штраф за зворотні ходи: <span>-{details().totalPenalty}</span></div>
-            {/if}
-          </div>
-          <div class="final-score-container">
-            <span class="score-label">Підсумковий рахунок:</span>
-            <span class="score-value">{details().totalScore}</span>
-          </div>
+          {#if details()}
+            <div class="score-breakdown">
+              <div>Базовий рахунок: <span>{details().baseScore}</span></div>
+              {#if details().sizeBonus > 0}
+                <div>Бонус за розмір дошки: <span>+{details().sizeBonus}</span></div>
+              {/if}
+              {#if details().blockModeBonus > 0}
+                <div>Бонус за режим блокування: <span>+{details().blockModeBonus}</span></div>
+              {/if}
+              {#if details().jumpBonus > 0}
+                <div>Бонус за стрибки: <span>+{details().jumpBonus}</span></div>
+              {/if}
+              {#if details().noMovesBonus > 0}
+                <div>Бонус "Ходів немає": <span>+{details().noMovesBonus}</span></div>
+              {/if}
+              {#if details().totalPenalty > 0}
+                <div class="penalty">Штраф за зворотні ходи: <span>-{details().totalPenalty}</span></div>
+              {/if}
+            </div>
+            <div class="final-score-container">
+              <span class="score-label">Підсумковий рахунок:</span>
+              <span class="score-value">{details().totalScore}</span>
+            </div>
+          {/if}
         {:else if typeof $modal_data.content === 'object' && $modal_data.content !== null && $modal_data.content.score}
           <!-- Старий вигляд з рахунком -->
           <p class="reason">{$modal_data.content.reason}</p>
