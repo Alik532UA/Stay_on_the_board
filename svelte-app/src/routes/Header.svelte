@@ -4,6 +4,7 @@
 	import github from '$lib/images/github.svg';
 	import { _ } from 'svelte-i18n';
 	import LanguageSwitcher from '../lib/components/LanguageSwitcher.svelte';
+	import { base } from '$app/paths';
 </script>
 
 <header>
@@ -18,14 +19,14 @@
 			<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
 		</svg>
 		<ul>
-			<li aria-current={page.url.pathname === '/' ? 'page' : undefined}>
-				<a href="/">{$_('header.home')}</a>
+			<li aria-current={page.url.pathname === base + '/' ? 'page' : undefined}>
+				<a href="{base}/">{$_('header.home')}</a>
 			</li>
-			<li aria-current={page.url.pathname === '/about' ? 'page' : undefined}>
-				<a href="/about">{$_('header.about')}</a>
+			<li aria-current={page.url.pathname === base + '/about' ? 'page' : undefined}>
+				<a href="{base}/about">{$_('header.about')}</a>
 			</li>
-			<li aria-current={page.url.pathname.startsWith('/sverdle') ? 'page' : undefined}>
-				<a href="/sverdle">{$_('header.sverdle')}</a>
+			<li aria-current={page.url.pathname.startsWith(base + '/sverdle') ? 'page' : undefined}>
+				<a href="{base}/sverdle">{$_('header.sverdle')}</a>
 			</li>
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
