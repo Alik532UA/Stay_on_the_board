@@ -13,6 +13,8 @@
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from './SvgIcons.svelte';
+  import { flip } from 'svelte/animate';
+  import { quintOut } from 'svelte/easing';
   // Функція очищення кешу
   function clearCache() {
     localStorage.clear();
@@ -299,7 +301,7 @@
                 class="board-cell"
                 class:light={ (rowIdx + colIdx) % 2 === 0 }
                 class:dark={ (rowIdx + colIdx) % 2 !== 0 }
-                class:player-piece={ rowIdx === playerRow && colIdx === playerCol }
+                class:player-piece={rowIdx === playerRow && colIdx === playerCol}
                 class:blocked-cell={ isCellBlocked(rowIdx, colIdx) }
                 class:available={ showMoves && isAvailable(rowIdx, colIdx) && currentPlayer === 1 }
                 role="button"
@@ -313,7 +315,7 @@
                   <span class="blocked-x">✗</span>
                 {:else}
                   {#if rowIdx === playerRow && colIdx === playerCol}
-                    <span class="crown" title={playerTitle}><SvgIcons name="queen" /></span>
+                    <SvgIcons name="queen" />
                   {/if}
                   {#if isAvailable(rowIdx, colIdx) && currentPlayer === 1 && showMoves}
                     <span class="move-dot"></span>
@@ -326,6 +328,7 @@
       </div>
     {/key}
   {/if}
+  <!-- Рендеримо ферзя як окремий елемент поверх сітки -->
   <GameControls />
   <Modal />
   {#if $uiState.isVoiceSettingsModalOpen}
