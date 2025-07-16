@@ -55,10 +55,7 @@
     color: var(--text-accent);
 }
 
-.board-cell.player-piece {
-    color: var(--piece-color);
-    text-shadow: 0 0 5px var(--piece-shadow);
-}
+/* Видалено .board-cell.player-piece */
 
 .board-hidden .board-cell {
     background-color: var(--board-hidden-bg) !important;
@@ -249,11 +246,7 @@
   font-size: 1em;
 }
 
-.crown {
-  display: block;
-  text-align: center;
-  filter: drop-shadow(0 0 8px #fff8) drop-shadow(0 0 4px #ffb300cc);
-}
+/* Видалено .crown і .crown svg */
 
 @keyframes crown-pop {
     0% { transform: scale(0.5) rotate(-20deg); opacity: 0; }
@@ -479,4 +472,37 @@
     max-width: 95vw;
     min-width: 0;
   }
+} 
+
+/* --- crown styles restored --- */
+.crown {
+  display: block;
+  text-align: center;
+  filter: drop-shadow(0 0 8px #fff8) drop-shadow(0 0 4px #ffb300cc);
+}
+.crown svg {
+  width: 75%;
+  height: 75%;
+  display: block;
+  margin: 0 auto;
+}
+/* --- piece-container for animation --- */
+.piece-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} 
+
+.board-cell.player-piece {
+  /* Цей клас буде застосовано до клітинки, що містить ферзя */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.board-cell.player-piece svg {
+  width: 70%;
+  height: 70%;
+  filter: drop-shadow(0 0 8px #fff8) drop-shadow(0 0 4px #ffb300cc);
 } 
