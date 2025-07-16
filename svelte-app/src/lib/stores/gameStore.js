@@ -779,10 +779,15 @@ export function continueGameAndClearBlocks() {
  * Завершує гру, нараховуючи бонусні бали.
  */
 export function finishGameWithBonus() {
+  // Встановлюємо прапорець, що гра завершена через кнопку
   appState.update(s => ({ ...s, finishedByNoMovesButton: true }));
+  // Отримуємо фінальний стан
   const state = get(appState);
+  // Розраховуємо фінальний рахунок
   const finalScoreDetails = calculateFinalScore(state);
+  // Оновлюємо стан гри як завершений з фінальним рахунком
   appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
+  // Показуємо фінальне модальне вікно
   modalStore.showModal({
     title: 'Гру завершено!',
     content: {
@@ -790,8 +795,7 @@ export function finishGameWithBonus() {
       scoreDetails: finalScoreDetails
     },
     buttons: [
-      { text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true },
-      { text: `Завершити (+${state.boardSize} балів)`, customClass: 'blue-btn', onClick: finishGameWithBonus }
+      { text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true }
     ]
   });
 }

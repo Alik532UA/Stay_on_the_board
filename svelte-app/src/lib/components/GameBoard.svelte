@@ -1,6 +1,6 @@
 <script>
   import '../css/components/game-board.css';
-  import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove } from '$lib/stores/gameStore.js';
+  import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove, toggleBlockMode, toggleShowBoard } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { goto } from '$app/navigation';
   import GameControls from '$lib/components/GameControls.svelte';
@@ -213,6 +213,34 @@
         noMoves();
         break;
         
+      // Налаштування дошки та режимів
+      case '*': // Numpad Multiply
+        logStore.addLog('[handleKeydown] Перемкнено режим заблокованих клітинок', 'info');
+        toggleBlockMode();
+        break;
+      case '/': // Numpad Divide
+        logStore.addLog('[handleKeydown] Перемкнено видимість дошки', 'info');
+        toggleShowBoard();
+        break;
+      case '+': // Numpad Add
+        {
+          const currentSize = get(appState).boardSize;
+          if (currentSize < 9) {
+            logStore.addLog(`[handleKeydown] Збільшено розмір дошки до ${currentSize + 1}`, 'info');
+            setBoardSize(currentSize + 1);
+          }
+        }
+        break;
+      case '-': // Numpad Subtract
+        {
+          const currentSize = get(appState).boardSize;
+          if (currentSize > 2) {
+            logStore.addLog(`[handleKeydown] Зменшено розмір дошки до ${currentSize - 1}`, 'info');
+            setBoardSize(currentSize - 1);
+          }
+        }
+        break;
+
       default:
         handled = false; // Ми не обробили цю клавішу
         break;
