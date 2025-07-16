@@ -61,7 +61,9 @@ export default {
     stylePeak: "Peak",
     styleCS2: "CS2",
     styleGlass: "Glassmorphism",
-    styleMaterial: "Material You"
+    styleMaterial: "Material You",
+    reset: "Скинути налаштування",
+    resetHint: "Повернути всі налаштування до стандартних значень"
   },
   modal: {
     ok: "OK"
