@@ -3,6 +3,7 @@
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { logStore } from '../stores/logStore.js';
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import { _ , isLoading, locale } from 'svelte-i18n';
   // Language dropdown logic (inline, замість LanguageSwitcher)
   let showLangDropdown = false;
@@ -41,7 +42,7 @@
    */
   function navigateTo(route) {
     logStore.addLog(`Навігація: ${route}`, 'info');
-    goto(route);
+    goto(`${base}${route}`);
   }
 
   function clearCache() {
