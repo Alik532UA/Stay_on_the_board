@@ -1,58 +1,64 @@
-// src/lib/speech.js
-import { get } from 'svelte/store';
+// svelte-app/src/lib/speech.js
+import { get, writable } from 'svelte/store';
 import { t } from 'svelte-i18n';
-import { writable } from 'svelte/store';
+import { logStore } from '$lib/stores/logStore.js';
 
-// Стор для зберігання доступних голосів
-export const voices = writable(/** @type {any[]} */([]));
-
+export const voices = writable([]);
 let voicesLoaded = false;
 
-/**
- * Асинхронно завантажує та кешує список голосів.
- */
-function loadVoices() {
-  return new Promise((resolve) => {
-    if (voicesLoaded) {
-      resolve(get(voices));
-      return;
-    }
+function populateVoiceList() {
+  if (typeof speechSynthesis === 'undefined' || voicesLoaded) {
+    return;
+  }
 
-    const allVoices = window.speechSynthesis.getVoices();
-    if (allVoices.length) {
-      voices.set(allVoices);
-      voicesLoaded = true;
-      resolve(allVoices);
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        const allVoices = window.speechSynthesis.getVoices();
-        voices.set(allVoices);
-        voicesLoaded = true;
-        resolve(allVoices);
-      };
-    }
-  });
+  const allVoices = speechSynthesis.getVoices();
+  if (allVoices.length) {
+    console.log('[Speech] Voices loaded:', allVoices.map(v => ({ name: v.name, lang: v.lang, default: v.default })));
+    logStore.addLog(`[Speech] Loaded ${allVoices.length} voices.`, 'debug');
+    voices.set(allVoices);
+    voicesLoaded = true;
+    speechSynthesis.onvoiceschanged = null; // Очищаємо, щоб уникнути повторних викликів
+  }
 }
 
-// Запускаємо завантаження голосів при першому імпорті файлу
+// Ініціалізація
 if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-  loadVoices();
+  populateVoiceList();
+
+  if (!voicesLoaded) {
+    speechSynthesis.onvoiceschanged = populateVoiceList;
+
+    // Запасний механізм для браузерів, де onvoiceschanged спрацьовує нестабільно
+    const checkInterval = setInterval(() => {
+      if (get(voices).length > 0) {
+        voicesLoaded = true;
+        clearInterval(checkInterval);
+      } else {
+        populateVoiceList();
+      }
+    }, 250);
+
+    setTimeout(() => clearInterval(checkInterval), 3000); // Зупинити перевірку через 3 секунди
+  }
 }
 
 /**
  * Фільтрує голоси за кодом мови (напр., 'uk' або 'en').
- * @param {string} langCode - 'uk', 'en', etc.
- * @returns {Promise<SpeechSynthesisVoice[]>}
+ * @param {string} langCode
+ * @returns {SpeechSynthesisVoice[]}
  */
-export async function getVoicesByLang(langCode) {
-  const allVoices = await loadVoices();
-  return allVoices.filter(/** @param {SpeechSynthesisVoice} voice */ (voice) => voice.lang.startsWith(langCode));
+export function getVoicesByLang(langCode) {
+  const allVoices = get(voices);
+  console.log(`[Speech] Filtering for langCode: "${langCode}". Total voices: ${allVoices.length}`);
+  const filtered = allVoices.filter(voice => voice.lang.startsWith(langCode));
+  console.log(`[Speech] Found ${filtered.length} voices for "${langCode}".`);
+  return filtered;
 }
 
 /**
- * Повертає правильну форму іменника "клітинка" на основі відстані.
+ * Повертає правильну форму іменника "клітинка"
  * @param {number} distance
- * @param {function} t - Функція перекладу з svelte-i18n.
+ * @param {function} t
  * @returns {string}
  */
 function getCellNoun(distance, t) {
@@ -66,13 +72,13 @@ function getCellNoun(distance, t) {
 
 /**
  * Озвучує ігровий хід.
- * @param {'computer'} actorKey - Ключ для визначення гравця.
- * @param {string} directionKey - Ключ напрямку.
- * @param {number} distance - Відстань ходу.
- * @param {string} lang - Код мови (напр. 'uk-UA').
- * @param {string | null} voiceURI - URI обраного голосу.
+ * @param {'player' | 'computer'} actorKey
+ * @param {string} directionKey
+ * @param {number} distance
+ * @param {string} lang
+ * @param {string | null} voiceURI
  */
-export async function speakMove(actorKey, directionKey, distance, lang, voiceURI) {
+export function speakMove(actorKey, directionKey, distance, lang, voiceURI) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
   const $t = get(t);
@@ -89,25 +95,21 @@ export async function speakMove(actorKey, directionKey, distance, lang, voiceURI
   utterance.rate = 1.0;
   utterance.pitch = 1.0;
 
-  // **НОВИЙ КОД: Пошук та встановлення голосу**
   if (voiceURI) {
-    const allVoices = await loadVoices();
-    const selectedVoice = allVoices.find(/** @param {SpeechSynthesisVoice} v */ (v) => v.voiceURI === voiceURI);
+    const allVoices = get(voices);
+    const selectedVoice = allVoices.find(v => v.voiceURI === voiceURI);
     if (selectedVoice) {
       utterance.voice = selectedVoice;
     } else {
-      console.warn(`Збережений голос з URI "${voiceURI}" не знайдено.`);
+      console.warn(`[Speech] Voice with URI "${voiceURI}" not found.`);
     }
   }
 
-  console.log(`[Speech] Озвучування: "${textToSpeak}"`, { voice: utterance.voice?.name });
+  console.log(`[Speech] Speaking: "${textToSpeak}"`, { voice: utterance.voice?.name });
   window.speechSynthesis.speak(utterance);
 }
 
-/**
- * @typedef {{ [key: string]: string; uk: string; en: string; crh: string; nl: string; }} LangMapType
- */
-/** @type {LangMapType} */
+/** @type {import('./types').LangMapType} */
 export const langMap = {
   uk: 'uk-UA',
   en: 'en-US',
