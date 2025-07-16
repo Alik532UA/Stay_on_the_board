@@ -4,8 +4,11 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA } from 'vite-plugin-pwa';
 import manifest from './static/manifest.json';
 
+// ВАЖЛИВО: у vite.config.ts треба використовувати process.env
+const base = process.env.VITE_BASE_PATH || '/';
+
 export default defineConfig({
-	base: '/Stay_on_the_board/', // додано для GitHub Pages
+	base,
 	plugins: [
 		sveltekit(),
 		visualizer({
