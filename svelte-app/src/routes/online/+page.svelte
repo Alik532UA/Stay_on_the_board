@@ -1,5 +1,5 @@
 <script>
-  import OnlineMenu from '../../components/OnlineMenu.svelte';
+  import OnlineMenu from '$lib/components/OnlineMenu.svelte';
 </script>
 
 <OnlineMenu /> 

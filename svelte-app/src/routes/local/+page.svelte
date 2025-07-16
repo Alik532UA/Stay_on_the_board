@@ -1,5 +1,5 @@
 <script>
-  import LocalGame from '../../components/LocalGame.svelte';
+  import LocalGame from '$lib/components/LocalGame.svelte';
 </script>
 
 <LocalGame /> 

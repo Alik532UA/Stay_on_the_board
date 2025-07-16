@@ -1,5 +1,5 @@
 <script>
-  import JoinRoom from '../../components/JoinRoom.svelte';
+  import JoinRoom from '$lib/components/JoinRoom.svelte';
 </script>
 
 <JoinRoom /> 
