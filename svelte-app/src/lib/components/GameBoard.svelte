@@ -15,6 +15,7 @@
   import SvgIcons from './SvgIcons.svelte';
   import { flip } from 'svelte/animate';
   import { quintOut } from 'svelte/easing';
+  import { base } from '$app/paths';
   // Функція очищення кешу
   function clearCache() {
     localStorage.clear();
@@ -89,8 +90,8 @@
   });
 
   function goToMainMenu() {
-    logStore.addLog('Повернення до головного меню', 'info');
-    goto('/');
+  logStore.addLog('Повернення до головного меню', 'info');
+  goto(base || '/'); // Використовуємо base, якщо він є
   }
 
   function showPenaltyInfo() {
