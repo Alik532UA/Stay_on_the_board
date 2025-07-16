@@ -2,6 +2,7 @@
   import { modalState, modalStore } from '$lib/stores/modalStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
+  import SvgIcons from './SvgIcons.svelte';
 
   const modal_data = $derived(modalState);
 
@@ -71,7 +72,7 @@
     <div class="modal-window">
       <div class="modal-header">
         {#if $modal_data.title && ($modal_data.title.includes('перемогли') || $modal_data.title.includes('Комп'))}
-          <span class="modal-victory-icon">👑</span>
+          <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
         {/if}
         <h2 class="modal-title">{$modal_data.title}</h2>
         {#if !(($modal_data.buttons && $modal_data.buttons.length === 2 && $modal_data.buttons.every(btn => typeof btn.onClick === 'function')) || $modal_data.title === 'Гру завершено!')}

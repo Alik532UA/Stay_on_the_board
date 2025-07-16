@@ -141,6 +141,7 @@
   box-shadow: 0 2px 16px 0 rgba(80,0,80,0.10);
   overflow: hidden;
   background-clip: padding-box;
+  color: var(--text-primary);
 }
 .main-menu-btn:hover {
   background: #ff9800;
@@ -374,17 +375,6 @@
 .board-size-dropdown-btn:hover {
   background: #ff9800;
   color: #fff;
-}
-.board-size-dropdown-btn svg {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  margin-left: 0;
-  vertical-align: middle;
-  width: 24px;
-  height: 24px;
-  display: block;
 }
 .board-size-dropdown-list {
   position: absolute;
