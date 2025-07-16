@@ -119,6 +119,7 @@ function getAvailableMoves(row, col, size, blockedCells = []) {
  * @property {number} jumpedBlockedCells
  * @property {number} penaltyPoints
  * @property {boolean} finishedByNoMovesButton
+ * @property {number} gameId // <-- ДОДАНО
  */
 
 /**
@@ -209,6 +210,7 @@ export const appState = writable(/** @type {AppState} */({
   jumpedBlockedCells: 0, // НОВЕ
   penaltyPoints: 0, // НОВЕ
   finishedByNoMovesButton: false, // НОВЕ
+  gameId: 1, // <-- ДОДАНО
   availableDistances: [], // ДОДАНО для відповідності типу AppState
 }));
 
@@ -344,6 +346,7 @@ export function setBoardSize(newSize) {
       lastComputerMove: null,
       score: 0,
       isGameOver: false,
+      gameId: (state.gameId || 0) + 1, // <-- ДОДАНО
     };
   });
 }
@@ -476,6 +479,7 @@ export function resetGame() {
       penaltyPoints: 0,
       finishedByNoMovesButton: false, // Скидаємо
       isGameOver: false,
+      gameId: (state.gameId || 0) + 1, // <-- ДОДАНО
     };
   });
 }
@@ -564,20 +568,18 @@ export function makeComputerMove() {
       }
     } else {
       console.log('[makeComputerMove] No valid moves available for computer. Player wins!');
-      // Показуємо меню з вибором: продовжити або завершити з бонусом
+      // Розраховуємо фінальний рахунок
+      const finalScoreDetails = calculateFinalScore(current);
+      appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
+      // Показуємо модальне вікно з фінальним рахунком
       modalStore.showModal({
-        title: 'Комп\'ютер не може зробити хід',
-        content: 'Ви можете очистити поле і продовжити гру, або завершити її зараз і отримати бонусні бали.',
+        title: 'Перемога!',
+        content: {
+          reason: 'Комп\'ютер не може зробити хід.',
+          scoreDetails: finalScoreDetails
+        },
         buttons: [
-          {
-            text: `Продовжити`,
-            onClick: continueGameAndClearBlocks
-          },
-          {
-            text: `Завершити (+${current.boardSize} балів)`,
-            customClass: 'blue-btn',
-            onClick: finishGameWithBonus
-          }
+          { text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true }
         ]
       });
     }
@@ -726,7 +728,7 @@ export function confirmMove() {
     modalStore.showModal({
       title: 'Гру завершено!',
       content: { reason: reason, scoreDetails: finalScoreDetails },
-      buttons: [{ text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal }]
+      buttons: [{ text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true }]
     });
     return;
   }
@@ -788,7 +790,7 @@ export function finishGameWithBonus() {
       scoreDetails: finalScoreDetails
     },
     buttons: [
-      { text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal },
+      { text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true },
       { text: `Завершити (+${state.boardSize} балів)`, customClass: 'blue-btn', onClick: finishGameWithBonus }
     ]
   });
@@ -796,35 +798,38 @@ export function finishGameWithBonus() {
 
 export function noMoves() {
   const state = get(appState);
-
   // Перевірка, чи дійсно немає ходів
   if (state.availableMoves.length === 0) {
-    // Ходів дійсно немає. Показуємо модальне вікно з вибором.
+    // Ходів дійсно немає.
+    // Встановлюємо прапорець, що гра завершена цим шляхом
+    appState.update(s => ({ ...s, finishedByNoMovesButton: true }));
+    // Отримуємо оновлений стан для розрахунку балів
+    const finalState = get(appState);
+    const finalScoreDetails = calculateFinalScore(finalState);
+    // Оновлюємо стан гри як завершений з фінальним рахунком
+    appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
+    // Показуємо модальне вікно з деталізованим рахунком
     modalStore.showModal({
-      title: 'Ходів немає. Що робити далі?',
-      content: 'Ви можете очистити поле і продовжити гру, або завершити її зараз і отримати бонусні бали.',
+      title: 'Ви перемогли!',
+      content: {
+        reason: 'Ви правильно визначили, що ходів немає.',
+        scoreDetails: finalScoreDetails
+      },
       buttons: [
-        {
-          text: `Продовжити`,
-          primary: true,
-          isHot: true,
-          hotKey: 'Enter',
-          onClick: continueGameAndClearBlocks,
-          customClass: 'green-btn'
-        },
-        {
-          text: `Завершити (+${state.boardSize} балів)`,
-          customClass: 'blue-btn',
-          onClick: finishGameWithBonus
-        }
+        { text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true }
       ]
     });
   } else {
-    // Ходи є. Показуємо інформаційне повідомлення.
+    // Ходи є. Гравець програв.
+    const finalScoreDetails = calculateFinalScore(state);
+    appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
     modalStore.showModal({
-      title: 'Увага!',
-      content: `У вас ще є доступні ходи (${state.availableMoves.length} шт.).`,
-      buttons: [{ text: 'OK', primary: true, onClick: closeModal }]
+      title: 'Помилка!',
+      content: {
+        reason: `У вас ще є доступні ходи (${state.availableMoves.length} шт.). Ви програли.`,
+        scoreDetails: finalScoreDetails
+      },
+      buttons: [{ text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true }]
     });
   }
 } 

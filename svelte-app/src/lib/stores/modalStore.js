@@ -11,18 +11,19 @@ import { writable } from 'svelte/store';
  */
 /**
  * @typedef {Object} ModalContent
- * @property {string} reason - Причина завершення гри.
- * @property {number} [score] - Фінальний рахунок.
- * @property {object} [scoreDetails] - Деталізація рахунку (бонуси).
+ * @property {string} [reason] - Причина завершення гри.
+ * @property {number} [score] - Фінальний рахунок (для старого вигляду).
+ * @property {any} [scoreDetails] - Деталізація рахунку (бонуси).
  */
 /**
  * @typedef {Object} ModalState
  * @property {boolean} isOpen
  * @property {string} title
- * @property {ModalContent | string} content - Може бути об'єктом або рядком для сумісності.
+ * @property {string|ModalContent} content - Може бути об'єктом або рядком для сумісності.
  * @property {ModalButton[]} buttons
  */
 
+/** @type {ModalState} */
 const initialState = {
   isOpen: false,
   title: '',
@@ -30,13 +31,16 @@ const initialState = {
   buttons: []
 };
 
-const { subscribe, set, update } = writable(/** @type {ModalState} */ ({ ...initialState }));
+const { subscribe, set, update } = writable(initialState);
+
+export const modalState = { subscribe };
 
 /**
- * @param {{ title: string, content: ModalContent | string, buttons?: ModalButton[] }} param0
+ * Відкриває модальне вікно
+ * @param {{ title: string, content: string|ModalContent, buttons?: ModalButton[] }} param0
  */
-function showModal({ title, content, buttons = [] }) {
-  set({ isOpen: true, title, content, buttons });
+function showModal({ title, content, buttons }) {
+  set({ isOpen: true, title, content, buttons: buttons || [] });
 }
 
 function closeModal() {
@@ -48,5 +52,5 @@ export { closeModal };
 export const modalStore = {
   subscribe,
   showModal,
-  closeModal
+  closeModal: () => set({ ...initialState })
 }; 
