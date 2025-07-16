@@ -3,18 +3,18 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Мультиплатформова настільна гра з підтримкою онлайн-режиму, локалізації та сучасного UI/UX." />
-	<link rel="icon" href="/favicon-32px.ico" sizes="32x32" />
-	<link rel="icon" href="/favicon-16px.ico" sizes="16x16" />
+	<link rel="icon" href="{assets}/favicon-32px.ico" sizes="32x32" />
+	<link rel="icon" href="{assets}/favicon-16px.ico" sizes="16x16" />
 	<link rel="canonical" href="https://stay-on-the-board.com/" />
 	<meta property="og:title" content="Stay on the Board" />
 	<meta property="og:description" content="Мультиплатформова настільна гра з підтримкою онлайн-режиму, локалізації та сучасного UI/UX." />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="https://stay-on-the-board.com/" />
-	<meta property="og:image" content="/logo-circle.png" />
+	<meta property="og:image" content="{assets}/logo-circle.png" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Stay on the Board" />
 	<meta name="twitter:description" content="Мультиплатформова настільна гра з підтримкою онлайн-режиму, локалізації та сучасного UI/UX." />
-	<meta name="twitter:image" content="/logo-circle.png" />
+	<meta name="twitter:image" content="{assets}/logo-circle.png" />
 </svelte:head>
 
 <script lang="ts">
@@ -23,6 +23,7 @@
 	import { settingsStore } from '$lib/stores/settingsStore.js';
 	import { get } from 'svelte/store';
 	import '../lib/i18n/init.js';
+	import { assets } from '$app/paths';
 
 	// onMount(() => {
 	// 	document.documentElement.setAttribute('data-theme', 'dark');
