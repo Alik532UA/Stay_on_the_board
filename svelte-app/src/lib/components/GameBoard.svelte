@@ -2,7 +2,7 @@
   import '../css/components/game-board.css';
   import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove, toggleBlockMode, toggleShowBoard, toggleSpeech } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
-  import { goto } from '$app/navigation';
+  import { navigateToMainMenu } from '$lib/utils/navigation.js';
   import GameControls from '$lib/components/GameControls.svelte';
   import Modal from '$lib/components/Modal.svelte';
   import { get } from 'svelte/store';
@@ -15,7 +15,6 @@
   import SvgIcons from './SvgIcons.svelte';
   import { flip } from 'svelte/animate';
   import { quintOut } from 'svelte/easing';
-  import { base } from '$app/paths';
   // Функція очищення кешу
   function clearCache() {
     localStorage.clear();
@@ -90,8 +89,8 @@
   });
 
   function goToMainMenu() {
-  logStore.addLog('Повернення до головного меню', 'info');
-  goto(base || '/'); // Використовуємо base, якщо він є
+    logStore.addLog('Повернення до головного меню', 'info');
+    navigateToMainMenu();
   }
 
   function showPenaltyInfo() {

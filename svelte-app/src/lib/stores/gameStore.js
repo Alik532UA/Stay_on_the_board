@@ -5,6 +5,7 @@ import { modalStore } from './modalStore.js';
 import { closeModal } from './modalStore.js';
 import { speakMove, langMap } from '$lib/speech.js';
 import { settingsStore } from './settingsStore.js';
+import { navigateToMainMenu } from '$lib/utils/navigation.js';
 /**
  * @typedef {{ [key: string]: string; uk: string; en: string; crh: string; nl: string; }} LangMapType
  */
@@ -762,7 +763,7 @@ export function finishGameWithBonus() {
     },
     buttons: [
       { text: 'Грати ще раз', primary: true, isHot: true, onClick: resetAndCloseModal, customClass: 'green-btn' },
-      { text: 'Головне меню', customClass: 'blue-btn', onClick: () => { window.location.href = '/' } }
+      { textKey: 'gameBoard.mainMenu', customClass: 'blue-btn', onClick: navigateToMainMenu }
     ]
   });
 }
