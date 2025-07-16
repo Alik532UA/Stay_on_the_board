@@ -3,6 +3,7 @@
   import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove } from '../stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import GameControls from './GameControls.svelte';
   import Modal from './Modal.svelte';
   import { get } from 'svelte/store';
@@ -78,7 +79,7 @@
 
   function goToMainMenu() {
     logStore.addLog('Повернення до головного меню', 'info');
-    goto('/');
+    goto(`${base}/`);
   }
 
   function onBoardSizeChange(/** @type {Event} */ event) {

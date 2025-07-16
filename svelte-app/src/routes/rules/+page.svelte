@@ -1,4 +1,5 @@
 <script>
+import { base } from '$app/paths';
   // Контент з GAME_RULES.md
 </script>
 
@@ -132,7 +133,7 @@
   <li>Гравець vs Комп'ютер</li>
   <li>Комп'ютер ходить після кожного ходу гравця</li>
   <li>Затримка 1 секунда між ходами комп'ютера</li>
-  <li>Детальніше дивіться <a href="/docs/logic/COMPUTER_AI.md" target="_blank">COMPUTER_AI.md</a></li>
+  <li>Детальніше дивіться <a href="{base}/docs/logic/COMPUTER_AI.md" target="_blank">COMPUTER_AI.md</a></li>
 </ul>
 <h3>Локальна гра</h3>
 <ul>
@@ -145,7 +146,7 @@
   <li>Гравець vs Гравець через інтернет</li>
   <li>Використовує PeerJS для P2P з'єднання</li>
   <li>Хост створює кімнату, гість приєднується</li>
-  <li>Детальніше дивіться <a href="/docs/logic/NAVIGATION.md" target="_blank">NAVIGATION.md</a></li>
+  <li>Детальніше дивіться <a href="{base}/docs/logic/NAVIGATION.md" target="_blank">NAVIGATION.md</a></li>
 </ul>
 
 <h2>Візуальні підказки</h2>
@@ -208,8 +209,8 @@
 
 <h2>Пов'язані файли</h2>
 <ul>
-  <li><a href="/docs/logic/UI_COMPONENTS.md" target="_blank">UI_COMPONENTS.md</a> — Логіка всіх UI елементів</li>
-  <li><a href="/docs/logic/GAME_STATES.md" target="_blank">GAME_STATES.md</a> — Стани гри та переходи</li>
-  <li><a href="/docs/logic/KEYBOARD_SHORTCUTS.md" target="_blank">KEYBOARD_SHORTCUTS.md</a> — Клавіатурні скорочення</li>
-  <li><a href="/docs/logic/COMPUTER_AI.md" target="_blank">COMPUTER_AI.md</a> — Алгоритм комп'ютера</li>
+  <li><a href="{base}/docs/logic/UI_COMPONENTS.md" target="_blank">UI_COMPONENTS.md</a> — Логіка всіх UI елементів</li>
+  <li><a href="{base}/docs/logic/GAME_STATES.md" target="_blank">GAME_STATES.md</a> — Стани гри та переходи</li>
+  <li><a href="{base}/docs/logic/KEYBOARD_SHORTCUTS.md" target="_blank">KEYBOARD_SHORTCUTS.md</a> — Клавіатурні скорочення</li>
+  <li><a href="{base}/docs/logic/COMPUTER_AI.md" target="_blank">COMPUTER_AI.md</a> — Алгоритм комп'ютера</li>
 </ul> 
