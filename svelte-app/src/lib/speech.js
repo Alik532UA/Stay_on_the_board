@@ -56,21 +56,6 @@ export function getVoicesByLang(langCode) {
 }
 
 /**
- * Повертає правильну форму іменника "клітинка"
- * @param {number} distance
- * @param {function} t
- * @returns {string}
- */
-function getCellNoun(distance, t) {
-  const n = Math.abs(distance) % 100;
-  const n1 = n % 10;
-  if (n > 10 && n < 20) return t('speech.cells_many');
-  if (n1 > 1 && n1 < 5) return t('speech.cells');
-  if (n1 === 1) return t('speech.cell');
-  return t('speech.cells_many');
-}
-
-/**
  * Озвучує ігровий хід.
  * @param {'player' | 'computer'} actorKey
  * @param {string} directionKey
@@ -82,12 +67,13 @@ export function speakMove(actorKey, directionKey, distance, lang, voiceURI) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
   const $t = get(t);
-  const actor = $t(`speech.${actorKey}`);
-  const moveVerb = $t('speech.move');
   const direction = $t(`speech.directions.${directionKey}`) || directionKey;
-  const onPrep = $t('speech.on');
-  const cellNoun = getCellNoun(distance, $t);
-  const textToSpeak = `${actor} ${moveVerb} ${direction} ${onPrep} ${distance} ${cellNoun}.`;
+  let textToSpeak;
+  if (distance === 1) {
+    textToSpeak = `${direction}.`;
+  } else {
+    textToSpeak = `${distance} ${direction}.`;
+  }
 
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(textToSpeak);
