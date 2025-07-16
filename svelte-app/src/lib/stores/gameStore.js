@@ -802,7 +802,8 @@ export function finishGameWithBonus() {
       scoreDetails: finalScoreDetails
     },
     buttons: [
-      { text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true }
+      { text: 'Грати ще раз', primary: true, isHot: true, onClick: resetAndCloseModal, customClass: 'green-btn' },
+      { text: 'Головне меню', customClass: 'blue-btn', onClick: () => { window.location.href = '/' } }
     ]
   });
 }
