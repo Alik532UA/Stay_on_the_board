@@ -28,7 +28,9 @@ export default {
   },
   gameBoard: {
     mainMenu: "Ana Menü",
-    player: "Oyunçu"
+    player: "Oyunçu",
+    penaltyInfoTitle: "Ceza aqqında malümat",
+    penaltyHint: "Az önce hereket yapılğan hücrege qaytmañız"
   },
   gameControls: {
     ok: "OK",

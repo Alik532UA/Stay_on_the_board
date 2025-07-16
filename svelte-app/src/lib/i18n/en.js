@@ -28,7 +28,9 @@ export default {
   },
   gameBoard: {
     mainMenu: "Main Menu",
-    player: "Player"
+    player: "Player",
+    penaltyInfoTitle: "Penalty Information",
+    penaltyHint: "Do not return to the cell from which the move was just made"
   },
   gameControls: {
     ok: "OK",
