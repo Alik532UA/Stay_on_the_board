@@ -106,10 +106,10 @@
 
     {#if showThemeDropdown}
       <div class="theme-dropdown" role="menu" tabindex="0" aria-label={$_('mainMenu.themeDropdown')} on:click|stopPropagation on:keydown={(e) => (e.key === 'Escape') && closeDropdowns()}>
-        <div class="theme-style-row" data-style="classic">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('classic', 'light')}>☀️</button>
+        <div class="theme-style-row" data-style="ubuntu">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('ubuntu', 'light')}>☀️</button>
           <span class="theme-name">{$_('mainMenu.themeName.ubuntu')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('classic', 'dark')}>🌙</button>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('ubuntu', 'dark')}>🌙</button>
         </div>
         <div class="theme-style-row" data-style="peak">
           <button class="theme-btn" data-theme="light" on:click={() => selectTheme('peak', 'light')}>☀️</button>

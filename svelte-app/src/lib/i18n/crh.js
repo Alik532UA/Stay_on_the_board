@@ -60,7 +60,7 @@ export default {
     themeDark: "Qaranlıq",
     themeLight: "Aydın",
     style: "Stil",
-    styleClassic: "Classic",
+    styleClassic: "Ubuntu",
     stylePeak: "Peak",
     styleCS2: "CS2",
     styleGlass: "Glassmorphism",

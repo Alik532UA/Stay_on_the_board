@@ -39,7 +39,7 @@
   <div class="settings-group">
     <label for="style-select">{$_('settings.style')}:</label>
     <select id="style-select" name="style" value={settings.style} onchange={onChange}>
-      <option value="classic">{$_('settings.styleClassic')}</option>
+      <option value="ubuntu">{$_('mainMenu.themeName.ubuntu')}</option>
       <option value="peak">{$_('settings.stylePeak')}</option>
       <option value="cs2">{$_('settings.styleCS2')}</option>
       <option value="glass">{$_('settings.styleGlass')}</option>

@@ -57,7 +57,7 @@ export default {
     themeDark: "Donker",
     themeLight: "Licht",
     style: "Stijl",
-    styleClassic: "Classic",
+    styleClassic: "Ubuntu",
     stylePeak: "Peak",
     styleCS2: "CS2",
     styleGlass: "Glassmorphism",

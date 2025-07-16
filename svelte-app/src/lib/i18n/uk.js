@@ -57,7 +57,7 @@ export default {
     themeDark: "Темна",
     themeLight: "Світла",
     style: "Стиль",
-    styleClassic: "Classic",
+    styleClassic: "Ubuntu",
     stylePeak: "Peak",
     styleCS2: "CS2",
     styleGlass: "Glassmorphism",

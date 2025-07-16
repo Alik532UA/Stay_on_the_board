@@ -1,38 +1,28 @@
 /* CS2 стиль - Світла тема */
-[data-style="cs2"] {
-    --bg-primary: #1b2838;
-    --bg-secondary: #2a475e;
-    --text-primary: #ffffff;
-    --text-secondary: #c7d5e0;
-    --text-accent: #66c0f4;
-    --border-color: #4a5f78;
-    --shadow-color: rgba(0, 0, 0, 0.4);
-    --cell-light: #4a5f78;
-    --cell-dark: #2a475e;
-    --cell-blocked: #1b2838;
-    --piece-color: #ffd700;
-    --piece-shadow: rgba(255, 215, 0, 0.5);
-    --control-bg: #4a5f78;
-    --control-hover: #66c0f4;
+[data-style="cs2"][data-theme="light"] {
+    --bg-primary: linear-gradient(135deg, #eaf2f8 0%, #d6eaf8 100%);
+    --bg-secondary: #f8f9fa;
+    --text-primary: #34495e;
+    --text-secondary: #5d6d7e;
+    --text-accent: #f39c12;
+    --border-color: #b0bec5;
+    --shadow-color: rgba(0, 0, 0, 0.15);
+    --cell-light: #e4e9f2;
+    --cell-dark: #d8dde6;
+    --cell-blocked: #90a4ae;
+    --piece-color: #34495e;
+    --piece-shadow: rgba(243, 156, 18, 0.5);
+    --control-bg: #e1e8ed;
+    --control-hover: #f39c12;
     --control-selected: #ff8000;
-    --computer-display-bg: #2a475e;
-    --computer-display-border: #66c0f4;
-    --computer-display-text: #66c0f4;
-    --confirm-btn-bg: #5c7e10;
-    --confirm-btn-hover: #4a6b0d;
-    --no-moves-btn-bg: #c23232;
-    --no-moves-btn-hover: #a02828;
-    --debug-btn-bg: #8b5cf6;
-    --debug-btn-hover: #7c3aed;
-    --modal-bg: rgba(27, 40, 56, 0.9);
-    --modal-content-bg: #2a475e;
-    --error-color: #c23232;
-    --board-hidden-bg: #4a5f78;
+    --confirm-btn-bg: #27ae60;
+    --no-moves-btn-bg: #c0392b;
+    --modal-content-bg: #f8f9fa;
 }
 
 /* CS2 стиль - Темна тема */
-[data-theme="dark"][data-style="cs2"] {
-    --bg-primary: #0f1419;
+[data-style="cs2"][data-theme="dark"] {
+    --bg-primary: linear-gradient(135deg, #0f1419 0%, #1b2838 70%, #2a475e 100%);
     --bg-secondary: #1a2838;
     --text-primary: #ffffff;
     --text-secondary: #c7d5e0;
@@ -46,20 +36,10 @@
     --piece-shadow: rgba(255, 215, 0, 0.7);
     --control-bg: #2a475e;
     --control-hover: #66c0f4;
-    --control-selected: #66c0f4;
-    --computer-display-bg: #1a2838;
-    --computer-display-border: #66c0f4;
-    --computer-display-text: #66c0f4;
+    --control-selected: #ff8000;
     --confirm-btn-bg: #5c7e10;
-    --confirm-btn-hover: #4a6b0d;
     --no-moves-btn-bg: #c23232;
-    --no-moves-btn-hover: #a02828;
-    --debug-btn-bg: #8b5cf6;
-    --debug-btn-hover: #7c3aed;
-    --modal-bg: rgba(15, 20, 25, 0.95);
     --modal-content-bg: #1a2838;
-    --error-color: #c23232;
-    --board-hidden-bg: #2a475e;
 }
 
 /* Спеціальні ефекти для CS 2 стилю */
@@ -131,4 +111,4 @@
 [data-style="cs2"] .arrow {
     font-family: 'M PLUS Rounded 1c', sans-serif !important;
     font-weight: 700;
-} 
+}
