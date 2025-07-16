@@ -64,14 +64,17 @@
 </script>
 
 {#if $modal_data.isOpen}
-  <div class="modal-overlay" role="button" tabindex="0" aria-label={$_('modal.close')} onclick={onOverlayClick} onkeydown={onModalKeydown}>
+  <div class="modal-overlay" role="button" tabindex="0" aria-label={$_('modal.close')} onclick={e => {
+    if ($modal_data.title === 'Гру завершено!') return;
+    onOverlayClick(e);
+  }} onkeydown={onModalKeydown}>
     <div class="modal-window">
       <div class="modal-header">
         {#if $modal_data.title && ($modal_data.title.includes('перемогли') || $modal_data.title.includes('Комп'))}
           <span class="modal-victory-icon">👑</span>
         {/if}
         <h2 class="modal-title">{$modal_data.title}</h2>
-        {#if !(($modal_data.buttons && $modal_data.buttons.length === 2 && $modal_data.buttons.every(btn => typeof btn.onClick === 'function')))}
+        {#if !(($modal_data.buttons && $modal_data.buttons.length === 2 && $modal_data.buttons.every(btn => typeof btn.onClick === 'function')) || $modal_data.title === 'Гру завершено!')}
           <button class="modal-close" onclick={() => { logStore.addLog('Закриття модального вікна (X)', 'info'); modalStore.closeModal(); }}>&times;</button>
         {/if}
       </div>
