@@ -781,18 +781,20 @@ export function continueGameAndClearBlocks() {
 }
 
 /**
- * Завершує гру, нараховуючи бонусні бали.
+ * Завершує гру, нараховуючи бонусні бали за правильне завершення (окремо від бонусу за "Ходів немає").
+ * @returns {void}
  */
 export function finishGameWithBonus() {
-  // Встановлюємо прапорець, що гра завершена через кнопку
+  const finishBonus = 3;
   appState.update(s => ({ ...s, finishedByNoMovesButton: true }));
-  // Отримуємо фінальний стан
   const state = get(appState);
-  // Розраховуємо фінальний рахунок
-  const finalScoreDetails = calculateFinalScore(state);
-  // Оновлюємо стан гри як завершений з фінальним рахунком
+  const baseScoreDetails = calculateFinalScore(state);
+  const finalScoreDetails = {
+    ...baseScoreDetails,
+    finishBonus,
+    totalScore: baseScoreDetails.totalScore + finishBonus
+  };
   appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
-  // Показуємо фінальне модальне вікно
   modalStore.showModal({
     title: 'Гру завершено!',
     content: {
@@ -809,10 +811,14 @@ export function noMoves() {
   const state = get(appState);
   // Перевірка, чи дійсно немає ходів
   if (state.availableMoves.length === 0) {
-    // Ходів дійсно немає. Гравець переміг, але даємо йому вибір.
+    // Показуємо попередній рахунок з бонусом
+    const previewScoreDetails = calculateFinalScore({ ...state, finishedByNoMovesButton: true });
     modalStore.showModal({
       title: 'Ходів немає. Що робити далі?',
-      content: 'Ви можете очистити поле і продовжити гру, або завершити її зараз і отримати бонусні бали.',
+      content: {
+        reason: 'Ви можете очистити поле і продовжити гру, або завершити її зараз і отримати бонусні бали.',
+        scoreDetails: previewScoreDetails
+      },
       buttons: [
         {
           text: `Продовжити`,

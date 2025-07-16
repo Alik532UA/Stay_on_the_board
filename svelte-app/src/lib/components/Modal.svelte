@@ -97,6 +97,9 @@
               {#if details().noMovesBonus > 0}
                 <div>Бонус "Ходів немає": <span>+{details().noMovesBonus}</span></div>
               {/if}
+              {#if details().finishBonus > 0}
+                <div>Бонус за завершення гри: <span>+{details().finishBonus}</span></div>
+              {/if}
               {#if details().totalPenalty > 0}
                 <div class="penalty">Штраф за зворотні ходи: <span>-{details().totalPenalty}</span></div>
               {/if}
