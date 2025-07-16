@@ -2,12 +2,13 @@ import { writable } from 'svelte/store';
 
 /**
  * @typedef {Object} ModalButton
- * @property {string} text
+ * @property {string} [text]
+ * @property {string} [textKey] // <-- ДОДАНО
  * @property {boolean} [primary]
  * @property {() => void} [onClick]
- * @property {string} [customClass] // Додаю для стилізації кнопок
- * @property {boolean} [isHot] // Додаю для фокусу
- * @property {string} [hotKey] // <-- ДОДАНО
+ * @property {string} [customClass]
+ * @property {boolean} [isHot]
+ * @property {string} [hotKey]
  */
 /**
  * @typedef {Object} ModalContent
@@ -18,8 +19,10 @@ import { writable } from 'svelte/store';
 /**
  * @typedef {Object} ModalState
  * @property {boolean} isOpen
- * @property {string} title
- * @property {string|ModalContent} content - Може бути об'єктом або рядком для сумісності.
+ * @property {string} [title]
+ * @property {string} [titleKey] // <-- ДОДАНО
+ * @property {string|ModalContent} [content]
+ * @property {string} [contentKey] // <-- ДОДАНО
  * @property {ModalButton[]} buttons
  */
 
@@ -37,10 +40,10 @@ export const modalState = { subscribe };
 
 /**
  * Відкриває модальне вікно
- * @param {{ title: string, content: string|ModalContent, buttons?: ModalButton[] }} param0
+ * @param {{ title?: string, titleKey?: string, content?: string|ModalContent, contentKey?: string, buttons?: ModalButton[] }} param0
  */
-function showModal({ title, content, buttons }) {
-  set({ isOpen: true, title, content, buttons: buttons || [] });
+function showModal({ title, titleKey, content, contentKey, buttons }) {
+  set({ isOpen: true, title, titleKey, content, contentKey, buttons: buttons || [] });
 }
 
 function closeModal() {

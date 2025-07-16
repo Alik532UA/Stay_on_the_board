@@ -28,7 +28,9 @@ export default {
   },
   gameBoard: {
     mainMenu: "Головне меню",
-    player: "Гравець"
+    player: "Гравець",
+    penaltyInfoTitle: "Інформація про штраф",
+    penaltyHint: "Не повертайтесь на клітинку з якої щойно був зроблений хід"
   },
   gameControls: {
     ok: "OK",

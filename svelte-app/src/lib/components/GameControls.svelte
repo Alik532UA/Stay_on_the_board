@@ -6,6 +6,7 @@
   import { onMount } from 'svelte';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
+  import SvgIcons from './SvgIcons.svelte';
   $: isPlayerTurn = $appState.currentPlayer === 1;
   $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
   // Для відображення стрілки за напрямком
@@ -67,7 +68,7 @@
         dir = directionArrows[computerLastMoveDisplay.direction];
       }
       if (typeof computerLastMoveDisplay.distance === 'number') {
-        dist = computerLastMoveDisplay.distance;
+        dist = String(computerLastMoveDisplay.distance);
       }
       return {
         class: 'computer-move-display',
@@ -194,9 +195,8 @@
         class="settings-icon-btn"
         title="Налаштувати голос"
         onclick={(e) => { e.stopPropagation(); openVoiceSettingsModal(); }}
-        disabled={!speechEnabled}
       >
-        ⚙️
+        <SvgIcons name="voice-settings" />
       </button>
     </label>
   </div>
@@ -379,24 +379,42 @@
   align-items: center;
   justify-content: center;
 }
-.central-btn.active-confirm {
-  background: #43a047cc;
-  color: #fff;
-  animation: pulse-green 1s infinite alternate;
-  border: 2.5px solid #43a047;
-  box-shadow: 0 0 16px 4px #43a04799, 0 4px 24px 0 #43a04744;
-  cursor: pointer;
+/* Універсальний зелений стиль для кнопки підтвердження */
+#center-info.confirm-btn-active {
+  background: linear-gradient(145deg, #4caf50, #388e3c) !important;
+  color: #ffffff !important;
+  border: 2px solid #388e3c !important;
+  box-shadow: 0 0 16px 4px rgba(76, 175, 80, 0.6), 0 4px 24px 0 rgba(76, 175, 80, 0.3) !important;
+  animation: pulse-green 1.5s infinite !important;
+  cursor: pointer !important;
 }
-.central-btn.show-move {
-  background: #ff9800cc;
-  color: #fff;
-  border: 2.5px solid #ff9800;
-  animation: none;
-  box-shadow: 0 0 16px 4px #ff980099, 0 4px 24px 0 #ff980044;
+
+#center-info.confirm-btn-active:hover {
+  background: linear-gradient(145deg, #5cb85c, #449d44) !important;
+  border-color: #449d44 !important;
+}
+/* Стилі для показу ходу комп'ютера */
+#center-info.computer-move-display {
+  background: linear-gradient(145deg, #ff9800, #f57c00) !important;
+  color: #ffffff !important;
+  border: 2px solid #f57c00 !important;
+  box-shadow: 0 0 16px 4px rgba(255, 152, 0, 0.6), 0 4px 24px 0 rgba(255, 152, 0, 0.3) !important;
+  animation: none !important;
+  cursor: default !important;
+}
+
+/* Стилі для стану вибору напрямку/відстані */
+#center-info.direction-distance-state {
+  background: rgba(255, 255, 255, 0.13) !important;
+  color: #222 !important;
+  border: 2.5px solid #43a047 !important;
+  box-shadow: 0 0 0 0 #43a047 !important;
+  animation: none !important;
+  cursor: default !important;
 }
 @keyframes pulse-green {
-  0% { box-shadow: 0 0 0 0 #43a04799, 0 4px 24px 0 #43a04744; }
-  100% { box-shadow: 0 0 24px 8px #43a04799, 0 4px 24px 0 #43a04744; }
+  0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.6), 0 4px 24px 0 rgba(76, 175, 80, 0.3); }
+  100% { box-shadow: 0 0 24px 8px rgba(76, 175, 80, 0), 0 4px 24px 0 rgba(76, 175, 80, 0.3); }
 }
 .distance-select {
   width: 100%;
@@ -520,12 +538,15 @@
   margin-left: auto;
   background: none;
   border: none;
-  font-size: 1.5em;
   cursor: pointer;
-  padding: 0 8px;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  color: var(--text-primary);
+  transition: color 0.2s, transform 0.2s;
 }
-.settings-icon-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.settings-icon-btn:hover {
+  color: var(--text-accent);
+  transform: scale(1.1) rotate(15deg);
 }
 </style> 
