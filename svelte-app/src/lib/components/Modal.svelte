@@ -8,6 +8,9 @@
     ? /** @type {any} */ (modal.content.scoreDetails)
     : null;
 
+  /** @type {HTMLButtonElement|null} */
+  let hotBtn = null;
+
   /**
    * @param {Event} e
    */
@@ -79,11 +82,38 @@
         {/if}
       </div>
       <div class="modal-buttons">
-        {#each modal.buttons as btn}
-          <button class={btn.primary ? 'primary' : ''} on:click={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}>{btn.text}</button>
+        {#each modal.buttons as btn, i}
+          {#if btn.isHot}
+            <button
+              class="modal-btn-generic"
+              class:primary={btn.primary && !btn.customClass}
+              class:blue-btn={btn.customClass === 'blue-btn'}
+              class:green-btn={btn.customClass === 'green-btn'}
+              data-testid={`modal-btn-${i}`}
+              data-role="modal-btn"
+              on:click={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
+              aria-label={btn.text}
+              aria-pressed="false"
+              bind:this={hotBtn}
+              tabindex="0"
+            >{btn.text}</button>
+          {:else}
+            <button
+              class="modal-btn-generic"
+              class:primary={btn.primary && !btn.customClass}
+              class:blue-btn={btn.customClass === 'blue-btn'}
+              class:green-btn={btn.customClass === 'green-btn'}
+              data-testid={`modal-btn-${i}`}
+              data-role="modal-btn"
+              on:click={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
+              aria-label={btn.text}
+              aria-pressed="false"
+              tabindex="-1"
+            >{btn.text}</button>
+          {/if}
         {/each}
         {#if !modal.buttons.length}
-          <button on:click={() => { logStore.addLog('Закриття модального вікна (OK)', 'info'); modalStore.closeModal(); }}>{$_('modal.ok')}</button>
+          <button class="modal-btn-generic" data-testid="modal-btn-ok" data-role="modal-btn" on:click={() => { logStore.addLog('Закриття модального вікна (OK)', 'info'); modalStore.closeModal(); }}>{$_('modal.ok')}</button>
         {/if}
       </div>
     </div>
@@ -204,51 +234,72 @@
   line-height: 1;
 }
 .modal-buttons {
-  justify-content: center;
-  display: flex;
-  background: transparent;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 20px;
-  padding-bottom: 24px;
-  gap: 12px;
-  width: 100%;
-  margin-top: 8px;
+    justify-content: center;
+    display: flex;
+    background: transparent;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px 24px 24px;
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
 }
-.modal-buttons button {
-  margin: 0 8px;
-  padding: 8px 26px;
-  font-size: 1.08em;
-  border-radius: 8px;
-  border: none;
-  background: #fff;
-  color: #222;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-  font-weight: 600;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
-  outline: none;
-  min-width: 120px;
-  text-align: center;
-  border: 1.5px solid #eee;
+
+.modal-btn-generic {
+    margin: 0 8px;
+    padding: 8px 26px;
+    font-size: 1.08em;
+    border-radius: 8px;
+    border: 1.5px solid #eee;
+    background: #fff;
+    color: #222;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
+    font-weight: 600;
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+    outline: none;
+    min-width: 120px;
+    text-align: center;
 }
-.modal-buttons button:focus {
-  border: 1.5px solid #4caf50;
+
+.modal-btn-generic:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px 0 rgba(0,0,0,0.12);
 }
-.modal-buttons button:hover {
-  background: #f5f5f5;
-  color: #111;
-  box-shadow: 0 4px 16px 0 #4caf5020;
+
+/* Стиль для основної (primary) кнопки */
+.modal-btn-generic.primary {
+    background: #4caf50; /* Зелений за замовчуванням для primary */
+    color: #fff;
+    border-color: #388e3c;
+    box-shadow: 0 2px 12px 0 #4caf5040;
 }
-.modal-buttons button.primary {
-  background: #4caf50;
-  color: #fff;
-  box-shadow: 0 2px 12px 0 #4caf5040;
-  font-weight: 700;
-  border: 1.5px solid #388e3c;
+
+.modal-btn-generic.primary:hover {
+    background: #43a047;
 }
-.modal-buttons button.primary:hover {
-  background: #43a047;
-  color: #fff;
+
+/* Спеціальний клас для синьої кнопки */
+.modal-btn-generic.blue-btn {
+    background: #2196f3;
+    color: #fff;
+    border-color: #1976d2;
+    box-shadow: 0 2px 12px 0 #2196f340;
+}
+
+.modal-btn-generic.blue-btn:hover {
+    background: #1976d2;
+}
+
+/* Спеціальний клас для зеленої кнопки (якщо потрібен окремо від primary) */
+.modal-btn-generic.green-btn {
+    background: #4caf50;
+    color: #fff;
+    border-color: #388e3c;
+    box-shadow: 0 2px 12px 0 #4caf5040;
+}
+
+.modal-btn-generic.green-btn:hover {
+    background: #43a047;
 }
 .reason {
   font-size: 1.1em;

@@ -5,6 +5,9 @@ import { writable } from 'svelte/store';
  * @property {string} text
  * @property {boolean} [primary]
  * @property {() => void} [onClick]
+ * @property {string} [customClass] // Додаю для стилізації кнопок
+ * @property {boolean} [isHot] // Додаю для фокусу
+ * @property {string} [hotKey] // <-- ДОДАНО
  */
 /**
  * @typedef {Object} ModalContent
