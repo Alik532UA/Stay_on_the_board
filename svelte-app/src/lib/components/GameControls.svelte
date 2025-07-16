@@ -161,32 +161,34 @@
 <div class="game-controls-panel">
   <div class="toggles">
     {#if showBoard}
-      <label class="switch">
-        <input type="checkbox" bind:checked={showMoves} on:change={onShowMovesChange} />
-        <span class="slider"></span>
-        {$_('gameControls.showMoves')}
-      </label>
-    {/if}
-    <label class="switch">
-      <input type="checkbox" bind:checked={showBoard} on:change={onShowBoardChange} />
-      <span class="slider"></span>
-      {$_('gameControls.showBoard')}
-    </label>
-    <label class="switch">
-      <input type="checkbox" bind:checked={blockModeEnabled} on:change={onBlockModeChange} />
-      <span class="slider"></span>
-      {$_('gameControls.blockMode')}
-    </label>
-    <div class="checkbox-label">
-      <!-- Частина, що відповідає за перемикач -->
       <label class="ios-switch-label">
         <div class="ios-switch">
-          <input type="checkbox" bind:checked={speechEnabled} on:change={onSpeechChange} />
+          <input type="checkbox" bind:checked={showMoves} on:change={onShowMovesChange} />
           <span class="slider"></span>
         </div>
-        <span>Озвучування ходів</span>
+        <span>{$_('gameControls.showMoves')}</span>
       </label>
-      <!-- Кнопка налаштувань тепер окремо -->
+    {/if}
+    <label class="ios-switch-label">
+      <div class="ios-switch">
+        <input type="checkbox" bind:checked={showBoard} on:change={onShowBoardChange} />
+        <span class="slider"></span>
+      </div>
+      <span>{$_('gameControls.showBoard')}</span>
+    </label>
+    <label class="ios-switch-label">
+      <div class="ios-switch">
+        <input type="checkbox" bind:checked={blockModeEnabled} on:change={onBlockModeChange} />
+        <span class="slider"></span>
+      </div>
+      <span>{$_('gameControls.blockMode')}</span>
+    </label>
+    <label class="ios-switch-label">
+      <div class="ios-switch">
+        <input type="checkbox" bind:checked={speechEnabled} on:change={onSpeechChange} />
+        <span class="slider"></span>
+      </div>
+      <span>Озвучування ходів</span>
       <button
         class="settings-icon-btn"
         title="Налаштувати голос"
@@ -195,7 +197,7 @@
       >
         ⚙️
       </button>
-    </div>
+    </label>
   </div>
   <div class="directions directions-3x3">
     <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => onDirectionClick('up-left')}>↖</button>
@@ -257,31 +259,47 @@
 .toggles {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
+  margin-bottom: 8px;
 }
-.switch {
+.switch, .switch input[type="checkbox"], .switch .slider, .switch input[type="checkbox"]:checked + .slider, .switch .slider:before, .switch input[type="checkbox"]:checked + .slider:before {
+  display: none !important;
+}
+.ios-switch-label {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  cursor: pointer;
   font-size: 1.08em;
+  margin-bottom: 2px;
 }
-.switch input[type="checkbox"] {
-  display: none;
-}
-.switch .slider {
+.ios-switch {
+  position: relative;
   width: 36px;
   height: 20px;
+  display: inline-block;
+}
+.ios-switch input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.ios-switch .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: #ccc;
   border-radius: 12px;
-  position: relative;
-  margin-right: 6px;
   transition: background 0.2s;
 }
-.switch input[type="checkbox"]:checked + .slider {
+.ios-switch input[type="checkbox"]:checked + .slider {
   background: #ff9800;
 }
-.switch .slider:before {
+.ios-switch .slider:before {
   content: '';
   position: absolute;
   left: 2px;
@@ -292,7 +310,7 @@
   border-radius: 50%;
   transition: transform 0.2s;
 }
-.switch input[type="checkbox"]:checked + .slider:before {
+.ios-switch input[type="checkbox"]:checked + .slider:before {
   transform: translateX(16px);
 }
 .directions-3x3 {
