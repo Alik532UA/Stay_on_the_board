@@ -1117,3 +1117,13 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
   z-index: 10000; /* Високий z-index, щоб бути над оверлеєм */
   /* ... існуючі стилі ... */
 } 
+
+/* 
+  WebKit/Safari Rendering Fix:
+  Цей хак змушує браузер активувати апаратне прискорення (GPU) 
+  для рендерингу елемента, що часто вирішує складні проблеми 
+  з відображенням SVG, не змінюючи його вигляд.
+*/
+.main-menu-icon .multicolor-svg {
+  transform: translateZ(0);
+} 
