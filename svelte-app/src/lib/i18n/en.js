@@ -24,6 +24,10 @@ export default {
       cs2: "CS 2",
       glass: "Glassmorphism",
       material: "Material You"
+    },
+    wipNotice: {
+      title: "Under Development",
+      description: "This feature is still under development. To speed up its release, you can support the project:",
     }
   },
   gameBoard: {
