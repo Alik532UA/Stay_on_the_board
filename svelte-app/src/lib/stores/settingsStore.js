@@ -1,5 +1,8 @@
 import { writable } from 'svelte/store';
 import { get } from 'svelte/store';
+import { loadAndGetVoices, filterVoicesByLang } from '$lib/speech.js'; // Додано filterVoicesByLang
+import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
+import { locale } from 'svelte-i18n';
 
 /**
  * @typedef {Object} SettingsState
@@ -98,11 +101,43 @@ export function toggleShowMoves() {
 }
 
 /**
- * Перемикає озвучування ходів
+ * Інтелектуально перемикає озвучування ходів.
+ * @param {boolean=} desiredState - Бажаний стан (true для увімкнення, false для вимкнення). Якщо не передано — інвертує поточний.
  */
-export function toggleSpeech() {
-  const prev = get(settingsStore);
-  updateSettings({ speechEnabled: !(prev.speechEnabled ?? false) });
+export async function toggleSpeech(desiredState) {
+  const isBrowser = typeof window !== 'undefined';
+  if (typeof desiredState === 'undefined') {
+    desiredState = !get(settingsStore).speechEnabled;
+  }
+
+  // Якщо користувач хоче вимкнути, просто вимикаємо.
+  if (!desiredState) {
+    updateSettings({ speechEnabled: false });
+    return;
+  }
+
+  // Логіка для УВІМКНЕННЯ (desiredState === true)
+  const allVoices = await loadAndGetVoices();
+  const currentLocale = get(locale) || 'uk';
+  const availableVoices = filterVoicesByLang(allVoices, currentLocale);
+
+  const hasConfiguredSpeech = isBrowser && localStorage.getItem('hasConfiguredSpeech') === 'true';
+
+  // Якщо голоси є
+  if (availableVoices.length > 0) {
+    if (!hasConfiguredSpeech) {
+      openVoiceSettingsModal();
+      if (isBrowser) localStorage.setItem('hasConfiguredSpeech', 'true');
+    }
+    // Дозволяємо увімкнення
+    updateSettings({ speechEnabled: true });
+  } 
+  // Якщо голосів немає
+  else {
+    openVoiceSettingsModal();
+    // Забороняємо увімкнення, повертаючи стан назад на false
+    updateSettings({ speechEnabled: false });
+  }
 }
 
 export const settingsStore = {

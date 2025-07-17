@@ -140,7 +140,6 @@
   function onBlockModeChange() { toggleBlockMode(); }
   function onShowMovesChange() { toggleShowMoves(); }
   function onShowBoardChange() { toggleShowBoard(); }
-  function onSpeechChange() { toggleSpeech(); }
   /**
    * @param {string} dir
    */
@@ -163,6 +162,14 @@
     confirmMove(); 
   }
   function onNoMoves() { noMoves(); }
+
+  /**
+   * @param {Event} event
+   */
+  async function onSpeechChange(event) {
+    // Викликаємо toggleSpeech без аргументів, щоб уникнути помилки типу
+    await toggleSpeech();
+  }
 </script>
 
 <div class="game-controls-panel">
@@ -199,7 +206,11 @@
     <label class="ios-switch-label">
       <div class="switch-content-wrapper">
         <div class="ios-switch">
-          <input type="checkbox" checked={speechEnabled} onchange={onSpeechChange} />
+          <input 
+            type="checkbox" 
+            bind:checked={speechEnabled} 
+            onchange={onSpeechChange}
+          />
           <span class="slider"></span>
         </div>
         <span>Озвучування ходів</span>
