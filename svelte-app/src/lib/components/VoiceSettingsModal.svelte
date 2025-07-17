@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { settingsStore } from '$lib/stores/settingsStore.js';
-  import { getVoicesByLang } from '$lib/speech.js';
+  import { loadAndGetVoices, filterVoicesByLang } from '$lib/speech.js';
   import { locale } from 'svelte-i18n';
   import { get } from 'svelte/store';
 
@@ -9,23 +9,24 @@
 
   let isLoading = true;
   /** @type {SpeechSynthesisVoice[]} */
-  let ukrainianVoices = [];
+  let availableVoices = [];
   let selectedVoiceURI = get(settingsStore).selectedVoiceURI;
 
   onMount(async () => {
-    // Завантажуємо голоси тільки для поточної мови, якщо це українська
-    if (get(locale) === 'uk') {
-      try {
-        ukrainianVoices = getVoicesByLang('uk');
-      } catch (error) {
-        console.error("Помилка завантаження голосів:", error);
-      }
+    const currentLocale = get(locale);
+    try {
+      // Await the promise to ensure voices are loaded
+      const allVoices = await loadAndGetVoices();
+      // Filter the loaded voices
+      availableVoices = filterVoicesByLang(allVoices, currentLocale);
+    } catch (error) {
+      console.error("Помилка завантаження голосів:", error);
     }
     isLoading = false;
   });
 
   function selectVoice() {
-    settingsStore.updateSettings({ selectedVoiceURI: selectedVoiceURI });
+    settingsStore.updateSettings({ selectedVoiceURI: selectedVoiceURI ? String(selectedVoiceURI) : '' });
   }
 </script>
 
@@ -41,9 +42,9 @@
           <div class="loading-spinner"></div>
           <p>Завантаження голосів...</p>
         </div>
-      {:else if ukrainianVoices.length > 0}
+      {:else if availableVoices.length > 0}
         <div class="voice-list" role="radiogroup" aria-labelledby="voice-settings-title">
-          {#each ukrainianVoices as voice (voice.voiceURI)}
+          {#each availableVoices as voice (voice.voiceURI)}
             <label class="voice-option">
               <input 
                 type="radio" 
