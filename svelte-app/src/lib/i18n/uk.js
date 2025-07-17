@@ -105,5 +105,8 @@ export default {
       'down-left': 'по діагоналі вниз-вліво',
       'down-right': 'по діагоналі вниз-вправо'
     }
+  },
+  ui: {
+    closeAndReturnToMenu: 'Закрити і повернутися в головне меню'
   }
 }; 
