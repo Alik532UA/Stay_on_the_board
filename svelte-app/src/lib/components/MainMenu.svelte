@@ -6,6 +6,7 @@
   import { base } from '$app/paths';
   import { _ , isLoading, locale } from 'svelte-i18n';
   import SvgIcons from './SvgIcons.svelte';
+  import { unlockSpeechSynthesis } from '$lib/utils/speechUtils.js';
   // Language dropdown logic (inline, замість LanguageSwitcher)
   let showLangDropdown = false;
   const languages = [
@@ -47,6 +48,7 @@
    */
   function navigateTo(route) {
     logStore.addLog(`Навігація: ${route}`, 'info');
+    unlockSpeechSynthesis();
     goto(`${base}${route}`);
   }
 
