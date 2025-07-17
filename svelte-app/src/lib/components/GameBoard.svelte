@@ -367,18 +367,12 @@
 
 <div class="game-board-container">
   <div class="game-board-top-row">
+    <!-- 1. Головне меню -->
     <button class="main-menu-btn" title={mainMenuTitle} onclick={goToMainMenu}>
       <SvgIcons name="home" />
     </button>
-    {#if import.meta.env.DEV}
-      <button class="clear-cache-btn" title="Очистити кеш" onclick={clearCache}>
-        <span class="visually-hidden">Очистити кеш</span>
-        <SvgIcons name="clear-cache" />
-      </button>
-    {/if}
-    <button class="main-menu-btn" title="Інструкція" onclick={toggleTutorial}>
-      <SvgIcons name="info" />
-    </button>
+
+    <!-- 2. Вибір розміру дошки -->
     <div class="board-size-dropdown-wrapper">
       <button class="board-size-dropdown-btn" onclick={toggleBoardSizeDropdown} aria-haspopup="listbox" aria-expanded={showBoardSizeDropdown}>
         <span class="board-size-dropdown-btn-text">{boardSize}</span>
@@ -402,6 +396,19 @@
         </ul>
       {/if}
     </div>
+
+    <!-- 3. Інформація -->
+    <button class="main-menu-btn" title="Інструкція" onclick={toggleTutorial}>
+      <SvgIcons name="info" />
+    </button>
+
+    <!-- 4. Очистити кеш (тільки для dev) -->
+    {#if import.meta.env.DEV}
+      <button class="clear-cache-btn" title="Очистити кеш" onclick={clearCache}>
+        <span class="visually-hidden">Очистити кеш</span>
+        <SvgIcons name="clear-cache" />
+      </button>
+    {/if}
   </div>
   {#if showTutorial}
     <div class="tutorial-panel game-content-block">
@@ -430,7 +437,7 @@
   {#if showBoard}
     {#key `${$appState.boardSize}-${$appState.gameId}`}
       <div class="board-bg-wrapper game-content-block">
-        <div class="game-board" style="--board-size: {boardSize}">
+        <div class="game-board" style="--board-size: {boardSize}" role="grid">
           {#each Array(boardSize) as _, rowIdx (rowIdx)}
             {#each Array(boardSize) as _, colIdx (colIdx)}
               <div
@@ -441,6 +448,7 @@
                 class:available={ showMoves && isAvailable(rowIdx, colIdx) }
                 aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
                 oncontextmenu={(e) => onCellRightClick(e, rowIdx, colIdx)}
+                role="gridcell"
               >
                 {#if isCellBlocked(rowIdx, colIdx)}
                   <span class="blocked-x">✗</span>
