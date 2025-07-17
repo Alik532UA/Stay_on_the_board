@@ -1,7 +1,7 @@
 {
   "name": "Stay on the Board",
-  "short_name": "BoardGame",
-  "description": "Мультиплатформова настільна гра з онлайн-режимом, локалізацією та сучасним UI/UX.",
+  "short_name": "Stay Board",
+  "description": "Кожен хід має значення. Продумайте свій шлях, щоб залишитися на дошці та перемогти у грі на витривалість!",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",

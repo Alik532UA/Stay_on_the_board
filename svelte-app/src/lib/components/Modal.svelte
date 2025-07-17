@@ -65,7 +65,7 @@
 </script>
 
 {#if $modal_data.isOpen}
-  <div class="modal-overlay" role="button" tabindex="0" aria-label={$_('modal.close')} onclick={e => {
+  <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.close')} onclick={e => {
     if ($modal_data.title === 'Гру завершено!') return;
     onOverlayClick(e);
   }} onkeydown={onModalKeydown}>
@@ -172,15 +172,12 @@
 <style>
 .modal-overlay {
   position: fixed;
-  left: 0; top: 0; right: 0; bottom: 0;
-  background: rgba(30, 16, 40, 0.45);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  inset: 0;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  /* background, backdrop-filter, -webkit-backdrop-filter видалено */
 }
 .modal-victory-icon {
   font-size: 2.5em;
@@ -209,9 +206,10 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 2px 16px 0 rgba(80,0,80,0.10);
   border-radius: 18px;
-  padding: 32px 16px 18px 16px;
-  max-width: 420px;
+  padding: 24px 16px;
   width: 100%;
+  box-sizing: border-box;
+  max-width: 420px;
   margin: 0 auto;
   max-height: 90vh;
   overflow: hidden;
@@ -239,6 +237,9 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  font-size: 1.25em;
+  font-weight: bold;
+  color: var(--text-accent, #ffbe0b);
 }
 .modal-title {
   margin: 0;
@@ -273,6 +274,8 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .score-label {
   font-size: 1em;
@@ -290,9 +293,10 @@
     display: flex;
     background: transparent;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px 16px 24px;
+    padding: 20px 0 24px 0;
     gap: 18px;
     width: 100%;
+    box-sizing: border-box;
     margin-top: 8px;
 }
 
@@ -371,7 +375,6 @@
   background: rgba(0,0,0,0.1);
   border-radius: 8px;
   width: 100%;
-  max-width: 300px;
   box-sizing: border-box;
   font-size: 0.9em;
   color: var(--text-secondary);

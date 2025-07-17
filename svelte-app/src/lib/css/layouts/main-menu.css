@@ -1092,17 +1092,28 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
 }
 /* === Кінець стилів дропдаунів === */ 
 
+/* --- Управління оверлеями та дропдаунами --- */
+
+/* 
+  Цей селектор відповідає за сам фон (затемнення + розмиття).
+  Ми використовуємо глобальний клас .screen-overlay-backdrop з app.css,
+  але тут встановлюємо z-index спеціально для головного меню.
+*/
 .dropdown-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 999;
-  background: rgba(30, 10, 40, 0.25);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
 }
 
+/* 
+  Ці селектори відповідають за самі вікна, що спливають.
+  Вони повинні бути НАД оверлеєм.
+*/
 .theme-dropdown,
-.lang-dropdown {
-  background: transparent;
-  box-shadow: none;
+.lang-dropdown,
+.wip-notice-overlay {
+  position: fixed; /* Важливо для створення нового stacking context */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000; /* z-index вищий, ніж у .dropdown-backdrop */
+  /* ... існуючі стилі для фону, тіней і т.д. ... */
 } 
