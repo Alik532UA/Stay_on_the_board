@@ -1126,4 +1126,8 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
 */
 .main-menu-icon .multicolor-svg {
   transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  background: transparent;
 } 
