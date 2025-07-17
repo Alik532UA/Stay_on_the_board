@@ -251,21 +251,15 @@ function performMove(state, newRow, newCol) {
     }
   }
 
-  // --- КЛЮЧОВЕ ВИПРАВЛЕННЯ ---
-  // Визначаємо, хто буде ходити НАСТУПНИМ.
-  const nextPlayer = currentPlayer === 1 ? 2 : 1;
-  // Розраховуємо доступні ходи ТІЛЬКИ якщо наступний гравець - людина.
-  // Для комп'ютера масив завжди буде порожнім, що усуне блимання.
-  const newAvailableMoves = nextPlayer === 1 
-    ? getAvailableMoves(newRow, newCol, boardSize, newBlockedCells) 
-    : [];
+  // КЛЮЧОВА ЗМІНА: Ми більше не розраховуємо доступні ходи тут.
+  // Це буде зроблено в окремому етапі.
 
   return {
     board: newBoard,
     playerRow: newRow,
     playerCol: newCol,
     blockedCells: newBlockedCells,
-    availableMoves: newAvailableMoves,
+    // Рядок availableMoves: newAvailableMoves, видалено.
   };
 }
 
@@ -321,6 +315,8 @@ export async function setBoardSize(newSize) {
   // ПІСЛЯ оновлення стану, з затримкою додаємо доступні ходи
   setTimeout(() => {
     appState.update(state => {
+      // Виправлення: захист від null
+      if (state.playerRow === null || state.playerCol === null) return state;
       const initialAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, []);
       return { ...state, availableMoves: initialAvailableMoves };
     });
@@ -401,7 +397,11 @@ export function toggleBlockCell(row, col) {
     } else {
       newBlockedCells = [...state.blockedCells, { row, col }];
     }
-    const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, newBlockedCells);
+    // Додаємо захист від null для getAvailableMoves
+    let newAvailableMoves = state.availableMoves;
+    if (state.playerRow !== null && state.playerCol !== null) {
+      newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, newBlockedCells);
+    }
     return {
       ...state,
       blockedCells: newBlockedCells,
@@ -577,23 +577,23 @@ export async function makeComputerMove() {
   const current = get(appState);
   if (current.isGameOver || current.currentPlayer !== 2) return;
 
-  // Розраховуємо хід комп'ютера, але ще не застосовуємо його до дошки
+  // 1. Розраховуємо хід комп'ютера
   const move = getRandomComputerMove(current.board, current.blockedCells, current.boardSize);
   
   if (move) {
     const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
     
-    // ЕТАП 1: Миттєво оновлюємо UI (центральну кнопку)
+    // 2. ЕТАП 1: Миттєво оновлюємо UI (центральну кнопку)
     appState.update(state => ({
       ...state,
       computerLastMoveDisplay: { direction: directionKey, distance: move.distance },
       lastComputerMove: { direction: directionKey, distance: move.distance },
     }));
 
-    // Пауза, щоб гравець побачив хід на кнопці перед анімацією
+    // 3. Пауза, щоб гравець побачив хід на кнопці перед анімацією
     await new Promise(resolve => setTimeout(resolve, 900));
 
-    // ЕТАП 2: Оновлюємо стан дошки, що запускає анімацію фігури
+    // 4. ЕТАП 2: Оновлюємо стан дошки, що запускає анімацію фігури
     appState.update(state => {
       const moveUpdates = performMove(state, move.row, move.col);
       return {
@@ -602,11 +602,12 @@ export async function makeComputerMove() {
       };
     });
 
-    // 6. Пауза, щоб анімація переміщення фігури завершилася
+    // 5. Пауза, щоб анімація переміщення фігури комп'ютера завершилася
     await new Promise(resolve => setTimeout(resolve, 600));
 
-    // 7. ЕТАП 3: Оновлюємо доступні ходи для гравця і передаємо хід
+    // 6. ЕТАП 3: ТІЛЬКИ ТЕПЕР оновлюємо доступні ходи для гравця і передаємо хід
     appState.update(state => {
+      // Виправлення: захист від null
       if (state.playerRow === null || state.playerCol === null) return state;
       const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.blockedCells);
       return { ...state, availableMoves: newAvailableMoves, currentPlayer: 1 };
@@ -619,7 +620,7 @@ export async function makeComputerMove() {
       speakMove('computer', directionKey, move.distance, langCode, latestSettings.selectedVoiceURI ?? null);
     }
   } else {
-    // НОВА ЛОГІКА: У комп'ютера немає ходів. Даємо вибір гравцеві.
+    // ... (існуюча логіка, коли у комп'ютера немає ходів)
     const previewScoreDetails = calculateFinalScore({ ...current, finishedByNoMovesButton: true });
     
     modalStore.showModal({
@@ -643,9 +644,6 @@ export async function makeComputerMove() {
         }
       ]
     });
-
-    // Важливо: передаємо хід назад гравцеві, щоб він міг взаємодіяти з модальним вікном
-    // і продовжити гру, якщо вибере цей варіант.
     appState.update(s => ({ ...s, currentPlayer: 1 }));
   }
 }
