@@ -105,14 +105,6 @@ export function toggleSpeech() {
   updateSettings({ speechEnabled: !(prev.speechEnabled ?? false) });
 }
 
-/**
- * Перемикає режим блокування клітинок
- */
-export function toggleBlockMode() {
-  const prev = get(settingsStore);
-  updateSettings({ blockModeEnabled: !(prev.blockModeEnabled ?? false) });
-}
-
 export const settingsStore = {
   subscribe,
   updateSettings,

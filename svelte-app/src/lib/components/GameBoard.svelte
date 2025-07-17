@@ -1,6 +1,6 @@
 <script>
   import '../css/components/game-board.css';
-  import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove } from '$lib/stores/gameStore.js';
+  import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove, toggleBlockMode } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { navigateToMainMenu } from '$lib/utils/navigation.js';
   import GameControls from '$lib/components/GameControls.svelte';
@@ -10,7 +10,7 @@
   import { _ } from 'svelte-i18n';
   import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore.js';
   import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
-  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleBlockMode } from '$lib/stores/settingsStore.js';
+  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech } from '$lib/stores/settingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from './SvgIcons.svelte';
   // Функція очищення кешу
