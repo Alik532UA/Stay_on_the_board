@@ -1,6 +1,9 @@
 <script>
+  import FloatingCloseButton from '$lib/components/FloatingCloseButton.svelte';
   // Контент з KEYBOARD_SHORTCUTS.md
 </script>
+
+<FloatingCloseButton />
 
 <h1>Керування та гарячі клавіші</h1>
 

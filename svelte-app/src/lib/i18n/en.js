@@ -103,5 +103,8 @@ export default {
       'down-left': 'diagonally down-left',
       'down-right': 'diagonally down-right'
     }
+  },
+  ui: {
+    closeAndReturnToMenu: 'Close and return to main menu'
   }
 }; 

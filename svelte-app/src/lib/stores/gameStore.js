@@ -311,6 +311,7 @@ export function setBoardSize(newSize) {
   const cell = getRandomCell(newSize);
   const row = cell.row;
   const col = cell.col;
+  
   appState.update(state => {
     const board = createEmptyBoard(newSize);
     board[row][col] = 1;
@@ -330,25 +331,21 @@ export function setBoardSize(newSize) {
       playerCol: col,
       blockedCells: [],
       visitedCells: [],
-      availableMoves: getAvailableMoves(row, col, newSize, []),
-      blockModeEnabled: state.blockModeEnabled,
-      distanceManuallySelected: false,
-      currentView: state.currentView,
-      gameMode: state.gameMode,
-      language: state.language,
-      theme: state.theme,
-      style: state.style,
-      settings: { ...state.settings },
+      // --- Ключове виправлення: Повне скидання стану ---
       selectedDirection: null,
       selectedDistance: null,
-      availableDistances: [1,2],
-      currentPlayer: 1,
+      distanceManuallySelected: false,
+      currentPlayer: 1, // Завжди починає гравець
       lastMove: null,
       computerLastMoveDisplay: null,
       lastComputerMove: null,
       score: 0,
+      movesInBlockMode: 0,
+      jumpedBlockedCells: 0,
+      penaltyPoints: 0,
+      finishedByNoMovesButton: false,
       isGameOver: false,
-      gameId: (state.gameId || 0) + 1, // <-- ДОДАНО
+      gameId: (state.gameId || 0) + 1, // Оновлюємо ID гри для Svelte
     };
   });
 }
@@ -452,6 +449,7 @@ export function resetGame() {
     const { row, col } = getRandomCell(boardSize);
     const board = createEmptyBoard(boardSize);
     board[row][col] = 1;
+    
     return {
       ...state,
       board,
@@ -460,28 +458,21 @@ export function resetGame() {
       blockedCells: [],
       availableMoves: getAvailableMoves(row, col, boardSize, []),
       visitedCells: [],
-      currentView: state.currentView,
-      boardSize: state.boardSize,
-      gameMode: state.gameMode,
-      language: state.language,
-      theme: state.theme,
-      style: state.style,
-      settings: { ...state.settings },
-      blockModeEnabled: state.blockModeEnabled,
+      // --- Ключове виправлення: Повне скидання стану ---
       selectedDirection: null,
       selectedDistance: null,
       distanceManuallySelected: false,
-      currentPlayer: 1,
+      currentPlayer: 1, // Завжди починає гравець
       lastMove: null,
       computerLastMoveDisplay: null,
       lastComputerMove: null,
       score: 0,
-      movesInBlockMode: 0, // Скидаємо
-      jumpedBlockedCells: 0, // Скидаємо
+      movesInBlockMode: 0,
+      jumpedBlockedCells: 0,
       penaltyPoints: 0,
-      finishedByNoMovesButton: false, // Скидаємо
+      finishedByNoMovesButton: false,
       isGameOver: false,
-      gameId: (state.gameId || 0) + 1, // <-- ДОДАНО
+      gameId: (state.gameId || 0) + 1, // Оновлюємо ID гри
     };
   });
 }
@@ -631,9 +622,9 @@ export function setDistance(dist) {
     computerLastMoveDisplay: null
   }));
 }
-export async function confirmMove() { // <--- ДОДАНО ASYNC
+export function confirmMove() {
   if (typeof window === 'undefined') return;
-  
+
   const state = get(appState);
   const {
     selectedDirection,
@@ -646,16 +637,16 @@ export async function confirmMove() { // <--- ДОДАНО ASYNC
     settings,
     blockModeEnabled
   } = state;
-  
+
   if (!selectedDirection || !selectedDistance) return;
-  
+
   const dir = /** @type {Direction} */ (selectedDirection);
   if (!dirMap[dir]) return;
-  
+
   const [dr, dc] = dirMap[dir];
   const newRow = playerRow + dr * selectedDistance;
   const newCol = playerCol + dc * selectedDistance;
-  
+
   const isOutsideBoard = newRow < 0 || newRow >= boardSize || newCol < 0 || newCol >= boardSize;
   const isCellBlocked = blockedCells.some(cell => cell.row === newRow && cell.col === newCol);
   
@@ -692,8 +683,9 @@ export async function confirmMove() { // <--- ДОДАНО ASYNC
     });
     return;
   }
-  
-  // Оновлюємо стан для ходу гравця
+  // --- Кінець логіки перевірки ---
+
+  // Оновлюємо стан ТІЛЬКИ для ходу гравця
   appState.update(s => {
     const moveUpdates = performMove(s, newRow, newCol);
     return {
@@ -706,19 +698,24 @@ export async function confirmMove() { // <--- ДОДАНО ASYNC
       selectedDirection: null,
       selectedDistance: null,
       distanceManuallySelected: false,
-      currentPlayer: 2, // <--- Важливо: змінюємо гравця
+      currentPlayer: 2, // Передаємо хід комп'ютеру
       lastMove: null,
       computerLastMoveDisplay: null,
     };
   });
-
-  // КЛЮЧОВЕ ВИПРАВЛЕННЯ: чекаємо наступного "тіку" event loop
-  await new Promise(resolve => setTimeout(resolve, 10));
-
-  if (state.gameMode === 'vsComputer') {
-    makeComputerMove();
-  }
 }
+
+// --- Реактивний ефект для запуску ходу комп'ютера ---
+appState.subscribe(state => {
+  if (state.currentPlayer === 2 && state.gameMode === 'vsComputer' && !state.isGameOver) {
+    const COMPUTER_MOVE_DELAY = 1000; // 1 секунда для дебагу
+    console.log(`[Effect] Player's turn ended. Waiting ${COMPUTER_MOVE_DELAY}ms to make computer's move.`);
+    setTimeout(() => {
+      makeComputerMove();
+    }, COMPUTER_MOVE_DELAY);
+  }
+});
+
 /**
  * Продовжує гру, очищуючи всі заблоковані клітинки.
  */
