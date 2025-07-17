@@ -13,7 +13,6 @@
   import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleBlockMode } from '$lib/stores/settingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from './SvgIcons.svelte';
-  import { fade } from 'svelte/transition';
   // Функція очищення кешу
   function clearCache() {
     localStorage.clear();
@@ -60,46 +59,19 @@
   let currentPlayer = $derived($appState.currentPlayer);
   let showMoves = $derived($settingsStore.showMoves);
   let showBoard = $derived($settingsStore.showBoard);
-  let gameId = $derived($appState.gameId); // ДОДАНО
+  let gameId = $derived($appState.gameId);
   let availableMoves = $derived($appState.availableMoves);
-  let visualPiece = $state({ row: 0, col: 0 });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let displayedMoves = $state(/** @type {any[]} */([]));
-  let prevGameId = $state(0);
-  let isAnimating = $state(false);
 
-  $effect(() => {
-    // --- 1. Обробка старту/рестарту гри ---
-    if (gameId !== prevGameId) {
-      isAnimating = false;
-      prevGameId = gameId;
-      setTimeout(() => { isAnimating = true; }, 50);
-      return;
-    }
-    // --- 2. Обробка ходу гравця (черга перейшла до комп'ютера) ---
-    if (currentPlayer === 2) {
-      setTimeout(() => {
-        if (get(appState).gameMode === 'vsComputer') {
-          makeComputerMove();
-        }
-      }, 600);
-    }
-    // --- 3. Обробка ходу комп'ютера (черга перейшла до гравця) ---
-    else if (currentPlayer === 1) {
-      setTimeout(() => {
-        displayedMoves = availableMoves;
-      }, 600);
-    }
-  });
+  // Видаляю visualPiece, displayedMoves, prevGameId, $effect, імпорти flip/quintOut/fade якщо вони не використовуються більше
 
   // Виношу виклики $_() на верхній рівень
   let playerTitle = $derived($_('gameBoard.player'));
   let mainMenuTitle = $derived($_('gameBoard.mainMenu'));
 
   onMount(() => {
-    if (!board || !Array.isArray(board) || board.length === 0) {
-      logStore.addLog('Дошка не ініціалізована, створюю дефолтну 3x3', 'warn');
-      setBoardSize(3);
+    // Якщо гра ще не почалася (немає гравця на дошці), ініціалізуємо її.
+    if (get(appState).playerRow === null) {
+      setBoardSize(get(appState).boardSize);
     }
   });
 
@@ -146,16 +118,6 @@
    */
   function isCellBlocked(row, col) {
     return !!(blockedCells && blockedCells.some(cell => cell.row === row && cell.col === col));
-  }
-
-  /**
-   * Перевіряє, чи є клітинка серед відображуваних доступних ходів
-   * @param {number} row
-   * @param {number} col
-   * @returns {boolean}
-   */
-  function isDisplayedAsAvailable(row, col) {
-    return displayedMoves.some(move => move.row === row && move.col === col);
   }
 
   /**
@@ -420,19 +382,24 @@
                   <span class="blocked-x">✗</span>
                 {:else}
                   {#if $settingsStore.showMoves && isAvailable(rowIdx, colIdx)}
-                    <span class="move-dot" transition:fade={{ duration: 300 }}></span>
+                    <span class="move-dot"></span>
                   {/if}
                 {/if}
               </div>
             {/each}
           {/each}
-          <div
-            class="player-piece"
-            style="top: calc(var(--cell-size) * {$appState.playerRow}); left: calc(var(--cell-size) * {$appState.playerCol});"
-            class:animating={isAnimating}
-          >
-            <SvgIcons name="queen" />
-          </div>
+          {#if $appState.playerRow !== null && $appState.playerCol !== null}
+            {#key $appState.gameId}
+              <div
+                class="player-piece"
+                style="top: calc(var(--cell-size) * {$appState.playerRow}); left: calc(var(--cell-size) * {$appState.playerCol});"
+              >
+                <div class="piece-container">
+                  <SvgIcons name="queen" />
+                </div>
+              </div>
+            {/key}
+          {/if}
         </div>
       </div>
     {/key}
