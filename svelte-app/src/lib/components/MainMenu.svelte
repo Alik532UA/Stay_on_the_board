@@ -21,6 +21,7 @@
     { code: 'crh', svg: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 350 195"><path fill="#00a3dd" d="M0 0h350v195H0z"/><path d="M40 30v30H30v10h20V40h20v30H60v10h30V70H80V40h20v30h20V60h-10V30Z" style="fill:#f8d80e"/></svg>` },
     { code: 'nl', svg: `<svg width="32" height="24" viewBox="0 0 32 24"><rect width="32" height="8" y="0" fill="#21468b"/><rect width="32" height="8" y="8" fill="#fff"/><rect width="32" height="8" y="16" fill="#ae1c28"/></svg>` }
   ];
+  /** @param {string} lang */
   function selectLang(lang) {
     logStore.addLog(`Зміна мови: ${lang}`, 'info');
     settingsStore.updateSettings({ language: lang });
@@ -100,7 +101,7 @@
         </span>
       </button>
       {#if showLangDropdown}
-        <div class="lang-dropdown main-menu-lang-dropdown" tabindex="0" on:blur={closeLangDropdown}>
+        <div class="lang-dropdown main-menu-lang-dropdown" role="dialog" aria-modal="true">
           {#each languages as lang}
             <button class="lang-option" on:click={() => selectLang(lang.code)} aria-label={lang.code}>
               {@html lang.svg}
@@ -137,7 +138,7 @@
     </div>
 
     {#if showThemeDropdown || showLangDropdown || showWipNotice}
-      <div class="dropdown-backdrop screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('mainMenu.closeDropdowns')} on:click={closeDropdowns}></div>
+      <div class="screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('mainMenu.closeDropdowns')} on:click={closeDropdowns} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && closeDropdowns()}></div>
     {/if}
 
     {#if showWipNotice}
@@ -154,7 +155,7 @@
     {/if}
 
     {#if showThemeDropdown}
-      <div class="theme-dropdown" role="menu" tabindex="0" aria-label={$_('mainMenu.themeDropdown')} on:click|stopPropagation on:keydown={(e) => (e.key === 'Escape') && closeDropdowns()}>
+      <div class="theme-dropdown" role="dialog" aria-modal="true" aria-label={$_('mainMenu.themeDropdown')} on:click|stopPropagation on:keydown={(e) => (e.key === 'Escape') && closeDropdowns()}>
         <div class="theme-style-row" data-style="ubuntu">
           <button class="theme-btn" data-theme="light" on:click={() => selectTheme('ubuntu', 'light')}>☀️</button>
           <span class="theme-name">{$_('mainMenu.themeName.ubuntu')}</span>

@@ -1110,10 +1110,10 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
 .theme-dropdown,
 .lang-dropdown,
 .wip-notice-overlay {
-  position: fixed; /* Важливо для створення нового stacking context */
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 10000; /* z-index вищий, ніж у .dropdown-backdrop */
-  /* ... існуючі стилі для фону, тіней і т.д. ... */
+  z-index: 10000; /* Високий z-index, щоб бути над оверлеєм */
+  /* ... існуючі стилі ... */
 } 
