@@ -852,9 +852,27 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
   height: 32px;
   display: block;
   border-radius: 8px;
-  object-fit: cover;
   box-shadow: none;
   overflow: hidden;
+}
+
+.main-menu-icon-svg {
+  width: 32px;
+  height: 32px;
+  display: block;
+  border-radius: 8px;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.main-menu-icon-img {
+  width: 32px;
+  height: 32px;
+  display: block;
+  border-radius: 8px;
+  box-shadow: none;
+  overflow: hidden;
+  object-fit: cover;
 }
 
 .main-menu-title {
@@ -1125,6 +1143,13 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
   з відображенням SVG, не змінюючи його вигляд.
 */
 .main-menu-icon .multicolor-svg {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  display: inline-block !important;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   will-change: transform;
