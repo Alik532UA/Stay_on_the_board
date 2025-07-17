@@ -415,12 +415,12 @@
     </div>
   </div>
   {#if showTutorial}
-    <div class="tutorial-panel">
+    <div class="tutorial-panel game-content-block">
       <button class="tutorial-close-btn" onclick={closeTutorial} aria-label="Закрити інструкцію">&times;</button>
       <p><strong>Вітаємо у грі!</strong> Ваша мета — рухати ферзя, не виходячи за межі дошки. Запам'ятовуйте його позицію, бо після вашого ходу дошка може зникнути! Хід комп'ютера з'явиться на центральній кнопці, після чого хід знову ваш.</p>
     </div>
   {/if}
-  <div class="score-panel">
+  <div class="score-panel game-content-block">
     Рахунок: {$appState.score}
     {#if $appState.penaltyPoints > 0}
       <span 
@@ -435,7 +435,7 @@
   </div>
   {#if showBoard}
     {#key `${$appState.boardSize}-${$appState.gameId}`}
-      <div class="board-bg-wrapper">
+      <div class="board-bg-wrapper game-content-block">
         <div class="game-board" style="--board-size: {boardSize}">
           {#each Array(boardSize) as _, rowIdx (rowIdx)}
             {#each Array(boardSize) as _, colIdx (colIdx)}
@@ -515,10 +515,6 @@
     font-size: 1.2em;
     font-weight: bold;
     color: var(--text-primary, #222);
-    width: 100%;
-    max-width: 340px;
-    margin-left: auto;
-    margin-right: auto;
   }
   .penalty-display {
     color: #f44336; /* Червоний колір для штрафів */
@@ -566,10 +562,6 @@
     text-align: center;
     font-size: 1.05em;
     color: var(--text-primary, #222);
-    width: 100%;
-    max-width: 480px;
-    margin-left: auto;
-    margin-right: auto;
     border: 1px solid var(--border-color);
     animation: fadeIn 0.5s ease-out;
   }
@@ -595,5 +587,9 @@
   .tutorial-panel p {
     margin: 0;
     padding-right: 16px;
+  }
+  .board-bg-wrapper {
+    /* Відповідає за центрування і ширину ігрового поля */
+    /* Всі розміри тепер задаються через .game-content-block */
   }
 </style> 
