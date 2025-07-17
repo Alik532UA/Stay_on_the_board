@@ -198,6 +198,9 @@
   box-shadow: none;
   text-align: center;
   background: none;
+  width: 90vw;
+  max-width: 420px;
+  box-sizing: border-box;
 }
 .modal-content {
   background: rgba(40, 10, 35, 0.65);
@@ -398,5 +401,15 @@
   box-shadow: none;
   border: none;
   max-width: 95vw;
+}
+@media (max-width: 400px) {
+  .modal-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .modal-btn-generic {
+    width: 100%;
+    margin: 0;
+  }
 }
 </style> 

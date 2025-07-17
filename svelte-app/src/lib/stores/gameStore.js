@@ -4,7 +4,7 @@ import { get } from 'svelte/store';
 import { modalStore } from './modalStore.js';
 import { closeModal } from './modalStore.js';
 import { speakMove, langMap } from '$lib/speech.js';
-import { settingsStore } from './settingsStore.js';
+import { settingsStore, toggleShowBoard } from './settingsStore.js';
 import { navigateToMainMenu } from '$lib/utils/navigation.js';
 /**
  * @typedef {{ [key: string]: string; uk: string; en: string; crh: string; nl: string; }} LangMapType
@@ -123,6 +123,7 @@ function getAvailableMoves(row, col, size, blockedCells = []) {
  * @property {number} penaltyPoints
  * @property {boolean} finishedByNoMovesButton
  * @property {number} gameId // <-- ДОДАНО
+ * @property {boolean} isFirstComputerMovePending // <-- ДОДАНО
  */
 
 /**
@@ -209,6 +210,7 @@ export const appState = writable(/** @type {AppState} */({
   finishedByNoMovesButton: false,
   gameId: 1,
   availableDistances: [],
+  isFirstComputerMovePending: true, // <-- ДОДАНО
 }));
 
 /**
@@ -285,6 +287,7 @@ export function setGameMode(mode) {
  * @param {number} newSize
  */
 export async function setBoardSize(newSize) {
+  settingsStore.updateSettings({ showBoard: true }); // <-- ДОДАНО
   appState.update(state => {
     const { row, col } = getRandomCell(newSize);
     const board = createEmptyBoard(newSize);
@@ -309,6 +312,7 @@ export async function setBoardSize(newSize) {
       penaltyPoints: 0, // <-- ДОДАНО
       isGameOver: false,
       gameId: (state.gameId || 0) + 1,
+      isFirstComputerMovePending: true, // <-- ДОДАНО
     };
   });
 
@@ -429,6 +433,7 @@ export function resetAndCloseModal() {
 }
 
 export function resetGame() {
+  settingsStore.updateSettings({ showBoard: true }); // <-- ДОДАНО
   appState.update(state => {
     const boardSize = state.boardSize;
     const { row, col } = getRandomCell(boardSize);
@@ -453,6 +458,7 @@ export function resetGame() {
       penaltyPoints: 0, // <-- ДОДАНО
       isGameOver: false,
       gameId: (state.gameId || 0) + 1,
+      isFirstComputerMovePending: true, // <-- ДОДАНО
     };
   });
 }
@@ -613,6 +619,13 @@ export async function makeComputerMove() {
       return { ...state, availableMoves: newAvailableMoves, currentPlayer: 1 };
     });
 
+    // 7. ЕТАП 4: Перевірка першого ходу та приховування дошки
+    const latestState = get(appState);
+    if (latestState.isFirstComputerMovePending) {
+      toggleShowBoard();
+      appState.update(s => ({ ...s, isFirstComputerMovePending: false }));
+    }
+
     // Озвучування ходу (залишається в кінці)
     const latestSettings = get(settingsStore);
     if (latestSettings.speechEnabled) {
@@ -733,6 +746,37 @@ export function finishGameWithBonus() {
     title: 'Гру завершено!',
     content: {
       reason: 'Ви вирішили завершити гру та забрати бонус.',
+      scoreDetails: finalScoreDetails
+    },
+    buttons: [
+      { text: 'Грати ще раз', primary: true, isHot: true, onClick: resetAndCloseModal, customClass: 'green-btn' },
+      { textKey: 'gameBoard.mainMenu', customClass: 'blue-btn', onClick: navigateToMainMenu }
+    ]
+  });
+}
+
+/**
+ * Достроково завершує гру та фіксує поточний рахунок.
+ */
+export function cashOutAndEndGame() {
+  const state = get(appState);
+  if (state.isGameOver) return; // Запобіжник від повторного виклику
+
+  // Розраховуємо фінальний рахунок на основі поточного стану
+  const finalScoreDetails = calculateFinalScore(state);
+
+  // Оновлюємо стан, позначаючи гру як завершену
+  appState.update(s => ({ 
+    ...s, 
+    isGameOver: true, 
+    score: finalScoreDetails.totalScore 
+  }));
+
+  // Показуємо модальне вікно з результатами
+  modalStore.showModal({
+    title: 'Гру завершено!',
+    content: {
+      reason: 'Ви вирішили завершити гру і забрати свій рахунок.',
       scoreDetails: finalScoreDetails
     },
     buttons: [
