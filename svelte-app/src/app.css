@@ -207,3 +207,14 @@ h1 {
   margin-right: auto;
   box-sizing: border-box; /* Включаємо padding та border у розрахунок ширини */
 } 
+
+/* Утилітарний клас для затемнення та розмиття фону */
+.screen-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999; /* Встановлюємо z-index, який буде під нашими дропдаунами */
+  transition: background-color 0.3s, backdrop-filter 0.3s;
+} 
