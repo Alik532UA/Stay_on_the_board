@@ -78,3 +78,35 @@
   - Темно-синій, темно-зелений (фон)
   - Яскравий бірюзовий, рожевий (акценти)
   - Білий (текст) 
+
+## [ДОДАНО] Відображення SVG-іконок у Safari/iOS (важливо для theme/donate icons)
+
+**Safari/iOS має специфічні баги з рендерингом SVG у flex-контейнерах. Щоб SVG-іконки гарантовано відображалися:**
+
+- Додавайте для SVG-іконок (особливо .multicolor-svg) такі стилі:
+  ```css
+  .main-menu-icon .multicolor-svg {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
+    display: inline-block !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    background: transparent;
+  }
+  ```
+- **object-fit: cover** не можна застосовувати до SVG! Лише до <img>:
+  ```css
+  .main-menu-icon-img {
+    object-fit: cover;
+  }
+  ```
+- Якщо SVG у flex-контейнері — width/height/min/max обовʼязкові, інакше Safari може зжати SVG до 0x0.
+- Не використовуйте overflow: hidden на батьківських flex-елементах для SVG.
+
+**Ці хаки гарантують, що SVG-іконки theme/donate будуть видимі на iPhone/Safari так само, як і на Android/Windows.** 
