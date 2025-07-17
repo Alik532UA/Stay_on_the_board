@@ -103,12 +103,38 @@
   let playerTitle = $derived($_('gameBoard.player'));
   let mainMenuTitle = $derived($_('gameBoard.mainMenu'));
 
+  let showTutorial = $state(false);
+  let isFirstVisit = $state(false);
   onMount(() => {
+    const hasVisited = localStorage.getItem('hasVisitedGame');
+    const isTutorialHidden = localStorage.getItem('isTutorialHidden');
+    if (!hasVisited) {
+      isFirstVisit = true;
+      showTutorial = true;
+      localStorage.setItem('hasVisitedGame', 'true');
+    } else {
+      if (isTutorialHidden !== 'true') {
+        showTutorial = true;
+      }
+    }
     // Якщо гра ще не почалася (немає гравця на дошці), ініціалізуємо її.
     if (get(appState).playerRow === null) {
       setBoardSize(get(appState).boardSize);
     }
   });
+  function toggleTutorial() {
+    showTutorial = !showTutorial;
+    if (!isFirstVisit) {
+      localStorage.setItem('isTutorialHidden', String(!showTutorial));
+    }
+  }
+  function closeTutorial() {
+    showTutorial = false;
+    localStorage.setItem('isTutorialHidden', 'true');
+    if (isFirstVisit) {
+      isFirstVisit = false;
+    }
+  }
 
   function goToMainMenu() {
     logStore.addLog('Повернення до головного меню', 'info');
@@ -361,6 +387,9 @@
         <SvgIcons name="clear-cache" />
       </button>
     {/if}
+    <button class="main-menu-btn" title="Інструкція" onclick={toggleTutorial}>
+      <SvgIcons name="info" />
+    </button>
     <div class="board-size-dropdown-wrapper">
       <button class="board-size-dropdown-btn" onclick={toggleBoardSizeDropdown} aria-haspopup="listbox" aria-expanded={showBoardSizeDropdown}>
         <span class="board-size-dropdown-btn-text">{boardSize}</span>
@@ -385,6 +414,12 @@
       {/if}
     </div>
   </div>
+  {#if showTutorial}
+    <div class="tutorial-panel">
+      <button class="tutorial-close-btn" onclick={closeTutorial} aria-label="Закрити інструкцію">&times;</button>
+      <p><strong>Вітаємо у грі!</strong> Ваша мета — рухати ферзя, не виходячи за межі дошки. Запам'ятовуйте його позицію, бо після вашого ходу дошка може зникнути! Хід комп'ютера з'явиться на центральній кнопці, після чого хід знову ваш.</p>
+    </div>
+  {/if}
   <div class="score-panel">
     Рахунок: {$appState.score}
     {#if $appState.penaltyPoints > 0}
@@ -520,5 +555,45 @@
     height: 18%;
     border-radius: 50%;
     background: #fff;
+  }
+  .tutorial-panel {
+    position: relative;
+    background: var(--bg-secondary, #fff3);
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: var(--unified-shadow, 0 2px 12px 0 rgba(80,0,80,0.10));
+    margin-bottom: 16px;
+    text-align: center;
+    font-size: 1.05em;
+    color: var(--text-primary, #222);
+    width: 100%;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid var(--border-color);
+    animation: fadeIn 0.5s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .tutorial-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+  }
+  .tutorial-close-btn:hover {
+    color: var(--text-primary);
+  }
+  .tutorial-panel p {
+    margin: 0;
+    padding-right: 16px;
   }
 </style> 
