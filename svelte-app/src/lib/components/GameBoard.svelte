@@ -262,8 +262,7 @@
         noMoves();
         break;
       case 'Backspace':
-      case 'Decimal': // Numpad .
-        logStore.addLog(`[handleKeydown] Натиснуто "${event.key}" — заявити "немає ходів"`, 'info');
+        logStore.addLog(`[handleKeydown] Натиснуто "Backspace" — заявити "немає ходів"`, 'info');
         noMoves();
         break;
       case 'v':
@@ -303,6 +302,13 @@
       default:
         handled = false; // Ми не обробили цю клавішу
         break;
+    }
+
+    // Додаємо окрему перевірку для NumpadDecimal за event.code
+    if (event.code === 'NumpadDecimal') {
+      logStore.addLog(`[handleKeydown] Натиснуто "NumpadDecimal" — заявити "немає ходів"`, 'info');
+      noMoves();
+      handled = true;
     }
 
     if (handled) {
