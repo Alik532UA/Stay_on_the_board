@@ -1,6 +1,6 @@
 <script>
   import '../css/components/game-board.css';
-  import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove, toggleBlockMode } from '$lib/stores/gameStore.js';
+  import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove, toggleBlockMode, cashOutAndEndGame } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { navigateToMainMenu } from '$lib/utils/navigation.js';
   import GameControls from '$lib/components/GameControls.svelte';
@@ -207,17 +207,6 @@
     return moves;
   }
 
-  function onCellClick(/** @type {number} */ row, /** @type {number} */ col) {
-    if (isAvailable(row, col) && !isBlocked(row, col)) {
-      logStore.addLog(`Рух гравця на клітинку [${row},${col}]`, 'info');
-      movePlayer(row, col);
-      // Якщо режим vsComputer — хід комп'ютера після гравця
-      if ($appState.gameMode === 'vsComputer') {
-        makeComputerMove();
-      }
-    }
-  }
-
   function onCellRightClick(/** @type {Event} */ event, /** @type {number} */ row, /** @type {number} */ col) {
     event.preventDefault();
     if (blockModeEnabled && !(row === playerRow && col === playerCol)) {
@@ -421,17 +410,22 @@
     </div>
   {/if}
   <div class="score-panel game-content-block">
-    Рахунок: {$appState.score}
-    {#if $appState.penaltyPoints > 0}
-      <span 
-        class="penalty-display" 
-        onclick={showPenaltyInfo}
-        onkeydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
-        title={$_('gameBoard.penaltyHint')}
-        role="button"
-        tabindex="0"
-      >-{$appState.penaltyPoints}</span>
-    {/if}
+    <div class="score-display">
+      Рахунок: {$appState.score}
+      {#if $appState.penaltyPoints > 0}
+        <span 
+          class="penalty-display" 
+          onclick={showPenaltyInfo}
+          onkeydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+          title={$_('gameBoard.penaltyHint')}
+          role="button"
+          tabindex="0"
+        >-{$appState.penaltyPoints}</span>
+      {/if}
+    </div>
+    <button class="cash-out-btn" onclick={cashOutAndEndGame} title="Завершити гру і забрати бали">
+      Забрати бали
+    </button>
   </div>
   {#if showBoard}
     {#key `${$appState.boardSize}-${$appState.gameId}`}
@@ -445,12 +439,8 @@
                 class:dark={ (rowIdx + colIdx) % 2 !== 0 }
                 class:blocked-cell={ isCellBlocked(rowIdx, colIdx) }
                 class:available={ showMoves && isAvailable(rowIdx, colIdx) }
-                role="button"
-                tabindex="0"
                 aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
-                onclick={() => onCellClick(rowIdx, colIdx)}
                 oncontextmenu={(e) => onCellRightClick(e, rowIdx, colIdx)}
-                onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') onCellClick(rowIdx, colIdx); }}
               >
                 {#if isCellBlocked(rowIdx, colIdx)}
                   <span class="blocked-x">✗</span>
@@ -507,7 +497,7 @@
   }
   .score-panel {
     background: var(--bg-secondary, #fff3);
-    padding: 12px 20px;
+    padding: 12px 16px;
     border-radius: 12px;
     box-shadow: var(--unified-shadow, 0 2px 12px 0 rgba(80,0,80,0.10));
     margin-bottom: 16px;
@@ -515,6 +505,31 @@
     font-size: 1.2em;
     font-weight: bold;
     color: var(--text-primary, #222);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .score-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cash-out-btn {
+    background: #2196f3;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+  }
+  .cash-out-btn:hover {
+    background: #1976d2;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
   }
   .penalty-display {
     color: #f44336; /* Червоний колір для штрафів */
