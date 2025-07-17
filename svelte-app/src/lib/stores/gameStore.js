@@ -801,32 +801,32 @@ export function setDirection(dir) {
     } = state;
 
     const maxDist = boardSize - 1;
-    let newDistance;
-    let newManuallySelected;
+    let newDistance = selectedDistance;
+    let newManuallySelected = distanceManuallySelected;
 
     // Випадок 1: Гравець вибрав новий напрямок.
     if (selectedDirection !== dir) {
-      newDistance = 1; // Завжди починаємо з відстані 1.
-      newManuallySelected = false; // Скидаємо прапорець ручного вибору.
-    } 
-    // Випадок 2: Гравець клікнув на той самий напрямок.
+      // Якщо відстань НЕ була обрана вручну, встановлюємо її за замовчуванням.
+      if (!distanceManuallySelected) {
+        newDistance = 1;
+        newManuallySelected = false;
+      }
+      // Якщо відстань була обрана вручну, ми її НЕ змінюємо.
+    }
+    // Випадок 2: Гравець клікнув на той самий напрямок (логіка інкременту).
     else {
-      // Якщо відстань була встановлена вручну, ми не змінюємо її.
+      // Якщо відстань була встановлена вручну, ми ігноруємо інкремент.
       if (distanceManuallySelected) {
-        newDistance = selectedDistance;
-        newManuallySelected = true;
-      } 
+        // Нічого не робимо, відстань залишається тією ж.
+      }
       // Якщо вибір не був ручним, застосовуємо логіку інкременту.
       else {
-        // Якщо відстань не встановлена або досягла максимуму, скидаємо на 1.
         if (selectedDistance === null || selectedDistance === undefined || selectedDistance >= maxDist) {
           newDistance = 1;
-        } 
-        // В іншому випадку, просто збільшуємо на 1.
-        else {
+        } else {
           newDistance = selectedDistance + 1;
         }
-        newManuallySelected = false; // Прапорець залишається false.
+        newManuallySelected = false;
       }
     }
 
