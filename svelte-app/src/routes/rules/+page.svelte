@@ -1,7 +1,10 @@
 <script>
-import { base } from '$app/paths';
+  import FloatingCloseButton from '$lib/components/FloatingCloseButton.svelte';
+  import { base } from '$app/paths';
   // Контент з GAME_RULES.md
 </script>
+
+<FloatingCloseButton />
 
 <h1>Правила гри "Stay on the Board"</h1>
 

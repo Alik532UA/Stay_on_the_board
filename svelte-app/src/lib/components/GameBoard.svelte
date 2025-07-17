@@ -33,19 +33,24 @@
     location.reload();
   }
   let boardSizes = Array.from({length:8},(_,i)=>i+2); // number[]
-  let showBoardSizeDropdown = false;
+  let showBoardSizeDropdown = $state(false); // Використовуємо $state для реактивності
+
   function toggleBoardSizeDropdown() {
     showBoardSizeDropdown = !showBoardSizeDropdown;
   }
+
   function closeBoardSizeDropdown() {
     showBoardSizeDropdown = false;
   }
+
   /**
    * @param {number} n
    */
   function selectBoardSize(n) {
-    setBoardSize(n);
-    showBoardSizeDropdown = false;
+    if (boardSize !== n) { // Запобігаємо зайвим викликам, якщо розмір не змінився
+      setBoardSize(n);
+    }
+    closeBoardSizeDropdown();
   }
 
   let boardSize = $derived(Number($appState.boardSize));
@@ -57,58 +62,56 @@
   let currentPlayer = $derived($appState.currentPlayer);
   let showMoves = $derived($settingsStore.showMoves);
   let showBoard = $derived($settingsStore.showBoard);
-  let visualPiece = $state([{ id: 'queen', row: playerRow, col: playerCol }]);
+  let gameId = $derived($appState.gameId); // ДОДАНО
+  /**
+   * @type {{ id: string, row: number, col: number }[]}
+   */
+  let visualPiece = $state([]); // Ініціалізуємо порожнім масивом
   let availableMoves = $derived($appState.availableMoves);
   let displayedMoves = $state(availableMoves); // Локальний стан для анімації
 
   $effect(() => {
-    console.log('[GameBoard] playerRow:', playerRow, 'playerCol:', playerCol, 'availableMoves:', $appState.availableMoves, 'blockedCells:', blockedCells);
-  });
+    // Цей ефект реагує на зміну gameId (старт нової гри).
+    // 1. Ініціалізуємо візуальну позицію фігури.
+    visualPiece = [{ id: 'queen', row: playerRow, col: playerCol }];
+    // 2. Миттєво встановлюємо початкові доступні ходи.
+    displayedMoves = availableMoves;
+    console.log(`[Effect gameId: ${gameId}] Game started/reset. Visuals initialized.`);
+});
 
-  $effect(() => {
+$effect(() => {
     const logicalRow = playerRow;
     const logicalCol = playerCol;
-    const newLogicalMoves = availableMoves;
+
+    // Якщо це перший рендер (visualPiece порожній) або позиції збігаються, нічого не робимо.
+    if (visualPiece.length === 0 || (visualPiece[0].row === logicalRow && visualPiece[0].col === logicalCol)) {
+        return;
+    }
 
     // Константи для керування таймінгами
-    const FADE_DURATION = 300;
     const MOVE_ANIMATION_DURATION = 600;
     const PAUSE_BEFORE_COMPUTER_MOVE = 1000;
 
-    // 1. Завжди починаємо з приховування старих доступних ходів
-    displayedMoves = [];
-
-    // Функція для показу нових ходів. Ми будемо викликати її в потрібний момент.
     const showNewMoves = () => {
-        displayedMoves = newLogicalMoves;
+        displayedMoves = availableMoves;
     };
 
-    // 2. Визначаємо, чий хід і застосовуємо відповідну логіку
+    // Приховуємо старі ходи
+    displayedMoves = [];
+
     const isPlayersTurnNow = currentPlayer === 1;
 
     if (isPlayersTurnNow) {
-        // Хід комп'ютера щойно завершився.
-        // Потрібно показати анімацію його ходу, а потім нові доступні ходи.
-        const totalDelay = PAUSE_BEFORE_COMPUTER_MOVE;
-
+        // Хід комп'ютера
         const computerMoveTimer = setTimeout(() => {
-            // Запускаємо анімацію руху фігури
             visualPiece = [{ id: 'queen', row: logicalRow, col: logicalCol }];
-
-            // Після завершення анімації руху фігури, показуємо нові ходи
             setTimeout(showNewMoves, MOVE_ANIMATION_DURATION);
-        }, totalDelay);
-
+        }, PAUSE_BEFORE_COMPUTER_MOVE);
         return () => clearTimeout(computerMoveTimer);
-
     } else {
-        // Це хід гравця.
-        // Анімація фігури запускається миттєво.
+        // Хід гравця
         visualPiece = [{ id: 'queen', row: logicalRow, col: logicalCol }];
-
-        // Нові доступні ходи (для комп'ютера) з'являться після анімації фігури гравця.
         const playerMoveTimer = setTimeout(showNewMoves, MOVE_ANIMATION_DURATION);
-        
         return () => clearTimeout(playerMoveTimer);
     }
 });
@@ -366,10 +369,20 @@
         <span class="board-size-dropdown-btn-text">{boardSize}</span>
       </button>
       {#if showBoardSizeDropdown}
-        <div class="dropdown-backdrop" on:click={closeBoardSizeDropdown}></div>
+        <!-- Цей фон буде перехоплювати кліки поза меню -->
+        <div class="dropdown-backdrop" on:click={closeBoardSizeDropdown} role="button" tabindex="-1" aria-label="Закрити меню"></div>
         <ul class="board-size-dropdown-list" role="listbox">
           {#each boardSizes as n (n)}
-            <li class="board-size-dropdown-option {n === boardSize ? 'selected' : ''}" role="option" aria-selected={n === boardSize} on:click={() => selectBoardSize(n)}>{n}x{n}</li>
+            <li 
+              class="board-size-dropdown-option {n === boardSize ? 'selected' : ''}" 
+              role="option" 
+              aria-selected={n === boardSize} 
+              on:click={() => selectBoardSize(n)}
+              on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') selectBoardSize(n); }}
+              tabindex="0"
+            >
+              {n}x{n}
+            </li>
           {/each}
         </ul>
       {/if}

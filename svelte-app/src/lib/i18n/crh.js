@@ -84,5 +84,8 @@ export default {
   },
   localGame: {
     title: "Mahalliy oyun"
+  },
+  ui: {
+    closeAndReturnToMenu: 'Qapat ve ana menüye qayt'
   }
 }; 

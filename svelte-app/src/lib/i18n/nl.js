@@ -84,5 +84,8 @@ export default {
   },
   localGame: {
     title: "Lokale spel"
+  },
+  ui: {
+    closeAndReturnToMenu: 'Sluiten en terug naar hoofdmenu'
   }
 }; 
