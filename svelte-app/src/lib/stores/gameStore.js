@@ -334,10 +334,9 @@ export function movePlayer(newRow, newCol) {
   appState.update(state => {
     const { board, boardSize, playerRow, playerCol, blockedCells } = state;
     if (playerRow === null || playerCol === null) return state;
-    const isAvailable = (playerRow !== null && playerCol !== null)
-      ? getAvailableMoves(playerRow, playerCol, boardSize, blockedCells)
-          .some(move => move.row === newRow && move.col === newCol)
-      : false;
+    if (typeof newRow !== 'number' || typeof newCol !== 'number') return state;
+    const isAvailable = getAvailableMoves(Number(playerRow), Number(playerCol), boardSize, blockedCells)
+      .some(move => move.row === Number(newRow) && move.col === Number(newCol));
     if (isAvailable) {
       const newBoard = board.map(row => row.slice());
       newBoard[playerRow][playerCol] = 0;
@@ -618,14 +617,34 @@ export async function makeComputerMove() {
       speakMove('computer', directionKey, move.distance, langCode, latestSettings.selectedVoiceURI ?? null);
     }
   } else {
-    // Обробка ситуації, коли у комп'ютера немає ходів
-    const finalScoreDetails = calculateFinalScore(current);
-    appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
+    // НОВА ЛОГІКА: У комп'ютера немає ходів. Даємо вибір гравцеві.
+    const previewScoreDetails = calculateFinalScore({ ...current, finishedByNoMovesButton: true });
+    
     modalStore.showModal({
-      title: 'Ви перемогли!',
-      content: { reason: 'Комп\'ютер не має куди ходити.', scoreDetails: finalScoreDetails },
-      buttons: [{ text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true }]
+      title: 'У комп\'ютера немає ходів',
+      content: {
+        reason: 'Комп\'ютер не може зробити хід. Ви можете продовжити гру, очистивши всі заблоковані клітинки, або завершити її зараз і отримати бонусні бали.',
+        scoreDetails: previewScoreDetails
+      },
+      buttons: [
+        {
+          text: `Продовжити`,
+          primary: true,
+          isHot: true,
+          onClick: continueGameAndClearBlocks,
+          customClass: 'green-btn'
+        },
+        {
+          text: `Завершити (+${current.boardSize} балів)`,
+          customClass: 'blue-btn',
+          onClick: finishGameWithBonus
+        }
+      ]
     });
+
+    // Важливо: передаємо хід назад гравцеві, щоб він міг взаємодіяти з модальним вікном
+    // і продовжити гру, якщо вибере цей варіант.
+    appState.update(s => ({ ...s, currentPlayer: 1 }));
   }
 }
 
@@ -690,6 +709,8 @@ export function continueGameAndClearBlocks() {
       ...state,
       blockedCells: newBlockedCells,
       availableMoves: newAvailableMoves,
+      lastComputerMove: null, // <-- ДОДАНО: Скидаємо останній хід комп'ютера
+      computerLastMoveDisplay: null, // <-- ДОДАНО: Очищуємо і його відображення
     };
   });
 }
