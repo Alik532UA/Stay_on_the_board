@@ -3,7 +3,8 @@ import { getRandomComputerMove } from '$lib/ai.js';
 import { get } from 'svelte/store';
 import { modalStore } from './modalStore.js';
 import { closeModal } from './modalStore.js';
-import { speakMove, langMap } from '$lib/speech.js';
+import { t } from 'svelte-i18n';
+import { speakText, langMap } from '$lib/speech.js';
 import { settingsStore, toggleShowBoard } from './settingsStore.js';
 import { navigateToMainMenu } from '$lib/utils/navigation.js';
 /**
@@ -629,8 +630,20 @@ export async function makeComputerMove() {
     // Озвучування ходу (залишається в кінці)
     const latestSettings = get(settingsStore);
     if (latestSettings.speechEnabled) {
-      const langCode = langMap[latestSettings.language] || 'uk-UA';
-      speakMove('computer', directionKey, move.distance, langCode, latestSettings.selectedVoiceURI ?? null);
+      const $t = get(t);
+      const direction = $t(`speech.directions.${directionKey}`) || directionKey;
+      let textToSpeak;
+      if (move.distance === 1) {
+        textToSpeak = `${direction}.`;
+      } else {
+        textToSpeak = `${move.distance} ${direction}.`;
+      }
+      let langCode = 'uk-UA';
+      if (Object.prototype.hasOwnProperty.call(langMap, latestSettings.language)) {
+        // @ts-ignore
+        langCode = langMap[latestSettings.language];
+      }
+      speakText(textToSpeak, langCode, latestSettings.selectedVoiceURI ?? null);
     }
   } else {
     // ... (існуюча логіка, коли у комп'ютера немає ходів)
