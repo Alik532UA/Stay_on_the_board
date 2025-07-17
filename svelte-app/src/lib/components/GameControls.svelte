@@ -144,7 +144,12 @@
   /**
    * @param {string} dir
    */
-  function onDirectionClick(dir) { setDirection(dir); }
+  function onDirectionClick(dir) {
+    // Перевіряємо, чи є переданий рядок валідним напрямком
+    if (Object.keys(directionArrows).includes(dir)) {
+      setDirection(/** @type {import('$lib/stores/gameStore').Direction} */ (dir));
+    }
+  }
   /**
    * @param {number} dist
    */
@@ -164,33 +169,41 @@
   <div class="toggles">
     {#if showBoard}
       <label class="ios-switch-label">
-        <div class="ios-switch">
-          <input type="checkbox" checked={showMoves} onchange={onShowMovesChange} />
-          <span class="slider"></span>
+        <div class="switch-content-wrapper">
+          <div class="ios-switch">
+            <input type="checkbox" checked={showMoves} onchange={onShowMovesChange} />
+            <span class="slider"></span>
+          </div>
+          <span>{$_('gameControls.showMoves')}</span>
         </div>
-        <span>{$_('gameControls.showMoves')}</span>
       </label>
     {/if}
     <label class="ios-switch-label">
-      <div class="ios-switch">
-        <input type="checkbox" checked={showBoard} onchange={onShowBoardChange} />
-        <span class="slider"></span>
+      <div class="switch-content-wrapper">
+        <div class="ios-switch">
+          <input type="checkbox" checked={showBoard} onchange={onShowBoardChange} />
+          <span class="slider"></span>
+        </div>
+        <span>{$_('gameControls.showBoard')}</span>
       </div>
-      <span>{$_('gameControls.showBoard')}</span>
     </label>
     <label class="ios-switch-label">
-      <div class="ios-switch">
-        <input type="checkbox" checked={blockModeEnabled} onchange={onBlockModeChange} />
-        <span class="slider"></span>
+      <div class="switch-content-wrapper">
+        <div class="ios-switch">
+          <input type="checkbox" checked={blockModeEnabled} onchange={onBlockModeChange} />
+          <span class="slider"></span>
+        </div>
+        <span>{$_('gameControls.blockMode')}</span>
       </div>
-      <span>{$_('gameControls.blockMode')}</span>
     </label>
     <label class="ios-switch-label">
-      <div class="ios-switch">
-        <input type="checkbox" checked={speechEnabled} onchange={onSpeechChange} />
-        <span class="slider"></span>
+      <div class="switch-content-wrapper">
+        <div class="ios-switch">
+          <input type="checkbox" checked={speechEnabled} onchange={onSpeechChange} />
+          <span class="slider"></span>
+        </div>
+        <span>Озвучування ходів</span>
       </div>
-      <span>Озвучування ходів</span>
       <button
         class="settings-icon-btn"
         title="Налаштувати голос"
@@ -266,16 +279,19 @@
   width: 100%;
   margin-bottom: 8px;
 }
-.switch, .switch input[type="checkbox"], .switch .slider, .switch input[type="checkbox"]:checked + .slider, .switch .slider:before, .switch input[type="checkbox"]:checked + .slider:before {
-  display: none !important;
-}
 .ios-switch-label {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between; /* <-- КЛЮЧОВА ЗМІНА */
   cursor: pointer;
   font-size: 1.08em;
   margin-bottom: 2px;
+  position: relative; /* <-- ДОДАНО */
+}
+.switch-content-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Переносимо gap сюди */
 }
 .ios-switch {
   position: relative;
@@ -535,7 +551,10 @@
   cursor: pointer;
 }
 .settings-icon-btn {
-  margin-left: auto;
+  position: absolute; /* Вириваємо з потоку */
+  right: 0; /* Притискаємо до правого краю */
+  top: 50%; /* Центруємо по вертикалі */
+  transform: translateY(-50%); /* Точне вертикальне центрування */
   background: none;
   border: none;
   cursor: pointer;
