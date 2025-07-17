@@ -291,23 +291,51 @@
 
 /* === УНІФІКОВАНІ СТИЛІ ДЛЯ ЗАБЛОКОВАНИХ КЛІТИНОК === */
 .board-cell.blocked-cell {
-    background-color: var(--cell-blocked);
+    background-color: #222; /* Темний фон для контрасту */
     cursor: not-allowed;
-    opacity: 0.8;
-    border: none; /* Видаляємо червону обводку */
-    box-shadow: none; /* Видаляємо будь-які тіні для чистоти */
-    z-index: 5; /* Знижуємо z-index, оскільки агресивний вигляд більше не потрібен */
+    position: relative; /* Необхідно для позиціонування псевдо-елементів */
+    overflow: hidden;   /* Ховаємо частини тріщин, що виходять за межі */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5); /* Внутрішня тінь для глибини */
 }
 
-.board-cell.blocked-cell .blocked-x {
-  display: none; /* Приховуємо хрестик, якщо він був */
+/* Створення тріщин для заблокованої клітинки */
+.board-cell.blocked-cell::before,
+.board-cell.blocked-cell::after {
+    content: '';
+    position: absolute;
+    width: 2px; /* Товщина тріщини */
+    background: rgba(255, 255, 255, 0.15); /* Колір тріщини */
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    animation: crack-appear 0.4s ease-out forwards;
 }
 
-.board-cell.available {
-  /* Обводку (тінь) видалено згідно з вимогою. */
-  /* Центральна біла крапка залишається, оскільки вона контролюється */
-  /* псевдо-елементом ::after класу .available-move, який ми не чіпаємо. */
-  box-shadow: none;
+/* Перша тріщина */
+.board-cell.blocked-cell::before {
+    height: 120%;
+    top: -10%;
+    left: 50%;
+    transform: rotate(20deg);
+}
+
+/* Друга тріщина */
+.board-cell.blocked-cell::after {
+    height: 120%;
+    top: -10%;
+    left: 40%;
+    transform: rotate(-35deg);
+    animation-delay: 0.1s; /* Невелика затримка для динаміки */
+}
+
+@keyframes crack-appear {
+    from {
+        opacity: 0;
+        height: 0;
+    }
+    to {
+        opacity: 1;
+        height: 120%;
+    }
 }
 
 /* === Кінець уніфікації клітинок === */ 
