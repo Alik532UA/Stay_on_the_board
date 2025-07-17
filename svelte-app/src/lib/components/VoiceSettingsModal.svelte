@@ -14,6 +14,8 @@
   /** @type {string} */
   let selectedVoiceURI = get(settingsStore).selectedVoiceURI ?? '';
 
+  const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
+
   onMount(async () => {
     const currentLocale = get(locale) || 'uk';
     try {
@@ -70,10 +72,15 @@
                 bind:group={selectedVoiceURI} 
                 onchange={selectVoice} 
               />
-              <span class="voice-name">{voice.name}</span>
+              <span class="voice-name">{voice.name} ({voice.lang})</span>
             </label>
           {/each}
         </div>
+        {#if isIOS && selectedVoiceURI}
+          <div class="ios-warning">
+            <p><strong>Увага!</strong> Через технічні особливості iOS, озвучення може працювати нестабільно, особливо для ходів комп'ютера. Ми працюємо над покращенням цієї функції.</p>
+          </div>
+        {/if}
       {:else}
         <div class="no-voices-container">
           <p class="no-voices-message">
@@ -284,5 +291,20 @@
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  .ios-warning {
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: rgba(255, 186, 11, 0.15); /* Жовтуватий фон */
+    border: 1px solid rgba(255, 186, 11, 0.3);
+    border-radius: 8px;
+    font-size: 0.9em;
+    line-height: 1.5;
+    color: #ffbe0b; /* Жовтий текст */
+  }
+
+  .ios-warning p {
+    margin: 0;
   }
 </style> 
