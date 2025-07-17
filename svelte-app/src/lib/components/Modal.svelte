@@ -209,7 +209,7 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 2px 16px 0 rgba(80,0,80,0.10);
   border-radius: 18px;
-  padding: 32px 28px 18px 28px;
+  padding: 32px 16px 18px 16px;
   max-width: 420px;
   width: 100%;
   margin: 0 auto;
@@ -232,7 +232,7 @@
 }
 .modal-header {
   background: transparent;
-  padding: 24px 24px 16px;
+  padding: 24px 16px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: none;
   display: flex;
@@ -267,7 +267,7 @@
   background-color: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 16px 24px;
+  padding: 16px 12px;
   margin: 0 auto;
   display: inline-flex;
   flex-direction: column;
@@ -290,8 +290,8 @@
     display: flex;
     background: transparent;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px 24px 24px;
-    gap: 12px;
+    padding: 20px 16px 24px;
+    gap: 18px;
     width: 100%;
     margin-top: 8px;
 }
@@ -370,7 +370,9 @@
   padding: 16px;
   background: rgba(0,0,0,0.1);
   border-radius: 8px;
+  width: 100%;
   max-width: 300px;
+  box-sizing: border-box;
   font-size: 0.9em;
   color: var(--text-secondary);
 }

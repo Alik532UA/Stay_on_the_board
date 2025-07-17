@@ -442,6 +442,7 @@
   gap: 18px;
   justify-content: center;
   margin-top: 10px;
+  flex-wrap: wrap;
 }
 .dist-btn {
   background: rgba(255,255,255,0.13);

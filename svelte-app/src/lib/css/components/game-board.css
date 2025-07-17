@@ -119,6 +119,8 @@
   align-items: center;
   gap: 16px;
   margin-bottom: 16px;
+  flex-wrap: wrap;
+  padding: 0 8px;
 }
 
 .main-menu-btn,
