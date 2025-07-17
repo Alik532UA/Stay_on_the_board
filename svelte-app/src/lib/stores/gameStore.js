@@ -238,7 +238,7 @@ export const availableDistances = derived(
 function performMove(state, newRow, newCol) {
   if (newRow === null || newCol === null) return state;
   const { board, playerRow, playerCol, boardSize, blockModeEnabled, currentPlayer } = state;
-
+  if (playerRow === null || playerCol === null) return {};
   const newBoard = board.map(row => row.slice());
   newBoard[playerRow][playerCol] = 0;
   newBoard[newRow][newCol] = 1;
@@ -333,8 +333,11 @@ export async function setBoardSize(newSize) {
 export function movePlayer(newRow, newCol) {
   appState.update(state => {
     const { board, boardSize, playerRow, playerCol, blockedCells } = state;
-    const isAvailable = getAvailableMoves(playerRow, playerCol, boardSize, blockedCells)
-      .some(move => move.row === newRow && move.col === newCol);
+    if (playerRow === null || playerCol === null) return state;
+    const isAvailable = (playerRow !== null && playerCol !== null)
+      ? getAvailableMoves(playerRow, playerCol, boardSize, blockedCells)
+          .some(move => move.row === newRow && move.col === newCol)
+      : false;
     if (isAvailable) {
       const newBoard = board.map(row => row.slice());
       newBoard[playerRow][playerCol] = 0;
@@ -390,6 +393,7 @@ export function movePlayer(newRow, newCol) {
  */
 export function toggleBlockCell(row, col) {
   appState.update(state => {
+    if (state.playerRow === null || state.playerCol === null) return state;
     const blocked = state.blockedCells.some(cell => cell.row === row && cell.col === col);
     let newBlockedCells;
     if (blocked) {
@@ -407,7 +411,12 @@ export function toggleBlockCell(row, col) {
 }
 
 export function toggleBlockMode() {
-  appState.update(state => ({ ...state, blockModeEnabled: !state.blockModeEnabled }));
+  appState.update(state => {
+    const newBlockModeState = !state.blockModeEnabled;
+    // Оновлюємо і стан гри, і налаштування одночасно
+    settingsStore.updateSettings({ blockModeEnabled: newBlockModeState });
+    return { ...state, blockModeEnabled: newBlockModeState };
+  });
 }
 
 /**
@@ -486,20 +495,22 @@ export async function confirmMove() {
   const {
     selectedDirection,
     selectedDistance,
-    lastComputerMove,
     playerRow,
     playerCol,
+    lastComputerMove,
     boardSize,
     blockedCells,
     settings,
     blockModeEnabled
   } = state;
-  if (!selectedDirection || !selectedDistance) return;
+  // Додаємо перевірку на null для координат
+  if (!selectedDirection || !selectedDistance || playerRow === null || playerCol === null) return;
   const dir = /** @type {Direction} */ (selectedDirection);
   if (!dirMap[dir]) return;
   const [dr, dc] = dirMap[dir];
   const newRow = playerRow + dr * selectedDistance;
   const newCol = playerCol + dc * selectedDistance;
+  if (newRow === null || newCol === null) return;
   const isOutsideBoard = newRow < 0 || newRow >= boardSize || newCol < 0 || newCol >= boardSize;
   const isCellBlocked = blockedCells.some(cell => cell.row === newRow && cell.col === newCol);
   let jumpedCount = 0;
@@ -533,6 +544,9 @@ export async function confirmMove() {
     });
     return;
   }
+
+  // 1. Оновлюємо стан для ходу гравця, що запускає його анімацію.
+  //    Також прибираємо доступні ходи, щоб вони не заважали.
   appState.update(s => {
     const moveUpdates = performMove(s, newRow, newCol);
     return {
@@ -545,21 +559,14 @@ export async function confirmMove() {
       selectedDirection: null,
       selectedDistance: null,
       distanceManuallySelected: false,
-      currentPlayer: 2, // Просто передаємо хід комп'ютеру
+      currentPlayer: 2,
       computerLastMoveDisplay: null,
+      availableMoves: [], // Прибираємо старі доступні ходи
     };
   });
 
-  // 1. Оновлюємо стан для ходу гравця, прибираючи доступні ходи
-  appState.update(s => {
-    const moveUpdates = performMove(s, newRow, newCol);
-    return { ...s, ...moveUpdates, currentPlayer: 2, availableMoves: [] };
-  });
-
-  // 2. Даємо час на анімацію ходу гравця
-  await new Promise(resolve => setTimeout(resolve, 600));
-
-  // 3. Запускаємо хід комп'ютера
+  // 2. НЕГАЙНО (без await) запускаємо хід комп'ютера.
+  //    Це дозволяє анімації гравця і логіці комп'ютера виконуватися паралельно.
   if (get(appState).gameMode === 'vsComputer') {
     makeComputerMove();
   }
@@ -599,6 +606,7 @@ export async function makeComputerMove() {
 
     // 7. ЕТАП 3: Оновлюємо доступні ходи для гравця і передаємо хід
     appState.update(state => {
+      if (state.playerRow === null || state.playerCol === null) return state;
       const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.blockedCells);
       return { ...state, availableMoves: newAvailableMoves, currentPlayer: 1 };
     });
@@ -671,6 +679,7 @@ export function noMoves() {
  */
 export function continueGameAndClearBlocks() {
   appState.update(state => {
+    if (state.playerRow === null || state.playerCol === null) return state;
     // Очищуємо заблоковані клітинки
     const newBlockedCells = /** @type {{row: number, col: number}[]} */ ([]);
     // Перераховуємо доступні ходи для чистої дошки
