@@ -36,6 +36,9 @@
   }
   $: settings = $settingsStore;
   let showThemeDropdown = false;
+  let showWipNotice = false;
+  function openWipNotice() { showWipNotice = true; }
+  function closeWipNotice() { showWipNotice = false; }
 
   /**
    * @param {string} route
@@ -66,6 +69,7 @@
   function closeDropdowns() {
     showThemeDropdown = false;
     showLangDropdown = false;
+    closeWipNotice(); // Додаємо закриття повідомлення
   }
 </script>
 
@@ -132,8 +136,21 @@
       </button>
     </div>
 
-    {#if showThemeDropdown || showLangDropdown}
-      <div class="dropdown-backdrop" role="button" tabindex="0" aria-label={$_('mainMenu.closeDropdowns')} on:click={closeDropdowns} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && closeDropdowns()}></div>
+    {#if showThemeDropdown || showLangDropdown || showWipNotice}
+      <div class="dropdown-backdrop" role="button" tabindex="0" aria-label={$_('mainMenu.closeDropdowns')} on:click={closeDropdowns}></div>
+    {/if}
+
+    {#if showWipNotice}
+      <div class="wip-notice-overlay" on:click|stopPropagation>
+        <div class="wip-notice-content">
+          <button class="wip-close-btn" on:click={closeWipNotice}>&times;</button>
+          <h3>{$_('mainMenu.wipNotice.title')}</h3>
+          <p>{$_('mainMenu.wipNotice.description')}</p>
+          <button class="wip-donate-btn" on:click={() => window.open('https://send.monobank.ua/jar/8TPmFKQTCK', '_blank', 'noopener,noreferrer')}>
+            {$_('mainMenu.donate')}
+          </button>
+        </div>
+      </div>
     {/if}
 
     {#if showThemeDropdown}
@@ -170,8 +187,8 @@
     <div class="main-menu-subtitle">{$_('mainMenu.menu')}</div>
     <div id="main-menu-buttons">
       <button class="modal-button secondary" on:click={() => navigateTo('/game')}>{$_('mainMenu.playVsComputer')}</button>
-      <button class="modal-button secondary" on:click={() => navigateTo('/local') } disabled>{$_('mainMenu.localGame')}</button>
-      <button class="modal-button secondary" on:click={() => navigateTo('/online') } disabled>{$_('mainMenu.playOnline')}</button>
+      <button class="modal-button secondary pseudo-disabled" on:click={openWipNotice}>{$_('mainMenu.localGame')}</button>
+      <button class="modal-button secondary pseudo-disabled" on:click={openWipNotice}>{$_('mainMenu.playOnline')}</button>
       <!-- <button class="modal-button secondary" on:click={() => navigateTo('/settings')}>{$_('mainMenu.settings')}</button> -->
       <button class="modal-button secondary" on:click={() => navigateTo('/controls')}>{$_('mainMenu.controls')}</button>
       <button class="modal-button secondary" on:click={() => navigateTo('/rules')}>{$_('mainMenu.rules')}</button>

@@ -12,6 +12,10 @@ export default {
     theme: "Thema",
     language: "Taal",
     donate: "Steun het project",
+    wipNotice: {
+      title: "Under Development",
+      description: "This feature is still under development. To speed up its release, you can support the project:",
+    },
     lang: {
       uk: "Oekraïens",
       en: "Engels",

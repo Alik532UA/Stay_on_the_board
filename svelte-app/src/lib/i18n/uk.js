@@ -24,6 +24,10 @@ export default {
       cs2: "CS 2",
       glass: "Glassmorphism",
       material: "Material You"
+    },
+    wipNotice: {
+      title: "В розробці",
+      description: "Ця функція ще розробляється. Щоб прискорити її появу, ви можете підтримати проєкт:",
     }
   },
   gameBoard: {
