@@ -566,43 +566,58 @@ export async function confirmMove() {
 }
 
 export async function makeComputerMove() {
-  // 1. Пауза перед "думкою" комп'ютера
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
   const current = get(appState);
   if (current.isGameOver || current.currentPlayer !== 2) return;
 
+  // Розраховуємо хід комп'ютера, але ще не застосовуємо його до дошки
   const move = getRandomComputerMove(current.board, current.blockedCells, current.boardSize);
   
   if (move) {
     const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
     
-    // 2. Оновлюємо логіку (позицію фігури)
+    // ЕТАП 1: Миттєво оновлюємо UI (центральну кнопку)
+    appState.update(state => ({
+      ...state,
+      computerLastMoveDisplay: { direction: directionKey, distance: move.distance },
+      lastComputerMove: { direction: directionKey, distance: move.distance },
+    }));
+
+    // Пауза, щоб гравець побачив хід на кнопці перед анімацією
+    await new Promise(resolve => setTimeout(resolve, 900));
+
+    // ЕТАП 2: Оновлюємо стан дошки, що запускає анімацію фігури
     appState.update(state => {
       const moveUpdates = performMove(state, move.row, move.col);
       return {
         ...state,
         ...moveUpdates,
-        computerLastMoveDisplay: { direction: directionKey, distance: move.distance },
-        lastComputerMove: { direction: directionKey, distance: move.distance },
       };
     });
 
-    // 3. Даємо час на анімацію фігури комп'ютера
+    // 6. Пауза, щоб анімація переміщення фігури завершилася
     await new Promise(resolve => setTimeout(resolve, 600));
 
-    // 4. ТІЛЬКИ ТЕПЕР оновлюємо стан з новими доступними ходами
+    // 7. ЕТАП 3: Оновлюємо доступні ходи для гравця і передаємо хід
     appState.update(state => {
       const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.blockedCells);
       return { ...state, availableMoves: newAvailableMoves, currentPlayer: 1 };
     });
 
-    // Озвучування
+    // Озвучування ходу (залишається в кінці)
     const latestSettings = get(settingsStore);
     if (latestSettings.speechEnabled) {
       const langCode = langMap[latestSettings.language] || 'uk-UA';
       speakMove('computer', directionKey, move.distance, langCode, latestSettings.selectedVoiceURI ?? null);
     }
+  } else {
+    // Обробка ситуації, коли у комп'ютера немає ходів
+    const finalScoreDetails = calculateFinalScore(current);
+    appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
+    modalStore.showModal({
+      title: 'Ви перемогли!',
+      content: { reason: 'Комп\'ютер не має куди ходити.', scoreDetails: finalScoreDetails },
+      buttons: [{ text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true }]
+    });
   }
 }
 
