@@ -479,25 +479,17 @@
   flex-direction: column;
   align-items: center;
   gap: 18px;
+  width: 100%;
+  max-width: 480px;
   min-width: 240px;
-  width: 480px;
-  max-width: 95vw;
+  margin-left: auto;
+  margin-right: auto;
   box-sizing: border-box;
-  /* Glassmorphism */
   backdrop-filter: blur(12px);
   box-shadow: 0 8px 32px 0 rgba(80,0,80,0.18);
   border: 1.5px solid rgba(255,255,255,0.18);
-  margin-left: auto;
-  margin-right: auto;
   transition: width 0.2s;
 }
-@media (max-width: 600px) {
-  .game-controls-panel {
-    width: 95vw;
-    max-width: 95vw;
-    min-width: 0;
-  }
-} 
 
 /* --- crown styles restored --- */
 .crown {

@@ -198,3 +198,12 @@ h1 {
   width: 1px;
   white-space: nowrap;
 } 
+
+/* Утилітарний клас для основних блоків на ігровому екрані */
+.game-content-block {
+  width: 100%;
+  max-width: 480px; /* Максимальна ширина для великих екранів */
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box; /* Включаємо padding та border у розрахунок ширини */
+} 
