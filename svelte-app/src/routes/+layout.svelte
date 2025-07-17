@@ -2,18 +2,18 @@
 	<title>Stay on the Board</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta name="description" content="Мультиплатформова настільна гра з підтримкою онлайн-режиму, локалізації та сучасного UI/UX." />
+	<meta name="description" content="Кожен хід має значення. Продумайте свій шлях, щоб залишитися на дошці та перемогти у грі на витривалість!" />
 	<link rel="icon" href="{assets}/favicon-32px.ico" sizes="32x32" />
 	<link rel="icon" href="{assets}/favicon-16px.ico" sizes="16x16" />
 	<link rel="canonical" href="https://stay-on-the-board.com/" />
 	<meta property="og:title" content="Stay on the Board" />
-	<meta property="og:description" content="Мультиплатформова настільна гра з підтримкою онлайн-режиму, локалізації та сучасного UI/UX." />
+	<meta property="og:description" content="Кожен хід має значення. Продумайте свій шлях, щоб залишитися на дошці та перемогти у грі на витривалість!" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="https://stay-on-the-board.com/" />
 	<meta property="og:image" content="{assets}/logo-circle.png" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Stay on the Board" />
-	<meta name="twitter:description" content="Мультиплатформова настільна гра з підтримкою онлайн-режиму, локалізації та сучасного UI/UX." />
+	<meta name="twitter:description" content="Кожен хід має значення. Продумайте свій шлях, щоб залишитися на дошці та перемогти у грі на витривалість!" />
 	<meta name="twitter:image" content="{assets}/logo-circle.png" />
 </svelte:head>
 

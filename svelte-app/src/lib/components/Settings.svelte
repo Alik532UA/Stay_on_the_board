@@ -2,6 +2,7 @@
   import { settingsStore } from '../stores/settingsStore.js';
   import { _ } from 'svelte-i18n';
   import LanguageSwitcher from './LanguageSwitcher.svelte';
+  import SvgIcons from './SvgIcons.svelte';
   $: settings = $settingsStore;
 
   /** @param {Event} e */
@@ -48,10 +49,7 @@
   </div>
   <div class="settings-actions">
     <button class="reset-btn" onclick={resetSettings} aria-label="{$_('settings.reset')}" title="{$_('settings.resetHint')}">
-      <svg class="reset-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" style="vertical-align:middle;margin-right:8px;">
-        <path d="M10 2v4M10 2l2 2M10 2l-2 2" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M4.93 4.93A8 8 0 1 0 10 2" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+      <SvgIcons name="reset" />
       {$_('settings.reset')}
     </button>
     <div class="reset-hint">{$_('settings.resetHint')}</div>
