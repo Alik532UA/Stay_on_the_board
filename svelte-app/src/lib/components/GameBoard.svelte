@@ -15,6 +15,7 @@
   import SvgIcons from './SvgIcons.svelte';
   import { flip } from 'svelte/animate';
   import { quintOut } from 'svelte/easing';
+  import { fade } from 'svelte/transition';
   // Функція очищення кешу
   function clearCache() {
     localStorage.clear();
@@ -57,26 +58,61 @@
   let showMoves = $derived($settingsStore.showMoves);
   let showBoard = $derived($settingsStore.showBoard);
   let visualPiece = $state([{ id: 'queen', row: playerRow, col: playerCol }]);
+  let availableMoves = $derived($appState.availableMoves);
+  let displayedMoves = $state(availableMoves); // Локальний стан для анімації
 
   $effect(() => {
     console.log('[GameBoard] playerRow:', playerRow, 'playerCol:', playerCol, 'availableMoves:', $appState.availableMoves, 'blockedCells:', blockedCells);
   });
+
   $effect(() => {
     const logicalRow = playerRow;
     const logicalCol = playerCol;
-    if (visualPiece[0].row === logicalRow && visualPiece[0].col === logicalCol) {
-      return;
-    }
+    const newLogicalMoves = availableMoves;
+
+    // Константи для керування таймінгами
+    const FADE_DURATION = 300;
+    const MOVE_ANIMATION_DURATION = 600;
+    const PAUSE_BEFORE_COMPUTER_MOVE = 1000;
+
+    // 1. Завжди починаємо з приховування старих доступних ходів
+    displayedMoves = [];
+
+    // Функція для показу нових ходів. Ми будемо викликати її в потрібний момент.
+    const showNewMoves = () => {
+        displayedMoves = newLogicalMoves;
+    };
+
+    // 2. Визначаємо, чий хід і застосовуємо відповідну логіку
     const isPlayersTurnNow = currentPlayer === 1;
+
     if (isPlayersTurnNow) {
-      const timer = setTimeout(() => {
-        visualPiece = [{ id: 'queen', row: logicalRow, col: logicalCol }];
-      }, 500);
-      return () => clearTimeout(timer);
+        // Хід комп'ютера щойно завершився.
+        // Потрібно показати анімацію його ходу, а потім нові доступні ходи.
+        const totalDelay = PAUSE_BEFORE_COMPUTER_MOVE;
+
+        const computerMoveTimer = setTimeout(() => {
+            // Запускаємо анімацію руху фігури
+            visualPiece = [{ id: 'queen', row: logicalRow, col: logicalCol }];
+
+            // Після завершення анімації руху фігури, показуємо нові ходи
+            setTimeout(showNewMoves, MOVE_ANIMATION_DURATION);
+        }, totalDelay);
+
+        return () => clearTimeout(computerMoveTimer);
+
     } else {
-      visualPiece = [{ id: 'queen', row: logicalRow, col: logicalCol }];
+        // Це хід гравця.
+        // Анімація фігури запускається миттєво.
+        visualPiece = [{ id: 'queen', row: logicalRow, col: logicalCol }];
+
+        // Нові доступні ходи (для комп'ютера) з'являться після анімації фігури гравця.
+        const playerMoveTimer = setTimeout(showNewMoves, MOVE_ANIMATION_DURATION);
+        
+        return () => clearTimeout(playerMoveTimer);
     }
-  });
+});
+
   // Виношу виклики $_() на верхній рівень
   let playerTitle = $derived($_('gameBoard.player'));
   let mainMenuTitle = $derived($_('gameBoard.mainMenu'));
@@ -132,6 +168,16 @@
    */
   function isCellBlocked(row, col) {
     return !!(blockedCells && blockedCells.some(cell => cell.row === row && cell.col === col));
+  }
+
+  /**
+   * Перевіряє, чи є клітинка серед відображуваних доступних ходів
+   * @param {number} row
+   * @param {number} col
+   * @returns {boolean}
+   */
+  function isDisplayedAsAvailable(row, col) {
+    return displayedMoves.some(move => move.row === row && move.col === col);
   }
 
   function onCellClick(/** @type {number} */ row, /** @type {number} */ col) {
@@ -363,8 +409,8 @@
                 {#if isCellBlocked(rowIdx, colIdx)}
                   <span class="blocked-x">✗</span>
                 {:else}
-                  {#if isAvailable(rowIdx, colIdx) && currentPlayer === 1 && showMoves}
-                    <span class="move-dot"></span>
+                  {#if isDisplayedAsAvailable(rowIdx, colIdx) && currentPlayer === 1 && showMoves}
+                    <span class="move-dot" transition:fade={{ duration: 300 }}></span>
                   {/if}
                 {/if}
               </div>
