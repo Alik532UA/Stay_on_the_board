@@ -24,12 +24,50 @@
 	import { get } from 'svelte/store';
 	import '../lib/i18n/init.js';
 	import { assets } from '$app/paths';
+	import { onMount } from 'svelte';
+	import { base } from '$app/paths';
+	import UpdateNotification from '$lib/components/UpdateNotification.svelte';
+
+	let showUpdateNotice = false;
+	const APP_VERSION_KEY = 'app_version';
+
+	onMount(async () => {
+		try {
+			// Додаємо випадковий параметр, щоб уникнути кешування самого файлу версії
+			const response = await fetch(`${base}/version.json?v=${new Date().getTime()}`);
+			if (!response.ok) return;
+
+			const serverVersionData = await response.json();
+			const serverVersion = serverVersionData.version;
+			const localVersion = localStorage.getItem(APP_VERSION_KEY);
+
+			if (localVersion && localVersion !== serverVersion) {
+				showUpdateNotice = true;
+			} else if (!localVersion) {
+				// Якщо версії ще немає, просто записуємо її
+				localStorage.setItem(APP_VERSION_KEY, serverVersion);
+			}
+		} catch (error) {
+			console.error('Failed to check for app update:', error);
+		}
+	});
+
+	function handleReload() {
+		// Очищуємо кеш і перезавантажуємо
+		localStorage.clear();
+		// true - для примусового перезавантаження з сервера
+		window.location.reload(true);
+	}
 
 	// onMount(() => {
 	// 	document.documentElement.setAttribute('data-theme', 'dark');
 	// 	document.documentElement.setAttribute('data-style', 'ubuntu');
 	// });
 </script>
+
+{#if showUpdateNotice}
+	<UpdateNotification on:reload={handleReload} />
+{/if}
 
 <div class="app">
 	{#if false}

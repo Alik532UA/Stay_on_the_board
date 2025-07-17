@@ -137,7 +137,7 @@
     </div>
 
     {#if showThemeDropdown || showLangDropdown || showWipNotice}
-      <div class="dropdown-backdrop" role="button" tabindex="0" aria-label={$_('mainMenu.closeDropdowns')} on:click={closeDropdowns}></div>
+      <div class="dropdown-backdrop screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('mainMenu.closeDropdowns')} on:click={closeDropdowns}></div>
     {/if}
 
     {#if showWipNotice}

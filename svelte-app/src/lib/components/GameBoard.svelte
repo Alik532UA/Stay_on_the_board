@@ -385,7 +385,7 @@
       </button>
       {#if showBoardSizeDropdown}
         <!-- Цей фон буде перехоплювати кліки поза меню -->
-        <div class="dropdown-backdrop" onclick={closeBoardSizeDropdown} onkeydown={e => (e.key === 'Escape') && closeBoardSizeDropdown()} role="button" tabindex="0" aria-label="Закрити меню"></div>
+        <div class="dropdown-backdrop screen-overlay-backdrop" onclick={closeBoardSizeDropdown} onkeydown={e => (e.key === 'Escape') && closeBoardSizeDropdown()} role="button" tabindex="0" aria-label="Закрити меню"></div>
         <ul class="board-size-dropdown-list" role="listbox">
           {#each boardSizes as n (n)}
             <li 
