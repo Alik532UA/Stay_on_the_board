@@ -44,9 +44,44 @@
    * @param {number} n
    */
   function selectBoardSize(n) {
-    if (boardSize !== n) { // Запобігаємо зайвим викликам, якщо розмір не змінився
-      setBoardSize(n);
+    const state = get(appState);
+
+    // Якщо розмір не змінився, нічого не робимо
+    if (state.boardSize === n) {
+      closeBoardSizeDropdown();
+      return;
     }
+
+    // Якщо рахунок нульовий, змінюємо розмір без попередження
+    if (state.score === 0 && state.penaltyPoints === 0) {
+      setBoardSize(n);
+      closeBoardSizeDropdown();
+      return;
+    }
+
+    // В іншому випадку, показуємо модальне вікно
+    modalStore.showModal({
+      titleKey: 'modal.resetScoreTitle',
+      contentKey: 'modal.resetScoreContent',
+      buttons: [
+        {
+          textKey: 'modal.resetScoreConfirm',
+          customClass: 'green-btn',
+          isHot: true,
+          onClick: () => {
+            setBoardSize(n);
+            modalStore.closeModal();
+          }
+        },
+        {
+          textKey: 'modal.resetScoreCancel',
+          onClick: () => {
+            modalStore.closeModal();
+          }
+        }
+      ]
+    });
+
     closeBoardSizeDropdown();
   }
 
@@ -284,8 +319,7 @@
         {
           const currentSize = get(appState).boardSize;
           if (currentSize < 9) {
-            logStore.addLog(`[handleKeydown] Збільшено розмір дошки до ${currentSize + 1}`, 'info');
-            setBoardSize(currentSize + 1);
+            selectBoardSize(currentSize + 1);
           }
         }
         break;
@@ -293,8 +327,7 @@
         {
           const currentSize = get(appState).boardSize;
           if (currentSize > 2) {
-            logStore.addLog(`[handleKeydown] Зменшено розмір дошки до ${currentSize - 1}`, 'info');
-            setBoardSize(currentSize - 1);
+            selectBoardSize(currentSize - 1);
           }
         }
         break;

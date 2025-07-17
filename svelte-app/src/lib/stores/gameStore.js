@@ -312,6 +312,7 @@ export async function setBoardSize(newSize) {
       computerLastMoveDisplay: null,
       lastComputerMove: null,
       score: 0,
+      penaltyPoints: 0, // <-- ДОДАНО
       isGameOver: false,
       gameId: (state.gameId || 0) + 1,
     };
@@ -449,6 +450,7 @@ export function resetGame() {
       computerLastMoveDisplay: null,
       lastComputerMove: null,
       score: 0,
+      penaltyPoints: 0, // <-- ДОДАНО
       isGameOver: false,
       gameId: (state.gameId || 0) + 1,
     };
