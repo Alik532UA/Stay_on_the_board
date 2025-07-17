@@ -1,6 +1,6 @@
 <script>
   import '../css/components/game-board.css';
-  import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove, toggleBlockMode, toggleShowBoard, toggleSpeech } from '$lib/stores/gameStore.js';
+  import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { navigateToMainMenu } from '$lib/utils/navigation.js';
   import GameControls from '$lib/components/GameControls.svelte';
@@ -10,11 +10,9 @@
   import { _ } from 'svelte-i18n';
   import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore.js';
   import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleBlockMode } from '$lib/stores/settingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from './SvgIcons.svelte';
-  import { flip } from 'svelte/animate';
-  import { quintOut } from 'svelte/easing';
   import { fade } from 'svelte/transition';
   // Функція очищення кешу
   function clearCache() {
@@ -63,58 +61,36 @@
   let showMoves = $derived($settingsStore.showMoves);
   let showBoard = $derived($settingsStore.showBoard);
   let gameId = $derived($appState.gameId); // ДОДАНО
-  /**
-   * @type {{ id: string, row: number, col: number }[]}
-   */
-  let visualPiece = $state([]); // Ініціалізуємо порожнім масивом
   let availableMoves = $derived($appState.availableMoves);
-  let displayedMoves = $state(availableMoves); // Локальний стан для анімації
+  let visualPiece = $state({ row: 0, col: 0 });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let displayedMoves = $state(/** @type {any[]} */([]));
+  let prevGameId = $state(0);
+  let isAnimating = $state(false);
 
   $effect(() => {
-    // Цей ефект реагує на зміну gameId (старт нової гри).
-    // 1. Ініціалізуємо візуальну позицію фігури.
-    visualPiece = [{ id: 'queen', row: playerRow, col: playerCol }];
-    // 2. Миттєво встановлюємо початкові доступні ходи.
-    displayedMoves = availableMoves;
-    console.log(`[Effect gameId: ${gameId}] Game started/reset. Visuals initialized.`);
-});
-
-$effect(() => {
-    const logicalRow = playerRow;
-    const logicalCol = playerCol;
-
-    // Якщо це перший рендер (visualPiece порожній) або позиції збігаються, нічого не робимо.
-    if (visualPiece.length === 0 || (visualPiece[0].row === logicalRow && visualPiece[0].col === logicalCol)) {
-        return;
+    // --- 1. Обробка старту/рестарту гри ---
+    if (gameId !== prevGameId) {
+      isAnimating = false;
+      prevGameId = gameId;
+      setTimeout(() => { isAnimating = true; }, 50);
+      return;
     }
-
-    // Константи для керування таймінгами
-    const MOVE_ANIMATION_DURATION = 600;
-    const PAUSE_BEFORE_COMPUTER_MOVE = 1000;
-
-    const showNewMoves = () => {
+    // --- 2. Обробка ходу гравця (черга перейшла до комп'ютера) ---
+    if (currentPlayer === 2) {
+      setTimeout(() => {
+        if (get(appState).gameMode === 'vsComputer') {
+          makeComputerMove();
+        }
+      }, 600);
+    }
+    // --- 3. Обробка ходу комп'ютера (черга перейшла до гравця) ---
+    else if (currentPlayer === 1) {
+      setTimeout(() => {
         displayedMoves = availableMoves;
-    };
-
-    // Приховуємо старі ходи
-    displayedMoves = [];
-
-    const isPlayersTurnNow = currentPlayer === 1;
-
-    if (isPlayersTurnNow) {
-        // Хід комп'ютера
-        const computerMoveTimer = setTimeout(() => {
-            visualPiece = [{ id: 'queen', row: logicalRow, col: logicalCol }];
-            setTimeout(showNewMoves, MOVE_ANIMATION_DURATION);
-        }, PAUSE_BEFORE_COMPUTER_MOVE);
-        return () => clearTimeout(computerMoveTimer);
-    } else {
-        // Хід гравця
-        visualPiece = [{ id: 'queen', row: logicalRow, col: logicalCol }];
-        const playerMoveTimer = setTimeout(showNewMoves, MOVE_ANIMATION_DURATION);
-        return () => clearTimeout(playerMoveTimer);
+      }, 600);
     }
-});
+  });
 
   // Виношу виклики $_() на верхній рівень
   let playerTitle = $derived($_('gameBoard.player'));
@@ -151,8 +127,7 @@ $effect(() => {
    * @param {number} col
    */
   function isAvailable(row, col) {
-    const result = $appState.availableMoves && $appState.availableMoves.some(move => move.row === row && move.col === col);
-    return result;
+    return $appState.availableMoves && $appState.availableMoves.some(move => move.row === row && move.col === col);
   }
 
   /**
@@ -181,6 +156,32 @@ $effect(() => {
    */
   function isDisplayedAsAvailable(row, col) {
     return displayedMoves.some(move => move.row === row && move.col === col);
+  }
+
+  /**
+   * @param {number} row
+   * @param {number} col
+   * @param {number} size
+   * @param {{row:number,col:number}[]} blockedCells
+   */
+  function getAvailableMoves(row, col, size, blockedCells = []) {
+    const moves = [];
+    const directions = [
+      [-1, 0], [1, 0], [0, -1], [0, 1],
+      [-1, -1], [-1, 1], [1, -1], [1, 1]
+    ];
+    const isBlocked = (/** @type {number} */ r, /** @type {number} */ c) => blockedCells.some(cell => cell.row === r && cell.col === c);
+    for (const [dr, dc] of directions) {
+      for (let dist = 1; dist < size; dist++) {
+        const nr = row + dr * dist;
+        const nc = col + dc * dist;
+        if (nr < 0 || nc < 0 || nr >= size || nc >= size) break;
+        if (!isBlocked(nr, nc)) {
+          moves.push({ row: nr, col: nc });
+        }
+      }
+    }
+    return moves;
   }
 
   function onCellClick(/** @type {number} */ row, /** @type {number} */ col) {
@@ -350,35 +351,30 @@ $effect(() => {
 
 <div class="game-board-container">
   <div class="game-board-top-row">
-    <button class="main-menu-btn" title={mainMenuTitle} on:click={goToMainMenu}>
-      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 547.596 547.596" width="32" height="32" aria-label={mainMenuTitle} class="main-menu-btn-img">
-        <g>
-          <path d="M540.76,254.788L294.506,38.216c-11.475-10.098-30.064-10.098-41.386,0L6.943,254.788   c-11.475,10.098-8.415,18.284,6.885,18.284h75.964v221.773c0,12.087,9.945,22.108,22.108,22.108h92.947V371.067   c0-12.087,9.945-22.108,22.109-22.108h93.865c12.239,0,22.108,9.792,22.108,22.108v145.886h92.947   c12.24,0,22.108-9.945,22.108-22.108v-221.85h75.965C549.021,272.995,552.081,264.886,540.76,254.788z"/>
-        </g>
-      </svg>
+    <button class="main-menu-btn" title={mainMenuTitle} onclick={goToMainMenu}>
+      <SvgIcons name="home" />
     </button>
     {#if import.meta.env.DEV}
-      <button class="clear-cache-btn" aria-label="Очистити кеш" title="Очистити кеш" on:click={clearCache}>
-        <svg width="64" height="64" viewBox="0 0 16 16" fill="none">
-          <path fill="currentColor" d="M13.9907,0 C14.8816,0 15.3277,1.07714 14.6978,1.70711 L13.8556,2.54922 C14.421,3.15654 14.8904,3.85028 15.2448,4.60695 C15.8028,5.79836 16.0583,7.109 15.9888,8.42277 C15.9193,9.73654 15.5268,11.0129 14.8462,12.1388 C14.1656,13.2646 13.2178,14.2053 12.0868,14.8773 C10.9558,15.5494 9.67655,15.9322 8.3623,15.9918 C7.04804,16.0514 5.73937,15.7859 4.55221,15.2189 C3.36505,14.652 2.33604,13.8009 1.55634,12.7413 C0.776635,11.6816 0.270299,10.446 0.0821822,9.14392 C0.00321229,8.59731 0.382309,8.09018 0.928918,8.01121 C1.47553,7.93224 1.98266,8.31133 2.06163,8.85794 C2.20272,9.83451 2.58247,10.7612 3.16725,11.556 C3.75203,12.3507 4.52378,12.989 5.41415,13.4142 C6.30452,13.8394 7.28602,14.0385 8.27172,13.9939 C9.25741,13.9492 10.2169,13.6621 11.0651,13.158 C11.9133,12.6539 12.6242,11.9485 13.1346,11.1041 C13.6451,10.2597 13.9395,9.30241 13.9916,8.31708 C14.0437,7.33175 13.8521,6.34877 13.4336,5.45521 C13.178,4.90949 12.8426,4.40741 12.4402,3.96464 L11.7071,4.69779 C11.0771,5.32776 9.99996,4.88159 9.99996,3.99069 L9.99996,0 L13.9907,0 Z M1.499979,4 C2.05226,4 2.499979,4.44772 2.499979,5 C2.499979,5.55229 2.05226,6 1.499979,6 C0.947694,6 0.499979,5.55228 0.499979,5 C0.499979,4.44772 0.947694,4 1.499979,4 Z M3.74998,1.25 C4.30226,1.25 4.74998,1.69772 4.74998,2.25 C4.74998,2.80229 4.30226,3.25 3.74998,3.25 C3.19769,3.25 2.74998,2.80228 2.74998,2.25 C2.74998,1.69772 3.19769,1.25 3.74998,1.25 Z M6.99998,0 C7.55226,0 7.99998,0.447716 7.99998,1 C7.99998,1.55229 7.55226,2 6.99998,2 C6.44769,2 5.99998,1.55229 5.99998,1 C5.99998,0.447716 6.44769,0 6.99998,0 Z"/>
-        </svg>
+      <button class="clear-cache-btn" title="Очистити кеш" onclick={clearCache}>
+        <span class="visually-hidden">Очистити кеш</span>
+        <SvgIcons name="clear-cache" />
       </button>
     {/if}
     <div class="board-size-dropdown-wrapper">
-      <button class="board-size-dropdown-btn" on:click={toggleBoardSizeDropdown} aria-haspopup="listbox" aria-expanded={showBoardSizeDropdown}>
+      <button class="board-size-dropdown-btn" onclick={toggleBoardSizeDropdown} aria-haspopup="listbox" aria-expanded={showBoardSizeDropdown}>
         <span class="board-size-dropdown-btn-text">{boardSize}</span>
       </button>
       {#if showBoardSizeDropdown}
         <!-- Цей фон буде перехоплювати кліки поза меню -->
-        <div class="dropdown-backdrop" on:click={closeBoardSizeDropdown} role="button" tabindex="-1" aria-label="Закрити меню"></div>
+        <div class="dropdown-backdrop" onclick={closeBoardSizeDropdown} onkeydown={e => (e.key === 'Escape') && closeBoardSizeDropdown()} role="button" tabindex="0" aria-label="Закрити меню"></div>
         <ul class="board-size-dropdown-list" role="listbox">
           {#each boardSizes as n (n)}
             <li 
               class="board-size-dropdown-option {n === boardSize ? 'selected' : ''}" 
               role="option" 
               aria-selected={n === boardSize} 
-              on:click={() => selectBoardSize(n)}
-              on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') selectBoardSize(n); }}
+              onclick={() => selectBoardSize(n)}
+              onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') selectBoardSize(n); }}
               tabindex="0"
             >
               {n}x{n}
@@ -393,7 +389,8 @@ $effect(() => {
     {#if $appState.penaltyPoints > 0}
       <span 
         class="penalty-display" 
-        on:click={showPenaltyInfo}
+        onclick={showPenaltyInfo}
+        onkeydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
         title={$_('gameBoard.penaltyHint')}
         role="button"
         tabindex="0"
@@ -411,33 +408,31 @@ $effect(() => {
                 class:light={ (rowIdx + colIdx) % 2 === 0 }
                 class:dark={ (rowIdx + colIdx) % 2 !== 0 }
                 class:blocked-cell={ isCellBlocked(rowIdx, colIdx) }
-                class:available={ showMoves && isAvailable(rowIdx, colIdx) && currentPlayer === 1 }
+                class:available={ showMoves && isAvailable(rowIdx, colIdx) }
                 role="button"
                 tabindex="0"
                 aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
-                on:click={() => onCellClick(rowIdx, colIdx)}
-                on:contextmenu={(e) => onCellRightClick(e, rowIdx, colIdx)}
-                on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') onCellClick(rowIdx, colIdx); }}
+                onclick={() => onCellClick(rowIdx, colIdx)}
+                oncontextmenu={(e) => onCellRightClick(e, rowIdx, colIdx)}
+                onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') onCellClick(rowIdx, colIdx); }}
               >
                 {#if isCellBlocked(rowIdx, colIdx)}
                   <span class="blocked-x">✗</span>
                 {:else}
-                  {#if isDisplayedAsAvailable(rowIdx, colIdx) && currentPlayer === 1 && showMoves}
+                  {#if $settingsStore.showMoves && isAvailable(rowIdx, colIdx)}
                     <span class="move-dot" transition:fade={{ duration: 300 }}></span>
                   {/if}
                 {/if}
               </div>
             {/each}
           {/each}
-          {#each visualPiece as piece (piece.id)}
-            <div
-              class="player-piece"
-              style="top: calc(var(--cell-size) * {piece.row}); left: calc(var(--cell-size) * {piece.col});"
-              animate:flip={{ duration: 600, easing: quintOut }}
-            >
-              <SvgIcons name="queen" />
-            </div>
-          {/each}
+          <div
+            class="player-piece"
+            style="top: calc(var(--cell-size) * {$appState.playerRow}); left: calc(var(--cell-size) * {$appState.playerCol});"
+            class:animating={isAnimating}
+          >
+            <SvgIcons name="queen" />
+          </div>
         </div>
       </div>
     {/key}
@@ -501,5 +496,23 @@ $effect(() => {
   .penalty-display:focus {
     outline: 2px solid #f44336;
     outline-offset: 2px;
+  }
+  .player-piece {
+    position: absolute;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    transition: top 0.6s ease-out, left 0.6s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .move-dot {
+    display: block;
+    width: 18%;
+    height: 18%;
+    border-radius: 50%;
+    background: #fff;
   }
 </style> 

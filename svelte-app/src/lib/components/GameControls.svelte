@@ -1,11 +1,11 @@
 <script>
-  import { appState, toggleBlockMode, toggleShowMoves, toggleShowBoard, toggleSpeech, setDirection, setDistance, confirmMove, noMoves, resetGame, availableDistances } from '$lib/stores/gameStore.js';
+  import { appState, toggleBlockMode, setDirection, setDistance, confirmMove, noMoves, resetGame, availableDistances } from '$lib/stores/gameStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech } from '$lib/stores/settingsStore.js';
   import SvgIcons from './SvgIcons.svelte';
   $: isPlayerTurn = $appState.currentPlayer === 1;
   $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
@@ -460,7 +460,7 @@
 /* --- Improved action-btns --- */
 .action-btns {
 	display: flex;
-	flex-direction: column; /* ЗАВЖДИ стовпчик */
+	flex-direction: column; /* ЗАВЖДА стовпчик */
 	gap: 14px; /* Оптимальна відстань для стовпчика */
 	width: 100%;
 	margin-top: 18px;

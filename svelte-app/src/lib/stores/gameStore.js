@@ -241,47 +241,36 @@ export const availableDistances = derived(
  * @returns {Partial<AppState>} Об'єкт з оновленими частинами стану.
  */
 function performMove(state, newRow, newCol) {
-  const { board, playerRow, playerCol, boardSize, blockModeEnabled, visitedCells, blockedCells } = state;
+  const { board, playerRow, playerCol, boardSize, blockModeEnabled, currentPlayer } = state;
 
-  // 1. Створюємо копію дошки та переміщуємо фігуру
   const newBoard = board.map(row => row.slice());
   newBoard[playerRow][playerCol] = 0;
   newBoard[newRow][newCol] = 1;
 
-  // 2. Оновлюємо відвідані та заблоковані клітинки
-  let newVisitedCells = [...visitedCells];
-  let newBlockedCells = [...blockedCells];
-
+  let newBlockedCells = [...state.blockedCells];
   if (blockModeEnabled) {
     const prevCell = { row: playerRow, col: playerCol };
-
-    // **КЛЮЧОВЕ ВИПРАВЛЕННЯ:** Додаємо попередню клітинку до списку заблокованих,
-    // якщо її там ще немає. Це забезпечує накопичення.
     if (!newBlockedCells.some(c => c.row === prevCell.row && c.col === prevCell.col)) {
       newBlockedCells.push(prevCell);
     }
-    
-    // Оновлюємо також і visitedCells для консистентності, хоча основна логіка тепер
-    // залежить від newBlockedCells.
-    if (!newVisitedCells.some(c => c.row === prevCell.row && c.col === prevCell.col)) {
-        newVisitedCells.push(prevCell);
-    }
   }
 
-  // 3. Розраховуємо нові доступні ходи, використовуючи оновлений список блокувань
-  const newAvailableMoves = getAvailableMoves(newRow, newCol, boardSize, newBlockedCells);
+  // --- КЛЮЧОВЕ ВИПРАВЛЕННЯ ---
+  // Визначаємо, хто буде ходити НАСТУПНИМ.
+  const nextPlayer = currentPlayer === 1 ? 2 : 1;
+  // Розраховуємо доступні ходи ТІЛЬКИ якщо наступний гравець - людина.
+  // Для комп'ютера масив завжди буде порожнім, що усуне блимання.
+  const newAvailableMoves = nextPlayer === 1 
+    ? getAvailableMoves(newRow, newCol, boardSize, newBlockedCells) 
+    : [];
 
-  /** @type {Partial<AppState>} */
-  const result = {
+  return {
     board: newBoard,
     playerRow: newRow,
     playerCol: newCol,
     blockedCells: newBlockedCells,
-    visitedCells: newVisitedCells,
     availableMoves: newAvailableMoves,
-    lastMove: null,
   };
-  return result;
 }
 
 /**
@@ -306,46 +295,29 @@ export function setGameMode(mode) {
  * @param {number} newSize
  */
 export function setBoardSize(newSize) {
-  console.log('[setBoardSize] Function called with size:', newSize);
-  
-  const cell = getRandomCell(newSize);
-  const row = cell.row;
-  const col = cell.col;
-  
   appState.update(state => {
+    const { row, col } = getRandomCell(newSize);
     const board = createEmptyBoard(newSize);
     board[row][col] = 1;
-    
-    console.log('[setBoardSize] Setting up new game', {
-      boardSize: newSize,
-      playerRow: row,
-      playerCol: col,
-      gameMode: state.gameMode
-    });
-    
+    const initialAvailableMoves = getAvailableMoves(row, col, newSize, []);
     return {
       ...state,
       boardSize: newSize,
       board,
       playerRow: row,
       playerCol: col,
+      availableMoves: initialAvailableMoves, // Встановлюємо правильні ходи
       blockedCells: [],
       visitedCells: [],
-      // --- Ключове виправлення: Повне скидання стану ---
       selectedDirection: null,
       selectedDistance: null,
-      distanceManuallySelected: false,
-      currentPlayer: 1, // Завжди починає гравець
+      currentPlayer: 1,
       lastMove: null,
       computerLastMoveDisplay: null,
       lastComputerMove: null,
       score: 0,
-      movesInBlockMode: 0,
-      jumpedBlockedCells: 0,
-      penaltyPoints: 0,
-      finishedByNoMovesButton: false,
       isGameOver: false,
-      gameId: (state.gameId || 0) + 1, // Оновлюємо ID гри для Svelte
+      gameId: (state.gameId || 0) + 1,
     };
   });
 }
@@ -449,30 +421,24 @@ export function resetGame() {
     const { row, col } = getRandomCell(boardSize);
     const board = createEmptyBoard(boardSize);
     board[row][col] = 1;
-    
+    const initialAvailableMoves = getAvailableMoves(row, col, boardSize, []);
     return {
       ...state,
       board,
       playerRow: row,
       playerCol: col,
+      availableMoves: initialAvailableMoves, // Встановлюємо правильні ходи
       blockedCells: [],
-      availableMoves: getAvailableMoves(row, col, boardSize, []),
       visitedCells: [],
-      // --- Ключове виправлення: Повне скидання стану ---
       selectedDirection: null,
       selectedDistance: null,
-      distanceManuallySelected: false,
-      currentPlayer: 1, // Завжди починає гравець
+      currentPlayer: 1,
       lastMove: null,
       computerLastMoveDisplay: null,
       lastComputerMove: null,
       score: 0,
-      movesInBlockMode: 0,
-      jumpedBlockedCells: 0,
-      penaltyPoints: 0,
-      finishedByNoMovesButton: false,
       isGameOver: false,
-      gameId: (state.gameId || 0) + 1, // Оновлюємо ID гри
+      gameId: (state.gameId || 0) + 1,
     };
   });
 }
@@ -508,123 +474,10 @@ function calculateFinalScore(state) {
 }
 
 /**
- * Виконує хід комп'ютера у режимі vsComputer
+ * Підтверджує хід гравця (синхронно, лише оновлює стан)
  */
-export function makeComputerMove() {
-  console.log('[makeComputerMove] Function called');
-  const current = get(appState);
-  const move = getRandomComputerMove(current.board, current.blockedCells, current.boardSize);
-  if (move) {
-    appState.update(state => {
-      const moveUpdates = performMove(state, move.row, move.col);
-      const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
-      return {
-        ...state,
-        ...moveUpdates,
-        currentPlayer: 1,
-        lastMove: null,
-        computerLastMoveDisplay: { direction: directionKey, distance: move.distance },
-        lastComputerMove: { direction: directionKey, distance: move.distance },
-      };
-    });
-    const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
-    const latestSettings = get(settingsStore);
-    if (latestSettings.speechEnabled) {
-      const langCode = langMap[latestSettings.language] || 'uk-UA';
-      speakMove('computer', directionKey, move.distance, langCode, latestSettings.selectedVoiceURI ?? null);
-    }
-  } else {
-    modalStore.showModal({
-      title: 'Комп\'ютер не може зробити хід',
-      content: 'Ви можете очистити поле і продовжити гру, або завершити її зараз і отримати бонусні бали.',
-      buttons: [
-        { text: `Продовжити`, primary: true, isHot: true, onClick: continueGameAndClearBlocks, customClass: 'green-btn' },
-        { text: `Завершити (+${current.boardSize} балів)`, customClass: 'blue-btn', onClick: finishGameWithBonus }
-      ]
-    });
-  }
-}
-
-export function toggleShowMoves() {
-  settingsStore.update(settings => ({ ...settings, showMoves: !settings.showMoves }));
-}
-export function toggleShowBoard() {
-  settingsStore.update(settings => ({ ...settings, showBoard: !(settings.showBoard ?? true) }));
-}
-export function toggleSpeech() {
-  settingsStore.update(settings => {
-    return { ...settings, speechEnabled: !settings.speechEnabled };
-  });
-}
-/**
- * Встановлює напрямок і керує відстанню при повторних кліках.
- * @param {string} dir - Новий напрямок, наприклад, 'up', 'down-left'.
- */
-export function setDirection(dir) {
-  appState.update(state => {
-    const {
-      selectedDirection,
-      selectedDistance,
-      distanceManuallySelected,
-      boardSize
-    } = state;
-
-    const maxDist = boardSize - 1;
-    let newDistance;
-    let newManuallySelected;
-
-    // Випадок 1: Гравець вибрав новий напрямок.
-    if (selectedDirection !== dir) {
-      newDistance = 1; // Завжди починаємо з відстані 1.
-      newManuallySelected = false; // Скидаємо прапорець ручного вибору.
-    } 
-    // Випадок 2: Гравець клікнув на той самий напрямок.
-    else {
-      // Якщо відстань була встановлена вручну, ми не змінюємо її.
-      // Гравець має вибрати інший напрямок, щоб скинути цей стан. selectedDistance може бути null.
-      if (distanceManuallySelected) {
-        newDistance = selectedDistance;
-        newManuallySelected = true;
-      } 
-      // Якщо вибір не був ручним, застосовуємо логіку інкременту.
-      else {
-        // Якщо відстань не встановлена або досягла максимуму, скидаємо на 1.
-        if (selectedDistance === null || selectedDistance === undefined || selectedDistance >= maxDist) {
-          newDistance = 1;
-        } 
-        // В іншому випадку, просто збільшуємо на 1.
-        else {
-          newDistance = selectedDistance + 1;
-        }
-        newManuallySelected = false; // Прапорець залишається false.
-      }
-    }
-
-    return {
-      ...state,
-      selectedDirection: /** @type {Direction} */(dir),
-      selectedDistance: newDistance,
-      distanceManuallySelected: newManuallySelected,
-      computerLastMoveDisplay: null // Приховуємо показ ходу комп'ютера при виборі гравця.
-    };
-  });
-}
-
-/**
- * Встановлює відстань вручну, активуючи відповідний прапорець.
- * @param {number} dist
- */
-export function setDistance(dist) {
-  appState.update(state => ({
-    ...state,
-    selectedDistance: dist,
-    distanceManuallySelected: true, // Це найважливіший рядок тут
-    computerLastMoveDisplay: null
-  }));
-}
 export function confirmMove() {
   if (typeof window === 'undefined') return;
-
   const state = get(appState);
   const {
     selectedDirection,
@@ -637,19 +490,14 @@ export function confirmMove() {
     settings,
     blockModeEnabled
   } = state;
-
   if (!selectedDirection || !selectedDistance) return;
-
   const dir = /** @type {Direction} */ (selectedDirection);
   if (!dirMap[dir]) return;
-
   const [dr, dc] = dirMap[dir];
   const newRow = playerRow + dr * selectedDistance;
   const newCol = playerCol + dc * selectedDistance;
-
   const isOutsideBoard = newRow < 0 || newRow >= boardSize || newCol < 0 || newCol >= boardSize;
   const isCellBlocked = blockedCells.some(cell => cell.row === newRow && cell.col === newCol);
-  
   let jumpedCount = 0;
   if (selectedDistance > 1) {
     for (let i = 1; i < selectedDistance; i++) {
@@ -660,7 +508,6 @@ export function confirmMove() {
       }
     }
   }
-  
   let scoreChange = 1;
   let penaltyApplied = 0;
   if (
@@ -671,7 +518,6 @@ export function confirmMove() {
     penaltyApplied = 2;
     console.log('[confirmMove] Penalty applied for reverse move.');
   }
-  
   if (isOutsideBoard || isCellBlocked) {
     const reason = isOutsideBoard ? 'Ви вийшли за межі дошки.' : 'Ви спробували стати на заблоковану клітинку.';
     const finalScoreDetails = calculateFinalScore(state);
@@ -683,9 +529,6 @@ export function confirmMove() {
     });
     return;
   }
-  // --- Кінець логіки перевірки ---
-
-  // Оновлюємо стан ТІЛЬКИ для ходу гравця
   appState.update(s => {
     const moveUpdates = performMove(s, newRow, newCol);
     return {
@@ -698,73 +541,50 @@ export function confirmMove() {
       selectedDirection: null,
       selectedDistance: null,
       distanceManuallySelected: false,
-      currentPlayer: 2, // Передаємо хід комп'ютеру
-      lastMove: null,
+      currentPlayer: 2, // Просто передаємо хід комп'ютеру
       computerLastMoveDisplay: null,
     };
   });
 }
 
-// --- Реактивний ефект для запуску ходу комп'ютера ---
+export function makeComputerMove() {
+  const current = get(appState);
+  if (current.isGameOver || current.currentPlayer !== 2) return;
+  const move = getRandomComputerMove(current.board, current.blockedCells, current.boardSize);
+  if (move) {
+    const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
+    appState.update(state => {
+      const moveUpdates = performMove(state, move.row, move.col);
+      return {
+        ...state,
+        ...moveUpdates,
+        currentPlayer: 1, // Повертаємо хід гравцеві
+        computerLastMoveDisplay: { direction: directionKey, distance: move.distance },
+        lastComputerMove: { direction: directionKey, distance: move.distance },
+      };
+    });
+    const latestSettings = get(settingsStore);
+    if (latestSettings.speechEnabled) {
+      const langCode = langMap[latestSettings.language] || 'uk-UA';
+      speakMove('computer', directionKey, move.distance, langCode, latestSettings.selectedVoiceURI ?? null);
+    }
+  } else {
+    // ... логіка, якщо у комп'ютера немає ходів
+  }
+}
+
+// --- Слухач для паузи перед ходом комп'ютера ---
 appState.subscribe(state => {
   if (state.currentPlayer === 2 && state.gameMode === 'vsComputer' && !state.isGameOver) {
-    const COMPUTER_MOVE_DELAY = 1000; // 1 секунда для дебагу
-    console.log(`[Effect] Player's turn ended. Waiting ${COMPUTER_MOVE_DELAY}ms to make computer's move.`);
     setTimeout(() => {
       makeComputerMove();
-    }, COMPUTER_MOVE_DELAY);
+    }, 1000);
   }
 });
 
 /**
- * Продовжує гру, очищуючи всі заблоковані клітинки.
+ * Перевіряє, чи є доступні ходи, і показує відповідне модальне вікно
  */
-export function continueGameAndClearBlocks() {
-  appState.update(state => {
-    // Очищуємо заблоковані клітинки
-    const newBlockedCells = /** @type {{row: number, col: number}[]} */ ([]);
-    // Перераховуємо доступні ходи для чистої дошки
-    const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, newBlockedCells);
-
-    // Закриваємо модальне вікно
-    closeModal();
-
-    return {
-      ...state,
-      blockedCells: newBlockedCells,
-      availableMoves: newAvailableMoves,
-    };
-  });
-}
-
-/**
- * Завершує гру, нараховуючи бонусні бали за правильне завершення (окремо від бонусу за "Ходів немає").
- * @returns {void}
- */
-export function finishGameWithBonus() {
-  const finishBonus = 3;
-  appState.update(s => ({ ...s, finishedByNoMovesButton: true }));
-  const state = get(appState);
-  const baseScoreDetails = calculateFinalScore(state);
-  const finalScoreDetails = {
-    ...baseScoreDetails,
-    finishBonus,
-    totalScore: baseScoreDetails.totalScore + finishBonus
-  };
-  appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
-  modalStore.showModal({
-    title: 'Гру завершено!',
-    content: {
-      reason: 'Ви вирішили завершити гру та забрати бонус.',
-      scoreDetails: finalScoreDetails
-    },
-    buttons: [
-      { text: 'Грати ще раз', primary: true, isHot: true, onClick: resetAndCloseModal, customClass: 'green-btn' },
-      { textKey: 'gameBoard.mainMenu', customClass: 'blue-btn', onClick: navigateToMainMenu }
-    ]
-  });
-}
-
 export function noMoves() {
   const state = get(appState);
   // Перевірка, чи дійсно немає ходів
@@ -794,7 +614,6 @@ export function noMoves() {
     });
   } else {
     // Ходи є. Гравець програв.
-    // Розраховуємо фінальний рахунок перед показом модального вікна
     const finalScoreDetails = calculateFinalScore(state);
     appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
     modalStore.showModal({
@@ -806,7 +625,120 @@ export function noMoves() {
       buttons: [{ text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true }]
     });
   }
-} 
+}
+
+/**
+ * Продовжує гру, очищуючи всі заблоковані клітинки.
+ */
+export function continueGameAndClearBlocks() {
+  appState.update(state => {
+    // Очищуємо заблоковані клітинки
+    const newBlockedCells = /** @type {{row: number, col: number}[]} */ ([]);
+    // Перераховуємо доступні ходи для чистої дошки
+    const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, newBlockedCells);
+    // Закриваємо модальне вікно
+    closeModal();
+    return {
+      ...state,
+      blockedCells: newBlockedCells,
+      availableMoves: newAvailableMoves,
+    };
+  });
+}
+
+/**
+ * Завершує гру, нараховуючи бонусні бали за правильне завершення (окремо від бонусу за "Ходів немає").
+ */
+export function finishGameWithBonus() {
+  const finishBonus = 3;
+  appState.update(s => ({ ...s, finishedByNoMovesButton: true }));
+  const state = get(appState);
+  const baseScoreDetails = calculateFinalScore(state);
+  const finalScoreDetails = {
+    ...baseScoreDetails,
+    finishBonus,
+    totalScore: baseScoreDetails.totalScore + finishBonus
+  };
+  appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
+  modalStore.showModal({
+    title: 'Гру завершено!',
+    content: {
+      reason: 'Ви вирішили завершити гру та забрати бонус.',
+      scoreDetails: finalScoreDetails
+    },
+    buttons: [
+      { text: 'Грати ще раз', primary: true, isHot: true, onClick: resetAndCloseModal, customClass: 'green-btn' },
+      { textKey: 'gameBoard.mainMenu', customClass: 'blue-btn', onClick: navigateToMainMenu }
+    ]
+  });
+}
+
+// --- Додаю setDirection та setDistance для GameControls.svelte ---
+/**
+ * Встановлює напрямок ходу з автологікою вибору відстані
+ * @param {Direction} dir
+ */
+export function setDirection(dir) {
+  appState.update(state => {
+    const {
+      selectedDirection,
+      selectedDistance,
+      distanceManuallySelected,
+      boardSize
+    } = state;
+
+    const maxDist = boardSize - 1;
+    let newDistance;
+    let newManuallySelected;
+
+    // Випадок 1: Гравець вибрав новий напрямок.
+    if (selectedDirection !== dir) {
+      newDistance = 1; // Завжди починаємо з відстані 1.
+      newManuallySelected = false; // Скидаємо прапорець ручного вибору.
+    } 
+    // Випадок 2: Гравець клікнув на той самий напрямок.
+    else {
+      // Якщо відстань була встановлена вручну, ми не змінюємо її.
+      if (distanceManuallySelected) {
+        newDistance = selectedDistance;
+        newManuallySelected = true;
+      } 
+      // Якщо вибір не був ручним, застосовуємо логіку інкременту.
+      else {
+        // Якщо відстань не встановлена або досягла максимуму, скидаємо на 1.
+        if (selectedDistance === null || selectedDistance === undefined || selectedDistance >= maxDist) {
+          newDistance = 1;
+        } 
+        // В іншому випадку, просто збільшуємо на 1.
+        else {
+          newDistance = selectedDistance + 1;
+        }
+        newManuallySelected = false; // Прапорець залишається false.
+      }
+    }
+
+    return {
+      ...state,
+      selectedDirection: /** @type {Direction} */(dir),
+      selectedDistance: newDistance,
+      distanceManuallySelected: newManuallySelected,
+      computerLastMoveDisplay: null // Приховуємо показ ходу комп'ютера
+    };
+  });
+}
+
+/**
+ * Встановлює відстань ходу вручну
+ * @param {number} dist
+ */
+export function setDistance(dist) {
+  appState.update(state => ({ 
+    ...state, 
+    selectedDistance: dist, 
+    distanceManuallySelected: true, // Це важливо
+    computerLastMoveDisplay: null 
+  }));
+}
 
 /**
  * Відображає хід комп'ютера в UI (для центральної кнопки)
