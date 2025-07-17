@@ -7,13 +7,15 @@
 
   export let close = () => {};
 
+  let showDetails = false;
   let isLoading = true;
   /** @type {SpeechSynthesisVoice[]} */
   let availableVoices = [];
-  let selectedVoiceURI = get(settingsStore).selectedVoiceURI;
+  /** @type {string} */
+  let selectedVoiceURI = get(settingsStore).selectedVoiceURI ?? '';
 
   onMount(async () => {
-    const currentLocale = get(locale);
+    const currentLocale = get(locale) || 'uk';
     try {
       // Await the promise to ensure voices are loaded
       const allVoices = await loadAndGetVoices();
@@ -22,18 +24,33 @@
     } catch (error) {
       console.error("Помилка завантаження голосів:", error);
     }
+    // Гарантуємо, що selectedVoiceURI завжди string
+    if (selectedVoiceURI == null) selectedVoiceURI = '';
     isLoading = false;
   });
 
   function selectVoice() {
-    settingsStore.updateSettings({ selectedVoiceURI: selectedVoiceURI ? String(selectedVoiceURI) : '' });
+    settingsStore.updateSettings({ selectedVoiceURI: String(selectedVoiceURI ?? '') });
   }
 </script>
 
-<div class="modal-overlay" onclick={close}>
-  <div class="modal-window" onclick={(e) => e.stopPropagation()}>
+<div 
+  class="modal-overlay" 
+  onclick={close} 
+  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') close(); }}
+  role="button"
+  tabindex="0"
+  aria-label="Закрити налаштування голосу"
+>
+  <div 
+    class="modal-window" 
+    onclick={(e) => e.stopPropagation()}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="voice-settings-title"
+  >
     <div class="modal-header">
-      <h2 class="modal-title">Налаштування голосу</h2>
+      <h2 class="modal-title" id="voice-settings-title">Налаштування голосу</h2>
       <button class="modal-close" onclick={close}>&times;</button>
     </div>
     <div class="modal-body">
@@ -58,7 +75,31 @@
           {/each}
         </div>
       {:else}
-        <p class="no-voices-message">Українські голоси не знайдено у вашому браузері. Озвучування буде стандартним голосом системи.</p>
+        <div class="no-voices-container">
+          <p class="no-voices-message">
+            На жаль, українські голоси для озвучення не знайдено у вашому браузері.
+          </p>
+          
+          <button class="details-button" onclick={() => showDetails = !showDetails}>
+            {showDetails ? 'Сховати деталі' : 'Чому так?'}
+          </button>
+
+          {#if showDetails}
+            <div class="details-text">
+              <h4>Причина проблеми</h4>
+              <p>
+                Наша гра використовує голоси, вбудовані у вашу операційну систему та доступні через браузер. Деякі браузери, як-от <strong>Chrome на Windows</strong>, не завжди мають доступ до системних українських голосів.
+              </p>
+              <h4>Рекомендовані платформи</h4>
+              <p>Для найкращого досвіду з озвученням спробуйте один із цих варіантів:</p>
+              <ul>
+                <li>Браузер <strong>Microsoft Edge</strong> на Windows.</li>
+                <li>Будь-який браузер на мобільних пристроях з <strong>Android</strong>.</li>
+              </ul>
+              <p>Підтримка <strong>iOS</strong> наразі в розробці. Ми працюємо над виправленням і сподіваємось відновити її найближчим часом.</p>
+            </div>
+          {/if}
+        </div>
       {/if}
     </div>
     <div class="modal-footer">
@@ -180,5 +221,68 @@
     text-align: center;
     padding: 1em;
     color: #ccc;
+  }
+  .no-voices-container {
+    text-align: center;
+    padding: 1em 0;
+  }
+
+  .details-button {
+    background: none;
+    border: none;
+    color: var(--text-accent, #ffbe0b);
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 16px;
+    font-size: 0.95em;
+    padding: 4px 8px;
+    transition: color 0.2s;
+  }
+
+  .details-button:hover {
+    color: #fff;
+  }
+
+  .details-text {
+    margin-top: 20px;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: left;
+    line-height: 1.6;
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  .details-text h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .details-text p, .details-text ul {
+    margin-bottom: 12px;
+    color: var(--text-secondary, #ccc);
+  }
+
+  .details-text ul {
+    padding-left: 20px;
+    margin-bottom: 0;
+  }
+
+  .details-text li {
+    margin-bottom: 8px;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style> 
