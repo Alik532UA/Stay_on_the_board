@@ -37,6 +37,7 @@ function getRandomCell(size) {
  * @param {{row:number,col:number}[]} blockedCells
  */
 function getAvailableMoves(row, col, size, blockedCells = []) {
+  if (row === null || col === null) return [];
   const moves = [];
   const directions = [
     [-1, 0],  // вгору
@@ -101,8 +102,8 @@ function getAvailableMoves(row, col, size, blockedCells = []) {
  * @property {string} style
  * @property {{ showMoves: boolean, showBoard: boolean, speechEnabled: boolean, language: string, theme: string, style: string, selectedVoiceURI?: string }} settings
  * @property {number[][]} board
- * @property {number} playerRow
- * @property {number} playerCol
+ * @property {number|null} playerRow
+ * @property {number|null} playerCol
  * @property {{row: number, col: number}[]} blockedCells
  * @property {{row: number, col: number}[]} availableMoves
  * @property {boolean} blockModeEnabled
@@ -171,8 +172,6 @@ const style = isBrowser ? localStorage.getItem('style') : null;
 
 // Випадкова стартова позиція ферзя
 const initialBoardSize = 3;
-const { row: initialRow, col: initialCol } = getRandomCell(initialBoardSize);
-console.log('[appState] Стартова позиція ферзя:', { initialRow, initialCol });
 export const appState = writable(/** @type {AppState} */({
   currentView: 'mainMenu',
   boardSize: initialBoardSize,
@@ -188,32 +187,28 @@ export const appState = writable(/** @type {AppState} */({
     theme: theme || 'dark',
     style: style || 'ubuntu',
   },
-  board: (() => {
-    const b = createEmptyBoard(initialBoardSize);
-    b[initialRow][initialCol] = 1;
-    return b;
-  })(),
-  playerRow: initialRow,
-  playerCol: initialCol,
+  board: createEmptyBoard(initialBoardSize), // Порожня дошка
+  playerRow: null, // Немає гравця
+  playerCol: null, // Немає гравця
   blockedCells: /** @type {{row:number,col:number}[]} */ ([]),
-  availableMoves: /** @type {{row:number,col:number}[]} */ (getAvailableMoves(initialRow, initialCol, initialBoardSize, [])),
+  availableMoves: /** @type {{row:number,col:number}[]} */ ([]), // Немає ходів
   blockModeEnabled: false,
   selectedDirection: null,
   selectedDistance: null,
-  currentPlayer: 1, // 1 — гравець, 2 — комп'ютер
+  currentPlayer: 1,
   lastMove: null,
-  computerLastMoveDisplay: null, // { direction, distance }
-  lastComputerMove: null, // **НОВЕ**
+  computerLastMoveDisplay: null,
+  lastComputerMove: null,
   distanceManuallySelected: false,
   visitedCells: /** @type {{row:number,col:number}[]} */ ([]),
   isGameOver: false,
   score: 0,
-  movesInBlockMode: 0, // НОВЕ
-  jumpedBlockedCells: 0, // НОВЕ
-  penaltyPoints: 0, // НОВЕ
-  finishedByNoMovesButton: false, // НОВЕ
-  gameId: 1, // <-- ДОДАНО
-  availableDistances: [], // ДОДАНО для відповідності типу AppState
+  movesInBlockMode: 0,
+  jumpedBlockedCells: 0,
+  penaltyPoints: 0,
+  finishedByNoMovesButton: false,
+  gameId: 1,
+  availableDistances: [],
 }));
 
 /**
@@ -241,6 +236,7 @@ export const availableDistances = derived(
  * @returns {Partial<AppState>} Об'єкт з оновленими частинами стану.
  */
 function performMove(state, newRow, newCol) {
+  if (newRow === null || newCol === null) return state;
   const { board, playerRow, playerCol, boardSize, blockModeEnabled, currentPlayer } = state;
 
   const newBoard = board.map(row => row.slice());
@@ -294,19 +290,19 @@ export function setGameMode(mode) {
 /**
  * @param {number} newSize
  */
-export function setBoardSize(newSize) {
+export async function setBoardSize(newSize) {
   appState.update(state => {
     const { row, col } = getRandomCell(newSize);
     const board = createEmptyBoard(newSize);
     board[row][col] = 1;
-    const initialAvailableMoves = getAvailableMoves(row, col, newSize, []);
+    
     return {
       ...state,
       boardSize: newSize,
       board,
       playerRow: row,
       playerCol: col,
-      availableMoves: initialAvailableMoves, // Встановлюємо правильні ходи
+      availableMoves: [], // Починаємо з порожніми ходами
       blockedCells: [],
       visitedCells: [],
       selectedDirection: null,
@@ -320,6 +316,14 @@ export function setBoardSize(newSize) {
       gameId: (state.gameId || 0) + 1,
     };
   });
+
+  // ПІСЛЯ оновлення стану, з затримкою додаємо доступні ходи
+  setTimeout(() => {
+    appState.update(state => {
+      const initialAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, []);
+      return { ...state, availableMoves: initialAvailableMoves };
+    });
+  }, 300); // Затримка для появи ферзя
 }
 
 /**
@@ -476,7 +480,7 @@ function calculateFinalScore(state) {
 /**
  * Підтверджує хід гравця (синхронно, лише оновлює стан)
  */
-export function confirmMove() {
+export async function confirmMove() {
   if (typeof window === 'undefined') return;
   const state = get(appState);
   const {
@@ -545,42 +549,62 @@ export function confirmMove() {
       computerLastMoveDisplay: null,
     };
   });
+
+  // 1. Оновлюємо стан для ходу гравця, прибираючи доступні ходи
+  appState.update(s => {
+    const moveUpdates = performMove(s, newRow, newCol);
+    return { ...s, ...moveUpdates, currentPlayer: 2, availableMoves: [] };
+  });
+
+  // 2. Даємо час на анімацію ходу гравця
+  await new Promise(resolve => setTimeout(resolve, 600));
+
+  // 3. Запускаємо хід комп'ютера
+  if (get(appState).gameMode === 'vsComputer') {
+    makeComputerMove();
+  }
 }
 
-export function makeComputerMove() {
+export async function makeComputerMove() {
+  // 1. Пауза перед "думкою" комп'ютера
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
   const current = get(appState);
   if (current.isGameOver || current.currentPlayer !== 2) return;
+
   const move = getRandomComputerMove(current.board, current.blockedCells, current.boardSize);
+  
   if (move) {
     const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
+    
+    // 2. Оновлюємо логіку (позицію фігури)
     appState.update(state => {
       const moveUpdates = performMove(state, move.row, move.col);
       return {
         ...state,
         ...moveUpdates,
-        currentPlayer: 1, // Повертаємо хід гравцеві
         computerLastMoveDisplay: { direction: directionKey, distance: move.distance },
         lastComputerMove: { direction: directionKey, distance: move.distance },
       };
     });
+
+    // 3. Даємо час на анімацію фігури комп'ютера
+    await new Promise(resolve => setTimeout(resolve, 600));
+
+    // 4. ТІЛЬКИ ТЕПЕР оновлюємо стан з новими доступними ходами
+    appState.update(state => {
+      const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.blockedCells);
+      return { ...state, availableMoves: newAvailableMoves, currentPlayer: 1 };
+    });
+
+    // Озвучування
     const latestSettings = get(settingsStore);
     if (latestSettings.speechEnabled) {
       const langCode = langMap[latestSettings.language] || 'uk-UA';
       speakMove('computer', directionKey, move.distance, langCode, latestSettings.selectedVoiceURI ?? null);
     }
-  } else {
-    // ... логіка, якщо у комп'ютера немає ходів
   }
 }
-
-// --- Слухач для паузи перед ходом комп'ютера ---
-appState.subscribe(state => {
-  if (state.currentPlayer === 2 && state.gameMode === 'vsComputer' && !state.isGameOver) {
-    setTimeout(() => {
-      makeComputerMove();
-    }, 1000);
-  }
-});
 
 /**
  * Перевіряє, чи є доступні ходи, і показує відповідне модальне вікно
