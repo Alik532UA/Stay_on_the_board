@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import { get } from 'svelte/store';
 
 /**
  * @typedef {Object} SettingsState
@@ -9,6 +10,7 @@ import { writable } from 'svelte/store';
  * @property {string} style
  * @property {boolean} speechEnabled // <-- ДОДАНО
  * @property {string | null} selectedVoiceURI // <-- ДОДАНО
+ * @property {boolean} blockModeEnabled // <-- ДОДАНО
  */
 
 const isBrowser = typeof window !== 'undefined';
@@ -21,6 +23,7 @@ const defaultSettings = {
   style: 'ubuntu',
   speechEnabled: false, // <-- ДОДАНО
   selectedVoiceURI: null, // <-- ДОДАНО
+  blockModeEnabled: false, // <-- ДОДАНО
 };
 
 if (isBrowser) {
@@ -36,7 +39,8 @@ const storedSettings = isBrowser ? {
   theme: localStorage.getItem('theme') || defaultSettings.theme,
   style: localStorage.getItem('style') || defaultSettings.style,
   speechEnabled: localStorage.getItem('speechEnabled') === 'true', // <-- ДОДАНО
-  selectedVoiceURI: localStorage.getItem('selectedVoiceURI') || null // <-- ДОДАНО
+  selectedVoiceURI: localStorage.getItem('selectedVoiceURI') || null, // <-- ДОДАНО
+  blockModeEnabled: localStorage.getItem('blockModeEnabled') === 'true' ? true : false, // <-- ДОДАНО
 } : defaultSettings;
 
 const { subscribe, set, update } = writable(storedSettings);
@@ -67,6 +71,7 @@ function updateSettings(newSettings) {
       } else {
         localStorage.removeItem('selectedVoiceURI');
       }
+      localStorage.setItem('blockModeEnabled', String(merged.blockModeEnabled)); // <-- ДОДАНО
     }
     return merged;
   });
@@ -74,6 +79,38 @@ function updateSettings(newSettings) {
 
 function resetSettings() {
   set({ ...defaultSettings });
+}
+
+/**
+ * Перемикає видимість дошки
+ */
+export function toggleShowBoard() {
+  const prev = get(settingsStore);
+  updateSettings({ showBoard: !(prev.showBoard ?? true) });
+}
+
+/**
+ * Перемикає видимість підсвічування ходів
+ */
+export function toggleShowMoves() {
+  const prev = get(settingsStore);
+  updateSettings({ showMoves: !(prev.showMoves ?? true) });
+}
+
+/**
+ * Перемикає озвучування ходів
+ */
+export function toggleSpeech() {
+  const prev = get(settingsStore);
+  updateSettings({ speechEnabled: !(prev.speechEnabled ?? false) });
+}
+
+/**
+ * Перемикає режим блокування клітинок
+ */
+export function toggleBlockMode() {
+  const prev = get(settingsStore);
+  updateSettings({ blockModeEnabled: !(prev.blockModeEnabled ?? false) });
 }
 
 export const settingsStore = {
