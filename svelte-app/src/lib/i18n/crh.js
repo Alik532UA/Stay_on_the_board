@@ -38,7 +38,7 @@ export default {
     scoreLabel: "Esap",
     cashOut: "Ballarnı al",
     tutorialTitle: "",
-    tutorialContent: "Siziñ maqsadıñız – nevbetnen bir ortaq figurani tahtadan tışarı çıqarmadan areket ettirmektir. Onıñ yerini aqlıñızda tutuñız, çünki siziñ areketiñizden soñ tahta ğayip olmaq mümkün! Kompyuterniñ areketi yöneliş saylav paneliniñ merkezinde peyda olacaq, soñra nevbet kene sizge keçecek.",
+    tutorialContent: "Siziñ maqsadıñız – nevbetnen ortaq figurani tahtadan tışarı çıqarmadan areket ettirmektir. Er bir areket içün daa çoq bal qazanmaq içün, sozlamalarda tahtanı ya da vezirni gizletiñiz!",
     info: "Talimat",
     details: "Tafsilât",
   },
@@ -54,7 +54,8 @@ export default {
     selectDistance: "Mesafeni sayla:",
     confirm: "Areketni tasdiqla",
     noMovesTitle: "Areket yoq",
-    voiceSettingsTitle: "Sesni sozla"
+    voiceSettingsTitle: "Sesni sozla",
+    settings: "Sozlamalar"
   },
   settings: {
     title: "Sozlamalar",
@@ -110,7 +111,9 @@ export default {
       penalty: "Keri areketler içün ceza:",
       finalScore: "Neticedeki esap:",
       yourScore: "Siziñ esabıñız:"
-    }
+    },
+    boardClickTitle: "Oyun nasıl idare etilir?",
+    boardClickContent: "Oyun tahtada degil, aşağıdaki idare paneli vastasınen idare etile. Yönelişni saylamaq içün oqlarnı ve mesafeni saylamaq içün raqamlı dögmelerni qullanıñız. Tahta tek areketlerni közetmek içündir."
   },
   voiceSettings: {
     title: "Ses Sozlamaları",

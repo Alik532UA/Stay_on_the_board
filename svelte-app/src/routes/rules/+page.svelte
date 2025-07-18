@@ -59,6 +59,11 @@
 
 <h2>{$_('rulesPage.scoringTitle')}</h2>
 <p>{$_('rulesPage.scoringText')}</p>
+<ul>
+  <li>{$_('rulesPage.scoreNormal')}</li>
+  <li>{$_('rulesPage.scoreHideQueen')}</li>
+  <li>{$_('rulesPage.scoreHideBoard')}</li>
+</ul>
 
 <h2>{$_('rulesPage.settingsTitle')}</h2>
 <h3>{$_('rulesPage.boardSize')}</h3>

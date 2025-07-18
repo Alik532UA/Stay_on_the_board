@@ -5,7 +5,7 @@
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
-  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech } from '$lib/stores/settingsStore.js';
+  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleHideQueen } from '$lib/stores/settingsStore.js';
   import SvgIcons from './SvgIcons.svelte';
   $: isPlayerTurn = $appState.players[$appState.currentPlayerIndex]?.type === 'human';
   $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
@@ -173,57 +173,76 @@
 </script>
 
 <div class="game-controls-panel">
-  <div class="toggles">
-    {#if showBoard}
+  <details class="settings-expander">
+    <summary class="settings-summary">{$_('gameControls.settings')}</summary>
+    <div class="toggles">
+      <!-- 1. Показати дошку -->
       <label class="ios-switch-label">
         <div class="switch-content-wrapper">
           <div class="ios-switch">
-            <input type="checkbox" checked={showMoves} onchange={onShowMovesChange} />
+            <input type="checkbox" checked={showBoard} onchange={onShowBoardChange} />
+            <span class="slider"></span>
+          </div>
+          <span>{$_('gameControls.showBoard')}</span>
+        </div>
+      </label>
+
+      <!-- 2. Приховати ферзя -->
+      <label class="ios-switch-label" class:disabled={!showBoard}>
+        <div class="switch-content-wrapper">
+          <div class="ios-switch">
+            <input type="checkbox" checked={$settingsStore.hideQueen} onchange={toggleHideQueen} disabled={!showBoard} />
+            <span class="slider"></span>
+          </div>
+          <span>{$_('gameControls.hideQueen')}</span>
+        </div>
+      </label>
+
+      <!-- 3. Показувати доступні ходи -->
+      <label class="ios-switch-label" class:disabled={!showBoard || $settingsStore.hideQueen}>
+        <div class="switch-content-wrapper">
+          <div class="ios-switch">
+            <input type="checkbox" checked={showMoves} onchange={onShowMovesChange} disabled={!showBoard || $settingsStore.hideQueen} />
             <span class="slider"></span>
           </div>
           <span>{$_('gameControls.showMoves')}</span>
         </div>
       </label>
-    {/if}
-    <label class="ios-switch-label">
-      <div class="switch-content-wrapper">
-        <div class="ios-switch">
-          <input type="checkbox" checked={showBoard} onchange={onShowBoardChange} />
-          <span class="slider"></span>
+
+      <!-- 4. Режим заблокованих клітинок -->
+      <label class="ios-switch-label">
+        <div class="switch-content-wrapper">
+          <div class="ios-switch">
+            <input type="checkbox" checked={blockModeEnabled} onchange={onBlockModeChange} />
+            <span class="slider"></span>
+          </div>
+          <span>{$_('gameControls.blockMode')}</span>
         </div>
-        <span>{$_('gameControls.showBoard')}</span>
-      </div>
-    </label>
-    <label class="ios-switch-label">
-      <div class="switch-content-wrapper">
-        <div class="ios-switch">
-          <input type="checkbox" checked={blockModeEnabled} onchange={onBlockModeChange} />
-          <span class="slider"></span>
+      </label>
+
+      <!-- 5. Озвучування ходів -->
+      <label class="ios-switch-label">
+        <div class="switch-content-wrapper">
+          <div class="ios-switch">
+            <input 
+              type="checkbox" 
+              bind:checked={speechEnabled} 
+              onchange={onSpeechChange}
+            />
+            <span class="slider"></span>
+          </div>
+          <span>{$_('gameControls.speech')}</span>
         </div>
-        <span>{$_('gameControls.blockMode')}</span>
-      </div>
-    </label>
-    <label class="ios-switch-label">
-      <div class="switch-content-wrapper">
-        <div class="ios-switch">
-          <input 
-            type="checkbox" 
-            bind:checked={speechEnabled} 
-            onchange={onSpeechChange}
-          />
-          <span class="slider"></span>
-        </div>
-        <span>{$_('gameControls.speech')}</span>
-      </div>
-      <button
-        class="settings-icon-btn"
-        title={$_('gameControls.voiceSettingsTitle')}
-        onclick={(e) => { e.stopPropagation(); openVoiceSettingsModal(); }}
-      >
-        <SvgIcons name="voice-settings" />
-      </button>
-    </label>
-  </div>
+        <button
+          class="settings-icon-btn"
+          title={$_('gameControls.voiceSettingsTitle')}
+          onclick={(e) => { e.stopPropagation(); openVoiceSettingsModal(); }}
+        >
+          <SvgIcons name="voice-settings" />
+        </button>
+      </label>
+    </div>
+  </details>
   <div class="directions directions-3x3">
     <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" onclick={() => onDirectionClick('up-left')}>↖</button>
     <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" onclick={() => onDirectionClick('up')}>↑</button>
@@ -579,5 +598,53 @@
 .settings-icon-btn:hover {
   color: var(--text-accent);
   transform: scale(1.1) rotate(15deg);
+}
+.settings-expander {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 8px;
+}
+
+.settings-summary {
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 1.1em;
+  cursor: pointer;
+  outline: none;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.settings-summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-summary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.settings-summary::after {
+  content: '+';
+  font-size: 1.4em;
+  font-weight: 300;
+  transition: transform 0.2s ease-in-out;
+}
+
+.settings-expander[open] > .settings-summary::after {
+  transform: rotate(45deg);
+}
+
+.settings-expander[open] > .toggles {
+  padding: 0 16px 16px 16px;
+}
+.ios-switch-label.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 </style> 

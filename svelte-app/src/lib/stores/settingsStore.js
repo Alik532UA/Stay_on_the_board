@@ -14,6 +14,7 @@ import { locale } from 'svelte-i18n';
  * @property {boolean} speechEnabled // <-- ДОДАНО
  * @property {string | null} selectedVoiceURI // <-- ДОДАНО
  * @property {boolean} blockModeEnabled // <-- ДОДАНО
+ * @property {boolean} hideQueen // <-- ДОДАНО
  */
 
 const isBrowser = typeof window !== 'undefined';
@@ -27,6 +28,7 @@ const defaultSettings = {
   speechEnabled: false, // <-- ДОДАНО
   selectedVoiceURI: null, // <-- ДОДАНО
   blockModeEnabled: false, // <-- ДОДАНО
+  hideQueen: false, // <-- ДОДАНО
 };
 
 if (isBrowser) {
@@ -44,6 +46,7 @@ const storedSettings = isBrowser ? {
   speechEnabled: localStorage.getItem('speechEnabled') === 'true', // <-- ДОДАНО
   selectedVoiceURI: localStorage.getItem('selectedVoiceURI') || null, // <-- ДОДАНО
   blockModeEnabled: localStorage.getItem('blockModeEnabled') === 'true' ? true : false, // <-- ДОДАНО
+  hideQueen: localStorage.getItem('hideQueen') === 'true', // <-- ДОДАНО
 } : defaultSettings;
 
 const { subscribe, set, update } = writable(storedSettings);
@@ -75,6 +78,7 @@ function updateSettings(newSettings) {
         localStorage.removeItem('selectedVoiceURI');
       }
       localStorage.setItem('blockModeEnabled', String(merged.blockModeEnabled)); // <-- ДОДАНО
+      localStorage.setItem('hideQueen', String(merged.hideQueen)); // <-- ДОДАНО
     }
     return merged;
   });
@@ -145,4 +149,18 @@ export const settingsStore = {
   updateSettings,
   resetSettings,
   update,
-}; 
+};
+
+/**
+ * Перемикає видимість ферзя
+ */
+export function toggleHideQueen() {
+  const prev = get(settingsStore);
+  const newHideQueenState = !(prev.hideQueen ?? false);
+  // Якщо ми ховаємо ферзя, ми також повинні приховати доступні ходи
+  if (newHideQueenState) {
+    updateSettings({ hideQueen: newHideQueenState, showMoves: false });
+  } else {
+    updateSettings({ hideQueen: newHideQueenState });
+  }
+} 

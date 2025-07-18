@@ -1,6 +1,6 @@
 <script>
   import '../css/components/game-board.css';
-  import { appState, setDirection, setDistance, confirmMove, noMoves, setBoardSize, movePlayer, toggleBlockCell, makeComputerMove, toggleBlockMode, cashOutAndEndGame } from '$lib/stores/gameStore.js';
+  import { appState, setBoardSize, toggleBlockCell, setDirection, setDistance, confirmMove, noMoves, toggleBlockMode, cashOutAndEndGame } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { navigateToMainMenu } from '$lib/utils/navigation.js';
   import GameControls from '$lib/components/GameControls.svelte';
@@ -10,15 +10,45 @@
   import { _ } from 'svelte-i18n';
   import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore.js';
   import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
-  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech } from '$lib/stores/settingsStore.js';
+  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleHideQueen } from '$lib/stores/settingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from './SvgIcons.svelte';
   import { base } from '$app/paths';
+  import { cubicOut } from 'svelte/easing';
+  import { scale } from 'svelte/transition';
+
+  let showBoard = $derived($settingsStore.showBoard);
+  let isBoardVisible = $state(showBoard);
+  let isHiding = $state(false);
+  let isEntering = $state(false);
+  const ANIMATION_DURATION = 10000; // 10 секунд для дебагу
+
+  $effect(() => {
+    if (showBoard) {
+      // Етап 1: Додаємо елемент в DOM і одразу ж застосовуємо початковий стан анімації
+      isBoardVisible = true;
+      isEntering = true;
+      isHiding = false;
+
+      // Етап 2: З мінімальною затримкою прибираємо клас, щоб запустити анімацію
+      requestAnimationFrame(() => {
+        isEntering = false;
+      });
+    } else {
+      // Логіка зникнення залишається такою ж
+      if (isBoardVisible) { // Запускаємо анімацію зникнення тільки якщо дошка видима
+        isHiding = true;
+        setTimeout(() => {
+          isBoardVisible = false;
+        }, ANIMATION_DURATION);
+      }
+    }
+  });
+
   // Функція очищення кешу
   function clearCache() {
     localStorage.clear();
     sessionStorage.clear();
-    // Очищення всіх cookies
     if (document.cookie && document.cookie !== '') {
       const cookies = document.cookie.split(';');
       for (let i = 0; i < cookies.length; i++) {
@@ -30,8 +60,8 @@
     }
     location.reload();
   }
-  let boardSizes = Array.from({length:8},(_,i)=>i+2); // number[]
-  let showBoardSizeDropdown = $state(false); // Використовуємо $state для реактивності
+  let boardSizes = Array.from({length:8},(_,i)=>i+2);
+  let showBoardSizeDropdown = $state(false);
 
   function toggleBoardSizeDropdown() {
     showBoardSizeDropdown = !showBoardSizeDropdown;
@@ -41,26 +71,18 @@
     showBoardSizeDropdown = false;
   }
 
-  /**
-   * @param {number} n
-   */
+  /** @param {number} n */
   function selectBoardSize(n) {
     const state = get(appState);
-
-    // Якщо розмір не змінився, нічого не робимо
     if (state.boardSize === n) {
       closeBoardSizeDropdown();
       return;
     }
-
-    // Якщо рахунок нульовий, змінюємо розмір без попередження
     if (state.score === 0 && state.penaltyPoints === 0) {
       setBoardSize(n);
       closeBoardSizeDropdown();
       return;
     }
-
-    // В іншому випадку, показуємо модальне вікно
     modalStore.showModal({
       titleKey: 'modal.resetScoreTitle',
       contentKey: 'modal.resetScoreContent',
@@ -82,25 +104,19 @@
         }
       ]
     });
-
     closeBoardSizeDropdown();
   }
 
   let boardSize = $derived(Number($appState.boardSize));
-  let board = $derived($appState.board);
   let playerRow = $derived($appState.playerRow);
   let playerCol = $derived($appState.playerCol);
   let blockedCells = $derived($appState.blockedCells);
   let blockModeEnabled = $derived($appState.blockModeEnabled);
-  let currentPlayer = $derived($appState.currentPlayer);
+  let currentPlayerIndex = $derived($appState.currentPlayerIndex);
   let showMoves = $derived($settingsStore.showMoves);
-  let showBoard = $derived($settingsStore.showBoard);
   let gameId = $derived($appState.gameId);
   let availableMoves = $derived($appState.availableMoves);
 
-  // Видаляю visualPiece, displayedMoves, prevGameId, $effect, імпорти flip/quintOut/fade якщо вони не використовуються більше
-
-  // Виношу виклики $_() на верхній рівень
   let playerTitle = $derived($_('gameBoard.player'));
   let mainMenuTitle = $derived($_('gameBoard.mainMenu'));
 
@@ -118,7 +134,6 @@
         showTutorial = true;
       }
     }
-    // Якщо гра ще не почалася (немає гравця на дошці), ініціалізуємо її.
     if (get(appState).playerRow === null) {
       setBoardSize(get(appState).boardSize);
     }
@@ -150,83 +165,21 @@
     });
   }
 
-  function onBoardSizeChange(/** @type {Event} */ event) {
-    const newSize = +/** @type {HTMLSelectElement} */(event.target).value;
-    logStore.addLog(`Зміна розміру дошки на ${newSize}x${newSize}`, 'info');
-    setBoardSize(newSize);
-  }
-
-  /**
-   * @param {number} row
-   * @param {number} col
-   */
+  /** @param {number} row @param {number} col */
   function isAvailable(row, col) {
     return $appState.availableMoves && $appState.availableMoves.some(move => move.row === row && move.col === col);
   }
 
-  /**
-   * @param {number} row
-   * @param {number} col
-   */
-  function isBlocked(row, col) {
-    const result = blockedCells && blockedCells.some(cell => Number(cell.row) === Number(row) && Number(cell.col) === Number(col));
-    return result;
-  }
-
-  /**
-   * Перевіряє, чи є клітинка заблокованою.
-   * @param {number} row
-   * @param {number} col
-   */
+  /** @param {number} row @param {number} col */
   function isCellBlocked(row, col) {
     return !!(blockedCells && blockedCells.some(cell => cell.row === row && cell.col === col));
   }
 
-  /**
-   * @param {number} row
-   * @param {number} col
-   * @param {number} size
-   * @param {{row:number,col:number}[]} blockedCells
-   */
-  function getAvailableMoves(row, col, size, blockedCells = []) {
-    const moves = [];
-    const directions = [
-      [-1, 0], [1, 0], [0, -1], [0, 1],
-      [-1, -1], [-1, 1], [1, -1], [1, 1]
-    ];
-    const isBlocked = (/** @type {number} */ r, /** @type {number} */ c) => blockedCells.some(cell => cell.row === r && cell.col === c);
-    for (const [dr, dc] of directions) {
-      for (let dist = 1; dist < size; dist++) {
-        const nr = row + dr * dist;
-        const nc = col + dc * dist;
-        if (nr < 0 || nc < 0 || nr >= size || nc >= size) break;
-        if (!isBlocked(nr, nc)) {
-          moves.push({ row: nr, col: nc });
-        }
-      }
-    }
-    return moves;
-  }
-
-  function onCellRightClick(/** @type {Event} */ event, /** @type {number} */ row, /** @type {number} */ col) {
-    event.preventDefault();
-    if (blockModeEnabled && !(row === playerRow && col === playerCol)) {
-      const blocked = blockedCells && blockedCells.some(cell => cell.row === row && cell.col === col);
-      logStore.addLog(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`, 'info');
-      toggleBlockCell(row, col);
-    }
-  }
-
-  /**
-   * Обробляє натискання клавіш для керування грою.
-   * @param {KeyboardEvent} event
-   */
+  /** @param {KeyboardEvent} event */
   function handleKeydown(event) {
-    // ЗАПОБІЖНИК: Якщо модальне вікно відкрите, ігноруємо всі ігрові гарячі клавіші.
     if (get(modalStore).isOpen) {
       return;
     }
-    // Ігноруємо гарячі клавіші, якщо фокус на полі вводу
     const target = event.target;
     if (target && typeof target === 'object' && 'tagName' in target) {
       const tag = target.tagName;
@@ -235,104 +188,38 @@
       }
     }
 
-    // Запобігаємо стандартній поведінці браузера (напр. скролінг стрілками)
-    // для клавіш, які ми обробляємо.
     let handled = true;
 
     switch (event.key) {
-      // Напрямки (Numpad та стрілки)
-      case 'ArrowUp':
-      case '8':
-        setDirection('up');
-        break;
-      case 'ArrowDown':
-      case '2':
-        setDirection('down');
-        break;
-      case 'ArrowLeft':
-      case '4':
-        setDirection('left');
-        break;
-      case 'ArrowRight':
-      case '6':
-        setDirection('right');
-        break;
-      case '7':
-        setDirection('up-left');
-        break;
-      case '9':
-        setDirection('up-right');
-        break;
+      case 'ArrowUp': case '8': setDirection('up'); break;
+      case 'ArrowDown': case '2': setDirection('down'); break;
+      case 'ArrowLeft': case '4': setDirection('left'); break;
+      case 'ArrowRight': case '6': setDirection('right'); break;
+      case '7': setDirection('up-left'); break;
+      case '9': setDirection('up-right'); break;
       case '1':
-        // Якщо це відстань, а не напрямок
         if ($appState.selectedDirection) {
           setDistance(1);
         } else {
           setDirection('down-left');
         }
         break;
-      case '3':
-        setDirection('down-right');
-        break;
-
-      // Альтернативне керування (QWE/ASD/ZXC)
-      case 'w':
-        setDirection('up');
-        break;
-      case 's':
-      case 'x':
-        setDirection('down');
-        break;
-      case 'a':
-        setDirection('left');
-        break;
-      case 'd':
-        setDirection('right');
-        break;
-      case 'q':
-        setDirection('up-left');
-        break;
-      case 'e':
-        setDirection('up-right');
-        break;
-      case 'z':
-        setDirection('down-left');
-        break;
-      case 'c':
-        setDirection('down-right');
-        break;
-
-      // Дії
-      case 'Enter':
-      case ' ': // Spacebar
-      case '5': // NumPad5
-        confirmMove();
-        break;
-      case 'n':
-      case 'N':
-        noMoves();
-        break;
-      case 'Backspace':
-        logStore.addLog(`[handleKeydown] Натиснуто "Backspace" — заявити "немає ходів"`, 'info');
-        noMoves();
-        break;
-      case 'v':
-      case 'V':
-        logStore.addLog('[handleKeydown] Перемкнено озвучування ходів', 'info');
-        toggleSpeech();
-        break;
-        
-      // Налаштування дошки та режимів
-      case '*': // Numpad Multiply
-        logStore.addLog('[handleKeydown] Перемкнено режим заблокованих клітинок', 'info');
-        toggleBlockMode();
-        break;
-      case '/': // Numpad Divide
-        logStore.addLog('[handleKeydown] Перемкнено видимість дошки', 'info');
-        toggleShowBoard();
-        break;
-      case '+': // Numpad Add
-      case '=': // Standard equals/plus key
+      case '3': setDirection('down-right'); break;
+      case 'w': setDirection('up'); break;
+      case 's': case 'x': setDirection('down'); break;
+      case 'a': setDirection('left'); break;
+      case 'd': setDirection('right'); break;
+      case 'q': setDirection('up-left'); break;
+      case 'e': setDirection('up-right'); break;
+      case 'z': setDirection('down-left'); break;
+      case 'c': setDirection('down-right'); break;
+      case 'Enter': case ' ': case '5': confirmMove(); break;
+      case 'n': case 'N': noMoves(); break;
+      case 'Backspace': logStore.addLog(`[handleKeydown] Натиснуто "Backspace" — заявити "немає ходів"`, 'info'); noMoves(); break;
+      case 'v': case 'V': logStore.addLog('[handleKeydown] Перемкнено озвучування ходів', 'info'); toggleSpeech(); break;
+      case '*': logStore.addLog('[handleKeydown] Перемкнено режим заблокованих клітинок', 'info'); toggleBlockMode(); break;
+      case '/': logStore.addLog('[handleKeydown] Перемкнено видимість дошки', 'info'); toggleShowBoard(); break;
+      case '+': case '=':
         {
           const currentSize = get(appState).boardSize;
           if (currentSize < 9) {
@@ -340,7 +227,7 @@
           }
         }
         break;
-      case '-': // Numpad Subtract
+      case '-':
         {
           const currentSize = get(appState).boardSize;
           if (currentSize > 2) {
@@ -348,13 +235,11 @@
           }
         }
         break;
-
       default:
-        handled = false; // Ми не обробили цю клавішу
+        handled = false;
         break;
     }
 
-    // Додаємо окрему перевірку для NumpadDecimal за event.code
     if (event.code === 'NumpadDecimal') {
       logStore.addLog(`[handleKeydown] Натиснуто "NumpadDecimal" — заявити "немає ходів"`, 'info');
       noMoves();
@@ -363,6 +248,28 @@
 
     if (handled) {
       event.preventDefault();
+    }
+  }
+
+  /** @param {MouseEvent} e */
+  function showBoardClickHint(e) {
+    e.stopPropagation();
+    modalStore.showModal({
+      titleKey: 'modal.boardClickTitle',
+      contentKey: 'modal.boardClickContent',
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+    });
+  }
+
+  /** @param {MouseEvent} event @param {number} row @param {number} col */
+  function onCellRightClick(event, row, col) {
+    // Якщо це не MouseEvent — ігноруємо (лінтер-фікс)
+    if (!(event instanceof MouseEvent)) return;
+    event.preventDefault();
+    if (blockModeEnabled && !(row === playerRow && col === playerCol)) {
+      const blocked = blockedCells && blockedCells.some(cell => cell.row === row && cell.col === col);
+      logStore.addLog(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`, 'info');
+      toggleBlockCell(row, col);
     }
   }
 </script>
@@ -437,9 +344,18 @@
       {$_('gameBoard.cashOut')}
     </button>
   </div>
-  {#if showBoard}
-    {#key `${$appState.boardSize}-${$appState.gameId}`}
-      <div class="board-bg-wrapper game-content-block">
+  {#key `${$appState.boardSize}-${$appState.gameId}`}
+    {#if isBoardVisible}
+      <div 
+        class="board-bg-wrapper game-content-block" 
+        class:is-hiding={isHiding}
+        class:is-entering={isEntering}
+        onclick={showBoardClickHint} 
+        onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
+        role="button"
+        tabindex="0"
+        aria-label="Ігрове поле"
+      >
         <div class="game-board" style="--board-size: {boardSize}" role="grid">
           {#each Array(boardSize) as _, rowIdx (rowIdx)}
             {#each Array(boardSize) as _, colIdx (colIdx)}
@@ -450,8 +366,9 @@
                 class:blocked-cell={ isCellBlocked(rowIdx, colIdx) }
                 class:available={ showMoves && isAvailable(rowIdx, colIdx) }
                 aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
-                oncontextmenu={(e) => onCellRightClick(e, rowIdx, colIdx)}
+                oncontextmenu={(e) => e instanceof MouseEvent && onCellRightClick(e, rowIdx, colIdx)}
                 role="gridcell"
+                tabindex="0"
               >
                 {#if isCellBlocked(rowIdx, colIdx)}
                   <span class="blocked-x">✗</span>
@@ -463,7 +380,7 @@
               </div>
             {/each}
           {/each}
-          {#if $appState.playerRow !== null && $appState.playerCol !== null}
+          {#if !$settingsStore.hideQueen && $appState.playerRow !== null && $appState.playerCol !== null}
             {#key $appState.gameId}
               <div
                 class="player-piece"
@@ -477,8 +394,8 @@
           {/if}
         </div>
       </div>
-    {/key}
-  {/if}
+    {/if}
+  {/key}
   <!-- Рендеримо ферзя як окремий елемент поверх сітки -->
   <GameControls />
   <Modal />
@@ -614,9 +531,34 @@
     margin: 0;
     padding-right: 16px;
   }
+  /* ОНОВЛЕНИЙ CSS для .board-bg-wrapper */
   .board-bg-wrapper {
-    /* Відповідає за центрування і ширину ігрового поля */
-    /* Всі розміри тепер задаються через .game-content-block */
+    width: 480px;
+    max-width: 95vw;
+    aspect-ratio: 1 / 1; /* Гарантуємо, що контейнер завжди квадратний */
+    margin: 0 auto 16px; /* Додаємо margin-bottom за замовчуванням */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: none;
+    /* Анімація */
+    transition: opacity 10s ease-in-out, transform 10s ease-in-out, margin-bottom 10s ease-in-out;
+    transform-origin: center;
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .board-bg-wrapper.is-hiding,
+  .board-bg-wrapper.is-entering {
+    opacity: 0;
+    transform: scale(0);
+    /* 
+      Компенсуємо висоту елемента від'ємним margin, щоб нижні елементи плавно піднялися.
+      480px - це максимальна висота, vw - для мобільних.
+      calc() забезпечує вибір меншого значення.
+    */
+    margin-bottom: calc(-1 * min(480px, 95vw));
   }
   .details-btn {
     display: inline-block;
