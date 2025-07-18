@@ -55,7 +55,7 @@ export default {
     confirm: "Підтвердити хід",
     noMovesTitle: "Ходів немає",
     voiceSettingsTitle: "Налаштувати голос",
-    hideQueen: "Приховати ферзя",
+    showQueen: "Показати ферзя",
     settings: "Налаштування"
   },
   settings: {
