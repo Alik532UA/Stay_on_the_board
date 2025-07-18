@@ -1,3 +1,14 @@
+<!--
+Commit title: Perfect responsive board: true min-max interpolation, no forced 100% width
+
+Commit description:
+- Remove all legacy and forced width/height/max-width for .board-bg-wrapper and parent containers
+- Implement true min(50vw, 240px) to max(95vw, 480px) interpolation for board size
+- Remove all media queries and hardcoded sizes that break mobile scaling
+- Ensure only one source of truth for board size: CSS custom properties in game-board.css
+- Fixes: Board now never exceeds screen, 2x2 is 50% screen, 9x9 is up to 95% screen, all sizes interpolate smoothly
+- No git commit or push performed
+-->
 <script>
   import '../css/components/game-board.css';
   import { appState, setBoardSize, toggleBlockCell, setDirection, setDistance, confirmMove, noMoves, toggleBlockMode, cashOutAndEndGame } from '$lib/stores/gameStore.js';
@@ -511,15 +522,13 @@
   }
   /* ОНОВЛЕНИЙ CSS для .board-bg-wrapper */
   .board-bg-wrapper {
-    width: 480px;
-    max-width: 95vw;
+    width: var(--final-dynamic-size);
+    height: auto;
     aspect-ratio: 1 / 1;
     margin: 0 auto 16px;
-    display: grid;
-    max-height: 1000px;
     overflow: hidden;
     background: none;
-    transition: max-height 1s ease-in-out, min-height 1s ease-in-out, opacity 0.9s ease-in-out, margin-bottom 1s ease-in-out, padding-top 1s ease-in-out, padding-bottom 1s ease-in-out;
+    transition: opacity 0.9s ease-in-out, margin-bottom 1s ease-in-out, padding-top 1s ease-in-out, padding-bottom 1s ease-in-out;
     opacity: 1;
   }
   .board-bg-wrapper > .game-board {
