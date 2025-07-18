@@ -40,11 +40,12 @@
   <div class="settings-group">
     <label for="style-select">{$_('settings.style')}:</label>
     <select id="style-select" name="style" value={settings.style} onchange={onChange}>
-      <option value="ubuntu">{$_('mainMenu.themeName.ubuntu')}</option>
-      <option value="peak">{$_('settings.stylePeak')}</option>
-      <option value="cs2">{$_('settings.styleCS2')}</option>
-      <option value="glass">{$_('settings.styleGlass')}</option>
-      <option value="material">{$_('settings.styleMaterial')}</option>
+      <option value="purple">{$_('mainMenu.themeName.purple')}</option>
+      <option value="green">{$_('settings.styleGreen')}</option>
+      <option value="blue">{$_('settings.styleBlue')}</option>
+      <option value="gray">{$_('settings.styleGray')}</option>
+      <option value="orange">{$_('settings.styleOrange')}</option>
+      <option value="wood">{$_('mainMenu.themeName.wood')}</option>
     </select>
   </div>
   <div class="settings-actions">

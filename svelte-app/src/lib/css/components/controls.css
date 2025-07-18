@@ -213,51 +213,51 @@
     box-shadow: 0 4px 12px rgba(255, 152, 0, 0.5);
 }
 
-[data-style="peak"] #computer-move-display.player1-turn {
+[data-style="green"] #computer-move-display.player1-turn {
     box-shadow: 0 4px 12px rgba(0, 255, 136, 0.4);
 }
 
-[data-style="peak"] #computer-move-display.player2-turn {
+[data-style="green"] #computer-move-display.player2-turn {
     box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
 }
 
-[data-style="peak"] #computer-move-display.computer-turn {
+[data-style="green"] #computer-move-display.computer-turn {
     box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
 }
 
-[data-style="cs2"] #computer-move-display.player1-turn {
+[data-style="blue"] #computer-move-display.player1-turn {
     box-shadow: 0 4px 12px rgba(92, 126, 16, 0.4);
 }
 
-[data-style="cs2"] #computer-move-display.player2-turn {
+[data-style="blue"] #computer-move-display.player2-turn {
     box-shadow: 0 4px 12px rgba(194, 50, 50, 0.4);
 }
 
-[data-style="cs2"] #computer-move-display.computer-turn {
+[data-style="blue"] #computer-move-display.computer-turn {
     box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
 }
 
-[data-theme="dark"][data-style="peak"] #computer-move-display.player1-turn {
+[data-theme="dark"][data-style="green"] #computer-move-display.player1-turn {
     box-shadow: 0 4px 12px rgba(0, 255, 136, 0.6);
 }
 
-[data-theme="dark"][data-style="peak"] #computer-move-display.player2-turn {
+[data-theme="dark"][data-style="green"] #computer-move-display.player2-turn {
     box-shadow: 0 4px 12px rgba(255, 107, 53, 0.6);
 }
 
-[data-theme="dark"][data-style="peak"] #computer-move-display.computer-turn {
+[data-theme="dark"][data-style="green"] #computer-move-display.computer-turn {
     box-shadow: 0 4px 12px rgba(255, 152, 0, 0.6);
 }
 
-[data-theme="dark"][data-style="cs2"] #computer-move-display.player1-turn {
+[data-theme="dark"][data-style="blue"] #computer-move-display.player1-turn {
     box-shadow: 0 4px 12px rgba(92, 126, 16, 0.6);
 }
 
-[data-theme="dark"][data-style="cs2"] #computer-move-display.player2-turn {
+[data-theme="dark"][data-style="blue"] #computer-move-display.player2-turn {
     box-shadow: 0 4px 12px rgba(194, 50, 50, 0.6);
 }
 
-[data-theme="dark"][data-style="cs2"] #computer-move-display.computer-turn {
+[data-theme="dark"][data-style="blue"] #computer-move-display.computer-turn {
     box-shadow: 0 4px 12px rgba(255, 152, 0, 0.6);
 }
 

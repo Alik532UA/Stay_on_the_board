@@ -19,11 +19,11 @@ export default {
       nl: "Nederlands"
     },
     themeName: {
-      ubuntu: "Фіолетий",
-      peak: "Зелений",
-      cs2: "Синій",
-      glass: "Сірий",
-      material: "Помаранчевий",
+      purple: "Фіолетий",
+      green: "Зелений",
+      blue: "Синій",
+      gray: "Сірий",
+      orange: "Помаранчевий",
       wood: "Дерев'яний"
     },
     wipNotice: {
@@ -73,11 +73,11 @@ export default {
     themeDark: "Темна",
     themeLight: "Світла",
     style: "Стиль",
-    styleClassic: "Ubuntu",
-    stylePeak: "Peak",
-    styleCS2: "CS2",
-    styleGlass: "Glassmorphism",
-    styleMaterial: "Material You",
+    stylePurple: "Фіолетова",
+    styleGreen: "Зелена",
+    styleBlue: "Синя",
+    styleGray: "Сіра",
+    styleOrange: "Помаранчева",
     reset: "Скинути налаштування",
     resetHint: "Повернути всі налаштування до стандартних значень"
   },
