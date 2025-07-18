@@ -509,20 +509,22 @@
     aspect-ratio: 1 / 1;
     margin: 0 auto 16px;
     display: grid;
-    grid-template-rows: 1fr;
+    max-height: 1000px;
     overflow: hidden;
     background: none;
-    transition: grid-template-rows 0.4s ease-in-out, opacity 0.3s ease-in-out, margin-bottom 0.4s ease-in-out;
+    transition: max-height 1s ease-in-out, min-height 1s ease-in-out, opacity 0.9s ease-in-out, margin-bottom 1s ease-in-out, padding-top 1s ease-in-out, padding-bottom 1s ease-in-out;
     opacity: 1;
   }
   .board-bg-wrapper > .game-board {
     min-height: 0;
   }
   .board-bg-wrapper.hidden {
-    grid-template-rows: 0fr;
+    max-height: 0;
+    min-height: 0;
     opacity: 0;
     margin-bottom: 0;
-    aspect-ratio: auto;
+    padding-top: 0;
+    padding-bottom: 0;
   }
   .details-btn {
     display: inline-block;
