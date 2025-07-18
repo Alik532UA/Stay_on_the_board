@@ -18,32 +18,7 @@
   import { scale } from 'svelte/transition';
 
   let showBoard = $derived($settingsStore.showBoard);
-  let isBoardVisible = $state(showBoard);
-  let isHiding = $state(false);
-  let isEntering = $state(false);
   const ANIMATION_DURATION = 10000; // 10 секунд для дебагу
-
-  $effect(() => {
-    if (showBoard) {
-      // Етап 1: Додаємо елемент в DOM і одразу ж застосовуємо початковий стан анімації
-      isBoardVisible = true;
-      isEntering = true;
-      isHiding = false;
-
-      // Етап 2: З мінімальною затримкою прибираємо клас, щоб запустити анімацію
-      requestAnimationFrame(() => {
-        isEntering = false;
-      });
-    } else {
-      // Логіка зникнення залишається такою ж
-      if (isBoardVisible) { // Запускаємо анімацію зникнення тільки якщо дошка видима
-        isHiding = true;
-        setTimeout(() => {
-          isBoardVisible = false;
-        }, ANIMATION_DURATION);
-      }
-    }
-  });
 
   // Функція очищення кешу
   function clearCache() {
@@ -345,56 +320,52 @@
     </button>
   </div>
   {#key `${$appState.boardSize}-${$appState.gameId}`}
-    {#if isBoardVisible}
-      <div 
-        class="board-bg-wrapper game-content-block" 
-        class:is-hiding={isHiding}
-        class:is-entering={isEntering}
-        onclick={showBoardClickHint} 
-        onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
-        role="button"
-        tabindex="0"
-        aria-label="Ігрове поле"
-      >
-        <div class="game-board" style="--board-size: {boardSize}" role="grid">
-          {#each Array(boardSize) as _, rowIdx (rowIdx)}
-            {#each Array(boardSize) as _, colIdx (colIdx)}
-              <div
-                class="board-cell"
-                class:light={ (rowIdx + colIdx) % 2 === 0 }
-                class:dark={ (rowIdx + colIdx) % 2 !== 0 }
-                class:blocked-cell={ isCellBlocked(rowIdx, colIdx) }
-                class:available={ showMoves && isAvailable(rowIdx, colIdx) }
-                aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
-                oncontextmenu={(e) => e instanceof MouseEvent && onCellRightClick(e, rowIdx, colIdx)}
-                role="gridcell"
-                tabindex="0"
-              >
-                {#if isCellBlocked(rowIdx, colIdx)}
-                  <span class="blocked-x">✗</span>
-                {:else}
-                  {#if $settingsStore.showMoves && isAvailable(rowIdx, colIdx)}
-                    <span class="move-dot"></span>
-                  {/if}
+    <div 
+      class="board-bg-wrapper game-content-block" 
+      class:hidden={!showBoard}
+      onclick={showBoardClickHint} 
+      role="button"
+      tabindex="0"
+      aria-label="Ігрове поле"
+    >
+      <div class="game-board" style="--board-size: {boardSize}" role="grid">
+        {#each Array(boardSize) as _, rowIdx (rowIdx)}
+          {#each Array(boardSize) as _, colIdx (colIdx)}
+            <div
+              class="board-cell"
+              class:light={ (rowIdx + colIdx) % 2 === 0 }
+              class:dark={ (rowIdx + colIdx) % 2 !== 0 }
+              class:blocked-cell={ isCellBlocked(rowIdx, colIdx) }
+              class:available={ showMoves && isAvailable(rowIdx, colIdx) }
+              aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
+              oncontextmenu={(e) => e instanceof MouseEvent && onCellRightClick(e, rowIdx, colIdx)}
+              role="gridcell"
+              tabindex="0"
+            >
+              {#if isCellBlocked(rowIdx, colIdx)}
+                <span class="blocked-x">✗</span>
+              {:else}
+                {#if $settingsStore.showMoves && isAvailable(rowIdx, colIdx)}
+                  <span class="move-dot"></span>
                 {/if}
-              </div>
-            {/each}
+              {/if}
+            </div>
           {/each}
-          {#if !$settingsStore.hideQueen && $appState.playerRow !== null && $appState.playerCol !== null}
-            {#key $appState.gameId}
-              <div
-                class="player-piece"
-                style="top: calc(var(--cell-size) * {$appState.playerRow}); left: calc(var(--cell-size) * {$appState.playerCol});"
-              >
-                <div class="piece-container">
-                  <SvgIcons name="queen" />
-                </div>
+        {/each}
+        {#if !$settingsStore.hideQueen && $appState.playerRow !== null && $appState.playerCol !== null}
+          {#key $appState.gameId}
+            <div
+              class="player-piece"
+              style="top: calc(var(--cell-size) * {$appState.playerRow}); left: calc(var(--cell-size) * {$appState.playerCol});"
+            >
+              <div class="piece-container">
+                <SvgIcons name="queen" />
               </div>
-            {/key}
-          {/if}
-        </div>
+            </div>
+          {/key}
+        {/if}
       </div>
-    {/if}
+    </div>
   {/key}
   <!-- Рендеримо ферзя як окремий елемент поверх сітки -->
   <GameControls />
@@ -535,30 +506,23 @@
   .board-bg-wrapper {
     width: 480px;
     max-width: 95vw;
-    aspect-ratio: 1 / 1; /* Гарантуємо, що контейнер завжди квадратний */
-    margin: 0 auto 16px; /* Додаємо margin-bottom за замовчуванням */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto 16px;
+    display: grid;
+    grid-template-rows: 1fr;
     overflow: hidden;
     background: none;
-    /* Анімація */
-    transition: opacity 10s ease-in-out, transform 10s ease-in-out, margin-bottom 10s ease-in-out;
-    transform-origin: center;
+    transition: grid-template-rows 0.4s ease-in-out, opacity 0.3s ease-in-out, margin-bottom 0.4s ease-in-out;
     opacity: 1;
-    transform: scale(1);
   }
-
-  .board-bg-wrapper.is-hiding,
-  .board-bg-wrapper.is-entering {
+  .board-bg-wrapper > .game-board {
+    min-height: 0;
+  }
+  .board-bg-wrapper.hidden {
+    grid-template-rows: 0fr;
     opacity: 0;
-    transform: scale(0);
-    /* 
-      Компенсуємо висоту елемента від'ємним margin, щоб нижні елементи плавно піднялися.
-      480px - це максимальна висота, vw - для мобільних.
-      calc() забезпечує вибір меншого значення.
-    */
-    margin-bottom: calc(-1 * min(480px, 95vw));
+    margin-bottom: 0;
+    aspect-ratio: auto;
   }
   .details-btn {
     display: inline-block;
