@@ -1,9 +1,31 @@
 <script>
-  import { appState, toggleBlockMode, toggleShowMoves, toggleShowBoard, toggleSpeech, setDirection, setDistance, confirmMove, noMoves, resetGame, availableDistances } from '../stores/gameStore.js';
-  import { modalStore } from '$lib/stores/modalStore.js';
-  import { logStore } from '$lib/stores/logStore.js';
-  import { _ } from 'svelte-i18n';
+  // Додаємо максимальне логування для імпортів
+  try {
+    import { appState, toggleBlockMode, toggleShowMoves, toggleShowBoard, toggleSpeech, setDirection, setDistance, confirmMove, noMoves, resetGame, availableDistances } from '../stores/gameStore.js';
+    console.log('[GameControls] Імпортовано gameStore.js успішно');
+  } catch (e) {
+    console.error('[GameControls] Помилка імпорту gameStore.js:', e);
+  }
+  try {
+    import { modalStore } from '$lib/stores/modalStore.js';
+    console.log('[GameControls] Імпортовано modalStore.js успішно');
+  } catch (e) {
+    console.error('[GameControls] Помилка імпорту modalStore.js:', e);
+  }
+  try {
+    import { logStore } from '$lib/stores/logStore.js';
+    console.log('[GameControls] Імпортовано logStore.js успішно');
+  } catch (e) {
+    console.error('[GameControls] Помилка імпорту logStore.js:', e);
+  }
+  try {
+    import { _ } from 'svelte-i18n';
+    console.log('[GameControls] Імпортовано svelte-i18n успішно');
+  } catch (e) {
+    console.error('[GameControls] Помилка імпорту svelte-i18n:', e);
+  }
   import { onMount } from 'svelte';
+</script>
   $: isPlayerTurn = $appState.currentPlayer === 1;
   $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
   // Для відображення стрілки за напрямком
@@ -230,11 +252,11 @@
   background: rgba(80,0,80,0.18);
   border-radius: 24px;
   padding: 24px 18px 24px 18px;
-  margin-top: 18px;
+  /* margin-top: 18px; */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 10px;
   min-width: 320px;
   /* Glassmorphism */
   backdrop-filter: blur(12px);
@@ -284,20 +306,20 @@
 }
 .directions-3x3 {
   display: grid;
-  grid-template-columns: repeat(3, 54px);
-  grid-template-rows: repeat(3, 54px);
+  grid-template-columns: repeat(3, 85px);
+  grid-template-rows: repeat(3, 85px);
   gap: 14px;
   margin: 18px 0 10px 0;
   justify-content: center;
 }
-.dir-btn, .central-btn, .dist-btn {
+.dir-btn, .dist-btn {
+  width: 85px;
+  height: 85px;
+  font-size: 2.21em;
   font-family: 'M PLUS Rounded 1c', sans-serif !important;
   border-radius: 12px;
 }
 .dir-btn {
-  width: 54px;
-  height: 54px;
-  font-size: 1.7em;
   border: none;
   border-radius: 16px;
   background: rgba(255,255,255,0.13);
@@ -330,7 +352,7 @@
   transform: scale(1.12);
 }
 .central-btn {
-  font-size: 1.3em;
+  font-size: 1.56em;
   background: rgba(67,160,71,0.13);
   color: #222;
   border: 2.5px solid #43a047;
@@ -339,8 +361,8 @@
   box-shadow: 0 0 0 0 #43a047;
   z-index: 2;
   backdrop-filter: blur(8px);
-  width: 54px;
-  height: 54px;
+  width: 65px;
+  height: 65px;
   display: flex;
   align-items: center;
   justify-content: center;

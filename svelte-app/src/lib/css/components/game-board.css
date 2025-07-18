@@ -171,12 +171,12 @@
 }
 
 .board-bg-wrapper {
-  width: 480px;
-  height: 480px;
+  width: 384px;
+  height: 384px;
   max-width: 95vw;
   max-height: 95vw;
-  min-width: 240px;
-  min-height: 240px;
+  min-width: 192px;
+  min-height: 192px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -475,7 +475,6 @@
   background: rgba(80,0,80,0.18);
   border-radius: 24px;
   padding: 24px 18px 24px 18px;
-  margin-top: 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
