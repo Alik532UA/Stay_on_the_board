@@ -7,8 +7,6 @@
     border-radius: 24px;
     box-shadow: var(--unified-shadow);
     margin: 0 auto;
-    width: 100%;
-    max-width: 340px;
 }
 
 /* === УНІФІКОВАНІ СТИЛІ КЛІТИНОК ДОШКИ === */
@@ -176,28 +174,6 @@
   box-shadow: 0 4px 12px var(--shadow-color), 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
-.board-bg-wrapper {
-  width: 480px;
-  height: 480px;
-  max-width: 95vw;
-  max-height: 95vw;
-  min-width: 240px;
-  min-height: 240px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background: none;
-}
-@media (max-width: 600px) {
-  .board-bg-wrapper {
-    width: 95vw;
-    height: 95vw;
-    max-width: 95vw;
-    max-height: 95vw;
-  }
-}
 .game-board {
   --cell-size: calc(100% / var(--board-size, 3));
   display: grid;
@@ -482,11 +458,4 @@
   margin-left: auto;
   margin-right: auto;
   transition: width 0.2s;
-}
-@media (max-width: 600px) {
-  .game-controls-panel {
-    width: 95vw;
-    max-width: 95vw;
-    min-width: 0;
-  }
 } 
