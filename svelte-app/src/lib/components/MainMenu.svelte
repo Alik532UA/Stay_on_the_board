@@ -42,6 +42,7 @@
   let showWipNotice = false;
   function openWipNotice() { showWipNotice = true; }
   function closeWipNotice() { showWipNotice = false; }
+  $: currentFlagSvg = languages.find(lang => lang.code === $settingsStore.language)?.svg || languages[0].svg;
 
   /**
    * @param {string} route
@@ -89,10 +90,7 @@
       </button>
       <button class="main-menu-icon" title={$_('mainMenu.language')} aria-label={$_('mainMenu.language')} on:click={toggleLangDropdown}>
         <span class="main-menu-icon-inner">
-          <svg class="main-menu-icon-svg" width="32" height="24" viewBox="0 0 32 24" fill="none">
-            <rect width="32" height="12" y="0" fill="#0057B7"/>
-            <rect width="32" height="12" y="12" fill="#FFD700"/>
-          </svg>
+          {@html currentFlagSvg}
         </span>
       </button>
       {#if showLangDropdown}
