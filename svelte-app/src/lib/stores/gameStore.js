@@ -180,7 +180,11 @@ const oppositeDirections = {
 const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
 const lang = isBrowser ? localStorage.getItem('lang') : null;
 const theme = isBrowser ? localStorage.getItem('theme') : null;
-const style = isBrowser ? localStorage.getItem('style') : null;
+const style = isBrowser ? (localStorage.getItem('style') === 'ubuntu' ? 'purple' :
+  localStorage.getItem('style') === 'peak' ? 'green' :
+  localStorage.getItem('style') === 'cs2' ? 'blue' :
+  localStorage.getItem('style') === 'glass' ? 'gray' :
+  localStorage.getItem('style') === 'material' ? 'orange' : localStorage.getItem('style')) : null;
 
 // Випадкова стартова позиція ферзя
 const initialBoardSize = 3;
@@ -190,14 +194,14 @@ export const appState = writable(/** @type {AppState} */({
   gameMode: 'vsComputer',
   language: lang || 'uk',
   theme: theme || 'dark',
-  style: style || 'ubuntu',
+  style: style || 'purple',
   settings: {
     showMoves: true,
     showBoard: true,
     speechEnabled: false,
     language: lang || 'uk',
     theme: theme || 'dark',
-    style: style || 'ubuntu',
+    style: style || 'purple',
   },
   board: createEmptyBoard(initialBoardSize), // Порожня дошка
   playerRow: null, // Немає гравця

@@ -128,30 +128,35 @@
 
     {#if showThemeDropdown}
       <div class="theme-dropdown" role="dialog" aria-modal="true" aria-label={$_('mainMenu.themeDropdown')} on:click|stopPropagation on:keydown={(e) => (e.key === 'Escape') && closeDropdowns()}>
-        <div class="theme-style-row" data-style="ubuntu">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('ubuntu', 'light')}>☀️</button>
-          <span class="theme-name">{$_('mainMenu.themeName.ubuntu')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('ubuntu', 'dark')}>🌙</button>
+        <div class="theme-style-row" data-style="purple">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('purple', 'light')}>☀️</button>
+          <span class="theme-name">{$_('mainMenu.themeName.purple')}</span>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('purple', 'dark')}>🌙</button>
         </div>
-        <div class="theme-style-row" data-style="peak">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('peak', 'light')}>☀️</button>
-          <span class="theme-name">{$_('mainMenu.themeName.peak')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('peak', 'dark')}>🌙</button>
+        <div class="theme-style-row" data-style="green">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('green', 'light')}>☀️</button>
+          <span class="theme-name">{$_('mainMenu.themeName.green')}</span>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('green', 'dark')}>🌙</button>
         </div>
-        <div class="theme-style-row" data-style="cs2">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('cs2', 'light')}>☀️</button>
-          <span class="theme-name">{$_('mainMenu.themeName.cs2')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('cs2', 'dark')}>🌙</button>
+        <div class="theme-style-row" data-style="blue">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('blue', 'light')}>☀️</button>
+          <span class="theme-name">{$_('mainMenu.themeName.blue')}</span>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('blue', 'dark')}>🌙</button>
         </div>
-        <div class="theme-style-row" data-style="glass">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('glass', 'light')}>☀️</button>
-          <span class="theme-name">{$_('mainMenu.themeName.glass')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('glass', 'dark')}>🌙</button>
+        <div class="theme-style-row" data-style="gray">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('gray', 'light')}>☀️</button>
+          <span class="theme-name">{$_('mainMenu.themeName.gray')}</span>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('gray', 'dark')}>🌙</button>
         </div>
-        <div class="theme-style-row" data-style="material">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('material', 'light')}>☀️</button>
-          <span class="theme-name">{$_('mainMenu.themeName.material')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('material', 'dark')}>🌙</button>
+        <div class="theme-style-row" data-style="orange">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('orange', 'light')}>☀️</button>
+          <span class="theme-name">{$_('mainMenu.themeName.orange')}</span>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('orange', 'dark')}>🌙</button>
+        </div>
+        <div class="theme-style-row" data-style="wood">
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('wood', 'light')}>☀️</button>
+          <span class="theme-name">{$_('mainMenu.themeName.wood')}</span>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('wood', 'dark')}>🌙</button>
         </div>
       </div>
     {/if}

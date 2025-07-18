@@ -24,7 +24,7 @@ const defaultSettings = {
   showBoard: true,
   language: 'uk',
   theme: 'dark',
-  style: 'ubuntu',
+  style: 'purple',
   speechEnabled: false, // <-- ДОДАНО
   selectedVoiceURI: null, // <-- ДОДАНО
   blockModeEnabled: false, // <-- ДОДАНО
@@ -34,7 +34,13 @@ const defaultSettings = {
 if (isBrowser) {
   // Очищаємо старі налаштування теми та стилю, щоб форсувати дефолт
   localStorage.setItem('theme', 'dark');
-  localStorage.setItem('style', 'ubuntu');
+  let style = localStorage.getItem('style');
+  if (style === 'ubuntu') style = 'purple';
+  if (style === 'peak') style = 'green';
+  if (style === 'cs2') style = 'blue';
+  if (style === 'glass') style = 'gray';
+  if (style === 'material') style = 'orange';
+  localStorage.setItem('style', style || 'purple');
 }
 
 const storedSettings = isBrowser ? {
@@ -42,7 +48,15 @@ const storedSettings = isBrowser ? {
   showBoard: localStorage.getItem('showBoard') === 'false' ? false : true,
   language: localStorage.getItem('lang') || defaultSettings.language,
   theme: localStorage.getItem('theme') || defaultSettings.theme,
-  style: localStorage.getItem('style') || defaultSettings.style,
+  style: (() => {
+    let style = localStorage.getItem('style');
+    if (style === 'ubuntu') style = 'purple';
+    if (style === 'peak') style = 'green';
+    if (style === 'cs2') style = 'blue';
+    if (style === 'glass') style = 'gray';
+    if (style === 'material') style = 'orange';
+    return style || defaultSettings.style;
+  })(),
   speechEnabled: localStorage.getItem('speechEnabled') === 'true', // <-- ДОДАНО
   selectedVoiceURI: localStorage.getItem('selectedVoiceURI') || null, // <-- ДОДАНО
   blockModeEnabled: localStorage.getItem('blockModeEnabled') === 'true' ? true : false, // <-- ДОДАНО
