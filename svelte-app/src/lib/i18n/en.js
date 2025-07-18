@@ -34,7 +34,12 @@ export default {
     mainMenu: "Main Menu",
     player: "Player",
     penaltyInfoTitle: "Penalty Information",
-    penaltyHint: "Do not return to the cell from which the move was just made"
+    penaltyHint: "Do not return to the cell from which the move was just made",
+    scoreLabel: "Score",
+    cashOut: "Cash Out",
+    tutorialTitle: "Welcome to the game!",
+    tutorialContent: "Your goal is to move the queen without going off the board. Remember its position, because after your move, the board may disappear! The computer's move will appear on the central button, after which it's your turn again.",
+    info: "Instructions"
   },
   gameControls: {
     ok: "OK",
@@ -44,10 +49,11 @@ export default {
     showMoves: "Show available moves",
     showBoard: "Show board",
     blockMode: "Blocked cells mode",
-    speech: "Speech enabled",
+    speech: "Enable voiceover",
     selectDistance: "Select distance:",
     confirm: "Confirm Move",
-    noMoves: "No moves available"
+    noMovesTitle: "No moves",
+    voiceSettingsTitle: "Configure voice"
   },
   settings: {
     title: "Settings",
@@ -67,10 +73,117 @@ export default {
     stylePeak: "Peak",
     styleCS2: "CS2",
     styleGlass: "Glassmorphism",
-    styleMaterial: "Material You"
+    styleMaterial: "Material You",
+    reset: "Reset Settings",
+    resetHint: "Return all settings to their default values"
   },
   modal: {
-    ok: "OK"
+    ok: "OK",
+    resetScoreTitle: "Reset score?",
+    resetScoreContent: "Changing the board size will reset your current score and penalty points. Are you sure you want to continue?",
+    resetScoreConfirm: "Yes, change size",
+    resetScoreCancel: "No, stay",
+    gameOverTitle: "Game Over!",
+    computerNoMovesTitle: "Computer has no moves",
+    playerNoMovesTitle: "No moves. What to do next?",
+    errorTitle: "Error!",
+    playAgain: "Play Again",
+    continueGame: "Continue",
+    finishGameWithBonus: "Finish (+{bonus} points)",
+    computerNoMovesContent: "The computer cannot make a move. You can continue the game by clearing all blocked cells, or end it now and receive bonus points.",
+    playerNoMovesContent: "You can clear the board and continue the game, or end it now and receive bonus points.",
+    errorContent: "You still have available moves ({count} left). You lost.",
+    gameOverReasonOut: "You went off the board.",
+    gameOverReasonBlocked: "You tried to move to a blocked cell.",
+    gameOverReasonCashOut: "You decided to end the game and cash out your score.",
+    gameOverReasonBonus: "You decided to end the game and claim a bonus.",
+
+    scoreDetails: {
+      baseScore: "Base score:",
+      sizeBonus: "Board size bonus:",
+      blockModeBonus: "Block mode bonus:",
+      jumpBonus: "Jump bonus:",
+      noMovesBonus: "\"No moves\" bonus:",
+      finishBonus: "Game completion bonus:",
+      penalty: "Penalty for reverse moves:",
+      finalScore: "Final score:",
+      yourScore: "Your score:"
+    }
+  },
+  voiceSettings: {
+    title: "Voice Settings",
+    loading: "Loading voices...",
+    noVoices: "Unfortunately, Ukrainian voices for narration were not found in your browser.",
+    whyButton: "Why is that?",
+    hideDetailsButton: "Hide details",
+    reasonTitle: "Reason for the issue",
+    reasonContent: "Our game uses voices built into your operating system and accessible through the browser. Some browsers, like Chrome on Windows, do not always have access to system Ukrainian voices.",
+    recommendationsTitle: "Recommended platforms",
+    recommendationsContent: "For the best voiceover experience, try one of these options:",
+    platformEdge: "Microsoft Edge browser on Windows.",
+    platformAndroid: "Any browser on mobile devices with Android.",
+    iosNotice: "iOS support is currently under development. We are working on a fix and hope to restore it soon.",
+    iosWarning: "Warning! Due to technical limitations of iOS, voiceover may work unstably, especially for computer moves. We are working on improving this feature.",
+    close: "Close"
+  },
+  controlsPage: {
+    title: "Controls & Hotkeys",
+    mainMovement: "Main Movement (NumPad)",
+    altMovement: "Alternative Movement (WASD-style)",
+    gameActions: "Game Actions",
+    gameSettings: "Game Settings Control",
+    upLeft: "Up-Left",
+    up: "Up",
+    upRight: "Up-Right",
+    left: "Left",
+    right: "Right",
+    downLeft: "Down-Left",
+    down: "Down",
+    downRight: "Down-Right",
+    downLeftNote: "(also sets distance to 1)",
+    confirmMove: "Confirm Move",
+    noMoves: "Declare \"no moves\"",
+    toggleBlockMode: "Toggle \"Blocked Cells Mode\"",
+    toggleBoardVisibility: "Toggle board visibility",
+    increaseBoard: "Increase board size",
+    decreaseBoard: "Decrease board size",
+    toggleSpeech: "Toggle move voiceover"
+  },
+  rulesPage: {
+    title: "Rules of \"Stay on the Board\"",
+    goalTitle: "Objective of the Game",
+    goalText: "\"Stay on the Board\" is a strategic endurance game. Your goal is to keep the piece on the board for as long as possible, taking turns with your opponent and forcing them to make a mistake.",
+    moveProcessTitle: "Move Process",
+    moveProcessText: "A player makes a move using the control panel below the board. Clicking on the board cells does not perform any moves.",
+    step1: "Step 1: Choose a direction.",
+    step1Text: "Press one of the 8 arrow buttons corresponding to the directions on a numeric keypad (NumPad):",
+    step2: "Step 2: Choose a distance.",
+    step2Text: "Press the button with a number indicating how many cells to move the piece. The maximum distance depends on the board size (N-1).",
+    step3: "Step 3: Confirm the move.",
+    step3Text: "Press the large green button to complete your move.",
+    winLossTitle: "Winning and Losing Conditions",
+    youLose: "You lose if:",
+    lose1: "Your move takes the piece off the board.",
+    lose2: "You try to move to an already blocked cell (in the corresponding mode).",
+    lose3: "You press the \"No moves\" button, but you actually have available moves.",
+    youWin: "You win if:",
+    win1: "Your opponent makes one of the above mistakes.",
+    win2: "You press \"No moves\", and the system confirms that there are indeed no available moves.",
+    gameModesTitle: "Game Modes",
+    normalMode: "Normal Mode",
+    normalModeText: "This is the basic mode, ideal for beginners. All cells remain available throughout the game. The game ends only when one of the players moves the piece off the board.",
+    blockMode: "Blocked Cells Mode",
+    blockModeText: "A more complex and strategic mode. The cell from which a move was made becomes blocked and unavailable for future moves. This forces players to carefully plan their route.",
+    noMovesButtonTitle: "\"No moves\" Button",
+    noMovesButtonText1: "If you believe the piece has no valid moves left, you can press this button. The system will check your claim:",
+    noMovesWin: "If you are correct (there are no moves) - you win.",
+    noMovesLoss: "If you are mistaken (at least one move is available) - you lose.",
+    noMovesButtonText2: "This is a risky but sometimes necessary strategy to win in a difficult situation.",
+    scoringTitle: "Scoring System",
+    scoringText: "For each successful move, you get 1 point. The longer the game lasts, the higher your score. The score is displayed in real-time and is finalized at the end of the game.",
+    settingsTitle: "Game Settings",
+    boardSize: "Board Size",
+    boardSizeText: "You can change the size of the game board from 2x2 to 9x9."
   },
   header: {
     home: "Home",
@@ -111,4 +224,4 @@ export default {
   ui: {
     closeAndReturnToMenu: 'Close and return to main menu'
   }
-}; 
+};

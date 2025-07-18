@@ -3,7 +3,7 @@ import { getRandomComputerMove } from '$lib/ai.js';
 import { get } from 'svelte/store';
 import { modalStore } from './modalStore.js';
 import { closeModal } from './modalStore.js';
-import { t } from 'svelte-i18n';
+import { _ as t } from 'svelte-i18n';
 import { speakText, langMap } from '$lib/speech.js';
 import { settingsStore, toggleShowBoard } from './settingsStore.js';
 import { navigateToMainMenu } from '$lib/utils/navigation.js';
@@ -542,13 +542,13 @@ export async function confirmMove() {
     console.log('[confirmMove] Penalty applied for reverse move.');
   }
   if (isOutsideBoard || isCellBlocked) {
-    const reason = isOutsideBoard ? 'Ви вийшли за межі дошки.' : 'Ви спробували стати на заблоковану клітинку.';
+    const reasonKey = isOutsideBoard ? 'modal.gameOverReasonOut' : 'modal.gameOverReasonBlocked';
     const finalScoreDetails = calculateFinalScore(state);
     appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
     modalStore.showModal({
-      title: 'Гру завершено!',
-      content: { reason: reason, scoreDetails: finalScoreDetails },
-      buttons: [{ text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true }]
+      titleKey: 'modal.gameOverTitle',
+      content: { reason: get(t)(reasonKey), scoreDetails: finalScoreDetails },
+      buttons: [{ textKey: 'modal.playAgain', primary: true, onClick: resetAndCloseModal, isHot: true }]
     });
     return;
   }
@@ -649,22 +649,23 @@ export async function makeComputerMove() {
     // ... (існуюча логіка, коли у комп'ютера немає ходів)
     const previewScoreDetails = calculateFinalScore({ ...current, finishedByNoMovesButton: true });
     
+    const $t = get(t);
     modalStore.showModal({
-      title: 'У комп\'ютера немає ходів',
+      titleKey: 'modal.computerNoMovesTitle',
       content: {
-        reason: 'Комп\'ютер не може зробити хід. Ви можете продовжити гру, очистивши всі заблоковані клітинки, або завершити її зараз і отримати бонусні бали.',
+        reason: $t('modal.computerNoMovesContent'),
         scoreDetails: previewScoreDetails
       },
       buttons: [
         {
-          text: `Продовжити`,
+          textKey: 'modal.continueGame',
           primary: true,
           isHot: true,
           onClick: continueGameAndClearBlocks,
           customClass: 'green-btn'
         },
         {
-          text: `Завершити (+${current.boardSize} балів)`,
+          text: $t('modal.finishGameWithBonus', { values: { bonus: current.boardSize } }),
           customClass: 'blue-btn',
           onClick: finishGameWithBonus
         }
@@ -683,22 +684,23 @@ export function noMoves() {
   if (state.availableMoves.length === 0) {
     // Показуємо попередній рахунок з бонусом
     const previewScoreDetails = calculateFinalScore({ ...state, finishedByNoMovesButton: true });
+    const $t = get(t);
     modalStore.showModal({
-      title: 'Ходів немає. Що робити далі?',
+      titleKey: 'modal.playerNoMovesTitle',
       content: {
-        reason: 'Ви можете очистити поле і продовжити гру, або завершити її зараз і отримати бонусні бали.',
+        reason: $t('modal.playerNoMovesContent'),
         scoreDetails: previewScoreDetails
       },
       buttons: [
         {
-          text: `Продовжити`,
+          textKey: 'modal.continueGame',
           primary: true,
           isHot: true,
           onClick: continueGameAndClearBlocks,
           customClass: 'green-btn'
         },
         {
-          text: `Завершити (+${state.boardSize} балів)`,
+          text: $t('modal.finishGameWithBonus', { values: { bonus: state.boardSize } }),
           customClass: 'blue-btn',
           onClick: finishGameWithBonus
         }
@@ -707,14 +709,14 @@ export function noMoves() {
   } else {
     // Ходи є. Гравець програв.
     const finalScoreDetails = calculateFinalScore(state);
-    appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
+    const $t = get(t);
     modalStore.showModal({
-      title: 'Помилка!',
+      titleKey: 'modal.errorTitle',
       content: {
-        reason: `У вас ще є доступні ходи (${state.availableMoves.length} шт.). Ви програли.`,
+        reason: $t('modal.errorContent', { values: { count: state.availableMoves.length } }),
         scoreDetails: finalScoreDetails
       },
-      buttons: [{ text: 'Грати ще раз', primary: true, onClick: resetAndCloseModal, isHot: true }]
+      buttons: [{ textKey: 'modal.playAgain', primary: true, onClick: resetAndCloseModal, isHot: true }]
     });
   }
 }
@@ -754,15 +756,14 @@ export function finishGameWithBonus() {
     finishBonus,
     totalScore: baseScoreDetails.totalScore + finishBonus
   };
-  appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
   modalStore.showModal({
-    title: 'Гру завершено!',
+    titleKey: 'modal.gameOverTitle',
     content: {
-      reason: 'Ви вирішили завершити гру та забрати бонус.',
+      reason: get(t)('modal.gameOverReasonBonus'),
       scoreDetails: finalScoreDetails
     },
     buttons: [
-      { text: 'Грати ще раз', primary: true, isHot: true, onClick: resetAndCloseModal, customClass: 'green-btn' },
+      { textKey: 'modal.playAgain', primary: true, isHot: true, onClick: resetAndCloseModal, customClass: 'green-btn' },
       { textKey: 'gameBoard.mainMenu', customClass: 'blue-btn', onClick: navigateToMainMenu }
     ]
   });
@@ -787,13 +788,13 @@ export function cashOutAndEndGame() {
 
   // Показуємо модальне вікно з результатами
   modalStore.showModal({
-    title: 'Гру завершено!',
+    titleKey: 'modal.gameOverTitle',
     content: {
-      reason: 'Ви вирішили завершити гру і забрати свій рахунок.',
+      reason: get(t)('modal.gameOverReasonCashOut'),
       scoreDetails: finalScoreDetails
     },
     buttons: [
-      { text: 'Грати ще раз', primary: true, isHot: true, onClick: resetAndCloseModal, customClass: 'green-btn' },
+      { textKey: 'modal.playAgain', primary: true, isHot: true, onClick: resetAndCloseModal, customClass: 'green-btn' },
       { textKey: 'gameBoard.mainMenu', customClass: 'blue-btn', onClick: navigateToMainMenu }
     ]
   });

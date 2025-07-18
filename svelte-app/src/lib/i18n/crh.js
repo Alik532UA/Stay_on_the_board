@@ -26,35 +26,38 @@ export default {
       material: "Material You"
     },
     wipNotice: {
-      title: "Under Development",
-      description: "This feature is still under development. To speed up its release, you can support the project:",
+      title: "İşlep Çıqarılmaqta",
+      description: "Bu funktsiya daa işlep çıqarılmaqta. Onıñ çıqışını tezleştirmek içün, layihani qoltutmaqñız mümkün:",
     }
   },
   gameBoard: {
     mainMenu: "Ana Menü",
-    player: "Oyunçu",
+    player: "Oyunçı",
     penaltyInfoTitle: "Ceza aqqında malümat",
-    penaltyHint: "Az önce hereket yapılğan hücrege qaytmañız"
+    penaltyHint: "Az önce hereket yapılğan hücrege qaytmañız",
+    scoreLabel: "Esap",
+    cashOut: "Ballarnı al",
+    tutorialTitle: "Oyunğa hoş keldiñiz!",
+    tutorialContent: "Siziñ maqsadıñız – vezirni tahta sıñırlarından tışına çıqarmayıp areket ettirmektir. Onıñ yerini aqlıñızda tutuñız, çünki siziñ areketiñizden soñ tahta ğayip olmaq mümkün! Kompyuterniñ areketi merkeziy dögmede peyda olacaq, soñra nevbet kene sizge keçecek.",
+    info: "Talimat"
   },
   gameControls: {
     ok: "OK",
     cancel: "İptal",
-    resetTitle: "Oyunu sıfırla?",
-    resetContent: "Oyunu sıfırlamak istediğinizden emin misiniz? Bütün bloklamalar ve oyuncu pozisyonu kaybolacaq.",
-    showMoves: "Mümkün hereketlerni köster",
-    showBoard: "Tahtani köster",
-    blockMode: "Bloklangan hücre rejimi",
-    speech: "Sesli oynatış",
+    resetTitle: "Oyunnı sıfırla?",
+    resetContent: "Oyunnı sıfırlamaq istediñizden eminmisiñiz? Bütün bloklamalar ve oyunçı pozitsiyası ğayip olacaq.",
+    showMoves: "Mümkün areketlerni köster",
+    showBoard: "Tahtanı köster",
+    blockMode: "Bloklanğan hücre rejimi",
+    speech: "Areketlerni seslendirüv",
     selectDistance: "Mesafeni sayla:",
-    confirm: "Hereketni tasdiqla",
-    noMoves: "Hereket yoq"
-  },
-  modal: {
-    ok: "OK"
+    confirm: "Areketni tasdiqla",
+    noMovesTitle: "Areket yoq",
+    voiceSettingsTitle: "Sesni sozla"
   },
   settings: {
     title: "Sozlamalar",
-    showMoves: "Mümkün hereketlerni köster",
+    showMoves: "Mümkün areketlerni köster",
     language: "Til",
     lang: {
       uk: "Ukrain tili",
@@ -70,7 +73,118 @@ export default {
     stylePeak: "Peak",
     styleCS2: "CS2",
     styleGlass: "Glassmorphism",
-    styleMaterial: "Material You"
+    styleMaterial: "Material You",
+    reset: "Sozlamalarnı sıfırla",
+    resetHint: "Bütün sozlamalarnı standart qıymetlerge qaytar"
+  },
+  modal: {
+    ok: "OK",
+    resetScoreTitle: "Esapnı sıfırla?",
+    resetScoreContent: "Tahta ölçüsini deñiştirüv, mevcut esabıñıznı ve ceza ballarıñıznı sıfırlaycaq. Devam etmek istediñizden eminmisiñiz?",
+    resetScoreConfirm: "Ebet, ölçüni deñiştir",
+    resetScoreCancel: "Hayır, qal",
+    gameOverTitle: "Oyun bitti!",
+    computerNoMovesTitle: "Kompyuterniñ areketi yoq",
+    playerNoMovesTitle: "Areket yoq. Ne yapmalı?",
+    errorTitle: "Hata!",
+    playAgain: "Kene oyna",
+    continueGame: "Devam et",
+    finishGameWithBonus: "Bitir (+{bonus} bal)",
+    computerNoMovesContent: "Kompyuter areket etip olamay. Bütün bloklanğan hücrelerni temizlep oyunnı devam etmek ya da şimdi bitirip bonus ballarını almaqñız mümkün.",
+    playerNoMovesContent: "Meydannı temizlep oyunnı devam etmek ya da şimdi bitirip bonus ballarını almaqñız mümkün.",
+    errorContent: "Siziñ daa mümkün areketleriñiz bar ({count} qaldı). Siz yeñildiñiz.",
+    gameOverReasonOut: "Siz tahta sıñırlarından tışına çıqtıñız.",
+    gameOverReasonBlocked: "Siz bloklanğan hücrege basmağa tırıştıñız.",
+    gameOverReasonCashOut: "Siz oyunnı bitirip esabıñıznı almağa qarar berdiñiz.",
+    gameOverReasonBonus: "Siz oyunnı bitirip bonusnı almağa qarar berdiñiz.",
+
+    // ДОДАНО
+    scoreDetails: {
+      baseScore: "Esas esap:",
+      sizeBonus: "Tahta ölçüsi içün bonus:",
+      blockModeBonus: "Blok rejimi içün bonus:",
+      jumpBonus: "Atlama bonusı:",
+      noMovesBonus: "\"Areket yoq\" bonusı:",
+      finishBonus: "Oyun bitirüv bonusı:",
+      penalty: "Keri areketler içün ceza:",
+      finalScore: "Neticedeki esap:",
+      yourScore: "Siziñ esabıñız:"
+    }
+  },
+  voiceSettings: {
+    title: "Ses Sozlamaları",
+    loading: "Sesler yüklenmekte...",
+    noVoices: "Maalesef, brauzeriñizde seslendirüv içün ukrain sesleri tapılmadı.",
+    whyButton: "Bu ne içün?",
+    hideDetailsButton: "Tafsilâtlarnı gizle",
+    reasonTitle: "Meseleniñ sebebi",
+    reasonContent: "Oyunımız, operatsion sistemiñizge qurulğan ve brauzer vastasınen irişimli olğan seslerni qullana. Bazı brauzerler, meselâ Windows-ta Chrome, er vaqıt sistem ukrain seslerine irişip olamay.",
+    recommendationsTitle: "Tavsiye etilgen platformalar",
+    recommendationsContent: "Eñ yahşı seslendirüv tecribesi içün bu variantlardan birini deñeñiz:",
+    platformEdge: "Windows-ta Microsoft Edge brauzeri.",
+    platformAndroid: "Android-li mobil cihazlarda er angi bir brauzer.",
+    iosNotice: "iOS qoltutuvı şimdilik işlep çıqarılmaqta. Biz hata üzerinde çalışamız ve onı yaqın zamanda tüzetmege ümüt etemiz.",
+    iosWarning: "Diqqat! iOS-nıñ tehnikiy hususiyetleri sebebinden, seslendirüv, hususan kompyuter areketleri içün, istiqrarsız çalışmaq mümkün. Biz bu funktsiyanı yahşılaştırmaq üzerinde çalışamız.",
+    close: "Qapat"
+  },
+  controlsPage: {
+    title: "İdare & Qısqa yollar",
+    mainMovement: "Esas areket idaresi (NumPad)",
+    altMovement: "Alternativ idare (WASD-stili)",
+    gameActions: "Oyun areketleri",
+    gameSettings: "Oyun sozlamalarını idare etüv",
+    upLeft: "Yuqarı-solğa",
+    up: "Yuqarı",
+    upRight: "Yuqarı-oñğa",
+    left: "Solğa",
+    right: "Oñğa",
+    downLeft: "Aşağı-solğa",
+    down: "Aşağı",
+    downRight: "Aşağı-oñğa",
+    downLeftNote: "(ayrıca mesafeni 1 olaraq ayarla)",
+    confirmMove: "Areketni tasdiqla",
+    noMoves: "\"Areket yoq\" dep bildir",
+    toggleBlockMode: "\"Bloklanğan Hücreler Rejimi\"ni deñiştir",
+    toggleBoardVisibility: "Tahta körünürligini deñiştir",
+    increaseBoard: "Tahta ölçüsini arttır",
+    decreaseBoard: "Tahta ölçüsini eksilt",
+    toggleSpeech: "Areket seslendirüvini deñiştir"
+  },
+  rulesPage: {
+    title: "\"Stay on the Board\" Oyunı Qaydaları",
+    goalTitle: "Oyunıñ Maqsadı",
+    goalText: "\"Stay on the Board\" – bu bir strategik dayanıqlılıq oyunı. Siziñ maqsadıñız – raqibiñiznen nevbetnen areket etip ve onı hata yapmağa mecbur etip, figurani mümkün olğanı qadar uzun vaqıt tahtada tutmaqtır.",
+    moveProcessTitle: "Areket Süreci",
+    moveProcessText: "Oyunçı, tahtanıñ altında yerleşken idare panelini qullanıp areket ete. Tahta hücrelerine basuv iç bir areket yapmay.",
+    step1: "1-nci adım: Yönelişni saylañız.",
+    step1Text: "Raqam klaviaturasındaki (NumPad) yönelişlerge kelişken 8 oq dögmesinden birine basıñız:",
+    step2: "2-nci adım: Mesafeni saylañız.",
+    step2Text: "Figuranıñ qaç hücrege areket etecegini köstergen raqamlı dögmege basıñız. Maksimal mesafe tahta ölçüsine (N-1) bağlıdır.",
+    step3: "3-nci adım: Areketni tasdiqlañız.",
+    step3Text: "Areketiñizni tamamlamaq içün büyük yeşil dögmege basıñız.",
+    winLossTitle: "Yeñüv ve Yeñilüv Şartları",
+    youLose: "Siz yeñilesiñiz, eger:",
+    lose1: "Areketiñiz figuranı tahtadan tışarı çıqarsa.",
+    lose2: "Siz endi bloklanğan bir hücrege basmağa tırışsañız (uyğun rejimde).",
+    lose3: "Siz \"Areket yoq\" dögmesine basasıñız, amma aslında daa mümkün areket variantlarıñız bar.",
+    youWin: "Siz yeñesiñiz, eger:",
+    win1: "Raqibiñiz yuqarıda aytılğan hatalardan birini yapsa.",
+    win2: "Siz \"Areket yoq\" dögmesine basasıñız ve sistem kerçekten de mümkün areketler olmağanını tasdiqlasa.",
+    gameModesTitle: "Oyun Rejimleri",
+    normalMode: "Adiy Rejim",
+    normalModeText: "Bu, başlağanlar içün ideal olğan bir esas rejimdir. Bütün hücreler oyun devamında irişimli qala. Oyun tek oyunçılardan biri figuranı tahtadan tışarı çıqarğanda bite.",
+    blockMode: "Bloklanğan Hücreler Rejimi",
+    blockModeText: "Daa mürekkep ve strategik bir rejim. Areket etilgen hücre bloklana ve kelecek areketler içün irişimsiz ola. Bu, oyunçılarnı marşrutlarını diqqatnen planlaştırmağa mecbur ete.",
+    noMovesButtonTitle: "\"Areket yoq\" Dögmesi",
+    noMovesButtonText1: "Eger figuranıñ iç bir geçerli areketi qalmağanını tüşünseñiz, bu dögmege basmaqñız mümkün. Sistem siziñ beyanatıñıznı teşkerir:",
+    noMovesWin: "Eger aqlı olsañız (kerçekten de areket yoq) – siz yeñesiñiz.",
+    noMovesLoss: "Eger hata yapsañız (eñ az bir areket bar) – siz yeñilesiñiz.",
+    noMovesButtonText2: "Bu, riskli, amma bazıda zor bir vaziyette yeñmek içün kerekli bir strategiyadır.",
+    scoringTitle: "Bal Sistemi",
+    scoringText: "Er bir muvafaqiyetli areket içün 1 bal alasınız. Oyun ne qadar uzun sürse, esabıñız o qadar yüksek olur. Esap kerçek zamanda kösterile ve oyun soñunda qayd etile.",
+    settingsTitle: "Oyun Sozlamaları",
+    boardSize: "Tahta Ölçüsi",
+    boardSizeText: "Oyun meydanınıñ ölçüsini 2x2-den 9x9-ğa qadar deñiştirmekñiz mümkün."
   },
   header: {
     home: "Baş sahypa",
@@ -92,4 +206,4 @@ export default {
   ui: {
     closeAndReturnToMenu: 'Qapat ve ana menüye qayt'
   }
-}; 
+};
