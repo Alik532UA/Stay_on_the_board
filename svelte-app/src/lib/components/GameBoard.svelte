@@ -328,6 +328,7 @@
     <div 
       class="board-bg-wrapper game-content-block" 
       class:hidden={!showBoard}
+      style="--board-size: {boardSize}"
       onclick={showBoardClickHint} 
       onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
       role="button"

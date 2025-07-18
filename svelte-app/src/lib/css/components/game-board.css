@@ -171,26 +171,35 @@
 }
 
 .board-bg-wrapper {
-  width: 384px;
-  height: 384px;
+  /* --- Змінні для розрахунку --- */
+  --min-board-logic-size: 2; /* Мінімальний логічний розмір дошки */
+  --max-board-logic-size: 9; /* Максимальний логічний розмір дошки */
+  --board-logic-range: calc(var(--max-board-logic-size) - var(--min-board-logic-size)); /* Діапазон: 7 */
+
+  --min-board-pixel-size: 240px; /* Мінімальний розмір в пікселях (для 2x2) */
+  --max-board-pixel-size: 480px; /* Максимальний розмір в пікселях (для 9x9) */
+  --board-pixel-range: calc(var(--max-board-pixel-size) - var(--min-board-pixel-size)); /* Діапазон: 240px */
+  
+  /* --- Коректна формула лінійної інтерполяції --- */
+  --pixel-per-step: calc(var(--board-pixel-range) / var(--board-logic-range));
+  --dynamic-size: calc(var(--min-board-pixel-size) + (var(--board-size, 3) - var(--min-board-logic-size)) * var(--pixel-per-step));
+
+  /* --- Застосування динамічного розміру --- */
+  width: var(--dynamic-size);
+  height: var(--dynamic-size);
+  
+  /* --- Обмеження для мобільних пристроїв --- */
   max-width: 95vw;
   max-height: 95vw;
-  min-width: 192px;
-  min-height: 192px;
+
+  /* --- Решта стилів --- */
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   background: none;
-}
-@media (max-width: 600px) {
-  .board-bg-wrapper {
-    width: 95vw;
-    height: 95vw;
-    max-width: 95vw;
-    max-height: 95vw;
-  }
+  transition: width 0.3s ease-out, height 0.3s ease-out; /* Плавна анімація зміни розміру */
 }
 .game-board {
   position: relative;
