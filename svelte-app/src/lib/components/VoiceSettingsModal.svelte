@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { loadAndGetVoices, filterVoicesByLang } from '$lib/speech.js';
-  import { locale } from 'svelte-i18n';
+  import { locale, _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
 
   export let close = () => {};
@@ -19,14 +19,11 @@
   onMount(async () => {
     const currentLocale = get(locale) || 'uk';
     try {
-      // Await the promise to ensure voices are loaded
       const allVoices = await loadAndGetVoices();
-      // Filter the loaded voices
       availableVoices = filterVoicesByLang(allVoices, currentLocale);
     } catch (error) {
       console.error("Помилка завантаження голосів:", error);
     }
-    // Гарантуємо, що selectedVoiceURI завжди string
     if (selectedVoiceURI == null) selectedVoiceURI = '';
     isLoading = false;
   });
@@ -42,7 +39,7 @@
   onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') close(); }}
   role="button"
   tabindex="0"
-  aria-label="Закрити налаштування голосу"
+  aria-label={$_('voiceSettings.close')}
 >
   <div 
     class="modal-window" 
@@ -52,14 +49,14 @@
     aria-labelledby="voice-settings-title"
   >
     <div class="modal-header">
-      <h2 class="modal-title" id="voice-settings-title">Налаштування голосу</h2>
+      <h2 class="modal-title" id="voice-settings-title">{$_('voiceSettings.title')}</h2>
       <button class="modal-close" onclick={close}>&times;</button>
     </div>
     <div class="modal-body">
       {#if isLoading}
         <div class="loader-container">
           <div class="loading-spinner"></div>
-          <p>Завантаження голосів...</p>
+          <p>{$_('voiceSettings.loading')}</p>
         </div>
       {:else if availableVoices.length > 0}
         <div class="voice-list" role="radiogroup" aria-labelledby="voice-settings-title">
@@ -78,39 +75,37 @@
         </div>
         {#if isIOS && selectedVoiceURI}
           <div class="ios-warning">
-            <p><strong>Увага!</strong> Через технічні особливості iOS, озвучення може працювати нестабільно, особливо для ходів комп'ютера. Ми працюємо над покращенням цієї функції.</p>
+            <p><strong>{$_('voiceSettings.iosWarning')}</strong></p>
           </div>
         {/if}
       {:else}
         <div class="no-voices-container">
           <p class="no-voices-message">
-            На жаль, українські голоси для озвучення не знайдено у вашому браузері.
+            {$_('voiceSettings.noVoices')}
           </p>
           
           <button class="details-button" onclick={() => showDetails = !showDetails}>
-            {showDetails ? 'Сховати деталі' : 'Чому так?'}
+            {showDetails ? $_('voiceSettings.hideDetailsButton') : $_('voiceSettings.whyButton')}
           </button>
 
           {#if showDetails}
             <div class="details-text">
-              <h4>Причина проблеми</h4>
-              <p>
-                Наша гра використовує голоси, вбудовані у вашу операційну систему та доступні через браузер. Деякі браузери, як-от <strong>Chrome на Windows</strong>, не завжди мають доступ до системних українських голосів.
-              </p>
-              <h4>Рекомендовані платформи</h4>
-              <p>Для найкращого досвіду з озвученням спробуйте один із цих варіантів:</p>
+              <h4>{$_('voiceSettings.reasonTitle')}</h4>
+              <p>{$_('voiceSettings.reasonContent')}</p>
+              <h4>{$_('voiceSettings.recommendationsTitle')}</h4>
+              <p>{$_('voiceSettings.recommendationsContent')}</p>
               <ul>
-                <li>Браузер <strong>Microsoft Edge</strong> на Windows.</li>
-                <li>Будь-який браузер на мобільних пристроях з <strong>Android</strong>.</li>
+                <li>{$_('voiceSettings.platformEdge')}</li>
+                <li>{$_('voiceSettings.platformAndroid')}</li>
               </ul>
-              <p>Підтримка <strong>iOS</strong> наразі в розробці. Ми працюємо над виправленням і сподіваємось відновити її найближчим часом.</p>
+              <p>{$_('voiceSettings.iosNotice')}</p>
             </div>
           {/if}
         </div>
       {/if}
     </div>
     <div class="modal-footer">
-      <button class="modal-btn-generic primary" onclick={close}>Закрити</button>
+      <button class="modal-btn-generic primary" onclick={close}>{$_('voiceSettings.close')}</button>
     </div>
   </div>
 </div>

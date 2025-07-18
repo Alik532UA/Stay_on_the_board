@@ -1,46 +1,47 @@
 <script>
   import FloatingCloseButton from '$lib/components/FloatingCloseButton.svelte';
+  import { _ } from 'svelte-i18n';
 </script>
 
 <FloatingCloseButton />
 
-<h1>Керування та гарячі клавіші</h1>
+<h1>{$_('controlsPage.title')}</h1>
 
-<h2>Основне керування рухом (NumPad)</h2>
+<h2>{$_('controlsPage.mainMovement')}</h2>
 <ul>
-  <li><b>7</b>: Вгору-ліворуч (↖)</li>
-  <li><b>8</b>: Вгору (↑)</li>
-  <li><b>9</b>: Вгору-праворуч (↗)</li>
-  <li><b>4</b>: Ліворуч (←)</li>
-  <li><b>6</b>: Праворуч (→)</li>
-  <li><b>1</b>: Вниз-ліворуч (↙) <em>(також встановлює відстань 1)</em></li>
-  <li><b>2</b>: Вниз (↓)</li>
-  <li><b>3</b>: Вниз-праворуч (↘)</li>
+  <li><b>7</b>: {$_('controlsPage.upLeft')} (↖)</li>
+  <li><b>8</b>: {$_('controlsPage.up')} (↑)</li>
+  <li><b>9</b>: {$_('controlsPage.upRight')} (↗)</li>
+  <li><b>4</b>: {$_('controlsPage.left')} (←)</li>
+  <li><b>6</b>: {$_('controlsPage.right')} (→)</li>
+  <li><b>1</b>: {$_('controlsPage.downLeft')} (↙) <em>{$_('controlsPage.downLeftNote')}</em></li>
+  <li><b>2</b>: {$_('controlsPage.down')} (↓)</li>
+  <li><b>3</b>: {$_('controlsPage.downRight')} (↘)</li>
 </ul>
 
-<h2>Альтернативне керування (WASD-стиль)</h2>
+<h2>{$_('controlsPage.altMovement')}</h2>
 <ul>
-  <li><b>Q</b>: Вгору-ліворуч (↖)</li>
-  <li><b>W</b>: Вгору (↑)</li>
-  <li><b>E</b>: Вгору-праворуч (↗)</li>
-  <li><b>A</b>: Ліворуч (←)</li>
-  <li><b>D</b>: Праворуч (→)</li>
-  <li><b>Z</b>: Вниз-ліворуч (↙)</li>
-  <li><b>S</b> або <b>X</b>: Вниз (↓)</li>
-  <li><b>C</b>: Вниз-праворуч (↘)</li>
+  <li><b>Q</b>: {$_('controlsPage.upLeft')} (↖)</li>
+  <li><b>W</b>: {$_('controlsPage.up')} (↑)</li>
+  <li><b>E</b>: {$_('controlsPage.upRight')} (↗)</li>
+  <li><b>A</b>: {$_('controlsPage.left')} (←)</li>
+  <li><b>D</b>: {$_('controlsPage.right')} (→)</li>
+  <li><b>Z</b>: {$_('controlsPage.downLeft')} (↙)</li>
+  <li><b>S</b> / <b>X</b>: {$_('controlsPage.down')} (↓)</li>
+  <li><b>C</b>: {$_('controlsPage.downRight')} (↘)</li>
 </ul>
 
-<h2>Дії в грі</h2>
+<h2>{$_('controlsPage.gameActions')}</h2>
 <ul>
-  <li><b>Enter</b> / <b>Space</b> / <b>NumPad 5</b>: Підтвердити хід</li>
-  <li><b>Backspace</b> / <b>Num .</b> / <b>N</b>: Заявити "немає ходів"</li>
+  <li><b>Enter</b> / <b>Space</b> / <b>NumPad 5</b>: {$_('controlsPage.confirmMove')}</li>
+  <li><b>Backspace</b> / <b>Num .</b> / <b>N</b>: {$_('controlsPage.noMoves')}</li>
 </ul>
 
-<h2>Керування налаштуваннями гри</h2>
+<h2>{$_('controlsPage.gameSettings')}</h2>
 <ul>
-  <li><b>Num *</b>: Перемкнути "Режим заблокованих клітинок"</li>
-  <li><b>Num /</b>: Перемкнути видимість дошки</li>
-  <li><b>Num +</b>: Збільшити розмір дошки</li>
-  <li><b>Num -</b>: Зменшити розмір дошки</li>
-  <li><b>V</b>: Перемкнути озвучування ходів</li>
+  <li><b>Num *</b>: {$_('controlsPage.toggleBlockMode')}</li>
+  <li><b>Num /</b>: {$_('controlsPage.toggleBoardVisibility')}</li>
+  <li><b>Num +</b>: {$_('controlsPage.increaseBoard')}</li>
+  <li><b>Num -</b>: {$_('controlsPage.decreaseBoard')}</li>
+  <li><b>V</b>: {$_('controlsPage.toggleSpeech')}</li>
 </ul> 

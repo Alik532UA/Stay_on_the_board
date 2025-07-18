@@ -213,11 +213,11 @@
           />
           <span class="slider"></span>
         </div>
-        <span>Озвучування ходів</span>
+        <span>{$_('gameControls.speech')}</span>
       </div>
       <button
         class="settings-icon-btn"
-        title="Налаштувати голос"
+        title={$_('gameControls.voiceSettingsTitle')}
         onclick={(e) => { e.stopPropagation(); openVoiceSettingsModal(); }}
       >
         <SvgIcons name="voice-settings" />
@@ -259,9 +259,9 @@
       {$_('gameControls.confirm')}
     </button>
     {#if blockModeEnabled}
-      <button class="no-moves-btn" onclick={onNoMoves} title="Ходів немає">
+      <button class="no-moves-btn" onclick={onNoMoves} title={$_('gameControls.noMovesTitle')}>
         <SvgIcons name="no-moves" />
-        Ходів немає
+        {$_('gameControls.noMovesTitle')}
       </button>
     {/if}
   </div>

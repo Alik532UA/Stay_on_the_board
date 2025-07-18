@@ -398,7 +398,7 @@
     </div>
 
     <!-- 3. Інформація -->
-    <button class="main-menu-btn" title="Інструкція" onclick={toggleTutorial}>
+    <button class="main-menu-btn" title={$_('gameBoard.info')} onclick={toggleTutorial}>
       <SvgIcons name="info" />
     </button>
 
@@ -413,12 +413,12 @@
   {#if showTutorial}
     <div class="tutorial-panel game-content-block">
       <button class="tutorial-close-btn" onclick={closeTutorial} aria-label="Закрити інструкцію">&times;</button>
-      <p><strong>Вітаємо у грі!</strong> Ваша мета — рухати ферзя, не виходячи за межі дошки. Запам'ятовуйте його позицію, бо після вашого ходу дошка може зникнути! Хід комп'ютера з'явиться на центральній кнопці, після чого хід знову ваш.</p>
+      <p><strong>{$_('gameBoard.tutorialTitle')}</strong> {$_('gameBoard.tutorialContent')}</p>
     </div>
   {/if}
   <div class="score-panel game-content-block">
     <div class="score-display">
-      Рахунок: {$appState.score}
+      {$_('gameBoard.scoreLabel')}: {$appState.score}
       {#if $appState.penaltyPoints > 0}
         <span 
           class="penalty-display" 
@@ -430,8 +430,8 @@
         >-{$appState.penaltyPoints}</span>
       {/if}
     </div>
-    <button class="cash-out-btn" onclick={cashOutAndEndGame} title="Завершити гру і забрати бали">
-      Забрати бали
+    <button class="cash-out-btn" onclick={cashOutAndEndGame} title={$_('gameBoard.cashOut')}>
+      {$_('gameBoard.cashOut')}
     </button>
   </div>
   {#if showBoard}

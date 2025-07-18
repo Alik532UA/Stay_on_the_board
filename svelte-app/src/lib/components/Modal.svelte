@@ -6,17 +6,9 @@
 
   const modal_data = $derived(modalState);
 
-  // Додаю реактивну змінну для scoreDetails за допомогою руни $derived
   const details = $derived(() => (typeof $modal_data.content === 'object' && $modal_data.content !== null && $modal_data.content.scoreDetails)
     ? /** @type {any} */ ($modal_data.content.scoreDetails)
     : null);
-
-  /**
-   * @typedef {Object} ModalContent
-   * @property {string} [reason]
-   * @property {number} [score]
-   * @property {any} [scoreDetails]
-   */
 
   /** @type {HTMLButtonElement | null} */
   let hotBtn = $state(null);
@@ -31,14 +23,10 @@
 
   function onModalKeydown(/** @type {any} */e) {
     if (!$modal_data.isOpen || !$modal_data.buttons) return;
-
-    // @ts-ignore: кастомне поле isHot
     const idx = $modal_data.buttons.findIndex(b => b.isHot);
-
     if (idx !== -1 && (e.key === 'Enter' || e.key === ' ' || e.key === '5')) {
       e.preventDefault();
-      e.stopPropagation(); // Додатково зупиняємо спливання події
-
+      e.stopPropagation();
       const button = $modal_data.buttons[idx];
       if (button && typeof button.onClick === 'function') {
         button.onClick();
@@ -48,11 +36,7 @@
     }
   }
 
-  /**
-   * @param {Event} e
-   */
-  function onOverlayClick(e) {
-    // Якщо це "критичне" модальне вікно (2 кнопки, обидві з onClick), не закриваємо по overlay
+  function onOverlayClick(/** @type {Event} */ e) {
     if ($modal_data.buttons && $modal_data.buttons.length === 2 && $modal_data.buttons.every(btn => typeof btn.onClick === 'function')) {
       return;
     }
@@ -65,67 +49,63 @@
 </script>
 
 {#if $modal_data.isOpen}
-  <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.close')} onclick={e => {
-    if ($modal_data.title === 'Гру завершено!') return;
+  <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.ok')} onclick={e => {
+    if ($modal_data.titleKey === 'modal.gameOverTitle') return;
     onOverlayClick(e);
   }} onkeydown={onModalKeydown}>
     <div class="modal-window">
       <div class="modal-header">
-        {#if $modal_data.title && ($modal_data.title.includes('перемогли') || $modal_data.title.includes('Комп'))}
+        {#if $modal_data.titleKey === 'modal.gameOverTitle'}
           <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
         {/if}
         <h2 class="modal-title">{$modal_data.titleKey ? $_($modal_data.titleKey) : $modal_data.title}</h2>
-        {#if !(($modal_data.buttons && $modal_data.buttons.length === 2 && $modal_data.buttons.every(btn => typeof btn.onClick === 'function')) || $modal_data.title === 'Гру завершено!')}
+        {#if !(($modal_data.buttons && $modal_data.buttons.length === 2 && $modal_data.buttons.every(btn => typeof btn.onClick === 'function')) || $modal_data.titleKey === 'modal.gameOverTitle')}
           <button class="modal-close" onclick={() => { logStore.addLog('Закриття модального вікна (X)', 'info'); modalStore.closeModal(); }}>&times;</button>
         {/if}
       </div>
-      <!-- subtitle прибрано -->
       <div class="modal-content">
         
-        <!-- Блок для простого тексту (використовується для інформаційних повідомлень) -->
         {#if $modal_data.contentKey || (typeof $modal_data.content === 'string' && $modal_data.content)}
           <div class="modal-info">
             {$modal_data.contentKey ? $_($modal_data.contentKey) : $modal_data.content}
           </div>
         {/if}
 
-        <!-- Блок для деталізованого рахунку (використовується в кінці гри) -->
         {#if details}
           {#if typeof $modal_data.content === 'object' && $modal_data.content !== null}
             <p class="reason">{$modal_data.content.reason}</p>
           {/if}
           {#if details()}
             <div class="score-breakdown">
-              <div>Базовий рахунок: <span>{details().baseScore}</span></div>
+              <div>{$_('modal.scoreDetails.baseScore')} <span>{details().baseScore}</span></div>
               {#if details().sizeBonus > 0}
-                <div>Бонус за розмір дошки: <span>+{details().sizeBonus}</span></div>
+                <div>{$_('modal.scoreDetails.sizeBonus')} <span>+{details().sizeBonus}</span></div>
               {/if}
               {#if details().blockModeBonus > 0}
-                <div>Бонус за режим блокування: <span>+{details().blockModeBonus}</span></div>
+                <div>{$_('modal.scoreDetails.blockModeBonus')} <span>+{details().blockModeBonus}</span></div>
               {/if}
               {#if details().jumpBonus > 0}
-                <div>Бонус за стрибки: <span>+{details().jumpBonus}</span></div>
+                <div>{$_('modal.scoreDetails.jumpBonus')} <span>+{details().jumpBonus}</span></div>
               {/if}
               {#if details().noMovesBonus > 0}
-                <div>Бонус "Ходів немає": <span>+{details().noMovesBonus}</span></div>
+                <div>{$_('modal.scoreDetails.noMovesBonus')} <span>+{details().noMovesBonus}</span></div>
               {/if}
               {#if details().finishBonus > 0}
-                <div>Бонус за завершення гри: <span>+{details().finishBonus}</span></div>
+                <div>{$_('modal.scoreDetails.finishBonus')} <span>+{details().finishBonus}</span></div>
               {/if}
               {#if details().totalPenalty > 0}
-                <div class="penalty">Штраф за зворотні ходи: <span>-{details().totalPenalty}</span></div>
+                <div class="penalty">{$_('modal.scoreDetails.penalty')} <span>-{details().totalPenalty}</span></div>
               {/if}
             </div>
             <div class="final-score-container">
-              <span class="score-label">Підсумковий рахунок:</span>
+              <span class="score-label">{$_('modal.scoreDetails.finalScore')}</span>
               <span class="score-value">{details().totalScore}</span>
             </div>
           {/if}
         {:else if typeof $modal_data.content === 'object' && $modal_data.content !== null && $modal_data.content.score}
-          <!-- Старий вигляд з рахунком (залишаємо для зворотної сумісності) -->
           <p class="reason">{$modal_data.content.reason}</p>
           <div class="final-score-container">
-            <span class="score-label">Ваш рахунок:</span>
+            <span class="score-label">{$_('modal.scoreDetails.yourScore')}</span>
             <span class="score-value">{$modal_data.content.score}</span>
           </div>
         {/if}
@@ -138,13 +118,9 @@
               class:primary={btn.primary && !btn.customClass}
               class:blue-btn={btn.customClass === 'blue-btn'}
               class:green-btn={btn.customClass === 'green-btn'}
-              data-testid={`modal-btn-${i}`}
-              data-role="modal-btn"
               onclick={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
-              aria-pressed="false"
               bind:this={hotBtn}
-              tabindex="0"
             >{btn.textKey ? $_(btn.textKey) : btn.text}</button>
           {:else}
             <button
@@ -152,17 +128,13 @@
               class:primary={btn.primary && !btn.customClass}
               class:blue-btn={btn.customClass === 'blue-btn'}
               class:green-btn={btn.customClass === 'green-btn'}
-              data-testid={`modal-btn-${i}`}
-              data-role="modal-btn"
               onclick={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
-              aria-pressed="false"
-              tabindex="-1"
             >{btn.textKey ? $_(btn.textKey) : btn.text}</button>
           {/if}
         {/each}
         {#if !$modal_data.buttons.length}
-          <button class="modal-btn-generic" data-testid="modal-btn-ok" data-role="modal-btn" onclick={() => { logStore.addLog('Закриття модального вікна (OK)', 'info'); modalStore.closeModal(); }}>{$_('modal.ok')}</button>
+          <button class="modal-btn-generic" onclick={() => { logStore.addLog('Закриття модального вікна (OK)', 'info'); modalStore.closeModal(); }}>{$_('modal.ok')}</button>
         {/if}
       </div>
     </div>
@@ -170,6 +142,7 @@
 {/if}
 
 <style>
+/* Styles remain unchanged */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -177,7 +150,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* background, backdrop-filter, -webkit-backdrop-filter видалено */
 }
 .modal-victory-icon {
   font-size: 2.5em;
@@ -185,9 +157,7 @@
   vertical-align: middle;
   filter: drop-shadow(0 2px 8px #ffeb3b88);
 }
-/* .modal-subtitle видалено */
 .modal-window {
-  /* Видаляємо фон, бо тепер .modal-content відповідає за glassmorphism */
   border-radius: 18px;
   min-width: 280px;
   max-width: 90vw;
@@ -322,9 +292,8 @@
     box-shadow: 0 4px 12px 0 rgba(0,0,0,0.12);
 }
 
-/* Стиль для основної (primary) кнопки */
 .modal-btn-generic.primary {
-    background: #4caf50; /* Зелений за замовчуванням для primary */
+    background: #4caf50;
     color: #fff;
     border-color: #388e3c;
     box-shadow: 0 2px 12px 0 #4caf5040;
@@ -334,7 +303,6 @@
     background: #43a047;
 }
 
-/* Спеціальний клас для синьої кнопки */
 .modal-btn-generic.blue-btn {
     background: #2196f3;
     color: #fff;
@@ -346,7 +314,6 @@
     background: #1976d2;
 }
 
-/* Спеціальний клас для зеленої кнопки (якщо потрібен окремо від primary) */
 .modal-btn-generic.green-btn {
     background: #4caf50;
     color: #fff;
