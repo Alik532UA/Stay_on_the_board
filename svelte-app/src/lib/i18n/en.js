@@ -38,7 +38,7 @@ export default {
     scoreLabel: "Score",
     cashOut: "Cash Out",
     tutorialTitle: "",
-    tutorialContent: "Your goal is to take turns moving one shared piece without going off the board. Remember its position, as the board may disappear after your move! The computer's move will appear in the center of the direction control panel, then it's your turn again.",
+    tutorialContent: "Your goal is to take turns moving the shared piece without going off the board. Hide the board or the queen in the settings to earn more points for each move!",
     info: "Instructions",
     details: "Details"
   },
@@ -54,7 +54,9 @@ export default {
     selectDistance: "Select distance:",
     confirm: "Confirm Move",
     noMovesTitle: "No moves",
-    voiceSettingsTitle: "Configure voice"
+    voiceSettingsTitle: "Configure voice",
+    hideQueen: "Hide Queen",
+    settings: "Settings"
   },
   settings: {
     title: "Settings",
@@ -98,6 +100,8 @@ export default {
     gameOverReasonBlocked: "You tried to move to a blocked cell.",
     gameOverReasonCashOut: "You decided to end the game and cash out your score.",
     gameOverReasonBonus: "You decided to end the game and claim a bonus.",
+    boardClickTitle: "How to control the game?",
+    boardClickContent: "The game is controlled not on the board, but with the control panel below. Use the arrows to select a direction and the number buttons to select a distance. The board is only for observing the moves.",
 
     scoreDetails: {
       baseScore: "Base score:",
@@ -180,8 +184,11 @@ export default {
     noMovesWin: "If you are correct (there are no moves) - you win.",
     noMovesLoss: "If you are mistaken (at least one move is available) - you lose.",
     noMovesButtonText2: "This is a risky but sometimes necessary strategy to win in a difficult situation.",
-    scoringTitle: "Points System",
-    scoringText: "For each successful move, you get 1 point. The longer the game lasts, the higher your score. Points are displayed in real-time and finalized at the end of the game.",
+    scoringTitle: "Scoring System",
+    scoringText: "The number of points per move depends on the difficulty:",
+    scoreNormal: "+1 point: with the board and queen visible.",
+    scoreHideQueen: "+2 points: with the board visible, but the queen hidden.",
+    scoreHideBoard: "+3 points: with the board hidden (hardest mode).",
     settingsTitle: "Game Settings",
     boardSize: "Board Size",
     boardSizeText: "You can change the size of the game board from 2x2 to 9x9."

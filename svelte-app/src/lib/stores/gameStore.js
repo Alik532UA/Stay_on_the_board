@@ -135,7 +135,6 @@ function getAvailableMoves(row, col, size, blockedCells = []) {
  * @property {number} penaltyPoints
  * @property {boolean} finishedByNoMovesButton
  * @property {number} gameId // <-- ДОДАНО
- * @property {boolean} isFirstComputerMovePending // <-- ДОДАНО
  */
 
 /**
@@ -226,7 +225,6 @@ export const appState = writable(/** @type {AppState} */({
   finishedByNoMovesButton: false,
   gameId: 1,
   availableDistances: Array.from({ length: initialBoardSize - 1 }, (_, i) => i + 1), // [1, 2] for size 3
-  isFirstComputerMovePending: true, // <-- ДОДАНО
 }));
 
 /**
@@ -479,7 +477,6 @@ export function resetGame() {
       isGameOver: false,
       gameId: (state.gameId || 0) + 1,
       availableDistances: Array.from({ length: boardSize - 1 }, (_, i) => i + 1),
-      isFirstComputerMovePending: true, // <-- ДОДАНО
     };
   });
 }
@@ -566,7 +563,13 @@ export async function confirmMove() {
       }
     }
   }
+  const { showBoard, hideQueen } = get(settingsStore);
   let scoreChange = 1;
+  if (!showBoard) {
+    scoreChange = 3; // Дошка прихована
+  } else if (hideQueen) {
+    scoreChange = 2; // Дошка видима, але ферзь прихований
+  }
   let penaltyApplied = 0;
   if (
     lastComputerMove &&
@@ -637,10 +640,7 @@ export async function makeComputerMove() {
     });
     // 7. ЕТАП 4: Перевірка першого ходу та приховування дошки
     const latestState = get(appState);
-    if (latestState.isFirstComputerMovePending) {
-      toggleShowBoard();
-      appState.update(s => ({ ...s, isFirstComputerMovePending: false }));
-    }
+    // Видаляємо блок автоприховування дошки та змінити нумерацію коментаря
     // 8. Передаємо хід наступному гравцеві
     advanceTurn();
     // Озвучування ходу (залишається в кінці)
