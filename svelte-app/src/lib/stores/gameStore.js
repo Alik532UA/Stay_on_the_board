@@ -563,11 +563,11 @@ export async function confirmMove() {
       }
     }
   }
-  const { showBoard, hideQueen } = get(settingsStore);
+  const { showBoard, showQueen } = get(settingsStore);
   let scoreChange = 1;
   if (!showBoard) {
     scoreChange = 3; // Дошка прихована
-  } else if (hideQueen) {
+  } else if (!showQueen) {
     scoreChange = 2; // Дошка видима, але ферзь прихований
   }
   let penaltyApplied = 0;

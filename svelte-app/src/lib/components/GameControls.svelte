@@ -5,7 +5,7 @@
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
-  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleHideQueen } from '$lib/stores/settingsStore.js';
+  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleShowQueen } from '$lib/stores/settingsStore.js';
   import SvgIcons from './SvgIcons.svelte';
   $: isPlayerTurn = $appState.players[$appState.currentPlayerIndex]?.type === 'human';
   $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
@@ -172,7 +172,7 @@
   }
 </script>
 
-<div class="game-controls-panel">
+<div class="game-interaction-wrapper">
   <details class="settings-expander">
     <summary class="settings-summary">{$_('gameControls.settings')}</summary>
     <div class="toggles">
@@ -186,29 +186,26 @@
           <span>{$_('gameControls.showBoard')}</span>
         </div>
       </label>
-
-      <!-- 2. Приховати ферзя -->
+      <!-- 2. Показати ферзя -->
       <label class="ios-switch-label" class:disabled={!showBoard}>
         <div class="switch-content-wrapper">
           <div class="ios-switch">
-            <input type="checkbox" checked={$settingsStore.hideQueen} onchange={toggleHideQueen} disabled={!showBoard} />
+            <input type="checkbox" checked={$settingsStore.showQueen} onchange={toggleShowQueen} disabled={!showBoard} />
             <span class="slider"></span>
           </div>
-          <span>{$_('gameControls.hideQueen')}</span>
+          <span>{$_('gameControls.showQueen')}</span>
         </div>
       </label>
-
       <!-- 3. Показувати доступні ходи -->
-      <label class="ios-switch-label" class:disabled={!showBoard || $settingsStore.hideQueen}>
+      <label class="ios-switch-label" class:disabled={!showBoard || !$settingsStore.showQueen}>
         <div class="switch-content-wrapper">
           <div class="ios-switch">
-            <input type="checkbox" checked={showMoves} onchange={onShowMovesChange} disabled={!showBoard || $settingsStore.hideQueen} />
+            <input type="checkbox" checked={showMoves} onchange={onShowMovesChange} disabled={!showBoard || !$settingsStore.showQueen} />
             <span class="slider"></span>
           </div>
           <span>{$_('gameControls.showMoves')}</span>
         </div>
       </label>
-
       <!-- 4. Режим заблокованих клітинок -->
       <label class="ios-switch-label">
         <div class="switch-content-wrapper">
@@ -219,7 +216,6 @@
           <span>{$_('gameControls.blockMode')}</span>
         </div>
       </label>
-
       <!-- 5. Озвучування ходів -->
       <label class="ios-switch-label">
         <div class="switch-content-wrapper">
@@ -243,60 +239,71 @@
       </label>
     </div>
   </details>
-  <div class="directions directions-3x3">
-    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" onclick={() => onDirectionClick('up-left')}>↖</button>
-    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" onclick={() => onDirectionClick('up')}>↑</button>
-    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" onclick={() => onDirectionClick('up-right')}>↗</button>
-    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" onclick={() => onDirectionClick('left')}>←</button>
-    <button
-      id="center-info"
-      class="control-btn center-info {centerInfoState.class}"
-      type="button"
-      aria-label={centerInfoState.aria}
-      onclick={centerInfoState.clickable ? onCentralClick : undefined}
-      tabindex="0"
-      disabled={!centerInfoState.clickable}
-    >
-      {String(centerInfoState.content)}
-    </button>
-    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" onclick={() => onDirectionClick('right')}>→</button>
-    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" onclick={() => onDirectionClick('down-left')}>↙</button>
-    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" onclick={() => onDirectionClick('down')}>↓</button>
-    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" onclick={() => onDirectionClick('down-right')}>↘</button>
-  </div>
-  <div class="distance-select">
-    <div>{$_('gameControls.selectDistance')}</div>
-    <div class="distance-btns">
-      {#each $availableDistances as dist}
-        <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" onclick={() => onDistanceClick(dist)} value={String(dist)} id={String(dist)}>{String(dist)}</button>
-      {/each}
-    </div>
-  </div>
-  <div class="action-btns">
-    <button class="confirm-btn" onclick={onConfirmMove} disabled={buttonDisabled} title={$_('gameControls.confirm')}>
-      <SvgIcons name="confirm" />
-      {$_('gameControls.confirm')}
-    </button>
-    {#if blockModeEnabled}
-      <button class="no-moves-btn" onclick={onNoMoves} title={$_('gameControls.noMovesTitle')}>
-        <SvgIcons name="no-moves" />
-        {$_('gameControls.noMovesTitle')}
+  <div class="game-controls-panel">
+    <div class="directions directions-3x3">
+      <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" onclick={() => onDirectionClick('up-left')}>↖</button>
+      <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" onclick={() => onDirectionClick('up')}>↑</button>
+      <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" onclick={() => onDirectionClick('up-right')}>↗</button>
+      <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" onclick={() => onDirectionClick('left')}>←</button>
+      <button
+        id="center-info"
+        class="control-btn center-info {centerInfoState.class}"
+        type="button"
+        aria-label={centerInfoState.aria}
+        onclick={centerInfoState.clickable ? onCentralClick : undefined}
+        tabindex="0"
+        disabled={!centerInfoState.clickable}
+      >
+        {String(centerInfoState.content)}
       </button>
-    {/if}
+      <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" onclick={() => onDirectionClick('right')}>→</button>
+      <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" onclick={() => onDirectionClick('down-left')}>↙</button>
+      <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" onclick={() => onDirectionClick('down')}>↓</button>
+      <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" onclick={() => onDirectionClick('down-right')}>↘</button>
+    </div>
+    <div class="distance-select">
+      <div>{$_('gameControls.selectDistance')}</div>
+      <div class="distance-btns">
+        {#each $availableDistances as dist}
+          <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" onclick={() => onDistanceClick(dist)} value={String(dist)} id={String(dist)}>{String(dist)}</button>
+        {/each}
+      </div>
+    </div>
+    <div class="action-btns">
+      <button class="confirm-btn" onclick={onConfirmMove} disabled={buttonDisabled} title={$_('gameControls.confirm')}>
+        <SvgIcons name="confirm" />
+        {$_('gameControls.confirm')}
+      </button>
+      {#if blockModeEnabled}
+        <button class="no-moves-btn" onclick={onNoMoves} title={$_('gameControls.noMovesTitle')}>
+          <SvgIcons name="no-moves" />
+          {$_('gameControls.noMovesTitle')}
+        </button>
+      {/if}
+    </div>
   </div>
 </div>
 
 <style>
-.game-controls-panel {
-  background: rgba(80,0,80,0.18);
-  border-radius: 24px;
-  padding: 24px 18px 24px 18px;
-  margin-top: 18px;
+.game-interaction-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 18px;
-  min-width: 320px;
+  width: 100%;
+  max-width: 480px;
+  margin: 18px auto 0;
+}
+.game-controls-panel {
+  background: rgba(80,0,80,0.18);
+  border-radius: 24px;
+  padding: 24px 18px 24px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  box-sizing: border-box;
   /* Glassmorphism */
   backdrop-filter: blur(12px);
   box-shadow: 0 8px 32px 0 rgba(80,0,80,0.18);
