@@ -19,11 +19,12 @@ export default {
       nl: "Dutch"
     },
     themeName: {
-      ubuntu: "Ubuntu",
-      peak: "PEAK",
-      cs2: "CS 2",
-      glass: "Glassmorphism",
-      material: "Material You"
+      ubuntu: "Purple",
+      peak: "Green",
+      cs2: "Blue",
+      glass: "Gray",
+      material: "Orange",
+      wood: "Wooden"
     },
     wipNotice: {
       title: "Under Development",
@@ -38,7 +39,7 @@ export default {
     scoreLabel: "Score",
     cashOut: "Cash Out",
     tutorialTitle: "",
-    tutorialContent: "Your goal is to take turns moving the shared piece without going off the board. Hide the board or the queen in the settings to earn more points for each move!",
+    tutorialContent: "Your goal is to take turns moving the shared piece without going off the board. Hide the queen or the board in the settings to earn more points for each move!",
     info: "Instructions",
     details: "Details"
   },

@@ -19,11 +19,12 @@ export default {
       nl: "Holland tili"
     },
     themeName: {
-      ubuntu: "Ubuntu",
-      peak: "PEAK",
-      cs2: "CS 2",
-      glass: "Glassmorphism",
-      material: "Material You"
+      ubuntu: "Menekşe",
+      peak: "Yeşil",
+      cs2: "Mavi",
+      glass: "Gri",
+      material: "Turuncu",
+      wood: "Ağaç"
     },
     wipNotice: {
       title: "İşlep Çıqarılmaqta",
@@ -38,7 +39,7 @@ export default {
     scoreLabel: "Esap",
     cashOut: "Ballarnı al",
     tutorialTitle: "",
-    tutorialContent: "Siziñ maqsadıñız – nevbetnen ortaq figurani tahtadan tışarı çıqarmadan areket ettirmektir. Er bir areket içün daa çoq bal qazanmaq içün, sozlamalarda tahtanı ya da vezirni gizletiñiz!",
+    tutorialContent: "Siziñ maqsadıñız – nevbetnen ortaq figurani tahtadan tışarı çıqarmadan areket ettirmektir. Er bir areket içün daa çoq bal qazanmaq içün, sozlamalarda vezirni ya da tahtanı gizletiñiz!",
     info: "Talimat",
     details: "Tafsilât",
   },
