@@ -7,7 +7,7 @@
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
   import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech } from '$lib/stores/settingsStore.js';
   import SvgIcons from './SvgIcons.svelte';
-  $: isPlayerTurn = $appState.currentPlayer === 1;
+  $: isPlayerTurn = $appState.players[$appState.currentPlayerIndex]?.type === 'human';
   $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
   // Для відображення стрілки за напрямком
   const directionArrows = {
