@@ -1,37 +1,37 @@
 /* Material стиль - Світла тема */
 [data-style="material"][data-theme="light"] {
-    --bg-primary: linear-gradient(120deg, #e3f0ff 0%, #f8e1ff 40%, #eafff0 80%, #fffbe7 100%);
-    --bg-secondary: #ffffff;
-    --text-primary: #22223b;
-    --text-secondary: #4a4e69;
-    --text-accent: #3a86ff;
-    --border-color: #e0e0e0;
-    --shadow-color: rgba(58, 134, 255, 0.10);
-    --cell-light: #f1f8ff;
-    --cell-dark: #eafff0;
-    --control-bg: #f6f6f6;
-    --control-hover: #e0e7ff;
-    --control-selected: #ffbe0b;
-    --confirm-btn-bg: #3a86ff;
-    --no-moves-btn-bg: #ff006e;
+    --bg-primary: linear-gradient(120deg, #fffde4 0%, #fff9c4 40%, #ffe066 80%, #fffbe7 100%);
+    --bg-secondary: #fffde4;
+    --text-primary: #7c5e00;
+    --text-secondary: #bfa900;
+    --text-accent: #ffd600;
+    --border-color: #ffe066;
+    --shadow-color: rgba(255, 224, 102, 0.18);
+    --cell-light: #fffbe7;
+    --cell-dark: #fff9c4;
+    --control-bg: #fff9c4;
+    --control-hover: #ffe066;
+    --control-selected: #ffd600;
+    --confirm-btn-bg: #ffd600;
+    --no-moves-btn-bg: #ffe066;
 }
 
 /* Material стиль - Темна тема */
 [data-style="material"][data-theme="dark"] {
-    --bg-primary: linear-gradient(120deg, #1a1a2e 0%, #232946 40%, #1e2e24 80%, #3a86ff 100%);
-    --bg-secondary: #232946;
-    --text-primary: #f4faff;
-    --text-secondary: #b8c1ec;
-    --text-accent: #ffbe0b;
-    --border-color: #393e46;
-    --shadow-color: rgba(58, 134, 255, 0.18);
-    --cell-light: #232946;
-    --cell-dark: #1a1a2e;
-    --control-bg: #232946;
-    --control-hover: #3a86ff33;
-    --control-selected: #ffbe0b;
-    --confirm-btn-bg: #3a86ff;
-    --no-moves-btn-bg: #ff006e;
+    --bg-primary: linear-gradient(120deg, #3a3000 0%, #7c5e00 40%, #ffe066 100%);
+    --bg-secondary: #7c5e00;
+    --text-primary: #fffde4;
+    --text-secondary: #ffe066;
+    --text-accent: #ffd600;
+    --border-color: #ffd600;
+    --shadow-color: rgba(255, 224, 102, 0.28);
+    --cell-light: #7c5e00;
+    --cell-dark: #3a3000;
+    --control-bg: #bfa900;
+    --control-hover: #ffe066;
+    --control-selected: #ffd600;
+    --confirm-btn-bg: #ffd600;
+    --no-moves-btn-bg: #ffe066;
 }
 
 /* Загальні стилі для Material, що визначають "підняття" елементів */

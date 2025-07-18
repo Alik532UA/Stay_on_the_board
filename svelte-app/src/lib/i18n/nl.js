@@ -23,11 +23,12 @@ export default {
       nl: "Nederlands"
     },
     themeName: {
-      ubuntu: "Ubuntu",
-      peak: "PEAK",
-      cs2: "CS 2",
-      glass: "Glassmorphism",
-      material: "Material You"
+      ubuntu: "Paars",
+      peak: "Groen",
+      cs2: "Blauw",
+      glass: "Grijs",
+      material: "Oranje",
+      wood: "Hout"
     }
   },
   gameBoard: {
@@ -38,7 +39,7 @@ export default {
     scoreLabel: "Score",
     cashOut: "Punten innen",
     tutorialTitle: "",
-    tutorialContent: "Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan. Verberg het bord of de koningin in de instellingen om meer punten te verdienen voor elke zet!",
+    tutorialContent: "Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan. Verberg de koningin of het bord in de instellingen om meer punten te verdienen voor elke zet!",
     info: "Instructies",
     details: "Details",
   },

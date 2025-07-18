@@ -19,11 +19,12 @@ export default {
       nl: "Nederlands"
     },
     themeName: {
-      ubuntu: "Ubuntu",
-      peak: "PEAK",
-      cs2: "CS 2",
-      glass: "Glassmorphism",
-      material: "Material You"
+      ubuntu: "Фіолетий",
+      peak: "Зелений",
+      cs2: "Синій",
+      glass: "Сірий",
+      material: "Помаранчевий",
+      wood: "Дерев'яний"
     },
     wipNotice: {
       title: "В розробці",
@@ -38,7 +39,7 @@ export default {
     scoreLabel: "Рахунок",
     cashOut: "Забрати бали",
     tutorialTitle: "",
-    tutorialContent: "Ваша мета — по черзі рухати спільну фігуру, не виходячи за межі дошки. Ховайте дошку або ферзя в налаштуваннях, щоб заробляти більше балів за кожен хід!",
+    tutorialContent: "Ваша мета — по черзі рухати спільну фігуру, не виходячи за межі дошки. Ховайте ферзя або дошку в налаштуваннях, щоб заробляти більше балів за кожен хід!",
     info: "Інструкція",
     details: "Детальніше",
   },
