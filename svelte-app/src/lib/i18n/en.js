@@ -37,9 +37,10 @@ export default {
     penaltyHint: "Do not return to the cell from which the move was just made",
     scoreLabel: "Score",
     cashOut: "Cash Out",
-    tutorialTitle: "Welcome to the game!",
-    tutorialContent: "Your goal is to move the queen without going off the board. Remember its position, because after your move, the board may disappear! The computer's move will appear on the central button, after which it's your turn again.",
-    info: "Instructions"
+    tutorialTitle: "",
+    tutorialContent: "Your goal is to take turns moving one shared piece without going off the board. Remember its position, as the board may disappear after your move! The computer's move will appear in the center of the direction control panel, then it's your turn again.",
+    info: "Instructions",
+    details: "Details"
   },
   gameControls: {
     ok: "OK",
@@ -152,7 +153,7 @@ export default {
   rulesPage: {
     title: "Rules of \"Stay on the Board\"",
     goalTitle: "Objective of the Game",
-    goalText: "\"Stay on the Board\" is a strategic endurance game. Your goal is to keep the piece on the board for as long as possible, taking turns with your opponent and forcing them to make a mistake.",
+    goalText: '"Stay on the Board" is a strategic endurance game. Players take turns moving one shared piece. Your goal is to keep it on the board for as long as possible and force your opponent to make a mistake.',
     moveProcessTitle: "Move Process",
     moveProcessText: "A player makes a move using the control panel below the board. Clicking on the board cells does not perform any moves.",
     step1: "Step 1: Choose a direction.",
@@ -164,7 +165,7 @@ export default {
     winLossTitle: "Winning and Losing Conditions",
     youLose: "You lose if:",
     lose1: "Your move takes the piece off the board.",
-    lose2: "You try to move to an already blocked cell (in the corresponding mode).",
+    lose2: "You try to move to an already blocked cell (in the corresponding mode, which can be enabled with a checkbox).",
     lose3: "You press the \"No moves\" button, but you actually have available moves.",
     youWin: "You win if:",
     win1: "Your opponent makes one of the above mistakes.",
@@ -179,8 +180,8 @@ export default {
     noMovesWin: "If you are correct (there are no moves) - you win.",
     noMovesLoss: "If you are mistaken (at least one move is available) - you lose.",
     noMovesButtonText2: "This is a risky but sometimes necessary strategy to win in a difficult situation.",
-    scoringTitle: "Scoring System",
-    scoringText: "For each successful move, you get 1 point. The longer the game lasts, the higher your score. The score is displayed in real-time and is finalized at the end of the game.",
+    scoringTitle: "Points System",
+    scoringText: "For each successful move, you get 1 point. The longer the game lasts, the higher your score. Points are displayed in real-time and finalized at the end of the game.",
     settingsTitle: "Game Settings",
     boardSize: "Board Size",
     boardSizeText: "You can change the size of the game board from 2x2 to 9x9."

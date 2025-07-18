@@ -2,7 +2,7 @@ export default {
   mainMenu: {
     title: "Tahtada qalmaq",
     menu: "Menü",
-    playVsComputer: "Kompyuterge qarşı oynamaq",
+    playVsComputer: "Kompyuterge qarşı oyna",
     localGame: "Mahalliy oyun",
     playOnline: "Onlayn oyna",
     settings: "Sozlamalar",
@@ -37,9 +37,10 @@ export default {
     penaltyHint: "Az önce hereket yapılğan hücrege qaytmañız",
     scoreLabel: "Esap",
     cashOut: "Ballarnı al",
-    tutorialTitle: "Oyunğa hoş keldiñiz!",
-    tutorialContent: "Siziñ maqsadıñız – vezirni tahta sıñırlarından tışına çıqarmayıp areket ettirmektir. Onıñ yerini aqlıñızda tutuñız, çünki siziñ areketiñizden soñ tahta ğayip olmaq mümkün! Kompyuterniñ areketi merkeziy dögmede peyda olacaq, soñra nevbet kene sizge keçecek.",
-    info: "Talimat"
+    tutorialTitle: "",
+    tutorialContent: "Siziñ maqsadıñız – nevbetnen bir ortaq figurani tahtadan tışarı çıqarmadan areket ettirmektir. Onıñ yerini aqlıñızda tutuñız, çünki siziñ areketiñizden soñ tahta ğayip olmaq mümkün! Kompyuterniñ areketi yöneliş saylav paneliniñ merkezinde peyda olacaq, soñra nevbet kene sizge keçecek.",
+    info: "Talimat",
+    details: "Tafsilât",
   },
   gameControls: {
     ok: "OK",
@@ -153,7 +154,7 @@ export default {
   rulesPage: {
     title: "\"Stay on the Board\" Oyunı Qaydaları",
     goalTitle: "Oyunıñ Maqsadı",
-    goalText: "\"Stay on the Board\" – bu bir strategik dayanıqlılıq oyunı. Siziñ maqsadıñız – raqibiñiznen nevbetnen areket etip ve onı hata yapmağa mecbur etip, figurani mümkün olğanı qadar uzun vaqıt tahtada tutmaqtır.",
+    goalText: '"Stay on the Board" – bu bir strategik dayanıqlılıq oyunı. Oyunçılar nevbetnen bir ortaq figurani areket ettireler. Siziñ maqsadıñız – onı mümkün olğanı qadar uzun vaqıt tahtada tutmaq ve raqibiñizni hatalı bir areket yapmağa mecbur etmektir.',
     moveProcessTitle: "Areket Süreci",
     moveProcessText: "Oyunçı, tahtanıñ altında yerleşken idare panelini qullanıp areket ete. Tahta hücrelerine basuv iç bir areket yapmay.",
     step1: "1-nci adım: Yönelişni saylañız.",
@@ -165,7 +166,7 @@ export default {
     winLossTitle: "Yeñüv ve Yeñilüv Şartları",
     youLose: "Siz yeñilesiñiz, eger:",
     lose1: "Areketiñiz figuranı tahtadan tışarı çıqarsa.",
-    lose2: "Siz endi bloklanğan bir hücrege basmağa tırışsañız (uyğun rejimde).",
+    lose2: "Siz endi bloklanğan bir hücrege basmağa tırışsañız (bu rejim bir onay kutusu ile etkinleştirilebilir).",
     lose3: "Siz \"Areket yoq\" dögmesine basasıñız, amma aslında daa mümkün areket variantlarıñız bar.",
     youWin: "Siz yeñesiñiz, eger:",
     win1: "Raqibiñiz yuqarıda aytılğan hatalardan birini yapsa.",
@@ -180,8 +181,8 @@ export default {
     noMovesWin: "Eger aqlı olsañız (kerçekten de areket yoq) – siz yeñesiñiz.",
     noMovesLoss: "Eger hata yapsañız (eñ az bir areket bar) – siz yeñilesiñiz.",
     noMovesButtonText2: "Bu, riskli, amma bazıda zor bir vaziyette yeñmek içün kerekli bir strategiyadır.",
-    scoringTitle: "Bal Sistemi",
-    scoringText: "Er bir muvafaqiyetli areket içün 1 bal alasınız. Oyun ne qadar uzun sürse, esabıñız o qadar yüksek olur. Esap kerçek zamanda kösterile ve oyun soñunda qayd etile.",
+    scoringTitle: "Ballar Sistemi",
+    scoringText: "Er bir muvafaqiyetli areket içün 1 bal alasınız. Oyun ne qadar uzun sürse, esabıñız o qadar yüksek olur. Ballar kerçek zamanda kösterile ve oyun soñunda qayd etile.",
     settingsTitle: "Oyun Sozlamaları",
     boardSize: "Tahta Ölçüsi",
     boardSizeText: "Oyun meydanınıñ ölçüsini 2x2-den 9x9-ğa qadar deñiştirmekñiz mümkün."
