@@ -66,9 +66,9 @@
       <div class="modal-content">
         
         {#if $modal_data.contentKey || (typeof $modal_data.content === 'string' && $modal_data.content)}
-          <div class="modal-info">
+          <p class="reason">
             {$modal_data.contentKey ? $_($modal_data.contentKey) : $modal_data.content}
-          </div>
+          </p>
         {/if}
 
         {#if details}
@@ -76,35 +76,33 @@
             <p class="reason">{$modal_data.content.reason}</p>
           {/if}
           {#if details()}
-            <div class="score-breakdown">
-              <div>{$_('modal.scoreDetails.baseScore')} <span>{details().baseScore}</span></div>
-              {#if details().sizeBonus > 0}
-                <div>{$_('modal.scoreDetails.sizeBonus')} <span>+{details().sizeBonus}</span></div>
-              {/if}
-              {#if details().blockModeBonus > 0}
-                <div>{$_('modal.scoreDetails.blockModeBonus')} <span>+{details().blockModeBonus}</span></div>
-              {/if}
-              {#if details().jumpBonus > 0}
-                <div>{$_('modal.scoreDetails.jumpBonus')} <span>+{details().jumpBonus}</span></div>
-              {/if}
-              {#if details().noMovesBonus > 0}
-                <div>{$_('modal.scoreDetails.noMovesBonus')} <span>+{details().noMovesBonus}</span></div>
-              {/if}
-              {#if details().finishBonus > 0}
-                <div>{$_('modal.scoreDetails.finishBonus')} <span>+{details().finishBonus}</span></div>
-              {/if}
-              {#if details().totalPenalty > 0}
-                <div class="penalty">{$_('modal.scoreDetails.penalty')} <span>-{details().totalPenalty}</span></div>
-              {/if}
-            </div>
-            <div class="final-score-container">
+            <div class="score-detail-row">{$_('modal.scoreDetails.baseScore')} <span>{details().baseScore}</span></div>
+            {#if details().sizeBonus > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.sizeBonus')} <span>+{details().sizeBonus}</span></div>
+            {/if}
+            {#if details().blockModeBonus > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.blockModeBonus')} <span>+{details().blockModeBonus}</span></div>
+            {/if}
+            {#if details().jumpBonus > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.jumpBonus')} <span>+{details().jumpBonus}</span></div>
+            {/if}
+            {#if details().noMovesBonus > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.noMovesBonus')} <span>+{details().noMovesBonus}</span></div>
+            {/if}
+            {#if details().finishBonus > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.finishBonus')} <span>+{details().finishBonus}</span></div>
+            {/if}
+            {#if details().totalPenalty > 0}
+              <div class="score-detail-row penalty">{$_('modal.scoreDetails.penalty')} <span>-{details().totalPenalty}</span></div>
+            {/if}
+            <div class="final-score-row">
               <span class="score-label">{$_('modal.scoreDetails.finalScore')}</span>
               <span class="score-value">{details().totalScore}</span>
             </div>
           {/if}
         {:else if typeof $modal_data.content === 'object' && $modal_data.content !== null && $modal_data.content.score}
           <p class="reason">{$modal_data.content.reason}</p>
-          <div class="final-score-container">
+          <div class="final-score-row">
             <span class="score-label">{$_('modal.scoreDetails.yourScore')}</span>
             <span class="score-value">{$modal_data.content.score}</span>
           </div>
@@ -142,7 +140,6 @@
 {/if}
 
 <style>
-/* Styles remain unchanged */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -150,47 +147,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 16px;
 }
 .modal-victory-icon {
-  font-size: 2.5em;
-  margin-right: 12px;
+  font-size: 1.5em;
+  margin-right: 8px;
   vertical-align: middle;
   filter: drop-shadow(0 2px 8px #ffeb3b88);
 }
 .modal-window {
-  border-radius: 18px;
-  min-width: 280px;
-  max-width: 90vw;
-  padding: 0;
-  box-shadow: none;
-  text-align: center;
-  background: none;
-  width: 90vw;
-  max-width: 420px;
-  box-sizing: border-box;
-}
-.modal-content {
-  background: rgba(40, 10, 35, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 2px 16px 0 rgba(80,0,80,0.10);
-  border-radius: 18px;
-  padding: 24px 16px;
+  background: rgba(40, 10, 35, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border-radius: 24px;
   width: 100%;
-  box-sizing: border-box;
-  max-width: 420px;
-  margin: 0 auto;
+  max-width: 400px;
   max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  position: relative;
-  color: var(--text-primary, #fff);
   transform: scale(0.95);
   opacity: 0;
   animation: modalFadeIn 0.3s ease-out forwards;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 @keyframes modalFadeIn {
   to {
@@ -198,62 +178,88 @@
     opacity: 1;
   }
 }
-.modal-header {
+.modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  color: var(--text-primary, #fff);
   background: transparent;
-  padding: 24px 16px 16px;
+}
+.modal-header {
+  padding: 20px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 1.25em;
-  font-weight: bold;
-  color: var(--text-accent, #ffbe0b);
+  flex-shrink: 0;
+  background: transparent;
 }
 .modal-title {
   margin: 0;
-  font-size: 2em;
-  font-weight: 800;
+  font-size: 1.8em;
+  font-weight: 700;
   color: #fffde7;
   text-align: center;
   flex: 1;
-  letter-spacing: 0.01em;
-  line-height: 1.2;
 }
 .modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   color: rgba(255, 255, 255, 0.7);
   background: none;
   border: none;
   font-size: 2em;
   cursor: pointer;
   transition: color 0.2s ease;
-  padding: 0 12px;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  z-index: 1;
 }
 .modal-close:hover {
-  background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
-.final-score-container {
-  background-color: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 16px 12px;
-  margin: 0 auto;
-  display: inline-flex;
+.score-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 1em;
+  color: var(--text-secondary);
+}
+.score-detail-row:last-of-type {
+  border-bottom: none;
+}
+.score-detail-row span {
+  font-weight: bold;
+  color: var(--text-primary);
+}
+.score-detail-row.penalty {
+  color: #f44336;
+}
+.score-detail-row.penalty span {
+  color: #f44336;
+  font-weight: bold;
+}
+.final-score-row {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  width: 100%;
-  box-sizing: border-box;
+  gap: 4px;
 }
 .score-label {
-  font-size: 1em;
+  font-size: 1.1em;
   color: var(--text-secondary, #ccc);
   font-weight: 500;
 }
 .score-value {
-  font-size: 2.5em;
+  font-size: 3em;
   font-weight: 700;
   color: var(--text-accent, #ff9800);
   line-height: 1;
@@ -261,29 +267,30 @@
 .modal-buttons {
     justify-content: center;
     display: flex;
-    background: transparent;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px 0 24px 0;
-    gap: 18px;
+    flex-direction: column;
+    padding: 24px;
+    gap: 12px;
     width: 100%;
     box-sizing: border-box;
-    margin-top: 8px;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
 }
 
 .modal-btn-generic {
-    margin: 0 8px;
-    padding: 8px 26px;
-    font-size: 1.08em;
-    border-radius: 8px;
-    border: 1.5px solid #eee;
+    margin: 0;
+    padding: 12px 26px;
+    font-size: 1.1em;
+    border-radius: 12px;
+    border: none;
     background: #fff;
     color: #222;
     cursor: pointer;
     transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
-    font-weight: 600;
+    font-weight: 700;
     box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
     outline: none;
-    min-width: 120px;
+    width: 100%;
     text-align: center;
 }
 
@@ -292,96 +299,45 @@
     box-shadow: 0 4px 12px 0 rgba(0,0,0,0.12);
 }
 
-.modal-btn-generic.primary {
+.modal-btn-generic.primary, .modal-btn-generic.green-btn {
     background: #4caf50;
     color: #fff;
-    border-color: #388e3c;
     box-shadow: 0 2px 12px 0 #4caf5040;
 }
 
-.modal-btn-generic.primary:hover {
+.modal-btn-generic.primary:hover, .modal-btn-generic.green-btn:hover {
     background: #43a047;
 }
 
 .modal-btn-generic.blue-btn {
     background: #2196f3;
     color: #fff;
-    border-color: #1976d2;
     box-shadow: 0 2px 12px 0 #2196f340;
 }
 
 .modal-btn-generic.blue-btn:hover {
     background: #1976d2;
 }
-
-.modal-btn-generic.green-btn {
-    background: #4caf50;
-    color: #fff;
-    border-color: #388e3c;
-    box-shadow: 0 2px 12px 0 #4caf5040;
-}
-
-.modal-btn-generic.green-btn:hover {
-    background: #43a047;
-}
 .reason {
   font-size: 1.1em;
   color: var(--text-secondary, #ccc);
-  margin-bottom: 20px;
-  margin-top: 32px;
-}
-.modal-content p, .modal-content .reason {
-  margin: 0 0 16px 0;
+  margin-bottom: 24px;
+  margin-top: 0;
   text-align: center;
-  font-size: 1.08em;
 }
-.score-breakdown {
-  text-align: left;
-  margin: 20px auto;
-  padding: 16px;
-  background: rgba(0,0,0,0.1);
-  border-radius: 8px;
-  width: 100%;
-  box-sizing: border-box;
-  font-size: 0.9em;
-  color: var(--text-secondary);
-}
-.score-breakdown div {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-}
-.score-breakdown span {
-  font-weight: bold;
-  color: var(--text-primary);
-}
-.score-breakdown .penalty {
-  color: #f44336;
-}
-.score-breakdown .penalty span {
-  color: #f44336;
-  font-weight: bold;
-}
-.modal-info {
-  background: rgba(30, 16, 40, 0.32);
-  color: #fff;
-  border-radius: 10px;
-  padding: 12px 18px 10px 18px;
-  margin: 0 0 18px 0;
-  font-size: 1.08em;
-  text-align: center;
-  box-shadow: none;
-  border: none;
-  max-width: 95vw;
-}
-@media (max-width: 400px) {
-  .modal-buttons {
-    flex-direction: column;
-    gap: 12px;
+
+@media (max-width: 480px) {
+  .modal-header {
+    padding: 20px 16px 12px;
   }
-  .modal-btn-generic {
-    width: 100%;
-    margin: 0;
+  .modal-title {
+    font-size: 1.6em;
+  }
+  .modal-content {
+    padding: 16px;
+  }
+  .modal-buttons {
+    padding: 16px;
   }
 }
 </style> 
