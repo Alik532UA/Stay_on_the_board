@@ -1,0 +1,100 @@
+/* Помаранчевий стиль - Світла тема */
+[data-style="orange"][data-theme="light"] {
+    --bg-primary: linear-gradient(120deg, #fff3e0 0%, #ffd180 100%);
+    --bg-secondary: #fff3e0;
+    --text-primary: #6d3a00;
+    --text-secondary: #ff9800;
+    --text-accent: #ffa726;
+    --border-color: #ffa726;
+    --shadow-color: rgba(255,167,38,0.10);
+    --cell-light: #ffb74d;
+    --cell-dark: #ff8a26;
+    --cell-blocked: #ffcc80;
+    --piece-color: #ffa726;
+    --piece-shadow: rgba(255,167,38,0.3);
+    --control-bg: #ffd180;
+    --control-hover: #ffa726;
+    --control-selected: #ff9800;
+    --confirm-btn-bg: #ffa726;
+    --confirm-btn-hover: #ff9800;
+    --no-moves-btn-bg: #fff3e0;
+    --no-moves-btn-hover: #ffd180;
+}
+
+/* Помаранчевий стиль - Темна тема */
+[data-style="orange"][data-theme="dark"] {
+    --bg-primary: linear-gradient(120deg, #ff6f00 0%, #e65100 100%);
+    --bg-secondary: #ff6f00;
+    --text-primary: #fff;
+    --text-secondary: #ffd180;
+    --text-accent: #ffa726;
+    --border-color: #ffa726;
+    --shadow-color: rgba(255,167,38,0.18);
+    --cell-light: #ff8a26;
+    --cell-dark: #e65100;
+    --cell-blocked: #ffa726;
+    --piece-color: #ffa726;
+    --piece-shadow: rgba(255,167,38,0.5);
+    --control-bg: #e65100;
+    --control-hover: #ffa726;
+    --control-selected: #ffd180;
+    --confirm-btn-bg: #ffa726;
+    --confirm-btn-hover: #ffd180;
+    --no-moves-btn-bg: #e65100;
+    --no-moves-btn-hover: #ffa726;
+}
+
+/* Загальні стилі для Orange, що визначають "підняття" елементів */
+[data-style="orange"] .game-board,
+[data-style="orange"] .game-controls-panel,
+[data-style="orange"] .score-panel,
+[data-style="orange"] .modal-window .modal-content {
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 2px 0 var(--shadow-color), 0 1px 3px 1px var(--shadow-color);
+}
+
+[data-style="orange"][data-theme="dark"] .game-board,
+[data-style="orange"][data-theme="dark"] .game-controls-panel,
+[data-style="orange"][data-theme="dark"] .score-panel,
+[data-style="orange"][data-theme="dark"] .modal-window .modal-content {
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.6), 0 1px 3px 1px rgba(0,0,0,0.3);
+}
+
+/* Стилізація кнопок у стилі Orange */
+[data-style="orange"] .dir-btn,
+[data-style="orange"] .dist-btn {
+    border: none;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+[data-style="orange"] .dir-btn:hover,
+[data-style="orange"] .dist-btn:hover {
+    background-color: var(--control-hover);
+}
+
+[data-style="orange"] .dir-btn:active,
+[data-style="orange"] .dist-btn:active {
+    transform: scale(0.95);
+}
+
+[data-style="orange"] .dir-btn.active,
+[data-style="orange"] .dist-btn.active {
+    background-color: var(--control-selected);
+    color: var(--bg-secondary);
+}
+
+[data-style="orange"] .confirm-btn,
+[data-style="orange"] .no-moves-btn {
+    border: none;
+    color: var(--bg-primary);
+    font-weight: 700;
+}
+
+[data-style="orange"] .confirm-btn {
+    background: var(--confirm-btn-bg);
+}
+
+[data-style="orange"] .no-moves-btn {
+    background: var(--no-moves-btn-bg);
+    color: #202124;
+}

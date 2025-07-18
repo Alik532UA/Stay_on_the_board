@@ -1,0 +1,59 @@
+/* Дерев'яний стиль - Світла тема */
+[data-style="wood"][data-theme="light"] {
+    --bg-primary: linear-gradient(120deg, #f7f3ed 0%, #e3d3c2 100%);
+    --bg-secondary: #f7f3ed;
+    --text-primary: #4b2e13;
+    --text-secondary: #7c5c3b;
+    --text-accent: #a47551;
+    --border-color: #a47551;
+    --shadow-color: rgba(124,92,59,0.10);
+    --cell-light: #d2b48c;
+    --cell-dark: #a47551;
+    --cell-blocked: #bfa074;
+    --piece-color: #7c5c3b;
+    --piece-shadow: rgba(124,92,59,0.3);
+    --control-bg: #e3d3c2;
+    --control-hover: #d2b48c;
+    --control-selected: #7c5c3b;
+    --confirm-btn-bg: #a47551;
+    --confirm-btn-hover: #7c5c3b;
+    --no-moves-btn-bg: #e3d3c2;
+    --no-moves-btn-hover: #d2b48c;
+    --arrow-color: #4b2e13;
+}
+
+/* Дерев'яний стиль - Темна тема */
+[data-style="wood"][data-theme="dark"] {
+    --bg-primary: linear-gradient(120deg, #231407 0%, #0d0502 100%);
+    --bg-secondary: #231407;
+    --text-primary: #f5e9da;
+    --text-secondary: #bfa074;
+    --text-accent: #a47551;
+    --border-color: #7c5c3b;
+    --shadow-color: rgba(60,40,20,0.28);
+    --cell-light: #3b2412;
+    --cell-dark: #1a0e05;
+    --cell-blocked: #7c5c3b;
+    --piece-color: #bfa074;
+    --piece-shadow: rgba(60,40,20,0.3);
+    --control-bg: #1a0e05;
+    --control-hover: #3b2412;
+    --control-selected: #bfa074;
+    --confirm-btn-bg: #3b2412;
+    --confirm-btn-hover: #bfa074;
+    --no-moves-btn-bg: #1a0e05;
+    --no-moves-btn-hover: #3b2412;
+    --arrow-color: #f5e9da;
+}
+
+[data-style="wood"][data-theme="dark"] button:disabled,
+[data-style="wood"][data-theme="dark"] .dir-btn[disabled],
+[data-style="wood"][data-theme="dark"] .dist-btn[disabled],
+[data-style="wood"][data-theme="dark"] .confirm-btn:disabled,
+[data-style="wood"][data-theme="dark"] .no-moves-btn:disabled {
+  opacity: 0.22;
+  background: #fff1 !important;
+  color: #fff5 !important;
+  box-shadow: none !important;
+  filter: grayscale(0.4);
+} 

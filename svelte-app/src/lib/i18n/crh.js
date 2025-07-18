@@ -19,11 +19,11 @@ export default {
       nl: "Holland tili"
     },
     themeName: {
-      ubuntu: "Menekşe",
-      peak: "Yeşil",
-      cs2: "Mavi",
-      glass: "Gri",
-      material: "Turuncu",
+      purple: "Menekşe",
+      green: "Yeşil",
+      blue: "Mavi",
+      gray: "Gri",
+      orange: "Turuncu",
       wood: "Ağaç"
     },
     wipNotice: {
@@ -73,11 +73,11 @@ export default {
     themeDark: "Qaranlıq",
     themeLight: "Aydın",
     style: "Stil",
-    styleClassic: "Ubuntu",
-    stylePeak: "Peak",
-    styleCS2: "CS2",
-    styleGlass: "Glassmorphism",
-    styleMaterial: "Material You",
+    stylePurple: "Menekşe",
+    styleGreen: "Yeşil",
+    styleBlue: "Mavi",
+    styleGray: "Gri",
+    styleOrange: "Turuncu",
     reset: "Sozlamalarnı sıfırla",
     resetHint: "Bütün sozlamalarnı standart qıymetlerge qaytar"
   },

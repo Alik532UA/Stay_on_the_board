@@ -19,11 +19,11 @@ export default {
       nl: "Dutch"
     },
     themeName: {
-      ubuntu: "Purple",
-      peak: "Green",
-      cs2: "Blue",
-      glass: "Gray",
-      material: "Orange",
+      purple: "Purple",
+      green: "Green",
+      blue: "Blue",
+      gray: "Gray",
+      orange: "Orange",
       wood: "Wooden"
     },
     wipNotice: {
@@ -73,11 +73,11 @@ export default {
     themeDark: "Dark",
     themeLight: "Light",
     style: "Style",
-    styleClassic: "Ubuntu",
-    stylePeak: "Peak",
-    styleCS2: "CS2",
-    styleGlass: "Glassmorphism",
-    styleMaterial: "Material You",
+    stylePurple: "Purple",
+    styleGreen: "Green",
+    styleBlue: "Blue",
+    styleGray: "Gray",
+    styleOrange: "Orange",
     reset: "Reset Settings",
     resetHint: "Return all settings to their default values"
   },

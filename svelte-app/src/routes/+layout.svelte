@@ -56,12 +56,12 @@
 		// Очищуємо кеш і перезавантажуємо
 		localStorage.clear();
 		// true - для примусового перезавантаження з сервера
-		window.location.reload(true);
+		window.location.reload();
 	}
 
 	// onMount(() => {
 	// 	document.documentElement.setAttribute('data-theme', 'dark');
-	// 	document.documentElement.setAttribute('data-style', 'ubuntu');
+	// 	document.documentElement.setAttribute('data-style', 'purple');
 	// });
 </script>
 

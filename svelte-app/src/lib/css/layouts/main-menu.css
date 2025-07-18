@@ -454,62 +454,62 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
 }
 
 /* Спеціальні стилі для різних тем */
-[data-style="glass"] #game-container,
-[data-style="glass"] #main-menu-container {
+[data-style="gray"] #game-container,
+[data-style="gray"] #main-menu-container {
     background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,0.2);
 }
 
-[data-style="glass"] .modal-button,
-[data-style="glass"] .control-btn {
+[data-style="gray"] .modal-button,
+[data-style="gray"] .control-btn {
     background: rgba(255,255,255,0.2);
     backdrop-filter: blur(5px);
     border: 1px solid rgba(255,255,255,0.3);
 }
 
-[data-style="glass"] .modal-button.primary,
-[data-style="glass"] .control-btn.selected {
+[data-style="gray"] .modal-button.primary,
+[data-style="gray"] .control-btn.selected {
     background: rgba(76, 175, 80, 0.8);
     backdrop-filter: blur(5px);
 }
 
-[data-style="material"] #game-container,
-[data-style="material"] #main-menu-container {
+[data-style="orange"] #game-container,
+[data-style="orange"] #main-menu-container {
     background: var(--bg-primary);
     box-shadow: inset 0 0 100px rgba(0,0,0,0.05);
 }
 
-[data-style="material"] .modal-button,
-[data-style="material"] .control-btn {
+[data-style="orange"] .modal-button,
+[data-style="orange"] .control-btn {
     background: var(--control-bg);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     border-radius: 4px;
     border: none;
 }
 
-[data-style="material"] .modal-button.primary,
-[data-style="material"] .control-btn.selected {
+[data-style="orange"] .modal-button.primary,
+[data-style="orange"] .control-btn.selected {
     background: var(--control-selected);
     color: white;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-[data-style="material"] .modal-button.secondary {
+[data-style="orange"] .modal-button.secondary {
     background: transparent;
     color: var(--text-primary);
     border: 1px solid var(--border-color);
 }
 
-[data-style="material"] .ios-switch .slider {
+[data-style="orange"] .ios-switch .slider {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-[data-style="material"] .ios-switch input:checked + .slider {
+[data-style="orange"] .ios-switch input:checked + .slider {
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-[data-style="material"][data-theme="dark"] #direction-grid {
+[data-style="orange"][data-theme="dark"] #direction-grid {
     background: var(--bg-secondary);
     padding: 20px;
     border-radius: 12px;
@@ -573,11 +573,11 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
     color: white;
 }
 
-.style-ubuntu { background: #f5f5f5; color: #222; font-weight: 500; }
-.style-peak { background: #e3e6fa; color: #2a2a7a; font-family: 'Segoe UI', sans-serif; }
-.style-cs2 { background: #222; color: #ffcc00; font-family: 'Consolas', monospace; }
-.style-glass { background: rgba(255,255,255,0.3); color: #1a1a1a; backdrop-filter: blur(4px); }
-.style-material { background: #e8f5e9; color: #388e3c; font-family: 'Roboto', sans-serif; font-weight: bold; }
+.style-purple { background: #f5f5f5; color: #222; font-weight: 500; }
+.style-green { background: #e3e6fa; color: #2a2a7a; font-family: 'Segoe UI', sans-serif; }
+.style-blue { background: #222; color: #ffcc00; font-family: 'Consolas', monospace; }
+.style-gray { background: rgba(255,255,255,0.3); color: #1a1a1a; backdrop-filter: blur(4px); }
+.style-orange { background: #e8f5e9; color: #388e3c; font-family: 'Roboto', sans-serif; font-weight: bold; }
 
 /* Дропдаун теми */
 .theme-dropdown {
@@ -620,24 +620,29 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
     padding: 8px;
 }
 
-.theme-style-row[data-style="ubuntu"] {
+.theme-style-row[data-style="purple"] {
     background: rgba(124,58,237,0.45);
 }
 
-.theme-style-row[data-style="peak"] {
+.theme-style-row[data-style="green"] {
     background: rgba(0,200,80,0.4);
 }
 
-.theme-style-row[data-style="cs2"] {
+.theme-style-row[data-style="blue"] {
     background: rgba(33,150,243,0.4);
 }
 
-.theme-style-row[data-style="glass"] {
+.theme-style-row[data-style="gray"] {
     background: rgba(120,120,120,0.22); backdrop-filter: blur(8px);
 }
 
-.theme-style-row[data-style="material"] {
+.theme-style-row[data-style="orange"] {
     background: rgba(255,224,102,0.45);
+}
+
+.theme-style-row[data-style="wood"] {
+  background: linear-gradient(90deg, #e2c9a0 60%, #c9a063 100%);
+  /* або можна додати прозорість: background: rgba(201,160,99,0.22); */
 }
 
 /* Кнопки теми */
@@ -1012,11 +1017,12 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
     gap: 16px; /* Відстань між кнопками та назвою теми */
     margin-bottom: 10px;
 }
-.theme-style-row[data-style="ubuntu"] { background: rgba(124,58,237,0.45); }
-.theme-style-row[data-style="peak"] { background: rgba(0,200,80,0.4); }
-.theme-style-row[data-style="cs2"] { background: rgba(33,150,243,0.4); }
-.theme-style-row[data-style="glass"] { background: rgba(120,120,120,0.22); backdrop-filter: blur(8px); }
-.theme-style-row[data-style="material"] { background: rgba(255,224,102,0.45); }
+.theme-style-row[data-style="purple"] { background: #2a0d3a; }
+.theme-style-row[data-style="green"] { background: #1b4022; }
+.theme-style-row[data-style="blue"] { background: #101a2c; }
+.theme-style-row[data-style="gray"] { background: #23272f; }
+.theme-style-row[data-style="orange"] { background: #a84300; }
+.theme-style-row[data-style="wood"] { background: #231407; }
 .theme-style-row { transition: background 0.25s, box-shadow 0.25s; }
 .theme-style-row.selected, .theme-style-row:focus-within { box-shadow: 0 0 0 3px #ffeb3b99; }
 .theme-btn { transition: background 0.18s, box-shadow 0.18s, transform 0.15s; }
@@ -1133,3 +1139,20 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
   backface-visibility: hidden;
   background: transparent;
 } 
+
+.modal-button.secondary.pseudo-disabled {
+  opacity: 0.12 !important;
+  background: var(--control-bg, #ccc) !important;
+  color: var(--text-primary, #666) !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  filter: grayscale(0.4);
+  pointer-events: none !important;
+} 
+
+.theme-style-row[data-style="purple"] { background: #2a0d3a; }
+.theme-style-row[data-style="green"] { background: #1b4022; }
+.theme-style-row[data-style="blue"] { background: #101a2c; }
+.theme-style-row[data-style="gray"] { background: #23272f; }
+.theme-style-row[data-style="orange"] { background: #a84300; }
+.theme-style-row[data-style="wood"] { background: #231407; } 

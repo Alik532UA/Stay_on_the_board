@@ -23,11 +23,11 @@ export default {
       nl: "Nederlands"
     },
     themeName: {
-      ubuntu: "Paars",
-      peak: "Groen",
-      cs2: "Blauw",
-      glass: "Grijs",
-      material: "Oranje",
+      purple: "Paars",
+      green: "Groen",
+      blue: "Blauw",
+      gray: "Grijs",
+      orange: "Oranje",
       wood: "Hout"
     }
   },
@@ -73,11 +73,11 @@ export default {
     themeDark: "Donker",
     themeLight: "Licht",
     style: "Stijl",
-    styleClassic: "Ubuntu",
-    stylePeak: "Peak",
-    styleCS2: "CS2",
-    styleGlass: "Glassmorphism",
-    styleMaterial: "Material You",
+    stylePurple: "Paars",
+    styleGreen: "Groen",
+    styleBlue: "Blauw",
+    styleGray: "Grijs",
+    styleOrange: "Oranje",
     reset: "Instellingen resetten",
     resetHint: "Alle instellingen terugzetten naar hun standaardwaarden"
   },

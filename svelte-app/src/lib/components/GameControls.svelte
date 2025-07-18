@@ -303,7 +303,8 @@
   margin: 18px auto 0;
 }
 .game-controls-panel {
-  background: rgba(80,0,80,0.18);
+  background: var(--bg-secondary);
+  box-shadow: 0 8px 32px 0 var(--shadow-color);
   border-radius: 24px;
   padding: 24px 18px 24px 18px;
   display: flex;
@@ -314,7 +315,6 @@
   box-sizing: border-box;
   /* Glassmorphism */
   backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px 0 rgba(80,0,80,0.18);
   border: 1.5px solid rgba(255,255,255,0.18);
 }
 .toggles {

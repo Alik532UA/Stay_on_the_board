@@ -2,11 +2,12 @@
 
 /* Централізований імпорт усіх стилів */
 @import url('./lib/css/base/variables.css');
-@import url('./lib/css/themes/ubuntu.css');
-@import url('./lib/css/themes/peak.css');
-@import url('./lib/css/themes/cs2.css');
-@import url('./lib/css/themes/glass.css');
-@import url('./lib/css/themes/material.css');
+@import url('./lib/css/themes/purple.css');
+@import url('./lib/css/themes/green.css');
+@import url('./lib/css/themes/blue.css');
+@import url('./lib/css/themes/gray.css');
+@import url('./lib/css/themes/orange.css');
+@import url('./lib/css/themes/wood.css');
 @import url('./lib/css/components/game-board.css');
 @import url('./lib/css/components/controls.css');
 @import url('./lib/css/components/modals.css');
@@ -76,11 +77,10 @@ h1 {
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-[data-style="peak"] .online-users {
+[data-style="green"] .online-users {
     box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
 }
-
-[data-style="cs2"] .online-users {
+[data-style="blue"] .online-users {
     box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 }
 
