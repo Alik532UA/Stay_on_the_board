@@ -171,26 +171,30 @@
 }
 
 .board-bg-wrapper {
-  /* --- Змінні для розрахунку --- */
-  --min-board-logic-size: 2; /* Мінімальний логічний розмір дошки */
-  --max-board-logic-size: 9; /* Максимальний логічний розмір дошки */
-  --board-logic-range: calc(var(--max-board-logic-size) - var(--min-board-logic-size)); /* Діапазон: 7 */
+  /* --- Базові константи --- */
+  --min-board-logic-size: 2;
+  --max-board-logic-size: 9;
+  --board-logic-range: calc(var(--max-board-logic-size) - var(--min-board-logic-size));
 
-  --min-board-pixel-size: 240px; /* Мінімальний розмір в пікселях (для 2x2) */
-  --max-board-pixel-size: 480px; /* Максимальний розмір в пікселях (для 9x9) */
-  --board-pixel-range: calc(var(--max-board-pixel-size) - var(--min-board-pixel-size)); /* Діапазон: 240px */
-  
-  /* --- Коректна формула лінійної інтерполяції --- */
-  --pixel-per-step: calc(var(--board-pixel-range) / var(--board-logic-range));
-  --dynamic-size: calc(var(--min-board-pixel-size) + (var(--board-size, 3) - var(--min-board-logic-size)) * var(--pixel-per-step));
+  /* 
+    --- КЛЮЧОВА ЛОГІКА: Адаптивні межі розміру ---
+    Мінімальний розмір: 50% ширини екрана, але не більше 240px.
+    Максимальний розмір: 95% ширини екрана, але не більше 480px.
+  */
+  --effective-min-size: min(240px, 50vw);
+  --effective-max-size: min(480px, 95vw);
 
-  /* --- Застосування динамічного розміру --- */
-  width: var(--dynamic-size);
-  height: var(--dynamic-size);
+  /* --- Динамічний діапазон росту в пікселях --- */
+  --effective-pixel-range: calc(var(--effective-max-size) - var(--effective-min-size));
   
-  /* --- Обмеження для мобільних пристроїв --- */
-  max-width: 95vw;
-  max-height: 95vw;
+  /* --- Фінальна формула лінійної інтерполяції --- */
+  --pixel-per-step: calc(var(--effective-pixel-range) / var(--board-logic-range));
+  --final-dynamic-size: calc(var(--effective-min-size) + (var(--board-size, 3) - var(--min-board-logic-size)) * var(--pixel-per-step));
+
+  /* --- Застосування фінального розміру --- */
+  width: var(--final-dynamic-size);
+  height: auto;
+  aspect-ratio: 1 / 1;
 
   /* --- Решта стилів --- */
   margin: 0 auto;
@@ -199,7 +203,7 @@
   justify-content: center;
   overflow: hidden;
   background: none;
-  transition: width 0.3s ease-out, height 0.3s ease-out; /* Плавна анімація зміни розміру */
+  transition: width 0.3s ease-out;
 }
 .game-board {
   position: relative;
