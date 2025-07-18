@@ -38,7 +38,7 @@ export default {
     scoreLabel: "Score",
     cashOut: "Punten innen",
     tutorialTitle: "",
-    tutorialContent: "Je doel is om beurten één gedeeld stuk te verplaatsen zonder van het bord te gaan. Onthoud de positie, want het bord kan verdwijnen na je zet! De zet van de computer verschijnt in het midden van het richtingspaneel, daarna is het weer jouw beurt.",
+    tutorialContent: "Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan. Verberg het bord of de koningin in de instellingen om meer punten te verdienen voor elke zet!",
     info: "Instructies",
     details: "Details",
   },
@@ -54,7 +54,8 @@ export default {
     selectDistance: "Kies afstand:",
     confirm: "Zet bevestigen",
     noMovesTitle: "Geen zetten",
-    voiceSettingsTitle: "Stem configureren"
+    voiceSettingsTitle: "Stem configureren",
+    settings: "Instellingen"
   },
   settings: {
     title: "Instellingen",
@@ -110,7 +111,9 @@ export default {
       penalty: "Straf voor omgekeerde zetten:",
       finalScore: "Eindscore:",
       yourScore: "Jouw score:"
-    }
+    },
+    boardClickTitle: "Hoe bestuur je het spel?",
+    boardClickContent: "Het spel wordt niet op het bord bestuurd, maar met het bedieningspaneel eronder. Gebruik de pijlen om een richting te kiezen en de nummer knoppen om een afstand te kiezen. Het bord is alleen om de zetten te observeren."
   },
   voiceSettings: {
     title: "Steminstellingen",
