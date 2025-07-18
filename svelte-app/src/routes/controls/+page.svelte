@@ -41,7 +41,7 @@
 <ul>
   <li><b>Num *</b>: {$_('controlsPage.toggleBlockMode')}</li>
   <li><b>Num /</b>: {$_('controlsPage.toggleBoardVisibility')}</li>
-  <li><b>Num +</b>: {$_('controlsPage.increaseBoard')}</li>
-  <li><b>Num -</b>: {$_('controlsPage.decreaseBoard')}</li>
+  <li><b>Num +</b> / <b>+</b>: {$_('controlsPage.increaseBoard')}</li>
+  <li><b>Num -</b> / <b>-</b>: {$_('controlsPage.decreaseBoard')}</li>
   <li><b>V</b>: {$_('controlsPage.toggleSpeech')}</li>
 </ul> 

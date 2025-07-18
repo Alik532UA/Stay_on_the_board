@@ -1,3 +1,10 @@
+<!--
+@Branch (Diff with Main Branch)
+
+Commit message (English, copy-paste ready):
+
+Unify and enlarge direction and distance buttons on the game page (+30%), refactor to use CSS variable for button size, harmonize font sizes, and improve UX consistency. Also, update board size and minor UI tweaks. Bump version to 0.2.24.
+-->
 # Stay on the Board
 
 ## Svelte-версія (актуальна архітектура)

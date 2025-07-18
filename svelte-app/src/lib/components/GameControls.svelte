@@ -174,7 +174,14 @@
 
 <div class="game-interaction-wrapper">
   <details class="settings-expander">
-    <summary class="settings-summary">{$_('gameControls.settings')}</summary>
+    <summary class="settings-summary">
+      {$_('gameControls.settings')}
+      <span class="expander-arrow" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </summary>
     <div class="toggles">
       <!-- 1. Показати дошку -->
       <label class="ios-switch-label">
@@ -286,10 +293,11 @@
 
 <style>
 .game-interaction-wrapper {
+  --control-btn-size: 70px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   width: 100%;
   max-width: 480px;
   margin: 18px auto 0;
@@ -371,22 +379,19 @@
 }
 .directions-3x3 {
   display: grid;
-  grid-template-columns: repeat(3, 54px);
-  grid-template-rows: repeat(3, 54px);
+  grid-template-columns: repeat(3, var(--control-btn-size));
+  grid-template-rows: repeat(3, var(--control-btn-size));
   gap: 14px;
   margin: 18px 0 10px 0;
   justify-content: center;
 }
-.dir-btn, .central-btn, .dist-btn {
-  font-family: 'M PLUS Rounded 1c', sans-serif !important;
-  border-radius: 12px;
-}
 .dir-btn {
-  width: 54px;
-  height: 54px;
-  font-size: 1.7em;
-  border: none;
+  width: var(--control-btn-size);
+  height: var(--control-btn-size);
+  font-size: 2em;
+  font-family: 'M PLUS Rounded 1c', sans-serif !important;
   border-radius: 16px;
+  border: none;
   background: rgba(255,255,255,0.13);
   color: #fff;
   cursor: pointer;
@@ -417,7 +422,7 @@
   transform: scale(1.12);
 }
 .central-btn {
-  font-size: 1.3em;
+  font-size: 1.8em;
   background: rgba(67,160,71,0.13);
   color: #222;
   border: 2.5px solid #43a047;
@@ -426,8 +431,8 @@
   box-shadow: 0 0 0 0 #43a047;
   z-index: 2;
   backdrop-filter: blur(8px);
-  width: 54px;
-  height: 54px;
+  width: var(--control-btn-size);
+  height: var(--control-btn-size);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -486,9 +491,9 @@
   color: #fff;
   border: none;
   border-radius: 12px;
-  width: 44px;
-  height: 44px;
-  font-size: 1.2em;
+  width: var(--control-btn-size);
+  height: var(--control-btn-size);
+  font-size: 1.8em;
   cursor: pointer;
   transition: background 0.22s, color 0.18s, box-shadow 0.22s, transform 0.15s;
   box-shadow: 0 2px 12px 0 rgba(80,0,80,0.10);
@@ -519,11 +524,7 @@
 	width: 100%;
 	margin-top: 18px;
 	align-items: center; /* Центруємо кнопки по горизонталі */
-	background: rgba(255, 255, 255, 0.1);
-	border-radius: 16px;
-	box-shadow: 0 4px 24px 0 rgba(80, 0, 80, 0.1);
-	backdrop-filter: blur(8px);
-	padding: 14px 10px 10px;
+  padding: 0;
 }
 
 .confirm-btn, .no-moves-btn {
@@ -589,64 +590,108 @@
   cursor: pointer;
 }
 .settings-icon-btn {
-  position: absolute; /* Вириваємо з потоку */
-  right: 0; /* Притискаємо до правого краю */
-  top: 50%; /* Центруємо по вертикалі */
-  transform: translateY(-50%); /* Точне вертикальне центрування */
+  position: static;
+  margin-left: auto;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  color: var(--text-primary);
-  transition: color 0.2s, transform 0.2s;
+  padding: 12px 12px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary, #ff9800);
+  border-radius: 50%;
+  transition: background 0.18s, color 0.18s, transform 0.18s;
+  font-size: 1.6em;
+  transform: translateY(10%);
 }
-.settings-icon-btn:hover {
-  color: var(--text-accent);
-  transform: scale(1.1) rotate(15deg);
+.settings-icon-btn:hover, .settings-icon-btn:focus {
+  background: rgba(255,152,0,0.13);
+  color: #fff;
+  outline: none;
+  transform: scale(1.06) rotate(6deg);
+  box-shadow: 0 2px 8px 0 #ff980044;
+  border: none;
+}
+.settings-icon-btn:active {
+  background: rgba(255,152,0,0.22);
+  color: #fff;
+  transform: scale(0.98) rotate(-8deg);
+  border: none;
 }
 .settings-expander {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 8px;
+  background: linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
+  border-radius: 16px;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  box-shadow: 0 8px 32px 0 rgba(80,0,80,0.10);
+  backdrop-filter: blur(16px);
+  transition: background 0.25s, box-shadow 0.25s;
 }
-
+.settings-expander:hover {
+  background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%);
+  box-shadow: 0 12px 40px 0 rgba(80,0,80,0.16);
+}
 .settings-summary {
-  padding: 12px 16px;
-  font-weight: 600;
-  font-size: 1.1em;
+  position: relative;
+  padding: 16px 20px;
+  font-weight: 700;
+  font-size: 1.18em;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: none;
+  border-radius: 16px 16px 0 0;
   cursor: pointer;
-  outline: none;
-  list-style: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  user-select: none;
   transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
 }
-
-.settings-summary::-webkit-details-marker {
-  display: none;
+.settings-summary:focus {
+  outline: none;
 }
-
-.settings-summary:hover {
-  background: rgba(255, 255, 255, 0.1);
+.expander-arrow {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
 }
-
-.settings-summary::after {
-  content: '+';
-  font-size: 1.4em;
-  font-weight: 300;
-  transition: transform 0.2s ease-in-out;
+.expander-arrow svg {
+  width: 28px;
+  height: 28px;
+  color: #ff9800;
+  filter: drop-shadow(0 2px 6px rgba(255,152,0,0.18));
+  transition: transform 0.3s cubic-bezier(.4,2,.6,1);
 }
-
-.settings-expander[open] > .settings-summary::after {
-  transform: rotate(45deg);
+.settings-expander[open] .expander-arrow svg {
+  animation: bounce 0.4s;
+  transform: rotate(180deg);
 }
-
+@keyframes bounce {
+  0%   { transform: scale(1) rotate(0deg);}
+  40%  { transform: scale(1.15) rotate(90deg);}
+  60%  { transform: scale(0.95) rotate(180deg);}
+  100% { transform: scale(1) rotate(180deg);}
+}
+.settings-expander .toggles {
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.23, 1, 0.32, 1), padding 0.5s, opacity 0.4s;
+  max-height: 0;
+  opacity: 0;
+  padding: 0 16px;
+  margin: 0;
+}
 .settings-expander[open] > .toggles {
+  max-height: 600px;
+  opacity: 1;
   padding: 0 16px 16px 16px;
 }
 .ios-switch-label.disabled {
