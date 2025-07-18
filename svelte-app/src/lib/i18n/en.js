@@ -55,7 +55,7 @@ export default {
     confirm: "Confirm Move",
     noMovesTitle: "No moves",
     voiceSettingsTitle: "Configure voice",
-    hideQueen: "Hide Queen",
+    showQueen: "Show Queen",
     settings: "Settings"
   },
   settings: {

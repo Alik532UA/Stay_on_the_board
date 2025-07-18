@@ -55,7 +55,8 @@ export default {
     confirm: "Zet bevestigen",
     noMovesTitle: "Geen zetten",
     voiceSettingsTitle: "Stem configureren",
-    settings: "Instellingen"
+    settings: "Instellingen",
+    showQueen: "Toon koningin",
   },
   settings: {
     title: "Instellingen",

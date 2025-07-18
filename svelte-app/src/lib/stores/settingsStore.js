@@ -14,7 +14,7 @@ import { locale } from 'svelte-i18n';
  * @property {boolean} speechEnabled // <-- ДОДАНО
  * @property {string | null} selectedVoiceURI // <-- ДОДАНО
  * @property {boolean} blockModeEnabled // <-- ДОДАНО
- * @property {boolean} hideQueen // <-- ДОДАНО
+ * @property {boolean} showQueen // <-- ІНВЕРТОВАНО
  */
 
 const isBrowser = typeof window !== 'undefined';
@@ -28,7 +28,7 @@ const defaultSettings = {
   speechEnabled: false, // <-- ДОДАНО
   selectedVoiceURI: null, // <-- ДОДАНО
   blockModeEnabled: false, // <-- ДОДАНО
-  hideQueen: false, // <-- ДОДАНО
+  showQueen: true, // <-- ІНВЕРТОВАНО
 };
 
 if (isBrowser) {
@@ -46,7 +46,7 @@ const storedSettings = isBrowser ? {
   speechEnabled: localStorage.getItem('speechEnabled') === 'true', // <-- ДОДАНО
   selectedVoiceURI: localStorage.getItem('selectedVoiceURI') || null, // <-- ДОДАНО
   blockModeEnabled: localStorage.getItem('blockModeEnabled') === 'true' ? true : false, // <-- ДОДАНО
-  hideQueen: localStorage.getItem('hideQueen') === 'true', // <-- ДОДАНО
+  showQueen: localStorage.getItem('showQueen') === 'false' ? false : true, // <-- ІНВЕРТОВАНО
 } : defaultSettings;
 
 const { subscribe, set, update } = writable(storedSettings);
@@ -78,7 +78,7 @@ function updateSettings(newSettings) {
         localStorage.removeItem('selectedVoiceURI');
       }
       localStorage.setItem('blockModeEnabled', String(merged.blockModeEnabled)); // <-- ДОДАНО
-      localStorage.setItem('hideQueen', String(merged.hideQueen)); // <-- ДОДАНО
+      localStorage.setItem('showQueen', String(merged.showQueen)); // <-- ІНВЕРТОВАНО
     }
     return merged;
   });
@@ -154,13 +154,13 @@ export const settingsStore = {
 /**
  * Перемикає видимість ферзя
  */
-export function toggleHideQueen() {
+export function toggleShowQueen() {
   const prev = get(settingsStore);
-  const newHideQueenState = !(prev.hideQueen ?? false);
-  // Якщо ми ховаємо ферзя, ми також повинні приховати доступні ходи
-  if (newHideQueenState) {
-    updateSettings({ hideQueen: newHideQueenState, showMoves: false });
+  const newShowQueenState = !(prev.showQueen ?? true);
+  // Якщо ми ховаємо ферзя (тобто newShowQueenState === false), вимикаємо показ ходів.
+  if (!newShowQueenState) {
+    updateSettings({ showQueen: newShowQueenState, showMoves: false });
   } else {
-    updateSettings({ hideQueen: newHideQueenState });
+    updateSettings({ showQueen: newShowQueenState });
   }
 } 

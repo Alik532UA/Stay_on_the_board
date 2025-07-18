@@ -55,7 +55,8 @@ export default {
     confirm: "Areketni tasdiqla",
     noMovesTitle: "Areket yoq",
     voiceSettingsTitle: "Sesni sozla",
-    settings: "Sozlamalar"
+    settings: "Sozlamalar",
+    showQueen: "Vezirni köster",
   },
   settings: {
     title: "Sozlamalar",

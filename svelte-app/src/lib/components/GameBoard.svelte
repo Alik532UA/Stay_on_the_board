@@ -10,7 +10,7 @@
   import { _ } from 'svelte-i18n';
   import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore.js';
   import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
-  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleHideQueen } from '$lib/stores/settingsStore.js';
+  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleShowQueen } from '$lib/stores/settingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from './SvgIcons.svelte';
   import { base } from '$app/paths';
@@ -226,9 +226,14 @@
     }
   }
 
-  /** @param {MouseEvent} e */
+  /**
+   * @param {MouseEvent|KeyboardEvent} e
+   */
   function showBoardClickHint(e) {
-    e.stopPropagation();
+    // e може бути MouseEvent або KeyboardEvent, або undefined
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
     modalStore.showModal({
       titleKey: 'modal.boardClickTitle',
       contentKey: 'modal.boardClickContent',
@@ -324,6 +329,7 @@
       class="board-bg-wrapper game-content-block" 
       class:hidden={!showBoard}
       onclick={showBoardClickHint} 
+      onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
       role="button"
       tabindex="0"
       aria-label="Ігрове поле"
@@ -352,7 +358,7 @@
             </div>
           {/each}
         {/each}
-        {#if !$settingsStore.hideQueen && $appState.playerRow !== null && $appState.playerCol !== null}
+        {#if $settingsStore.showQueen && $appState.playerRow !== null && $appState.playerCol !== null}
           {#key $appState.gameId}
             <div
               class="player-piece"
