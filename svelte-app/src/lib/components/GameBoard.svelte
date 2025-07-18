@@ -13,6 +13,7 @@
   import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech } from '$lib/stores/settingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from './SvgIcons.svelte';
+  import { base } from '$app/paths';
   // Функція очищення кешу
   function clearCache() {
     localStorage.clear();
@@ -331,6 +332,7 @@
         toggleShowBoard();
         break;
       case '+': // Numpad Add
+      case '=': // Standard equals/plus key
         {
           const currentSize = get(appState).boardSize;
           if (currentSize < 9) {
@@ -413,7 +415,8 @@
   {#if showTutorial}
     <div class="tutorial-panel game-content-block">
       <button class="tutorial-close-btn" onclick={closeTutorial} aria-label="Закрити інструкцію">&times;</button>
-      <p><strong>{$_('gameBoard.tutorialTitle')}</strong> {$_('gameBoard.tutorialContent')}</p>
+      <p>{$_('gameBoard.tutorialContent')}</p>
+      <a href="{base}/rules" class="details-btn">{$_('gameBoard.details')}</a>
     </div>
   {/if}
   <div class="score-panel game-content-block">
@@ -614,5 +617,21 @@
   .board-bg-wrapper {
     /* Відповідає за центрування і ширину ігрового поля */
     /* Всі розміри тепер задаються через .game-content-block */
+  }
+  .details-btn {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 14px;
+    background: var(--control-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.2s, color 0.2s;
+  }
+  .details-btn:hover {
+    background: var(--control-hover);
+    color: #fff;
   }
 </style> 

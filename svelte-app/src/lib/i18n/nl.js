@@ -2,7 +2,7 @@ export default {
   mainMenu: {
     title: "Blijf op het bord",
     menu: "Menu",
-    playVsComputer: "Tegen computer spelen",
+    playVsComputer: "Tegen de computer spelen",
     localGame: "Lokaal spel",
     playOnline: "Online spelen",
     settings: "Instellingen",
@@ -37,9 +37,10 @@ export default {
     penaltyHint: "Ga niet terug naar de cel waarvan de zet net is gemaakt",
     scoreLabel: "Score",
     cashOut: "Punten innen",
-    tutorialTitle: "Welkom bij het spel!",
-    tutorialContent: "Je doel is om de koningin te verplaatsen zonder van het bord te gaan. Onthoud haar positie, want na jouw zet kan het bord verdwijnen! De zet van de computer verschijnt op de centrale knop, waarna het weer jouw beurt is.",
-    info: "Instructies"
+    tutorialTitle: "",
+    tutorialContent: "Je doel is om beurten één gedeeld stuk te verplaatsen zonder van het bord te gaan. Onthoud de positie, want het bord kan verdwijnen na je zet! De zet van de computer verschijnt in het midden van het richtingspaneel, daarna is het weer jouw beurt.",
+    info: "Instructies",
+    details: "Details",
   },
   gameControls: {
     ok: "OK",
@@ -153,7 +154,7 @@ export default {
   rulesPage: {
     title: "Spelregels \"Stay on the Board\"",
     goalTitle: "Doel van het spel",
-    goalText: "\"Stay on the Board\" is een strategisch uithoudingsspel. Je doel is om het stuk zo lang mogelijk op het bord te houden, om de beurt met je tegenstander te zetten en hem te dwingen een fout te maken.",
+    goalText: '"Stay on the Board" is een strategisch uithoudingsspel. Spelers verplaatsen om de beurt één gedeeld stuk. Je doel is om het zo lang mogelijk op het bord te houden en je tegenstander te dwingen een fout te maken.',
     moveProcessTitle: "Zetproces",
     moveProcessText: "Een speler doet een zet met het bedieningspaneel onder het bord. Klikken op de bordcellen voert geen zetten uit.",
     step1: "Stap 1: Kies een richting.",
@@ -165,7 +166,7 @@ export default {
     winLossTitle: "Winst- en verliesvoorwaarden",
     youLose: "Je verliest als:",
     lose1: "Je zet het stuk van het bord haalt.",
-    lose2: "Je probeert naar een reeds geblokkeerde cel te gaan (in de betreffende modus).",
+    lose2: "Je probeert naar een reeds geblokkeerde cel te gaan (in de betreffende modus, die met een selectievakje kan worden ingeschakeld).",
     lose3: "Je op de knop \"Geen zetten\" drukt, maar je hebt eigenlijk nog beschikbare zetten.",
     youWin: "Je wint als:",
     win1: "Je tegenstander een van de bovengenoemde fouten maakt.",
@@ -180,8 +181,8 @@ export default {
     noMovesWin: "Als je gelijk hebt (er zijn geen zetten) - win je.",
     noMovesLoss: "Als je je vergist (er is minstens één zet beschikbaar) - verlies je.",
     noMovesButtonText2: "Dit is een riskante maar soms noodzakelijke strategie om in een moeilijke situatie te winnen.",
-    scoringTitle: "Puntensysteem",
-    scoringText: "Voor elke succesvolle zet krijg je 1 punt. Hoe langer het spel duurt, hoe hoger je score. De score wordt in realtime weergegeven en wordt aan het einde van het spel vastgelegd.",
+    scoringTitle: "Punten Systeem",
+    scoringText: "Voor elke succesvolle zet krijg je 1 punt. Hoe langer het spel duurt, hoe hoger je score. Punten worden in realtime weergegeven en aan het einde van het spel vastgelegd.",
     settingsTitle: "Spelinstellingen",
     boardSize: "Bordgrootte",
     boardSizeText: "Je kunt de grootte van het speelveld veranderen van 2x2 naar 9x9."
