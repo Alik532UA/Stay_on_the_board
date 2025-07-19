@@ -125,7 +125,7 @@
 
 .main-menu-btn,
 .clear-cache-btn {
-  background: #fff3;
+  background: var(--control-bg, #fff3);
   border: none;
   border-radius: 12px;
   width: 64px !important;
@@ -134,7 +134,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
   margin-right: 4px;
   box-shadow: 0 2px 16px 0 rgba(80,0,80,0.10);
   overflow: hidden;
@@ -143,8 +143,15 @@
 }
 .main-menu-btn:hover,
 .clear-cache-btn:hover {
-  background: #ff9800;
+  background: var(--control-hover, #ff9800);
   color: #fff;
+}
+
+.main-menu-btn.active {
+  background: var(--control-selected, #ff9800);
+  color: #fff;
+  box-shadow: 0 0 12px var(--control-selected, #ff9800);
+  transform: scale(1.05);
 }
 
 .board-size-select {
