@@ -332,6 +332,7 @@
   font-size: 1.08em;
   margin-bottom: 2px;
   position: relative; /* <-- ДОДАНО */
+  padding-right: 44px;
 }
 .switch-content-wrapper {
   display: flex;
@@ -590,12 +591,14 @@
   cursor: pointer;
 }
 .settings-icon-btn {
-  position: static;
-  margin-left: auto;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 12px 12px;
+  padding: 12px;
   width: 44px;
   height: 44px;
   display: flex;
@@ -605,7 +608,6 @@
   border-radius: 50%;
   transition: background 0.18s, color 0.18s, transform 0.18s;
   font-size: 1.6em;
-  transform: translateY(10%);
 }
 .settings-icon-btn:hover, .settings-icon-btn:focus {
   background: rgba(255,152,0,0.13);
@@ -621,6 +623,7 @@
   transform: scale(0.98) rotate(-8deg);
   border: none;
 }
+/* --- ПОЧАТОК: нові стилі для анімації settings-expander --- */
 .settings-expander {
   width: 100%;
   background: linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
@@ -642,13 +645,17 @@
   letter-spacing: 0.02em;
   color: #fff;
   background: none;
-  border-radius: 16px 16px 0 0;
+  border-radius: 16px; /* Заокруглення з усіх боків */
   cursor: pointer;
   user-select: none;
-  transition: background 0.2s;
+  transition: background 0.2s, margin-bottom 0.4s ease-out; /* Додано анімацію відступу */
   display: flex;
   align-items: center;
   min-height: 44px;
+}
+.settings-expander[open] > .settings-summary {
+  border-radius: 16px 16px 0 0; /* Змінюємо заокруглення при відкритті */
+  margin-bottom: 12px; /* Додаємо відступ для краси */
 }
 .settings-summary:focus {
   outline: none;
@@ -667,33 +674,27 @@
   height: 28px;
   color: #ff9800;
   filter: drop-shadow(0 2px 6px rgba(255,152,0,0.18));
-  transition: transform 0.3s cubic-bezier(.4,2,.6,1);
+  transition: transform 0.4s ease-out; /* Плавний перехід для обертання */
 }
 .settings-expander[open] .expander-arrow svg {
-  animation: bounce 0.4s;
-  transform: rotate(180deg);
-}
-@keyframes bounce {
-  0%   { transform: scale(1) rotate(0deg);}
-  40%  { transform: scale(1.15) rotate(90deg);}
-  60%  { transform: scale(0.95) rotate(180deg);}
-  100% { transform: scale(1) rotate(180deg);}
+  transform: translateY(-50%) rotate(180deg);
 }
 .settings-expander .toggles {
-  box-sizing: border-box;
-  width: 100%;
   overflow: hidden;
-  transition: max-height 0.5s cubic-bezier(0.23, 1, 0.32, 1), padding 0.5s, opacity 0.4s;
   max-height: 0;
   opacity: 0;
+  transition: max-height 0.4s ease-out, opacity 0.3s ease-out, padding 0.4s ease-out;
   padding: 0 16px;
   margin: 0;
+  box-sizing: border-box;
+  width: 100%;
 }
 .settings-expander[open] > .toggles {
-  max-height: 600px;
+  max-height: 600px; /* Безпечне велике значення */
   opacity: 1;
   padding: 0 16px 16px 16px;
 }
+/* --- КІНЕЦЬ: нові стилі для анімації settings-expander --- */
 .ios-switch-label.disabled {
   opacity: 0.5;
   cursor: not-allowed;
