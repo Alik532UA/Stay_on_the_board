@@ -190,7 +190,6 @@ select:focus, select:hover {
 }
 .reset-icon {
   margin-right: 8px;
-  vertical-align: middle;
   transition: transform 0.18s;
 }
 .reset-btn:active .reset-icon {

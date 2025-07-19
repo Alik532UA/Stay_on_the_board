@@ -15,6 +15,7 @@ import { locale } from 'svelte-i18n';
  * @property {string | null} selectedVoiceURI // <-- ДОДАНО
  * @property {boolean} blockModeEnabled // <-- ДОДАНО
  * @property {boolean} showQueen // <-- ІНВЕРТОВАНО
+ * @property {number} blockOnVisitCount // <-- ДОДАНО
  */
 
 const isBrowser = typeof window !== 'undefined';
@@ -29,6 +30,7 @@ const defaultSettings = {
   selectedVoiceURI: null, // <-- ДОДАНО
   blockModeEnabled: false, // <-- ДОДАНО
   showQueen: true, // <-- ІНВЕРТОВАНО
+  blockOnVisitCount: 0, // <-- ДОДАНО
 };
 
 if (isBrowser) {
@@ -61,6 +63,7 @@ const storedSettings = isBrowser ? {
   selectedVoiceURI: localStorage.getItem('selectedVoiceURI') || null, // <-- ДОДАНО
   blockModeEnabled: localStorage.getItem('blockModeEnabled') === 'true' ? true : false, // <-- ДОДАНО
   showQueen: localStorage.getItem('showQueen') === 'false' ? false : true, // <-- ІНВЕРТОВАНО
+  blockOnVisitCount: parseInt(localStorage.getItem('blockOnVisitCount') || '0', 10), // <-- ДОДАНО
 } : defaultSettings;
 
 const { subscribe, set, update } = writable(storedSettings);
@@ -93,6 +96,9 @@ function updateSettings(newSettings) {
       }
       localStorage.setItem('blockModeEnabled', String(merged.blockModeEnabled)); // <-- ДОДАНО
       localStorage.setItem('showQueen', String(merged.showQueen)); // <-- ІНВЕРТОВАНО
+      if (merged.blockOnVisitCount !== undefined) {
+        localStorage.setItem('blockOnVisitCount', String(merged.blockOnVisitCount));
+      }
     }
     return merged;
   });

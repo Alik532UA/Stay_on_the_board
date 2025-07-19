@@ -234,5 +234,17 @@ export default {
   },
   ui: {
     closeAndReturnToMenu: 'Close and return to main menu'
+  },
+  tooltips: {
+    'up-left': "Up-Left\nNum 7 or Q",
+    'up': "Up\nNum 8 or W",
+    'up-right': "Up-Right\nNum 9 or E",
+    'left': "Left\nNum 4 or A",
+    'right': "Right\nNum 6 or D",
+    'down-left': "Down-Left\nNum 1 or Z",
+    'down': "Down\nNum 2, S or X",
+    'down-right': "Down-Right\nNum 3 or C",
+    'confirm': "Confirm Move\nEnter, Space or Num 5",
+    'no-moves': "Declare \"No Moves\"\nBackspace, Num . or N"
   }
 };

@@ -213,5 +213,17 @@ export default {
   },
   ui: {
     closeAndReturnToMenu: 'Sluiten en terug naar hoofdmenu'
+  },
+  tooltips: {
+    'up-left': "Schuin omhoog-links\nNum 7 of Q",
+    'up': "Omhoog\nNum 8 of W",
+    'up-right': "Schuin omhoog-rechts\nNum 9 of E",
+    'left': "Links\nNum 4 of A",
+    'right': "Rechts\nNum 6 of D",
+    'down-left': "Schuin omlaag-links\nNum 1 of Z",
+    'down': "Omlaag\nNum 2, S of X",
+    'down-right': "Schuin omlaag-rechts\nNum 3 of C",
+    'confirm': "Zet Bevestigen\nEnter, Spatie of Num 5",
+    'no-moves': "Aangeven \"Geen Zetten\"\nBackspace, Num . of N"
   }
 };
