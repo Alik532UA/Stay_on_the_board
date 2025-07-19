@@ -226,9 +226,26 @@
             <input type="checkbox" checked={blockModeEnabled} onchange={onBlockModeChange} />
             <span class="slider"></span>
           </div>
-          <span>{$_('gameControls.blockMode')}</span>
+          <span>Режим заблокованих клітинок</span>
         </div>
       </label>
+      {#if blockModeEnabled}
+        <div class="block-mode-options">
+          <span class="options-label">Блокувати після:</span>
+          <div class="options-values" role="radiogroup" aria-labelledby="block-after-label">
+            {#each [0, 1, 2, 3] as count}
+              <button
+                class="count-selector-btn"
+                class:active={$settingsStore.blockOnVisitCount === count}
+                onclick={() => settingsStore.updateSettings({ blockOnVisitCount: count })}
+                aria-pressed={$settingsStore.blockOnVisitCount === count}
+              >
+                {count === 0 ? '0' : count}
+              </button>
+            {/each}
+          </div>
+        </div>
+      {/if}
       <!-- 5. Озвучування ходів -->
       <label class="ios-switch-label">
         <div class="switch-content-wrapper">
@@ -254,10 +271,10 @@
   </details>
   <div class="game-controls-panel">
     <div class="directions directions-3x3">
-      <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" onclick={() => onDirectionClick('up-left')}>↖</button>
-      <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" onclick={() => onDirectionClick('up')}>↑</button>
-      <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" onclick={() => onDirectionClick('up-right')}>↗</button>
-      <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" onclick={() => onDirectionClick('left')}>←</button>
+      <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" onclick={() => onDirectionClick('up-left')} title={$_('tooltips.up-left')}>↖</button>
+      <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" onclick={() => onDirectionClick('up')} title={$_('tooltips.up')}>↑</button>
+      <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" onclick={() => onDirectionClick('up-right')} title={$_('tooltips.up-right')}>↗</button>
+      <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" onclick={() => onDirectionClick('left')} title={$_('tooltips.left')}>←</button>
       <button
         id="center-info"
         class="control-btn center-info {centerInfoState.class}"
@@ -269,10 +286,10 @@
       >
         {String(centerInfoState.content)}
       </button>
-      <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" onclick={() => onDirectionClick('right')}>→</button>
-      <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" onclick={() => onDirectionClick('down-left')}>↙</button>
-      <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" onclick={() => onDirectionClick('down')}>↓</button>
-      <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" onclick={() => onDirectionClick('down-right')}>↘</button>
+      <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" onclick={() => onDirectionClick('right')} title={$_('tooltips.right')}>→</button>
+      <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" onclick={() => onDirectionClick('down-left')} title={$_('tooltips.down-left')}>↙</button>
+      <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" onclick={() => onDirectionClick('down')} title={$_('tooltips.down')}>↓</button>
+      <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" onclick={() => onDirectionClick('down-right')} title={$_('tooltips.down-right')}>↘</button>
     </div>
     <div class="distance-select">
       <div>{$_('gameControls.selectDistance')}</div>
@@ -288,12 +305,12 @@
       </div>
     </div>
     <div class="action-btns">
-      <button class="confirm-btn" onclick={onConfirmMove} disabled={buttonDisabled} title={$_('gameControls.confirm')}>
+      <button class="confirm-btn" onclick={onConfirmMove} disabled={buttonDisabled} title={$_('tooltips.confirm')}>
         <SvgIcons name="confirm" />
         {$_('gameControls.confirm')}
       </button>
       {#if blockModeEnabled}
-        <button class="no-moves-btn" onclick={onNoMoves} title={$_('gameControls.noMovesTitle')}>
+        <button class="no-moves-btn" onclick={onNoMoves} title={$_('tooltips.no-moves')}>
           <SvgIcons name="no-moves" />
           {$_('gameControls.noMovesTitle')}
         </button>
@@ -413,6 +430,7 @@
   outline: none;
   position: relative;
   z-index: 1;
+  white-space: pre-line;
 }
 .dir-btn:focus, .dir-btn:hover {
   background: rgba(255,152,0,0.25);
@@ -558,6 +576,7 @@
 	transition: background 0.22s, color 0.18s, box-shadow 0.22s, transform 0.15s;
 	cursor: pointer;
 	letter-spacing: 0.01em;
+  white-space: pre-line;
 }
 .confirm-btn {
   background: linear-gradient(90deg, #43a047 60%, #66bb6a 100%);
@@ -712,4 +731,48 @@
   cursor: not-allowed;
   pointer-events: none;
 }
+  .block-mode-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0 8px 50px;
+    animation: fadeIn 0.5s ease-out;
+  }
+  .options-label {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+  }
+  .options-values {
+    display: flex;
+    gap: 12px;
+  }
+  .count-selector-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid transparent;
+    color: var(--text-secondary, #ccc);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+  }
+  .count-selector-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 152, 0, 0.5);
+  }
+  .count-selector-btn.active {
+    background: var(--text-accent, #ff9800);
+    color: #fff;
+    border-color: var(--text-accent, #ff9800);
+    transform: scale(1.1);
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style> 

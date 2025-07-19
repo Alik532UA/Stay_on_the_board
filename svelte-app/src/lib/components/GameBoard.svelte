@@ -91,6 +91,8 @@
   let showMoves = $derived($settingsStore.showMoves);
   let gameId = $derived($appState.gameId);
   let availableMoves = $derived($appState.availableMoves);
+  let cellVisitCounts = $derived($appState.cellVisitCounts);
+  let blockOnVisitCount = $derived($settingsStore.blockOnVisitCount);
 
   let playerTitle = $derived($_('gameBoard.player'));
   let mainMenuTitle = $derived($_('gameBoard.mainMenu'));
@@ -155,7 +157,18 @@
 
   /** @param {number} row @param {number} col */
   function isCellBlocked(row, col) {
-    return !!(blockedCells && blockedCells.some(cell => cell.row === row && cell.col === col));
+    const visitCount = cellVisitCounts[`${row}-${col}`] || 0;
+    return blockModeEnabled && visitCount > blockOnVisitCount;
+  }
+
+  /** @param {number} row @param {number} col */
+  function getDamageClass(row, col) {
+    if (!blockModeEnabled) return '';
+    const visitCount = cellVisitCounts[`${row}-${col}`] || 0;
+    if (visitCount > 0 && visitCount <= blockOnVisitCount) {
+      return `cell-damage-${visitCount}`;
+    }
+    return '';
   }
 
   /** @param {KeyboardEvent} event */
@@ -356,7 +369,7 @@
         {#each Array(boardSize) as _, rowIdx (rowIdx)}
           {#each Array(boardSize) as _, colIdx (colIdx)}
             <div
-              class="board-cell"
+              class="board-cell {getDamageClass(rowIdx, colIdx)}"
               class:light={ (rowIdx + colIdx) % 2 === 0 }
               class:dark={ (rowIdx + colIdx) % 2 !== 0 }
               class:blocked-cell={ isCellBlocked(rowIdx, colIdx) }
@@ -366,6 +379,9 @@
               role="gridcell"
               tabindex="0"
             >
+              {#if getDamageClass(rowIdx, colIdx) === 'cell-damage-3'}
+                <span class="crack-extra"></span>
+              {/if}
               {#if isCellBlocked(rowIdx, colIdx)}
                 <span class="blocked-x">✗</span>
               {:else}
@@ -588,5 +604,57 @@
   .positive-score {
     color: var(--positive-score-color, #4CAF50);
     font-weight: bold;
+  }
+  .board-cell.cell-damage-1::before,
+  .board-cell.cell-damage-2::before, .board-cell.cell-damage-2::after,
+  .board-cell.cell-damage-3::before, .board-cell.cell-damage-3::after, .board-cell.cell-damage-3 .crack-extra {
+    content: '';
+    position: absolute;
+    width: 1.5px;
+    background: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 2px rgba(0,0,0,0.5);
+    border-radius: 2px;
+    animation: crack-appear 0.4s ease-out forwards;
+  }
+  .board-cell.cell-damage-1::before {
+    height: 50%;
+    top: 25%;
+    left: 50%;
+    transform: rotate(25deg);
+  }
+  .board-cell.cell-damage-2::before {
+    height: 60%;
+    top: 20%;
+    left: 40%;
+    transform: rotate(-30deg);
+  }
+  .board-cell.cell-damage-2::after {
+    height: 55%;
+    top: 25%;
+    left: 60%;
+    transform: rotate(40deg);
+  }
+  .board-cell.cell-damage-3::before {
+    height: 70%;
+    top: 15%;
+    left: 50%;
+    transform: rotate(15deg);
+  }
+  .board-cell.cell-damage-3::after {
+    height: 60%;
+    top: 20%;
+    left: 30%;
+    transform: rotate(-50deg);
+  }
+  .board-cell.cell-damage-3 .crack-extra {
+    display: block;
+    height: 50%;
+    top: 30%;
+    left: 70%;
+    transform: rotate(60deg);
+  }
+  @keyframes crack-appear {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 </style> 

@@ -35,9 +35,10 @@ function getRandomCell(size) {
  * @param {number} row
  * @param {number} col
  * @param {number} size
- * @param {{row:number,col:number}[]} blockedCells
+ * @param {{ [key: string]: number }} cellVisitCounts
+ * @param {number} blockOnVisitCount
  */
-function getAvailableMoves(row, col, size, blockedCells = []) {
+function getAvailableMoves(row, col, size, cellVisitCounts = {}, blockOnVisitCount = 0) {
   if (row === null || col === null) return [];
   const moves = [];
   const directions = [
@@ -50,12 +51,16 @@ function getAvailableMoves(row, col, size, blockedCells = []) {
     [1, -1],  // вниз-вліво
     [1, 1],   // вниз-вправо
   ];
-
+  /** @type {{ [key: string]: number }} */
+  const visitMap = cellVisitCounts;
   /**
    * @param {number} r
    * @param {number} c
    */
-  const isBlocked = (r, c) => blockedCells.some(cell => cell.row === r && cell.col === c);
+  const isBlocked = (r, c) => {
+    const visitCount = visitMap[`${r}-${c}`] || 0;
+    return visitCount > blockOnVisitCount;
+  };
 
   for (const [dr, dc] of directions) {
     for (let dist = 1; dist < size; dist++) {
@@ -135,6 +140,7 @@ function getAvailableMoves(row, col, size, blockedCells = []) {
  * @property {number} penaltyPoints
  * @property {boolean} finishedByNoMovesButton
  * @property {number} gameId // <-- ДОДАНО
+ * @property {{ [key: string]: number }} cellVisitCounts // <-- ДОДАНО
  */
 
 /**
@@ -229,6 +235,7 @@ export const appState = writable(/** @type {AppState} */({
   finishedByNoMovesButton: false,
   gameId: 1,
   availableDistances: Array.from({ length: initialBoardSize - 1 }, (_, i) => i + 1), // [1, 2] for size 3
+  cellVisitCounts: {}, // <-- ДОДАНО
 }));
 
 /**
@@ -271,6 +278,12 @@ function performMove(state, newRow, newCol) {
     }
   }
 
+  const newVisitCounts = { ...state.cellVisitCounts };
+  if (state.blockModeEnabled && playerRow !== null && playerCol !== null) {
+    const cellKey = `${playerRow}-${playerCol}`;
+    newVisitCounts[cellKey] = (newVisitCounts[cellKey] || 0) + 1;
+  }
+
   // КЛЮЧОВА ЗМІНА: Ми більше не розраховуємо доступні ходи тут.
   // Це буде зроблено в окремому етапі.
 
@@ -279,6 +292,7 @@ function performMove(state, newRow, newCol) {
     playerRow: newRow,
     playerCol: newCol,
     blockedCells: newBlockedCells,
+    cellVisitCounts: newVisitCounts,
     // Рядок availableMoves: newAvailableMoves, видалено.
   };
 }
@@ -310,13 +324,14 @@ export async function setBoardSize(newSize) {
     const { row, col } = getRandomCell(newSize);
     const board = createEmptyBoard(newSize);
     board[row][col] = 1;
+    const initialAvailableMoves = getAvailableMoves(row, col, newSize, {}, 0);
     return {
       ...state,
       boardSize: newSize,
       board,
       playerRow: row,
       playerCol: col,
-      availableMoves: [], // Починаємо з порожніми ходами
+      availableMoves: initialAvailableMoves, // Починаємо з порожніми ходами
       blockedCells: [],
       visitedCells: [],
       selectedDirection: null,
@@ -334,12 +349,13 @@ export async function setBoardSize(newSize) {
       isGameOver: false,
       gameId: (state.gameId || 0) + 1,
       availableDistances: Array.from({ length: newSize - 1 }, (_, i) => i + 1),
+      cellVisitCounts: {}, // <-- ДОДАНО
     };
   });
   setTimeout(() => {
     appState.update(state => {
       if (state.playerRow === null || state.playerCol === null) return state;
-      const initialAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, []);
+      const initialAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.cellVisitCounts, get(settingsStore).blockOnVisitCount);
       return { ...state, availableMoves: initialAvailableMoves };
     });
   }, 300);
@@ -354,13 +370,13 @@ export function movePlayer(newRow, newCol) {
     const { board, boardSize, playerRow, playerCol, blockedCells } = state;
     if (playerRow === null || playerCol === null) return state;
     if (typeof newRow !== 'number' || typeof newCol !== 'number') return state;
-    const isAvailable = getAvailableMoves(Number(playerRow), Number(playerCol), boardSize, blockedCells)
+    const isAvailable = getAvailableMoves(Number(playerRow), Number(playerCol), boardSize, state.cellVisitCounts, get(settingsStore).blockOnVisitCount)
       .some(move => move.row === Number(newRow) && move.col === Number(newCol));
     if (isAvailable) {
       const newBoard = board.map(row => row.slice());
       newBoard[playerRow][playerCol] = 0;
       newBoard[newRow][newCol] = 1;
-      const newAvailableMoves = [...getAvailableMoves(newRow, newCol, boardSize, blockedCells)];
+      const newAvailableMoves = [...getAvailableMoves(newRow, newCol, boardSize, state.cellVisitCounts, get(settingsStore).blockOnVisitCount)];
       // Визначаємо напрямок і відстань
       const dr = newRow - playerRow;
       const dc = newCol - playerCol;
@@ -422,7 +438,7 @@ export function toggleBlockCell(row, col) {
     // Додаємо захист від null для getAvailableMoves
     let newAvailableMoves = state.availableMoves;
     if (state.playerRow !== null && state.playerCol !== null) {
-      newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, newBlockedCells);
+      newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.cellVisitCounts, get(settingsStore).blockOnVisitCount);
     }
     return {
       ...state,
@@ -457,7 +473,7 @@ export function resetGame() {
     const { row, col } = getRandomCell(boardSize);
     const board = createEmptyBoard(boardSize);
     board[row][col] = 1;
-    const initialAvailableMoves = getAvailableMoves(row, col, boardSize, []);
+    const initialAvailableMoves = getAvailableMoves(row, col, boardSize, {}, 0);
     return {
       ...state,
       board,
@@ -481,6 +497,7 @@ export function resetGame() {
       isGameOver: false,
       gameId: (state.gameId || 0) + 1,
       availableDistances: Array.from({ length: boardSize - 1 }, (_, i) => i + 1),
+      cellVisitCounts: {}, // <-- ДОДАНО
     };
   });
 }
@@ -556,7 +573,9 @@ export async function confirmMove() {
   const newCol = playerCol + dc * selectedDistance;
   if (newRow === null || newCol === null) return;
   const isOutsideBoard = newRow < 0 || newRow >= boardSize || newCol < 0 || newCol >= boardSize;
-  const isCellBlocked = blockedCells.some(cell => cell.row === newRow && cell.col === newCol);
+  const { blockOnVisitCount } = get(settingsStore);
+  const visitCount = state.cellVisitCounts[`${newRow}-${newCol}`] || 0;
+  const isCellBlocked = blockModeEnabled && visitCount > blockOnVisitCount;
   let jumpedCount = 0;
   if (selectedDistance > 1) {
     for (let i = 1; i < selectedDistance; i++) {
@@ -619,7 +638,7 @@ export async function makeComputerMove() {
   const current = get(appState);
   // Перевіряємо, чи зараз хід AI
   if (current.isGameOver || current.players[current.currentPlayerIndex]?.type !== 'ai') return;
-  const move = getRandomComputerMove(current.board, current.blockedCells, current.boardSize);
+  const move = getRandomComputerMove(current.board, current.cellVisitCounts, get(settingsStore).blockOnVisitCount, current.boardSize);
   if (move) {
     const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
     appState.update(state => ({
@@ -639,7 +658,7 @@ export async function makeComputerMove() {
     // 6. ЕТАП 3: Оновлюємо доступні ходи для гравця
     appState.update(state => {
       if (state.playerRow === null || state.playerCol === null) return state;
-      const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.blockedCells);
+      const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.cellVisitCounts, get(settingsStore).blockOnVisitCount);
       return { ...state, availableMoves: newAvailableMoves };
     });
     // 7. ЕТАП 4: Перевірка першого ходу та приховування дошки
@@ -746,18 +765,25 @@ export function noMoves() {
 export function continueGameAndClearBlocks() {
   appState.update(state => {
     if (state.playerRow === null || state.playerCol === null) return state;
-    // Очищуємо заблоковані клітинки
-    const newBlockedCells = /** @type {{row: number, col: number}[]} */ ([]);
+    // Скидаємо лічильники відвідувань
+    /** @type {{ [key: string]: number }} */
+    const newVisitCounts = {};
     // Перераховуємо доступні ходи для чистої дошки
-    const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, newBlockedCells);
+    const newAvailableMoves = getAvailableMoves(
+      state.playerRow,
+      state.playerCol,
+      state.boardSize,
+      newVisitCounts,
+      get(settingsStore).blockOnVisitCount
+    );
     // Закриваємо модальне вікно
     closeModal();
     return {
       ...state,
-      blockedCells: newBlockedCells,
+      cellVisitCounts: newVisitCounts,
       availableMoves: newAvailableMoves,
-      lastComputerMove: null, // <-- ДОДАНО: Скидаємо останній хід комп'ютера
-      computerLastMoveDisplay: null, // <-- ДОДАНО: Очищуємо і його відображення
+      lastComputerMove: null,
+      computerLastMoveDisplay: null,
     };
   });
 }

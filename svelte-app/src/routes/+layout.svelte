@@ -59,11 +59,20 @@
 		window.location.reload();
 	}
 
+	function handleDevKeys(event) {
+		if (import.meta.env.DEV && event.key === ']') {
+			event.preventDefault();
+			showUpdateNotice = !showUpdateNotice;
+		}
+	}
+
 	// onMount(() => {
 	// 	document.documentElement.setAttribute('data-theme', 'dark');
 	// 	document.documentElement.setAttribute('data-style', 'purple');
 	// });
 </script>
+
+<svelte:window on:keydown={handleDevKeys} />
 
 {#if showUpdateNotice}
 	<UpdateNotification on:reload={handleReload} />
