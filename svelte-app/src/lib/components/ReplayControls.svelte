@@ -1,5 +1,5 @@
 <script>
-  import { appState, goToReplayStep, toggleAutoPlay, stopReplay } from '$lib/stores/gameStore.js';
+  import { appState, goToReplayStep, toggleAutoPlay, stopReplay, toggleLimitReplayPath } from '$lib/stores/gameStore.js';
   import { _ } from 'svelte-i18n';
 </script>
 
@@ -13,6 +13,10 @@
   <div class="step-counter">
     {$_('replay.step', { values: { current: $appState.replayCurrentStep + 1, total: $appState.moveHistory.length } })}
   </div>
+  <label class="limit-path-toggle">
+    <input type="checkbox" bind:checked={$appState.limitReplayPath} onchange={toggleLimitReplayPath} />
+    <span>{$_('replay.limitPath')}</span>
+  </label>
 </div>
 
 <style>
@@ -54,5 +58,17 @@
     font-weight: bold;
     min-width: 80px;
     text-align: center;
+  }
+  .limit-path-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8em;
+    cursor: pointer;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  .limit-path-toggle input {
+    accent-color: var(--text-accent, #ff9800);
   }
 </style> 

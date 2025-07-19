@@ -297,9 +297,10 @@
       const history = $appState.moveHistory;
       const totalSteps = history.length - 1;
       const cellSize = 100 / $appState.boardSize;
-      // Кольори для градієнта
-      const startColor = { r: 76, g: 175, b: 80 }; // Зелений
-      const endColor = { r: 244, g: 67, b: 54 }; // Червоний
+      const currentStep = $appState.replayCurrentStep;
+      const limitPath = $appState.limitReplayPath;
+      const startColor = { r: 76, g: 175, b: 80 };
+      const endColor = { r: 244, g: 67, b: 54 };
       for (let i = 0; i < totalSteps; i++) {
         const startPos = history[i].pos;
         const endPos = history[i + 1].pos;
@@ -307,12 +308,25 @@
         const r = Math.round(startColor.r + ratio * (endColor.r - startColor.r));
         const g = Math.round(startColor.g + ratio * (endColor.g - startColor.g));
         const b = Math.round(startColor.b + ratio * (endColor.b - startColor.b));
+        // --- Логіка прозорості ---
+        let opacity = 1.0;
+        if (limitPath) {
+          const dist = i - currentStep;
+          if (dist >= 0 && dist < 6) {
+            opacity = 1.0 - dist * 0.15;
+          } else if (dist < 0 && dist >= -3) {
+            opacity = 1.0 + dist * 0.3;
+          } else {
+            opacity = 0;
+          }
+        }
         segments.push({
           x1: startPos.col * cellSize + cellSize / 2,
           y1: startPos.row * cellSize + cellSize / 2,
           x2: endPos.col * cellSize + cellSize / 2,
           y2: endPos.row * cellSize + cellSize / 2,
-          color: `rgb(${r}, ${g}, ${b})`
+          color: `rgb(${r}, ${g}, ${b})`,
+          opacity: Math.max(0, opacity)
         });
       }
       return segments;
@@ -459,7 +473,8 @@
                 y1={segment.y1} 
                 x2={segment.x2} 
                 y2={segment.y2} 
-                stroke={segment.color} 
+                stroke={segment.color}
+                stroke-opacity={segment.opacity}
               />
             {/each}
           </svg>
@@ -745,8 +760,8 @@
   }
   .replay-path-svg line {
     stroke-width: 1;
-    stroke-opacity: 0.8;
     stroke-linecap: round;
+    transition: stroke-opacity 0.3s ease-out;
   }
   .game-board {
     position: relative;

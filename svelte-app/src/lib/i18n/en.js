@@ -121,7 +121,8 @@ export default {
     watchReplay: "Watch Replay"
   },
   replay: {
-    step: "Step {current}/{total}"
+    step: "Step {current}/{total}",
+    limitPath: "Limit Path"
   },
   voiceSettings: {
     title: "Voice Settings",
