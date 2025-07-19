@@ -230,7 +230,9 @@ export default {
   },
   supportersPage: {
     title: "Onze Supporters",
-    gratitudeText: "We zijn iedereen die ons project steunt ongelooflijk dankbaar. Jullie hulp inspireert ons en laat het spel groeien. Dank jullie wel!"
+    gratitudeText: "We zijn iedereen die ons project steunt ongelooflijk dankbaar. Jullie hulp inspireert ons en laat het spel groeien. Dank jullie wel!",
+    callToAction: "De ontwikkelaar voegt u graag toe aan deze lijst! Vermeld bij het sturen van een donatie uw bijnaam in de opmerkingen. Als dat niet mogelijk is, neem dan contact met mij op via Telegram: <a href='https://t.me/alik532' target='_blank' rel='noopener noreferrer'>@alik532</a>",
+    supportButton: "Steun het Project"
   },
   replay: {
     step: "Stap {current}/{total}",

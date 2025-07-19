@@ -260,6 +260,8 @@ export default {
   },
   supportersPage: {
     title: "Our Supporters",
-    gratitudeText: "We are incredibly grateful to everyone who supports our project. Your help inspires us and allows the game to grow. Thank you!"
+    gratitudeText: "We are incredibly grateful to everyone who supports our project. Your help inspires us and allows the game to grow. Thank you!",
+    callToAction: "The developer would be happy to add you to this list! When sending a donation, please include your nickname in the comments. If that's not possible, contact me on Telegram: <a href='https://t.me/alik532' target='_blank' rel='noopener noreferrer'>@alik532</a>",
+    supportButton: "Support the Project"
   }
 };

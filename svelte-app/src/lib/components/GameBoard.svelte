@@ -17,6 +17,7 @@
   import { cubicOut } from 'svelte/easing';
   import { scale } from 'svelte/transition';
   import ReplayControls from '$lib/components/ReplayControls.svelte';
+  import { replayPosition, replayBlockedCells, replaySegments } from '$lib/utils/replay.js';
 
   let showBoard = $derived($settingsStore.showBoard);
   const ANIMATION_DURATION = 10000; // 10 секунд для дебагу
@@ -168,7 +169,7 @@
    */
   function isCellBlocked(row, col) {
     if ($appState.isReplayMode) {
-      return replayBlockedCells.some(cell => cell.row === row && cell.col === col);
+      return $replayBlockedCells && $replayBlockedCells.some(cell => cell.row === row && cell.col === col);
     }
     const visitCount = cellVisitCounts[`${row}-${col}`] || 0;
     return blockModeEnabled && visitCount > blockOnVisitCount;
@@ -288,7 +289,7 @@
   }
 
   // Реплеї: сегменти для градієнтної лінії
-  let replaySegments = $derived(
+  let segments = $derived(
     (() => {
       if (!$appState.isReplayMode || $appState.moveHistory.length < 2) {
         return [];
@@ -333,7 +334,7 @@
     })()
   );
 
-  let replayPosition = $derived(
+  let position = $derived(
     $appState.isReplayMode
       ? $appState.moveHistory[$appState.replayCurrentStep]?.pos
       : ($appState.playerRow !== null && $appState.playerCol !== null)
@@ -341,7 +342,7 @@
         : null
   );
 
-  let replayBlockedCells = $derived(
+  let blocked = $derived(
     $appState.isReplayMode
       ? $appState.moveHistory[$appState.replayCurrentStep]?.blocked || []
       : blockedCells
@@ -467,7 +468,7 @@
         {/each}
         {#if $appState.isReplayMode}
           <svg class="replay-path-svg" viewBox="0 0 100 100" overflow="visible">
-            {#each replaySegments as segment, i (i)}
+            {#each $replaySegments as segment, i (i)}
               <line 
                 x1={segment.x1} 
                 y1={segment.y1} 
@@ -479,11 +480,11 @@
             {/each}
           </svg>
         {/if}
-        {#if $settingsStore.showQueen && replayPosition}
+        {#if $settingsStore.showQueen && $replayPosition}
           {#key $appState.gameId}
             <div
               class="player-piece"
-              style="top: {replayPosition.row * (100 / $appState.boardSize)}%; left: {replayPosition.col * (100 / $appState.boardSize)}%;"
+              style="top: {$replayPosition.row * (100 / $appState.boardSize)}%; left: {$replayPosition.col * (100 / $appState.boardSize)}%;"
             >
               <div class="piece-container">
                 <SvgIcons name="queen" />

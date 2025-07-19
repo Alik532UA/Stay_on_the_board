@@ -239,6 +239,8 @@ export default {
   },
   supportersPage: {
     title: "Bizim Himayecilerimiz",
-    gratitudeText: "Layihemizni qoltutqan er keske pek minnetdarmız. Siziñ yardımıñız bizge ilham bere ve oyunnıñ inkişafına imkân bere. Sağıñız!"
+    gratitudeText: "Layihemizni qoltutqan er keske pek minnetdarmız. Siziñ yardımıñız bizge ilham bere ve oyunnıñ inkişafına imkân bere. Sağıñız!",
+    callToAction: "İşlep çıqarıcı sizni de bu cedvelge qoşmaqtan memnun olur! Donat yibergende, tefsirlerde lağabıñıznı belirtiñiz. Eger böyle imkân yoqsa, maña Telegram'da yazıñız: <a href='https://t.me/alik532' target='_blank' rel='noopener noreferrer'>@alik532</a>",
+    supportButton: "Layiheni Destekle"
   }
 };
