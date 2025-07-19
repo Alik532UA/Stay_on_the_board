@@ -382,7 +382,7 @@
     </div>
 
     <!-- 3. Інформація -->
-    <button class="main-menu-btn" title={$_('gameBoard.info')} onclick={toggleTutorial}>
+    <button class="main-menu-btn" class:active={showTutorial} title={$_('gameBoard.info')} onclick={toggleTutorial}>
       <SvgIcons name="info" />
     </button>
 
