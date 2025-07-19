@@ -122,7 +122,8 @@ export default {
     watchReplay: "Yazını baq",
   },
   replay: {
-    step: "Adım {current}/{total}"
+    step: "Adım {current}/{total}",
+    limitPath: "Yolnı sıñırla"
   },
   voiceSettings: {
     title: "Ses Sozlamaları",

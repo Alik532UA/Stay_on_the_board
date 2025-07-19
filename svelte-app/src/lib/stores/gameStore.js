@@ -145,6 +145,7 @@ function getAvailableMoves(row, col, size, cellVisitCounts = {}, blockOnVisitCou
  * @property {boolean} isReplayMode // Прапорець, що вказує на режим перегляду
  * @property {number} replayCurrentStep // Поточний крок у реплеї
  * @property {boolean} isAutoPlaying // Прапорець для автовідтворення
+ * @property {boolean} limitReplayPath // Новий прапорець для обмеження шляху реплею
  */
 
 /**
@@ -244,6 +245,7 @@ export const appState = writable(/** @type {AppState} */({
   isReplayMode: false,
   replayCurrentStep: 0,
   isAutoPlaying: false,
+  limitReplayPath: true,
 }));
 
 /**
@@ -363,6 +365,7 @@ export async function setBoardSize(newSize) {
       isReplayMode: false,
       replayCurrentStep: 0,
       isAutoPlaying: false,
+      limitReplayPath: true,
     };
   });
   setTimeout(() => {
@@ -515,6 +518,7 @@ export function resetGame() {
       isReplayMode: false,
       replayCurrentStep: 0,
       isAutoPlaying: false,
+      limitReplayPath: true,
     };
   });
 }
@@ -1028,4 +1032,11 @@ export function toggleAutoPlay() {
       }
     }, 1000);
   }
+} 
+
+export function toggleLimitReplayPath() {
+  appState.update(state => ({
+    ...state,
+    limitReplayPath: !state.limitReplayPath,
+  }));
 } 

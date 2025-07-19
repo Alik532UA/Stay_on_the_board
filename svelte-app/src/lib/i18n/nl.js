@@ -235,6 +235,7 @@ export default {
     watchReplay: "Herhaling bekijken",
   },
   replay: {
-    step: "Stap {current}/{total}"
+    step: "Stap {current}/{total}",
+    limitPath: "Pad Beperken"
   }
 };
