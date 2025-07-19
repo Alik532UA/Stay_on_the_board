@@ -10,7 +10,7 @@
   <p class="gratitude-text">{$_('supportersPage.gratitudeText')}</p>
   
   <div class="supporters-list">
-    <div class="supporter-item">Khaaaa</div>
+    <div class="supporter-item" onclick={() => window.open('https://steamcommunity.com/profiles/76561198055854871/', '_blank', 'noopener,noreferrer')}>Khaaaa</div>
     <!-- Майбутні імена будуть додаватися сюди -->
   </div>
   <p class="call-to-action-text">{@html $_('supportersPage.callToAction')}</p>
@@ -47,6 +47,14 @@
     padding: 0.5em 1.5em;
     border-radius: 8px;
     border: 1px solid var(--border-color, rgba(255, 152, 0, 0.3));
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .supporter-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.2);
   }
   .call-to-action-text {
     margin-top: 3rem;

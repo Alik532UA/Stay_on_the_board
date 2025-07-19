@@ -102,7 +102,7 @@
           {/each}
         </div>
       {/if}
-      <button class="main-menu-icon" title={$_('mainMenu.donate')} aria-label={$_('mainMenu.donate')} on:click={() => window.open('https://send.monobank.ua/jar/8TPmFKQTCK', '_blank', 'noopener,noreferrer')}>
+      <button class="main-menu-icon" title={$_('mainMenu.donate')} aria-label={$_('mainMenu.donate')} on:click={() => navigateTo('/supporters')}>
         <span class="main-menu-icon-inner">
           <SvgIcons name="donate" />
         </span>
