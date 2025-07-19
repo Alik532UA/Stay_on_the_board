@@ -141,6 +141,10 @@ function getAvailableMoves(row, col, size, cellVisitCounts = {}, blockOnVisitCou
  * @property {boolean} finishedByNoMovesButton
  * @property {number} gameId // <-- ДОДАНО
  * @property {{ [key: string]: number }} cellVisitCounts // <-- ДОДАНО
+ * @property {{pos: {row: number, col: number}, blocked: {row: number, col: number}[]}[]} moveHistory // Масив для збереження позиції та заблокованих клітинок на кожному кроці
+ * @property {boolean} isReplayMode // Прапорець, що вказує на режим перегляду
+ * @property {number} replayCurrentStep // Поточний крок у реплеї
+ * @property {boolean} isAutoPlaying // Прапорець для автовідтворення
  */
 
 /**
@@ -236,6 +240,10 @@ export const appState = writable(/** @type {AppState} */({
   gameId: 1,
   availableDistances: Array.from({ length: initialBoardSize - 1 }, (_, i) => i + 1), // [1, 2] for size 3
   cellVisitCounts: {}, // <-- ДОДАНО
+  moveHistory: [{ pos: { row: 0, col: 0 }, blocked: [] }], // Починаємо історію з першої клітинки
+  isReplayMode: false,
+  replayCurrentStep: 0,
+  isAutoPlaying: false,
 }));
 
 /**
@@ -293,6 +301,7 @@ function performMove(state, newRow, newCol) {
     playerCol: newCol,
     blockedCells: newBlockedCells,
     cellVisitCounts: newVisitCounts,
+    moveHistory: [...(state.moveHistory || []), { pos: { row: newRow, col: newCol }, blocked: newBlockedCells }],
     // Рядок availableMoves: newAvailableMoves, видалено.
   };
 }
@@ -350,6 +359,10 @@ export async function setBoardSize(newSize) {
       gameId: (state.gameId || 0) + 1,
       availableDistances: Array.from({ length: newSize - 1 }, (_, i) => i + 1),
       cellVisitCounts: {}, // <-- ДОДАНО
+      moveHistory: [{ pos: { row, col }, blocked: [] }], // Починаємо історію з першої клітинки
+      isReplayMode: false,
+      replayCurrentStep: 0,
+      isAutoPlaying: false,
     };
   });
   setTimeout(() => {
@@ -498,6 +511,10 @@ export function resetGame() {
       gameId: (state.gameId || 0) + 1,
       availableDistances: Array.from({ length: boardSize - 1 }, (_, i) => i + 1),
       cellVisitCounts: {}, // <-- ДОДАНО
+      moveHistory: [{ pos: { row, col }, blocked: [] }],
+      isReplayMode: false,
+      replayCurrentStep: 0,
+      isAutoPlaying: false,
     };
   });
 }
@@ -604,12 +621,22 @@ export async function confirmMove() {
   }
   if (isOutsideBoard || isCellBlocked) {
     const reasonKey = isOutsideBoard ? 'modal.gameOverReasonOut' : 'modal.gameOverReasonBlocked';
-    const finalScoreDetails = calculateFinalScore(state);
+    // --- Додаємо останній хід до історії, якщо це вихід за межі дошки ---
+    if (isOutsideBoard) {
+      appState.update(s => ({
+        ...s,
+        moveHistory: [...s.moveHistory, { pos: { row: newRow, col: newCol }, blocked: s.blockedCells }]
+      }));
+    }
+    const finalScoreDetails = calculateFinalScore(get(appState));
     appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
     modalStore.showModal({
       titleKey: 'modal.gameOverTitle',
       content: { reason: get(t)(reasonKey), scoreDetails: finalScoreDetails },
-      buttons: [{ textKey: 'modal.playAgain', primary: true, onClick: resetAndCloseModal, isHot: true }]
+      buttons: [
+        { textKey: 'modal.playAgain', primary: true, onClick: resetAndCloseModal, isHot: true },
+        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+      ]
     });
     return;
   }
@@ -932,4 +959,73 @@ export function clearComputerMove() {
     ...state,
     computerLastMoveDisplay: null
   }));
+} 
+
+// === REPLAY LOGIC ===
+/** @type {ReturnType<typeof setInterval> | null} */
+let autoPlayInterval = null;
+
+export function startReplay() {
+  modalStore.closeModal();
+  appState.update(state => ({
+    ...state,
+    isReplayMode: true,
+    replayCurrentStep: 0,
+  }));
+}
+
+export function stopReplay() {
+  if (autoPlayInterval) clearInterval(autoPlayInterval);
+  appState.update(state => ({
+    ...state,
+    isReplayMode: false,
+    isAutoPlaying: false,
+  }));
+  const state = get(appState);
+  const finalScoreDetails = calculateFinalScore(state);
+  const lastMove = state.moveHistory.length > 0 ? state.moveHistory.at(-1) : null;
+  const reasonKey = lastMove && (
+    lastMove.pos.row < 0 || lastMove.pos.row >= state.boardSize ||
+    lastMove.pos.col < 0 || lastMove.pos.col >= state.boardSize
+  )
+    ? 'modal.gameOverReasonOut'
+    : 'modal.gameOverReasonBlocked';
+  modalStore.showModal({
+    titleKey: 'modal.gameOverTitle',
+    content: { reason: get(t)(reasonKey), scoreDetails: finalScoreDetails },
+    buttons: [
+      { textKey: 'modal.playAgain', primary: true, onClick: resetAndCloseModal, isHot: true, customClass: 'green-btn' },
+      { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+    ]
+  });
+}
+
+/**
+ * Перейти до кроку реплею
+ * @param {number} step
+ */
+export function goToReplayStep(step) {
+  appState.update(state => {
+    const newStep = Math.max(0, Math.min(step, (state.moveHistory?.length || 1) - 1));
+    return { ...state, replayCurrentStep: newStep };
+  });
+}
+
+export function toggleAutoPlay() {
+  const state = get(appState);
+  if (state.isAutoPlaying) {
+    if (autoPlayInterval) clearInterval(autoPlayInterval);
+    appState.update(s => ({ ...s, isAutoPlaying: false }));
+  } else {
+    appState.update(s => ({ ...s, isAutoPlaying: true }));
+    autoPlayInterval = setInterval(() => {
+      const currentState = get(appState);
+      if (currentState.replayCurrentStep < (currentState.moveHistory?.length || 1) - 1) {
+        goToReplayStep(currentState.replayCurrentStep + 1);
+      } else {
+        if (autoPlayInterval) clearInterval(autoPlayInterval);
+        appState.update(s => ({ ...s, isAutoPlaying: false }));
+      }
+    }, 1000);
+  }
 } 

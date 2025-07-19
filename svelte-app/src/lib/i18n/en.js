@@ -118,6 +118,10 @@ export default {
     },
     scoreInfoTitle: "How are points awarded?",
     scoreInfoContent: `Points per move:\n• +1 point: with the board and queen visible.\n• +2 points: with the board visible, but the queen hidden.\n• +3 points: with the board hidden (hardest mode).\n\nAdditional bonus points are awarded automatically at the end of the game:\n• Board Size Bonus.\n• Blocked Cells Mode Bonus.\n• "No Moves" Button Bonus.\n• Jump Bonus for jumping over blocked cells.`,
+    watchReplay: "Watch Replay"
+  },
+  replay: {
+    step: "Step {current}/{total}"
   },
   voiceSettings: {
     title: "Voice Settings",
