@@ -170,6 +170,12 @@
     // Викликаємо toggleSpeech без аргументів, щоб уникнути помилки типу
     await toggleSpeech();
   }
+  $: numColumns = (() => {
+    const count = $availableDistances.length;
+    if (count <= 4) return count;
+    if (count === 5 || count === 6) return 3;
+    return 4;
+  })();
 </script>
 
 <div class="game-interaction-wrapper">
@@ -270,9 +276,14 @@
     </div>
     <div class="distance-select">
       <div>{$_('gameControls.selectDistance')}</div>
-      <div class="distance-btns">
+      <div class="distance-btns" style="--num-columns: {numColumns};">
         {#each $availableDistances as dist}
-          <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" onclick={() => onDistanceClick(dist)} value={String(dist)} id={String(dist)}>{String(dist)}</button>
+          <button 
+            class="dist-btn {selectedDistance === dist ? 'active' : ''}" 
+            onclick={() => onDistanceClick(dist)} 
+            value={String(dist)} 
+            id={String(dist)}
+          >{String(dist)}</button>
         {/each}
       </div>
     </div>
@@ -482,10 +493,11 @@
 }
 .distance-btns {
   display: flex;
+  flex-wrap: wrap;
   gap: 18px;
   justify-content: center;
-  margin-top: 10px;
-  flex-wrap: wrap;
+  margin: 10px auto 0;
+  width: calc(var(--num-columns) * var(--control-btn-size) + (var(--num-columns) - 1) * 18px);
 }
 .dist-btn {
   background: rgba(255,255,255,0.13);
