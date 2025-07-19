@@ -35,7 +35,7 @@ export default {
     mainMenu: "Ana Menü",
     player: "Oyunçı",
     penaltyInfoTitle: "Ceza aqqında malümat",
-    penaltyHint: "Az önce hereket yapılğan hücrege qaytmañız",
+    penaltyHint: "Ceza ballarını almamaq içün, kompyuterniñ soñki areketiniñ keri areketini yapmañız (yani, onıñ endi kelgen ücresine qaytmañız).",
     scoreLabel: "Esap",
     cashOut: "Ballarnı al",
     tutorialTitle: "",
@@ -115,7 +115,9 @@ export default {
       yourScore: "Siziñ esabıñız:"
     },
     boardClickTitle: "Oyun nasıl idare etilir?",
-    boardClickContent: "Oyun tahtada degil, aşağıdaki idare paneli vastasınen idare etile. Yönelişni saylamaq içün oqlarnı ve mesafeni saylamaq içün raqamlı dögmelerni qullanıñız. Tahta tek areketlerni közetmek içündir."
+    boardClickContent: "Oyun tahtada degil, aşağıdaki idare paneli vastasınen idare etile. Yönelişni saylamaq içün oqlarnı ve mesafeni saylamaq içün raqamlı dögmelerni qullanıñız. Tahta tek areketlerni közetmek içündir.",
+    scoreInfoTitle: "Ballar nasıl esaplana?",
+    scoreInfoContent: `Er bir areket içün ballar:\n• +1 bal: tahta ve vezir körüngen.\n• +2 bal: tahta körüngen, amma vezir gizli.\n• +3 bal: tahta gizli (eñ zor rejim).\n\nQoşma bonus balları oyun soñunda avtomatik olaraq esaplana:\n• Tahta ölçüsi bonusı.\n• Bloklanğan hücreler rejimi bonusı.\n• "Areket yoq" dögmesini muvafaqiyetli qullanuv bonusı.\n• Bloklanğan hücreler üzerinden atlama bonusı.`,
   },
   voiceSettings: {
     title: "Ses Sozlamaları",
