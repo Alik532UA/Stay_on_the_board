@@ -235,5 +235,17 @@ export default {
   },
   ui: {
     closeAndReturnToMenu: 'Закрити і повернутися в головне меню'
+  },
+  tooltips: {
+    'up-left': "Вгору-ліворуч\nNum 7 або Q",
+    'up': "Вгору\nNum 8 або W",
+    'up-right': "Вгору-праворуч\nNum 9 або E",
+    'left': "Ліворуч\nNum 4 або A",
+    'right': "Праворуч\nNum 6 або D",
+    'down-left': "Вниз-ліворуч\nNum 1 або Z",
+    'down': "Вниз\nNum 2, S або X",
+    'down-right': "Вниз-праворуч\nNum 3 або C",
+    'confirm': "Підтвердити хід\nEnter, Space або Num 5",
+    'no-moves': "Заявити \"Ходів немає\"\nBackspace, Num . або N"
   }
 };

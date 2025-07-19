@@ -213,5 +213,17 @@ export default {
   },
   ui: {
     closeAndReturnToMenu: 'Qapat ve ana menüye qayt'
+  },
+  tooltips: {
+    'up-left': "Yuqarı-solğa\nNum 7 ya da Q",
+    'up': "Yuqarı\nNum 8 ya da W",
+    'up-right': "Yuqarı-oñğa\nNum 9 ya da E",
+    'left': "Solğa\nNum 4 ya da A",
+    'right': "Oñğa\nNum 6 ya da D",
+    'down-left': "Aşağı-solğa\nNum 1 ya da Z",
+    'down': "Aşağı\nNum 2, S ya da X",
+    'down-right': "Aşağı-oñğa\nNum 3 ya da C",
+    'confirm': "Areketni tasdiqla\nEnter, Space ya da Num 5",
+    'no-moves': "Bildir \"Areket yoq\"\nBackspace, Num . ya da N"
   }
 };
