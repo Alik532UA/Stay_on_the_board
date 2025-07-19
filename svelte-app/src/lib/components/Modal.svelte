@@ -59,7 +59,7 @@
           <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
         {/if}
         <h2 class="modal-title">{$modal_data.titleKey ? $_($modal_data.titleKey) : $modal_data.title}</h2>
-        {#if !(($modal_data.buttons && $modal_data.buttons.length === 2 && $modal_data.buttons.every(btn => typeof btn.onClick === 'function')) || $modal_data.titleKey === 'modal.gameOverTitle')}
+        {#if !(($modal_data.buttons && $modal_data.buttons.length === 2 && $modal_data.buttons.every(btn => typeof btn.onClick === 'function')) || $modal_data.titleKey === 'modal.gameOverTitle' || ($modal_data.buttons && $modal_data.buttons.length === 1))}
           <button class="modal-close" onclick={() => { logStore.addLog('Закриття модального вікна (X)', 'info'); modalStore.closeModal(); }}>&times;</button>
         {/if}
       </div>
@@ -324,6 +324,7 @@
   margin-bottom: 24px;
   margin-top: 0;
   text-align: center;
+  white-space: pre-line;
 }
 
 @media (max-width: 480px) {
