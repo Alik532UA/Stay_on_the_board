@@ -35,7 +35,7 @@ export default {
     mainMenu: "Main Menu",
     player: "Player",
     penaltyInfoTitle: "Penalty Information",
-    penaltyHint: "Do not return to the cell from which the move was just made",
+    penaltyHint: "To avoid a penalty, do not make a move that is the exact reverse of the computer's last move (i.e., don't move back to the cell it just came from).",
     scoreLabel: "Score",
     cashOut: "Cash Out",
     tutorialTitle: "",
@@ -114,7 +114,9 @@ export default {
       penalty: "Penalty for reverse moves:",
       finalScore: "Final score:",
       yourScore: "Your score:"
-    }
+    },
+    scoreInfoTitle: "How are points awarded?",
+    scoreInfoContent: `Points per move:\n• +1 point: with the board and queen visible.\n• +2 points: with the board visible, but the queen hidden.\n• +3 points: with the board hidden (hardest mode).\n\nAdditional bonus points are awarded automatically at the end of the game:\n• Board Size Bonus.\n• Blocked Cells Mode Bonus.\n• "No Moves" Button Bonus.\n• Jump Bonus for jumping over blocked cells.`,
   },
   voiceSettings: {
     title: "Voice Settings",

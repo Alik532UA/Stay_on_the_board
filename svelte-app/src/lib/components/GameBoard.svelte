@@ -140,6 +140,14 @@
     });
   }
 
+  function showScoreInfo() {
+    modalStore.showModal({
+      titleKey: 'modal.scoreInfoTitle',
+      contentKey: 'modal.scoreInfoContent',
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+    });
+  }
+
   /** @param {number} row @param {number} col */
   function isAvailable(row, col) {
     return $appState.availableMoves && $appState.availableMoves.some(move => move.row === row && move.col === col);
@@ -308,7 +316,16 @@
   {/if}
   <div class="score-panel game-content-block">
     <div class="score-display">
-      {$_('gameBoard.scoreLabel')}: {$appState.score}
+      <span class="score-label-text">{$_('gameBoard.scoreLabel')}:</span>
+      <span
+        class="score-value-clickable"
+        class:positive-score={$appState.score > 0}
+        onclick={showScoreInfo}
+        onkeydown={e => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
+        role="button"
+        tabindex="0"
+        title={$_('modal.scoreInfoTitle')}
+      >{$appState.score}</span>
       {#if $appState.penaltyPoints > 0}
         <span 
           class="penalty-display" 
@@ -398,8 +415,7 @@
     transition: background 0.2s;
   }
   .clear-cache-btn:hover {
-    background: #ff9800;
-    color: #fff;
+    background: #fff6;
   }
   .score-panel {
     background: var(--bg-secondary, #fff3);
@@ -418,7 +434,7 @@
   .score-display {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 16px;
   }
   .cash-out-btn {
     background: #2196f3;
@@ -440,7 +456,6 @@
   .penalty-display {
     color: #f44336; /* Червоний колір для штрафів */
     font-weight: bold;
-    margin-left: 8px;
     cursor: pointer;
     transition: color 0.2s, transform 0.2s;
     border-radius: 4px;
@@ -546,5 +561,20 @@
   .details-btn:hover {
     background: var(--control-hover);
     color: #fff;
+  }
+  .score-value-clickable {
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s, text-shadow 0.2s;
+  }
+  .score-value-clickable:hover,
+  .score-value-clickable:focus {
+    color: var(--text-accent, #ff9800);
+    text-shadow: 0 0 8px var(--shadow-color);
+    outline: none;
+  }
+  .positive-score {
+    color: var(--positive-score-color, #4CAF50);
+    font-weight: bold;
   }
 </style> 
