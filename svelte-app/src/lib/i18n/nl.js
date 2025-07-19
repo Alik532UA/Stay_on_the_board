@@ -29,7 +29,8 @@ export default {
       gray: "Grijs",
       orange: "Oranje",
       wood: "Hout"
-    }
+    },
+    supporters: "Dankbetuigingen"
   },
   gameBoard: {
     mainMenu: "Hoofdmenu",
@@ -88,9 +89,9 @@ export default {
     resetScoreConfirm: "Ja, grootte wijzigen",
     resetScoreCancel: "Nee, blijven",
     gameOverTitle: "Spel voorbij!",
-    computerNoMovesTitle: "Computer heeft geen zetten",
-    playerNoMovesTitle: "Geen zetten. Wat nu?",
-    errorTitle: "Fout!",
+    computerNoMovesTitle: "Tegenstander Zit Vast!",
+    playerNoMovesTitle: "Briljante Analyse!",
+    errorTitle: "Onjuiste Bewering!",
     playAgain: "Opnieuw spelen",
     continueGame: "Doorgaan",
     finishGameWithBonus: "Beëindigen (+{bonus} punten)",
@@ -225,5 +226,9 @@ export default {
     'down-right': "Schuin omlaag-rechts\nNum 3 of C",
     'confirm': "Zet Bevestigen\nEnter, Spatie of Num 5",
     'no-moves': "Aangeven \"Geen Zetten\"\nBackspace, Num . of N"
+  },
+  supportersPage: {
+    title: "Onze Supporters",
+    gratitudeText: "We zijn iedereen die ons project steunt ongelooflijk dankbaar. Jullie hulp inspireert ons en laat het spel groeien. Dank jullie wel!"
   }
 };

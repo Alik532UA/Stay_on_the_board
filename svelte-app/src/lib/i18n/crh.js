@@ -29,7 +29,8 @@ export default {
     wipNotice: {
       title: "İşlep Çıqarılmaqta",
       description: "Bu funktsiya daa işlep çıqarılmaqta. Onıñ çıqışını tezleştirmek içün, layihani qoltutmaqñız mümkün:",
-    }
+    },
+    supporters: "Destek içün teşekkürler"
   },
   gameBoard: {
     mainMenu: "Ana Menü",
@@ -88,9 +89,9 @@ export default {
     resetScoreConfirm: "Ebet, ölçüni deñiştir",
     resetScoreCancel: "Hayır, qal",
     gameOverTitle: "Oyun bitti!",
-    computerNoMovesTitle: "Kompyuterniñ areketi yoq",
-    playerNoMovesTitle: "Areket yoq. Ne yapmalı?",
-    errorTitle: "Hata!",
+    computerNoMovesTitle: "Raqip tuzaqqa tüştü!",
+    playerNoMovesTitle: "Mükemmel analiz!",
+    errorTitle: "Hatalı beyanat!",
     playAgain: "Kene oyna",
     continueGame: "Devam et",
     finishGameWithBonus: "Bitir (+{bonus} bal)",
@@ -225,5 +226,9 @@ export default {
     'down-right': "Aşağı-oñğa\nNum 3 ya da C",
     'confirm': "Areketni tasdiqla\nEnter, Space ya da Num 5",
     'no-moves': "Bildir \"Areket yoq\"\nBackspace, Num . ya da N"
+  },
+  supportersPage: {
+    title: "Bizim Himayecilerimiz",
+    gratitudeText: "Layihemizni qoltutqan er keske pek minnetdarmız. Siziñ yardımıñız bizge ilham bere ve oyunnıñ inkişafına imkân bere. Sağıñız!"
   }
 };

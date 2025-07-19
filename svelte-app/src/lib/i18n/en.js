@@ -29,7 +29,8 @@ export default {
     wipNotice: {
       title: "Under Development",
       description: "This feature is still under development. To speed up its release, you can support the project:",
-    }
+    },
+    supporters: "Acknowledgements"
   },
   gameBoard: {
     mainMenu: "Main Menu",
@@ -88,9 +89,9 @@ export default {
     resetScoreConfirm: "Yes, change size",
     resetScoreCancel: "No, stay",
     gameOverTitle: "Game Over!",
-    computerNoMovesTitle: "Computer has no moves",
-    playerNoMovesTitle: "No moves. What to do next?",
-    errorTitle: "Error!",
+    computerNoMovesTitle: "Opponent is Trapped!",
+    playerNoMovesTitle: "Brilliant Analysis!",
+    errorTitle: "Mistaken Claim!",
     playAgain: "Play Again",
     continueGame: "Continue",
     finishGameWithBonus: "Finish (+{bonus} points)",
@@ -246,5 +247,9 @@ export default {
     'down-right': "Down-Right\nNum 3 or C",
     'confirm': "Confirm Move\nEnter, Space or Num 5",
     'no-moves': "Declare \"No Moves\"\nBackspace, Num . or N"
+  },
+  supportersPage: {
+    title: "Our Supporters",
+    gratitudeText: "We are incredibly grateful to everyone who supports our project. Your help inspires us and allows the game to grow. Thank you!"
   }
 };

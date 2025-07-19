@@ -1,6 +1,6 @@
 <script>
   import '../css/components/game-board.css';
-  import { appState, setBoardSize, toggleBlockCell, setDirection, setDistance, confirmMove, noMoves, toggleBlockMode, cashOutAndEndGame } from '$lib/stores/gameStore.js';
+  import { appState, setBoardSize, toggleBlockCell, setDirection, setDistance, confirmMove, noMoves, toggleBlockMode, cashOutAndEndGame, resetGame } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { navigateToMainMenu } from '$lib/utils/navigation.js';
   import GameControls from '$lib/components/GameControls.svelte';
@@ -100,6 +100,12 @@
   let showTutorial = $state(false);
   let isFirstVisit = $state(false);
   onMount(() => {
+    // Перевіряємо, чи була попередня гра завершена
+    if (get(appState).isGameOver) {
+      // Якщо так, мовчки запускаємо нову гру
+      resetGame();
+    }
+
     const hasVisited = localStorage.getItem('hasVisitedGame');
     const isTutorialHidden = localStorage.getItem('isTutorialHidden');
     if (!hasVisited) {

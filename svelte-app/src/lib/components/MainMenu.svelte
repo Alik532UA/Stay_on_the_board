@@ -170,6 +170,7 @@
       <!-- <button class="modal-button secondary" on:click={() => navigateTo('/settings')}>{$_('mainMenu.settings')}</button> -->
       <button class="modal-button secondary" on:click={() => navigateTo('/controls')}>{$_('mainMenu.controls')}</button>
       <button class="modal-button secondary" on:click={() => navigateTo('/rules')}>{$_('mainMenu.rules')}</button>
+      <button class="modal-button secondary" on:click={() => navigateTo('/supporters')}>{$_('mainMenu.supporters')}</button>
       <button class="modal-button danger" on:click={clearCache}>{$_('mainMenu.clearCache')}</button>
     </div>
   {/if}

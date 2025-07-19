@@ -29,7 +29,8 @@ export default {
     wipNotice: {
       title: "В розробці",
       description: "Ця функція ще розробляється. Щоб прискорити її появу, ви можете підтримати проєкт:",
-    }
+    },
+    supporters: "Подяка за підтримку"
   },
   gameBoard: {
     mainMenu: "Головне меню",
@@ -88,9 +89,9 @@ export default {
     resetScoreConfirm: "Так, змінити розмір",
     resetScoreCancel: "Ні, залишитися",
     gameOverTitle: "Гру завершено!",
-    computerNoMovesTitle: "У комп'ютера немає ходів",
-    playerNoMovesTitle: "Ходів немає. Що робити далі?",
-    errorTitle: "Помилка!",
+    computerNoMovesTitle: "Суперник у пастці!",
+    playerNoMovesTitle: "Блискучий аналіз!",
+    errorTitle: "Помилкова заява!",
     playAgain: "Грати ще раз",
     continueGame: "Продовжити",
     finishGameWithBonus: "Завершити (+{bonus} балів)",
@@ -247,5 +248,9 @@ export default {
     'down-right': "Вниз-праворуч\nNum 3 або C",
     'confirm': "Підтвердити хід\nEnter, Space або Num 5",
     'no-moves': "Заявити \"Ходів немає\"\nBackspace, Num . або N"
+  },
+  supportersPage: {
+    title: "Наші Меценати",
+    gratitudeText: "Ми безмежно вдячні кожному, хто підтримує наш проєкт. Ваша допомога надихає нас і дозволяє грі розвиватися. Дякуємо вам!"
   }
 };
