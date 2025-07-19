@@ -230,5 +230,11 @@ export default {
   supportersPage: {
     title: "Onze Supporters",
     gratitudeText: "We zijn iedereen die ons project steunt ongelooflijk dankbaar. Jullie hulp inspireert ons en laat het spel groeien. Dank jullie wel!"
+  },
+  modal: {
+    watchReplay: "Herhaling bekijken",
+  },
+  replay: {
+    step: "Stap {current}/{total}"
   }
 };

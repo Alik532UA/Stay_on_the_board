@@ -1,5 +1,6 @@
 <script>
   import { modalState, modalStore } from '$lib/stores/modalStore.js';
+  import { startReplay } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
   import SvgIcons from './SvgIcons.svelte';

@@ -16,6 +16,7 @@
   import { base } from '$app/paths';
   import { cubicOut } from 'svelte/easing';
   import { scale } from 'svelte/transition';
+  import ReplayControls from '$lib/components/ReplayControls.svelte';
 
   let showBoard = $derived($settingsStore.showBoard);
   const ANIMATION_DURATION = 10000; // 10 секунд для дебагу
@@ -161,8 +162,14 @@
     return $appState.availableMoves && $appState.availableMoves.some(move => move.row === row && move.col === col);
   }
 
-  /** @param {number} row @param {number} col */
+  /**
+   * @param {number} row
+   * @param {number} col
+   */
   function isCellBlocked(row, col) {
+    if ($appState.isReplayMode) {
+      return replayBlockedCells.some(cell => cell.row === row && cell.col === col);
+    }
     const visitCount = cellVisitCounts[`${row}-${col}`] || 0;
     return blockModeEnabled && visitCount > blockOnVisitCount;
   }
@@ -279,6 +286,52 @@
       toggleBlockCell(row, col);
     }
   }
+
+  // Реплеї: сегменти для градієнтної лінії
+  let replaySegments = $derived(
+    (() => {
+      if (!$appState.isReplayMode || $appState.moveHistory.length < 2) {
+        return [];
+      }
+      const segments = [];
+      const history = $appState.moveHistory;
+      const totalSteps = history.length - 1;
+      const cellSize = 100 / $appState.boardSize;
+      // Кольори для градієнта
+      const startColor = { r: 76, g: 175, b: 80 }; // Зелений
+      const endColor = { r: 244, g: 67, b: 54 }; // Червоний
+      for (let i = 0; i < totalSteps; i++) {
+        const startPos = history[i].pos;
+        const endPos = history[i + 1].pos;
+        const ratio = i / totalSteps;
+        const r = Math.round(startColor.r + ratio * (endColor.r - startColor.r));
+        const g = Math.round(startColor.g + ratio * (endColor.g - startColor.g));
+        const b = Math.round(startColor.b + ratio * (endColor.b - startColor.b));
+        segments.push({
+          x1: startPos.col * cellSize + cellSize / 2,
+          y1: startPos.row * cellSize + cellSize / 2,
+          x2: endPos.col * cellSize + cellSize / 2,
+          y2: endPos.row * cellSize + cellSize / 2,
+          color: `rgb(${r}, ${g}, ${b})`
+        });
+      }
+      return segments;
+    })()
+  );
+
+  let replayPosition = $derived(
+    $appState.isReplayMode
+      ? $appState.moveHistory[$appState.replayCurrentStep]?.pos
+      : ($appState.playerRow !== null && $appState.playerCol !== null)
+        ? { row: $appState.playerRow, col: $appState.playerCol }
+        : null
+  );
+
+  let replayBlockedCells = $derived(
+    $appState.isReplayMode
+      ? $appState.moveHistory[$appState.replayCurrentStep]?.blocked || []
+      : blockedCells
+  );
 </script>
 
 <div class="game-board-container">
@@ -391,18 +444,31 @@
               {#if isCellBlocked(rowIdx, colIdx)}
                 <span class="blocked-x">✗</span>
               {:else}
-                {#if $settingsStore.showMoves && isAvailable(rowIdx, colIdx)}
+                {#if !$appState.isReplayMode && $settingsStore.showMoves && isAvailable(rowIdx, colIdx)}
                   <span class="move-dot"></span>
                 {/if}
               {/if}
             </div>
           {/each}
         {/each}
-        {#if $settingsStore.showQueen && $appState.playerRow !== null && $appState.playerCol !== null}
+        {#if $appState.isReplayMode}
+          <svg class="replay-path-svg" viewBox="0 0 100 100" overflow="visible">
+            {#each replaySegments as segment, i (i)}
+              <line 
+                x1={segment.x1} 
+                y1={segment.y1} 
+                x2={segment.x2} 
+                y2={segment.y2} 
+                stroke={segment.color} 
+              />
+            {/each}
+          </svg>
+        {/if}
+        {#if $settingsStore.showQueen && replayPosition}
           {#key $appState.gameId}
             <div
               class="player-piece"
-              style="top: calc(var(--cell-size) * {$appState.playerRow}); left: calc(var(--cell-size) * {$appState.playerCol});"
+              style="top: {replayPosition.row * (100 / $appState.boardSize)}%; left: {replayPosition.col * (100 / $appState.boardSize)}%;"
             >
               <div class="piece-container">
                 <SvgIcons name="queen" />
@@ -414,7 +480,11 @@
     </div>
   {/key}
   <!-- Рендеримо ферзя як окремий елемент поверх сітки -->
-  <GameControls />
+  {#if $appState.isReplayMode}
+    <ReplayControls />
+  {:else}
+    <GameControls />
+  {/if}
   <Modal />
   {#if $uiState.isVoiceSettingsModalOpen}
     <VoiceSettingsModal close={closeVoiceSettingsModal} />
@@ -662,5 +732,23 @@
   @keyframes crack-appear {
     from { opacity: 0; }
     to { opacity: 1; }
+  }
+  .replay-path-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    overflow: visible;
+  }
+  .replay-path-svg line {
+    stroke-width: 1;
+    stroke-opacity: 0.8;
+    stroke-linecap: round;
+  }
+  .game-board {
+    position: relative;
   }
 </style> 
