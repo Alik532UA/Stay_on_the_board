@@ -46,14 +46,3 @@
     --arrow-color: #f5e9da;
 }
 
-[data-style="wood"][data-theme="dark"] button:disabled,
-[data-style="wood"][data-theme="dark"] .dir-btn[disabled],
-[data-style="wood"][data-theme="dark"] .dist-btn[disabled],
-[data-style="wood"][data-theme="dark"] .confirm-btn:disabled,
-[data-style="wood"][data-theme="dark"] .no-moves-btn:disabled {
-  opacity: 0.22;
-  background: #fff1 !important;
-  color: #fff5 !important;
-  box-shadow: none !important;
-  filter: grayscale(0.4);
-} 
