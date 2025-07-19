@@ -737,6 +737,11 @@ export async function makeComputerMove() {
           text: $t('modal.finishGameWithBonus', { values: { bonus: current.boardSize } }),
           customClass: 'blue-btn',
           onClick: finishGameWithBonus
+        },
+        {
+          textKey: 'modal.watchReplay',
+          customClass: 'blue-btn',
+          onClick: startReplay
         }
       ]
     });
@@ -772,6 +777,11 @@ export function noMoves() {
           text: $t('modal.finishGameWithBonus', { values: { bonus: state.boardSize } }),
           customClass: 'blue-btn',
           onClick: finishGameWithBonus
+        },
+        {
+          textKey: 'modal.watchReplay',
+          customClass: 'blue-btn',
+          onClick: startReplay
         }
       ]
     });
@@ -840,6 +850,7 @@ export function finishGameWithBonus() {
     },
     buttons: [
       { textKey: 'modal.playAgain', primary: true, isHot: true, onClick: resetAndCloseModal, customClass: 'green-btn' },
+      { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay },
       { textKey: 'gameBoard.mainMenu', customClass: 'blue-btn', onClick: navigateToMainMenu }
     ]
   });
@@ -871,6 +882,7 @@ export function cashOutAndEndGame() {
     },
     buttons: [
       { textKey: 'modal.playAgain', primary: true, isHot: true, onClick: resetAndCloseModal, customClass: 'green-btn' },
+      { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay },
       { textKey: 'gameBoard.mainMenu', customClass: 'blue-btn', onClick: navigateToMainMenu }
     ]
   });

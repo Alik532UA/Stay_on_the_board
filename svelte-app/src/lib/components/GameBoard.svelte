@@ -308,14 +308,14 @@
         const r = Math.round(startColor.r + ratio * (endColor.r - startColor.r));
         const g = Math.round(startColor.g + ratio * (endColor.g - startColor.g));
         const b = Math.round(startColor.b + ratio * (endColor.b - startColor.b));
-        // --- Логіка прозорості ---
+        // --- ОНОВЛЕНА ЛОГІКА ПРОЗОРОСТІ ---
         let opacity = 1.0;
         if (limitPath) {
           const dist = i - currentStep;
-          if (dist >= 0 && dist < 6) {
-            opacity = 1.0 - dist * 0.15;
-          } else if (dist < 0 && dist >= -3) {
-            opacity = 1.0 + dist * 0.3;
+          if (dist >= 0 && dist < 3) { // 3 кроки вперед
+            opacity = 1.0 - dist * 0.3;
+          } else if (dist < 0 && dist >= -1) { // 1 крок назад
+            opacity = 0.7;
           } else {
             opacity = 0;
           }

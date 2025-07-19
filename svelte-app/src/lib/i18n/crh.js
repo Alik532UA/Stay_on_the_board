@@ -123,7 +123,12 @@ export default {
   },
   replay: {
     step: "Adım {current}/{total}",
-    limitPath: "Yolnı sıñırla"
+    limitPath: "Yolnıñ yahşı körünişi",
+    close: "Yazını qapat",
+    prev: "Önceki adım",
+    play: "Oynat",
+    pause: "Pauza",
+    next: "Soñraki adım"
   },
   voiceSettings: {
     title: "Ses Sozlamaları",

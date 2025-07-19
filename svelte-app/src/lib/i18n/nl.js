@@ -118,7 +118,8 @@ export default {
     scoreInfoTitle: "Hoe worden punten toegekend?",
     scoreInfoContent: `Punten per zet:\n• +1 punt: met het bord en de koningin zichtbaar.\n• +2 punten: met het bord zichtbaar, maar de koningin verborgen.\n• +3 punten: met het bord verborgen (moeilijkste modus).\n\nExtra bonuspunten worden automatisch toegekend aan het einde van het spel:\n• Bordgrootte Bonus.\n• Geblokkeerde Cellen Modus Bonus.\n• "Geen Zetten" Knop Bonus.\n• Springbonus voor het springen over geblokkeerde cellen.`,
     boardClickTitle: "Hoe bestuur je het spel?",
-    boardClickContent: "Het spel wordt niet op het bord bestuurd, maar met het bedieningspaneel eronder. Gebruik de pijlen om een richting te kiezen en de nummer knoppen om een afstand te kiezen. Het bord is alleen om de zetten te observeren."
+    boardClickContent: "Het spel wordt niet op het bord bestuurd, maar met het bedieningspaneel eronder. Gebruik de pijlen om een richting te kiezen en de nummer knoppen om een afstand te kiezen. Het bord is alleen om de zetten te observeren.",
+    watchReplay: "Herhaling bekijken"
   },
   voiceSettings: {
     title: "Steminstellingen",
@@ -231,11 +232,13 @@ export default {
     title: "Onze Supporters",
     gratitudeText: "We zijn iedereen die ons project steunt ongelooflijk dankbaar. Jullie hulp inspireert ons en laat het spel groeien. Dank jullie wel!"
   },
-  modal: {
-    watchReplay: "Herhaling bekijken",
-  },
   replay: {
     step: "Stap {current}/{total}",
-    limitPath: "Pad Beperken"
+    limitPath: "Verbeterde Padweergave",
+    close: "Herhaling Sluiten",
+    prev: "Vorige Stap",
+    play: "Afspelen",
+    pause: "Pauze",
+    next: "Volgende Stap"
   }
 };

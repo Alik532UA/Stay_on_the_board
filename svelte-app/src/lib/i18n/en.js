@@ -122,7 +122,12 @@ export default {
   },
   replay: {
     step: "Step {current}/{total}",
-    limitPath: "Limit Path"
+    limitPath: "Enhanced Path Visibility",
+    close: "Close Replay",
+    prev: "Previous Step",
+    play: "Play",
+    pause: "Pause",
+    next: "Next Step"
   },
   voiceSettings: {
     title: "Voice Settings",
