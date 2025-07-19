@@ -256,6 +256,11 @@ export default {
   },
   replay: {
     step: "Крок {current}/{total}",
-    limitPath: "Обмежити шлях"
+    limitPath: "Покращена видимість шляху",
+    close: "Закрити реплей",
+    prev: "Попередній хід",
+    play: "Відтворити",
+    pause: "Пауза",
+    next: "Наступний хід"
   }
 };
