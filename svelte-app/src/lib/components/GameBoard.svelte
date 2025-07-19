@@ -402,6 +402,9 @@
 <svelte:window on:keydown={handleKeydown} />
 
 <style>
+  :root {
+    --board-hide-duration: 1s; /* 10 секунд для дебагу */
+  }
   .clear-cache-btn {
     background: #fff3;
     border: none;
@@ -532,8 +535,16 @@
     margin: 0 auto 16px;
     overflow: hidden;
     background: none;
-    transition: opacity 0.9s ease-in-out, margin-bottom 1s ease-in-out, padding-top 1s ease-in-out, padding-bottom 1s ease-in-out;
+    max-height: 1000px;
     opacity: 1;
+    transform: scale(1);
+    transition: 
+      max-height var(--board-hide-duration) ease-in-out,
+      opacity var(--board-hide-duration) ease-in-out,
+      transform var(--board-hide-duration) ease-in-out,
+      margin-bottom var(--board-hide-duration) ease-in-out,
+      padding-top var(--board-hide-duration) ease-in-out,
+      padding-bottom var(--board-hide-duration) ease-in-out;
   }
   .board-bg-wrapper > .game-board {
     min-height: 0;
@@ -545,6 +556,7 @@
     margin-bottom: 0;
     padding-top: 0;
     padding-bottom: 0;
+    transform: scale(0);
   }
   .details-btn {
     display: inline-block;
