@@ -453,16 +453,3 @@
   margin-right: auto;
   transition: width 0.2s;
 } 
-
-button:disabled,
-.dir-btn[disabled],
-.dist-btn[disabled],
-.confirm-btn:disabled,
-.no-moves-btn:disabled {
-  opacity: 0.45;
-  background: var(--control-bg, #ccc) !important;
-  color: var(--text-primary, #666) !important;
-  cursor: not-allowed !important;
-  box-shadow: none !important;
-  filter: grayscale(0.2);
-} 
