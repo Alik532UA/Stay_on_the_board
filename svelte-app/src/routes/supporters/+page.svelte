@@ -13,6 +13,10 @@
     <div class="supporter-item">Khaaaa</div>
     <!-- Майбутні імена будуть додаватися сюди -->
   </div>
+  <p class="call-to-action-text">{@html $_('supportersPage.callToAction')}</p>
+  <button class="support-btn" onclick={() => window.open('https://send.monobank.ua/jar/8TPmFKQTCK', '_blank', 'noopener,noreferrer')}>
+    {$_('supportersPage.supportButton')}
+  </button>
 </div>
 
 <style>
@@ -43,5 +47,42 @@
     padding: 0.5em 1.5em;
     border-radius: 8px;
     border: 1px solid var(--border-color, rgba(255, 152, 0, 0.3));
+  }
+  .call-to-action-text {
+    margin-top: 3rem;
+    font-size: 1.1em;
+    line-height: 1.7;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--text-secondary);
+  }
+  .call-to-action-text :global(a) {
+    color: var(--text-accent, #ff9800);
+    text-decoration: none; /* Прибираємо підкреслення */
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+  .call-to-action-text :global(a:hover) {
+    color: #fff;
+  }
+
+  .support-btn {
+    margin-top: 2rem;
+    background: linear-gradient(90deg, #ff9800 60%, #ffb300 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 36px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 20px rgba(255, 152, 0, 0.3);
+  }
+
+  .support-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 24px rgba(255, 152, 0, 0.4);
   }
 </style> 
