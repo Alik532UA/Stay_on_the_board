@@ -141,7 +141,7 @@ export default {
     recommendationsTitle: "Tavsiye etilgen platformalar",
     recommendationsContent: "En yahşı seslendirüv tecribesi için bu variantlardan birini deñeñiz:",
     platformEdge: "Windows-ta Microsoft Edge brauzeri.",
-    platformAndroid: "Android-li mobil cihazlarda er angi bir brauzer.",
+    platformAndroid: "Mobil cihazlarda er angi bir brauzer.",
     iosNotice: "iOS qoltutuvı şimdilik işlep çıkarılmaqta. Biz hata üzerinde çalışamız ve onı yaqın zamanda tüzetmege ümit etemiz.",
     iosWarning: "Diqqat! iOS-nıñ tehnikiy hususiyetleri sebebinden, seslendirüv, hususan kompyuter areketleri için, istiqrarsız çalışmaq mümkün. Biz bu funktsiyanı yahşılaştırmaq üzerinde çalışamız.",
     close: "Qapat"
