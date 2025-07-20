@@ -829,9 +829,9 @@
     gap: 12px;
   }
   .count-selector-btn {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--control-bg);
     border: 1.5px solid transparent;
-    color: var(--text-secondary, #ccc);
+    color: var(--text-primary);
     width: 32px;
     height: 32px;
     border-radius: 8px;
@@ -844,13 +844,13 @@
     transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
   }
   .count-selector-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 152, 0, 0.5);
+    background: var(--control-hover);
+    border-color: var(--control-selected);
   }
   .count-selector-btn.active {
-    background: var(--text-accent, #ff9800);
-    color: #fff;
-    border-color: var(--text-accent, #ff9800);
+    background: var(--control-selected);
+    color: var(--control-selected-text);
+    border-color: var(--control-selected);
     transform: scale(1.1);
   }
   @keyframes fadeIn {
