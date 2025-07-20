@@ -42,7 +42,9 @@ export default {
     tutorialTitle: "",
     tutorialContent: "Your goal is to take turns moving the shared piece without going off the board. Hide the queen or the board in the settings to earn more points for each move!",
     info: "Instructions",
-    details: "Details"
+    details: "Details",
+    infoModalTitle: "About the Game and Its Goal",
+    infoModalContent: `Your goal is to take turns moving the shared piece without going off the board.\n\n<b>Pro Mode: Training Your Imagination</b>\nThe real fun begins when you move the board into your mind. Try turning off the board in settings, enabling voiceover, and playing blindfolded using hotkeys. This turns the game into a powerful trainer for memory and spatial thinking. Start with a 3x3 board and gradually increase the challenge!`,
   },
   gameControls: {
     ok: "OK",
@@ -133,7 +135,15 @@ export default {
     title: "Voice Settings",
     loading: "Loading voices...",
     noVoices: "Ukrainian voices are not yet loaded. Please start a game to activate them, then return to this menu.",
-    whyButton: "Fix It",
+    whyButton: "Why is that?",
+    edgeFixTitle: "How to activate voices in Edge:",
+    edgeFixStep1: "1. Open any other tab with text (e.g., a Wikipedia article).",
+    edgeFixStep2: "2. Select a piece of text, right-click, and choose \"Read aloud selection\".",
+    edgeFixStep3: "3. When the narration starts, pause it.",
+    edgeFixStep4: "4. Return to the game tab and click the \"Check Again\" button below.",
+    edgeFixStep5: "If this doesn't help, you may need to restart your browser.",
+    checkAgainButton: "Check Again",
+    whyIsThisNeededTitle: "Why is this necessary?",
     hideDetailsButton: "Hide details",
     reasonTitle: "Reason for the issue",
     reasonContent: "Our game uses voices built into your operating system and accessible through the browser. Some browsers, like Chrome on Windows, do not always have access to system Ukrainian voices.",
@@ -204,7 +214,16 @@ export default {
     scoreHideBoard: "+3 points: with the board hidden (hardest mode).",
     settingsTitle: "Game Settings",
     boardSize: "Board Size",
-    boardSizeText: "You can change the size of the game board from 2x2 to 9x9."
+    boardSizeText: "You can change the size of the game board from 2x2 to 9x9.",
+    proModeTitle: "Pro Mode: Training Your Imagination",
+    proModeText: "The real fun begins when you move the board into your mind and play almost blindfolded. This turns the game into a powerful trainer for memory and spatial thinking.",
+    proModeTip: "Try this mode for maximum immersion:",
+    proModeStep1: "1. Start with a 3x3 board.",
+    proModeStep2: "2. In settings, turn off 'Show board' but keep 'Voiceover' enabled.",
+    proModeStep3: "3. Enable 'Blocked Cells Mode' to add strategic depth.",
+    proModeStep4: "4. Use hotkeys to control the game without looking at the screen.",
+    proModeConclusion: "Now you can make moves, listen to the computer's response, and keep the entire game situation — the queen's position and blocked cells — entirely in your head.",
+    proModeNextLevel: "When 3x3 becomes easy, increase the size to 4x4, then 5x5, and so on, gradually increasing the challenge and training your imagination!"
   },
   header: {
     home: "Home",
@@ -243,7 +262,8 @@ export default {
     }
   },
   ui: {
-    closeAndReturnToMenu: 'Close and return to main menu'
+    closeAndReturnToMenu: 'Close and return to main menu',
+    goBack: 'Go back'
   },
   tooltips: {
     'up-left': "Up-Left\nNum 7 or Q",

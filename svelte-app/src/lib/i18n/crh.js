@@ -43,6 +43,8 @@ export default {
     tutorialContent: "Siziñ maqsadıñız – nevbetnen ortaq figurani tahtadan tışarı çıqarmadan areket ettirmektir. Er bir areket içün daa çoq bal qazanmaq içün, sozlamalarda vezirni ya da tahtanı gizletiñiz!",
     info: "Talimat",
     details: "Tafsilât",
+    infoModalTitle: "Oyun ve Onıñ Maqsadı Hakkında",
+    infoModalContent: `Maqsadıñız – ortaq figurani nevbetnen areket ettirip, tahta tışına çıqarmamaq.\n\n<b>Pro Rejim: Hayal Kuvvetini Terbiye Etmek</b>\nOyunıñ asıl lezzeti, tahta hayalinizde canlanıp, kör körüne oynamağa başlağanda açıladı. Sozlamalarda tahtanı gizlep, seslendirüvni açıp, qısqa yollar (hotkeys) ile oynap baqıñız. Bu, oyunnı hafıza ve mekânsal tüşüniş üçün quvetli bir trenajorğa aylandıra. 3x3 tahta ile başlayıñız ve zorlarnı arttırıñız!`,
   },
   gameControls: {
     ok: "OK",
@@ -134,7 +136,15 @@ export default {
     title: "Ses Sozlamaları",
     loading: "Sesler yüklenmekte...",
     noVoices: "Ukrain sesleri henüz yüklenmedi. Lütfen oyuna başlayıp onları etkinleştirin, sonra bu menüye dönün.",
-    whyButton: "Tüzet",
+    whyButton: "Bu ne içün?",
+    edgeFixTitle: "Edge-de seslerni nasıl faalleştirmeli:",
+    edgeFixStep1: "1. Metinli er angi bir başqa saifeni açıñız (meselâ, Vikipediya maqalesi).",
+    edgeFixStep2: "2. Bir metin parçasını saylap, oñ dögmege basıñız ve \"Saylanğannı sesli oqu\"nı saylañız.",
+    edgeFixStep3: "3. Seslendirüv başlağanda, onı pauzağa qoyuñız.",
+    edgeFixStep4: "4. Oyun saifesine qaytıp, aşağıdaki \"Kene teşker\" dögmesine basıñız.",
+    edgeFixStep5: "Eger bu yardım etmese, brauzerni kene başlatmaq kerek olmaq mümkün.",
+    checkAgainButton: "Kene teşker",
+    whyIsThisNeededTitle: "Bu ne içün kerek?",
     hideDetailsButton: "Tafsilâtlarını gizle",
     reasonTitle: "Meselenin sebebi",
     reasonContent: "Oyunımız, operatsion sisteminizge qurulğan ve brauzer vastasınen erişimli olğan seslerni qullana. Bazı brauzerler, meselâ Windows-ta Chrome, er vaqıt sistem ukrain seslerine erişip olamay.",
@@ -223,7 +233,8 @@ export default {
     title: "Mahalliy oyun"
   },
   ui: {
-    closeAndReturnToMenu: 'Qapat ve ana menüye qayt'
+    closeAndReturnToMenu: 'Qapat ve ana menüye qayt',
+    goBack: 'Keri qaytmaq'
   },
   tooltips: {
     'up-left': "Yuqarı-solğa\nNum 7 ya da Q",

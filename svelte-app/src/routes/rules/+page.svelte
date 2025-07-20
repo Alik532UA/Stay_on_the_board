@@ -1,9 +1,9 @@
 <script>
-  import FloatingCloseButton from '$lib/components/FloatingCloseButton.svelte';
+  import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
   import { _ } from 'svelte-i18n';
 </script>
 
-<FloatingCloseButton />
+<FloatingBackButton />
 
 <h1>{$_('rulesPage.title')}</h1>
 
@@ -69,6 +69,18 @@
 <h3>{$_('rulesPage.boardSize')}</h3>
 <p>{$_('rulesPage.boardSizeText')}</p>
 
+<h2 class="pro-mode-title">{$_('rulesPage.proModeTitle')}</h2>
+<p>{$_('rulesPage.proModeText')}</p>
+<p><b>{$_('rulesPage.proModeTip')}</b></p>
+<ol>
+  <li>{$_('rulesPage.proModeStep1')}</li>
+  <li>{$_('rulesPage.proModeStep2')}</li>
+  <li>{$_('rulesPage.proModeStep3')}</li>
+  <li>{$_('rulesPage.proModeStep4')}</li>
+</ol>
+<p>{$_('rulesPage.proModeConclusion')}</p>
+<p>{$_('rulesPage.proModeNextLevel')}</p>
+
 <style>
   .directions-grid-visual {
     display: grid;
@@ -97,5 +109,12 @@
     background: var(--cell-dark, #e4d5c6);
     color: var(--piece-color, #3a2a22);
     border: none;
+  }
+
+  .pro-mode-title {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border-color, rgba(233, 84, 32, 0.5));
+    color: var(--text-accent, #e95420);
   }
 </style> 

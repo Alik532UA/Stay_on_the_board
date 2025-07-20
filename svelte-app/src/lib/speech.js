@@ -5,7 +5,7 @@ import { logStore } from '$lib/stores/logStore.js';
 /** @type {import('svelte/store').Writable<SpeechSynthesisVoice[]>} */
 export const voices = writable([]);
 /** @type {Promise<SpeechSynthesisVoice[]> | null} */
-let voicesPromise = null;
+export let voicesPromise = null;
 
 /**
  * Завантажує та повертає список доступних голосів.
