@@ -4,10 +4,18 @@
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
 
-  const faqItems = Array.from({ length: 10 }, (_, i) => ({
-    q: `faq.q${i + 1}`,
-    a: `faq.a${i + 1}`,
-  }));
+  const faqItems = [
+    { q: 'faq.q1', a: 'faq.a1' },
+    { q: 'faq.q8', a: 'faq.a8' },
+    { q: 'faq.q7', a: 'faq.a7' },
+    { q: 'faq.q10', a: 'faq.a10' },
+    { q: 'faq.q4', a: 'faq.a4' },
+    { q: 'faq.q2', a: 'faq.a2' },
+    { q: 'faq.q9', a: 'faq.a9' },
+    { q: 'faq.q3', a: 'faq.a3' },
+    { q: 'faq.q5', a: 'faq.a5' },
+    { q: 'faq.q6', a: 'faq.a6' },
+  ];
 </script>
 
 <div class="faq-container">

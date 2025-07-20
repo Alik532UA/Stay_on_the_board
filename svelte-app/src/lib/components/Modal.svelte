@@ -190,7 +190,7 @@
 }
 .modal-content {
   flex: 1;
-  overflow-y: auto;
+  /* overflow-y: auto; */ /* Вимикаємо скролбар для цього контейнера */
   padding: 20px 24px;
   color: var(--text-primary, #fff);
   background: transparent;
