@@ -64,7 +64,7 @@
 	}
 
 	function handleDevKeys(event) {
-		if (import.meta.env.DEV && event.key === ']') {
+		if (import.meta.env.DEV && event.code === 'BracketRight') {
 			event.preventDefault();
 			showUpdateNotice = !showUpdateNotice;
 		}
