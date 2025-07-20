@@ -166,7 +166,7 @@
   filter: drop-shadow(0 2px 8px #ffeb3b88);
 }
 .modal-window {
-  background: rgba(40, 10, 35, 0.85);
+  background: var(--bg-secondary);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);

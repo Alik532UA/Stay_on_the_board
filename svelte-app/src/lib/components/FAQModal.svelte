@@ -13,7 +13,14 @@
 <div class="faq-container">
   {#each faqItems as item, i}
     <details class="faq-item">
-      <summary>{$_(item.q)}</summary>
+      <summary>
+        {$_(item.q)}
+        <span class="faq-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </summary>
       <p>{@html $_(item.a)}</p>
     </details>
   {/each}
@@ -59,23 +66,29 @@
     cursor: pointer;
     list-style: none;
     position: relative;
-    padding-right: 24px;
+    padding-right: 32px; /* Додаємо відступ для стрілки */
   }
   .faq-item summary::-webkit-details-marker {
     display: none;
   }
-  .faq-item summary::after {
-    content: '+';
+  .faq-arrow {
     position: absolute;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 1.4em;
-    color: var(--text-accent, #ff9800);
-    transition: transform 0.2s;
+    display: inline-flex;
+    align-items: center;
   }
-  .faq-item[open] summary::after {
-    transform: translateY(-50%) rotate(45deg);
+
+  .faq-arrow svg {
+    width: 24px;
+    height: 24px;
+    color: var(--text-accent, #ff9800);
+    transition: transform 0.3s ease-out;
+  }
+
+  .faq-item[open] .faq-arrow svg {
+    transform: rotate(180deg);
   }
   .faq-item p {
     margin-top: 12px;
