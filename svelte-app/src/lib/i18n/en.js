@@ -297,7 +297,7 @@ export default {
     q5: "How do I score points?",
     a5: "You earn points for each move depending on the difficulty:\n• +1 point: with the board and queen visible.\n• +2 points: with the board visible, but the queen hidden.\n• +3 points: with the board hidden.\nAt the end of the game, you also get bonuses for board size, block mode, and more. Penalty points (-2) are given for making a mirrored move after the computer's move.",
     q6: "How can I make the game more interesting?",
-    a6: "Try 'Pro Mode': turn off 'Show board' in settings, enable 'Voiceover', and play blindfolded using hotkeys. This turns the game into a powerful trainer for memory and spatial thinking.",
+    a6: "Try 'Pro Mode': enable 'Blocked Cells Mode', turn off 'Show board' in settings, enable 'Voiceover', and play blindfolded using hotkeys. This turns the game into a powerful trainer for memory and spatial thinking.",
     q7: "How do I control the queen?",
     a7: "Use the control panel below the board. First, press one of the 8 arrows to choose a direction, then a number button to choose the distance. Then confirm your move.",
     q8: "Why is there only one piece? Where is the computer's piece?",

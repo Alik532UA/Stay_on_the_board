@@ -20,50 +20,46 @@ import { locale } from 'svelte-i18n';
 
 const isBrowser = typeof window !== 'undefined';
 
+const defaultStyle = import.meta.env.DEV ? 'gray' : 'purple';
+
 const defaultSettings = {
   showMoves: true,
   showBoard: true,
   language: 'uk',
   theme: 'dark',
-  style: 'purple',
-  speechEnabled: false, // <-- ДОДАНО
-  selectedVoiceURI: null, // <-- ДОДАНО
-  blockModeEnabled: false, // <-- ДОДАНО
-  showQueen: true, // <-- ІНВЕРТОВАНО
-  blockOnVisitCount: 0, // <-- ДОДАНО
+  style: defaultStyle,
+  speechEnabled: false,
+  selectedVoiceURI: null,
+  blockModeEnabled: false,
+  showQueen: true,
+  blockOnVisitCount: 0,
 };
 
-if (isBrowser) {
-  // Очищаємо старі налаштування теми та стилю, щоб форсувати дефолт
-  localStorage.setItem('theme', 'dark');
-  let style = localStorage.getItem('style');
-  if (style === 'ubuntu') style = 'purple';
-  if (style === 'peak') style = 'green';
-  if (style === 'cs2') style = 'blue';
-  if (style === 'glass') style = 'gray';
-  if (style === 'material') style = 'orange';
-  localStorage.setItem('style', style || 'purple');
-}
+/**
+ * @param {string|null} style
+ * @returns {string|null}
+ */
+const convertStyle = (style) => {
+  if (!style) return null;
+  /** @type {{ [key: string]: string }} */
+  const conversions = {
+    'ubuntu': 'purple', 'peak': 'green', 'cs2': 'blue',
+    'glass': 'gray', 'material': 'orange'
+  };
+  return conversions[style] || style;
+};
 
 const storedSettings = isBrowser ? {
-  showMoves: localStorage.getItem('showMoves') === 'false' ? false : true,
-  showBoard: localStorage.getItem('showBoard') === 'false' ? false : true,
+  showMoves: localStorage.getItem('showMoves') === 'true',
+  showBoard: localStorage.getItem('showBoard') !== 'false',
   language: localStorage.getItem('lang') || defaultSettings.language,
   theme: localStorage.getItem('theme') || defaultSettings.theme,
-  style: (() => {
-    let style = localStorage.getItem('style');
-    if (style === 'ubuntu') style = 'purple';
-    if (style === 'peak') style = 'green';
-    if (style === 'cs2') style = 'blue';
-    if (style === 'glass') style = 'gray';
-    if (style === 'material') style = 'orange';
-    return style || defaultSettings.style;
-  })(),
-  speechEnabled: localStorage.getItem('speechEnabled') === 'true', // <-- ДОДАНО
-  selectedVoiceURI: localStorage.getItem('selectedVoiceURI') || null, // <-- ДОДАНО
-  blockModeEnabled: localStorage.getItem('blockModeEnabled') === 'true' ? true : false, // <-- ДОДАНО
-  showQueen: localStorage.getItem('showQueen') === 'false' ? false : true, // <-- ІНВЕРТОВАНО
-  blockOnVisitCount: parseInt(localStorage.getItem('blockOnVisitCount') || '0', 10), // <-- ДОДАНО
+  style: convertStyle(localStorage.getItem('style')) || defaultSettings.style,
+  speechEnabled: localStorage.getItem('speechEnabled') === 'true',
+  selectedVoiceURI: localStorage.getItem('selectedVoiceURI') || null,
+  blockModeEnabled: localStorage.getItem('blockModeEnabled') === 'true',
+  showQueen: localStorage.getItem('showQueen') !== 'false',
+  blockOnVisitCount: Number(localStorage.getItem('blockOnVisitCount')) || 0,
 } : defaultSettings;
 
 const { subscribe, set, update } = writable(storedSettings);

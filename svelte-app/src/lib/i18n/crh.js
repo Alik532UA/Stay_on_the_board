@@ -268,7 +268,7 @@ export default {
     q5: "Ballar nasıl toplanadı?",
     a5: "Her bir muvafaqiyetli areket içün ballar alınadı:\n• +1 bal: tahta ve vezir körünüvde.\n• +2 bal: tahta körünüvde, amma vezir gizli.\n• +3 bal: tahta gizli.\nOyun soñunda tahta ölçüsi, blok rejimi ve başqalar içün bonuslar alınadı. Kompyuter areketine ayna areket yapqan içün ceza balları (-2) berile.",
     q6: "Oyun nasıl daa qızıq ola?",
-    a6: "'Pro Rejim'ni sınap baqıñız: sozlamalarda 'Tahtanı köster'ni qapatıñız, 'Seslendirüv'ni açıp, qısqa yollar (hotkeys) ile kör körüne oynap baqıñız. Bu, hafıza ve mekânsal tüşüniş içün quvetli bir trenajorğa aylandıra.",
+    a6: "'Pro Rejim'ni sınap baqıñız: 'Bloklanğan hücreler rejimi'ni açınız, sozlamalarda 'Tahtanı köster'ni qapatıñız, 'Seslendirüv'ni açıp, qısqa yollar (hotkeys) ile kör körüne oynap baqıñız. Bu, hafıza ve mekânsal tüşüniş içün quvetli bir trenajorğa aylandıra.",
     q7: "Vezirni nasıl idare etem?",
     a7: "Tahtanıñ altında yerleşken idare panelini qullanıñız. Evvel 8 oqtan birini basıp yönelişni saylañız, sonra raqam düğmesini basıp mesafeni saylañız. Ondan soñ areketiñizni tasdiqlayınız.",
     q8: "Neden tek figura bar? Kompyuterniñ figurası qayda?",
