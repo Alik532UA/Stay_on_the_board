@@ -96,7 +96,6 @@
                 <li>{$_('voiceSettings.platformEdge')}</li>
                 <li>{$_('voiceSettings.platformAndroid')}</li>
               </ul>
-              <p>{$_('voiceSettings.iosNotice')}</p>
             </div>
           {/if}
         </div>

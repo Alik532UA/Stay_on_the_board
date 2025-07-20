@@ -132,8 +132,7 @@ export default {
     recommendationsTitle: "Aanbevolen platforms",
     recommendationsContent: "Probeer een van deze opties voor de beste voice-overervaring:",
     platformEdge: "Microsoft Edge-browser op Windows.",
-    platformAndroid: "Elke browser op mobiele apparaten met Android.",
-    iosNotice: "iOS-ondersteuning is momenteel in ontwikkeling. We werken aan een oplossing en hopen deze binnenkort te herstellen.",
+    platformAndroid: "Elke browser op mobiele apparaten.",
     iosWarning: "Waarschuwing! Vanwege technische beperkingen van iOS kan de voice-over onstabiel werken, vooral voor computerzetten. We werken aan het verbeteren van deze functie.",
     close: "Sluiten"
   },

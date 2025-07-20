@@ -140,8 +140,7 @@ export default {
     recommendationsTitle: "Recommended platforms",
     recommendationsContent: "For the best voiceover experience, try one of these options:",
     platformEdge: "Microsoft Edge browser on Windows.",
-    platformAndroid: "Any browser on mobile devices with Android.",
-    iosNotice: "iOS support is currently under development. We are working on a fix and hope to restore it soon.",
+    platformAndroid: "Any browser on mobile devices.",
     iosWarning: "Warning! Due to technical limitations of iOS, voiceover may work unstably, especially for computer moves. We are working on improving this feature.",
     close: "Close"
   },
