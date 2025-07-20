@@ -123,7 +123,11 @@ export default {
     scoreInfoContent: `Punten per zet:\n• +1 punt: met het bord en de koningin zichtbaar.\n• +2 punten: met het bord zichtbaar, maar de koningin verborgen.\n• +3 punten: met het bord verborgen (moeilijkste modus).\n\nExtra bonuspunten worden automatisch toegekend aan het einde van het spel:\n• Bordgrootte Bonus.\n• Geblokkeerde Cellen Modus Bonus.\n• "Geen Zetten" Knop Bonus.\n• Springbonus voor het springen over geblokkeerde cellen.`,
     boardClickTitle: "Hoe bestuur je het spel?",
     boardClickContent: "Het spel wordt niet op het bord bestuurd, maar met het bedieningspaneel eronder. Gebruik de pijlen om een richting te kiezen en de nummer knoppen om een afstand te kiezen. Het bord is alleen om de zetten te observeren.",
-    watchReplay: "Herhaling bekijken"
+    watchReplay: "Herhaling bekijken",
+    expertModeTitle: "Let op: Expertmodus",
+    expertModeContent: "U heeft een modus geselecteerd waarin cellen niet onmiddellijk worden geblokkeerd. Dit maakt het spel aanzienlijk ingewikkelder, omdat u nu niet alleen moet onthouden *waar* het stuk is geweest, maar ook *hoe vaak*.\n\nWe raden aan om eerst de basismodus (blokkeren na 0 bezoeken) onder de knie te krijgen om het meeste plezier uit het spel te halen.",
+    expertModeConfirm: "Doorgaan (niet opnieuw tonen)",
+    expertModeCancel: "Terug naar basismodus"
   },
   voiceSettings: {
     title: "Steminstellingen",

@@ -123,6 +123,10 @@ export default {
     scoreInfoTitle: "Ballar nasıl esaplana?",
     scoreInfoContent: `Er bir areket içün ballar:\n• +1 bal: tahta ve vezir körüngen.\n• +2 bal: tahta körüngen, amma vezir gizli.\n• +3 bal: tahta gizli (eñ zor rejim).\n\nQoşma bonus balları oyun soñunda avtomatik olaraq esaplana:\n• Tahta ölçüsi bonusı.\n• Bloklanğan hücreler rejimi bonusı.\n• "Areket yoq" dögmesini muvafaqiyetli qullanuv bonusı.\n• Bloklanğan hücreler üzerinden atlama bonusı.`,
     watchReplay: "Yazını baq",
+    expertModeTitle: "Diqqat: Tecribeli oyunçılar içün rejim",
+    expertModeContent: "Siz hücrelerniñ deral bloklanmağan bir rejim sayladıñız. Bu, oyunnı emiyetli derecede zorlaştıra, çünki endi tek figuranıñ *qayda* olğanını degil, em de *qaç kere* olğanını hatırda tutmaq kerek.\n\nOyunından eñ büyük zevq almaq içün, başta esas rejimni (0 ziyaret soñu bloklanuv) menimsemege tevsiye etemiz.",
+    expertModeConfirm: "Devam et (daa kösterme)",
+    expertModeCancel: "Esas rejimge qayt",
   },
   replay: {
     step: "Adım {current}/{total}",
