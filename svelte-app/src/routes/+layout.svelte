@@ -52,6 +52,10 @@
 		}
 	});
 
+	onMount(() => {
+		document.body.classList.remove('preload-theme');
+	});
+
 	function handleReload() {
 		// Очищуємо кеш і перезавантажуємо
 		localStorage.clear();
