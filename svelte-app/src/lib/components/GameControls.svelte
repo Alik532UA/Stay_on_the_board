@@ -300,12 +300,12 @@
             <input type="checkbox" checked={blockModeEnabled} onchange={onBlockModeChange} />
             <span class="slider"></span>
           </div>
-          <span>Режим заблокованих клітинок</span>
+          <span>{$_('gameControls.blockMode')}</span>
         </div>
       </label>
       {#if blockModeEnabled}
         <div class="block-mode-options">
-          <span class="options-label">Блокувати після:</span>
+          <span class="options-label">{$_('gameControls.blockAfter')}</span>
           <div class="options-values" role="radiogroup" aria-labelledby="block-after-label">
             {#each [0, 1, 2, 3] as count}
               <button

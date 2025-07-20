@@ -34,5 +34,7 @@ export default {
   boardClickTitle: "Hoe bestuur je het spel?",
   boardClickContent: "Het spel wordt niet op het bord bestuurd, maar met het bedieningspaneel eronder. Gebruik de pijlen om een richting te kiezen en de nummer knoppen om een afstand te kiezen. Het bord is alleen om de zetten te observeren.",
   scoreInfoTitle: "Hoe worden punten toegekend?",
-  scoreInfoContent: `Punten per zet:\n• +1 punt: met het bord en de koningin zichtbaar.\n• +2 punten: met het bord zichtbaar, maar de koningin verborgen.\n• +3 punten: met het bord verborgen (moeilijkste modus).\n\nExtra bonuspunten worden automatisch toegekend aan het einde van het spel:\n• Bordgrootte Bonus.\n• Geblokkeerde Cellen Modus Bonus.\n• 'Geen Zetten' Knop Bonus.\n• Springbonus voor het springen over geblokkeerde cellen.`,
+  scoreInfoContent: `Punten per zet:\n• +1 punt: met het bord en de koningin zichtbaar.\n• +2 punten: met het bord zichtbaar, maar de koningin verborgen.\n• +3 punt: met het bord verborgen (moeilijkste modus).\n\nExtra bonuspunten worden automatisch toegekend aan het einde van het spel:\n• Bordgrootte Bonus.\n• Geblokkeerde Cellen Modus Bonus.\n• 'Geen Zetten' Knop Bonus.\n• Springbonus voor het springen over geblokkeerde cellen.`,
+  watchReplay: "Herhaling bekijken",
+  cancel: "Annuleren"
 }; 

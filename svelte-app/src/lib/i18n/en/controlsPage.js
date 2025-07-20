@@ -48,5 +48,6 @@ export default {
     'distance-7': "Distance 7",
     'distance-8': "Distance 8"
   },
-  distanceSelection: "Distance Selection"
+  distanceSelection: "Distance Selection",
+  resetToDefaults: "Reset to Defaults"
 }; 

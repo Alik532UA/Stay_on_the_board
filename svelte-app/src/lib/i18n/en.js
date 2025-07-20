@@ -1,5 +1,6 @@
 import mainMenu from './en/mainMenu.js';
 import gameBoard from './en/gameBoard.js';
+import gameControls from './en/gameControls.js';
 import controlsPage from './en/controlsPage.js';
 import modal from './en/modal.js';
 import settings from './en/settings.js';
@@ -20,6 +21,7 @@ import faq from './en/faq.js';
 export default {
   mainMenu,
   gameBoard,
+  gameControls,
   controlsPage,
   modal,
   settings,
