@@ -459,7 +459,7 @@
             {/each}
           </svg>
         {/if}
-        {#if $settingsStore.showQueen && $replayPosition}
+        {#if ($appState.isReplayMode || $settingsStore.showQueen) && $replayPosition}
           {#key $appState.gameId}
             <div
               class="player-piece"
