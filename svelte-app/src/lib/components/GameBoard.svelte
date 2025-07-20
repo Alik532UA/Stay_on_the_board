@@ -358,7 +358,7 @@
 
     <!-- 2. Вибір розміру дошки -->
     <div class="board-size-dropdown-wrapper">
-      <button class="board-size-dropdown-btn" onclick={toggleBoardSizeDropdown} aria-haspopup="listbox" aria-expanded={showBoardSizeDropdown}>
+      <button class="board-size-dropdown-btn" class:active={showBoardSizeDropdown} onclick={toggleBoardSizeDropdown} aria-haspopup="listbox" aria-expanded={showBoardSizeDropdown}>
         <span class="board-size-dropdown-btn-text">{boardSize}</span>
       </button>
       {#if showBoardSizeDropdown}
@@ -513,20 +513,41 @@
   :root {
     --board-hide-duration: 1s; /* 10 секунд для дебагу */
   }
-  .clear-cache-btn {
-    background: #fff3;
+  .main-menu-btn,
+  .clear-cache-btn,
+  .board-size-dropdown-btn {
+    background: var(--control-bg, #fff3);
     border: none;
-    width: 44px;
-    height: 44px;
+    border-radius: 12px;
+    width: 64px !important;
+    height: 64px !important;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 4px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+    margin-right: 4px;
+    box-shadow: 0 2px 16px 0 rgba(80,0,80,0.10);
+    overflow: hidden;
+    background-clip: padding-box;
+    color: var(--text-primary);
+    position: relative;
   }
-  .clear-cache-btn:hover {
-    background: #fff6;
+  .main-menu-btn:hover,
+  .clear-cache-btn:hover,
+  .board-size-dropdown-btn:hover {
+    background: var(--control-hover, #ff9800);
+    color: #fff;
+  }
+  .main-menu-btn.active,
+  .board-size-dropdown-btn.active {
+    background: var(--control-selected, #ff9800);
+    color: #fff;
+    box-shadow: 0 0 12px var(--control-selected, #ff9800);
+    transform: scale(1.05);
+  }
+  .board-size-dropdown-btn {
+    /* Унікальні стилі, якщо потрібні, залишити тут. */
   }
   .score-panel {
     background: var(--bg-secondary, #fff3);
