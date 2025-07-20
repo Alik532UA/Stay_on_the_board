@@ -18,6 +18,7 @@
   import { scale } from 'svelte/transition';
   import ReplayControls from '$lib/components/ReplayControls.svelte';
   import { replayPosition, replayBlockedCells, replaySegments } from '$lib/utils/replay.js';
+  import { goto } from '$app/navigation';
 
   let showBoard = $derived($settingsStore.showBoard);
   const ANIMATION_DURATION = 10000; // 10 секунд для дебагу
@@ -100,9 +101,10 @@
   let mainMenuTitle = $derived($_('gameBoard.mainMenu'));
 
   onMount(() => {
-    // Перевіряємо, чи була попередня гра завершена
-    if (get(appState).isGameOver) {
-      // Якщо так, мовчки запускаємо нову гру
+    const state = get(appState);
+    // Якщо гра завершена АБО якщо це початковий стан (рахунок 0 і не в режимі реплею),
+    // то запускаємо нову гру.
+    if (state.isGameOver || (state.score === 0 && !state.isReplayMode && state.moveHistory.length <= 1)) {
       resetGame();
     }
   });
@@ -405,7 +407,7 @@
   {#key `${$appState.boardSize}-${$appState.gameId}`}
     <div 
       class="board-bg-wrapper game-content-block" 
-      class:hidden={!showBoard}
+      class:hidden={!showBoard && !$appState.isReplayMode}
       style="--board-size: {boardSize}"
       onclick={showBoardClickHint} 
       onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
