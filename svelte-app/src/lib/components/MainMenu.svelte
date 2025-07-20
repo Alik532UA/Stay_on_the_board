@@ -7,6 +7,8 @@
   import { _ , isLoading, locale } from 'svelte-i18n';
   import SvgIcons from './SvgIcons.svelte';
   import { appVersion } from '$lib/stores/versionStore.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
+  import { clearCache } from '$lib/utils/cacheManager.js';
   // Language dropdown logic (inline, замість LanguageSwitcher)
   let showLangDropdown = false;
   const languages = [
@@ -52,10 +54,33 @@
     goto(`${base}${route}`);
   }
 
-  function clearCache() {
-    logStore.addLog('Очищення кешу та перезавантаження сторінки', 'info');
-    localStorage.clear();
-    location.reload();
+  function showClearCacheModal() {
+    modalStore.showModal({
+      titleKey: 'mainMenu.clearCacheModal.title',
+      contentKey: 'mainMenu.clearCacheModal.content',
+      buttons: [
+        {
+          textKey: 'mainMenu.clearCacheModal.fullClear',
+          customClass: 'danger-btn',
+          onClick: () => {
+            logStore.addLog('Повне очищення кешу', 'info');
+            clearCache({ keepAppearance: false });
+            modalStore.closeModal();
+          }
+        },
+        {
+          textKey: 'mainMenu.clearCacheModal.keepAppearance',
+          primary: true,
+          isHot: true,
+          onClick: () => {
+            logStore.addLog('Очищення кешу зі збереженням вигляду', 'info');
+            clearCache({ keepAppearance: true });
+            modalStore.closeModal();
+          }
+        },
+        { textKey: 'modal.cancel', onClick: modalStore.closeModal }
+      ]
+    });
   }
 
   /**
@@ -113,7 +138,7 @@
     {#if showWipNotice}
       <div class="wip-notice-overlay" on:click|stopPropagation>
         <div class="wip-notice-content">
-          <button class="wip-close-btn" on:click={closeWipNotice}>&times;</button>
+          <button class="wip-close-btn" on:click={closeWipNotice}>×</button>
           <h3>{$_('mainMenu.wipNotice.title')}</h3>
           <p>{$_('mainMenu.wipNotice.description')}</p>
           <button class="wip-donate-btn" on:click={() => window.open('https://send.monobank.ua/jar/8TPmFKQTCK', '_blank', 'noopener,noreferrer')}>
@@ -173,7 +198,7 @@
       <button class="modal-button secondary" on:click={() => navigateTo('/controls')}>{$_('mainMenu.controls')}</button>
       <button class="modal-button secondary" on:click={() => navigateTo('/rules')}>{$_('mainMenu.rules')}</button>
       <button class="modal-button secondary" on:click={() => navigateTo('/supporters')}>{$_('mainMenu.supporters')}</button>
-      <button class="modal-button danger" on:click={clearCache}>{$_('mainMenu.clearCache')}</button>
+      <button class="modal-button danger" on:click={showClearCacheModal}>{$_('mainMenu.clearCache')}</button>
     </div>
   {/if}
 </main>

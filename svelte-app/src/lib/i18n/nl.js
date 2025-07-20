@@ -1,285 +1,39 @@
-export default {
-  mainMenu: {
-    title: "Blijf op het bord",
-    menu: "Menu",
-    playVsComputer: "Tegen de computer spelen",
-    localGame: "Lokaal spel",
-    playOnline: "Online spelen",
-    settings: "Instellingen",
-    controls: "Besturing",
-    rules: "Regels",
-    clearCache: "Cache wissen",
-    theme: "Thema",
-    language: "Taal",
-    donate: "Steun het project",
-    wipNotice: {
-      title: "In ontwikkeling",
-      description: "Deze functie is nog in ontwikkeling. Om de release te versnellen, kunt u het project ondersteunen:",
-    },
-    lang: {
-      uk: "Oekraïens",
-      en: "Engels",
-      crh: "Krim-Tataars",
-      nl: "Nederlands"
-    },
-    themeName: {
-      purple: "Paars",
-      green: "Groen",
-      blue: "Blauw",
-      gray: "Grijs",
-      orange: "Oranje",
-      wood: "Hout"
-    },
-    supporters: "Dankbetuigingen"
-  },
-  gameBoard: {
-    mainMenu: "Hoofdmenu",
-    player: "Speler",
-    penaltyInfoTitle: "Informatie over strafpunten",
-    penaltyHint: "Om strafpunten te vermijden, maak geen zet die precies het omgekeerde is van de laatste zet van de computer (d.w.z. ga niet terug naar de cel waar het net vandaan kwam).",
-    scoreLabel: "Score",
-    cashOut: "Punten innen",
-    tutorialTitle: "",
-    tutorialContent: "Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan. Verberg de koningin of het bord in de instellingen om meer punten te verdienen voor elke zet!",
-    infoModalTitle: "Over het spel en het doel",
-    infoModalContent: `Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan.\n\n<b>Pro-modus: Train je verbeelding</b>\nHet echte plezier begint wanneer je het bord in je hoofd verplaatst. Probeer het bord in de instellingen uit te schakelen, voice-over aan te zetten en geblinddoekt te spelen met sneltoetsen. Dit maakt van het spel een krachtige trainer voor geheugen en ruimtelijk inzicht. Begin met een 3x3 bord en maak het steeds moeilijker!`,
-    info: "Instructies",
-    details: "Details",
-  },
-  gameControls: {
-    ok: "OK",
-    cancel: "Annuleren",
-    resetTitle: "Spel resetten?",
-    resetContent: "Weet je zeker dat je het spel wilt resetten? Alle blokkades en de positie van de speler gaan verloren.",
-    showMoves: "Toon mogelijke zetten",
-    showBoard: "Toon bord",
-    blockMode: "Geblokkeerde cellen modus",
-    speech: "Voice-over inschakelen",
-    selectDistance: "Kies afstand:",
-    confirm: "Zet bevestigen",
-    noMovesTitle: "Geen zetten",
-    voiceSettingsTitle: "Stem configureren",
-    settings: "Instellingen",
-    showQueen: "Toon koningin",
-  },
-  settings: {
-    title: "Instellingen",
-    showMoves: "Toon mogelijke zetten",
-    language: "Taal",
-    lang: {
-      uk: "Oekraïens",
-      en: "Engels",
-      crh: "Krim-Tataars",
-      nl: "Nederlands"
-    },
-    theme: "Thema",
-    themeDark: "Donker",
-    themeLight: "Licht",
-    style: "Stijl",
-    stylePurple: "Paars",
-    styleGreen: "Groen",
-    styleBlue: "Blauw",
-    styleGray: "Grijs",
-    styleOrange: "Oranje",
-    reset: "Instellingen resetten",
-    resetHint: "Alle instellingen terugzetten naar hun standaardwaarden",
-    boardSize: "Bordgrootte",
-    boardSizeText: "Je kunt de grootte van het speelveld veranderen van 2x2 naar 9x9."
-  },
-  modal: {
-    ok: "OK",
-    resetScoreTitle: "Score resetten?",
-    resetScoreContent: "Het wijzigen van de bordgrootte zal je huidige score en strafpunten resetten. Weet je zeker dat je wilt doorgaan?",
-    resetScoreConfirm: "Ja, grootte wijzigen",
-    resetScoreCancel: "Nee, blijven",
-    gameOverTitle: "Spel voorbij!",
-    computerNoMovesTitle: "Tegenstander Zit Vast!",
-    playerNoMovesTitle: "Briljante Analyse!",
-    errorTitle: "Onjuiste Bewering!",
-    playAgain: "Opnieuw spelen",
-    continueGame: "Doorgaan",
-    finishGameWithBonus: "Beëindigen (+{bonus} punten)",
-    computerNoMovesContent: "De computer kan geen zet doen. Je kunt het spel voortzetten door alle geblokkeerde cellen te wissen, of het nu beëindigen en bonuspunten ontvangen.",
-    playerNoMovesContent: "Je kunt het veld leegmaken en het spel voortzetten, of het nu beëindigen en bonuspunten ontvangen.",
-    errorContent: "Je hebt nog beschikbare zetten ({count} over). Je hebt verloren.",
-    gameOverReasonOut: "Je bent van het bord gegaan.",
-    gameOverReasonBlocked: "Je probeerde naar een geblokkeerde cel te gaan.",
-    gameOverReasonCashOut: "Je hebt besloten het spel te beëindigen en je score te innen.",
-    gameOverReasonBonus: "Je hebt besloten het spel te beëindigen en een bonus te claimen.",
+import mainMenu from './nl/mainMenu.js';
+import gameBoard from './nl/gameBoard.js';
+import controlsPage from './nl/controlsPage.js';
+import modal from './nl/modal.js';
+import settings from './nl/settings.js';
+import rulesPage from './nl/rulesPage.js';
+import voiceSettings from './nl/voiceSettings.js';
+import header from './nl/header.js';
+import onlineMenu from './nl/onlineMenu.js';
+import waitingForPlayer from './nl/waitingForPlayer.js';
+import joinRoom from './nl/joinRoom.js';
+import localGame from './nl/localGame.js';
+import speech from './nl/speech.js';
+import ui from './nl/ui.js';
+import tooltips from './nl/tooltips.js';
+import supportersPage from './nl/supportersPage.js';
+import replay from './nl/replay.js';
+import faq from './nl/faq.js';
 
-    // ДОДАНО
-    scoreDetails: {
-      baseScore: "Basisscore:",
-      sizeBonus: "Bonus voor bordgrootte:",
-      blockModeBonus: "Bonus voor blokmodus:",
-      jumpBonus: "Springbonus:",
-      noMovesBonus: "\"Geen zetten\" bonus:",
-      finishBonus: "Spelvoltooiingsbonus:",
-      penalty: "Straf voor omgekeerde zetten:",
-      finalScore: "Eindscore:",
-      yourScore: "Jouw score:"
-    },
-    scoreInfoTitle: "Hoe worden punten toegekend?",
-    scoreInfoContent: `Punten per zet:\n• +1 punt: met het bord en de koningin zichtbaar.\n• +2 punten: met het bord zichtbaar, maar de koningin verborgen.\n• +3 punten: met het bord verborgen (moeilijkste modus).\n\nExtra bonuspunten worden automatisch toegekend aan het einde van het spel:\n• Bordgrootte Bonus.\n• Geblokkeerde Cellen Modus Bonus.\n• "Geen Zetten" Knop Bonus.\n• Springbonus voor het springen over geblokkeerde cellen.`,
-    boardClickTitle: "Hoe bestuur je het spel?",
-    boardClickContent: "Het spel wordt niet op het bord bestuurd, maar met het bedieningspaneel eronder. Gebruik de pijlen om een richting te kiezen en de nummer knoppen om een afstand te kiezen. Het bord is alleen om de zetten te observeren.",
-    watchReplay: "Herhaling bekijken",
-    expertModeTitle: "Let op: Expertmodus",
-    expertModeContent: "U heeft een modus geselecteerd waarin cellen niet onmiddellijk worden geblokkeerd. Dit maakt het spel aanzienlijk ingewikkelder, omdat u nu niet alleen moet onthouden *waar* het stuk is geweest, maar ook *hoe vaak*.\n\nWe raden aan om eerst de basismodus (blokkeren na 0 bezoeken) onder de knie te krijgen om het meeste plezier uit het spel te halen.",
-    expertModeConfirm: "Doorgaan (niet opnieuw tonen)",
-    expertModeCancel: "Terug naar basismodus"
-  },
-  voiceSettings: {
-    title: "Steminstellingen",
-    loading: "Stemmen laden...",
-    noVoices: "Oekraïense stemmen zijn nog niet geladen. Start een spel om ze te activeren en keer dan terug naar dit menu.",
-    whyButton: "Waarom is dat?",
-    edgeFixTitle: "Hoe stemmen in Edge te activeren:",
-    edgeFixStep1: "1. Open een ander tabblad met tekst (bijv. een Wikipedia-artikel).",
-    edgeFixStep2: "2. Selecteer een stuk tekst, klik met de rechtermuisknop en kies \"Selectie hardop voorlezen\".",
-    edgeFixStep3: "3. Pauzeer de vertelling wanneer deze begint.",
-    edgeFixStep4: "4. Ga terug naar het tabblad van het spel en klik op de knop \"Opnieuw controleren\" hieronder.",
-    edgeFixStep5: "Als dit niet helpt, moet u mogelijk uw browser opnieuw opstarten.",
-    checkAgainButton: "Opnieuw controleren",
-    whyIsThisNeededTitle: "Waarom is dit nodig?",
-    hideDetailsButton: "Details verbergen",
-    reasonTitle: "Oorzaak van het probleem",
-    reasonContent: "Ons spel gebruikt stemmen die zijn ingebouwd in uw besturingssysteem en toegankelijk zijn via de browser. Sommige browsers, zoals Chrome op Windows, hebben niet altijd toegang tot de Oekraïense systeemstemmen.",
-    recommendationsTitle: "Aanbevolen platforms",
-    recommendationsContent: "Probeer een van deze opties voor de beste voice-overervaring:",
-    platformEdge: "Microsoft Edge-browser op Windows.",
-    platformAndroid: "Elke browser op mobiele apparaten.",
-    iosWarning: "Waarschuwing! Vanwege technische beperkingen van iOS kan de voice-over onstabiel werken, vooral voor computerzetten. We werken aan het verbeteren van deze functie.",
-    close: "Sluiten"
-  },
-  controlsPage: {
-    title: "Besturing & Sneltoetsen",
-    mainMovement: "Hoofdbesturing (NumPad)",
-    altMovement: "Alternatieve besturing (WASD-stijl)",
-    gameActions: "Spelacties",
-    gameSettings: "Spelinstellingen beheren",
-    upLeft: "Schuin omhoog-links",
-    up: "Omhoog",
-    upRight: "Schuin omhoog-rechts",
-    left: "Links",
-    right: "Rechts",
-    downLeft: "Schuin omlaag-links",
-    down: "Omlaag",
-    downRight: "Schuin omlaag-rechts",
-    downLeftNote: "(stelt ook afstand in op 1)",
-    confirmMove: "Zet bevestigen",
-    noMoves: "Aangeven \"geen zetten\"",
-    toggleBlockMode: "Schakel \"Geblokkeerde Cellen Modus\" in/uit",
-    toggleBoardVisibility: "Schakel bordzichtbaarheid in/uit",
-    increaseBoard: "Bordgrootte vergroten",
-    decreaseBoard: "Bordgrootte verkleinen",
-    toggleSpeech: "Schakel zet-voiceover in/uit"
-  },
-  rulesPage: {
-    title: "Spelregels \"Stay on the Board\"",
-    goalTitle: "Doel van het spel",
-    goalText: '"Stay on the Board" is een strategisch uithoudingsspel. Spelers verplaatsen om de beurt één gedeeld stuk. Je doel is om het zo lang mogelijk op het bord te houden en je tegenstander te dwingen een fout te maken.',
-    moveProcessTitle: "Zetproces",
-    moveProcessText: "Een speler doet een zet met het bedieningspaneel onder het bord. Klikken op de bordcellen voert geen zetten uit.",
-    step1: "Stap 1: Kies een richting.",
-    step1Text: "Druk op een van de 8 pijlknoppen die overeenkomen met de richtingen op een numeriek toetsenbord (NumPad):",
-    step2: "Stap 2: Kies een afstand.",
-    step2Text: "Druk op de knop met een getal dat aangeeft hoeveel cellen het stuk moet verplaatsen. De maximale afstand hangt af van de bordgrootte (N-1).",
-    step3: "Stap 3: Bevestig de zet.",
-    step3Text: "Druk op de grote groene knop om je zet te voltooien.",
-    winLossTitle: "Winst- en verliesvoorwaarden",
-    youLose: "Je verliest als:",
-    lose1: "Je zet het stuk van het bord haalt.",
-    lose2: "Je probeert naar een reeds geblokkeerde cel te gaan (in de betreffende modus, die met een selectievakje kan worden ingeschakeld).",
-    lose3: "Je op de knop \"Geen zetten\" drukt, maar je hebt eigenlijk nog beschikbare zetten.",
-    youWin: "Je wint als:",
-    win1: "Je tegenstander een van de bovengenoemde fouten maakt.",
-    win2: "Je op \"Geen zetten\" drukt en het systeem bevestigt dat er inderdaad geen zetten beschikbaar zijn.",
-    gameModesTitle: "Spelmodi",
-    normalMode: "Normale modus",
-    normalModeText: "Dit is de basismodus, ideaal voor beginners. Alle cellen blijven gedurende het spel beschikbaar. Het spel eindigt alleen wanneer een van de spelers het stuk van het bord haalt.",
-    blockMode: "Geblokkeerde Cellen Modus",
-    blockModeText: "Een complexere en strategische modus. De cel van waaruit een zet is gedaan, wordt geblokkeerd en is niet beschikbaar voor toekomstige zetten. Dit dwingt spelers om hun route zorgvuldig te plannen.",
-    noMovesButtonTitle: "\"Geen zetten\" Knop",
-    noMovesButtonText1: "Als je denkt dat het stuk geen geldige zetten meer heeft, kun je op deze knop drukken. Het systeem controleert je bewering:",
-    noMovesWin: "Als je gelijk hebt (er zijn geen zetten) - win je.",
-    noMovesLoss: "Als je je vergist (er is minstens één zet beschikbaar) - verlies je.",
-    noMovesButtonText2: "Dit is een riskante maar soms noodzakelijke strategie om in een moeilijke situatie te winnen.",
-    scoringTitle: "Punten Systeem",
-    scoringText: "Voor elke succesvolle zet krijg je 1 punt. Hoe langer het spel duurt, hoe hoger je score. Punten worden in realtime weergegeven en aan het einde van het spel vastgelegd.",
-    settingsTitle: "Spelinstellingen",
-    boardSize: "Bordgrootte",
-    boardSizeText: "Je kunt de grootte van het speelveld veranderen van 2x2 naar 9x9."
-  },
-  header: {
-    home: "Home",
-    about: "Over",
-    sverdle: "Sverdle"
-  },
-  onlineMenu: {
-    title: "Online menu"
-  },
-  waitingForPlayer: {
-    title: "Wachten op speler..."
-  },
-  joinRoom: {
-    title: "Deelnemen aan kamer"
-  },
-  localGame: {
-    title: "Lokaal spel"
-  },
-  ui: {
-    closeAndReturnToMenu: 'Sluiten en terug naar hoofdmenu',
-    goBack: 'Ga terug'
-  },
-  tooltips: {
-    'up-left': "Schuin omhoog-links\nNum 7 of Q",
-    'up': "Omhoog\nNum 8 of W",
-    'up-right': "Schuin omhoog-rechts\nNum 9 of E",
-    'left': "Links\nNum 4 of A",
-    'right': "Rechts\nNum 6 of D",
-    'down-left': "Schuin omlaag-links\nNum 1 of Z",
-    'down': "Omlaag\nNum 2, S of X",
-    'down-right': "Schuin omlaag-rechts\nNum 3 of C",
-    'confirm': "Zet Bevestigen\nEnter, Spatie of Num 5",
-    'no-moves': "Aangeven \"Geen Zetten\"\nBackspace, Num . of N"
-  },
-  supportersPage: {
-    title: "Onze Supporters",
-    gratitudeText: "We zijn iedereen die ons project steunt ongelooflijk dankbaar. Jullie hulp inspireert ons en laat het spel groeien. Dank jullie wel!",
-    callToAction: "De ontwikkelaar voegt u graag toe aan deze lijst! Vermeld bij het sturen van een donatie uw bijnaam in de opmerkingen. Als dat niet mogelijk is, neem dan contact met mij op via Telegram: <a href='https://t.me/alik532' target='_blank' rel='noopener noreferrer'>@alik532</a>",
-    supportButton: "Steun het Project"
-  },
-  replay: {
-    step: "Stap {current}/{total}",
-    limitPath: "Verbeterde Padweergave",
-    close: "Herhaling Sluiten",
-    prev: "Vorige Stap",
-    play: "Afspelen",
-    pause: "Pauze",
-    next: "Volgende Stap"
-  },
-  faq: {
-    title: "Veelgestelde Vragen",
-    q1: "Wat is het doel van het spel?",
-    a1: "Het belangrijkste doel is niet om de computer te verslaan, maar om je geheugen en verbeelding te trainen. Je moet het gedeelde stuk zo lang mogelijk op het bord houden, om de beurt bewegen en punten verdienen voor elke zet.",
-    q8: "Waarom is er maar één stuk? Waar is het stuk van de computer?",
-    a8: "In dit spel is er maar één stuk, dat wordt gedeeld door jou en de computer. Jij verplaatst het naar jouw veld, daarna verplaatst de computer het vanaf de nieuwe positie. Het draait allemaal om het zo lang mogelijk op het bord houden van één stuk.",
-    q7: "Hoe bestuur ik de koningin?",
-    a7: "Gebruik het bedieningspaneel onder het bord. Druk eerst op een van de 8 pijlen om een richting te kiezen, daarna op een cijferknop om de afstand te kiezen. Bevestig vervolgens je zet.",
-    q10: "Zijn er sneltoetsen?",
-    a10: "Ja! Je kunt het spel bedienen met het numerieke toetsenbord of de WASD-toetsen. Dit is de handigste manier om in de 'Pro-modus' te spelen. De volledige lijst met toetsen vind je op de pagina 'Besturing' in het hoofdmenu.",
-    q4: "Wat betekenen de stippen op het bord?",
-    a4: "Dit zijn visuele hints die alle beschikbare velden tonen waar je naartoe kunt bewegen vanaf de huidige positie van de koningin. Je kunt deze optie uitschakelen in de instellingen voor een moeilijkere uitdaging.",
-    q2: "Waarom staat het stuk niet waar ik het heb neergezet?",
-    a2: "Omdat de computer direct na jouw zet beweegt. Zijn zet (richting en afstand) wordt kort weergegeven op de centrale oranje knop direct na de jouwe.",
-    q9: "Hoe weet ik waar de computer naartoe is gegaan?",
-    a9: "Kijk direct na je zet naar de centrale bedieningsknop. Op de oranje achtergrond verschijnt een pijl en een cijfer die de richting en afstand van de zet van de computer aangeven. Je kunt ook voice-over inschakelen in de instellingen.",
-    q3: "Hoe versla ik de computer?",
-    a3: "In dit spel kun je de computer niet op de klassieke manier verslaan. Hij maakt geen fouten. Je doel is om zoveel mogelijk punten te scoren door zo lang mogelijk op het bord te blijven.",
-    q5: "Hoe scoor ik punten?",
-    a5: "Je verdient punten voor elke zet, afhankelijk van de moeilijkheidsgraad:\n• +1 punt: met het bord en de koningin zichtbaar.\n• +2 punten: met het bord zichtbaar, maar de koningin verborgen.\n• +3 punten: met het bord verborgen.\nAan het einde van het spel ontvang je ook bonussen voor bordgrootte, blokmodus en meer. Strafpunten (-2) worden gegeven voor een spiegelzet na de zet van de computer.",
-    q6: "Hoe maak ik het spel interessanter?",
-    a6: "Probeer de 'Pro-modus': schakel 'Geblokkeerde Cellen Modus' in, schakel 'Toon bord' uit in de instellingen, zet 'Voice-over' aan en speel geblinddoekt met sneltoetsen. Dit maakt van het spel een krachtige trainer voor geheugen en ruimtelijk inzicht."
-  }
+export default {
+  mainMenu,
+  gameBoard,
+  controlsPage,
+  modal,
+  settings,
+  rulesPage,
+  voiceSettings,
+  header,
+  onlineMenu,
+  waitingForPlayer,
+  joinRoom,
+  localGame,
+  speech,
+  ui,
+  tooltips,
+  supportersPage,
+  replay,
+  faq
 };

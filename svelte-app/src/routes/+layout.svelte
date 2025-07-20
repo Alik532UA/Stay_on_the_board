@@ -27,6 +27,8 @@
 	import { onMount } from 'svelte';
 	import { base } from '$app/paths';
 	import UpdateNotification from '$lib/components/UpdateNotification.svelte';
+	import { clearCache } from '$lib/utils/cacheManager.js';
+	import Modal from '$lib/components/Modal.svelte';
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
@@ -57,13 +59,11 @@
 	});
 
 	function handleReload() {
-		// Очищуємо кеш і перезавантажуємо
-		localStorage.clear();
-		// true - для примусового перезавантаження з сервера
-		window.location.reload();
+		// Очищуємо кеш, зберігаючи вигляд, і перезавантажуємо
+		clearCache({ keepAppearance: true });
 	}
 
-	function handleDevKeys(event) {
+	function handleDevKeys(/** @type {any} */ event) {
 		if (import.meta.env.DEV && event.code === 'BracketRight') {
 			event.preventDefault();
 			showUpdateNotice = !showUpdateNotice;
@@ -99,6 +99,8 @@
 		</footer>
 	{/if}
 </div>
+
+<Modal />
 
 <style>
 	.app {

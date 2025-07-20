@@ -1,285 +1,39 @@
-export default {
-  mainMenu: {
-    title: "Tahtada qalmaq",
-    menu: "Menü",
-    playVsComputer: "Kompyuterge qarşı oyna",
-    localGame: "Mahalliy oyun",
-    playOnline: "Onlayn oyna",
-    settings: "Sozlamalar",
-    controls: "Idare",
-    rules: "Qaydalar",
-    clearCache: "Keşni temizle",
-    theme: "Tema",
-    language: "Til",
-    donate: "Layiheni destekle",
-    lang: {
-      uk: "Ukrain tili",
-      en: "İnglizce",
-      crh: "Qırımtatarca",
-      nl: "Holland tili"
-    },
-    themeName: {
-      purple: "Menekşe",
-      green: "Yeşil",
-      blue: "Mavi",
-      gray: "Gri",
-      orange: "Turuncu",
-      wood: "Ağaç"
-    },
-    wipNotice: {
-      title: "İşlep Çıqarılmaqta",
-      description: "Bu funktsiya daa işlep çıqarılmaqta. Onıñ çıqışını tezleştirmek içün, layihani qoltutmaqñız mümkün:",
-    },
-    supporters: "Destek içün teşekkürler"
-  },
-  gameBoard: {
-    mainMenu: "Ana Menü",
-    player: "Oyunçı",
-    penaltyInfoTitle: "Ceza aqqında malümat",
-    penaltyHint: "Ceza ballarını almamaq içün, kompyuterniñ soñki areketiniñ keri areketini yapmañız (yani, onıñ endi kelgen ücresine qaytmañız).",
-    scoreLabel: "Esap",
-    cashOut: "Ballarnı al",
-    tutorialTitle: "",
-    tutorialContent: "Siziñ maqsadıñız – nevbetnen ortaq figurani tahtadan tışarı çıqarmadan areket ettirmektir. Er bir areket içün daa çoq bal qazanmaq içün, sozlamalarda vezirni ya da tahtanı gizletiñiz!",
-    info: "Talimat",
-    details: "Tafsilât",
-    infoModalTitle: "Oyun ve Onıñ Maqsadı Hakkında",
-    infoModalContent: `Maqsadıñız – ortaq figurani nevbetnen areket ettirip, tahta tışına çıqarmamaq.\n\n<b>Pro Rejim: Hayal Kuvvetini Terbiye Etmek</b>\nOyunıñ asıl lezzeti, tahta hayalinizde canlanıp, kör körüne oynamağa başlağanda açıladı. Sozlamalarda tahtanı gizlep, seslendirüvni açıp, qısqa yollar (hotkeys) ile oynap baqıñız. Bu, oyunnı hafıza ve mekânsal tüşüniş üçün quvetli bir trenajorğa aylandıra. 3x3 tahta ile başlayıñız ve zorlarnı arttırıñız!`,
-  },
-  gameControls: {
-    ok: "OK",
-    cancel: "İptal",
-    resetTitle: "Oyunnı sıfırla?",
-    resetContent: "Oyunnı sıfırlamaq istediñizden eminmisiñiz? Bütün bloklamalar ve oyunçı pozitsiyası ğayip olacaq.",
-    showMoves: "Mümkün areketlerni köster",
-    showBoard: "Tahtanı köster",
-    blockMode: "Bloklanğan hücre rejimi",
-    speech: "Areketlerni seslendirüv",
-    selectDistance: "Mesafeni sayla:",
-    confirm: "Areketni tasdiqla",
-    noMovesTitle: "Areket yoq",
-    voiceSettingsTitle: "Sesni sozla",
-    settings: "Sozlamalar",
-    showQueen: "Vezirni köster",
-  },
-  settings: {
-    title: "Sozlamalar",
-    showMoves: "Mümkün areketlerni köster",
-    language: "Til",
-    lang: {
-      uk: "Ukrain tili",
-      en: "İnglizce",
-      crh: "Qırımtatarca",
-      nl: "Holland tili"
-    },
-    theme: "Tema",
-    themeDark: "Qaranlıq",
-    themeLight: "Aydın",
-    style: "Stil",
-    stylePurple: "Menekşe",
-    styleGreen: "Yeşil",
-    styleBlue: "Mavi",
-    styleGray: "Gri",
-    styleOrange: "Turuncu",
-    reset: "Sozlamalarnı sıfırla",
-    resetHint: "Bütün sozlamalarnı standart qıymetlerge qaytar",
-    boardSize: "Tahta ölçüsi",
-  },
-  modal: {
-    ok: "OK",
-    resetScoreTitle: "Esapnı sıfırla?",
-    resetScoreContent: "Tahta ölçüsini deñiştirüv, mevcut esabıñıznı ve ceza ballarıñıznı sıfırlaycaq. Devam etmek istediñizden eminmisiñiz?",
-    resetScoreConfirm: "Ebet, ölçüni deñiştir",
-    resetScoreCancel: "Hayır, qal",
-    gameOverTitle: "Oyun bitti!",
-    computerNoMovesTitle: "Raqip tuzaqqa tüştü!",
-    playerNoMovesTitle: "Mükemmel analiz!",
-    errorTitle: "Hatalı beyanat!",
-    playAgain: "Kene oyna",
-    continueGame: "Devam et",
-    finishGameWithBonus: "Bitir (+{bonus} bal)",
-    computerNoMovesContent: "Kompyuter areket etip olamay. Bütün bloklanğan hücrelerni temizlep oyunnı devam etmek ya da şimdi bitirip bonus ballarını almaqñız mümkün.",
-    playerNoMovesContent: "Meydannı temizlep oyunnı devam etmek ya da şimdi bitirip bonus ballarını almaqñız mümkün.",
-    errorContent: "Siziñ daa mümkün areketleriñiz bar ({count} qaldı). Siz yeñildiñiz.",
-    gameOverReasonOut: "Siz tahta sıñırlarından tışına çıqtıñız.",
-    gameOverReasonBlocked: "Siz bloklanğan hücrege basmağa tırıştıñız.",
-    gameOverReasonCashOut: "Siz oyunnı bitirip esabıñıznı almağa qarar berdiñiz.",
-    gameOverReasonBonus: "Siz oyunnı bitirip bonusnı almağa qarar berdiñiz.",
+import mainMenu from './crh/mainMenu.js';
+import gameBoard from './crh/gameBoard.js';
+import controlsPage from './crh/controlsPage.js';
+import modal from './crh/modal.js';
+import settings from './crh/settings.js';
+import rulesPage from './crh/rulesPage.js';
+import voiceSettings from './crh/voiceSettings.js';
+import header from './crh/header.js';
+import onlineMenu from './crh/onlineMenu.js';
+import waitingForPlayer from './crh/waitingForPlayer.js';
+import joinRoom from './crh/joinRoom.js';
+import localGame from './crh/localGame.js';
+import speech from './crh/speech.js';
+import ui from './crh/ui.js';
+import tooltips from './crh/tooltips.js';
+import supportersPage from './crh/supportersPage.js';
+import replay from './crh/replay.js';
+import faq from './crh/faq.js';
 
-    // ДОДАНО
-    scoreDetails: {
-      baseScore: "Esas esap:",
-      sizeBonus: "Tahta ölçüsi içün bonus:",
-      blockModeBonus: "Blok rejimi içün bonus:",
-      jumpBonus: "Atlama bonusı:",
-      noMovesBonus: "\"Areket yoq\" bonusı:",
-      finishBonus: "Oyun bitirüv bonusı:",
-      penalty: "Keri areketler içün ceza:",
-      finalScore: "Neticedeki esap:",
-      yourScore: "Siziñ esabıñız:"
-    },
-    boardClickTitle: "Oyun nasıl idare etilir?",
-    boardClickContent: "Oyun tahtada degil, aşağıdaki idare paneli vastasınen idare etile. Yönelişni saylamaq içün oqlarnı ve mesafeni saylamaq içün raqamlı dögmelerni qullanıñız. Tahta tek areketlerni közetmek içündir.",
-    scoreInfoTitle: "Ballar nasıl esaplana?",
-    scoreInfoContent: `Er bir areket içün ballar:\n• +1 bal: tahta ve vezir körüngen.\n• +2 bal: tahta körüngen, amma vezir gizli.\n• +3 bal: tahta gizli (eñ zor rejim).\n\nQoşma bonus balları oyun soñunda avtomatik olaraq esaplana:\n• Tahta ölçüsi bonusı.\n• Bloklanğan hücreler rejimi bonusı.\n• "Areket yoq" dögmesini muvafaqiyetli qullanuv bonusı.\n• Bloklanğan hücreler üzerinden atlama bonusı.`,
-    watchReplay: "Yazını baq",
-    expertModeTitle: "Diqqat: Tecribeli oyunçılar içün rejim",
-    expertModeContent: "Siz hücrelerniñ deral bloklanmağan bir rejim sayladıñız. Bu, oyunnı emiyetli derecede zorlaştıra, çünki endi tek figuranıñ *qayda* olğanını degil, em de *qaç kere* olğanını hatırda tutmaq kerek.\n\nOyunından eñ büyük zevq almaq içün, başta esas rejimni (0 ziyaret soñu bloklanuv) menimsemege tevsiye etemiz.",
-    expertModeConfirm: "Devam et (daa kösterme)",
-    expertModeCancel: "Esas rejimge qayt",
-  },
-  replay: {
-    step: "Adım {current}/{total}",
-    limitPath: "Yolnıñ yahşı körünişi",
-    close: "Yazını qapat",
-    prev: "Önceki adım",
-    play: "Oynat",
-    pause: "Pauza",
-    next: "Soñraki adım"
-  },
-  voiceSettings: {
-    title: "Ses Sozlamaları",
-    loading: "Sesler yüklenmekte...",
-    noVoices: "Ukrain sesleri henüz yüklenmedi. Lütfen oyuna başlayıp onları etkinleştirin, sonra bu menüye dönün.",
-    whyButton: "Bu ne içün?",
-    edgeFixTitle: "Edge-de seslerni nasıl faalleştirmeli:",
-    edgeFixStep1: "1. Metinli er angi bir başqa saifeni açıñız (meselâ, Vikipediya maqalesi).",
-    edgeFixStep2: "2. Bir metin parçasını saylap, oñ dögmege basıñız ve \"Saylanğannı sesli oqu\"nı saylañız.",
-    edgeFixStep3: "3. Seslendirüv başlağanda, onı pauzağa qoyuñız.",
-    edgeFixStep4: "4. Oyun saifesine qaytıp, aşağıdaki \"Kene teşker\" dögmesine basıñız.",
-    edgeFixStep5: "Eger bu yardım etmese, brauzerni kene başlatmaq kerek olmaq mümkün.",
-    checkAgainButton: "Kene teşker",
-    whyIsThisNeededTitle: "Bu ne içün kerek?",
-    hideDetailsButton: "Tafsilâtlarını gizle",
-    reasonTitle: "Meselenin sebebi",
-    reasonContent: "Oyunımız, operatsion sisteminizge qurulğan ve brauzer vastasınen erişimli olğan seslerni qullana. Bazı brauzerler, meselâ Windows-ta Chrome, er vaqıt sistem ukrain seslerine erişip olamay.",
-    recommendationsTitle: "Tavsiye etilgen platformalar",
-    recommendationsContent: "En yahşı seslendirüv tecribesi için bu variantlardan birini deñeñiz:",
-    platformEdge: "Windows-ta Microsoft Edge brauzeri.",
-    platformAndroid: "Mobil cihazlarda er angi bir brauzer.",
-    iosNotice: "iOS qoltutuvı şimdilik işlep çıkarılmaqta. Biz hata üzerinde çalışamız ve onı yaqın zamanda tüzetmege ümit etemiz.",
-    iosWarning: "Diqqat! iOS-nıñ tehnikiy hususiyetleri sebebinden, seslendirüv, hususan kompyuter areketleri için, istiqrarsız çalışmaq mümkün. Biz bu funktsiyanı yahşılaştırmaq üzerinde çalışamız.",
-    close: "Qapat"
-  },
-  controlsPage: {
-    title: "İdare & Qısqa yollar",
-    mainMovement: "Esas areket idaresi (NumPad)",
-    altMovement: "Alternativ idare (WASD-stili)",
-    gameActions: "Oyun areketleri",
-    gameSettings: "Oyun sozlamalarını idare etüv",
-    upLeft: "Yuqarı-solğa",
-    up: "Yuqarı",
-    upRight: "Yuqarı-oñğa",
-    left: "Solğa",
-    right: "Oñğa",
-    downLeft: "Aşağı-solğa",
-    down: "Aşağı",
-    downRight: "Aşağı-oñğa",
-    downLeftNote: "(ayrıca mesafeni 1 olaraq ayarla)",
-    confirmMove: "Areketni tasdiqla",
-    noMoves: "\"Areket yoq\" dep bildir",
-    toggleBlockMode: "\"Bloklanğan Hücreler Rejimi\"ni deñiştir",
-    toggleBoardVisibility: "Tahta körünürligini deñiştir",
-    increaseBoard: "Tahta ölçüsini arttır",
-    decreaseBoard: "Tahta ölçüsini eksilt",
-    toggleSpeech: "Areket seslendirüvini deñiştir"
-  },
-  rulesPage: {
-    title: "\"Stay on the Board\" Oyunı Qaydaları",
-    goalTitle: "Oyunıñ Maqsadı",
-    goalText: '"Stay on the Board" – bu bir strategik dayanıqlılıq oyunı. Oyunçılar nevbetnen bir ortaq figurani areket ettireler. Siziñ maqsadıñız – onı mümkün olğanı qadar uzun vaqıt tahtada tutmaq ve raqibiñizni hatalı bir areket yapmağa mecbur etmektir.',
-    moveProcessTitle: "Areket Süreci",
-    moveProcessText: "Oyunçı, tahtanıñ altında yerleşken idare panelini qullanıp areket ete. Tahta hücrelerine basuv iç bir areket yapmay.",
-    step1: "1-nci adım: Yönelişni saylañız.",
-    step1Text: "Raqam klaviaturasındaki (NumPad) yönelişlerge kelişken 8 oq dögmesinden birine basıñız:",
-    step2: "2-nci adım: Mesafeni saylañız.",
-    step2Text: "Figuranıñ qaç hücrege areket etecegini köstergen raqamlı dögmege basıñız. Maksimal mesafe tahta ölçüsine (N-1) bağlıdır.",
-    step3: "3-nci adım: Areketni tasdiqlañız.",
-    step3Text: "Areketiñizni tamamlamaq içün büyük yeşil dögmege basıñız.",
-    winLossTitle: "Yeñüv ve Yeñilüv Şartları",
-    youLose: "Siz yeñilesiñiz, eger:",
-    lose1: "Areketiñiz figuranı tahtadan tışarı çıqarsa.",
-    lose2: "Siz endi bloklanğan bir hücrege basmağa tırışsañız (bu rejim bir onay kutusu ile etkinleştirilebilir).",
-    lose3: "Siz \"Areket yoq\" dögmesine basasıñız, amma aslında daa mümkün areket variantlarıñız bar.",
-    youWin: "Siz yeñesiñiz, eger:",
-    win1: "Raqibiñiz yuqarıda aytılğan hatalardan birini yapsa.",
-    win2: "Siz \"Areket yoq\" dögmesine basasıñız ve sistem kerçekten de mümkün areketler olmağanını tasdiqlasa.",
-    gameModesTitle: "Oyun Rejimleri",
-    normalMode: "Adiy Rejim",
-    normalModeText: "Bu, başlağanlar içün ideal olğan bir esas rejimdir. Bütün hücreler oyun devamında irişimli qala. Oyun tek oyunçılardan biri figuranı tahtadan tışarı çıqarğanda bite.",
-    blockMode: "Bloklanğan Hücreler Rejimi",
-    blockModeText: "Daa mürekkep ve strategik bir rejim. Areket etilgen hücre bloklana ve kelecek areketler içün irişimsiz ola. Bu, oyunçılarnı marşrutlarını diqqatnen planlaştırmağa mecbur ete.",
-    noMovesButtonTitle: "\"Areket yoq\" Dögmesi",
-    noMovesButtonText1: "Eger figuranıñ iç bir geçerli areketi qalmağanını tüşünseñiz, bu dögmege basmaqñız mümkün. Sistem siziñ beyanatıñıznı teşkerir:",
-    noMovesWin: "Eger aqlı olsañız (kerçekten de areket yoq) – siz yeñesiñiz.",
-    noMovesLoss: "Eger hata yapsañız (eñ az bir areket bar) – siz yeñilesiñiz.",
-    noMovesButtonText2: "Bu, riskli, amma bazıda zor bir vaziyette yeñmek içün kerekli bir strategiyadır.",
-    scoringTitle: "Ballar Sistemi",
-    scoringText: "Er bir muvafaqiyetli areket içün 1 bal alasınız. Oyun ne qadar uzun sürse, esabıñız o qadar yüksek olur. Ballar kerçek zamanda kösterile ve oyun soñunda qayd etile.",
-    settingsTitle: "Oyun Sozlamaları",
-    boardSize: "Tahta Ölçüsi",
-    boardSizeText: "Oyun meydanınıñ ölçüsini 2x2-den 9x9-ğa qadar deñiştirmekñiz mümkün."
-  },
-  header: {
-    home: "Baş sahypa",
-    about: "Oyun haqqında",
-    sverdle: "Sverdle"
-  },
-  onlineMenu: {
-    title: "Onlayn Menü"
-  },
-  waitingForPlayer: {
-    title: "Oyunçını bekley..."
-  },
-  joinRoom: {
-    title: "Odaya qoşulmaq"
-  },
-  localGame: {
-    title: "Mahalliy oyun"
-  },
-  ui: {
-    closeAndReturnToMenu: 'Qapat ve ana menüye qayt',
-    goBack: 'Keri qaytmaq'
-  },
-  tooltips: {
-    'up-left': "Yuqarı-solğa\nNum 7 ya da Q",
-    'up': "Yuqarı\nNum 8 ya da W",
-    'up-right': "Yuqarı-oñğa\nNum 9 ya da E",
-    'left': "Solğa\nNum 4 ya da A",
-    'right': "Oñğa\nNum 6 ya da D",
-    'down-left': "Aşağı-solğa\nNum 1 ya da Z",
-    'down': "Aşağı\nNum 2, S ya da X",
-    'down-right': "Aşağı-oñğa\nNum 3 ya da C",
-    'confirm': "Areketni tasdiqla\nEnter, Space ya da Num 5",
-    'no-moves': "Bildir \"Areket yoq\"\nBackspace, Num . ya da N"
-  },
-  supportersPage: {
-    title: "Bizim Himayecilerimiz",
-    gratitudeText: "Layihemizni qoltutqan er keske pek minnetdarmız. Siziñ yardımıñız bizge ilham bere ve oyunnıñ inkişafına imkân bere. Sağıñız!",
-    callToAction: "İşlep çıqarıcı sizni de bu cedvelge qoşmaqtan memnun olur! Donat yibergende, tefsirlerde lağabıñıznı belirtiñiz. Eger böyle imkân yoqsa, maña Telegram'da yazıñız: <a href='https://t.me/alik532' target='_blank' rel='noopener noreferrer'>@alik532</a>",
-    supportButton: "Layiheni Destekle"
-  },
-  faq: {
-    title: "Sık Sorulğan Sualler",
-    q1: "Oyunıñ maqsadı nedir?",
-    a1: "Esas maqsat – kompyuterni yeñmek degil, hafızanıñıznı ve hayaliñizni terbiye etmek. Ortak figurani mümkün qadar uzun vaqıt tahtada tutmaq, nevbetnen areket etmek ve er bir areket içün ballar almaq kerek.",
-    q8: "Чому фігура одна? Де фігура комп'ютера?",
-    a8: "Bu oyunda tek figura bar ve o, siz ve kompyuter içün ortaqtır. Siz onı bir yerge areket ettireseñiz, kompyuter onı yeni pozitsiyadan areket ettire. Bu, bir figuranı mümkün qadar uzun müddet tahtada tutmaq oyunıdır.",
-    q7: "Vezirni nasıl idare etem?",
-    a7: "Tahtanıñ altında yerleşken idare panelini qullanıñız. Evvel 8 oqtan birini basıp yönelişni saylañız, sonra raqam düğmesini basıp mesafeni saylañız. Ondan soñ areketiñizni tasdiqlayınız.",
-    q10: "Qısqa yollar bar mı?",
-    a10: "Ebet! Oyunı NumPad ya da WASD klavye blokınen idare ete bileceksiñiz. 'Pro Rejim' içün en qulayı budur. Bütün klavye kombinatsiyaları 'Idare' betinde kösterile.",
-    q4: "Tahtadaki noqtalar ne içün?",
-    a4: "Bunlar vezirniñ mevcut pozitsiyasından barlıq mümkün areketlerni kösterip turğan vizual ipuçlarıdır. Bu opsiyanı sozlamalarda qapatıp, oyunnı çetindire bileceksiñiz.",
-    q2: "Чому фігура не там, куди я її перемістив?",
-    a2: "Çünki siz areket yapqan soñ, derhal kompyuter areket ete. Onıñ areketi (yönelişi ve mesafesi) sizinki soñra merkezi apelsin düğmesinde qısqa vaqıt kösterile.",
-    q9: "Як зрозуміти, куди пішов комп'ютер?",
-    a9: "Siz areket yapqan soñ, merkezi idare düğmesine baqıñız. Apelsin fonunda oq ve raqam kösterile – bunlar kompyuterniñ areket yönelişi ve mesafesidir. Sozlamalarda seslendirüvni de açıp baqıñız.",
-    q3: "Kompyuterni nasıl yeñmek mümkün?",
-    a3: "Bu oyunda klasik manada kompyuterni yeñmek mümkün degil. O hata yapmay. Maqsadıñız – mümkün qadar çoq bal toplayıp, tahta üstünde en uzun müddet qalmaq.",
-    q5: "Ballar nasıl toplanadı?",
-    a5: "Her bir muvafaqiyetli areket içün ballar alınadı:\n• +1 bal: tahta ve vezir körünüvde.\n• +2 bal: tahta körünüvde, amma vezir gizli.\n• +3 bal: tahta gizli.\nOyun soñunda tahta ölçüsi, blok rejimi ve başqalar içün bonuslar alınadı. Kompyuter areketine ayna areket yapqan içün ceza balları (-2) berile.",
-    q6: "Oyun nasıl daa qızıq ola?",
-    a6: "'Pro Rejim'ni sınap baqıñız: 'Bloklanğan hücreler rejimi'ni açınız, sozlamalarda 'Tahtanı köster'ni qapatıñız, 'Seslendirüv'ni açıp, qısqa yollar (hotkeys) ile kör körüne oynap baqıñız. Bu, hafıza ve mekânsal tüşüniş içün quvetli bir trenajorğa aylandıra."
-  }
+export default {
+  mainMenu,
+  gameBoard,
+  controlsPage,
+  modal,
+  settings,
+  rulesPage,
+  voiceSettings,
+  header,
+  onlineMenu,
+  waitingForPlayer,
+  joinRoom,
+  localGame,
+  speech,
+  ui,
+  tooltips,
+  supportersPage,
+  replay,
+  faq
 };

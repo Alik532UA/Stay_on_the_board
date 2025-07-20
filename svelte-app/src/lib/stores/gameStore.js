@@ -1,12 +1,12 @@
 import { writable, derived } from 'svelte/store';
-import { getRandomComputerMove } from '$lib/ai.js';
 import { get } from 'svelte/store';
 import { modalStore } from './modalStore.js';
 import { closeModal } from './modalStore.js';
 import { _ as t } from 'svelte-i18n';
-import { speakText, langMap } from '$lib/speech.js';
 import { settingsStore, toggleShowBoard } from './settingsStore.js';
 import { navigateToMainMenu } from '$lib/utils/navigation.js';
+import { getAvailableMoves, calculateFinalScore } from '$lib/gameCore.js';
+import { langMap } from '$lib/speech.js';
 /**
  * @typedef {{ [key: string]: string; uk: string; en: string; crh: string; nl: string; }} LangMapType
  */
@@ -29,57 +29,6 @@ function getRandomCell(size) {
     row: Math.floor(Math.random() * size),
     col: Math.floor(Math.random() * size)
   };
-}
-
-/**
- * @param {number} row
- * @param {number} col
- * @param {number} size
- * @param {{ [key: string]: number }} cellVisitCounts
- * @param {number} blockOnVisitCount
- */
-function getAvailableMoves(row, col, size, cellVisitCounts = {}, blockOnVisitCount = 0) {
-  if (row === null || col === null) return [];
-  const moves = [];
-  const directions = [
-    [-1, 0],  // вгору
-    [1, 0],   // вниз
-    [0, -1],  // вліво
-    [0, 1],   // вправо
-    [-1, -1], // вгору-вліво
-    [-1, 1],  // вгору-вправо
-    [1, -1],  // вниз-вліво
-    [1, 1],   // вниз-вправо
-  ];
-  /** @type {{ [key: string]: number }} */
-  const visitMap = cellVisitCounts;
-  /**
-   * @param {number} r
-   * @param {number} c
-   */
-  const isBlocked = (r, c) => {
-    const visitCount = visitMap[`${r}-${c}`] || 0;
-    return visitCount > blockOnVisitCount;
-  };
-
-  for (const [dr, dc] of directions) {
-    for (let dist = 1; dist < size; dist++) {
-      const nr = row + dr * dist;
-      const nc = col + dc * dist;
-
-      // Перевіряємо, чи не вийшли ми за межі дошки
-      if (nr < 0 || nc < 0 || nr >= size || nc >= size) {
-        break;
-      }
-
-      // КЛЮЧОВЕ ВИПРАВЛЕННЯ: не break при заблокованій клітинці, а просто не додаємо її як хід
-      if (!isBlocked(nr, nc)) {
-        moves.push({ row: nr, col: nc });
-      }
-      // цикл продовжується навіть якщо клітинка заблокована
-    }
-  }
-  return moves;
 }
 
 /**
@@ -141,7 +90,7 @@ function getAvailableMoves(row, col, size, cellVisitCounts = {}, blockOnVisitCou
  * @property {boolean} finishedByNoMovesButton
  * @property {number} gameId // <-- ДОДАНО
  * @property {{ [key: string]: number }} cellVisitCounts // <-- ДОДАНО
- * @property {{pos: {row: number, col: number}, blocked: {row: number, col: number}[]}[]} moveHistory // Масив для збереження позиції та заблокованих клітинок на кожному кроці
+ * @property {{pos: {row: number, col: number}, blocked: {row: number, col: number}[], visits?: { [key: string]: number }}[]} moveHistory // Масив для збереження позиції та заблокованих клітинок на кожному кроці
  * @property {boolean} isReplayMode // Прапорець, що вказує на режим перегляду
  * @property {number} replayCurrentStep // Поточний крок у реплеї
  * @property {boolean} isAutoPlaying // Прапорець для автовідтворення
@@ -241,7 +190,7 @@ export const appState = writable(/** @type {AppState} */({
   gameId: 1,
   availableDistances: Array.from({ length: initialBoardSize - 1 }, (_, i) => i + 1), // [1, 2] for size 3
   cellVisitCounts: {}, // <-- ДОДАНО
-  moveHistory: [{ pos: { row: 0, col: 0 }, visits: {} }], // Починаємо історію з першої клітинки
+  moveHistory: [{ pos: { row: 0, col: 0 }, blocked: [], visits: {} }], // Починаємо історію з першої клітинки
   isReplayMode: false,
   replayCurrentStep: 0,
   isAutoPlaying: false,
@@ -272,7 +221,7 @@ export const availableDistances = derived(
  * @param {number} newCol - Новий стовпець для фігури.
  * @returns {Partial<AppState>} Об'єкт з оновленими частинами стану.
  */
-function performMove(state, newRow, newCol) {
+function _performMoveInternal(state, newRow, newCol) {
   if (newRow === null || newCol === null) return state;
   const { board, playerRow, playerCol, boardSize, blockModeEnabled } = state;
   if (playerRow === null || playerCol === null) return {};
@@ -303,9 +252,74 @@ function performMove(state, newRow, newCol) {
     playerCol: newCol,
     blockedCells: newBlockedCells,
     cellVisitCounts: newVisitCounts,
-    moveHistory: [...(state.moveHistory || []), { pos: { row: newRow, col: newCol }, visits: newVisitCounts }],
+    moveHistory: [...(state.moveHistory || []), { pos: { row: newRow, col: newCol }, blocked: newBlockedCells, visits: newVisitCounts }],
     // Рядок availableMoves: newAvailableMoves, видалено.
   };
+}
+
+// Видалено старі/заглушки _performMove, _updateAvailableMoves, _endGame, _applyPenalty, _incrementScore
+// Додаю нові мутатори:
+/**
+ * Виконує переміщення фігури та повертає оновлені частини стану.
+ * Ця функція є єдиним джерелом правди для логіки ходу.
+ * @param {number} newRow - Новий рядок для фігури.
+ * @param {number} newCol - Новий стовпець для фігури.
+ */
+export function _performMove(newRow, newCol) {
+  appState.update(state => {
+    if (state.playerRow === null || state.playerCol === null) return state;
+    const newBoard = state.board.map(row => row.slice());
+    newBoard[state.playerRow][state.playerCol] = 0;
+    newBoard[newRow][newCol] = 1;
+    const newVisitCounts = { ...state.cellVisitCounts };
+    if (state.blockModeEnabled) {
+      const cellKey = `${state.playerRow}-${state.playerCol}`;
+      newVisitCounts[cellKey] = (newVisitCounts[cellKey] || 0) + 1;
+    }
+    return {
+      ...state,
+      board: newBoard,
+      playerRow: newRow,
+      playerCol: newCol,
+      cellVisitCounts: newVisitCounts,
+      moveHistory: [...state.moveHistory, { pos: { row: newRow, col: newCol }, blocked: [...state.blockedCells], visits: newVisitCounts }],
+    };
+  });
+}
+
+export function _updateAvailableMoves() {
+  appState.update(state => {
+    if (state.playerRow === null || state.playerCol === null) return state;
+    const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.cellVisitCounts, get(settingsStore).blockOnVisitCount);
+    return { ...state, availableMoves: newAvailableMoves };
+  });
+}
+
+/** @param {string} reasonKey */
+export function _endGame(reasonKey) {
+  appState.update(state => {
+    if (state.isGameOver) return state;
+    const finalScoreDetails = calculateFinalScore(state);
+    modalStore.showModal({
+      titleKey: 'modal.gameOverTitle',
+      content: { reason: get(t)(reasonKey), scoreDetails: finalScoreDetails },
+      buttons: [
+        { textKey: 'modal.playAgain', primary: true, onClick: resetAndCloseModal, isHot: true },
+        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+      ]
+    });
+    return { ...state, isGameOver: true, score: finalScoreDetails.totalScore };
+  });
+}
+
+/** @param {number} penalty */
+export function _applyPenalty(penalty) {
+  appState.update(state => ({ ...state, penaltyPoints: state.penaltyPoints + penalty }));
+}
+
+/** @param {number} amount */
+export function _incrementScore(amount) {
+  appState.update(state => ({ ...state, score: state.score + amount }));
 }
 
 /**
@@ -361,7 +375,7 @@ export async function setBoardSize(newSize) {
       gameId: (state.gameId || 0) + 1,
       availableDistances: Array.from({ length: newSize - 1 }, (_, i) => i + 1),
       cellVisitCounts: {}, // <-- ДОДАНО
-      moveHistory: [{ pos: { row, col }, visits: {} }], // Починаємо історію з першої клітинки
+      moveHistory: [{ pos: { row, col }, blocked: [], visits: {} }], // Починаємо історію з першої клітинки
       isReplayMode: false,
       replayCurrentStep: 0,
       isAutoPlaying: false,
@@ -514,7 +528,7 @@ export function resetGame() {
       gameId: (state.gameId || 0) + 1,
       availableDistances: Array.from({ length: boardSize - 1 }, (_, i) => i + 1),
       cellVisitCounts: {}, // <-- ДОДАНО
-      moveHistory: [{ pos: { row, col }, visits: {} }],
+      moveHistory: [{ pos: { row, col }, blocked: [], visits: {} }],
       isReplayMode: false,
       replayCurrentStep: 0,
       isAutoPlaying: false,
@@ -528,30 +542,6 @@ export function resetGame() {
  * @param {AppState} state - Поточний стан гри ($appState).
  * @returns {{baseScore: number, totalPenalty: number, sizeBonus: number, blockModeBonus: number, noMovesBonus: number, jumpBonus: number, totalScore: number}}
  */
-function calculateFinalScore(state) {
-  const { score, penaltyPoints, boardSize, movesInBlockMode, finishedByNoMovesButton, jumpedBlockedCells } = state;
-  const baseScore = score;
-  const totalPenalty = penaltyPoints;
-  // 1. Бонус за розмір дошки
-  const sizeBonusPercentage = (boardSize > 2) ? (boardSize - 2) * 10 : 0;
-  const sizeBonus = Math.ceil(baseScore * (sizeBonusPercentage / 100));
-  // 2. Бонус за режим заблокованих клітинок
-  const blockModeBonus = movesInBlockMode;
-  // 3. Бонус за кнопку "Ходів немає"
-  const noMovesBonus = finishedByNoMovesButton ? boardSize : 0;
-  // 4. Бонус за перестрибування
-  const jumpBonus = jumpedBlockedCells;
-  const totalScore = baseScore + sizeBonus + blockModeBonus + noMovesBonus + jumpBonus - totalPenalty;
-  return {
-    baseScore,
-    totalPenalty, // НОВЕ
-    sizeBonus,
-    blockModeBonus,
-    noMovesBonus,
-    jumpBonus,
-    totalScore
-  };
-}
 
 /**
  * Передає хід наступному гравцеві та запускає логіку для нового гравця (напр., хід AI).
@@ -563,242 +553,13 @@ function advanceTurn() {
     const nextPlayer = state.players[newIndex];
     const newState = { ...state, currentPlayerIndex: newIndex };
     if (nextPlayer.type === 'ai') {
-      setTimeout(() => makeComputerMove(), 100);
+      // Видалено: setTimeout(() => makeComputerMove(), 100);
     }
     return newState;
   });
 }
 
-/**
- * Підтверджує хід гравця (синхронно, лише оновлює стан)
- */
-export async function confirmMove() {
-  if (typeof window === 'undefined') return;
-  const state = get(appState);
-  const {
-    selectedDirection,
-    selectedDistance,
-    playerRow,
-    playerCol,
-    lastComputerMove,
-    boardSize,
-    blockedCells,
-    settings,
-    blockModeEnabled
-  } = state;
-  if (!selectedDirection || !selectedDistance || playerRow === null || playerCol === null) return;
-  const dir = /** @type {Direction} */ (selectedDirection);
-  if (!dirMap[dir]) return;
-  const [dr, dc] = dirMap[dir];
-  const newRow = playerRow + dr * selectedDistance;
-  const newCol = playerCol + dc * selectedDistance;
-  if (newRow === null || newCol === null) return;
-  const isOutsideBoard = newRow < 0 || newRow >= boardSize || newCol < 0 || newCol >= boardSize;
-  const { blockOnVisitCount } = get(settingsStore);
-  const visitCount = state.cellVisitCounts[`${newRow}-${newCol}`] || 0;
-  const isCellBlocked = blockModeEnabled && visitCount > blockOnVisitCount;
-  let jumpedCount = 0;
-  if (selectedDistance > 1) {
-    for (let i = 1; i < selectedDistance; i++) {
-      const checkRow = playerRow + dr * i;
-      const checkCol = playerCol + dc * i;
-      if (blockedCells.some(cell => cell.row === checkRow && cell.col === checkCol)) {
-        jumpedCount++;
-      }
-    }
-  }
-  const { showBoard, showQueen } = get(settingsStore);
-  let scoreChange = 1;
-  if (!showBoard) {
-    scoreChange = 3; // Дошка прихована
-  } else if (!showQueen) {
-    scoreChange = 2; // Дошка видима, але ферзь прихований
-  }
-  let penaltyApplied = 0;
-  if (
-    lastComputerMove &&
-    selectedDistance === lastComputerMove.distance &&
-    selectedDirection === oppositeDirections[lastComputerMove.direction]
-  ) {
-    penaltyApplied = 2;
-    console.log('[confirmMove] Penalty applied for reverse move.');
-  }
-  if (isOutsideBoard || isCellBlocked) {
-    const reasonKey = isOutsideBoard ? 'modal.gameOverReasonOut' : 'modal.gameOverReasonBlocked';
-    // --- Додаємо останній хід до історії, якщо це вихід за межі дошки ---
-    if (isOutsideBoard) {
-      appState.update(s => ({
-        ...s,
-        moveHistory: [...s.moveHistory, { pos: { row: newRow, col: newCol }, visits: s.cellVisitCounts }]
-      }));
-    }
-    const finalScoreDetails = calculateFinalScore(get(appState));
-    appState.update(s => ({ ...s, isGameOver: true, score: finalScoreDetails.totalScore }));
-    modalStore.showModal({
-      titleKey: 'modal.gameOverTitle',
-      content: { reason: get(t)(reasonKey), scoreDetails: finalScoreDetails },
-      buttons: [
-        { textKey: 'modal.playAgain', primary: true, onClick: resetAndCloseModal, isHot: true },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
-      ]
-    });
-    return;
-  }
-  // 1. Оновлюємо стан для ходу гравця, що запускає його анімацію.
-  appState.update(s => {
-    const moveUpdates = performMove(s, newRow, newCol);
-    return {
-      ...s,
-      ...moveUpdates,
-      score: s.score + scoreChange,
-      penaltyPoints: s.penaltyPoints + penaltyApplied,
-      movesInBlockMode: blockModeEnabled ? s.movesInBlockMode + 1 : s.movesInBlockMode,
-      jumpedBlockedCells: s.jumpedBlockedCells + jumpedCount,
-      selectedDirection: null,
-      selectedDistance: null,
-      distanceManuallySelected: false,
-      computerLastMoveDisplay: null,
-      availableMoves: [], // Прибираємо старі доступні ходи
-    };
-  });
-  // 2. Передаємо хід наступному гравцеві через новий ігровий цикл.
-  advanceTurn();
-}
-
-export async function makeComputerMove() {
-  const current = get(appState);
-  // Перевіряємо, чи зараз хід AI
-  if (current.isGameOver || current.players[current.currentPlayerIndex]?.type !== 'ai') return;
-  const move = getRandomComputerMove(current.board, current.cellVisitCounts, get(settingsStore).blockOnVisitCount, current.boardSize);
-  if (move) {
-    const directionKey = Object.prototype.hasOwnProperty.call(numToDir, move.direction) ? /** @type {Direction} */(numToDir[move.direction]) : /** @type {Direction} */(move.direction);
-    appState.update(state => ({
-      ...state,
-      computerLastMoveDisplay: { direction: directionKey, distance: move.distance },
-      lastComputerMove: { direction: directionKey, distance: move.distance },
-    }));
-    await new Promise(resolve => setTimeout(resolve, 900));
-    appState.update(state => {
-      const moveUpdates = performMove(state, move.row, move.col);
-      return {
-        ...state,
-        ...moveUpdates,
-      };
-    });
-    await new Promise(resolve => setTimeout(resolve, 600));
-    // 6. ЕТАП 3: Оновлюємо доступні ходи для гравця
-    appState.update(state => {
-      if (state.playerRow === null || state.playerCol === null) return state;
-      const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.cellVisitCounts, get(settingsStore).blockOnVisitCount);
-      return { ...state, availableMoves: newAvailableMoves };
-    });
-    // 7. ЕТАП 4: Перевірка першого ходу та приховування дошки
-    const latestState = get(appState);
-    // Видаляємо блок автоприховування дошки та змінити нумерацію коментаря
-    // 8. Передаємо хід наступному гравцеві
-    advanceTurn();
-    // Озвучування ходу (залишається в кінці)
-    const latestSettings = get(settingsStore);
-    if (latestSettings.speechEnabled) {
-      const $t = get(t);
-      const direction = $t(`speech.directions.${directionKey}`) || directionKey;
-      let textToSpeak;
-      if (move.distance === 1) {
-        textToSpeak = `${direction}.`;
-      } else {
-        textToSpeak = `${move.distance} ${direction}.`;
-      }
-      let langCode = 'uk-UA';
-      if (Object.prototype.hasOwnProperty.call(langMap, latestSettings.language)) {
-        // @ts-ignore
-        langCode = langMap[latestSettings.language];
-      }
-      speakText(textToSpeak, langCode, latestSettings.selectedVoiceURI ?? null);
-    }
-  } else {
-    // ... (існуюча логіка, коли у комп'ютера немає ходів)
-    const previewScoreDetails = calculateFinalScore({ ...current, finishedByNoMovesButton: true });
-    const $t = get(t);
-    modalStore.showModal({
-      titleKey: 'modal.computerNoMovesTitle',
-      content: {
-        reason: $t('modal.computerNoMovesContent'),
-        scoreDetails: previewScoreDetails
-      },
-      buttons: [
-        {
-          textKey: 'modal.continueGame',
-          primary: true,
-          isHot: true,
-          onClick: continueGameAndClearBlocks,
-          customClass: 'green-btn'
-        },
-        {
-          text: $t('modal.finishGameWithBonus', { values: { bonus: current.boardSize } }),
-          customClass: 'blue-btn',
-          onClick: finishGameWithBonus
-        },
-        {
-          textKey: 'modal.watchReplay',
-          customClass: 'blue-btn',
-          onClick: startReplay
-        }
-      ]
-    });
-    // Видаляємо ручне повернення currentPlayer
-  }
-}
-
-/**
- * Перевіряє, чи є доступні ходи, і показує відповідне модальне вікно
- */
-export function noMoves() {
-  const state = get(appState);
-  // Перевірка, чи дійсно немає ходів
-  if (state.availableMoves.length === 0) {
-    // Показуємо попередній рахунок з бонусом
-    const previewScoreDetails = calculateFinalScore({ ...state, finishedByNoMovesButton: true });
-    const $t = get(t);
-    modalStore.showModal({
-      titleKey: 'modal.playerNoMovesTitle',
-      content: {
-        reason: $t('modal.playerNoMovesContent'),
-        scoreDetails: previewScoreDetails
-      },
-      buttons: [
-        {
-          textKey: 'modal.continueGame',
-          primary: true,
-          isHot: true,
-          onClick: continueGameAndClearBlocks,
-          customClass: 'green-btn'
-        },
-        {
-          text: $t('modal.finishGameWithBonus', { values: { bonus: state.boardSize } }),
-          customClass: 'blue-btn',
-          onClick: finishGameWithBonus
-        },
-        {
-          textKey: 'modal.watchReplay',
-          customClass: 'blue-btn',
-          onClick: startReplay
-        }
-      ]
-    });
-  } else {
-    // Ходи є. Гравець програв.
-    const finalScoreDetails = calculateFinalScore(state);
-    const $t = get(t);
-    modalStore.showModal({
-      titleKey: 'modal.errorTitle',
-      content: {
-        reason: $t('modal.errorContent', { values: { count: state.availableMoves.length } }),
-        scoreDetails: finalScoreDetails
-      },
-      buttons: [{ textKey: 'modal.playAgain', primary: true, onClick: resetAndCloseModal, isHot: true }]
-    });
-  }
-}
+export { advanceTurn };
 
 /**
  * Продовжує гру, очищуючи всі заблоковані клітинки.

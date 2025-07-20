@@ -17,13 +17,13 @@
     position: fixed;
     top: 20px;
     right: 20px;
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     border: none;
     background: rgba(0, 0, 0, 0.2);
     color: white;
-    font-size: 28px;
+    font-size: 32px;
     line-height: 1;
     font-weight: 300;
     cursor: pointer;
@@ -31,14 +31,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s, transform 0.2s;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   .floating-close-btn:hover {
     background: rgba(0, 0, 0, 0.4);
-    transform: scale(1.1);
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   }
 
   /* Адаптація для світлої теми */

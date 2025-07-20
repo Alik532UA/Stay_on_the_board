@@ -11,6 +11,7 @@
   
   <div class="supporters-list">
     <div class="supporter-item" onclick={() => window.open('https://steamcommunity.com/profiles/76561198055854871/', '_blank', 'noopener,noreferrer')}>Khaaaa</div>
+    <div class="supporter-item">Destroyter94</div>
     <!-- Майбутні імена будуть додаватися сюди -->
   </div>
   <p class="call-to-action-text">{@html $_('supportersPage.callToAction')}</p>
