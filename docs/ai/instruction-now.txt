@@ -1,202 +1,340 @@
-
-**Крок 1: Розширення системи керування клавішами**
-
-1.  **У файлі `svelte-app/src/lib/stores/settingsStore.js`:**
-    *   Додай нові дії для вибору відстані (`distance-1`, `distance-2`, ..., `distance-8`) до `defaultKeybindings`. Це дозволить користувачам налаштовувати ці клавіші окремо.
-2.  **У файлі `svelte-app/src/routes/controls/+page.svelte`:**
-    *   Додай нову групу "Вибір відстані" до `actionGroups`, щоб ці налаштування відображалися в інтерфейсі.
-3.  **У файлах інтернаціоналізації (`uk.js`, `en.js`):**
-    *   Додай переклади для нової групи та для кожної дії вибору відстані.
-
-**Крок 2: Рефакторинг обробника `handleKeydown` для врахування контексту**
-
-1.  **У файлі `svelte-app/src/lib/components/GameBoard.svelte`:**
-    *   Онови `actionHandlers`, додавши обробники для нових дій вибору відстані (`distance-1`, `distance-2` тощо).
-    *   Зміни логіку `handleKeydown`:
-        *   Вона більше не буде просто викликати дію з `keyToActionMap`.
-        *   Замість цього, вона буде перевіряти, чи є натиснута клавіша цифрою (`Digit1`-`Digit9`).
-        *   **Якщо це цифра:** буде застосовано контекстну логіку — якщо напрямок вже обрано, буде встановлено відстань; якщо ні — буде виконано дію, призначену на цю клавішу (наприклад, рух).
-        *   **Якщо це не цифра:** буде виконано дію з `keyToActionMap`, як і раніше.
-
-Цей підхід вирішить конфлікт, коли одна й та сама клавіша використовується для різних цілей, і відновить коректну роботу всіх гарячих клавіш.
-
----
-
-**Приступаю до виконання.**
-
 ```javascript
-// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\stores\settingsStore.js
-// Deleting the following lines:
-  'decrease-board': ['NumpadSubtract', 'Minus'],
-  'toggle-speech': ['KeyV'],
-};
-
-// Adding the following lines:
-  'decrease-board': ['NumpadSubtract', 'Minus'],
-  'toggle-speech': ['KeyV'],
-  'distance-1': ['Digit1'],
-  'distance-2': ['Digit2'],
-  'distance-3': ['Digit3'],
-  'distance-4': ['Digit4'],
-  'distance-5': ['Digit5'],
-  'distance-6': ['Digit6'],
-  'distance-7': ['Digit7'],
-  'distance-8': ['Digit8'],
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\uk\gameControls.js
+export default {
+  settings: "Налаштування",
+  showBoard: "Показати дошку",
+  showQueen: "Показати ферзя",
+  showMoves: "Показувати доступні ходи",
+  blockMode: "Режим заблокованих клітинок",
+  blockAfter: "Блокувати після:",
+  speech: "Озвучування ходів",
+  voiceSettingsTitle: "Налаштування голосу",
+  selectDistance: "Оберіть відстань",
+  confirm: "Підтвердити",
+  noMovesTitle: "Ходів немає"
 };
 ```
 ```javascript
-// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\routes\controls\+page.svelte
-// Deleting the following lines:
-    {
-      title: 'controlsPage.gameSettings',
-      actions: ['toggle-block-mode', 'toggle-board', 'increase-board', 'decrease-board', 'toggle-speech']
-    }
-  ];
-
-// Adding the following lines:
-    {
-      title: 'controlsPage.gameSettings',
-      actions: ['toggle-block-mode', 'toggle-board', 'increase-board', 'decrease-board', 'toggle-speech']
-    },
-    {
-      title: 'controlsPage.distanceSelection',
-      actions: ['distance-1', 'distance-2', 'distance-3', 'distance-4', 'distance-5', 'distance-6', 'distance-7', 'distance-8']
-    }
-  ];
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\en\gameControls.js
+export default {
+  settings: "Settings",
+  showBoard: "Show Board",
+  showQueen: "Show Queen",
+  showMoves: "Show Available Moves",
+  blockMode: "Blocked Cells Mode",
+  blockAfter: "Block after:",
+  speech: "Voiceover",
+  voiceSettingsTitle: "Voice Settings",
+  selectDistance: "Select Distance",
+  confirm: "Confirm",
+  noMovesTitle: "No Moves"
+};
 ```
 ```javascript
-// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\components\GameBoard.svelte
-// Deleting the following lines:
-    'increase-board': () => setBoardSize(Math.min(get(appState).boardSize + 1, 9)),
-    'decrease-board': () => setBoardSize(Math.max(get(appState).boardSize - 1, 2)),
-    'toggle-speech': toggleSpeech,
-  };
-
-  const keyToActionMap = $derived(Object.entries($settingsStore.keybindings).reduce((acc, [action, keys]) => {
-    keys.forEach(key => {
-      acc[key] = action;
-    });
-    return acc;
-  }, /** @type {Record<string, string>} */ ({})));
-
-  /** @param {KeyboardEvent} event */
-  function handleKeydown(event) {
-    if (get(modalStore).isOpen) return;
-
-    const target = /** @type {HTMLElement} */ (event.target);
-    if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) {
-      return;
-    }
-
-    const action = keyToActionMap[event.code];
-    if (action && actionHandlers[action]) {
-      event.preventDefault();
-      actionHandlers[action]();
-    }
-  }
-
-// Adding the following lines:
-    'increase-board': () => setBoardSize(Math.min(get(appState).boardSize + 1, 9)),
-    'decrease-board': () => setBoardSize(Math.max(get(appState).boardSize - 1, 2)),
-    'toggle-speech': toggleSpeech,
-    'distance-1': () => setDistance(1),
-    'distance-2': () => setDistance(2),
-    'distance-3': () => setDistance(3),
-    'distance-4': () => setDistance(4),
-    'distance-5': () => setDistance(5),
-    'distance-6': () => setDistance(6),
-    'distance-7': () => setDistance(7),
-    'distance-8': () => setDistance(8),
-  };
-
-  const keyToActionMap = $derived(Object.entries($settingsStore.keybindings).reduce((acc, [action, keys]) => {
-    keys.forEach(key => {
-      acc[key] = action;
-    });
-    return acc;
-  }, /** @type {Record<string, string>} */ ({})));
-
-  /** @param {KeyboardEvent} event */
-  function handleKeydown(event) {
-    if (get(modalStore).isOpen) return;
-
-    const target = /** @type {HTMLElement} */ (event.target);
-    if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) {
-      return;
-    }
-
-    const action = keyToActionMap[event.code];
-    if (!action || !actionHandlers[action]) return;
-
-    event.preventDefault();
-
-    // Контекстна логіка для цифрових клавіш
-    if (event.code.startsWith('Digit')) {
-      const digit = parseInt(event.code.replace('Digit', ''), 10);
-      if (get(appState).selectedDirection && digit > 0 && digit < get(appState).boardSize) {
-        setDistance(digit);
-        return;
-      }
-    }
-    
-    actionHandlers[action]();
-  }
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\crh\gameControls.js
+export default {
+  settings: "Sozlamalar",
+  showBoard: "Tahtanı köster",
+  showQueen: "Vezirni köster",
+  showMoves: "Mümkün areketlerni köster",
+  blockMode: "Bloklanğan hücreler rejimi",
+  blockAfter: "Soñra blokla:",
+  speech: "Seslendirüv",
+  voiceSettingsTitle: "Ses Sozlamaları",
+  selectDistance: "Mesafeni sayla",
+  confirm: "Tasdiqla",
+  noMovesTitle: "Areket yoq"
+};
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\nl\gameControls.js
+export default {
+  settings: "Instellingen",
+  showBoard: "Toon Bord",
+  showQueen: "Toon Koningin",
+  showMoves: "Toon Beschikbare Zetten",
+  blockMode: "Geblokkeerde Cellen Modus",
+  blockAfter: "Blokkeer na:",
+  speech: "Voiceover",
+  voiceSettingsTitle: "Spraakinstellingen",
+  selectDistance: "Selecteer Afstand",
+  confirm: "Bevestig",
+  noMovesTitle: "Geen Zetten"
+};
 ```
 ```javascript
 // file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\uk.js
 // Deleting the following lines:
-      'increase-board': "Збільшити дошку",
-      'decrease-board': "Зменшити дошку",
-      'toggle-speech': "Озвучування ходів"
-    }
-  },
-  rulesPage: {
-    title: "Правила гри \"Stay on the Board\"",
+import mainMenu from './uk/mainMenu.js';
+import gameBoard from './uk/gameBoard.js';
+import controlsPage from './uk/controlsPage.js';
+import modal from './uk/modal.js';
+import settings from './uk/settings.js';
 
 // Adding the following lines:
-      'increase-board': "Збільшити дошку",
-      'decrease-board': "Зменшити дошку",
-      'toggle-speech': "Озвучування ходів",
-      'distance-1': "Відстань 1",
-      'distance-2': "Відстань 2",
-      'distance-3': "Відстань 3",
-      'distance-4': "Відстань 4",
-      'distance-5': "Відстань 5",
-      'distance-6': "Відстань 6",
-      'distance-7': "Відстань 7",
-      'distance-8': "Відстань 8"
-    },
-    distanceSelection: "Вибір відстані"
-  },
-  rulesPage: {
-    title: "Правила гри \"Stay on the Board\"",
+import mainMenu from './uk/mainMenu.js';
+import gameBoard from './uk/gameBoard.js';
+import gameControls from './uk/gameControls.js';
+import controlsPage from './uk/controlsPage.js';
+import modal from './uk/modal.js';
+import settings from './uk/settings.js';
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\uk.js
+// Deleting the following lines:
+export default {
+  mainMenu,
+  gameBoard,
+  controlsPage,
+  modal,
+  settings,
+
+// Adding the following lines:
+export default {
+  mainMenu,
+  gameBoard,
+  gameControls,
+  controlsPage,
+  modal,
+  settings,
 ```
 ```javascript
 // file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\en.js
 // Deleting the following lines:
-      'increase-board': "Increase Board Size",
-      'decrease-board': "Decrease Board Size",
-      'toggle-speech': "Toggle Voiceover"
-    }
-  },
-  rulesPage: {
-    title: "Rules of \"Stay on the Board\"",
+import mainMenu from './en/mainMenu.js';
+import gameBoard from './en/gameBoard.js';
+import controlsPage from './en/controlsPage.js';
+import modal from './en/modal.js';
+import settings from './en/settings.js';
 
 // Adding the following lines:
-      'increase-board': "Increase Board Size",
-      'decrease-board': "Decrease Board Size",
-      'toggle-speech': "Toggle Voiceover",
-      'distance-1': "Distance 1",
-      'distance-2': "Distance 2",
-      'distance-3': "Distance 3",
-      'distance-4': "Distance 4",
-      'distance-5': "Distance 5",
-      'distance-6': "Distance 6",
-      'distance-7': "Distance 7",
-      'distance-8': "Distance 8"
-    },
-    distanceSelection: "Distance Selection"
-  },
-  rulesPage: {
-    title: "Rules of \"Stay on the Board\"",
+import mainMenu from './en/mainMenu.js';
+import gameBoard from './en/gameBoard.js';
+import gameControls from './en/gameControls.js';
+import controlsPage from './en/controlsPage.js';
+import modal from './en/modal.js';
+import settings from './en/settings.js';
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\en.js
+// Deleting the following lines:
+export default {
+  mainMenu,
+  gameBoard,
+  controlsPage,
+  modal,
+  settings,
+
+// Adding the following lines:
+export default {
+  mainMenu,
+  gameBoard,
+  gameControls,
+  controlsPage,
+  modal,
+  settings,
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\crh.js
+// Deleting the following lines:
+import mainMenu from './crh/mainMenu.js';
+import gameBoard from './crh/gameBoard.js';
+import controlsPage from './crh/controlsPage.js';
+import modal from './crh/modal.js';
+import settings from './crh/settings.js';
+
+// Adding the following lines:
+import mainMenu from './crh/mainMenu.js';
+import gameBoard from './crh/gameBoard.js';
+import gameControls from './crh/gameControls.js';
+import controlsPage from './crh/controlsPage.js';
+import modal from './crh/modal.js';
+import settings from './crh/settings.js';
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\crh.js
+// Deleting the following lines:
+export default {
+  mainMenu,
+  gameBoard,
+  controlsPage,
+  modal,
+  settings,
+
+// Adding the following lines:
+export default {
+  mainMenu,
+  gameBoard,
+  gameControls,
+  controlsPage,
+  modal,
+  settings,
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\nl.js
+// Deleting the following lines:
+import mainMenu from './nl/mainMenu.js';
+import gameBoard from './nl/gameBoard.js';
+import controlsPage from './nl/controlsPage.js';
+import modal from './nl/modal.js';
+import settings from './nl/settings.js';
+
+// Adding the following lines:
+import mainMenu from './nl/mainMenu.js';
+import gameBoard from './nl/gameBoard.js';
+import gameControls from './nl/gameControls.js';
+import controlsPage from './nl/controlsPage.js';
+import modal from './nl/modal.js';
+import settings from './nl/settings.js';
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\nl.js
+// Deleting the following lines:
+export default {
+  mainMenu,
+  gameBoard,
+  controlsPage,
+  modal,
+  settings,
+
+// Adding the following lines:
+export default {
+  mainMenu,
+  gameBoard,
+  gameControls,
+  controlsPage,
+  modal,
+  settings,
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\uk\controlsPage.js
+// Deleting the following lines:
+  distanceSelection: "Вибір відстані"
+};
+
+// Adding the following lines:
+  distanceSelection: "Вибір відстані",
+  resetToDefaults: "Скинути до стандартних"
+};
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\en\controlsPage.js
+// Deleting the following lines:
+  distanceSelection: "Distance Selection"
+};
+
+// Adding the following lines:
+  distanceSelection: "Distance Selection",
+  resetToDefaults: "Reset to Defaults"
+};
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\crh\controlsPage.js
+// Deleting the following lines:
+  distanceSelection: "Mesafeni sayla"
+};
+
+// Adding the following lines:
+  distanceSelection: "Mesafeni sayla",
+  resetToDefaults: "Standartlarğa qaytar"
+};
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\nl\controlsPage.js
+// Deleting the following lines:
+  distanceSelection: "Afstand selecteren"
+};
+
+// Adding the following lines:
+  distanceSelection: "Afstand selecteren",
+  resetToDefaults: "Reset naar Standaard"
+};
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\uk\modal.js
+// Deleting the following lines:
+  scoreInfoTitle: "Як нараховуються бали?",
+  scoreInfoContent: `Бали за кожен хід:\n• +1 бал: з видимою дошкою та ферзем.\n• +2 бали: з видимою дошкою, але прихованим ферзем.\n• +3 бали: з прихованою дошкою (найскладніший режим).\n\nДодаткові бонусні бали нараховуються автоматично в кінці гри:\n• Бонус за розмір дошки.\n• Бонус за гру в режимі заблокованих клітинок.\n• Бонус за успішне використання кнопки "Ходів немає".\n• Бонус за перестрибування через заблоковані клітинки.`,
+};
+
+// Adding the following lines:
+  scoreInfoTitle: "Як нараховуються бали?",
+  scoreInfoContent: `Бали за кожен хід:\n• +1 бал: з видимою дошкою та ферзем.\n• +2 бали: з видимою дошкою, але прихованим ферзем.\n• +3 бали: з прихованою дошкою (найскладніший режим).\n\nДодаткові бонусні бали нараховуються автоматично в кінці гри:\n• Бонус за розмір дошки.\n• Бонус за гру в режимі заблокованих клітинок.\n• Бонус за успішне використання кнопки "Ходів немає".\n• Бонус за перестрибування через заблоковані клітинки.`,
+  watchReplay: "Переглянути запис",
+  cancel: "Скасувати"
+};
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\en\modal.js
+// Deleting the following lines:
+  scoreInfoTitle: "How are points awarded?",
+  scoreInfoContent: `Points per move:\n• +1 point: with the board and queen visible.\n• +2 points: with the board visible, but the queen hidden.\n• +3 points: with the board hidden (hardest mode).\n\nAdditional bonus points are awarded automatically at the end of the game:\n• Board Size Bonus.\n• Blocked Cells Mode Bonus.\n• 'No Moves' Button Bonus.\n• Jump Bonus for jumping over blocked cells.`,
+};
+
+// Adding the following lines:
+  scoreInfoTitle: "How are points awarded?",
+  scoreInfoContent: `Points per move:\n• +1 point: with the board and queen visible.\n• +2 points: with the board visible, but the queen hidden.\n• +3 points: with the board hidden (hardest mode).\n\nAdditional bonus points are awarded automatically at the end of the game:\n• Board Size Bonus.\n• Blocked Cells Mode Bonus.\n• 'No Moves' Button Bonus.\n• Jump Bonus for jumping over blocked cells.`,
+  watchReplay: "Watch Replay",
+  cancel: "Cancel"
+};
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\crh\modal.js
+// Deleting the following lines:
+  scoreInfoTitle: "Ballar nasıl esaplana?",
+  scoreInfoContent: `Er bir areket içün ballar:\n• +1 bal: tahta ve vezir körüngen.\n• +2 bal: tahta körüngen, amma vezir gizli.\n• +3 bal: tahta gizli (eñ zor rejim).\n\nQoşma bonus balları oyun soñunda avtomatik olaraq esaplana:\n• Tahta ölçüsi bonusı.\n• Bloklanğan hücreler rejimi bonusı.\n• 'Areket yoq' döğmesini muvafaqiyetli qullanuv bonusı.\n• Bloklanğan hücreler üzerinden atlama bonusı.`,
+};
+
+// Adding the following lines:
+  scoreInfoTitle: "Ballar nasıl esaplana?",
+  scoreInfoContent: `Er bir areket içün ballar:\n• +1 bal: tahta ve vezir körüngen.\n• +2 bal: tahta körüngen, amma vezir gizli.\n• +3 bal: tahta gizli (eñ zor rejim).\n\nQoşma bonus balları oyun soñunda avtomatik olaraq esaplana:\n• Tahta ölçüsi bonusı.\n• Bloklanğan hücreler rejimi bonusı.\n• 'Areket yoq' döğmesini muvafaqiyetli qullanuv bonusı.\n• Bloklanğan hücreler üzerinden atlama bonusı.`,
+  watchReplay: "Tekrarnı baq",
+  cancel: "İptal et"
+};
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\nl\modal.js
+// Deleting the following lines:
+  scoreInfoTitle: "Hoe worden punten toegekend?",
+  scoreInfoContent: `Punten per zet:\n• +1 punt: met het bord en de koningin zichtbaar.\n• +2 punten: met het bord zichtbaar, maar de koningin verborgen.\n• +3 punten: met het bord verborgen (moeilijkste modus).\n\nExtra bonuspunten worden automatisch toegekend aan het einde van het spel:\n• Bordgrootte Bonus.\n• Geblokkeerde Cellen Modus Bonus.\n• 'Geen Zetten' Knop Bonus.\n• Springbonus voor het springen over geblokkeerde cellen.`,
+};
+
+// Adding the following lines:
+  scoreInfoTitle: "Hoe worden punten toegekend?",
+  scoreInfoContent: `Punten per zet:\n• +1 punt: met het bord en de koningin zichtbaar.\n• +2 punten: met het bord zichtbaar, maar de koningin verborgen.\n• +3 punten: met het bord verborgen (moeilijkste modus).\n\nExtra bonuspunten worden automatisch toegekend aan het einde van het spel:\n• Bordgrootte Bonus.\n• Geblokkeerde Cellen Modus Bonus.\n• 'Geen Zetten' Knop Bonus.\n• Springbonus voor het springen over geblokkeerde cellen.`,
+  watchReplay: "Herhaling bekijken",
+  cancel: "Annuleren"
+};
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\components\GameControls.svelte
+// Deleting the following lines:
+          <div class="ios-switch">
+            <input type="checkbox" checked={blockModeEnabled} onchange={onBlockModeChange} />
+            <span class="slider"></span>
+          </div>
+          <span>Режим заблокованих клітинок</span>
+        </div>
+      </label>
+      {#if blockModeEnabled}
+        <div class="block-mode-options">
+          <span class="options-label">Блокувати після:</span>
+          <div class="options-values" role="radiogroup" aria-labelledby="block-after-label">
+            {#each [0, 1, 2, 3] as count}
+              <button
+
+// Adding the following lines:
+          <div class="ios-switch">
+            <input type="checkbox" checked={blockModeEnabled} onchange={onBlockModeChange} />
+            <span class="slider"></span>
+          </div>
+          <span>{$_('gameControls.blockMode')}</span>
+        </div>
+      </label>
+      {#if blockModeEnabled}
+        <div class="block-mode-options">
+          <span class="options-label">{$_('gameControls.blockAfter')}</span>
+          <div class="options-values" role="radiogroup" aria-labelledby="block-after-label">
+            {#each [0, 1, 2, 3] as count}
+              <button
 ```

@@ -1,5 +1,6 @@
 import mainMenu from './crh/mainMenu.js';
 import gameBoard from './crh/gameBoard.js';
+import gameControls from './crh/gameControls.js';
 import controlsPage from './crh/controlsPage.js';
 import modal from './crh/modal.js';
 import settings from './crh/settings.js';
@@ -20,6 +21,7 @@ import faq from './crh/faq.js';
 export default {
   mainMenu,
   gameBoard,
+  gameControls,
   controlsPage,
   modal,
   settings,

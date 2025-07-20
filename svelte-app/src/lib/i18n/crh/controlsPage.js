@@ -48,5 +48,6 @@ export default {
     'distance-7': "Mesafe 7",
     'distance-8': "Mesafe 8"
   },
-  distanceSelection: "Mesafeni sayla"
+  distanceSelection: "Mesafeni sayla",
+  resetToDefaults: "Standartlarğa qaytar"
 }; 

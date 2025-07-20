@@ -48,5 +48,6 @@ export default {
     'distance-7': "Afstand 7",
     'distance-8': "Afstand 8"
   },
-  distanceSelection: "Afstand selecteren"
+  distanceSelection: "Afstand selecteren",
+  resetToDefaults: "Reset naar Standaard"
 }; 
