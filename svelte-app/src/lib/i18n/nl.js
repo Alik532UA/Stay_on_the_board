@@ -41,6 +41,8 @@ export default {
     cashOut: "Punten innen",
     tutorialTitle: "",
     tutorialContent: "Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan. Verberg de koningin of het bord in de instellingen om meer punten te verdienen voor elke zet!",
+    infoModalTitle: "Over het spel en het doel",
+    infoModalContent: `Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan.\n\n<b>Pro-modus: Train je verbeelding</b>\nHet echte plezier begint wanneer je het bord in je hoofd verplaatst. Probeer het bord in de instellingen uit te schakelen, voice-over aan te zetten en geblinddoekt te spelen met sneltoetsen. Dit maakt van het spel een krachtige trainer voor geheugen en ruimtelijk inzicht. Begin met een 3x3 bord en maak het steeds moeilijker!`,
     info: "Instructies",
     details: "Details",
   },
@@ -125,7 +127,15 @@ export default {
     title: "Steminstellingen",
     loading: "Stemmen laden...",
     noVoices: "Oekraïense stemmen zijn nog niet geladen. Start een spel om ze te activeren en keer dan terug naar dit menu.",
-    whyButton: "Repareren",
+    whyButton: "Waarom is dat?",
+    edgeFixTitle: "Hoe stemmen in Edge te activeren:",
+    edgeFixStep1: "1. Open een ander tabblad met tekst (bijv. een Wikipedia-artikel).",
+    edgeFixStep2: "2. Selecteer een stuk tekst, klik met de rechtermuisknop en kies \"Selectie hardop voorlezen\".",
+    edgeFixStep3: "3. Pauzeer de vertelling wanneer deze begint.",
+    edgeFixStep4: "4. Ga terug naar het tabblad van het spel en klik op de knop \"Opnieuw controleren\" hieronder.",
+    edgeFixStep5: "Als dit niet helpt, moet u mogelijk uw browser opnieuw opstarten.",
+    checkAgainButton: "Opnieuw controleren",
+    whyIsThisNeededTitle: "Waarom is dit nodig?",
     hideDetailsButton: "Details verbergen",
     reasonTitle: "Oorzaak van het probleem",
     reasonContent: "Ons spel gebruikt stemmen die zijn ingebouwd in uw besturingssysteem en toegankelijk zijn via de browser. Sommige browsers, zoals Chrome op Windows, hebben niet altijd toegang tot de Oekraïense systeemstemmen.",
@@ -213,7 +223,8 @@ export default {
     title: "Lokaal spel"
   },
   ui: {
-    closeAndReturnToMenu: 'Sluiten en terug naar hoofdmenu'
+    closeAndReturnToMenu: 'Sluiten en terug naar hoofdmenu',
+    goBack: 'Ga terug'
   },
   tooltips: {
     'up-left': "Schuin omhoog-links\nNum 7 of Q",

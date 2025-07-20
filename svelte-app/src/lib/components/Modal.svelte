@@ -68,7 +68,11 @@
         
         {#if $modal_data.contentKey || (typeof $modal_data.content === 'string' && $modal_data.content)}
           <p class="reason">
-            {$modal_data.contentKey ? $_($modal_data.contentKey) : $modal_data.content}
+            {#if $modal_data.contentKey}
+              {@html $_($modal_data.contentKey)}
+            {:else if typeof $modal_data.content === 'string'}
+              {@html $modal_data.content}
+            {/if}
           </p>
         {/if}
 

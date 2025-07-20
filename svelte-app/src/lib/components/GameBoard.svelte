@@ -99,43 +99,13 @@
   let playerTitle = $derived($_('gameBoard.player'));
   let mainMenuTitle = $derived($_('gameBoard.mainMenu'));
 
-  let showTutorial = $state(false);
-  let isFirstVisit = $state(false);
   onMount(() => {
     // Перевіряємо, чи була попередня гра завершена
     if (get(appState).isGameOver) {
       // Якщо так, мовчки запускаємо нову гру
       resetGame();
     }
-
-    const hasVisited = localStorage.getItem('hasVisitedGame');
-    const isTutorialHidden = localStorage.getItem('isTutorialHidden');
-    if (!hasVisited) {
-      isFirstVisit = true;
-      showTutorial = true;
-      localStorage.setItem('hasVisitedGame', 'true');
-    } else {
-      if (isTutorialHidden !== 'true') {
-        showTutorial = true;
-      }
-    }
-    if (get(appState).playerRow === null) {
-      setBoardSize(get(appState).boardSize);
-    }
   });
-  function toggleTutorial() {
-    showTutorial = !showTutorial;
-    if (!isFirstVisit) {
-      localStorage.setItem('isTutorialHidden', String(!showTutorial));
-    }
-  }
-  function closeTutorial() {
-    showTutorial = false;
-    localStorage.setItem('isTutorialHidden', 'true');
-    if (isFirstVisit) {
-      isFirstVisit = false;
-    }
-  }
 
   function goToMainMenu() {
     logStore.addLog('Повернення до головного меню', 'info');
@@ -347,6 +317,17 @@
       ? $appState.moveHistory[$appState.replayCurrentStep]?.blocked || []
       : blockedCells
   );
+
+  function showGameInfoModal() {
+    modalStore.showModal({
+      titleKey: 'gameBoard.infoModalTitle',
+      contentKey: 'gameBoard.infoModalContent',
+      buttons: [
+        { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },
+        { textKey: 'modal.ok', primary: true, isHot: true, onClick: modalStore.closeModal }
+      ]
+    });
+  }
 </script>
 
 <div class="game-board-container">
@@ -382,7 +363,7 @@
     </div>
 
     <!-- 3. Інформація -->
-    <button class="main-menu-btn" class:active={showTutorial} title={$_('gameBoard.info')} onclick={toggleTutorial}>
+    <button class="main-menu-btn" title={$_('gameBoard.info')} onclick={showGameInfoModal}>
       <SvgIcons name="info" />
     </button>
 
@@ -394,13 +375,6 @@
       </button>
     {/if}
   </div>
-  {#if showTutorial}
-    <div class="tutorial-panel game-content-block">
-      <button class="tutorial-close-btn" onclick={closeTutorial} aria-label="Закрити інструкцію">&times;</button>
-      <p>{$_('gameBoard.tutorialContent')}</p>
-      <a href="{base}/rules" class="details-btn">{$_('gameBoard.details')}</a>
-    </div>
-  {/if}
   <div class="score-panel game-content-block">
     <div class="score-display">
       <span class="score-label-text">{$_('gameBoard.scoreLabel')}:</span>
@@ -655,6 +629,12 @@
   .tutorial-panel p {
     margin: 0;
     padding-right: 16px;
+  }
+  .pro-tip-link {
+    margin-top: 12px;
+    font-size: 0.95em;
+    font-style: italic;
+    opacity: 0.9;
   }
   /* ОНОВЛЕНИЙ CSS для .board-bg-wrapper */
   .board-bg-wrapper {

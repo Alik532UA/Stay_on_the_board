@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { settingsStore } from '$lib/stores/settingsStore.js';
-  import { loadAndGetVoices, filterVoicesByLang } from '$lib/speech.js';
+  import { loadAndGetVoices, filterVoicesByLang, resetVoicesPromise } from '$lib/speech.js';
   import { locale, _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
 
@@ -15,6 +15,7 @@
   let selectedVoiceURI = get(settingsStore).selectedVoiceURI ?? '';
 
   const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isEdge = typeof window !== 'undefined' && navigator.userAgent.includes("Edg/");
 
   onMount(async () => {
     const currentLocale = get(locale) || 'uk';
@@ -30,6 +31,19 @@
 
   function selectVoice() {
     settingsStore.updateSettings({ selectedVoiceURI: String(selectedVoiceURI ?? '') });
+  }
+
+  async function recheckVoices() {
+    isLoading = true;
+    resetVoicesPromise();
+    const currentLocale = get(locale) || 'uk';
+    try {
+      const allVoices = await loadAndGetVoices();
+      availableVoices = filterVoicesByLang(allVoices, currentLocale);
+    } catch (error) {
+      console.error("Помилка повторного завантаження голосів:", error);
+    }
+    isLoading = false;
   }
 </script>
 
@@ -83,19 +97,40 @@
           <p class="no-voices-message">
             {$_('voiceSettings.noVoices')}
           </p>
-          <button class="details-button" onclick={() => showDetails = !showDetails}>
-            {showDetails ? $_('voiceSettings.hideDetailsButton') : $_('voiceSettings.whyButton')}
-          </button>
+          {#if isEdge}
+            <div class="edge-fix-instructions">
+              <h4>{$_('voiceSettings.edgeFixTitle')}</h4>
+              <ol>
+                <li>{@html $_('voiceSettings.edgeFixStep1')}</li>
+                <li>{@html $_('voiceSettings.edgeFixStep2')}</li>
+                <li>{@html $_('voiceSettings.edgeFixStep3')}</li>
+                <li>{@html $_('voiceSettings.edgeFixStep4')}</li>
+              </ol>
+              <p>{$_('voiceSettings.edgeFixStep5')}</p>
+              <button class="modal-btn-generic primary" onclick={recheckVoices}>
+                {$_('voiceSettings.checkAgainButton')}
+              </button>
+            </div>
+            <button class="details-button" onclick={() => showDetails = !showDetails}>
+              {showDetails ? $_('voiceSettings.hideDetailsButton') : $_('voiceSettings.whyIsThisNeededTitle')}
+            </button>
+          {:else}
+            <button class="details-button" onclick={() => showDetails = !showDetails}>
+              {showDetails ? $_('voiceSettings.hideDetailsButton') : $_('voiceSettings.whyButton')}
+            </button>
+          {/if}
           {#if showDetails}
             <div class="details-text">
               <h4>{$_('voiceSettings.reasonTitle')}</h4>
               <p>{$_('voiceSettings.reasonContent')}</p>
-              <h4>{$_('voiceSettings.recommendationsTitle')}</h4>
-              <p>{$_('voiceSettings.recommendationsContent')}</p>
-              <ul>
-                <li>{$_('voiceSettings.platformEdge')}</li>
-                <li>{$_('voiceSettings.platformAndroid')}</li>
-              </ul>
+              {#if !isEdge}
+                <h4>{$_('voiceSettings.recommendationsTitle')}</h4>
+                <p>{$_('voiceSettings.recommendationsContent')}</p>
+                <ul>
+                  <li>{$_('voiceSettings.platformEdge')}</li>
+                  <li>{$_('voiceSettings.platformAndroid')}</li>
+                </ul>
+              {/if}
             </div>
           {/if}
         </div>

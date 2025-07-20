@@ -1,9 +1,9 @@
 <script>
-  import FloatingCloseButton from '$lib/components/FloatingCloseButton.svelte';
+  import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
   import { _ } from 'svelte-i18n';
 </script>
 
-<FloatingCloseButton />
+<FloatingBackButton />
 
 <div class="supporters-container">
   <h1>{$_('supportersPage.title')}</h1>

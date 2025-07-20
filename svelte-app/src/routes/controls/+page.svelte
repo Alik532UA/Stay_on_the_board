@@ -1,9 +1,9 @@
 <script>
-  import FloatingCloseButton from '$lib/components/FloatingCloseButton.svelte';
+  import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
   import { _ } from 'svelte-i18n';
 </script>
 
-<FloatingCloseButton />
+<FloatingBackButton />
 
 <h1>{$_('controlsPage.title')}</h1>
 
