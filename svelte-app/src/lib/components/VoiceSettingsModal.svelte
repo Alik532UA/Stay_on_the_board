@@ -83,11 +83,9 @@
           <p class="no-voices-message">
             {$_('voiceSettings.noVoices')}
           </p>
-          
           <button class="details-button" onclick={() => showDetails = !showDetails}>
             {showDetails ? $_('voiceSettings.hideDetailsButton') : $_('voiceSettings.whyButton')}
           </button>
-
           {#if showDetails}
             <div class="details-text">
               <h4>{$_('voiceSettings.reasonTitle')}</h4>
@@ -301,5 +299,34 @@
 
   .ios-warning p {
     margin: 0;
+  }
+
+  /* Додаю стилі для edge-fix-instructions */
+  .edge-fix-instructions {
+    margin-top: 20px;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    text-align: left;
+  }
+  .edge-fix-instructions h4 {
+    margin-top: 0;
+    color: var(--text-accent, #ffbe0b);
+  }
+  .edge-fix-instructions ol {
+    padding-left: 20px;
+    margin-bottom: 12px;
+  }
+  .edge-fix-instructions li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .edge-fix-instructions p {
+    font-size: 0.9em;
+    opacity: 0.8;
+  }
+  .edge-fix-instructions button {
+    width: 100%;
+    margin-top: 16px;
   }
 </style> 

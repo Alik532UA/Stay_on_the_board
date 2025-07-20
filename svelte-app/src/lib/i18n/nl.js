@@ -124,8 +124,8 @@ export default {
   voiceSettings: {
     title: "Steminstellingen",
     loading: "Stemmen laden...",
-    noVoices: "Helaas zijn er geen Oekraïense stemmen voor de voice-over gevonden in uw browser.",
-    whyButton: "Waarom is dat?",
+    noVoices: "Oekraïense stemmen zijn nog niet geladen. Start een spel om ze te activeren en keer dan terug naar dit menu.",
+    whyButton: "Repareren",
     hideDetailsButton: "Details verbergen",
     reasonTitle: "Oorzaak van het probleem",
     reasonContent: "Ons spel gebruikt stemmen die zijn ingebouwd in uw besturingssysteem en toegankelijk zijn via de browser. Sommige browsers, zoals Chrome op Windows, hebben niet altijd toegang tot de Oekraïense systeemstemmen.",

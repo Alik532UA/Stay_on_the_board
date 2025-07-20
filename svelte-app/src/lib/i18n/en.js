@@ -132,8 +132,8 @@ export default {
   voiceSettings: {
     title: "Voice Settings",
     loading: "Loading voices...",
-    noVoices: "Unfortunately, Ukrainian voices for narration were not found in your browser.",
-    whyButton: "Why is that?",
+    noVoices: "Ukrainian voices are not yet loaded. Please start a game to activate them, then return to this menu.",
+    whyButton: "Fix It",
     hideDetailsButton: "Hide details",
     reasonTitle: "Reason for the issue",
     reasonContent: "Our game uses voices built into your operating system and accessible through the browser. Some browsers, like Chrome on Windows, do not always have access to system Ukrainian voices.",

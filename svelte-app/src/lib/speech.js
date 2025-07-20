@@ -53,6 +53,13 @@ export function loadAndGetVoices() {
   return voicesPromise;
 }
 
+/**
+ * Скидає кешований voicesPromise, щоб змусити loadAndGetVoices завантажити голоси заново.
+ */
+export function resetVoicesPromise() {
+  voicesPromise = null;
+}
+
 // Ініціюємо завантаження при першому імпорті файлу
 loadAndGetVoices();
 
