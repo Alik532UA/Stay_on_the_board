@@ -15,10 +15,20 @@
     --control-bg: #ffd180;
     --control-hover: #ffa726;
     --control-selected: #ff9800;
+    --control-selected-text: #fff;
     --confirm-btn-bg: #ffa726;
     --confirm-btn-hover: #ff9800;
+    --confirm-btn-text: #fff;
     --no-moves-btn-bg: #fff3e0;
     --no-moves-btn-hover: #ffd180;
+    --no-moves-btn-text: #6d3a00;
+    --confirm-action-bg: #4caf50;
+    --confirm-action-text: #ffffff;
+    --warning-action-bg: #ff9800;
+    --warning-action-text: #ffffff;
+    --info-action-bg: #03a9f4;
+    --info-action-text: #ffffff;
+    --disabled-bg: #ffd180; --disabled-text: #b5651d;
 }
 
 /* Помаранчевий стиль - Темна тема */
@@ -38,10 +48,20 @@
     --control-bg: #e65100;
     --control-hover: #ffa726;
     --control-selected: #ffd180;
+    --control-selected-text: #6d3a00;
     --confirm-btn-bg: #ffa726;
     --confirm-btn-hover: #ffd180;
+    --confirm-btn-text: #6d3a00;
     --no-moves-btn-bg: #e65100;
     --no-moves-btn-hover: #ffa726;
+    --no-moves-btn-text: #fff;
+    --confirm-action-bg: #66bb6a;
+    --confirm-action-text: #222;
+    --warning-action-bg: #ffb300;
+    --warning-action-text: #222;
+    --info-action-bg: #81d4fa;
+    --info-action-text: #222;
+    --disabled-bg: #e65100; --disabled-text: #ffd180;
 }
 
 /* Загальні стилі для Orange, що визначають "підняття" елементів */

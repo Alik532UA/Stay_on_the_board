@@ -186,4 +186,15 @@
     font-weight: normal;
     color: var(--text-accent);
   }
+  .wip-donate-btn {
+    background: var(--warning-action-bg);
+    color: var(--warning-action-text);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 32px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: all 0.2s ease;
+  }
 </style>

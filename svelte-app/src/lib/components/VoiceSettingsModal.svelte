@@ -154,7 +154,7 @@
     justify-content: center;
   }
   .modal-window {
-    background: rgba(40, 10, 35, 0.85);
+    background: var(--bg-secondary);
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     border-radius: 18px;

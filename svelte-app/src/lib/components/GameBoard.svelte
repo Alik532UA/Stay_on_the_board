@@ -400,8 +400,8 @@
     gap: 16px;
   }
   .cash-out-btn {
-    background: #2196f3;
-    color: #fff;
+    background: var(--control-selected);
+    color: var(--control-selected-text); /* Використовуємо змінну для кольору тексту */
     border: none;
     border-radius: 10px;
     padding: 8px 16px;
@@ -409,15 +409,15 @@
     font-weight: 700;
     cursor: pointer;
     transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+    box-shadow: 0 2px 8px var(--shadow-color); /* Використовуємо змінну для тіні */
   }
   .cash-out-btn:hover {
-    background: #1976d2;
+    background: var(--control-hover); /* Використовуємо змінну для фону при наведенні */
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+    box-shadow: 0 4px 12px var(--shadow-color);
   }
   .penalty-display {
-    color: #f44336; /* Червоний колір для штрафів */
+    color: var(--error-color);
     font-weight: bold;
     cursor: pointer;
     transition: color 0.2s, transform 0.2s;
@@ -449,7 +449,15 @@
     width: 18%;
     height: 18%;
     border-radius: 50%;
-    background: #fff;
+    background: var(--dot-color);
+  }
+  .player-piece svg {
+    width: 70%;
+    height: 70%;
+    filter: drop-shadow(0 0 8px var(--crown-shadow)) drop-shadow(0 0 4px var(--text-accent));
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
   }
   .tutorial-panel {
     position: relative;

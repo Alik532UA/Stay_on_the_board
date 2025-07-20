@@ -310,23 +310,14 @@
 }
 
 .modal-btn-generic.primary, .modal-btn-generic.green-btn {
-    background: #4caf50;
-    color: #fff;
-    box-shadow: 0 2px 12px 0 #4caf5040;
+    background: var(--confirm-action-bg);
+    color: var(--confirm-action-text);
+    box-shadow: 0 2px 12px 0 var(--shadow-color);
 }
-
-.modal-btn-generic.primary:hover, .modal-btn-generic.green-btn:hover {
-    background: #43a047;
-}
-
 .modal-btn-generic.blue-btn {
-    background: #2196f3;
-    color: #fff;
-    box-shadow: 0 2px 12px 0 #2196f340;
-}
-
-.modal-btn-generic.blue-btn:hover {
-    background: #1976d2;
+    background: var(--info-action-bg);
+    color: var(--info-action-text);
+    box-shadow: 0 2px 12px 0 var(--shadow-color);
 }
 .reason {
   font-size: 1.1em;

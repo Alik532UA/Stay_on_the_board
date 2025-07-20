@@ -14,37 +14,8 @@
 		<!-- <link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.png" /> -->
 		<link rel="apple-touch-icon" href="%sveltekit.assets%/logo-circle.png" sizes="192x192" />
 		%sveltekit.head%
-		<style>
-		  .preload-theme,
-		  .preload-theme html, .preload-theme body,
-		  .preload-theme #main-menu-container,
-		  .preload-theme #game-container,
-		  .preload-theme .main-menu,
-		  .preload-theme .main,
-		  .preload-theme .app {
-		    background: #23272f !important;
-		    color: #fff !important;
-		  }
-		  .preload-theme button,
-		  .preload-theme .modal-button,
-		  .preload-theme .adjust-btn {
-		    background: #23272f !important;
-		    color: #fff !important;
-		    border: 1.5px solid #444 !important;
-		    box-shadow: none !important;
-		    transition: none !important;
-		  }
-		  .preload-theme h1,
-		  .preload-theme .main-menu-title {
-		    color: #fff !important;
-		    text-shadow: none !important;
-		  }
-		  .preload-theme .main-menu-subtitle {
-		    color: #fff !important;
-		  }
-		</style>
 	</head>
-	<body class="preload-theme" data-sveltekit-preload-data="hover">
+	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

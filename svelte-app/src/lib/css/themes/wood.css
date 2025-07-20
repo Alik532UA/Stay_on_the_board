@@ -15,11 +15,21 @@
     --control-bg: #e3d3c2;
     --control-hover: #d2b48c;
     --control-selected: #7c5c3b;
+    --control-selected-text: #fff;
     --confirm-btn-bg: #a47551;
     --confirm-btn-hover: #7c5c3b;
+    --confirm-btn-text: #fff;
     --no-moves-btn-bg: #e3d3c2;
     --no-moves-btn-hover: #d2b48c;
+    --no-moves-btn-text: #4b2e13;
     --arrow-color: #4b2e13;
+    --confirm-action-bg: #556b2f;
+    --confirm-action-text: #ffffff;
+    --warning-action-bg: #daa520;
+    --warning-action-text: #ffffff;
+    --info-action-bg: #8b4513;
+    --info-action-text: #ffffff;
+    --disabled-bg: #e3d3c2; --disabled-text: #7c5c3b;
 }
 
 /* Дерев'яний стиль - Темна тема */
@@ -39,10 +49,20 @@
     --control-bg: #1a0e05;
     --control-hover: #3b2412;
     --control-selected: #bfa074;
+    --control-selected-text: #231407;
     --confirm-btn-bg: #3b2412;
     --confirm-btn-hover: #bfa074;
+    --confirm-btn-text: #f5e9da;
     --no-moves-btn-bg: #1a0e05;
     --no-moves-btn-hover: #3b2412;
+    --no-moves-btn-text: #f5e9da;
     --arrow-color: #f5e9da;
+    --confirm-action-bg: #8fbc8f;
+    --confirm-action-text: #231407;
+    --warning-action-bg: #f0e68c;
+    --warning-action-text: #231407;
+    --info-action-bg: #d2b48c;
+    --info-action-text: #231407;
+    --disabled-bg: #1a0e05; --disabled-text: #7c5c3b;
 }
 

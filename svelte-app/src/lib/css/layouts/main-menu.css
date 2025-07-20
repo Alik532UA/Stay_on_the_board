@@ -68,7 +68,7 @@
 }
 .wip-notice-content {
   position: relative;
-  background: rgba(30, 10, 40, 0.98);
+  background: var(--bg-secondary);
   color: #fff;
   padding: 28px 32px;
   border-radius: 18px;
@@ -87,7 +87,7 @@
   font-size: 1.05em;
 }
 .wip-donate-btn {
-  background: linear-gradient(90deg, #ff9800 60%, #ffb300 100%);
+  background: var(--no-moves-btn-bg);
   color: #fff;
   border: none;
   border-radius: 10px;
