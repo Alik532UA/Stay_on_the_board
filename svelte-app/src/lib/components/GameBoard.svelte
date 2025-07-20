@@ -15,7 +15,7 @@
   import SvgIcons from './SvgIcons.svelte';
   import { base } from '$app/paths';
   import ReplayControls from '$lib/components/ReplayControls.svelte';
-  import { replayPosition, replayBlockedCells, replaySegments } from '$lib/utils/replay.js';
+  import { replayPosition, replayCellVisitCounts, replaySegments } from '$lib/utils/replay.js';
   import { goto } from '$app/navigation';
   import FAQModal from '$lib/components/FAQModal.svelte';
 
@@ -84,19 +84,18 @@
     return $appState.availableMoves && $appState.availableMoves.some(move => move.row === row && move.col === col);
   }
 
+  let activeCellVisitCounts = $derived($appState.isReplayMode ? $replayCellVisitCounts : $appState.cellVisitCounts);
+
   /** @param {number} row @param {number} col */
   function isCellBlocked(row, col) {
-    if ($appState.isReplayMode) {
-      return $replayBlockedCells.some((cell) => cell.row === row && cell.col === col);
-    }
-    const visitCount = cellVisitCounts[`${row}-${col}`] || 0;
+    const visitCount = activeCellVisitCounts[`${row}-${col}`] || 0;
     return blockModeEnabled && visitCount > blockOnVisitCount;
   }
 
   /** @param {number} row @param {number} col */
   function getDamageClass(row, col) {
     if (!blockModeEnabled) return '';
-    const visitCount = cellVisitCounts[`${row}-${col}`] || 0;
+    const visitCount = activeCellVisitCounts[`${row}-${col}`] || 0;
     if (visitCount > 0 && visitCount <= blockOnVisitCount) {
       return `cell-damage-${visitCount}`;
     }
@@ -451,7 +450,7 @@
     border-radius: 50%;
     background: var(--dot-color);
   }
-  .player-piece svg {
+  .player-piece :global(svg) {
     width: 70%;
     height: 70%;
     filter: drop-shadow(0 0 8px var(--crown-shadow)) drop-shadow(0 0 4px var(--text-accent));

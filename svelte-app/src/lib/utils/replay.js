@@ -18,13 +18,13 @@ export const replayPosition = derived(
 );
 
 /**
- * Реактивна змінна, що розраховує масив заблокованих клітинок для поточного кроку реплею або гри.
+ * Реактивна змінна, що повертає об'єкт з кількістю відвідувань клітинок для поточного кроку реплею.
  */
-export const replayBlockedCells = derived(
+export const replayCellVisitCounts = derived(
   appState,
   ($appState) => $appState.isReplayMode
-    ? $appState.moveHistory[$appState.replayCurrentStep]?.blocked || []
-    : $appState.blockedCells
+    ? $appState.moveHistory[$appState.replayCurrentStep]?.visits || {}
+    : {}
 );
 
 /**
