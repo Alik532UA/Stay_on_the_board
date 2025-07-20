@@ -15,10 +15,20 @@
     --control-bg: #e0e1e6;
     --control-hover: #b0b0b0;
     --control-selected: #43464e;
+    --control-selected-text: #fff;
     --confirm-btn-bg: #b0b0b0;
     --confirm-btn-hover: #43464e;
     --no-moves-btn-bg: #f5f6fa;
     --no-moves-btn-hover: #e0e1e6;
+    --confirm-btn-text: #23272f;
+    --no-moves-btn-text: #23272f;
+    --confirm-action-bg: #4caf50;
+    --confirm-action-text: #ffffff;
+    --warning-action-bg: #ffc107;
+    --warning-action-text: #23272f;
+    --info-action-bg: #526d82;
+    --info-action-text: #ffffff;
+    --disabled-bg: #e0e1e6; --disabled-text: #7a7e87;
 }
 
 /* Сірий стиль - Темна тема */
@@ -38,10 +48,21 @@
     --control-bg: #43464e;
     --control-hover: #b0b0b0;
     --control-selected: #e0e0e0;
+    --control-selected-text: #23272f;
     --confirm-btn-bg: #b0b0b0;
     --confirm-btn-hover: #e0e0e0;
     --no-moves-btn-bg: #43464e;
     --no-moves-btn-hover: #b0b0b0;
+    --confirm-btn-text: #fff;
+    --no-moves-btn-text: #fff;
+    --confirm-action-bg: #43a047;
+    --confirm-action-text: #ffffff;
+    --warning-action-bg: #ffb300;
+    --warning-action-text: #23272f;
+    --info-action-bg: #9db2bf;
+    --info-action-text: #23272f;
+    --disabled-bg: #43464e; --disabled-text: #b0b0b0;
+    --toggle-off-bg: #23272f;
 }
 
 /* Gray ефекти */

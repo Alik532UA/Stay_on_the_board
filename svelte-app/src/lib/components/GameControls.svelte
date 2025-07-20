@@ -505,12 +505,12 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #ccc;
+  background: var(--toggle-off-bg);
   border-radius: 12px;
   transition: background 0.2s;
 }
 .ios-switch input[type="checkbox"]:checked + .slider {
-  background: #ff9800;
+  background: var(--control-selected);
 }
 .ios-switch .slider:before {
   content: '';
@@ -534,95 +534,98 @@
   margin: 18px 0 10px 0;
   justify-content: center;
 }
-.dir-btn {
+.dir-btn,
+.dist-btn {
   width: var(--control-btn-size);
   height: var(--control-btn-size);
-  font-size: 2em;
   font-family: 'M PLUS Rounded 1c', sans-serif !important;
   border-radius: 16px;
   border: none;
-  background: rgba(255,255,255,0.13);
-  color: #fff;
+  background: var(--control-bg);
+  color: var(--text-primary);
   cursor: pointer;
   transition: background 0.25s, box-shadow 0.25s, color 0.2s, transform 0.15s;
-  box-shadow: 0 2px 16px 0 rgba(80,0,80,0.10);
+  box-shadow: 0 2px 16px 0 var(--shadow-color);
   backdrop-filter: blur(6px);
   outline: none;
   position: relative;
   z-index: 1;
   white-space: pre-line;
-}
-.dir-btn:focus, .dir-btn:hover {
-  background: rgba(255,152,0,0.25);
-  color: #ff9800;
-  transform: scale(1.10);
-  box-shadow: 0 4px 24px 0 #ff980088;
-}
-.dir-btn[disabled] {
-  background: transparent;
-  color: #bbb;
-  cursor: default;
-  box-shadow: none;
-}
-.dir-btn.active {
-  background: rgba(255,152,0,0.45);
-  color: #fff;
-  font-weight: bold;
-  box-shadow: 0 0 0 3px #ff9800cc, 0 4px 24px 0 #ff980088;
-  transform: scale(1.12);
-}
-.central-btn {
-  font-size: 1.8em;
-  background: rgba(67,160,71,0.13);
-  color: #222;
-  border: 2.5px solid #43a047;
-  border-radius: 12px;
-  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-  box-shadow: 0 0 0 0 #43a047;
-  z-index: 2;
-  backdrop-filter: blur(8px);
-  width: var(--control-btn-size);
-  height: var(--control-btn-size);
   display: flex;
   align-items: center;
   justify-content: center;
 }
-/* Універсальний зелений стиль для кнопки підтвердження */
+
+.dir-btn {
+  font-size: 2em;
+}
+
+.dist-btn {
+  font-size: 1.8em;
+}
+
+.dir-btn:focus, .dir-btn:hover,
+.dist-btn:focus, .dist-btn:hover {
+  background: var(--control-hover);
+  color: var(--text-accent);
+  transform: scale(1.10);
+  box-shadow: 0 4px 24px 0 var(--shadow-color);
+}
+
+.dir-btn[disabled] {
+  background: var(--disabled-bg);
+  color: var(--disabled-text);
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
+.dir-btn.active,
+.dist-btn.active {
+  background: var(--control-selected);
+  color: var(--control-selected-text);
+  font-weight: bold;
+  box-shadow: 0 0 0 3px var(--control-selected), 0 4px 24px 0 var(--shadow-color);
+  transform: scale(1.05);
+}
+
+.confirm-btn {
+  background: var(--control-bg);
+  color: var(--text-secondary);
+}
+
+.confirm-btn:not(:disabled) {
+  background: var(--confirm-action-bg);
+  color: var(--confirm-action-text);
+  animation: pulse-green 1.5s infinite;
+}
+
 #center-info.confirm-btn-active {
-  background: linear-gradient(145deg, #4caf50, #388e3c) !important;
-  color: #ffffff !important;
-  border: 2px solid #388e3c !important;
-  box-shadow: 0 0 16px 4px rgba(76, 175, 80, 0.6), 0 4px 24px 0 rgba(76, 175, 80, 0.3) !important;
+  background: var(--confirm-action-bg) !important;
+  color: var(--confirm-action-text) !important;
+  box-shadow: 0 0 16px 4px var(--shadow-color), 0 4px 24px 0 var(--shadow-color) !important;
   animation: pulse-green 1.5s infinite !important;
   cursor: pointer !important;
 }
 
-#center-info.confirm-btn-active:hover {
-  background: linear-gradient(145deg, #5cb85c, #449d44) !important;
-  border-color: #449d44 !important;
-}
-/* Стилі для показу ходу комп'ютера */
 #center-info.computer-move-display {
-  background: linear-gradient(145deg, #ff9800, #f57c00) !important;
-  color: #ffffff !important;
-  border: 2px solid #f57c00 !important;
-  box-shadow: 0 0 16px 4px rgba(255, 152, 0, 0.6), 0 4px 24px 0 rgba(255, 152, 0, 0.3) !important;
+  background: var(--no-moves-btn-bg) !important;
+  color: var(--no-moves-btn-text) !important;
+  box-shadow: 0 0 16px 4px var(--shadow-color), 0 4px 24px 0 var(--shadow-color) !important;
   animation: none !important;
   cursor: default !important;
 }
 
-/* Стилі для стану вибору напрямку/відстані */
 #center-info.direction-distance-state {
-  background: rgba(255, 255, 255, 0.13) !important;
-  color: #222 !important;
-  border: 2.5px solid #43a047 !important;
-  box-shadow: 0 0 0 0 #43a047 !important;
+  background: var(--control-bg) !important;
+  color: var(--text-primary) !important;
+  box-shadow: none !important;
   animation: none !important;
   cursor: default !important;
 }
 @keyframes pulse-green {
-  0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.6), 0 4px 24px 0 rgba(76, 175, 80, 0.3); }
-  100% { box-shadow: 0 0 24px 8px rgba(76, 175, 80, 0), 0 4px 24px 0 rgba(76, 175, 80, 0.3); }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--confirm-action-bg) 60%, transparent), 0 4px 24px 0 color-mix(in srgb, var(--confirm-action-bg) 30%, transparent); }
+  100% { box-shadow: 0 0 24px 8px transparent, 0 4px 24px 0 color-mix(in srgb, var(--confirm-action-bg) 30%, transparent); }
 }
 .distance-select {
   width: 100%;
@@ -637,36 +640,7 @@
   margin: 10px auto 0;
   width: calc(var(--num-columns) * var(--control-btn-size) + (var(--num-columns) - 1) * 18px);
 }
-.dist-btn {
-  background: rgba(255,255,255,0.13);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  width: var(--control-btn-size);
-  height: var(--control-btn-size);
-  font-size: 1.8em;
-  cursor: pointer;
-  transition: background 0.22s, color 0.18s, box-shadow 0.22s, transform 0.15s;
-  box-shadow: 0 2px 12px 0 rgba(80,0,80,0.10);
-  backdrop-filter: blur(6px);
-  outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.dist-btn:focus, .dist-btn:hover {
-  background: rgba(255,152,0,0.25);
-  color: #ff9800;
-  transform: scale(1.10);
-  box-shadow: 0 4px 16px 0 #ff980088;
-}
-.dist-btn.active {
-  background: rgba(255,152,0,0.45);
-  color: #fff;
-  font-weight: bold;
-  box-shadow: 0 0 0 3px #ff9800cc, 0 4px 16px 0 #ff980088;
-  transform: scale(1.12);
-}
+/* Видалено застарілий блок .dist-btn, .dist-btn:focus, .dist-btn:hover, .dist-btn.active */
 /* --- Improved action-btns --- */
 .action-btns {
 	display: flex;
@@ -689,38 +663,31 @@
 	border-radius: 12px;
 	min-height: 54px;
 	min-width: 0px;
-	width: 100%; /* Додано */
-	max-width: 280px; /* Додано */
+	width: 100%;
+	max-width: 280px;
 	padding: 0 0.5em;
-	box-shadow: 0 2px 16px 0 rgba(80,0,80,0.10);
+	box-shadow: 0 2px 16px 0 var(--shadow-color);
 	transition: background 0.22s, color 0.18s, box-shadow 0.22s, transform 0.15s;
 	cursor: pointer;
 	letter-spacing: 0.01em;
   white-space: pre-line;
 }
 .confirm-btn {
-  background: linear-gradient(90deg, #43a047 60%, #66bb6a 100%);
-  color: #fff;
-  box-shadow: 0 4px 24px 0 #43a04733;
-}
-.confirm-btn:focus, .confirm-btn:hover {
-  background: linear-gradient(90deg, #66bb6a 60%, #43a047 100%);
-  color: #fff;
-  outline: none;
-  transform: scale(1.045);
-  box-shadow: 0 6px 32px 0 #43a04755;
+  background: var(--confirm-action-bg);
+  color: var(--confirm-action-text);
+  box-shadow: 0 4px 24px 0 var(--shadow-color);
 }
 .confirm-btn:disabled {
-  background: #ccc;
-  color: #666;
+  background: var(--disabled-bg);
+  color: var(--disabled-text);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 .no-moves-btn {
-  background: linear-gradient(90deg, #ffb300 60%, #ffe082 100%);
-  color: #222;
-  box-shadow: 0 4px 24px 0 #ffb30033;
+  background: var(--warning-action-bg);
+  color: var(--warning-action-text);
+  box-shadow: 0 4px 24px 0 var(--shadow-color);
 }
 .no-moves-btn:focus, .no-moves-btn:hover {
   background: linear-gradient(90deg, #ffe082 60%, #ffb300 100%);
@@ -742,10 +709,6 @@
   cursor: pointer;
 }
 .settings-icon-btn {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
@@ -822,8 +785,8 @@
 .expander-arrow svg {
   width: 28px;
   height: 28px;
-  color: #ff9800;
-  filter: drop-shadow(0 2px 6px rgba(255,152,0,0.18));
+  color: var(--text-accent);
+  filter: drop-shadow(0 2px 6px var(--shadow-color));
   transition: transform 0.4s ease-out; /* Плавний перехід для обертання */
 }
 .settings-expander[open] .expander-arrow svg {

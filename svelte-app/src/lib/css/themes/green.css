@@ -15,10 +15,20 @@
     --control-bg: #b2f7b8;
     --control-hover: #43a047;
     --control-selected: #388e3c;
+    --control-selected-text: #fff;
     --confirm-btn-bg: #43a047;
     --confirm-btn-hover: #388e3c;
     --no-moves-btn-bg: #e6ffe6;
     --no-moves-btn-hover: #b2f7b8;
+    --confirm-btn-text: #fff;
+    --no-moves-btn-text: #1b4022;
+    --confirm-action-bg: #388e3c;
+    --confirm-action-text: #ffffff;
+    --warning-action-bg: #ffc107;
+    --warning-action-text: #1b4022;
+    --info-action-bg: #0288d1;
+    --info-action-text: #ffffff;
+    --disabled-bg: #b2f7b8; --disabled-text: #388e3c;
 }
 
 /* Зелений стиль - Темна тема */
@@ -38,10 +48,21 @@
     --control-bg: #245c36;
     --control-hover: #43a047;
     --control-selected: #b2f7b8;
+    --control-selected-text: #1b4022;
     --confirm-btn-bg: #43a047;
     --confirm-btn-hover: #b2f7b8;
     --no-moves-btn-bg: #245c36;
     --no-moves-btn-hover: #388e3c;
+    --confirm-btn-text: #1b4022;
+    --no-moves-btn-text: #1b4022;
+    --confirm-action-bg: #66bb6a;
+    --confirm-action-text: #1b4022;
+    --warning-action-bg: #ffa000;
+    --warning-action-text: #1b4022;
+    --info-action-bg: #4fc3f7;
+    --info-action-text: #1b4022;
+    --disabled-bg: #245c36; --disabled-text: #81c784;
+    --toggle-off-bg: #1b4022;
 }
 
 /* Спеціальні ефекти для GREEN стилю */

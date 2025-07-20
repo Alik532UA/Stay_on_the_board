@@ -20,13 +20,13 @@
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #2c001e;
-  color: white;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   padding: 20px 24px;
   border-radius: 16px;
   box-shadow: 0 6px 24px rgba(0,0,0,0.5);
   z-index: 10001;
-  border: 1px solid #e95420;
+  border: 1px solid var(--control-selected);
   animation: slide-in 0.5s ease-out;
   width: 90vw;
   max-width: 380px;
@@ -57,7 +57,7 @@
 }
 
 button {
-  background: #e95420;
+  background: var(--control-selected);
   color: white;
   border: none;
   border-radius: 12px;
@@ -70,7 +70,7 @@ button {
 }
 
 button:hover {
-  background: #dd4814;
+  background: var(--control-hover);
   transform: scale(1.03);
 }
 </style> 

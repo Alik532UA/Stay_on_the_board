@@ -39,6 +39,18 @@
     --modal-footer-gap: 16px;
     --modal-overlay-bg: rgba(0,0,0,0.4);
     --positive-score-color: #4CAF50;
+    --confirm-action-bg: #4CAF50;
+    --confirm-action-text: #fff;
+    --warning-action-bg: #ff9800;
+    --warning-action-text: #222;
+    --info-action-bg: #2196f3;
+    --info-action-text: #fff;
+    --dot-color: #fff;
+    --crown-shadow: #fff8;
+    --control-selected-text: #fff;
+    --disabled-bg: #cccccc;
+    --disabled-text: #666666;
+    --toggle-off-bg: #ccc;
 }
 
 /* Класичний стиль - Темна тема */
@@ -71,4 +83,16 @@
     --modal-content-bg: #2d2d2d;
     --error-color: #f44336;
     --board-hidden-bg: #424242;
+    --confirm-action-bg: #388e3c;
+    --confirm-action-text: #fff;
+    --warning-action-bg: #ffb300;
+    --warning-action-text: #222;
+    --info-action-bg: #1976d2;
+    --info-action-text: #fff;
+    --dot-color: #fff;
+    --crown-shadow: #fff8;
+    --control-selected-text: #fff;
+    --disabled-bg: #424242;
+    --disabled-text: #757575;
+    --toggle-off-bg: #555;
 } 
