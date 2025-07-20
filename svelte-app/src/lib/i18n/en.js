@@ -121,7 +121,12 @@ export default {
     },
     scoreInfoTitle: "How are points awarded?",
     scoreInfoContent: `Points per move:\n• +1 point: with the board and queen visible.\n• +2 points: with the board visible, but the queen hidden.\n• +3 points: with the board hidden (hardest mode).\n\nAdditional bonus points are awarded automatically at the end of the game:\n• Board Size Bonus.\n• Blocked Cells Mode Bonus.\n• "No Moves" Button Bonus.\n• Jump Bonus for jumping over blocked cells.`,
-    watchReplay: "Watch Replay"
+    watchReplay: "Watch Replay",
+    expertModeTitle: "Attention: Expert Mode",
+    expertModeContent: "You have selected a mode where cells are not blocked immediately. This significantly complicates the game, as you now need to remember not only *where* the piece has been, but also *how many times*.
+\nWe recommend mastering the basic mode (blocking after 0 visits) first to get the most enjoyment out of the game.",
+    expertModeConfirm: "Continue (don't show again)",
+    expertModeCancel: "Return to Basic Mode"
   },
   replay: {
     step: "Step {current}/{total}",

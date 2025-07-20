@@ -204,6 +204,36 @@
       ]
     });
   }
+
+  /** @param {number} count */
+  function selectBlockCount(count) {
+    const hasSeenWarning = localStorage.getItem('hasSeenExpertModeWarning');
+
+    if (count > 0 && !hasSeenWarning) {
+      modalStore.showModal({
+        titleKey: 'modal.expertModeTitle',
+        contentKey: 'modal.expertModeContent',
+        buttons: [
+          {
+            textKey: 'modal.expertModeConfirm',
+            primary: true,
+            isHot: true,
+            onClick: () => {
+              localStorage.setItem('hasSeenExpertModeWarning', 'true');
+              settingsStore.updateSettings({ blockOnVisitCount: count });
+              modalStore.closeModal();
+            }
+          },
+          {
+            textKey: 'modal.expertModeCancel',
+            onClick: modalStore.closeModal
+          }
+        ]
+      });
+    } else {
+      settingsStore.updateSettings({ blockOnVisitCount: count });
+    }
+  }
 </script>
 
 <div class="game-interaction-wrapper">
@@ -273,7 +303,7 @@
               <button
                 class="count-selector-btn"
                 class:active={$settingsStore.blockOnVisitCount === count}
-                onclick={() => settingsStore.updateSettings({ blockOnVisitCount: count })}
+                onclick={() => selectBlockCount(count)}
                 aria-pressed={$settingsStore.blockOnVisitCount === count}
               >
                 {count === 0 ? '0' : count}
