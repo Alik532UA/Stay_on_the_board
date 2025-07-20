@@ -185,7 +185,7 @@
 
 #game-container,
 #main-menu-container {
-    background: var(--bg-primary);
+    background: #23272f !important;
     color: var(--text-primary);
     min-height: 100vh;
     padding: var(--unified-spacing);
