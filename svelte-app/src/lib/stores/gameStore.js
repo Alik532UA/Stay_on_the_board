@@ -241,7 +241,7 @@ export const appState = writable(/** @type {AppState} */({
   gameId: 1,
   availableDistances: Array.from({ length: initialBoardSize - 1 }, (_, i) => i + 1), // [1, 2] for size 3
   cellVisitCounts: {}, // <-- ДОДАНО
-  moveHistory: [{ pos: { row: 0, col: 0 }, blocked: [] }], // Починаємо історію з першої клітинки
+  moveHistory: [{ pos: { row: 0, col: 0 }, visits: {} }], // Починаємо історію з першої клітинки
   isReplayMode: false,
   replayCurrentStep: 0,
   isAutoPlaying: false,
@@ -303,7 +303,7 @@ function performMove(state, newRow, newCol) {
     playerCol: newCol,
     blockedCells: newBlockedCells,
     cellVisitCounts: newVisitCounts,
-    moveHistory: [...(state.moveHistory || []), { pos: { row: newRow, col: newCol }, blocked: newBlockedCells }],
+    moveHistory: [...(state.moveHistory || []), { pos: { row: newRow, col: newCol }, visits: newVisitCounts }],
     // Рядок availableMoves: newAvailableMoves, видалено.
   };
 }
@@ -361,7 +361,7 @@ export async function setBoardSize(newSize) {
       gameId: (state.gameId || 0) + 1,
       availableDistances: Array.from({ length: newSize - 1 }, (_, i) => i + 1),
       cellVisitCounts: {}, // <-- ДОДАНО
-      moveHistory: [{ pos: { row, col }, blocked: [] }], // Починаємо історію з першої клітинки
+      moveHistory: [{ pos: { row, col }, visits: {} }], // Починаємо історію з першої клітинки
       isReplayMode: false,
       replayCurrentStep: 0,
       isAutoPlaying: false,
@@ -514,7 +514,7 @@ export function resetGame() {
       gameId: (state.gameId || 0) + 1,
       availableDistances: Array.from({ length: boardSize - 1 }, (_, i) => i + 1),
       cellVisitCounts: {}, // <-- ДОДАНО
-      moveHistory: [{ pos: { row, col }, blocked: [] }],
+      moveHistory: [{ pos: { row, col }, visits: {} }],
       isReplayMode: false,
       replayCurrentStep: 0,
       isAutoPlaying: false,
@@ -629,7 +629,7 @@ export async function confirmMove() {
     if (isOutsideBoard) {
       appState.update(s => ({
         ...s,
-        moveHistory: [...s.moveHistory, { pos: { row: newRow, col: newCol }, blocked: s.blockedCells }]
+        moveHistory: [...s.moveHistory, { pos: { row: newRow, col: newCol }, visits: s.cellVisitCounts }]
       }));
     }
     const finalScoreDetails = calculateFinalScore(get(appState));
