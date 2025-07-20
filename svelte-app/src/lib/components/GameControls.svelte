@@ -1,5 +1,5 @@
 <script>
-  import { appState, toggleBlockMode, setDirection, setDistance, confirmMove, noMoves, resetGame, availableDistances } from '$lib/stores/gameStore.js';
+  import { appState, toggleBlockMode, setDirection, setDistance, confirmMove, noMoves, resetGame, availableDistances, setBoardSize } from '$lib/stores/gameStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
@@ -7,6 +7,7 @@
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
   import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleShowQueen } from '$lib/stores/settingsStore.js';
   import SvgIcons from './SvgIcons.svelte';
+  import { get } from 'svelte/store';
   $: isPlayerTurn = $appState.players[$appState.currentPlayerIndex]?.type === 'human';
   $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
   // Для відображення стрілки за напрямком
@@ -176,6 +177,20 @@
     if (count === 5 || count === 6) return 3;
     return 4;
   })();
+
+  let boardSizes = [5, 6, 7, 8, 9, 10];
+  let showBoardSizeDropdown = false;
+  function toggleBoardSizeDropdown() {
+    showBoardSizeDropdown = !showBoardSizeDropdown;
+  }
+  function closeBoardSizeDropdown() {
+    showBoardSizeDropdown = false;
+  }
+  /** @param {number} n */
+  function selectBoardSize(n) {
+    setBoardSize(n);
+    closeBoardSizeDropdown();
+  }
 </script>
 
 <div class="game-interaction-wrapper">
@@ -189,6 +204,30 @@
       </span>
     </summary>
     <div class="toggles">
+      <div class="setting-item board-size-selector">
+        <span>{$_('settings.boardSize')}</span>
+        <div class="board-size-dropdown-wrapper" class:open={showBoardSizeDropdown}>
+          <button class="board-size-dropdown-btn" class:active={showBoardSizeDropdown} onclick={toggleBoardSizeDropdown} aria-haspopup="listbox" aria-expanded={showBoardSizeDropdown}>
+            <span>{$appState.boardSize}x{$appState.boardSize}</span>
+            <svg class="dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+          </button>
+          <div class="dropdown-backdrop" onclick={closeBoardSizeDropdown} onkeydown={e => (e.key === 'Escape') && closeBoardSizeDropdown()} role="button" tabindex="0" aria-label="Закрити меню"></div>
+          <ul class="board-size-dropdown-list" role="listbox">
+            {#each boardSizes as n (n)}
+              <li 
+                class="board-size-dropdown-option {$appState.boardSize === n ? 'selected' : ''}" 
+                role="option" 
+                aria-selected={$appState.boardSize === n} 
+                onclick={() => selectBoardSize(n)}
+                onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') selectBoardSize(n); }}
+                tabindex="0"
+              >
+                {n}x{n}
+              </li>
+            {/each}
+          </ul>
+        </div>
+      </div>
       <!-- 1. Показати дошку -->
       <label class="ios-switch-label">
         <div class="switch-content-wrapper">
@@ -351,6 +390,91 @@
   gap: 12px;
   width: 100%;
   margin-bottom: 8px;
+}
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.08em;
+  padding: 4px 0;
+}
+.board-size-dropdown-wrapper {
+  position: relative;
+}
+
+.board-size-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid transparent;
+  color: var(--text-primary, #fff);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.board-size-dropdown-btn:hover,
+.board-size-dropdown-btn.active {
+  border-color: var(--text-accent, #ff9800);
+}
+
+.dropdown-arrow {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  transition: transform 0.3s ease-out;
+}
+
+.board-size-dropdown-btn.active .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.board-size-dropdown-list {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+  z-index: 10000;
+  padding: 8px;
+  list-style: none;
+  max-height: 250px;
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.board-size-dropdown-wrapper.open .board-size-dropdown-list {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.board-size-dropdown-option {
+  padding: 10px 24px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.board-size-dropdown-option:hover,
+.board-size-dropdown-option.selected {
+  background: var(--text-accent, #ff9800);
+  color: #fff;
+}
+
+.dropdown-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.3);
 }
 .ios-switch-label {
   display: flex;

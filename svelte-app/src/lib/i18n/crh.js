@@ -82,7 +82,8 @@ export default {
     styleGray: "Gri",
     styleOrange: "Turuncu",
     reset: "Sozlamalarnı sıfırla",
-    resetHint: "Bütün sozlamalarnı standart qıymetlerge qaytar"
+    resetHint: "Bütün sozlamalarnı standart qıymetlerge qaytar",
+    boardSize: "Tahta ölçüsi",
   },
   modal: {
     ok: "OK",
@@ -253,5 +254,28 @@ export default {
     gratitudeText: "Layihemizni qoltutqan er keske pek minnetdarmız. Siziñ yardımıñız bizge ilham bere ve oyunnıñ inkişafına imkân bere. Sağıñız!",
     callToAction: "İşlep çıqarıcı sizni de bu cedvelge qoşmaqtan memnun olur! Donat yibergende, tefsirlerde lağabıñıznı belirtiñiz. Eger böyle imkân yoqsa, maña Telegram'da yazıñız: <a href='https://t.me/alik532' target='_blank' rel='noopener noreferrer'>@alik532</a>",
     supportButton: "Layiheni Destekle"
+  },
+  faq: {
+    title: "Sık Sorulğan Sualler",
+    q1: "Oyunıñ maqsadı nedir?",
+    a1: "Esas maqsat – kompyuterni yeñmek degil, hafızanıñıznı ve hayaliñizni terbiye etmek. Ortak figurani mümkün qadar uzun vaqıt tahtada tutmaq, nevbetnen areket etmek ve er bir areket içün ballar almaq kerek.",
+    q2: "Figuranı nege qoyğan yerimde tapmadım?",
+    a2: "Çünki siz areket yapqan soñ, derhal kompyuter areket ete. Onıñ areketi (yönelişi ve mesafesi) sizinki soñra merkezi apelsin düğmesinde qısqa vaqıt kösterile.",
+    q3: "Kompyuterni nasıl yeñmek mümkün?",
+    a3: "Bu oyunda klasik manada kompyuterni yeñmek mümkün degil. O hata yapmay. Maqsadıñız – mümkün qadar çoq bal toplayıp, tahta üstünde en uzun müddet qalmaq.",
+    q4: "Tahtadaki noqtalar ne içün?",
+    a4: "Bunlar vezirniñ mevcut pozitsiyasından barlıq mümkün areketlerni kösterip turğan vizual ipuçlarıdır. Bu opsiyanı sozlamalarda qapatıp, oyunnı çetindire bileceksiñiz.",
+    q5: "Ballar nasıl toplanadı?",
+    a5: "Her bir muvafaqiyetli areket içün ballar alınadı:\n• +1 bal: tahta ve vezir körünüvde.\n• +2 bal: tahta körünüvde, amma vezir gizli.\n• +3 bal: tahta gizli.\nOyun soñunda tahta ölçüsi, blok rejimi ve başqalar içün bonuslar alınadı. Kompyuter areketine ayna areket yapqan içün ceza balları (-2) berile.",
+    q6: "Oyun nasıl daa qızıq ola?",
+    a6: "'Pro Rejim'ni sınap baqıñız: sozlamalarda 'Tahtanı köster'ni qapatıñız, 'Seslendirüv'ni açıp, qısqa yollar (hotkeys) ile kör körüne oynap baqıñız. Bu, hafıza ve mekânsal tüşüniş içün quvetli bir trenajorğa aylandıra.",
+    q7: "Vezirni nasıl idare etem?",
+    a7: "Tahtanıñ altında yerleşken idare panelini qullanıñız. Evvel 8 oqtan birini basıp yönelişni saylañız, sonra raqam düğmesini basıp mesafeni saylañız. Ondan soñ areketiñizni tasdiqlayınız.",
+    q8: "Neden tek figura bar? Kompyuterniñ figurası qayda?",
+    a8: "Bu oyunda tek figura bar ve o, siz ve kompyuter içün ortaqtır. Siz onı bir yerge areket ettireseñiz, kompyuter onı yeni pozitsiyadan areket ettire. Bu, bir figuranı mümkün qadar uzun müddet tahtada tutmaq oyunıdır.",
+    q9: "Kompyuter qayda areket etti – nasıl bilecem?",
+    a9: "Siz areket yapqan soñ, merkezi idare düğmesine baqıñız. Apelsin fonunda oq ve raqam kösterile – bunlar kompyuterniñ areket yönelişi ve mesafesidir. Sozlamalarda seslendirüvni de açıp baqıñız.",
+    q10: "Qısqa yollar bar mı?",
+    a10: "Ebet! Oyunı NumPad ya da WASD klavye blokınen idare ete bileceksiñiz. 'Pro Rejim' içün en qulayı budur. Bütün klavye kombinatsiyaları 'Idare' betinde kösterile."
   }
 };

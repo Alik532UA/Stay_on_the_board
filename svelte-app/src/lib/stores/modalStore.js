@@ -3,7 +3,7 @@ import { writable } from 'svelte/store';
 /**
  * @typedef {Object} ModalButton
  * @property {string} [text]
- * @property {string} [textKey] // <-- ДОДАНО
+ * @property {string} [textKey]
  * @property {boolean} [primary]
  * @property {() => void} [onClick]
  * @property {string} [customClass]
@@ -12,17 +12,18 @@ import { writable } from 'svelte/store';
  */
 /**
  * @typedef {Object} ModalContent
- * @property {string} [reason] - Причина завершення гри.
- * @property {number} [score] - Фінальний рахунок (для старого вигляду).
- * @property {any} [scoreDetails] - Деталізація рахунку (бонуси).
+ * @property {string} [reason]
+ * @property {number} [score]
+ * @property {any} [scoreDetails]
+ * @property {boolean} [isFaq]
  */
 /**
  * @typedef {Object} ModalState
  * @property {boolean} isOpen
  * @property {string} [title]
- * @property {string} [titleKey] // <-- ДОДАНО
+ * @property {string} [titleKey]
  * @property {string|ModalContent} [content]
- * @property {string} [contentKey] // <-- ДОДАНО
+ * @property {string} [contentKey]
  * @property {ModalButton[]} buttons
  */
 
@@ -34,12 +35,11 @@ const initialState = {
   buttons: []
 };
 
-const { subscribe, set, update } = writable(initialState);
+const { subscribe, set } = writable(initialState);
 
 export const modalState = { subscribe };
 
 /**
- * Відкриває модальне вікно
  * @param {{ title?: string, titleKey?: string, content?: string|ModalContent, contentKey?: string, buttons?: ModalButton[] }} param0
  */
 function showModal({ title, titleKey, content, contentKey, buttons }) {

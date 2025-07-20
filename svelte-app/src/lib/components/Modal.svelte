@@ -4,6 +4,7 @@
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
   import SvgIcons from './SvgIcons.svelte';
+  import FAQModal from './FAQModal.svelte';
 
   const modal_data = $derived(modalState);
 
@@ -66,7 +67,11 @@
       </div>
       <div class="modal-content">
         
-        {#if $modal_data.contentKey || (typeof $modal_data.content === 'string' && $modal_data.content)}
+        {#if $modal_data.component}
+          <svelte:component this={$modal_data.component} />
+        {:else if typeof $modal_data.content === 'object' && $modal_data.content?.isFaq}
+          <FAQModal />
+        {:else if $modal_data.contentKey || (typeof $modal_data.content === 'string' && $modal_data.content)}
           <p class="reason">
             {#if $modal_data.contentKey}
               {@html $_($modal_data.contentKey)}

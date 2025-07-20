@@ -82,7 +82,8 @@ export default {
     styleGray: "Gray",
     styleOrange: "Orange",
     reset: "Reset Settings",
-    resetHint: "Return all settings to their default values"
+    resetHint: "Return all settings to their default values",
+    boardSize: "Board size"
   },
   modal: {
     ok: "OK",
@@ -282,5 +283,28 @@ export default {
     gratitudeText: "We are incredibly grateful to everyone who supports our project. Your help inspires us and allows the game to grow. Thank you!",
     callToAction: "The developer would be happy to add you to this list! When sending a donation, please include your nickname in the comments. If that's not possible, contact me on Telegram: <a href='https://t.me/alik532' target='_blank' rel='noopener noreferrer'>@alik532</a>",
     supportButton: "Support the Project"
+  },
+  faq: {
+    title: "Frequently Asked Questions",
+    q1: "What is the goal of the game?",
+    a1: "The main goal is not to beat the computer, but to train your memory and imagination. You must keep the shared piece on the board as long as possible, taking turns and earning points for each move.",
+    q2: "Why isn't the piece where I moved it?",
+    a2: "Because after your move, the computer moves immediately. Its move (direction and distance) is briefly shown on the central orange button right after yours.",
+    q3: "How do I beat the computer?",
+    a3: "In this game, you can't beat the computer in the classic sense. It doesn't make mistakes. Your goal is to score as many points as possible by surviving on the board for as many moves as you can.",
+    q4: "What do the dots on the board mean?",
+    a4: "They are visual hints showing all available cells you can move to from the queen's current position. You can turn this off in settings for a harder challenge.",
+    q5: "How do I score points?",
+    a5: "You earn points for each move depending on the difficulty:\n• +1 point: with the board and queen visible.\n• +2 points: with the board visible, but the queen hidden.\n• +3 points: with the board hidden.\nAt the end of the game, you also get bonuses for board size, block mode, and more. Penalty points (-2) are given for making a mirrored move after the computer's move.",
+    q6: "How can I make the game more interesting?",
+    a6: "Try 'Pro Mode': turn off 'Show board' in settings, enable 'Voiceover', and play blindfolded using hotkeys. This turns the game into a powerful trainer for memory and spatial thinking.",
+    q7: "How do I control the queen?",
+    a7: "Use the control panel below the board. First, press one of the 8 arrows to choose a direction, then a number button to choose the distance. Then confirm your move.",
+    q8: "Why is there only one piece? Where is the computer's piece?",
+    a8: "There is only one piece in this game, shared by you and the computer. You move it to your cell, then the computer moves it from its new position. It's a game about keeping a single piece on the board as long as possible.",
+    q9: "How do I know where the computer moved?",
+    a9: "Right after your move, look at the central control button. The orange background will show an arrow and a number indicating the computer's move direction and distance. You can also enable voiceover in settings.",
+    q10: "Are there hotkeys?",
+    a10: "Yes! You can control the game using the NumPad or WASD keys. This is the most convenient way to play in 'Pro Mode'. See the full list of keys on the 'Controls' page in the main menu."
   }
 };

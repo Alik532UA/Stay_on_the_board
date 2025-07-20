@@ -14,16 +14,13 @@
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from './SvgIcons.svelte';
   import { base } from '$app/paths';
-  import { cubicOut } from 'svelte/easing';
-  import { scale } from 'svelte/transition';
   import ReplayControls from '$lib/components/ReplayControls.svelte';
   import { replayPosition, replayBlockedCells, replaySegments } from '$lib/utils/replay.js';
   import { goto } from '$app/navigation';
+  import FAQModal from '$lib/components/FAQModal.svelte';
 
   let showBoard = $derived($settingsStore.showBoard);
-  const ANIMATION_DURATION = 10000; // 10 секунд для дебагу
 
-  // Функція очищення кешу
   function clearCache() {
     localStorage.clear();
     sessionStorage.clear();
@@ -38,74 +35,26 @@
     }
     location.reload();
   }
-  let boardSizes = Array.from({length:8},(_,i)=>i+2);
-  let showBoardSizeDropdown = $state(false);
-
-  function toggleBoardSizeDropdown() {
-    showBoardSizeDropdown = !showBoardSizeDropdown;
-  }
-
-  function closeBoardSizeDropdown() {
-    showBoardSizeDropdown = false;
-  }
-
-  /** @param {number} n */
-  function selectBoardSize(n) {
-    const state = get(appState);
-    if (state.boardSize === n) {
-      closeBoardSizeDropdown();
-      return;
-    }
-    if (state.score === 0 && state.penaltyPoints === 0) {
-      setBoardSize(n);
-      closeBoardSizeDropdown();
-      return;
-    }
-    modalStore.showModal({
-      titleKey: 'modal.resetScoreTitle',
-      contentKey: 'modal.resetScoreContent',
-      buttons: [
-        {
-          textKey: 'modal.resetScoreConfirm',
-          customClass: 'green-btn',
-          isHot: true,
-          onClick: () => {
-            setBoardSize(n);
-            modalStore.closeModal();
-          }
-        },
-        {
-          textKey: 'modal.resetScoreCancel',
-          onClick: () => {
-            modalStore.closeModal();
-          }
-        }
-      ]
-    });
-    closeBoardSizeDropdown();
-  }
 
   let boardSize = $derived(Number($appState.boardSize));
   let playerRow = $derived($appState.playerRow);
   let playerCol = $derived($appState.playerCol);
   let blockedCells = $derived($appState.blockedCells);
   let blockModeEnabled = $derived($appState.blockModeEnabled);
-  let currentPlayerIndex = $derived($appState.currentPlayerIndex);
   let showMoves = $derived($settingsStore.showMoves);
-  let gameId = $derived($appState.gameId);
-  let availableMoves = $derived($appState.availableMoves);
   let cellVisitCounts = $derived($appState.cellVisitCounts);
   let blockOnVisitCount = $derived($settingsStore.blockOnVisitCount);
-
-  let playerTitle = $derived($_('gameBoard.player'));
   let mainMenuTitle = $derived($_('gameBoard.mainMenu'));
 
   onMount(() => {
     const state = get(appState);
-    // Якщо гра завершена АБО якщо це початковий стан (рахунок 0 і не в режимі реплею),
-    // то запускаємо нову гру.
     if (state.isGameOver || (state.score === 0 && !state.isReplayMode && state.moveHistory.length <= 1)) {
       resetGame();
+    }
+    const hasVisitedGame = localStorage.getItem('hasVisitedGame');
+    if (!hasVisitedGame) {
+      showGameInfoModal();
+      localStorage.setItem('hasVisitedGame', 'true');
     }
   });
 
@@ -135,13 +84,10 @@
     return $appState.availableMoves && $appState.availableMoves.some(move => move.row === row && move.col === col);
   }
 
-  /**
-   * @param {number} row
-   * @param {number} col
-   */
+  /** @param {number} row @param {number} col */
   function isCellBlocked(row, col) {
     if ($appState.isReplayMode) {
-      return $replayBlockedCells && $replayBlockedCells.some(cell => cell.row === row && cell.col === col);
+      return $replayBlockedCells.some((cell) => cell.row === row && cell.col === col);
     }
     const visitCount = cellVisitCounts[`${row}-${col}`] || 0;
     return blockModeEnabled && visitCount > blockOnVisitCount;
@@ -218,8 +164,8 @@
       case 'NumpadMultiply': logStore.addLog('[handleKeydown] Перемкнено режим заблокованих клітинок', 'info'); toggleBlockMode(); break;
       case 'NumpadDivide': logStore.addLog('[handleKeydown] Перемкнено видимість дошки', 'info'); toggleShowBoard(); break;
       // Board size
-      case 'NumpadAdd': case 'Equal': selectBoardSize(Math.min(get(appState).boardSize + 1, 9)); break;
-      case 'NumpadSubtract': case 'Minus': selectBoardSize(Math.max(get(appState).boardSize - 1, 2)); break;
+      case 'NumpadAdd': case 'Equal': setBoardSize(Math.min(get(appState).boardSize + 1, 9)); break;
+      case 'NumpadSubtract': case 'Minus': setBoardSize(Math.max(get(appState).boardSize - 1, 2)); break;
       default:
         handled = false;
         break;
@@ -236,11 +182,8 @@
     }
   }
 
-  /**
-   * @param {MouseEvent|KeyboardEvent} e
-   */
+  /** @param {MouseEvent|KeyboardEvent|undefined} e */
   function showBoardClickHint(e) {
-    // e може бути MouseEvent або KeyboardEvent, або undefined
     if (e && typeof e.stopPropagation === 'function') {
       e.stopPropagation();
     }
@@ -253,7 +196,6 @@
 
   /** @param {MouseEvent} event @param {number} row @param {number} col */
   function onCellRightClick(event, row, col) {
-    // Якщо це не MouseEvent — ігноруємо (лінтер-фікс)
     if (!(event instanceof MouseEvent)) return;
     event.preventDefault();
     if (blockModeEnabled && !(row === playerRow && col === playerCol)) {
@@ -263,70 +205,10 @@
     }
   }
 
-  // Реплеї: сегменти для градієнтної лінії
-  let segments = $derived(
-    (() => {
-      if (!$appState.isReplayMode || $appState.moveHistory.length < 2) {
-        return [];
-      }
-      const segments = [];
-      const history = $appState.moveHistory;
-      const totalSteps = history.length - 1;
-      const cellSize = 100 / $appState.boardSize;
-      const currentStep = $appState.replayCurrentStep;
-      const limitPath = $appState.limitReplayPath;
-      const startColor = { r: 76, g: 175, b: 80 };
-      const endColor = { r: 244, g: 67, b: 54 };
-      for (let i = 0; i < totalSteps; i++) {
-        const startPos = history[i].pos;
-        const endPos = history[i + 1].pos;
-        const ratio = i / totalSteps;
-        const r = Math.round(startColor.r + ratio * (endColor.r - startColor.r));
-        const g = Math.round(startColor.g + ratio * (endColor.g - startColor.g));
-        const b = Math.round(startColor.b + ratio * (endColor.b - startColor.b));
-        // --- ОНОВЛЕНА ЛОГІКА ПРОЗОРОСТІ ---
-        let opacity = 1.0;
-        if (limitPath) {
-          const dist = i - currentStep;
-          if (dist >= 0 && dist < 3) { // 3 кроки вперед
-            opacity = 1.0 - dist * 0.3;
-          } else if (dist < 0 && dist >= -1) { // 1 крок назад
-            opacity = 0.7;
-          } else {
-            opacity = 0;
-          }
-        }
-        segments.push({
-          x1: startPos.col * cellSize + cellSize / 2,
-          y1: startPos.row * cellSize + cellSize / 2,
-          x2: endPos.col * cellSize + cellSize / 2,
-          y2: endPos.row * cellSize + cellSize / 2,
-          color: `rgb(${r}, ${g}, ${b})`,
-          opacity: Math.max(0, opacity)
-        });
-      }
-      return segments;
-    })()
-  );
-
-  let position = $derived(
-    $appState.isReplayMode
-      ? $appState.moveHistory[$appState.replayCurrentStep]?.pos
-      : ($appState.playerRow !== null && $appState.playerCol !== null)
-        ? { row: $appState.playerRow, col: $appState.playerCol }
-        : null
-  );
-
-  let blocked = $derived(
-    $appState.isReplayMode
-      ? $appState.moveHistory[$appState.replayCurrentStep]?.blocked || []
-      : blockedCells
-  );
-
   function showGameInfoModal() {
     modalStore.showModal({
-      titleKey: 'gameBoard.infoModalTitle',
-      contentKey: 'gameBoard.infoModalContent',
+      titleKey: 'faq.title',
+      content: { isFaq: true },
       buttons: [
         { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },
         { textKey: 'modal.ok', primary: true, isHot: true, onClick: modalStore.closeModal }
@@ -337,42 +219,12 @@
 
 <div class="game-board-container">
   <div class="game-board-top-row">
-    <!-- 1. Головне меню -->
     <button class="main-menu-btn" title={mainMenuTitle} onclick={goToMainMenu}>
       <SvgIcons name="home" />
     </button>
-
-    <!-- 2. Вибір розміру дошки -->
-    <div class="board-size-dropdown-wrapper">
-      <button class="board-size-dropdown-btn" class:active={showBoardSizeDropdown} onclick={toggleBoardSizeDropdown} aria-haspopup="listbox" aria-expanded={showBoardSizeDropdown}>
-        <span class="board-size-dropdown-btn-text">{boardSize}</span>
-      </button>
-      {#if showBoardSizeDropdown}
-        <!-- Цей фон буде перехоплювати кліки поза меню -->
-        <div class="dropdown-backdrop screen-overlay-backdrop" onclick={closeBoardSizeDropdown} onkeydown={e => (e.key === 'Escape') && closeBoardSizeDropdown()} role="button" tabindex="0" aria-label="Закрити меню"></div>
-        <ul class="board-size-dropdown-list" role="listbox">
-          {#each boardSizes as n (n)}
-            <li 
-              class="board-size-dropdown-option {n === boardSize ? 'selected' : ''}" 
-              role="option" 
-              aria-selected={n === boardSize} 
-              onclick={() => selectBoardSize(n)}
-              onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') selectBoardSize(n); }}
-              tabindex="0"
-            >
-              {n}x{n}
-            </li>
-          {/each}
-        </ul>
-      {/if}
-    </div>
-
-    <!-- 3. Інформація -->
     <button class="main-menu-btn" title={$_('gameBoard.info')} onclick={showGameInfoModal}>
       <SvgIcons name="info" />
     </button>
-
-    <!-- 4. Очистити кеш (тільки для dev) -->
     {#if import.meta.env.DEV}
       <button class="clear-cache-btn" title="Очистити кеш" onclick={clearCache}>
         <span class="visually-hidden">Очистити кеш</span>
@@ -380,6 +232,7 @@
       </button>
     {/if}
   </div>
+  
   <div class="score-panel game-content-block">
     <div class="score-display">
       <span class="score-label-text">{$_('gameBoard.scoreLabel')}:</span>
@@ -407,6 +260,7 @@
       {$_('gameBoard.cashOut')}
     </button>
   </div>
+
   {#key `${$appState.boardSize}-${$appState.gameId}`}
     <div 
       class="board-bg-wrapper game-content-block" 
@@ -474,12 +328,13 @@
       </div>
     </div>
   {/key}
-  <!-- Рендеримо ферзя як окремий елемент поверх сітки -->
+
   {#if $appState.isReplayMode}
     <ReplayControls />
   {:else}
     <GameControls />
   {/if}
+  
   <Modal />
   {#if $uiState.isVoiceSettingsModalOpen}
     <VoiceSettingsModal close={closeVoiceSettingsModal} />
@@ -524,9 +379,6 @@
     color: #fff;
     box-shadow: 0 0 12px var(--control-selected, #ff9800);
     transform: scale(1.05);
-  }
-  .board-size-dropdown-btn {
-    /* Унікальні стилі, якщо потрібні, залишити тут. */
   }
   .score-panel {
     background: var(--bg-secondary, #fff3);
@@ -630,10 +482,6 @@
   }
   .tutorial-close-btn:hover {
     color: var(--text-primary);
-  }
-  .tutorial-panel p {
-    margin: 0;
-    padding-right: 16px;
   }
   .pro-tip-link {
     margin-top: 12px;
