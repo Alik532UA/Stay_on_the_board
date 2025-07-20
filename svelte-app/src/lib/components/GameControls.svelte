@@ -1,13 +1,15 @@
 <script>
-  import { appState, toggleBlockMode, setDirection, setDistance, confirmMove, noMoves, resetGame, availableDistances, setBoardSize } from '$lib/stores/gameStore.js';
+  import { appState, toggleBlockMode, setDirection, setDistance, setBoardSize, resetGame } from '$lib/stores/gameStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { logStore } from '$lib/stores/logStore.js';
+  import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js';
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
   import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleShowQueen } from '$lib/stores/settingsStore.js';
   import SvgIcons from './SvgIcons.svelte';
   import { get } from 'svelte/store';
+  import { availableDistances } from '$lib/stores/gameStore.js';
   $: isPlayerTurn = $appState.players[$appState.currentPlayerIndex]?.type === 'human';
   $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
   // Для відображення стрілки за напрямком
@@ -57,12 +59,15 @@
 
   // --- CENTRAL BUTTON STATE LOGIC ---
   $: centerInfoState = (() => {
+    console.log('[GameControls] Recalculating centerInfoState:', { selectedDirection, selectedDistance, computerLastMoveDisplay });
     // 1. Початковий стан: нічого не вибрано, немає ходу комп'ютера
     if (!selectedDirection && !selectedDistance && !computerLastMoveDisplay) {
+      console.log('[GameControls] State: Initial');
       return { class: '', content: '', clickable: false, aria: 'Порожньо' };
     }
     // 2. Показ ходу комп'ютера
     if (!selectedDirection && !selectedDistance && typeof computerLastMoveDisplay === 'object' && computerLastMoveDisplay !== null) {
+      console.log('[GameControls] State: Displaying computer move');
       let dir = '';
       let dist = '';
       if (typeof computerLastMoveDisplay.direction === 'string' && directionArrows.hasOwnProperty(computerLastMoveDisplay.direction)) {
@@ -80,6 +85,7 @@
     }
     // 3. Тільки напрямок
     if (selectedDirection && !selectedDistance) {
+      console.log('[GameControls] State: Direction only');
       let dir = '';
       if (typeof selectedDirection === 'string' && directionArrows.hasOwnProperty(selectedDirection)) {
         dir = directionArrows[selectedDirection];
@@ -93,6 +99,7 @@
     }
     // 4. Тільки відстань
     if (!selectedDirection && selectedDistance) {
+      console.log('[GameControls] State: Distance only');
       return {
         class: 'direction-distance-state',
         content: String(selectedDistance),
@@ -102,6 +109,7 @@
     }
     // 5. Підтверджуваний хід (напрямок + відстань)
     if (selectedDirection && selectedDistance) {
+      console.log('[GameControls] State: Confirmable move');
       let dir = '';
       if (typeof selectedDirection === 'string' && directionArrows.hasOwnProperty(selectedDirection)) {
         dir = directionArrows[selectedDirection];
@@ -114,6 +122,7 @@
       };
     }
     // fallback
+    console.log('[GameControls] State: Fallback');
     return { class: '', content: '', clickable: false, aria: '' };
   })();
 
@@ -160,9 +169,9 @@
       selectedDistance,
       buttonDisabled
     });
-    confirmMove(); 
+    confirmPlayerMove(); 
   }
-  function onNoMoves() { noMoves(); }
+  function onNoMoves() { claimNoMoves(); }
 
   /**
    * @param {Event} event
@@ -171,12 +180,11 @@
     // Викликаємо toggleSpeech без аргументів, щоб уникнути помилки типу
     await toggleSpeech();
   }
-  $: numColumns = (() => {
-    const count = $availableDistances.length;
+  $: numColumns = ((count) => {
     if (count <= 4) return count;
     if (count === 5 || count === 6) return 3;
     return 4;
-  })();
+  })($availableDistances.length);
 
   /** @param {number} increment */
   function changeBoardSize(increment) {
@@ -337,10 +345,14 @@
   </details>
   <div class="game-controls-panel">
     <div class="directions directions-3x3">
-      <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" onclick={() => onDirectionClick('up-left')} title={$_('tooltips.up-left')}>↖</button>
-      <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" onclick={() => onDirectionClick('up')} title={$_('tooltips.up')}>↑</button>
-      <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" onclick={() => onDirectionClick('up-right')} title={$_('tooltips.up-right')}>↗</button>
-      <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" onclick={() => onDirectionClick('left')} title={$_('tooltips.left')}>←</button>
+      <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" onclick={() => onDirectionClick('up-left')} title={`${$_('tooltips.up-left')}
+(${$settingsStore.keybindings['up-left'].join(', ')})`}>↖</button>
+      <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" onclick={() => onDirectionClick('up')} title={`${$_('tooltips.up')}
+(${$settingsStore.keybindings['up'].join(', ')})`}>↑</button>
+      <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" onclick={() => onDirectionClick('up-right')} title={`${$_('tooltips.up-right')}
+(${$settingsStore.keybindings['up-right'].join(', ')})`}>↗</button>
+      <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" onclick={() => onDirectionClick('left')} title={`${$_('tooltips.left')}
+(${$settingsStore.keybindings['left'].join(', ')})`}>←</button>
       <button
         id="center-info"
         class="control-btn center-info {centerInfoState.class}"
@@ -352,10 +364,14 @@
       >
         {String(centerInfoState.content)}
       </button>
-      <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" onclick={() => onDirectionClick('right')} title={$_('tooltips.right')}>→</button>
-      <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" onclick={() => onDirectionClick('down-left')} title={$_('tooltips.down-left')}>↙</button>
-      <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" onclick={() => onDirectionClick('down')} title={$_('tooltips.down')}>↓</button>
-      <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" onclick={() => onDirectionClick('down-right')} title={$_('tooltips.down-right')}>↘</button>
+      <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" onclick={() => onDirectionClick('right')} title={`${$_('tooltips.right')}
+(${$settingsStore.keybindings['right'].join(', ')})`}>→</button>
+      <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" onclick={() => onDirectionClick('down-left')} title={`${$_('tooltips.down-left')}
+(${$settingsStore.keybindings['down-left'].join(', ')})`}>↙</button>
+      <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" onclick={() => onDirectionClick('down')} title={`${$_('tooltips.down')}
+(${$settingsStore.keybindings['down'].join(', ')})`}>↓</button>
+      <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" onclick={() => onDirectionClick('down-right')} title={`${$_('tooltips.down-right')}
+(${$settingsStore.keybindings['down-right'].join(', ')})`}>↘</button>
     </div>
     <div class="distance-select">
       <div>{$_('gameControls.selectDistance')}</div>
@@ -371,12 +387,12 @@
       </div>
     </div>
     <div class="action-btns">
-      <button class="confirm-btn" onclick={onConfirmMove} disabled={buttonDisabled} title={$_('tooltips.confirm')}>
+      <button class="confirm-btn" onclick={confirmPlayerMove} disabled={buttonDisabled} title={`${$_('tooltips.confirm')}\n(${$settingsStore.keybindings['confirm']})`}>
         <SvgIcons name="confirm" />
         {$_('gameControls.confirm')}
       </button>
       {#if blockModeEnabled}
-        <button class="no-moves-btn" onclick={onNoMoves} title={$_('tooltips.no-moves')}>
+        <button class="no-moves-btn" onclick={claimNoMoves} title={`${$_('tooltips.no-moves')}\n(${$settingsStore.keybindings['no-moves']})`}>
           <SvgIcons name="no-moves" />
           {$_('gameControls.noMovesTitle')}
         </button>
@@ -639,8 +655,8 @@
 }
 
 #center-info.computer-move-display {
-  background: var(--no-moves-btn-bg) !important;
-  color: var(--no-moves-btn-text) !important;
+  background: var(--warning-action-bg) !important;
+  color: var(--warning-action-text) !important;
   box-shadow: 0 0 16px 4px var(--shadow-color), 0 4px 24px 0 var(--shadow-color) !important;
   animation: none !important;
   cursor: default !important;

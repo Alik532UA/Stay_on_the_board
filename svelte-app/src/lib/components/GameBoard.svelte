@@ -1,6 +1,6 @@
 <script>
   import '../css/components/game-board.css';
-  import { appState, setBoardSize, toggleBlockCell, setDirection, setDistance, confirmMove, noMoves, toggleBlockMode, cashOutAndEndGame, resetGame } from '$lib/stores/gameStore.js';
+  import { appState, setBoardSize, toggleBlockCell, setDirection, setDistance, toggleBlockMode, cashOutAndEndGame, resetGame } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { navigateToMainMenu } from '$lib/utils/navigation.js';
   import GameControls from '$lib/components/GameControls.svelte';
@@ -18,23 +18,9 @@
   import { replayPosition, replayCellVisitCounts, replaySegments } from '$lib/utils/replay.js';
   import { goto } from '$app/navigation';
   import FAQModal from '$lib/components/FAQModal.svelte';
+  import { confirmPlayerMove } from '$lib/gameOrchestrator.js';
 
   let showBoard = $derived($settingsStore.showBoard);
-
-  function clearCache() {
-    localStorage.clear();
-    sessionStorage.clear();
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i];
-        const eqPos = cookie.indexOf('=');
-        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
-      }
-    }
-    location.reload();
-  }
 
   let boardSize = $derived(Number($appState.boardSize));
   let playerRow = $derived($appState.playerRow);
@@ -102,82 +88,120 @@
     return '';
   }
 
+  // === Динамічні гарячі клавіші ===
+  /** @type {Record<string, () => void>} */
+  const actionHandlers = {
+    'up-left': () => setDirection('up-left'),
+    'up': () => setDirection('up'),
+    'up-right': () => setDirection('up-right'),
+    'left': () => setDirection('left'),
+    'right': () => setDirection('right'),
+    'down-left': () => setDirection('down-left'),
+    'down': () => setDirection('down'),
+    'down-right': () => setDirection('down-right'),
+    'confirm': confirmPlayerMove,
+    'no-moves': () => { logStore.addLog(`[handleKeydown] "немає ходів"`, 'info'); setDirection('down-right'); },
+    'toggle-block-mode': () => { logStore.addLog('[handleKeydown] Перемкнено режим заблокованих клітинок', 'info'); toggleBlockMode(); },
+    'toggle-board': () => { logStore.addLog('[handleKeydown] Перемкнено видимість дошки', 'info'); toggleShowBoard(); },
+    'increase-board': () => setBoardSize(Math.min(get(appState).boardSize + 1, 9)),
+    'decrease-board': () => setBoardSize(Math.max(get(appState).boardSize - 1, 2)),
+    'toggle-speech': toggleSpeech,
+    'distance-1': () => setDistance(1),
+    'distance-2': () => setDistance(2),
+    'distance-3': () => setDistance(3),
+    'distance-4': () => setDistance(4),
+    'distance-5': () => setDistance(5),
+    'distance-6': () => setDistance(6),
+    'distance-7': () => setDistance(7),
+    'distance-8': () => setDistance(8),
+  };
+
+  const keyToActionMap = $derived(Object.entries($settingsStore.keybindings).reduce((acc, [action, keys]) => {
+    keys.forEach(key => {
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(action);
+    });
+    return acc;
+  }, /** @type {Record<string, string[]>} */ ({})));
+
+  function getKeyToActionMap() {
+    /** @type {Record<string, string>} */
+    const map = {};
+    Object.entries($settingsStore.keybindings).forEach(([action, keys]) => {
+      keys.forEach(key => {
+        map[key] = action;
+      });
+    });
+    return map;
+  }
+
   /** @param {KeyboardEvent} event */
   function handleKeydown(event) {
-    if (get(modalStore).isOpen) {
+    if (get(modalStore).isOpen) return;
+
+    const target = /** @type {HTMLElement} */ (event.target);
+    if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) {
       return;
     }
-    const target = event.target;
-    if (target && typeof target === 'object' && 'tagName' in target) {
-      const tag = target.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
-        return;
+
+    const actions = keyToActionMap[event.code];
+    if (!actions || actions.length === 0) return;
+
+    event.preventDefault();
+
+    if (actions.length === 1) {
+      const handler = actionHandlers[actions[0]];
+      if (handler) handler();
+    } else {
+      const resolvedAction = $settingsStore.keyConflictResolution[event.code];
+      if (resolvedAction && actionHandlers[resolvedAction]) {
+        actionHandlers[resolvedAction]();
+      } else {
+        // Show modal to choose
+        modalStore.showModal({
+          titleKey: 'modal.keyConflictTitle',
+          content: {
+            key: event.code,
+            actions: actions,
+          },
+          buttons: actions.map(action => ({
+            text: $_(`controlsPage.actions.${action}`),
+            onClick: () => {
+              // 1. Зберігаємо вибір користувача
+              const newResolutions = {
+                ...$settingsStore.keyConflictResolution,
+                [event.code]: action
+              };
+
+              // 2. Оновлюємо прив'язки, видаляючи конфліктну клавішу з інших дій
+              /** @type {Record<string, string[]>} */
+              const newKeybindings = { ...$settingsStore.keybindings };
+              actions.forEach(otherAction => {
+                if (otherAction !== action && Array.isArray(newKeybindings[otherAction])) {
+                  newKeybindings[otherAction] = newKeybindings[otherAction].filter(
+                    key => key !== event.code
+                  );
+                }
+              });
+
+              settingsStore.updateSettings({
+                keyConflictResolution: newResolutions,
+                keybindings: newKeybindings
+              });
+
+              // 3. Виконуємо обрану дію
+              if (actionHandlers[action]) {
+                actionHandlers[action]();
+              }
+              
+              // 4. Закриваємо модальне вікно
+              modalStore.closeModal();
+            }
+          }))
+        });
       }
-    }
-
-    let handled = true;
-
-    switch (event.code) {
-      // NumPad
-      case 'Numpad7': setDirection('up-left'); break;
-      case 'Numpad8': setDirection('up'); break;
-      case 'Numpad9': setDirection('up-right'); break;
-      case 'Numpad4': setDirection('left'); break;
-      case 'Numpad6': setDirection('right'); break;
-      case 'Numpad1': setDirection('down-left'); break;
-      case 'Numpad2': setDirection('down'); break;
-      case 'Numpad3': setDirection('down-right'); break;
-      case 'Numpad5': confirmMove(); break;
-      case 'NumpadEnter': confirmMove(); break;
-      // Main digit keys
-      case 'Digit7': setDirection('up-left'); break;
-      case 'Digit8': setDirection('up'); break;
-      case 'Digit9': setDirection('up-right'); break;
-      case 'Digit4': setDirection('left'); break;
-      case 'Digit6': setDirection('right'); break;
-      case 'Digit1':
-        if ($appState.selectedDirection) {
-          setDistance(1);
-        } else {
-          setDirection('down-left');
-        }
-        break;
-      case 'Digit2': setDirection('down'); break;
-      case 'Digit3': setDirection('down-right'); break;
-      case 'Digit5': confirmMove(); break;
-      // WASD
-      case 'KeyW': setDirection('up'); break;
-      case 'KeyS': case 'KeyX': setDirection('down'); break;
-      case 'KeyA': setDirection('left'); break;
-      case 'KeyD': setDirection('right'); break;
-      case 'KeyQ': setDirection('up-left'); break;
-      case 'KeyE': setDirection('up-right'); break;
-      case 'KeyZ': setDirection('down-left'); break;
-      case 'KeyC': setDirection('down-right'); break;
-      // Actions
-      case 'Enter': case 'Space': confirmMove(); break;
-      case 'KeyN': noMoves(); break;
-      case 'Backspace': logStore.addLog(`[handleKeydown] Натиснуто "Backspace" — заявити "немає ходів"`, 'info'); noMoves(); break;
-      // Settings
-      case 'KeyV': logStore.addLog('[handleKeydown] Перемкнено озвучування ходів', 'info'); toggleSpeech(); break;
-      case 'NumpadMultiply': logStore.addLog('[handleKeydown] Перемкнено режим заблокованих клітинок', 'info'); toggleBlockMode(); break;
-      case 'NumpadDivide': logStore.addLog('[handleKeydown] Перемкнено видимість дошки', 'info'); toggleShowBoard(); break;
-      // Board size
-      case 'NumpadAdd': case 'Equal': setBoardSize(Math.min(get(appState).boardSize + 1, 9)); break;
-      case 'NumpadSubtract': case 'Minus': setBoardSize(Math.max(get(appState).boardSize - 1, 2)); break;
-      default:
-        handled = false;
-        break;
-    }
-
-    if (event.code === 'NumpadDecimal') {
-      logStore.addLog(`[handleKeydown] Натиснуто "NumpadDecimal" — заявити "немає ходів"`, 'info');
-      noMoves();
-      handled = true;
-    }
-
-    if (handled) {
-      event.preventDefault();
     }
   }
 
@@ -224,12 +248,6 @@
     <button class="main-menu-btn" title={$_('gameBoard.info')} onclick={showGameInfoModal}>
       <SvgIcons name="info" />
     </button>
-    {#if import.meta.env.DEV}
-      <button class="clear-cache-btn" title="Очистити кеш" onclick={clearCache}>
-        <span class="visually-hidden">Очистити кеш</span>
-        <SvgIcons name="clear-cache" />
-      </button>
-    {/if}
   </div>
   
   <div class="score-panel game-content-block">

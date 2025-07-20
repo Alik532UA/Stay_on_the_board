@@ -1,0 +1,23 @@
+export default {
+  title: "Veelgestelde Vragen",
+  q1: "Wat is het doel van het spel?",
+  a1: "Het belangrijkste doel is niet om de computer te verslaan, maar om je geheugen en verbeelding te trainen. Je moet het gedeelde stuk zo lang mogelijk op het bord houden, om de beurt bewegen en punten verdienen voor elke zet.",
+  q8: "Waarom is er maar één stuk? Waar is het stuk van de computer?",
+  a8: "In dit spel is er maar één stuk, dat gedeeld wordt tussen jou en de computer. Jij verplaatst het naar jouw vakje, de computer vanaf zijn nieuwe positie naar het zijne. Het spel draait om het zo lang mogelijk op het bord houden van één stuk.",
+  q7: "Hoe bestuur ik de dame?",
+  a7: "Besturen doe je met het paneel onder het bord. Klik eerst op een van de 8 pijlen om een richting te kiezen, klik daarna op een knop met een cijfer om de afstand te kiezen. Bevestig daarna je zet.",
+  q10: "Zijn er sneltoetsen?",
+  a10: "Ja! Je kunt het spel besturen met het numerieke toetsenblok of de WASD-toetsen. Dit is de handigste manier om in 'Pro-modus' te spelen. De volledige lijst met toetsen vind je op de pagina 'Besturing' in het hoofdmenu.",
+  q4: "Wat betekenen de stippen op het bord?",
+  a4: "Dit zijn visuele hints die alle beschikbare vakjes voor de zet van de dame vanaf haar huidige positie tonen. Je kunt deze optie uitschakelen in de instellingen om het spel moeilijker te maken.",
+  q2: "Waarom staat het stuk niet waar ik het heb neergezet?",
+  a2: "Omdat de computer direct na jouw zet zijn zet doet. Zijn zet (richting en afstand) wordt kort weergegeven op de centrale oranje knop direct na die van jou.",
+  q9: "Hoe weet ik waar de computer naartoe is gegaan?",
+  a9: "Kijk direct na jouw zet naar de centrale bedieningsknop. Op de oranje achtergrond verschijnt een pijl en een cijfer die de richting en afstand van de zet van de computer aangeven. Je kunt ook de zet-voiceover inschakelen in de instellingen.",
+  q3: "Hoe versla ik de computer?",
+  a3: "Het is onmogelijk om de computer op de klassieke manier te verslaan. Hij maakt geen fouten. Jouw doel is om zoveel mogelijk punten te scoren door zo lang mogelijk op het bord te blijven.",
+  q5: "Hoe verdien ik punten?",
+  a5: "Punten worden toegekend voor elke zet, afhankelijk van de moeilijkheidsgraad:\n• +1 punt: met zichtbaar bord en dame.\n• +2 punten: met zichtbaar bord, maar dame verborgen.\n• +3 punten: met verborgen bord.\nAan het einde van het spel worden bonussen toegekend voor bordgrootte, blokmodus en meer. Strafpunten (-2) worden gegeven voor een spiegelzet als reactie op de zet van de computer.",
+  q6: "Hoe maak ik het spel interessanter?",
+  a6: "Probeer de 'Pro-modus': schakel 'Geblokkeerde cellen-modus' in, schakel 'Bord tonen' uit in de instellingen, zet 'Zet-voiceover' aan en speel geblinddoekt met sneltoetsen. Dit maakt van het spel een krachtige trainer voor geheugen en ruimtelijk inzicht."
+}; 

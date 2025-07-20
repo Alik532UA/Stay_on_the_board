@@ -1,0 +1,202 @@
+
+**Крок 1: Розширення системи керування клавішами**
+
+1.  **У файлі `svelte-app/src/lib/stores/settingsStore.js`:**
+    *   Додай нові дії для вибору відстані (`distance-1`, `distance-2`, ..., `distance-8`) до `defaultKeybindings`. Це дозволить користувачам налаштовувати ці клавіші окремо.
+2.  **У файлі `svelte-app/src/routes/controls/+page.svelte`:**
+    *   Додай нову групу "Вибір відстані" до `actionGroups`, щоб ці налаштування відображалися в інтерфейсі.
+3.  **У файлах інтернаціоналізації (`uk.js`, `en.js`):**
+    *   Додай переклади для нової групи та для кожної дії вибору відстані.
+
+**Крок 2: Рефакторинг обробника `handleKeydown` для врахування контексту**
+
+1.  **У файлі `svelte-app/src/lib/components/GameBoard.svelte`:**
+    *   Онови `actionHandlers`, додавши обробники для нових дій вибору відстані (`distance-1`, `distance-2` тощо).
+    *   Зміни логіку `handleKeydown`:
+        *   Вона більше не буде просто викликати дію з `keyToActionMap`.
+        *   Замість цього, вона буде перевіряти, чи є натиснута клавіша цифрою (`Digit1`-`Digit9`).
+        *   **Якщо це цифра:** буде застосовано контекстну логіку — якщо напрямок вже обрано, буде встановлено відстань; якщо ні — буде виконано дію, призначену на цю клавішу (наприклад, рух).
+        *   **Якщо це не цифра:** буде виконано дію з `keyToActionMap`, як і раніше.
+
+Цей підхід вирішить конфлікт, коли одна й та сама клавіша використовується для різних цілей, і відновить коректну роботу всіх гарячих клавіш.
+
+---
+
+**Приступаю до виконання.**
+
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\stores\settingsStore.js
+// Deleting the following lines:
+  'decrease-board': ['NumpadSubtract', 'Minus'],
+  'toggle-speech': ['KeyV'],
+};
+
+// Adding the following lines:
+  'decrease-board': ['NumpadSubtract', 'Minus'],
+  'toggle-speech': ['KeyV'],
+  'distance-1': ['Digit1'],
+  'distance-2': ['Digit2'],
+  'distance-3': ['Digit3'],
+  'distance-4': ['Digit4'],
+  'distance-5': ['Digit5'],
+  'distance-6': ['Digit6'],
+  'distance-7': ['Digit7'],
+  'distance-8': ['Digit8'],
+};
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\routes\controls\+page.svelte
+// Deleting the following lines:
+    {
+      title: 'controlsPage.gameSettings',
+      actions: ['toggle-block-mode', 'toggle-board', 'increase-board', 'decrease-board', 'toggle-speech']
+    }
+  ];
+
+// Adding the following lines:
+    {
+      title: 'controlsPage.gameSettings',
+      actions: ['toggle-block-mode', 'toggle-board', 'increase-board', 'decrease-board', 'toggle-speech']
+    },
+    {
+      title: 'controlsPage.distanceSelection',
+      actions: ['distance-1', 'distance-2', 'distance-3', 'distance-4', 'distance-5', 'distance-6', 'distance-7', 'distance-8']
+    }
+  ];
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\components\GameBoard.svelte
+// Deleting the following lines:
+    'increase-board': () => setBoardSize(Math.min(get(appState).boardSize + 1, 9)),
+    'decrease-board': () => setBoardSize(Math.max(get(appState).boardSize - 1, 2)),
+    'toggle-speech': toggleSpeech,
+  };
+
+  const keyToActionMap = $derived(Object.entries($settingsStore.keybindings).reduce((acc, [action, keys]) => {
+    keys.forEach(key => {
+      acc[key] = action;
+    });
+    return acc;
+  }, /** @type {Record<string, string>} */ ({})));
+
+  /** @param {KeyboardEvent} event */
+  function handleKeydown(event) {
+    if (get(modalStore).isOpen) return;
+
+    const target = /** @type {HTMLElement} */ (event.target);
+    if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) {
+      return;
+    }
+
+    const action = keyToActionMap[event.code];
+    if (action && actionHandlers[action]) {
+      event.preventDefault();
+      actionHandlers[action]();
+    }
+  }
+
+// Adding the following lines:
+    'increase-board': () => setBoardSize(Math.min(get(appState).boardSize + 1, 9)),
+    'decrease-board': () => setBoardSize(Math.max(get(appState).boardSize - 1, 2)),
+    'toggle-speech': toggleSpeech,
+    'distance-1': () => setDistance(1),
+    'distance-2': () => setDistance(2),
+    'distance-3': () => setDistance(3),
+    'distance-4': () => setDistance(4),
+    'distance-5': () => setDistance(5),
+    'distance-6': () => setDistance(6),
+    'distance-7': () => setDistance(7),
+    'distance-8': () => setDistance(8),
+  };
+
+  const keyToActionMap = $derived(Object.entries($settingsStore.keybindings).reduce((acc, [action, keys]) => {
+    keys.forEach(key => {
+      acc[key] = action;
+    });
+    return acc;
+  }, /** @type {Record<string, string>} */ ({})));
+
+  /** @param {KeyboardEvent} event */
+  function handleKeydown(event) {
+    if (get(modalStore).isOpen) return;
+
+    const target = /** @type {HTMLElement} */ (event.target);
+    if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) {
+      return;
+    }
+
+    const action = keyToActionMap[event.code];
+    if (!action || !actionHandlers[action]) return;
+
+    event.preventDefault();
+
+    // Контекстна логіка для цифрових клавіш
+    if (event.code.startsWith('Digit')) {
+      const digit = parseInt(event.code.replace('Digit', ''), 10);
+      if (get(appState).selectedDirection && digit > 0 && digit < get(appState).boardSize) {
+        setDistance(digit);
+        return;
+      }
+    }
+    
+    actionHandlers[action]();
+  }
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\uk.js
+// Deleting the following lines:
+      'increase-board': "Збільшити дошку",
+      'decrease-board': "Зменшити дошку",
+      'toggle-speech': "Озвучування ходів"
+    }
+  },
+  rulesPage: {
+    title: "Правила гри \"Stay on the Board\"",
+
+// Adding the following lines:
+      'increase-board': "Збільшити дошку",
+      'decrease-board': "Зменшити дошку",
+      'toggle-speech': "Озвучування ходів",
+      'distance-1': "Відстань 1",
+      'distance-2': "Відстань 2",
+      'distance-3': "Відстань 3",
+      'distance-4': "Відстань 4",
+      'distance-5': "Відстань 5",
+      'distance-6': "Відстань 6",
+      'distance-7': "Відстань 7",
+      'distance-8': "Відстань 8"
+    },
+    distanceSelection: "Вибір відстані"
+  },
+  rulesPage: {
+    title: "Правила гри \"Stay on the Board\"",
+```
+```javascript
+// file: C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\svelte-app\src\lib\i18n\en.js
+// Deleting the following lines:
+      'increase-board': "Increase Board Size",
+      'decrease-board': "Decrease Board Size",
+      'toggle-speech': "Toggle Voiceover"
+    }
+  },
+  rulesPage: {
+    title: "Rules of \"Stay on the Board\"",
+
+// Adding the following lines:
+      'increase-board': "Increase Board Size",
+      'decrease-board': "Decrease Board Size",
+      'toggle-speech': "Toggle Voiceover",
+      'distance-1': "Distance 1",
+      'distance-2': "Distance 2",
+      'distance-3': "Distance 3",
+      'distance-4': "Distance 4",
+      'distance-5': "Distance 5",
+      'distance-6': "Distance 6",
+      'distance-7': "Distance 7",
+      'distance-8': "Distance 8"
+    },
+    distanceSelection: "Distance Selection"
+  },
+  rulesPage: {
+    title: "Rules of \"Stay on the Board\"",
+```

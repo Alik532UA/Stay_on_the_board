@@ -1,315 +1,39 @@
-export default {
-  mainMenu: {
-    title: "Stay on the Board",
-    menu: "Menu",
-    playVsComputer: "Play vs Computer",
-    localGame: "Local Game",
-    playOnline: "Play Online",
-    settings: "Settings",
-    controls: "Controls",
-    rules: "Rules",
-    clearCache: "Clear Cache",
-    theme: "Theme",
-    language: "Language",
-    donate: "Support the project",
-    lang: {
-      uk: "Ukrainian",
-      en: "English",
-      crh: "Crimean Tatar",
-      nl: "Dutch"
-    },
-    themeName: {
-      purple: "Purple",
-      green: "Green",
-      blue: "Blue",
-      gray: "Gray",
-      orange: "Orange",
-      wood: "Wooden"
-    },
-    wipNotice: {
-      title: "Under Development",
-      description: "This feature is still under development. To speed up its release, you can support the project:",
-    },
-    supporters: "Acknowledgements"
-  },
-  gameBoard: {
-    mainMenu: "Main Menu",
-    player: "Player",
-    penaltyInfoTitle: "Penalty Information",
-    penaltyHint: "To avoid a penalty, do not make a move that is the exact reverse of the computer's last move (i.e., don't move back to the cell it just came from).",
-    scoreLabel: "Score",
-    cashOut: "Cash Out",
-    tutorialTitle: "",
-    tutorialContent: "Your goal is to take turns moving the shared piece without going off the board. Hide the queen or the board in the settings to earn more points for each move!",
-    info: "Instructions",
-    details: "Details",
-    infoModalTitle: "About the Game and Its Goal",
-    infoModalContent: `Your goal is to take turns moving the shared piece without going off the board.\n\n<b>Pro Mode: Training Your Imagination</b>\nThe real fun begins when you move the board into your mind. Try turning off the board in settings, enabling voiceover, and playing blindfolded using hotkeys. This turns the game into a powerful trainer for memory and spatial thinking. Start with a 3x3 board and gradually increase the challenge!`,
-  },
-  gameControls: {
-    ok: "OK",
-    cancel: "Cancel",
-    resetTitle: "Reset game?",
-    resetContent: "Are you sure you want to reset the game? All blocks and player position will be lost.",
-    showMoves: "Show available moves",
-    showBoard: "Show board",
-    blockMode: "Blocked cells mode",
-    speech: "Enable voiceover",
-    selectDistance: "Select distance:",
-    confirm: "Confirm Move",
-    noMovesTitle: "No moves",
-    voiceSettingsTitle: "Configure voice",
-    showQueen: "Show Queen",
-    settings: "Settings"
-  },
-  settings: {
-    title: "Settings",
-    showMoves: "Show available moves",
-    language: "Language",
-    lang: {
-      uk: "Ukrainian",
-      en: "English",
-      crh: "Crimean Tatar",
-      nl: "Dutch"
-    },
-    theme: "Theme",
-    themeDark: "Dark",
-    themeLight: "Light",
-    style: "Style",
-    stylePurple: "Purple",
-    styleGreen: "Green",
-    styleBlue: "Blue",
-    styleGray: "Gray",
-    styleOrange: "Orange",
-    reset: "Reset Settings",
-    resetHint: "Return all settings to their default values",
-    boardSize: "Board size"
-  },
-  modal: {
-    ok: "OK",
-    resetScoreTitle: "Reset score?",
-    resetScoreContent: "Changing the board size will reset your current score and penalty points. Are you sure you want to continue?",
-    resetScoreConfirm: "Yes, change size",
-    resetScoreCancel: "No, stay",
-    gameOverTitle: "Game Over!",
-    computerNoMovesTitle: "Opponent is Trapped!",
-    playerNoMovesTitle: "Brilliant Analysis!",
-    errorTitle: "Mistaken Claim!",
-    playAgain: "Play Again",
-    continueGame: "Continue",
-    finishGameWithBonus: "Finish (+{bonus} points)",
-    computerNoMovesContent: "The computer cannot make a move. You can continue the game by clearing all blocked cells, or end it now and receive bonus points.",
-    playerNoMovesContent: "You can clear the board and continue the game, or end it now and receive bonus points.",
-    errorContent: "You still have available moves ({count} left). You lost.",
-    gameOverReasonOut: "You went off the board.",
-    gameOverReasonBlocked: "You tried to move to a blocked cell.",
-    gameOverReasonCashOut: "You decided to end the game and cash out your score.",
-    gameOverReasonBonus: "You decided to end the game and claim a bonus.",
-    boardClickTitle: "How to control the game?",
-    boardClickContent: "The game is controlled not on the board, but with the control panel below. Use the arrows to select a direction and the number buttons to select a distance. The board is only for observing the moves.",
+import mainMenu from './en/mainMenu.js';
+import gameBoard from './en/gameBoard.js';
+import controlsPage from './en/controlsPage.js';
+import modal from './en/modal.js';
+import settings from './en/settings.js';
+import rulesPage from './en/rulesPage.js';
+import voiceSettings from './en/voiceSettings.js';
+import header from './en/header.js';
+import onlineMenu from './en/onlineMenu.js';
+import waitingForPlayer from './en/waitingForPlayer.js';
+import joinRoom from './en/joinRoom.js';
+import localGame from './en/localGame.js';
+import speech from './en/speech.js';
+import ui from './en/ui.js';
+import tooltips from './en/tooltips.js';
+import supportersPage from './en/supportersPage.js';
+import replay from './en/replay.js';
+import faq from './en/faq.js';
 
-    scoreDetails: {
-      baseScore: "Base score:",
-      sizeBonus: "Board size bonus:",
-      blockModeBonus: "Block mode bonus:",
-      jumpBonus: "Jump bonus:",
-      noMovesBonus: "\"No moves\" bonus:",
-      finishBonus: "Game completion bonus:",
-      penalty: "Penalty for reverse moves:",
-      finalScore: "Final score:",
-      yourScore: "Your score:"
-    },
-    scoreInfoTitle: "How are points awarded?",
-    scoreInfoContent: `Points per move:\n• +1 point: with the board and queen visible.\n• +2 points: with the board visible, but the queen hidden.\n• +3 points: with the board hidden (hardest mode).\n\nAdditional bonus points are awarded automatically at the end of the game:\n• Board Size Bonus.\n• Blocked Cells Mode Bonus.\n• "No Moves" Button Bonus.\n• Jump Bonus for jumping over blocked cells.`,
-    watchReplay: "Watch Replay",
-    expertModeTitle: "Attention: Expert Mode",
-    expertModeContent: "You have selected a mode where cells are not blocked immediately. This significantly complicates the game, as you now need to remember not only *where* the piece has been, but also *how many times*.
-\nWe recommend mastering the basic mode (blocking after 0 visits) first to get the most enjoyment out of the game.",
-    expertModeConfirm: "Continue (don't show again)",
-    expertModeCancel: "Return to Basic Mode"
-  },
-  replay: {
-    step: "Step {current}/{total}",
-    limitPath: "Enhanced Path Visibility",
-    close: "Close Replay",
-    prev: "Previous Step",
-    play: "Play",
-    pause: "Pause",
-    next: "Next Step"
-  },
-  voiceSettings: {
-    title: "Voice Settings",
-    loading: "Loading voices...",
-    noVoices: "Ukrainian voices are not yet loaded. Please start a game to activate them, then return to this menu.",
-    whyButton: "Why is that?",
-    edgeFixTitle: "How to activate voices in Edge:",
-    edgeFixStep1: "1. Open any other tab with text (e.g., a Wikipedia article).",
-    edgeFixStep2: "2. Select a piece of text, right-click, and choose \"Read aloud selection\".",
-    edgeFixStep3: "3. When the narration starts, pause it.",
-    edgeFixStep4: "4. Return to the game tab and click the \"Check Again\" button below.",
-    edgeFixStep5: "If this doesn't help, you may need to restart your browser.",
-    checkAgainButton: "Check Again",
-    whyIsThisNeededTitle: "Why is this necessary?",
-    hideDetailsButton: "Hide details",
-    reasonTitle: "Reason for the issue",
-    reasonContent: "Our game uses voices built into your operating system and accessible through the browser. Some browsers, like Chrome on Windows, do not always have access to system Ukrainian voices.",
-    recommendationsTitle: "Recommended platforms",
-    recommendationsContent: "For the best voiceover experience, try one of these options:",
-    platformEdge: "Microsoft Edge browser on Windows.",
-    platformAndroid: "Any browser on mobile devices.",
-    iosWarning: "Warning! Due to technical limitations of iOS, voiceover may work unstably, especially for computer moves. We are working on improving this feature.",
-    close: "Close"
-  },
-  controlsPage: {
-    title: "Controls & Hotkeys",
-    mainMovement: "Main Movement (NumPad)",
-    altMovement: "Alternative Movement (WASD-style)",
-    gameActions: "Game Actions",
-    gameSettings: "Game Settings Control",
-    upLeft: "Up-Left",
-    up: "Up",
-    upRight: "Up-Right",
-    left: "Left",
-    right: "Right",
-    downLeft: "Down-Left",
-    down: "Down",
-    downRight: "Down-Right",
-    downLeftNote: "(also sets distance to 1)",
-    confirmMove: "Confirm Move",
-    noMoves: "Declare \"no moves\"",
-    toggleBlockMode: "Toggle \"Blocked Cells Mode\"",
-    toggleBoardVisibility: "Toggle board visibility",
-    increaseBoard: "Increase board size",
-    decreaseBoard: "Decrease board size",
-    toggleSpeech: "Toggle move voiceover"
-  },
-  rulesPage: {
-    title: "Rules of \"Stay on the Board\"",
-    goalTitle: "Objective of the Game",
-    goalText: '"Stay on the Board" is a strategic endurance game. Players take turns moving one shared piece. Your goal is to keep it on the board for as long as possible and force your opponent to make a mistake.',
-    moveProcessTitle: "Move Process",
-    moveProcessText: "A player makes a move using the control panel below the board. Clicking on the board cells does not perform any moves.",
-    step1: "Step 1: Choose a direction.",
-    step1Text: "Press one of the 8 arrow buttons corresponding to the directions on a numeric keypad (NumPad):",
-    step2: "Step 2: Choose a distance.",
-    step2Text: "Press the button with a number indicating how many cells to move the piece. The maximum distance depends on the board size (N-1).",
-    step3: "Step 3: Confirm the move.",
-    step3Text: "Press the large green button to complete your move.",
-    winLossTitle: "Winning and Losing Conditions",
-    youLose: "You lose if:",
-    lose1: "Your move takes the piece off the board.",
-    lose2: "You try to move to an already blocked cell (in the corresponding mode, which can be enabled with a checkbox).",
-    lose3: "You press the \"No moves\" button, but you actually have available moves.",
-    youWin: "You win if:",
-    win1: "Your opponent makes one of the above mistakes.",
-    win2: "You press \"No moves\", and the system confirms that there are indeed no available moves.",
-    gameModesTitle: "Game Modes",
-    normalMode: "Normal Mode",
-    normalModeText: "This is the basic mode, ideal for beginners. All cells remain available throughout the game. The game ends only when one of the players moves the piece off the board.",
-    blockMode: "Blocked Cells Mode",
-    blockModeText: "A more complex and strategic mode. The cell from which a move was made becomes blocked and unavailable for future moves. This forces players to carefully plan their route.",
-    noMovesButtonTitle: "\"No moves\" Button",
-    noMovesButtonText1: "If you believe the piece has no valid moves left, you can press this button. The system will check your claim:",
-    noMovesWin: "If you are correct (there are no moves) - you win.",
-    noMovesLoss: "If you are mistaken (at least one move is available) - you lose.",
-    noMovesButtonText2: "This is a risky but sometimes necessary strategy to win in a difficult situation.",
-    scoringTitle: "Scoring System",
-    scoringText: "The number of points per move depends on the difficulty:",
-    scoreNormal: "+1 point: with the board and queen visible.",
-    scoreHideQueen: "+2 points: with the board visible, but the queen hidden.",
-    scoreHideBoard: "+3 points: with the board hidden (hardest mode).",
-    settingsTitle: "Game Settings",
-    boardSize: "Board Size",
-    boardSizeText: "You can change the size of the game board from 2x2 to 9x9.",
-    proModeTitle: "Pro Mode: Training Your Imagination",
-    proModeText: "The real fun begins when you move the board into your mind and play almost blindfolded. This turns the game into a powerful trainer for memory and spatial thinking.",
-    proModeTip: "Try this mode for maximum immersion:",
-    proModeStep1: "1. Start with a 3x3 board.",
-    proModeStep2: "2. In settings, turn off 'Show board' but keep 'Voiceover' enabled.",
-    proModeStep3: "3. Enable 'Blocked Cells Mode' to add strategic depth.",
-    proModeStep4: "4. Use hotkeys to control the game without looking at the screen.",
-    proModeConclusion: "Now you can make moves, listen to the computer's response, and keep the entire game situation — the queen's position and blocked cells — entirely in your head.",
-    proModeNextLevel: "When 3x3 becomes easy, increase the size to 4x4, then 5x5, and so on, gradually increasing the challenge and training your imagination!"
-  },
-  header: {
-    home: "Home",
-    about: "About",
-    sverdle: "Sverdle"
-  },
-  onlineMenu: {
-    title: "Online Menu"
-  },
-  waitingForPlayer: {
-    title: "Waiting for player..."
-  },
-  joinRoom: {
-    title: "Join Room"
-  },
-  localGame: {
-    title: "Local Game"
-  },
-  speech: {
-    player: "Player",
-    computer: "Computer",
-    move: "moves",
-    on: "for",
-    cell: "cell",
-    cells: "cells",
-    cells_many: "cells",
-    directions: {
-      'up': 'up',
-      'down': 'down',
-      'left': 'left',
-      'right': 'right',
-      'up-left': 'diagonally up-left',
-      'up-right': 'diagonally up-right',
-      'down-left': 'diagonally down-left',
-      'down-right': 'diagonally down-right'
-    }
-  },
-  ui: {
-    closeAndReturnToMenu: 'Close and return to main menu',
-    goBack: 'Go back'
-  },
-  tooltips: {
-    'up-left': "Up-Left\nNum 7 or Q",
-    'up': "Up\nNum 8 or W",
-    'up-right': "Up-Right\nNum 9 or E",
-    'left': "Left\nNum 4 or A",
-    'right': "Right\nNum 6 or D",
-    'down-left': "Down-Left\nNum 1 or Z",
-    'down': "Down\nNum 2, S or X",
-    'down-right': "Down-Right\nNum 3 or C",
-    'confirm': "Confirm Move\nEnter, Space or Num 5",
-    'no-moves': "Declare \"No Moves\"\nBackspace, Num . or N"
-  },
-  supportersPage: {
-    title: "Our Supporters",
-    gratitudeText: "We are incredibly grateful to everyone who supports our project. Your help inspires us and allows the game to grow. Thank you!",
-    callToAction: "The developer would be happy to add you to this list! When sending a donation, please include your nickname in the comments. If that's not possible, contact me on Telegram: <a href='https://t.me/alik532' target='_blank' rel='noopener noreferrer'>@alik532</a>",
-    supportButton: "Support the Project"
-  },
-  faq: {
-    title: "Frequently Asked Questions",
-    q1: "What is the goal of the game?",
-    a1: "The main goal is not to beat the computer, but to train your memory and imagination. You must keep the shared piece on the board as long as possible, taking turns and earning points for each move.",
-    q8: "Why is there only one piece? Where is the computer's piece?",
-    a8: "There is only one piece in this game, shared by you and the computer. You move it to your cell, then the computer moves it from its new position. It's a game about keeping a single piece on the board as long as possible.",
-    q7: "How do I control the queen?",
-    a7: "Use the control panel below the board. First, press one of the 8 arrows to choose a direction, then a number button to choose the distance. Then confirm your move.",
-    q10: "Are there hotkeys?",
-    a10: "Yes! You can control the game using the NumPad or WASD keys. This is the most convenient way to play in 'Pro Mode'. See the full list of keys on the 'Controls' page in the main menu.",
-    q4: "What do the dots on the board mean?",
-    a4: "They are visual hints showing all available cells you can move to from the queen's current position. You can turn this off in settings for a harder challenge.",
-    q2: "Why isn't the piece where I moved it?",
-    a2: "Because after your move, the computer moves immediately. Its move (direction and distance) is briefly shown on the central orange button right after yours.",
-    q9: "How do I know where the computer moved?",
-    a9: "Right after your move, look at the central control button. The orange background will show an arrow and a number indicating the computer's move direction and distance. You can also enable voiceover in settings.",
-    q3: "How do I beat the computer?",
-    a3: "In this game, you can't beat the computer in the classic sense. It doesn't make mistakes. Your goal is to score as many points as possible by surviving on the board for as many moves as you can.",
-    q5: "How do I score points?",
-    a5: "You earn points for each move depending on the difficulty:\n• +1 point: with the board and queen visible.\n• +2 points: with the board visible, but the queen hidden.\n• +3 points: with the board hidden.\nAt the end of the game, you also get bonuses for board size, block mode, and more. Penalty points (-2) are given for making a mirrored move after the computer's move.",
-    q6: "How can I make the game more interesting?",
-    a6: "Try 'Pro Mode': enable 'Blocked Cells Mode', turn off 'Show board' in settings, enable 'Voiceover', and play blindfolded using hotkeys. This turns the game into a powerful trainer for memory and spatial thinking."
-  }
+export default {
+  mainMenu,
+  gameBoard,
+  controlsPage,
+  modal,
+  settings,
+  rulesPage,
+  voiceSettings,
+  header,
+  onlineMenu,
+  waitingForPlayer,
+  joinRoom,
+  localGame,
+  speech,
+  ui,
+  tooltips,
+  supportersPage,
+  replay,
+  faq
 };

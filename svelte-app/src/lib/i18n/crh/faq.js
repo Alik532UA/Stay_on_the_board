@@ -1,0 +1,23 @@
+export default {
+  title: "Sıkça Sorulan Sorular",
+  q1: "Oyun amacı nedir?",
+  a1: "Ana amaç bilgisayarı yenmek değil, hafızanızı ve hayal gücünüzü geliştirmektir. Ortak taşı tahtada mümkün olduğunca uzun süre tutmalı, sırayla hamle yapmalı ve her hamle için puan kazanmalısınız.",
+  q8: "Neden sadece bir taş var? Bilgisayarın taşı nerede?",
+  a8: "Bu oyunda sadece bir taş var ve bu taş hem sizin hem de bilgisayar içindir. Siz onu kendi hücrenize, bilgisayar ise yeni pozisyonundan kendi hücresine taşır. Oyun, tek bir taşı tahtada mümkün olduğunca uzun süre tutmak üzerinedir.",
+  q7: "Vezir nasıl kontrol edilir?",
+  a7: "Kontrol, tahtanın altındaki panel ile yapılır. Önce 8 ok tuşundan birine tıklayarak yönü seçin, ardından bir rakam tuşuna tıklayarak mesafeyi seçin. Sonra hamlenizi onaylayın.",
+  q10: "Kısayol tuşları var mı?",
+  a10: "Evet! Oyunu NumPad veya WASD tuşları ile kontrol edebilirsiniz. Bu, 'Pro Modu'nda oynamanın en uygun yoludur. Tüm tuşların listesi ana menüdeki 'Kontroller' sayfasında bulunabilir.",
+  q4: "Tahtadaki noktalar ne anlama geliyor?",
+  a4: "Bunlar, vezirin mevcut konumundan hareket edebileceği tüm hücreleri gösteren görsel ipuçlarıdır. Bu seçeneği ayarlardan kapatarak oyunu zorlaştırabilirsiniz.",
+  q2: "Taş neden koyduğum yerde değil?",
+  a2: "Çünkü sizin hamlenizden hemen sonra bilgisayar hamle yapar. Onun hamlesi (yön ve mesafe) sizin hamlenizden hemen sonra merkezi turuncu düğmede kısa süreliğine gösterilir.",
+  q9: "Bilgisayarın nereye gittiğini nasıl anlarım?",
+  a9: "Hamlenizden hemen sonra merkezi kontrol düğmesine bakın. Turuncu arka planda bir ok ve bir rakam belirir, bu da bilgisayarın hamlesinin yönünü ve mesafesini gösterir. Ayrıca ayarlardan hamle seslendirmesini etkinleştirebilirsiniz.",
+  q3: "Bilgisayarı nasıl yenebilirim?",
+  a3: "Klasik anlamda bilgisayarı yenmek imkansızdır. O hata yapmaz. Amacınız, tahtada mümkün olduğunca fazla hamle yaparak en yüksek puanı toplamaktır.",
+  q5: "Nasıl puan kazanırım?",
+  a5: "Her hamleniz için zorluk derecesine göre puan verilir:\n• +1 puan: Tahta ve vezir görünür.\n• +2 puan: Tahta görünür, vezir gizli.\n• +3 puan: Tahta gizli.\nOyun sonunda, tahta boyutu, blok modu ve daha fazlası için bonuslar verilir. Bilgisayarın hamlesine ayna hamlesi yaparsanız -2 ceza puanı alırsınız.",
+  q6: "Oyunu nasıl daha ilginç hale getirebilirim?",
+  a6: "'Pro Modu'nu deneyin: 'Bloklu Hücreler Modu'nu etkinleştirin, ayarlardan 'Tahtayı Göster'i kapatın, 'Hamle Seslendirmesi'ni açın ve kısayol tuşlarıyla gözlerinizi kapatarak oynayın. Bu, oyunu hafıza ve mekânsal düşünme için güçlü bir antrenöre dönüştürür."
+}; 
