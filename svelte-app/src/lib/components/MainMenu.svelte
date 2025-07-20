@@ -6,6 +6,7 @@
   import { base } from '$app/paths';
   import { _ , isLoading, locale } from 'svelte-i18n';
   import SvgIcons from './SvgIcons.svelte';
+  import { appVersion } from '$lib/stores/versionStore.js';
   // Language dropdown logic (inline, замість LanguageSwitcher)
   let showLangDropdown = false;
   const languages = [
@@ -63,8 +64,6 @@
    */
   function selectTheme(style, theme) {
     logStore.addLog(`Зміна теми: ${style}, ${theme}`, 'info');
-    document.documentElement.setAttribute('data-style', style);
-    document.documentElement.setAttribute('data-theme', theme);
     settingsStore.updateSettings({ style, theme });
     showThemeDropdown = false;
   }
@@ -160,7 +159,12 @@
     {/if}
 
     <div class="main-menu-title">{$_('mainMenu.title')}</div>
-    <div class="main-menu-subtitle">{$_('mainMenu.menu')}</div>
+    <div class="main-menu-subtitle">
+      {$_('mainMenu.menu')}
+      {#if import.meta.env.DEV && $appVersion}
+        <span class="dev-version">dev v.{$appVersion}</span>
+      {/if}
+    </div>
     <div id="main-menu-buttons">
       <button class="modal-button secondary" on:click={() => navigateTo('/game')}>{$_('mainMenu.playVsComputer')}</button>
       <button class="modal-button secondary pseudo-disabled" on:click={openWipNotice}>{$_('mainMenu.localGame')}</button>
@@ -173,3 +177,13 @@
     </div>
   {/if}
 </main>
+
+<style>
+  .dev-version {
+    font-size: 0.7em;
+    opacity: 0.7;
+    margin-left: 8px;
+    font-weight: normal;
+    color: var(--text-accent);
+  }
+</style>

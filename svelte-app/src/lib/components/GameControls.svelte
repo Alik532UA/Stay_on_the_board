@@ -178,23 +178,36 @@
     return 4;
   })();
 
-  let boardSizes = [5, 6, 7, 8, 9, 10];
-  let showBoardSizeDropdown = false;
-  function toggleBoardSizeDropdown() {
-    showBoardSizeDropdown = !showBoardSizeDropdown;
+  /** @param {number} increment */
+  function changeBoardSize(increment) {
+    const currentSize = get(appState).boardSize;
+    const newSize = currentSize + increment;
+    if (newSize >= 2 && newSize <= 9) {
+      selectBoardSize(newSize);
+    }
   }
-  function closeBoardSizeDropdown() {
-    showBoardSizeDropdown = false;
-  }
+
   /** @param {number} n */
   function selectBoardSize(n) {
-    setBoardSize(n);
-    closeBoardSizeDropdown();
+    const state = get(appState);
+    if (state.boardSize === n) return;
+    if (state.score === 0 && state.penaltyPoints === 0) {
+      setBoardSize(n);
+      return;
+    }
+    modalStore.showModal({
+      titleKey: 'modal.resetScoreTitle',
+      contentKey: 'modal.resetScoreContent',
+      buttons: [
+        { textKey: 'modal.resetScoreConfirm', customClass: 'green-btn', isHot: true, onClick: () => { setBoardSize(n); modalStore.closeModal(); } },
+        { textKey: 'modal.resetScoreCancel', onClick: modalStore.closeModal }
+      ]
+    });
   }
 </script>
 
 <div class="game-interaction-wrapper">
-  <details class="settings-expander">
+  <details class="settings-expander" open>
     <summary class="settings-summary">
       {$_('gameControls.settings')}
       <span class="expander-arrow" aria-hidden="true">
@@ -204,28 +217,12 @@
       </span>
     </summary>
     <div class="toggles">
-      <div class="setting-item board-size-selector">
+      <div class="setting-item board-size-control">
         <span>{$_('settings.boardSize')}</span>
-        <div class="board-size-dropdown-wrapper" class:open={showBoardSizeDropdown}>
-          <button class="board-size-dropdown-btn" class:active={showBoardSizeDropdown} onclick={toggleBoardSizeDropdown} aria-haspopup="listbox" aria-expanded={showBoardSizeDropdown}>
-            <span>{$appState.boardSize}x{$appState.boardSize}</span>
-            <svg class="dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
-          </button>
-          <div class="dropdown-backdrop" onclick={closeBoardSizeDropdown} onkeydown={e => (e.key === 'Escape') && closeBoardSizeDropdown()} role="button" tabindex="0" aria-label="Закрити меню"></div>
-          <ul class="board-size-dropdown-list" role="listbox">
-            {#each boardSizes as n (n)}
-              <li 
-                class="board-size-dropdown-option {$appState.boardSize === n ? 'selected' : ''}" 
-                role="option" 
-                aria-selected={$appState.boardSize === n} 
-                onclick={() => selectBoardSize(n)}
-                onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') selectBoardSize(n); }}
-                tabindex="0"
-              >
-                {n}x{n}
-              </li>
-            {/each}
-          </ul>
+        <div class="size-adjuster">
+          <button class="adjust-btn" onclick={() => changeBoardSize(-1)} disabled={$appState.boardSize <= 2}>-</button>
+          <span class="current-size">{$appState.boardSize}x{$appState.boardSize}</span>
+          <button class="adjust-btn" onclick={() => changeBoardSize(1)} disabled={$appState.boardSize >= 9}>+</button>
         </div>
       </div>
       <!-- 1. Показати дошку -->
@@ -449,7 +446,6 @@
   pointer-events: none;
   transition: opacity 0.3s ease-out, transform 0.3s ease-out;
 }
-
 .board-size-dropdown-wrapper.open .board-size-dropdown-list {
   opacity: 1;
   transform: translateY(0);
@@ -785,7 +781,6 @@
   border-radius: 16px;
   border: 1.5px solid rgba(255,255,255,0.18);
   box-shadow: 0 8px 32px 0 rgba(80,0,80,0.10);
-  backdrop-filter: blur(16px);
   transition: background 0.25s, box-shadow 0.25s;
 }
 .settings-expander:hover {
@@ -899,4 +894,41 @@
     from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
   }
+/* --- Нові стилі для кнопок зміни розміру дошки --- */
+.size-adjuster {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.adjust-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid transparent;
+  color: var(--text-primary, #fff);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 1.4em;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.adjust-btn:hover:not(:disabled) {
+  border-color: var(--text-accent, #ff9800);
+}
+
+.adjust-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.current-size {
+  font-weight: bold;
+  min-width: 40px;
+  text-align: center;
+}
 </style> 

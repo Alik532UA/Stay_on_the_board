@@ -268,7 +268,7 @@ export default {
     q5: "Hoe scoor ik punten?",
     a5: "Je verdient punten voor elke zet, afhankelijk van de moeilijkheidsgraad:\n• +1 punt: met het bord en de koningin zichtbaar.\n• +2 punten: met het bord zichtbaar, maar de koningin verborgen.\n• +3 punten: met het bord verborgen.\nAan het einde van het spel ontvang je ook bonussen voor bordgrootte, blokmodus en meer. Strafpunten (-2) worden gegeven voor een spiegelzet na de zet van de computer.",
     q6: "Hoe maak ik het spel interessanter?",
-    a6: "Probeer de 'Pro-modus': schakel 'Toon bord' uit in de instellingen, zet 'Voice-over' aan en speel geblinddoekt met sneltoetsen. Dit maakt van het spel een krachtige trainer voor geheugen en ruimtelijk inzicht.",
+    a6: "Probeer de 'Pro-modus': schakel 'Geblokkeerde Cellen Modus' in, schakel 'Toon bord' uit in de instellingen, zet 'Voice-over' aan en speel geblinddoekt met sneltoetsen. Dit maakt van het spel een krachtige trainer voor geheugen en ruimtelijk inzicht.",
     q7: "Hoe bestuur ik de koningin?",
     a7: "Gebruik het bedieningspaneel onder het bord. Druk eerst op een van de 8 pijlen om een richting te kiezen, daarna op een cijferknop om de afstand te kiezen. Bevestig vervolgens je zet.",
     q8: "Waarom is er maar één stuk? Waar is het stuk van de computer?",

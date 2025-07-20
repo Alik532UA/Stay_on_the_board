@@ -26,6 +26,27 @@
     overflow-y: auto;
     padding-right: 10px;
   }
+
+  /* --- СТИЛІ ДЛЯ СКРОЛБАРУ --- */
+  .faq-container::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .faq-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+
+  .faq-container::-webkit-scrollbar-thumb {
+    background-color: var(--text-accent, #ff9800);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .faq-container::-webkit-scrollbar-thumb:hover {
+    background-color: #fff;
+  }
   .faq-item {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 16px 0;
