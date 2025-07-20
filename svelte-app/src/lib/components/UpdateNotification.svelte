@@ -57,20 +57,22 @@
 }
 
 button {
-  background: var(--control-selected);
-  color: white;
+  background: var(--confirm-action-bg);
+  color: var(--confirm-action-text);
   border: none;
   border-radius: 12px;
   padding: 12px 24px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
   width: 100%;
   font-size: 1.05em;
+  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 button:hover {
   background: var(--control-hover);
   transform: scale(1.03);
+  box-shadow: 0 6px 16px var(--shadow-color);
 }
 </style> 

@@ -26,7 +26,7 @@
   function onModalKeydown(/** @type {any} */e) {
     if (!$modal_data.isOpen || !$modal_data.buttons) return;
     const idx = $modal_data.buttons.findIndex(b => b.isHot);
-    if (idx !== -1 && (e.key === 'Enter' || e.key === ' ' || e.key === '5')) {
+    if (idx !== -1 && (e.key === 'Enter' || e.key === ' ' || e.code === 'Numpad5')) {
       e.preventDefault();
       e.stopPropagation();
       const button = $modal_data.buttons[idx];
