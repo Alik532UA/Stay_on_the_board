@@ -1033,6 +1033,10 @@ export function toggleAutoPlay() {
     if (autoPlayInterval) clearInterval(autoPlayInterval);
     appState.update(s => ({ ...s, isAutoPlaying: false }));
   } else {
+    // Якщо запис дійшов кінця, скидаємо на початок
+    if (state.replayCurrentStep >= (state.moveHistory?.length || 1) - 1) {
+      goToReplayStep(0);
+    }
     appState.update(s => ({ ...s, isAutoPlaying: true }));
     autoPlayInterval = setInterval(() => {
       const currentState = get(appState);
