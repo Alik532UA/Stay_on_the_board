@@ -172,51 +172,54 @@
 
     let handled = true;
 
-    switch (event.key) {
-      case 'ArrowUp': case '8': setDirection('up'); break;
-      case 'ArrowDown': case '2': setDirection('down'); break;
-      case 'ArrowLeft': case '4': setDirection('left'); break;
-      case 'ArrowRight': case '6': setDirection('right'); break;
-      case '7': setDirection('up-left'); break;
-      case '9': setDirection('up-right'); break;
-      case '1':
+    switch (event.code) {
+      // NumPad
+      case 'Numpad7': setDirection('up-left'); break;
+      case 'Numpad8': setDirection('up'); break;
+      case 'Numpad9': setDirection('up-right'); break;
+      case 'Numpad4': setDirection('left'); break;
+      case 'Numpad6': setDirection('right'); break;
+      case 'Numpad1': setDirection('down-left'); break;
+      case 'Numpad2': setDirection('down'); break;
+      case 'Numpad3': setDirection('down-right'); break;
+      case 'Numpad5': confirmMove(); break;
+      case 'NumpadEnter': confirmMove(); break;
+      // Main digit keys
+      case 'Digit7': setDirection('up-left'); break;
+      case 'Digit8': setDirection('up'); break;
+      case 'Digit9': setDirection('up-right'); break;
+      case 'Digit4': setDirection('left'); break;
+      case 'Digit6': setDirection('right'); break;
+      case 'Digit1':
         if ($appState.selectedDirection) {
           setDistance(1);
         } else {
           setDirection('down-left');
         }
         break;
-      case '3': setDirection('down-right'); break;
-      case 'w': setDirection('up'); break;
-      case 's': case 'x': setDirection('down'); break;
-      case 'a': setDirection('left'); break;
-      case 'd': setDirection('right'); break;
-      case 'q': setDirection('up-left'); break;
-      case 'e': setDirection('up-right'); break;
-      case 'z': setDirection('down-left'); break;
-      case 'c': setDirection('down-right'); break;
-      case 'Enter': case ' ': case '5': confirmMove(); break;
-      case 'n': case 'N': noMoves(); break;
+      case 'Digit2': setDirection('down'); break;
+      case 'Digit3': setDirection('down-right'); break;
+      case 'Digit5': confirmMove(); break;
+      // WASD
+      case 'KeyW': setDirection('up'); break;
+      case 'KeyS': case 'KeyX': setDirection('down'); break;
+      case 'KeyA': setDirection('left'); break;
+      case 'KeyD': setDirection('right'); break;
+      case 'KeyQ': setDirection('up-left'); break;
+      case 'KeyE': setDirection('up-right'); break;
+      case 'KeyZ': setDirection('down-left'); break;
+      case 'KeyC': setDirection('down-right'); break;
+      // Actions
+      case 'Enter': case 'Space': confirmMove(); break;
+      case 'KeyN': noMoves(); break;
       case 'Backspace': logStore.addLog(`[handleKeydown] Натиснуто "Backspace" — заявити "немає ходів"`, 'info'); noMoves(); break;
-      case 'v': case 'V': logStore.addLog('[handleKeydown] Перемкнено озвучування ходів', 'info'); toggleSpeech(); break;
-      case '*': logStore.addLog('[handleKeydown] Перемкнено режим заблокованих клітинок', 'info'); toggleBlockMode(); break;
-      case '/': logStore.addLog('[handleKeydown] Перемкнено видимість дошки', 'info'); toggleShowBoard(); break;
-      case '+': case '=':
-        {
-          const currentSize = get(appState).boardSize;
-          if (currentSize < 9) {
-            selectBoardSize(currentSize + 1);
-          }
-        }
-        break;
-      case '-':
-        {
-          const currentSize = get(appState).boardSize;
-          if (currentSize > 2) {
-            selectBoardSize(currentSize - 1);
-          }
-        }
-        break;
+      // Settings
+      case 'KeyV': logStore.addLog('[handleKeydown] Перемкнено озвучування ходів', 'info'); toggleSpeech(); break;
+      case 'NumpadMultiply': logStore.addLog('[handleKeydown] Перемкнено режим заблокованих клітинок', 'info'); toggleBlockMode(); break;
+      case 'NumpadDivide': logStore.addLog('[handleKeydown] Перемкнено видимість дошки', 'info'); toggleShowBoard(); break;
+      // Board size
+      case 'NumpadAdd': case 'Equal': selectBoardSize(Math.min(get(appState).boardSize + 1, 9)); break;
+      case 'NumpadSubtract': case 'Minus': selectBoardSize(Math.max(get(appState).boardSize - 1, 2)); break;
       default:
         handled = false;
         break;

@@ -39,9 +39,9 @@
 
 <h2>{$_('controlsPage.gameSettings')}</h2>
 <ul>
-  <li><b>Num *</b>: {$_('controlsPage.toggleBlockMode')}</li>
-  <li><b>Num /</b>: {$_('controlsPage.toggleBoardVisibility')}</li>
-  <li><b>Num +</b> / <b>+</b>: {$_('controlsPage.increaseBoard')}</li>
-  <li><b>Num -</b> / <b>-</b>: {$_('controlsPage.decreaseBoard')}</li>
+  <li><b>NumPad *</b>: {$_('controlsPage.toggleBlockMode')}</li>
+  <li><b>NumPad /</b>: {$_('controlsPage.toggleBoardVisibility')}</li>
+  <li><b>NumPad +</b> / <b>=</b>: {$_('controlsPage.increaseBoard')}</li>
+  <li><b>NumPad -</b> / <b>-</b>: {$_('controlsPage.decreaseBoard')}</li>
   <li><b>V</b>: {$_('controlsPage.toggleSpeech')}</li>
 </ul> 
