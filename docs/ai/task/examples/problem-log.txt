@@ -1,0 +1,85 @@
+game:5590  Error handling response: TypeError: Cannot read properties of undefined (reading 'features')
+    at chrome-extension://jjkchpdmjjdmalgembblgafllbpcjlei/mcafee_wa_contentplg.js:2719:35
+game:5590  Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+client:733 [vite] connecting...
+client:826 [vite] connected.
+[Violation] Added non-passive event listener to a scroll-blocking <some> event. Consider marking event handler as 'passive' to make the page more responsive. See <URL>
+[Violation] Added non-passive event listener to a scroll-blocking <some> event. Consider marking event handler as 'passive' to make the page more responsive. See <URL>
+[Violation] Added non-passive event listener to a scroll-blocking <some> event. Consider marking event handler as 'passive' to make the page more responsive. See <URL>
+[Violation] Added non-passive event listener to a scroll-blocking <some> event. Consider marking event handler as 'passive' to make the page more responsive. See <URL>
+[Violation] Added non-passive event listener to a scroll-blocking <some> event. Consider marking event handler as 'passive' to make the page more responsive. See <URL>
+[Violation] Added non-passive event listener to a scroll-blocking <some> event. Consider marking event handler as 'passive' to make the page more responsive. See <URL>
+[Violation] Added non-passive event listener to a scroll-blocking <some> event. Consider marking event handler as 'passive' to make the page more responsive. See <URL>
+[Violation] Added non-passive event listener to a scroll-blocking <some> event. Consider marking event handler as 'passive' to make the page more responsive. See <URL>
+[Violation] Added non-passive event listener to a scroll-blocking <some> event. Consider marking event handler as 'passive' to make the page more responsive. See <URL>
+index.mjs:1904  Uncaught TypeError: Cannot read properties of undefined (reading 'parentElement')
+    at keepOriginalElementInDom (index.mjs:1904:31)
+keepOriginalElementInDom @ index.mjs:1904
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+requestAnimationFrame
+keepOriginalElementInDom @ index.mjs:1915
+DynamicLayout.svelte:34 [DND] handleDndUpdate {event: CustomEvent, targetColumnId: 'column-3'}
+DynamicLayout.svelte:49 [DND] newItemsForTarget [{…}]
+DynamicLayout.svelte:57 [DND] newWidgetIdsForTarget (after shadow fix) ['settings-expander']
+DynamicLayout.svelte:75 [DND] finalState (3) [{…}, {…}, {…}]

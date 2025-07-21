@@ -1,0 +1,665 @@
+## 1. Аналіз для мене
+
+**Завдання:** Покращити UX/UI режиму перегляду запису гри, прибравши зайві елементи ("Налаштування") та відцентрувавши дошку.
+
+**Поточна проблема:** Режим реплею активується на тому ж ігровому екрані (`/game`), який спроєктований для активної гри та кастомізації за допомогою перетягуваних колонок. Це призводить до кількох проблем:
+1.  **Зайвий UI:** Панель налаштувань не має сенсу в режимі перегляду і лише захаращує екран.
+2.  **Неправильне компонування:** Дошка залишається у своїй колонці (зазвичай лівій), замість того, щоб бути центральним елементом перегляду.
+3.  **Архітектурна складність:** Змішування двох різних станів ("гра" та "перегляд") на одній сторінці ускладнює логіку компонентів, що ми вже бачили на попередніх етапах.
+
+**Архітектурне рішення:**
+Найкращим рішенням є **повне розділення відповідальності (Separation of Concerns)**. Замість того, щоб намагатися "втиснути" режим реплею в існуючу сторінку гри, ми створимо для нього **окрему, спеціалізовану сторінку** (`/replay`).
+
+**Переваги цього підходу:**
+1.  **Чистий UX:** Сторінка `/replay` буде спроєктована виключно для перегляду. Вона міститиме лише дошку по центру, панель керування реплеєм та кнопку "Назад". Жодних зайвих налаштувань чи колонок.
+2.  **Спрощена логіка:** Компоненти на сторінці `/replay` будуть набагато простішими. Їм не потрібно знати про стан активної гри, вибір ходу, гравців тощо.
+3.  **Надійність:** Ми усуваємо потенційні конфлікти між станами гри та реплею.
+4.  **Передача даних:** Дані про ходи гри (`moveHistory`) будуть передаватися зі сторінки гри на сторінку реплею за допомогою `sessionStorage`. Це надійний та простий спосіб передачі тимчасових даних між сторінками в межах однієї сесії.
+
+Ми проведемо рефакторинг, який створить новий, чистий досвід для перегляду записів, одночасно спрощуючи код ігрової сторінки.
+
+## 2. План для AI-асистента "Cursor"
+
+### Фаза 1: Створення нової сторінки для реплею
+
+#### Крок 1.1: Створення файлу маршруту
+
+Створи новий файл: `svelte-app/src/routes/replay/+page.svelte`.
+
+Встав у нього наступний код. Цей код створює базову структуру сторінки, яка буде завантажувати дані з `sessionStorage` та відображати спеціалізований компонент `ReplayViewer`.
+
+```svelte
+<script>
+  import { onMount } from 'svelte';
+  import ReplayViewer from '$lib/components/ReplayViewer.svelte';
+  import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
+  import { navigateToMainMenu } from '$lib/utils/navigation.js';
+
+  let moveHistory = null;
+  let boardSize = 4; // Значення за замовчуванням
+
+  onMount(() => {
+    const replayDataJSON = sessionStorage.getItem('replayData');
+    if (replayDataJSON) {
+      try {
+        const replayData = JSON.parse(replayDataJSON);
+        moveHistory = replayData.moveHistory;
+        boardSize = replayData.boardSize;
+      } catch (e) {
+        console.error("Failed to parse replay data", e);
+        navigateToMainMenu();
+      }
+    } else {
+      // Якщо даних немає (прямий захід на сторінку), перенаправляємо
+      navigateToMainMenu();
+    }
+  });
+</script>
+
+<FloatingBackButton />
+
+<div class="replay-page-container">
+  {#if moveHistory}
+    <ReplayViewer {moveHistory} {boardSize} />
+  {:else}
+    <p>Завантаження даних для перегляду...</p>
+  {/if}
+</div>
+
+<style>
+  .replay-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+</style>
+```
+
+#### Крок 1.2: Створення спеціалізованого компонента `ReplayViewer`
+
+Створи новий файл: `svelte-app/src/lib/components/ReplayViewer.svelte`.
+
+Встав у нього наступний код. Цей компонент інкапсулює всю логіку відображення реплею: дошку, шлях, фігуру та панель керування.
+
+```svelte
+<script>
+  import { writable, derived } from 'svelte/store';
+  import SvgIcons from './SvgIcons.svelte';
+  import ReplayControls from './ReplayControls.svelte';
+  import { replayPosition as calculateReplayPosition, replayCellVisitCounts as calculateReplayCellVisitCounts, replaySegments as calculateReplaySegments } from '$lib/utils/replay.js';
+
+  export let moveHistory;
+  export let boardSize;
+
+  // Створюємо локальний стор для стану реплею
+  const replayState = writable({
+    isReplayMode: true,
+    moveHistory,
+    boardSize,
+    replayCurrentStep: 0,
+    autoPlayDirection: 'paused',
+    limitReplayPath: true,
+  });
+
+  // Використовуємо derived стори для обчислення позицій
+  const replayPosition = calculateReplayPosition(replayState);
+  const replayCellVisitCounts = calculateReplayCellVisitCounts(replayState);
+  const replaySegments = calculateReplaySegments(replayState);
+
+  // Функції для керування локальним стором
+  function goToStep(step) {
+    replayState.update(s => ({ ...s, replayCurrentStep: Math.max(0, Math.min(step, s.moveHistory.length - 1)) }));
+  }
+
+  let autoPlayInterval = null;
+
+  function toggleAutoPlay(direction) {
+    if (autoPlayInterval) clearInterval(autoPlayInterval);
+    
+    const currentDirection = $replayState.autoPlayDirection;
+    
+    if (currentDirection === direction) {
+      replayState.update(s => ({ ...s, autoPlayDirection: 'paused' }));
+      return;
+    }
+
+    replayState.update(s => ({ ...s, autoPlayDirection: direction }));
+
+    autoPlayInterval = setInterval(() => {
+      const s = $replayState;
+      const nextStep = s.replayCurrentStep + (direction === 'forward' ? 1 : -1);
+      
+      if (nextStep >= 0 && nextStep < s.moveHistory.length) {
+        goToStep(nextStep);
+      } else {
+        clearInterval(autoPlayInterval);
+        replayState.update(st => ({ ...st, autoPlayDirection: 'paused' }));
+      }
+    }, 1000);
+  }
+
+  function toggleLimitPath() {
+    replayState.update(s => ({ ...s, limitReplayPath: !s.limitReplayPath }));
+  }
+</script>
+
+<div class="replay-viewer">
+  <div class="board-bg-wrapper game-content-block" style="--board-size: {boardSize}">
+    <div class="game-board" style="--board-size: {boardSize}">
+      {#each Array(boardSize) as _, rowIdx}
+        {#each Array(boardSize) as _, colIdx}
+          <div
+            class="board-cell"
+            class:light={(rowIdx + colIdx) % 2 === 0}
+            class:dark={(rowIdx + colIdx) % 2 !== 0}
+          ></div>
+        {/each}
+      {/each}
+
+      <svg class="replay-path-svg" viewBox="0 0 100 100" overflow="visible">
+        {#each $replaySegments as segment, i (i)}
+          <line x1={segment.x1} y1={segment.y1} x2={segment.x2} y2={segment.y2} stroke={segment.color} stroke-opacity={segment.opacity}/>
+        {/each}
+      </svg>
+
+      {#if $replayPosition}
+        <div class="player-piece" style="top: {$replayPosition.row * (100 / boardSize)}%; left: {$replayPosition.col * (100 / boardSize)}%; z-index: 10;">
+          <div class="piece-container"><SvgIcons name="queen" /></div>
+        </div>
+      {/if}
+    </div>
+  </div>
+
+  <ReplayControls 
+    bind:limitReplayPath={$replayState.limitReplayPath}
+    on:toggleLimitPath={toggleLimitPath}
+    on:goToStep={(e) => goToStep(e.detail)}
+    on:toggleAutoPlay={(e) => toggleAutoPlay(e.detail)}
+    currentStep={$replayState.replayCurrentStep}
+    totalSteps={moveHistory.length}
+    autoPlayDirection={$replayState.autoPlayDirection}
+  />
+</div>
+
+<style>
+  .replay-viewer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 500px;
+  }
+</style>
+```
+
+### Фаза 2: Модифікація існуючої логіки
+
+#### Крок 2.1: Оновлення `gameStore` для навігації
+
+Відкрий файл `svelte-app/src/lib/stores/gameStore.js`.
+
+1.  **Імпортуй `goto`:**
+    Додай на початок файлу:
+    ```javascript
+    import { goto } from '$app/navigation';
+    import { base } from '$app/paths';
+    ```
+
+2.  **Зміни функцію `startReplay`:**
+    Знайди функцію `startReplay` і повністю заміни її на цей код. Тепер вона буде зберігати дані в `sessionStorage` і перенаправляти на нову сторінку.
+
+    ```javascript
+    export function startReplay() {
+      modalStore.closeModal();
+      const state = get(appState);
+      const replayData = {
+        moveHistory: state.moveHistory,
+        boardSize: state.boardSize
+      };
+      sessionStorage.setItem('replayData', JSON.stringify(replayData));
+      goto(`${base}/replay`);
+    }
+    ```
+
+3.  **Видали непотрібний код:**
+    Знайди та видали функцію `stopReplay`, оскільки вона більше не потрібна. Також видали пов'язані з нею `autoPlayInterval` та функції `goToReplayStep`, `toggleAutoPlayForward`, `toggleAutoPlayBackward`, `toggleLimitReplayPath`.
+
+#### Крок 2.2: Оновлення `replay.js` для роботи з локальним стором
+
+Відкрий файл `svelte-app/src/lib/utils/replay.js`.
+
+Повністю заміни його вміст на цей код. Функції тепер приймають `replayState` як аргумент, що робить їх чистішими та придатними для використання в новому компоненті.
+
+```javascript
+import { derived } from 'svelte/store';
+
+export const replayPosition = (replayState) => derived(
+  replayState,
+  ($replayState) => {
+    if ($replayState.isReplayMode) {
+      return $replayState.moveHistory[$replayState.replayCurrentStep]?.pos;
+    }
+    return null;
+  }
+);
+
+export const replayCellVisitCounts = (replayState) => derived(
+  replayState,
+  ($replayState) => $replayState.isReplayMode
+    ? $replayState.moveHistory[$replayState.replayCurrentStep]?.visits || {}
+    : {}
+);
+
+export const replaySegments = (replayState) => derived(
+  replayState,
+  ($replayState) => {
+    if (!$replayState.isReplayMode || $replayState.moveHistory.length < 2) {
+      return [];
+    }
+
+    const segments = [];
+    const history = $replayState.moveHistory;
+    const totalSteps = history.length - 1;
+    const cellSize = 100 / $replayState.boardSize;
+    const currentStep = $replayState.replayCurrentStep;
+    const limitPath = $replayState.limitReplayPath;
+
+    const startColor = { r: 76, g: 175, b: 80 };
+    const endColor = { r: 244, g: 67, b: 54 };
+
+    for (let i = 0; i < totalSteps; i++) {
+      const startPos = history[i].pos;
+      const endPos = history[i + 1].pos;
+      
+      const ratio = i / totalSteps;
+      const r = Math.round(startColor.r + ratio * (endColor.r - startColor.r));
+      const g = Math.round(startColor.g + ratio * (endColor.g - startColor.g));
+      const b = Math.round(startColor.b + ratio * (endColor.b - startColor.b));
+
+      let opacity = 1.0;
+      if (limitPath) {
+        const dist = Math.abs(i - currentStep);
+        if (i < currentStep) { // Минулі ходи
+            opacity = Math.max(0, 1.0 - dist * 0.2);
+        } else { // Майбутні ходи
+            opacity = Math.max(0, 1.0 - dist * 0.3);
+        }
+      }
+
+      segments.push({
+        x1: startPos.col * cellSize + cellSize / 2,
+        y1: startPos.row * cellSize + cellSize / 2,
+        x2: endPos.col * cellSize + cellSize / 2,
+        y2: endPos.row * cellSize + cellSize / 2,
+        color: `rgb(${r}, ${g}, ${b})`,
+        opacity: Math.max(0, opacity)
+      });
+    }
+    return segments;
+  }
+);
+```
+
+#### Крок 2.3: Оновлення `ReplayControls.svelte` для роботи з подіями
+
+Відкрий файл `svelte-app/src/lib/components/ReplayControls.svelte`.
+
+Повністю заміни його вміст. Компонент тепер буде більш гнучким, використовуючи властивості та події замість прямої залежності від глобального стору.
+
+```svelte
+<script>
+  import { createEventDispatcher } from 'svelte';
+  import { _ } from 'svelte-i18n';
+
+  export let limitReplayPath;
+  export let currentStep;
+  export let totalSteps;
+  export let autoPlayDirection;
+
+  const dispatch = createEventDispatcher();
+</script>
+
+<div class="replay-ui-container">
+  <label class="limit-path-toggle">
+    <input 
+      type="checkbox" 
+      bind:checked={limitReplayPath} 
+      on:change={() => dispatch('toggleLimitPath')} 
+    />
+    <span>{$_('replay.limitPath')}</span>
+  </label>
+
+  <div class="replay-controls">
+    <button class="control-btn" on:click={() => dispatch('goToStep', currentStep - 1)} disabled={currentStep === 0} title={$_('replay.prev')}>«</button>
+    <button class="control-btn play-pause" class:active={autoPlayDirection === 'backward'} on:click={() => dispatch('toggleAutoPlay', 'backward')} title={autoPlayDirection === 'backward' ? $_('replay.pause') : $_('replay.playBackward')}>
+      {#if autoPlayDirection === 'backward'}❚❚{:else}◀{/if}
+    </button>
+    <button class="control-btn play-pause" class:active={autoPlayDirection === 'forward'} on:click={() => dispatch('toggleAutoPlay', 'forward')} title={autoPlayDirection === 'forward' ? $_('replay.pause') : $_('replay.play')}>
+      {#if autoPlayDirection === 'forward'}❚❚{:else}▶{/if}
+    </button>
+    <button class="control-btn" on:click={() => dispatch('goToStep', currentStep + 1)} disabled={currentStep >= totalSteps - 1} title={$_('replay.next')}>»</button>
+    <div class="step-counter">
+      {$_('replay.step', { values: { current: currentStep + 1, total: totalSteps } })}
+    </div>
+  </div>
+</div>
+
+<style>
+.replay-ui-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.limit-path-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9em;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.1);
+  transition: background 0.2s;
+}
+.limit-path-toggle:hover {
+  background: rgba(0,0,0,0.2);
+}
+.limit-path-toggle input {
+  accent-color: var(--text-accent, #ff9800);
+}
+
+.replay-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--bg-secondary);
+  padding: 12px;
+  border-radius: 16px;
+  box-shadow: var(--unified-shadow);
+  width: 100%;
+}
+.control-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--control-bg);
+  color: var(--text-primary);
+  font-size: 1.5em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.control-btn:hover:not(:disabled) {
+  background: var(--control-hover);
+  color: #fff;
+}
+.control-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.play-pause {
+  background: var(--control-bg);
+  color: var(--text-primary);
+}
+.play-pause.active {
+  background: var(--confirm-btn-bg);
+  color: #fff;
+}
+.step-counter {
+  font-weight: bold;
+  min-width: 80px;
+  text-align: center;
+}
+</style>
+```
+
+### Фаза 3: Очищення старих компонентів
+
+#### Крок 3.1: Спрощення `BoardWrapperWidget.svelte`
+
+Відкрий файл `svelte-app/src/lib/components/widgets/BoardWrapperWidget.svelte`.
+
+Видали всю логіку, пов'язану з реплеєм.
+1.  Зміни умову `{#if $appState.isReplayMode || $settingsStore.showBoard}` назад на `{#if $settingsStore.showBoard}`.
+2.  Видали весь блок `{#if $appState.isReplayMode}` всередині розмітки, який містить `<svg class="replay-path-svg">`.
+3.  Видали умову `$appState.isReplayMode` з блоку, що відображає фігуру.
+4.  Видали імпорти та змінні, що стосуються реплею (`replayPosition`, `replayCellVisitCounts`, `replaySegments`).
+
+**Оновлений код `BoardWrapperWidget.svelte` має виглядати так:**
+```svelte
+<script lang="ts">
+  import { appState, toggleBlockCell } from '$lib/stores/gameStore.js';
+  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { logStore } from '$lib/stores/logStore.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
+  import SvgIcons from '../SvgIcons.svelte';
+  import { slide, scale } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
+
+  let boardSize = $derived(Number($appState.boardSize));
+  let playerRow = $derived($appState.playerRow);
+  let playerCol = $derived($appState.playerCol);
+  let blockedCells = $derived($appState.blockedCells);
+  let blockModeEnabled = $derived($appState.blockModeEnabled);
+  let showMoves = $derived($settingsStore.showMoves);
+  let blockOnVisitCount = $derived($settingsStore.blockOnVisitCount);
+  let activeCellVisitCounts = $derived($appState.cellVisitCounts);
+  let lastRow = null;
+  let lastCol = null;
+  let animating = false;
+  let pieceClass = 'player-piece';
+
+  $effect(() => {
+    if (playerRow !== null && playerCol !== null && (playerRow !== lastRow || playerCol !== lastCol)) {
+      animating = false;
+      setTimeout(() => { animating = true; pieceClass = 'player-piece animating'; }, 0);
+      lastRow = playerRow;
+      lastCol = playerCol;
+    } else {
+      pieceClass = 'player-piece';
+    }
+  });
+
+  function isAvailable(row, col) {
+    return $appState.availableMoves && $appState.availableMoves.some(move => move.row === row && move.col === col);
+  }
+
+  function isCellBlocked(row, col) {
+    const visitCount = activeCellVisitCounts[`${row}-${col}`] || 0;
+    return blockModeEnabled && visitCount > blockOnVisitCount;
+  }
+
+  function getDamageClass(row, col) {
+    if (!blockModeEnabled) return '';
+    const visitCount = activeCellVisitCounts[`${row}-${col}`] || 0;
+    if (visitCount > 0 && visitCount <= blockOnVisitCount) {
+      return `cell-damage-${visitCount}`;
+    }
+    return '';
+  }
+
+  function showBoardClickHint(e) {
+    if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+    modalStore.showModal({
+      titleKey: 'modal.boardClickTitle',
+      contentKey: 'modal.boardClickContent',
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+    });
+  }
+
+  function onCellRightClick(event, row, col) {
+    if (!(event instanceof MouseEvent)) return;
+    event.preventDefault();
+    if (blockModeEnabled && !(row === playerRow && col === playerCol)) {
+      const blocked = blockedCells && blockedCells.some(cell => cell.row === row && cell.col === col);
+      logStore.addLog(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`, 'info');
+      toggleBlockCell(row, col);
+    }
+  }
+
+  function scaleAndSlide(node: HTMLElement, params: any) {
+      const slideTrans = slide(node, params);
+      const scaleTrans = scale(node, params);
+
+      return {
+          duration: params.duration,
+          easing: params.easing,
+          css: (t: number) => `
+              ${slideTrans.css ? slideTrans.css(t) : ''}
+              ${scaleTrans.css ? scaleTrans.css(t) : ''}
+          `
+      };
+  }
+</script>
+
+{#if $settingsStore.showBoard}
+  <div 
+    class="board-bg-wrapper game-content-block"
+    style="--board-size: {boardSize}"
+    on:click={showBoardClickHint} 
+    on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
+    role="button"
+    tabindex="0"
+    aria-label="Ігрове поле"
+    transition:scaleAndSlide={{ duration: 600, easing: quintOut }}
+  >
+    <div class="game-board" style="--board-size: {boardSize}" role="grid">
+      {#each Array(boardSize) as _, rowIdx (rowIdx)}
+        {#each Array(boardSize) as _, colIdx (colIdx)}
+          <div
+            class="board-cell {getDamageClass(rowIdx, colIdx)}"
+            class:light={(rowIdx + colIdx) % 2 === 0}
+            class:dark={(rowIdx + colIdx) % 2 !== 0}
+            class:blocked-cell={isCellBlocked(rowIdx, colIdx)}
+            class:available={showMoves && isAvailable(rowIdx, colIdx)}
+            aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
+            on:contextmenu={(e) => onCellRightClick(e, rowIdx, colIdx)}
+            role="gridcell"
+            tabindex="0"
+          >
+            {#if getDamageClass(rowIdx, colIdx) === 'cell-damage-3'}<span class="crack-extra"></span>{/if}
+            {#if isCellBlocked(rowIdx, colIdx)}
+              <span class="blocked-x">✗</span>
+            {:else if $settingsStore.showMoves && isAvailable(rowIdx, colIdx)}
+              <span class="move-dot"></span>
+            {/if}
+          </div>
+        {/each}
+      {/each}
+      
+      {#if $settingsStore.showQueen && playerRow !== null && playerCol !== null}
+        {#key $appState.gameId}
+          <div class={pieceClass}
+            style="top: {playerRow * (100 / boardSize)}%; left: {playerCol * (100 / boardSize)}%; z-index: 10;">
+            <div class="piece-container"><SvgIcons name="queen" /></div>
+          </div>
+        {/key}
+      {/if}
+    </div>
+  </div>
+{/if}
+```
+
+#### Крок 3.2: Спрощення `ControlsPanelWidget.svelte`
+
+Відкрий файл `svelte-app/src/lib/components/widgets/ControlsPanelWidget.svelte`.
+
+Видали умовний рендеринг та все, що пов'язано з реплеєм.
+1.  Видали імпорт `ReplayControls`.
+2.  Видали весь блок `{#if $appState.isReplayMode} ... {:else} ... {/if}`.
+
+**Оновлений код `ControlsPanelWidget.svelte` має виглядати так:**
+```svelte
+<script>
+  import { appState, setDirection, setDistance, availableDistances } from '$lib/stores/gameStore.js';
+  import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js';
+  import { _ } from 'svelte-i18n';
+  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import SvgIcons from '../SvgIcons.svelte';
+  import { get } from 'svelte/store';
+
+  $: isPlayerTurn = $appState.players[$appState.currentPlayerIndex]?.type === 'human';
+  $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
+  const directionArrows = { 'up-left': '↖', 'up': '↑', 'up-right': '↗', 'left': '←', 'right': '→', 'down-left': '↙', 'down': '↓', 'down-right': '↘' };
+  $: selectedDirection = $appState.selectedDirection || null;
+  $: selectedDistance = $appState.selectedDistance || null;
+  $: buttonDisabled = !selectedDirection || !selectedDistance;
+
+  $: centerInfoState = (() => {
+    if (!selectedDirection && !selectedDistance && !computerLastMoveDisplay) return { class: '', content: '', clickable: false, aria: 'Порожньо' };
+    if (!selectedDirection && !selectedDistance && computerLastMoveDisplay) {
+      const dir = directionArrows[computerLastMoveDisplay.direction] || '';
+      const dist = computerLastMoveDisplay.distance || '';
+      return { class: 'computer-move-display', content: `${dir}${dist}`, clickable: false, aria: `Хід комп'ютера: ${dir}${dist}` };
+    }
+    if (selectedDirection && !selectedDistance) return { class: 'direction-distance-state', content: directionArrows[selectedDirection], clickable: false, aria: `Вибрано напрямок: ${directionArrows[selectedDirection]}` };
+    if (!selectedDirection && selectedDistance) return { class: 'direction-distance-state', content: String(selectedDistance), clickable: false, aria: `Вибрано відстань: ${selectedDistance}` };
+    if (selectedDirection && selectedDistance) {
+      const dir = directionArrows[selectedDirection] || '';
+      return { class: 'confirm-btn-active', content: `${dir}${selectedDistance}`, clickable: isPlayerTurn, aria: `Підтвердити хід: ${dir}${selectedDistance}` };
+    }
+    return { class: '', content: '', clickable: false, aria: '' };
+  })();
+
+  function onCentralClick() { if (selectedDirection && selectedDistance && isPlayerTurn) confirmPlayerMove(); }
+  /** @param {import('$lib/stores/gameStore').Direction} dir */
+  function onDirectionClick(dir) { setDirection(dir); }
+  /** @param {number} dist */
+  function onDistanceClick(dist) { setDistance(dist); }
+  
+  $: numColumns = ((count) => {
+    if (count <= 4) return count;
+    if (count === 5 || count === 6) return 3;
+    return 4;
+  })($availableDistances.length);
+</script>
+
+<div class="game-controls-panel">
+  <div class="directions directions-3x3">
+    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => onDirectionClick('up-left')} title={`${$_('tooltips.up-left')}\n(${$settingsStore.keybindings['up-left'].join(', ')})`}>↖</button>
+    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" on:click={() => onDirectionClick('up')} title={`${$_('tooltips.up')}\n(${$settingsStore.keybindings['up'].join(', ')})`}>↑</button>
+    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" on:click={() => onDirectionClick('up-right')} title={`${$_('tooltips.up-right')}\n(${$settingsStore.keybindings['up-right'].join(', ')})`}>↗</button>
+    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" on:click={() => onDirectionClick('left')} title={`${$_('tooltips.left')}\n(${$settingsStore.keybindings['left'].join(', ')})`}>←</button>
+    <button id="center-info" class="control-btn center-info {centerInfoState.class}" type="button" aria-label={centerInfoState.aria} on:click={onCentralClick} disabled={!centerInfoState.clickable}>{String(centerInfoState.content)}</button>
+    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" on:click={() => onDirectionClick('right')} title={`${$_('tooltips.right')}\n(${$settingsStore.keybindings['right'].join(', ')})`}>→</button>
+    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" on:click={() => onDirectionClick('down-left')} title={`${$_('tooltips.down-left')}\n(${$settingsStore.keybindings['down-left'].join(', ')})`}>↙</button>
+    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" on:click={() => onDirectionClick('down')} title={`${$_('tooltips.down')}\n(${$settingsStore.keybindings['down'].join(', ')})`}>↓</button>
+    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" on:click={() => onDirectionClick('down-right')} title={`${$_('tooltips.down-right')}\n(${$settingsStore.keybindings['down-right'].join(', ')})`}>↘</button>
+  </div>
+  <div class="distance-select">
+    <div>{$_('gameControls.selectDistance')}</div>
+    <div class="distance-btns" style="--num-columns: {numColumns};">
+      {#each $availableDistances as dist}
+        <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" on:click={() => onDistanceClick(dist)}>{dist}</button>
+      {/each}
+    </div>
+  </div>
+  <div class="action-btns">
+    <button class="confirm-btn" on:click={confirmPlayerMove} disabled={buttonDisabled} title={`${$_('tooltips.confirm')}\n(${$settingsStore.keybindings['confirm']})`}>
+      <SvgIcons name="confirm" />
+      {$_('gameControls.confirm')}
+    </button>
+    {#if $appState.blockModeEnabled}
+      <button class="no-moves-btn" on:click={claimNoMoves} title={`${$_('tooltips.no-moves')}\n(${$settingsStore.keybindings['no-moves']})`}>
+        <SvgIcons name="no-moves" />
+        {$_('gameControls.noMovesTitle')}
+      </button>
+    {/if}
+  </div>
+</div>
+
+<style>
+  /* ... існуючі стилі ... */
+</style>
+```
