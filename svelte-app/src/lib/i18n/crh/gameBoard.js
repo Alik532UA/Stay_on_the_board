@@ -11,4 +11,5 @@ export default {
   details: "Tafsilât",
   infoModalTitle: "Oyun ve Onıñ Maqsadı Hakkında",
   infoModalContent: `Maqsadıñız – ortaq figurani nevbetnen areket ettirip, tahta tışına çıqarmamaq.\n\n<b>Pro Rejim: Hayal Kuvvetini Terbiye Etmek</b>\nOyunıñ asıl lezzeti, tahta hayalinizde canlanıp, kör körüne oynağa başlağanda açıladı. Sozlamalarda tahtanı gizlep, seslendirüvni açıp, qısqa yollar (hotkeys) ile oynap baqıñız. Bu, oyunnı hafıza ve mekânsal tüşüniş içün quvetli bir trenajorğa aylandıra. 3x3 tahta ile başlayınız ve zorlarnı arttırıñız!`,
+  clearCache: "Keşni temizle (DEV)"
 }; 

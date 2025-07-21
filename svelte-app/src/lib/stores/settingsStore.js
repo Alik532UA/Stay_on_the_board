@@ -1,8 +1,8 @@
-import { writable } from 'svelte/store';
-import { get } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import { loadAndGetVoices, filterVoicesByLang } from '$lib/speech.js';
 import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
 import { locale } from 'svelte-i18n';
+import { modalStore } from './modalStore.js';
 
 /**
  * @typedef {Object} SettingsState
@@ -18,10 +18,10 @@ import { locale } from 'svelte-i18n';
  * @property {number} blockOnVisitCount
  * @property {Record<string, string[]>} keybindings
  * @property {Record<string, string>} keyConflictResolution
+ * @property {boolean} autoHideBoard
  */
 
 const isBrowser = typeof window !== 'undefined';
-
 const defaultStyle = import.meta.env.DEV ? 'gray' : 'purple';
 
 export const defaultKeybindings = {
@@ -50,6 +50,7 @@ export const defaultKeybindings = {
   'distance-8': ['Digit8'],
 };
 
+/** @type {SettingsState} */
 const defaultSettings = {
   showMoves: true,
   showBoard: true,
@@ -61,56 +62,18 @@ const defaultSettings = {
   blockModeEnabled: false,
   showQueen: true,
   blockOnVisitCount: 0,
+  autoHideBoard: false,
   keybindings: defaultKeybindings,
   keyConflictResolution: {},
 };
 
-/**
- * @param {string | null} jsonString
- * @param {any} defaultValue
- */
+/** @param {string | null} jsonString @param {any} defaultValue */
 function safeJsonParse(jsonString, defaultValue) {
-  if (!jsonString) {
-    return defaultValue;
-  }
+  if (!jsonString) return defaultValue;
   try {
     return JSON.parse(jsonString);
   } catch (e) {
-    console.warn('Failed to parse JSON string from localStorage, returning default value.', e);
     return defaultValue;
-  }
-}
-
-/** @returns {SettingsState} */
-function loadSettings() {
-  if (!isBrowser) return defaultSettings;
-  try {
-    const storedKeybindingsRaw = localStorage.getItem('keybindings');
-    let storedKeybindings = safeJsonParse(storedKeybindingsRaw, {});
-    // Зворотна сумісність: якщо значення не масив — обгортаємо у масив
-    Object.keys(storedKeybindings).forEach(action => {
-      if (typeof storedKeybindings[action] === 'string') {
-        storedKeybindings[action] = [storedKeybindings[action]];
-      }
-    });
-    const stored = {
-      showMoves: localStorage.getItem('showMoves') === 'true',
-      showBoard: localStorage.getItem('showBoard') !== 'false',
-      language: localStorage.getItem('lang') || defaultSettings.language,
-      theme: localStorage.getItem('theme') || defaultSettings.theme,
-      style: convertStyle(localStorage.getItem('style')) || defaultSettings.style,
-      speechEnabled: localStorage.getItem('speechEnabled') === 'true',
-      selectedVoiceURI: localStorage.getItem('selectedVoiceURI') || null,
-      blockModeEnabled: localStorage.getItem('blockModeEnabled') === 'true',
-      showQueen: localStorage.getItem('showQueen') !== 'false',
-      blockOnVisitCount: Number(localStorage.getItem('blockOnVisitCount')) || 0,
-      keybindings: { ...defaultKeybindings, ...storedKeybindings },
-      keyConflictResolution: safeJsonParse(localStorage.getItem('keyConflictResolution'), {}),
-    };
-    return stored;
-  } catch (e) {
-    console.error("Failed to load settings, falling back to default.", e);
-    return defaultSettings;
   }
 }
 
@@ -121,111 +84,164 @@ function loadSettings() {
 const convertStyle = (style) => {
   if (!style) return null;
   /** @type {{ [key: string]: string }} */
-  const conversions = {
-    'ubuntu': 'purple', 'peak': 'green', 'cs2': 'blue',
-    'glass': 'gray', 'material': 'orange'
-  };
+  const conversions = { 'ubuntu': 'purple', 'peak': 'green', 'cs2': 'blue', 'glass': 'gray', 'material': 'orange' };
   return conversions[style] || style;
 };
 
-const { subscribe, set, update } = writable(loadSettings());
-
-if (isBrowser) {
-  subscribe(settings => {
-    document.documentElement.setAttribute('data-theme', settings.theme);
-    document.documentElement.setAttribute('data-style', settings.style);
+/** @returns {SettingsState} */
+function loadSettings() {
+  if (!isBrowser) return defaultSettings;
+  const storedKeybindingsRaw = localStorage.getItem('keybindings');
+  let storedKeybindings = safeJsonParse(storedKeybindingsRaw, {});
+  Object.keys(storedKeybindings).forEach(action => {
+    if (typeof storedKeybindings[action] === 'string') {
+      storedKeybindings[action] = [storedKeybindings[action]];
+    }
   });
+  return {
+    showMoves: localStorage.getItem('showMoves') !== 'false',
+    showBoard: localStorage.getItem('showBoard') !== 'false',
+    language: localStorage.getItem('lang') || defaultSettings.language,
+    theme: localStorage.getItem('theme') || defaultSettings.theme,
+    style: convertStyle(localStorage.getItem('style')) || defaultSettings.style,
+    speechEnabled: localStorage.getItem('speechEnabled') === 'true',
+    selectedVoiceURI: localStorage.getItem('selectedVoiceURI') || null,
+    blockModeEnabled: localStorage.getItem('blockModeEnabled') === 'true',
+    showQueen: localStorage.getItem('showQueen') !== 'false',
+    blockOnVisitCount: Number(localStorage.getItem('blockOnVisitCount')) || 0,
+    autoHideBoard: localStorage.getItem('autoHideBoard') === 'true',
+    keybindings: { ...defaultKeybindings, ...storedKeybindings },
+    keyConflictResolution: safeJsonParse(localStorage.getItem('keyConflictResolution'), {}),
+  };
 }
 
-/**
- * @param {Partial<SettingsState>} newSettings
- */
-function updateSettings(newSettings) {
-  update(state => {
-    const merged = { ...state, ...newSettings };
-    if (isBrowser) {
-      Object.entries(merged).forEach(([key, value]) => {
-        if (typeof value === 'object' && value !== null) {
-          localStorage.setItem(key, JSON.stringify(value));
-        } else if (key === 'language') {
-          localStorage.setItem('lang', String(value));
-        } else if (value !== null && value !== undefined) {
-          localStorage.setItem(key, String(value));
-        } else {
-          localStorage.removeItem(key);
+function createSettingsStore() {
+  const { subscribe, set, update } = writable(defaultSettings);
+
+  const methods = {
+    init: () => {
+      if (isBrowser) {
+        const settings = loadSettings();
+        set(settings);
+        subscribe(currentSettings => {
+          document.documentElement.setAttribute('data-theme', currentSettings.theme);
+          document.documentElement.setAttribute('data-style', currentSettings.style);
+        });
+      }
+    },
+    updateSettings: (/** @type {Partial<SettingsState>} */ newSettings) => {
+      update(state => {
+        const merged = { ...state, ...newSettings };
+        if (isBrowser) {
+          Object.entries(newSettings).forEach(([key, value]) => {
+            const storageKey = key === 'language' ? 'lang' : key;
+            if (typeof value === 'object' && value !== null) {
+              localStorage.setItem(storageKey, JSON.stringify(value));
+            } else if (value !== null && value !== undefined) {
+              localStorage.setItem(storageKey, String(value));
+            } else {
+              localStorage.removeItem(storageKey);
+            }
+          });
         }
+        return merged;
       });
+    },
+    resetSettings: () => {
+      if (isBrowser) {
+        Object.keys(defaultSettings).forEach(key => localStorage.removeItem(key));
+        localStorage.setItem('keybindings', JSON.stringify(defaultKeybindings));
+      }
+      set({ ...defaultSettings });
+    },
+    resetKeybindings: () => methods.updateSettings({ keybindings: defaultKeybindings }),
+    /**
+     * @param {boolean=} forceState
+     */
+    toggleShowBoard: (forceState) => {
+      update(state => {
+        const newState = typeof forceState === 'boolean' ? forceState : !state.showBoard;
+        if (isBrowser) localStorage.setItem('showBoard', String(newState));
+        return { ...state, showBoard: newState };
+      });
+    },
+    toggleShowMoves: () => {
+      update(state => {
+        const newState = !state.showMoves;
+        if (isBrowser) localStorage.setItem('showMoves', String(newState));
+        return { ...state, showMoves: newState };
+      });
+    },
+    toggleShowQueen: () => {
+      update(state => {
+        const newShowQueenState = !state.showQueen;
+        const newSettings = { ...state, showQueen: newShowQueenState };
+        if (!newShowQueenState) newSettings.showMoves = false;
+        if (isBrowser) {
+          localStorage.setItem('showQueen', String(newShowQueenState));
+          if (!newShowQueenState) localStorage.setItem('showMoves', 'false');
+        }
+        return newSettings;
+      });
+    },
+    toggleAutoHideBoard: () => {
+      update(state => {
+        const newState = !state.autoHideBoard;
+        if (isBrowser) localStorage.setItem('autoHideBoard', String(newState));
+        return { ...state, autoHideBoard: newState };
+      });
+    },
+    /**
+     * @param {boolean=} desiredState
+     */
+    toggleSpeech: async (desiredState) => {
+      const currentState = get(settingsStore);
+      const isEnabled = typeof desiredState === 'boolean' ? desiredState : !currentState.speechEnabled;
+      if (!isEnabled) {
+        methods.updateSettings({ speechEnabled: false });
+        return;
+      }
+      const allVoices = await loadAndGetVoices();
+      const currentLocale = get(locale) || 'uk';
+      const availableVoices = filterVoicesByLang(allVoices, currentLocale);
+      const hasConfiguredSpeech = isBrowser && localStorage.getItem('hasConfiguredSpeech') === 'true';
+      if (availableVoices.length > 0) {
+        if (!hasConfiguredSpeech) {
+          openVoiceSettingsModal();
+          if (isBrowser) localStorage.setItem('hasConfiguredSpeech', 'true');
+        }
+        methods.updateSettings({ speechEnabled: true });
+      } else {
+        openVoiceSettingsModal();
+        methods.updateSettings({ speechEnabled: false });
+      }
+    },
+    /**
+     * @param {'beginner' | 'experienced' | 'pro'} mode
+     * @returns {boolean} чи потрібно показати FAQ
+     */
+    applyGameModePreset: (mode) => {
+      /** @type {Partial<SettingsState>} */
+      let settingsToApply = {};
+      let showFaq = false;
+      switch (mode) {
+        case 'beginner':
+          settingsToApply = { showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: false, speechEnabled: false, autoHideBoard: false };
+          showFaq = true;
+          break;
+        case 'experienced':
+          settingsToApply = { showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
+          break;
+        case 'pro':
+          settingsToApply = { showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
+          break;
+      }
+      methods.updateSettings(settingsToApply);
+      modalStore.closeModal();
+      return showFaq;
     }
-    return merged;
-  });
+  };
+  return { subscribe, ...methods };
 }
 
-function resetSettings() {
-  set({ ...defaultSettings });
-  if(isBrowser) {
-    Object.keys(defaultSettings).forEach(key => localStorage.removeItem(key));
-    localStorage.setItem('keybindings', JSON.stringify(defaultKeybindings));
-  }
-}
-
-function resetKeybindings() {
-  updateSettings({ keybindings: defaultKeybindings });
-}
-
-export const settingsStore = {
-  subscribe,
-  updateSettings,
-  resetSettings,
-  resetKeybindings,
-  update,
-};
-
-export function toggleShowBoard() {
-  const prev = get(settingsStore);
-  updateSettings({ showBoard: !(prev.showBoard ?? true) });
-}
-
-export function toggleShowMoves() {
-  const prev = get(settingsStore);
-  updateSettings({ showMoves: !(prev.showMoves ?? true) });
-}
-
-/**
- * Інтелектуально перемикає озвучування ходів.
- * @param {boolean=} desiredState - Бажаний стан (true для увімкнення, false для вимкнення). Якщо не передано — інвертує поточний.
- */
-export async function toggleSpeech(desiredState /**: boolean | undefined */) {
-  const isBrowser = typeof window !== 'undefined';
-  if (typeof desiredState === 'undefined') {
-    desiredState = !get(settingsStore).speechEnabled;
-  }
-  if (!desiredState) {
-    updateSettings({ speechEnabled: false });
-    return;
-  }
-  const allVoices = await loadAndGetVoices();
-  const currentLocale = get(locale) || 'uk';
-  const availableVoices = filterVoicesByLang(allVoices, currentLocale);
-  const hasConfiguredSpeech = isBrowser && localStorage.getItem('hasConfiguredSpeech') === 'true';
-  if (availableVoices.length > 0) {
-    if (!hasConfiguredSpeech) {
-      openVoiceSettingsModal();
-      if (isBrowser) localStorage.setItem('hasConfiguredSpeech', 'true');
-    }
-    updateSettings({ speechEnabled: true });
-  } 
-  else {
-    openVoiceSettingsModal();
-    updateSettings({ speechEnabled: false });
-  }
-}
-
-export function toggleShowQueen() {
-  const prev = get(settingsStore);
-  const newShowQueenState = !(prev.showQueen ?? true);
-  if (!newShowQueenState) {
-    updateSettings({ showQueen: newShowQueenState, showMoves: false });
-  } else {
-    updateSettings({ showQueen: newShowQueenState });
-  }
-} 
+export const settingsStore = createSettingsStore(); 

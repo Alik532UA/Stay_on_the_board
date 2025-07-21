@@ -9,6 +9,8 @@
   import { appVersion } from '$lib/stores/versionStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { clearCache } from '$lib/utils/cacheManager.js';
+  import { requestGameModeModal } from '$lib/stores/uiStore.js';
+  import ClearCacheOptions from './ClearCacheOptions.svelte';
   // Language dropdown logic (inline, замість LanguageSwitcher)
   let showLangDropdown = false;
   const languages = [
@@ -50,6 +52,9 @@
    * @param {string} route
    */
   function navigateTo(route) {
+    if (route === '/game') {
+      requestGameModeModal();
+    }
     logStore.addLog(`Навігація: ${route}`, 'info');
     goto(`${base}${route}`);
   }
@@ -57,27 +62,8 @@
   function showClearCacheModal() {
     modalStore.showModal({
       titleKey: 'mainMenu.clearCacheModal.title',
-      contentKey: 'mainMenu.clearCacheModal.content',
+      component: ClearCacheOptions,
       buttons: [
-        {
-          textKey: 'mainMenu.clearCacheModal.fullClear',
-          customClass: 'danger-btn',
-          onClick: () => {
-            logStore.addLog('Повне очищення кешу', 'info');
-            clearCache({ keepAppearance: false });
-            modalStore.closeModal();
-          }
-        },
-        {
-          textKey: 'mainMenu.clearCacheModal.keepAppearance',
-          primary: true,
-          isHot: true,
-          onClick: () => {
-            logStore.addLog('Очищення кешу зі збереженням вигляду', 'info');
-            clearCache({ keepAppearance: true });
-            modalStore.closeModal();
-          }
-        },
         { textKey: 'modal.cancel', onClick: modalStore.closeModal }
       ]
     });

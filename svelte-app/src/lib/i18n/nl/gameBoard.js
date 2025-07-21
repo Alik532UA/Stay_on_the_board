@@ -11,4 +11,5 @@ export default {
   details: "Details",
   infoModalTitle: "Over het spel en het doel",
   infoModalContent: `Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan.\n\n<b>Pro-modus: Train je verbeelding</b>\nHet echte plezier begint wanneer je het bord in je hoofd verplaatst. Probeer het bord in de instellingen uit te schakelen, voice-over aan te zetten en geblinddoekt te spelen met sneltoetsen. Dit maakt van het spel een <a href='https://youtube.com/shorts/_4n1F84wORI' target='_blank' rel='noopener noreferrer' style='color:inherit;text-decoration:none;'>krachtige</a> trainer voor geheugen en ruimtelijk inzicht. Begin met een 3x3 bord en maak het steeds moeilijker!`,
+  clearCache: "Cache wissen (DEV)"
 }; 

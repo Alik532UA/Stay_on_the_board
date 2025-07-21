@@ -3,7 +3,8 @@ export default {
   limitPath: "Improved path visibility",
   close: "Close replay",
   prev: "Previous move",
-  play: "Play",
+  play: "Play forward",
+  playBackward: "Play backward",
   pause: "Pause",
   next: "Next move"
 }; 

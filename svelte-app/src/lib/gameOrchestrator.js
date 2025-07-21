@@ -52,6 +52,12 @@ async function triggerComputerMove() {
 }
 
 export async function confirmPlayerMove() {
+  // Негайно очищуємо доступні ходи для приховування крапок перед анімацією
+  appState.update(s => ({ ...s, availableMoves: [] }));
+
+  if (get(settingsStore).autoHideBoard) {
+    settingsStore.toggleShowBoard(false);
+  }
   const state = get(appState);
   const { selectedDirection, selectedDistance, playerRow, playerCol, lastComputerMove, boardSize, blockModeEnabled } = state;
   if (!selectedDirection || !selectedDistance || playerRow === null || playerCol === null) return;

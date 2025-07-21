@@ -3,7 +3,8 @@ export default {
   limitPath: "Yaxşılaşdırılğan yol körünüşi",
   close: "Replay'ni qapat",
   prev: "Evvelki areket",
-  play: "Oynat",
+  play: "İleri oynat",
+  playBackward: "Keri oynat",
   pause: "Pauza",
   next: "Kelecek areket"
 }; 
