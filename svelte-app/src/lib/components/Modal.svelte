@@ -39,9 +39,7 @@
   }
 
   function onOverlayClick(/** @type {any} */ e) {
-    if ($modalState.buttons && $modalState.buttons.length === 2 && $modalState.buttons.every(btn => typeof btn.onClick === 'function')) {
-      return;
-    }
+    if (!$modalState.closable) return;
     const target = /** @type {HTMLElement|null} */(e.target);
     if (target && target.classList.contains('modal-overlay')) {
       logStore.addLog('Закриття модального вікна (overlay)', 'info');
@@ -62,7 +60,9 @@
         {/if}
         <h2 class="modal-title">{$modalState.titleKey ? $_($modalState.titleKey) : $modalState.title}</h2>
         {#if !(($modalState.buttons && $modalState.buttons.length === 2 && $modalState.buttons.every(btn => typeof btn.onClick === 'function')) || $modalState.titleKey === 'modal.gameOverTitle' || ($modalState.buttons && $modalState.buttons.length === 1))}
-          <button class="modal-close" onclick={() => { logStore.addLog('Закриття модального вікна (X)', 'info'); modalStore.closeModal(); }}>&times;</button>
+          {#if $modalState.closable}
+            <button class="modal-close" onclick={() => { logStore.addLog('Закриття модального вікна (X)', 'info'); modalStore.closeModal(); }}>&times;</button>
+          {/if}
         {/if}
       </div>
       <div class="modal-content">

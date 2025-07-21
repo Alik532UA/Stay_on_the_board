@@ -22,7 +22,8 @@
 	import '../app.css';
 	import { settingsStore } from '$lib/stores/settingsStore.js';
 	import { get } from 'svelte/store';
-	import '../lib/i18n/init.js';
+	import { initializeI18n, i18nReady } from '../lib/i18n/init.js';
+	import { initGameStoreSubscriptions } from '$lib/stores/gameStore.js';
 	import { assets } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { base } from '$app/paths';
@@ -49,6 +50,9 @@
 				// Якщо версії ще немає, просто записуємо її
 				localStorage.setItem(APP_VERSION_KEY, serverVersion);
 			}
+			settingsStore.init(); // <-- Ініціалізуємо налаштування на клієнті
+			initializeI18n(); // Ініціалізуємо локалізацію
+			initGameStoreSubscriptions(); // Ініціалізуємо підписки для gameStore
 		} catch (error) {
 			console.error('Failed to check for app update:', error);
 		}
@@ -88,7 +92,11 @@
 	{/if}
 
 	<main>
-		<slot />
+		{#if $i18nReady}
+			<slot />
+		{:else}
+			<div>Loading...</div>
+		{/if}
 	</main>
 
 	{#if false}

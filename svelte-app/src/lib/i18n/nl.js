@@ -17,6 +17,7 @@ import tooltips from './nl/tooltips.js';
 import supportersPage from './nl/supportersPage.js';
 import replay from './nl/replay.js';
 import faq from './nl/faq.js';
+import gameModes from './nl/gameModes.js';
 
 export default {
   mainMenu,
@@ -37,5 +38,6 @@ export default {
   tooltips,
   supportersPage,
   replay,
-  faq
+  faq,
+  gameModes
 };

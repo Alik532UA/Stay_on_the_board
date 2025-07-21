@@ -17,6 +17,7 @@ import tooltips from './crh/tooltips.js';
 import supportersPage from './crh/supportersPage.js';
 import replay from './crh/replay.js';
 import faq from './crh/faq.js';
+import gameModes from './crh/gameModes.js';
 
 export default {
   mainMenu,
@@ -37,5 +38,6 @@ export default {
   tooltips,
   supportersPage,
   replay,
-  faq
+  faq,
+  gameModes
 };

@@ -1,5 +1,5 @@
 <script>
-  import { appState, goToReplayStep, toggleAutoPlay, stopReplay, toggleLimitReplayPath } from '$lib/stores/gameStore.js';
+  import { appState, goToReplayStep, toggleAutoPlayForward, toggleAutoPlayBackward, toggleLimitReplayPath } from '$lib/stores/gameStore.js';
   import { _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
   function handleCheckboxChange() {
@@ -19,10 +19,12 @@
   </label>
 
   <div class="replay-controls">
-    <button class="control-btn" onclick={stopReplay} title={$_('replay.close')}>×</button>
     <button class="control-btn" onclick={() => goToReplayStep($appState.replayCurrentStep - 1)} disabled={$appState.replayCurrentStep === 0} title={$_('replay.prev')}>«</button>
-    <button class="control-btn play-pause" onclick={toggleAutoPlay} title={$appState.isAutoPlaying ? $_('replay.pause') : $_('replay.play')}>
-      {#if $appState.isAutoPlaying}❚❚{:else}▶{/if}
+    <button class="control-btn play-pause" class:active={$appState.autoPlayDirection === 'backward'} onclick={toggleAutoPlayBackward} title={$appState.autoPlayDirection === 'backward' ? $_('replay.pause') : $_('replay.playBackward')}>
+      {#if $appState.autoPlayDirection === 'backward'}❚❚{:else}◀{/if}
+    </button>
+    <button class="control-btn play-pause" class:active={$appState.autoPlayDirection === 'forward'} onclick={toggleAutoPlayForward} title={$appState.autoPlayDirection === 'forward' ? $_('replay.pause') : $_('replay.play')}>
+      {#if $appState.autoPlayDirection === 'forward'}❚❚{:else}▶{/if}
     </button>
     <button class="control-btn" onclick={() => goToReplayStep($appState.replayCurrentStep + 1)} disabled={$appState.replayCurrentStep >= $appState.moveHistory.length - 1} title={$_('replay.next')}>»</button>
     <div class="step-counter">
@@ -90,6 +92,10 @@
   cursor: not-allowed;
 }
 .play-pause {
+  background: var(--control-bg);
+  color: var(--text-primary);
+}
+.play-pause.active {
   background: var(--confirm-btn-bg);
   color: #fff;
 }

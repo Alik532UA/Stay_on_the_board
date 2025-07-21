@@ -117,3 +117,9 @@
     <path d="M4.93 4.93A8 8 0 1 0 10 2" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 {/if} 
+
+{#if name === 'game-mode'}
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Змінити режим гри">
+    <path d="M4 6H20M4 12H20M4 18H20"/>
+  </svg>
+{/if} 

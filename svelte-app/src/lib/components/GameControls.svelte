@@ -6,7 +6,7 @@
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
-  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleShowQueen } from '$lib/stores/settingsStore.js';
+  import { settingsStore } from '$lib/stores/settingsStore.js';
   import SvgIcons from './SvgIcons.svelte';
   import { get } from 'svelte/store';
   import { availableDistances } from '$lib/stores/gameStore.js';
@@ -148,8 +148,8 @@
   }
 
   function onBlockModeChange() { toggleBlockMode(); }
-  function onShowMovesChange() { toggleShowMoves(); }
-  function onShowBoardChange() { toggleShowBoard(); }
+  function onShowMovesChange() { settingsStore.toggleShowMoves(); }
+  function onShowBoardChange() { settingsStore.toggleShowBoard(); }
   /**
    * @param {string} dir
    */
@@ -178,7 +178,7 @@
    */
   async function onSpeechChange(event) {
     // Викликаємо toggleSpeech без аргументів, щоб уникнути помилки типу
-    await toggleSpeech();
+    await settingsStore.toggleSpeech();
   }
   $: numColumns = ((count) => {
     if (count <= 4) return count;
@@ -245,6 +245,62 @@
 </script>
 
 <div class="game-interaction-wrapper">
+  <div class="game-controls-panel">
+    <div class="directions directions-3x3">
+      <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" onclick={() => onDirectionClick('up-left')} title={`${$_('tooltips.up-left')}
+(${$settingsStore.keybindings['up-left'].join(', ')})`}>↖</button>
+      <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" onclick={() => onDirectionClick('up')} title={`${$_('tooltips.up')}
+(${$settingsStore.keybindings['up'].join(', ')})`}>↑</button>
+      <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" onclick={() => onDirectionClick('up-right')} title={`${$_('tooltips.up-right')}
+(${$settingsStore.keybindings['up-right'].join(', ')})`}>↗</button>
+      <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" onclick={() => onDirectionClick('left')} title={`${$_('tooltips.left')}
+(${$settingsStore.keybindings['left'].join(', ')})`}>←</button>
+      <button
+        id="center-info"
+        class="control-btn center-info {centerInfoState.class}"
+        type="button"
+        aria-label={centerInfoState.aria}
+        onclick={centerInfoState.clickable ? onCentralClick : undefined}
+        tabindex="0"
+        disabled={!centerInfoState.clickable}
+      >
+        {String(centerInfoState.content)}
+      </button>
+      <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" onclick={() => onDirectionClick('right')} title={`${$_('tooltips.right')}
+(${$settingsStore.keybindings['right'].join(', ')})`}>→</button>
+      <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" onclick={() => onDirectionClick('down-left')} title={`${$_('tooltips.down-left')}
+(${$settingsStore.keybindings['down-left'].join(', ')})`}>↙</button>
+      <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" onclick={() => onDirectionClick('down')} title={`${$_('tooltips.down')}
+(${$settingsStore.keybindings['down'].join(', ')})`}>↓</button>
+      <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" onclick={() => onDirectionClick('down-right')} title={`${$_('tooltips.down-right')}
+(${$settingsStore.keybindings['down-right'].join(', ')})`}>↘</button>
+    </div>
+    <div class="distance-select">
+      <div>{$_('gameControls.selectDistance')}</div>
+      <div class="distance-btns" style="--num-columns: {numColumns};">
+        {#each $availableDistances as dist}
+          <button 
+            class="dist-btn {selectedDistance === dist ? 'active' : ''}" 
+            onclick={() => onDistanceClick(dist)} 
+            value={String(dist)} 
+            id={String(dist)}
+          >{String(dist)}</button>
+        {/each}
+      </div>
+    </div>
+    <div class="action-btns">
+      <button class="confirm-btn" onclick={confirmPlayerMove} disabled={buttonDisabled} title={`${$_('tooltips.confirm')}\n(${$settingsStore.keybindings['confirm']})`}>
+        <SvgIcons name="confirm" />
+        {$_('gameControls.confirm')}
+      </button>
+      {#if blockModeEnabled}
+        <button class="no-moves-btn" onclick={claimNoMoves} title={`${$_('tooltips.no-moves')}\n(${$settingsStore.keybindings['no-moves']})`}>
+          <SvgIcons name="no-moves" />
+          {$_('gameControls.noMovesTitle')}
+        </button>
+      {/if}
+    </div>
+  </div>
   <details class="settings-expander" open>
     <summary class="settings-summary">
       {$_('gameControls.settings')}
@@ -277,7 +333,7 @@
       <label class="ios-switch-label" class:disabled={!showBoard}>
         <div class="switch-content-wrapper">
           <div class="ios-switch">
-            <input type="checkbox" checked={$settingsStore.showQueen} onchange={toggleShowQueen} disabled={!showBoard} />
+            <input type="checkbox" checked={$settingsStore.showQueen} onchange={settingsStore.toggleShowQueen} disabled={!showBoard} />
             <span class="slider"></span>
           </div>
           <span>{$_('gameControls.showQueen')}</span>
@@ -341,64 +397,18 @@
           <SvgIcons name="voice-settings" />
         </button>
       </label>
+      <!-- 6. Автоматично приховувати дошку -->
+      <label class="ios-switch-label">
+        <div class="switch-content-wrapper">
+          <div class="ios-switch">
+            <input type="checkbox" checked={$settingsStore.autoHideBoard} onchange={settingsStore.toggleAutoHideBoard} />
+            <span class="slider"></span>
+          </div>
+          <span>{$_('gameModes.autoHideBoard')}</span>
+        </div>
+      </label>
     </div>
   </details>
-  <div class="game-controls-panel">
-    <div class="directions directions-3x3">
-      <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" onclick={() => onDirectionClick('up-left')} title={`${$_('tooltips.up-left')}
-(${$settingsStore.keybindings['up-left'].join(', ')})`}>↖</button>
-      <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" onclick={() => onDirectionClick('up')} title={`${$_('tooltips.up')}
-(${$settingsStore.keybindings['up'].join(', ')})`}>↑</button>
-      <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" onclick={() => onDirectionClick('up-right')} title={`${$_('tooltips.up-right')}
-(${$settingsStore.keybindings['up-right'].join(', ')})`}>↗</button>
-      <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" onclick={() => onDirectionClick('left')} title={`${$_('tooltips.left')}
-(${$settingsStore.keybindings['left'].join(', ')})`}>←</button>
-      <button
-        id="center-info"
-        class="control-btn center-info {centerInfoState.class}"
-        type="button"
-        aria-label={centerInfoState.aria}
-        onclick={centerInfoState.clickable ? onCentralClick : undefined}
-        tabindex="0"
-        disabled={!centerInfoState.clickable}
-      >
-        {String(centerInfoState.content)}
-      </button>
-      <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" onclick={() => onDirectionClick('right')} title={`${$_('tooltips.right')}
-(${$settingsStore.keybindings['right'].join(', ')})`}>→</button>
-      <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" onclick={() => onDirectionClick('down-left')} title={`${$_('tooltips.down-left')}
-(${$settingsStore.keybindings['down-left'].join(', ')})`}>↙</button>
-      <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" onclick={() => onDirectionClick('down')} title={`${$_('tooltips.down')}
-(${$settingsStore.keybindings['down'].join(', ')})`}>↓</button>
-      <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" onclick={() => onDirectionClick('down-right')} title={`${$_('tooltips.down-right')}
-(${$settingsStore.keybindings['down-right'].join(', ')})`}>↘</button>
-    </div>
-    <div class="distance-select">
-      <div>{$_('gameControls.selectDistance')}</div>
-      <div class="distance-btns" style="--num-columns: {numColumns};">
-        {#each $availableDistances as dist}
-          <button 
-            class="dist-btn {selectedDistance === dist ? 'active' : ''}" 
-            onclick={() => onDistanceClick(dist)} 
-            value={String(dist)} 
-            id={String(dist)}
-          >{String(dist)}</button>
-        {/each}
-      </div>
-    </div>
-    <div class="action-btns">
-      <button class="confirm-btn" onclick={confirmPlayerMove} disabled={buttonDisabled} title={`${$_('tooltips.confirm')}\n(${$settingsStore.keybindings['confirm']})`}>
-        <SvgIcons name="confirm" />
-        {$_('gameControls.confirm')}
-      </button>
-      {#if blockModeEnabled}
-        <button class="no-moves-btn" onclick={claimNoMoves} title={`${$_('tooltips.no-moves')}\n(${$settingsStore.keybindings['no-moves']})`}>
-          <SvgIcons name="no-moves" />
-          {$_('gameControls.noMovesTitle')}
-        </button>
-      {/if}
-    </div>
-  </div>
 </div>
 
 <style>

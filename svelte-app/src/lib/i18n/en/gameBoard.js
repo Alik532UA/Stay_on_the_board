@@ -11,4 +11,5 @@ export default {
   details: "Details",
   infoModalTitle: "About the Game and Its Goal",
   infoModalContent: `Your goal is to take turns moving the shared piece without going off the board.\n\n<b>Pro Mode: Training Your Imagination</b>\nThe real fun begins when you move the board into your mind. Try turning off the board in settings, enabling voiceover, and playing blindfolded using hotkeys. This turns the game into a <a href='https://youtube.com/shorts/_4n1F84wORI' target='_blank' rel='noopener noreferrer' style='color:inherit;text-decoration:none;'>powerful</a> trainer for memory and spatial thinking. Start with a 3x3 board and gradually increase the challenge!`,
+  clearCache: "Clear Cache (DEV)"
 }; 

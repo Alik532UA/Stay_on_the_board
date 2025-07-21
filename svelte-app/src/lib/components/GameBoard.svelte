@@ -1,6 +1,6 @@
 <script>
   import '../css/components/game-board.css';
-  import { appState, setBoardSize, toggleBlockCell, setDirection, setDistance, toggleBlockMode, cashOutAndEndGame, resetGame } from '$lib/stores/gameStore.js';
+  import { appState, setBoardSize, toggleBlockCell, setDirection, setDistance, toggleBlockMode, cashOutAndEndGame, resetGame, stopReplay } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { navigateToMainMenu } from '$lib/utils/navigation.js';
   import GameControls from '$lib/components/GameControls.svelte';
@@ -8,9 +8,9 @@
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
   import { _ } from 'svelte-i18n';
-  import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore.js';
+  import { uiState, closeVoiceSettingsModal, clearGameModeModalRequest } from '$lib/stores/uiStore.js';
   import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
-  import { settingsStore, toggleShowBoard, toggleShowMoves, toggleSpeech, toggleShowQueen } from '$lib/stores/settingsStore.js';
+  import { settingsStore } from '$lib/stores/settingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from './SvgIcons.svelte';
   import { base } from '$app/paths';
@@ -19,6 +19,8 @@
   import { goto } from '$app/navigation';
   import FAQModal from '$lib/components/FAQModal.svelte';
   import { confirmPlayerMove } from '$lib/gameOrchestrator.js';
+  import GameModeModal from '$lib/components/GameModeModal.svelte';
+  import { clearCache } from '$lib/utils/cacheManager.js';
 
   let showBoard = $derived($settingsStore.showBoard);
 
@@ -37,12 +39,26 @@
     if (state.isGameOver || (state.score === 0 && !state.isReplayMode && state.moveHistory.length <= 1)) {
       resetGame();
     }
-    const hasVisitedGame = localStorage.getItem('hasVisitedGame');
-    if (!hasVisitedGame) {
-      showGameInfoModal();
-      localStorage.setItem('hasVisitedGame', 'true');
-    }
+
+    // Відкладаємо логіку показу модального вікна, щоб уникнути race conditions
+    setTimeout(() => {
+      if (get(uiState).shouldShowGameModeModalOnLoad) {
+        showGameModeSelector();
+        clearGameModeModalRequest();
+      }
+    }, 50);
   });
+
+  function showGameModeSelector() {
+    modalStore.showModal({
+      titleKey: 'gameModes.title',
+      component: GameModeModal,
+      buttons: [
+        { textKey: 'modal.cancel', onClick: modalStore.closeModal }
+      ],
+      closable: false
+    });
+  }
 
   function goToMainMenu() {
     logStore.addLog('Повернення до головного меню', 'info');
@@ -102,10 +118,10 @@
     'confirm': confirmPlayerMove,
     'no-moves': () => { logStore.addLog(`[handleKeydown] "немає ходів"`, 'info'); setDirection('down-right'); },
     'toggle-block-mode': () => { logStore.addLog('[handleKeydown] Перемкнено режим заблокованих клітинок', 'info'); toggleBlockMode(); },
-    'toggle-board': () => { logStore.addLog('[handleKeydown] Перемкнено видимість дошки', 'info'); toggleShowBoard(); },
+    'toggle-board': () => { logStore.addLog('[handleKeydown] Перемкнено видимість дошки', 'info'); settingsStore.toggleShowBoard(); },
     'increase-board': () => setBoardSize(Math.min(get(appState).boardSize + 1, 9)),
     'decrease-board': () => setBoardSize(Math.max(get(appState).boardSize - 1, 2)),
-    'toggle-speech': toggleSpeech,
+    'toggle-speech': () => { logStore.addLog('[handleKeydown] Перемкнено мовлення', 'info'); settingsStore.toggleSpeech(); },
     'distance-1': () => setDistance(1),
     'distance-2': () => setDistance(2),
     'distance-3': () => setDistance(3),
@@ -245,38 +261,48 @@
     <button class="main-menu-btn" title={mainMenuTitle} onclick={goToMainMenu}>
       <SvgIcons name="home" />
     </button>
+    <button class="main-menu-btn" title={$_('gameModes.changeModeTooltip')} onclick={showGameModeSelector}>
+      <SvgIcons name="game-mode" />
+    </button>
     <button class="main-menu-btn" title={$_('gameBoard.info')} onclick={showGameInfoModal}>
       <SvgIcons name="info" />
     </button>
+    {#if import.meta.env.DEV}
+      <button class="main-menu-btn" title={$_('gameBoard.clearCache')} onclick={() => clearCache({ keepAppearance: false })}>
+        <SvgIcons name="clear-cache" />
+      </button>
+    {/if}
   </div>
   
-  <div class="score-panel game-content-block">
-    <div class="score-display">
-      <span class="score-label-text">{$_('gameBoard.scoreLabel')}:</span>
-      <span
-        class="score-value-clickable"
-        class:positive-score={$appState.score > 0}
-        onclick={showScoreInfo}
-        onkeydown={e => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
-        role="button"
-        tabindex="0"
-        title={$_('modal.scoreInfoTitle')}
-      >{$appState.score}</span>
-      {#if $appState.penaltyPoints > 0}
-        <span 
-          class="penalty-display" 
-          onclick={showPenaltyInfo}
-          onkeydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
-          title={$_('gameBoard.penaltyHint')}
+  {#if !$appState.isReplayMode}
+    <div class="score-panel game-content-block">
+      <div class="score-display">
+        <span class="score-label-text">{$_('gameBoard.scoreLabel')}:</span>
+        <span
+          class="score-value-clickable"
+          class:positive-score={$appState.score > 0}
+          onclick={showScoreInfo}
+          onkeydown={e => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
           role="button"
           tabindex="0"
-        >-{$appState.penaltyPoints}</span>
-      {/if}
+          title={$_('modal.scoreInfoTitle')}
+        >{$appState.score}</span>
+        {#if $appState.penaltyPoints > 0}
+          <span 
+            class="penalty-display" 
+            onclick={showPenaltyInfo}
+            onkeydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+            title={$_('gameBoard.penaltyHint')}
+            role="button"
+            tabindex="0"
+          >-{$appState.penaltyPoints}</span>
+        {/if}
+      </div>
+      <button class="cash-out-btn" onclick={cashOutAndEndGame} title={$_('gameBoard.cashOut')}>
+        {$_('gameBoard.cashOut')}
+      </button>
     </div>
-    <button class="cash-out-btn" onclick={cashOutAndEndGame} title={$_('gameBoard.cashOut')}>
-      {$_('gameBoard.cashOut')}
-    </button>
-  </div>
+  {/if}
 
   {#key `${$appState.boardSize}-${$appState.gameId}`}
     <div 
@@ -348,6 +374,11 @@
 
   {#if $appState.isReplayMode}
     <ReplayControls />
+    <div class="close-replay-container">
+      <button class="modal-btn-generic danger-btn" onclick={stopReplay}>
+        {$_('replay.close')}
+      </button>
+    </div>
   {:else}
     <GameControls />
   {/if}
@@ -645,5 +676,15 @@
   }
   .game-board {
     position: relative;
+  }
+  .close-replay-container {
+    width: 100%;
+    max-width: 480px;
+    margin: 16px auto 0;
+    display: flex;
+    justify-content: center;
+  }
+  .close-replay-container .modal-btn-generic {
+    min-width: 200px;
   }
 </style> 

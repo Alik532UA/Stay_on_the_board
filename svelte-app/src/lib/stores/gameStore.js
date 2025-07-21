@@ -3,7 +3,7 @@ import { get } from 'svelte/store';
 import { modalStore } from './modalStore.js';
 import { closeModal } from './modalStore.js';
 import { _ as t } from 'svelte-i18n';
-import { settingsStore, toggleShowBoard } from './settingsStore.js';
+import { settingsStore } from './settingsStore.js';
 import { navigateToMainMenu } from '$lib/utils/navigation.js';
 import { getAvailableMoves, calculateFinalScore } from '$lib/gameCore.js';
 import { langMap } from '$lib/speech.js';
@@ -93,7 +93,7 @@ function getRandomCell(size) {
  * @property {{pos: {row: number, col: number}, blocked: {row: number, col: number}[], visits?: { [key: string]: number }}[]} moveHistory // Масив для збереження позиції та заблокованих клітинок на кожному кроці
  * @property {boolean} isReplayMode // Прапорець, що вказує на режим перегляду
  * @property {number} replayCurrentStep // Поточний крок у реплеї
- * @property {boolean} isAutoPlaying // Прапорець для автовідтворення
+ * @property {'paused' | 'forward' | 'backward'} autoPlayDirection // Напрямок автовідтворення
  * @property {boolean} limitReplayPath // Новий прапорець для обмеження шляху реплею
  */
 
@@ -147,7 +147,7 @@ const style = isBrowser ? (localStorage.getItem('style') === 'ubuntu' ? 'purple'
   localStorage.getItem('style') === 'material' ? 'orange' : localStorage.getItem('style')) : null;
 
 // Випадкова стартова позиція ферзя
-const initialBoardSize = 3;
+const initialBoardSize = 4;
 export const appState = writable(/** @type {AppState} */({
   currentView: 'mainMenu',
   boardSize: initialBoardSize,
@@ -193,7 +193,7 @@ export const appState = writable(/** @type {AppState} */({
   moveHistory: [{ pos: { row: 0, col: 0 }, blocked: [], visits: {} }], // Починаємо історію з першої клітинки
   isReplayMode: false,
   replayCurrentStep: 0,
-  isAutoPlaying: false,
+  autoPlayDirection: 'paused',
   limitReplayPath: true,
 }));
 
@@ -344,7 +344,7 @@ export function setGameMode(mode) {
  * @param {number} newSize
  */
 export async function setBoardSize(newSize) {
-  settingsStore.updateSettings({ showBoard: true }); // <-- ДОДАНО
+  settingsStore.toggleShowBoard(true);
   appState.update(state => {
     const { row, col } = getRandomCell(newSize);
     const board = createEmptyBoard(newSize);
@@ -378,7 +378,7 @@ export async function setBoardSize(newSize) {
       moveHistory: [{ pos: { row, col }, blocked: [], visits: {} }], // Починаємо історію з першої клітинки
       isReplayMode: false,
       replayCurrentStep: 0,
-      isAutoPlaying: false,
+      autoPlayDirection: 'paused',
       limitReplayPath: true,
     };
   });
@@ -497,7 +497,7 @@ export function resetAndCloseModal() {
 }
 
 export function resetGame() {
-  settingsStore.updateSettings({ showBoard: true }); // <-- ДОДАНО
+  settingsStore.toggleShowBoard(true);
   appState.update(state => {
     const boardSize = state.boardSize;
     const { row, col } = getRandomCell(boardSize);
@@ -531,7 +531,7 @@ export function resetGame() {
       moveHistory: [{ pos: { row, col }, blocked: [], visits: {} }],
       isReplayMode: false,
       replayCurrentStep: 0,
-      isAutoPlaying: false,
+      autoPlayDirection: 'paused',
       limitReplayPath: true,
     };
   });
@@ -756,7 +756,7 @@ export function stopReplay() {
   appState.update(state => ({
     ...state,
     isReplayMode: false,
-    isAutoPlaying: false,
+    autoPlayDirection: 'paused',
   }));
   const state = get(appState);
   const finalScoreDetails = calculateFinalScore(state);
@@ -788,32 +788,74 @@ export function goToReplayStep(step) {
   });
 }
 
-export function toggleAutoPlay() {
+export function toggleAutoPlayForward() {
+  if (autoPlayInterval) clearInterval(autoPlayInterval);
   const state = get(appState);
-  if (state.isAutoPlaying) {
-    if (autoPlayInterval) clearInterval(autoPlayInterval);
-    appState.update(s => ({ ...s, isAutoPlaying: false }));
+  if (state.autoPlayDirection === 'forward') {
+    appState.update(s => ({ ...s, autoPlayDirection: 'paused' }));
   } else {
-    // Якщо запис дійшов кінця, скидаємо на початок
     if (state.replayCurrentStep >= (state.moveHistory?.length || 1) - 1) {
       goToReplayStep(0);
     }
-    appState.update(s => ({ ...s, isAutoPlaying: true }));
+    appState.update(s => ({ ...s, autoPlayDirection: 'forward' }));
     autoPlayInterval = setInterval(() => {
       const currentState = get(appState);
       if (currentState.replayCurrentStep < (currentState.moveHistory?.length || 1) - 1) {
         goToReplayStep(currentState.replayCurrentStep + 1);
       } else {
         if (autoPlayInterval) clearInterval(autoPlayInterval);
-        appState.update(s => ({ ...s, isAutoPlaying: false }));
+        appState.update(s => ({ ...s, autoPlayDirection: 'paused' }));
       }
     }, 1000);
   }
-} 
+}
+
+export function toggleAutoPlayBackward() {
+  if (autoPlayInterval) clearInterval(autoPlayInterval);
+  const state = get(appState);
+  if (state.autoPlayDirection === 'backward') {
+    appState.update(s => ({ ...s, autoPlayDirection: 'paused' }));
+  } else {
+    if (state.replayCurrentStep <= 0) {
+      goToReplayStep((state.moveHistory?.length || 1) - 1);
+    }
+    appState.update(s => ({ ...s, autoPlayDirection: 'backward' }));
+    autoPlayInterval = setInterval(() => {
+      const currentState = get(appState);
+      if (currentState.replayCurrentStep > 0) {
+        goToReplayStep(currentState.replayCurrentStep - 1);
+      } else {
+        if (autoPlayInterval) clearInterval(autoPlayInterval);
+        appState.update(s => ({ ...s, autoPlayDirection: 'paused' }));
+      }
+    }, 1000);
+  }
+}
 
 export function toggleLimitReplayPath() {
   appState.update(state => ({
     ...state,
     limitReplayPath: !state.limitReplayPath,
   }));
+} 
+
+/**
+ * Ініціалізує підписки gameStore на інші стори.
+ * Викликається на клієнті, щоб уникнути циклічних залежностей на сервері.
+ */
+export function initGameStoreSubscriptions() {
+  // Синхронізація стану гри з налаштуваннями
+  settingsStore.subscribe(settings => {
+    appState.update(state => {
+      const updates = {};
+      if (state.blockModeEnabled !== settings.blockModeEnabled) {
+        updates.blockModeEnabled = settings.blockModeEnabled;
+      }
+      // Можна додати синхронізацію інших налаштувань у майбутньому тут
+      if (Object.keys(updates).length > 0) {
+        return { ...state, ...updates };
+      }
+      return state;
+    });
+  });
 } 
