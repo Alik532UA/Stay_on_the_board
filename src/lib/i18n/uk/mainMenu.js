@@ -35,5 +35,6 @@ export default {
     content: "Виберіть тип очищення:",
     fullClear: "Очистити все (скине всі налаштування)",
     keepAppearance: "Зберегти вигляд (тема, мова)"
-  }
+  },
+  dragAndDropTest: "Тест перетягування"
 }; 

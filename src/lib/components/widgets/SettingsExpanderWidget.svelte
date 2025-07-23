@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { appState, setBoardSize } from '$lib/stores/gameStore.js';
+  import { gameState } from '$lib/stores/gameState.js';
+  import { setBoardSize } from '$lib/stores/gameActions.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { _ } from 'svelte-i18n';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
@@ -28,7 +29,7 @@
       const keybindings = get(settingsStore).keybindings;
       // Toggle block mode
       if (keybindings['toggle-block-mode']?.includes(key)) {
-        settingsStore.updateSettings({ blockModeEnabled: !$appState.blockModeEnabled });
+        settingsStore.updateSettings({ blockModeEnabled: !$settingsStore.blockModeEnabled });
         e.preventDefault();
         return;
       }
@@ -64,35 +65,16 @@
   $: showMoves = $settingsStore.showMoves;
   $: showBoard = $settingsStore.showBoard;
   $: speechEnabled = $settingsStore.speechEnabled;
-  $: blockModeEnabled = $appState.blockModeEnabled;
 
   /**
    * @param {number} increment
    */
   function changeBoardSize(increment: number) {
-    const currentSize = get(appState).boardSize;
+    const currentSize = get(gameState).boardSize;
     const newSize = currentSize + increment;
-    if (newSize >= 2 && newSize <= 9) selectBoardSize(newSize);
-  }
-
-  /**
-   * @param {number} n
-   */
-  function selectBoardSize(n: number) {
-    const state = get(appState);
-    if (state.boardSize === n) return;
-    if (state.score === 0 && state.penaltyPoints === 0) {
-      setBoardSize(n);
-      return;
+    if (newSize >= 2 && newSize <= 9) {
+      setBoardSize(newSize);
     }
-    modalStore.showModal({
-      titleKey: 'modal.resetScoreTitle',
-      contentKey: 'modal.resetScoreContent',
-      buttons: [
-        { textKey: 'modal.resetScoreConfirm', customClass: 'green-btn', isHot: true, onClick: () => { setBoardSize(n); modalStore.closeModal(); } },
-        { textKey: 'modal.resetScoreCancel', onClick: modalStore.closeModal }
-      ]
-    });
   }
 
   /**
@@ -114,24 +96,6 @@
     }
   }
 
-  /**
-   * @param {Event} event
-   */
-  function handleToggleShowBoard(event: Event) {
-    settingsStore.toggleShowBoard();
-  }
-  /**
-   * @param {Event} event
-   */
-  function handleToggleShowQueen(event: Event) {
-    settingsStore.toggleShowQueen();
-  }
-  /**
-   * @param {Event} event
-   */
-  function handleToggleShowMoves(event: Event) {
-    settingsStore.toggleShowMoves();
-  }
   /**
    * @param {Event} event
    */
@@ -280,11 +244,6 @@
     border-color: var(--control-selected);
     outline: none;
   }
-  .menu-style-btn svg, .settings-icon-btn svg {
-    width: 18px !important;
-    height: 18px !important;
-    display: block;
-  }
   .ios-switch-label {
     display: flex;
     align-items: center;
@@ -368,15 +327,19 @@
     border-color: var(--control-selected);
     outline: none;
   }
+  .game-mode-btn.active {
+    background: var(--control-selected);
+    color: var(--control-selected-text);
+    border-color: var(--control-selected);
+    box-shadow: 0 0 8px var(--control-selected, #4caf50);
+    transform: scale(1.07);
+    z-index: 1;
+  }
   .game-mode-divider {
     border: none;
     border-top: 1.5px solid var(--border-color, #444);
     margin: 0;
     width: 100%;
-  }
-  .menu-style-btn svg {
-    width: 16px;
-    height: 16px;
   }
   .options-values {
     display: flex;
@@ -392,32 +355,68 @@
   </summary>
   <div class="toggles">
     <div class="game-mode-row">
-      <button class="game-mode-btn" on:click={() => settingsStore.applyGameModePreset('beginner')}>Новачок</button>
-      <button class="game-mode-btn" on:click={() => settingsStore.applyGameModePreset('experienced')}>Досвідчений</button>
-      <button class="game-mode-btn" on:click={() => settingsStore.applyGameModePreset('pro')}>Профі</button>
+      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => settingsStore.applyGameModePreset('beginner')}>Новачок</button>
+      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => settingsStore.applyGameModePreset('experienced')}>Досвідчений</button>
+      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'pro'} on:click={() => settingsStore.applyGameModePreset('pro')}>Профі</button>
     </div>
     <hr class="game-mode-divider" />
     <div class="setting-item board-size-control">
       <span>{$_('settings.boardSize')}</span>
       <div class="size-adjuster">
-        <button class="adjust-btn" on:click={() => changeBoardSize(-1)} disabled={$appState.boardSize <= 2}>-</button>
-        <span class="current-size">{$appState.boardSize}x{$appState.boardSize}</span>
-        <button class="adjust-btn" on:click={() => changeBoardSize(1)} disabled={$appState.boardSize >= 9}>+</button>
+        <button 
+          class="adjust-btn" 
+          on:click={() => changeBoardSize(-1)}
+          disabled={$gameState.boardSize <= 2}
+        >-</button>
+        <span class="current-size">{$gameState.boardSize}x{$gameState.boardSize}</span>
+        <button 
+          class="adjust-btn" 
+          on:click={() => changeBoardSize(1)}
+          disabled={$gameState.boardSize >= 9}
+        >+</button>
       </div>
     </div>
     <label class="ios-switch-label">
-      <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={showBoard} on:change={handleToggleShowBoard} /><span class="slider"></span></div><span>{$_('gameControls.showBoard')}</span></div>
+      <div class="switch-content-wrapper">
+        <div class="ios-switch">
+          <input type="checkbox" checked={$settingsStore.showBoard} on:change={() => settingsStore.toggleShowBoard()} />
+          <span class="slider"></span>
+        </div>
+        <span>{$_('gameControls.showBoard')}</span>
+      </div>
     </label>
-    <label class="ios-switch-label" class:disabled={!showBoard}>
-      <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={$settingsStore.showQueen} on:change={handleToggleShowQueen} disabled={!showBoard} /><span class="slider"></span></div><span>{$_('gameControls.showQueen')}</span></div>
+    <label class="ios-switch-label" class:disabled={!$settingsStore.showBoard}>
+      <div class="switch-content-wrapper">
+        <div class="ios-switch">
+          <input type="checkbox" checked={$settingsStore.showQueen} on:change={settingsStore.toggleShowQueen} disabled={!$settingsStore.showBoard} />
+          <span class="slider"></span>
+        </div>
+        <span>{$_('gameControls.showQueen')}</span>
+      </div>
     </label>
-    <label class="ios-switch-label" class:disabled={!showBoard || !$settingsStore.showQueen}>
-      <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={showMoves} on:change={handleToggleShowMoves} disabled={!showBoard || !$settingsStore.showQueen} /><span class="slider"></span></div><span>{$_('gameControls.showMoves')}</span></div>
+    <label class="ios-switch-label" class:disabled={!$settingsStore.showBoard || !$settingsStore.showQueen}>
+      <div class="switch-content-wrapper">
+        <div class="ios-switch">
+          <input type="checkbox" checked={$settingsStore.showMoves} on:change={settingsStore.toggleShowMoves} disabled={!$settingsStore.showBoard || !$settingsStore.showQueen} />
+          <span class="slider"></span>
+        </div>
+        <span>{$_('gameControls.showMoves')}</span>
+      </div>
     </label>
     <label class="ios-switch-label">
-      <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={blockModeEnabled} on:change={() => settingsStore.updateSettings({ blockModeEnabled: !blockModeEnabled })} /><span class="slider"></span></div><span>{$_('gameControls.blockMode')}</span></div>
+      <div class="switch-content-wrapper">
+        <div class="ios-switch">
+          <input 
+            type="checkbox" 
+            checked={$settingsStore.blockModeEnabled} 
+            on:change={settingsStore.toggleBlockMode} 
+          />
+          <span class="slider"></span>
+        </div>
+        <span>{$_('gameControls.blockMode')}</span>
+      </div>
     </label>
-    {#if blockModeEnabled}
+    {#if $settingsStore.blockModeEnabled}
       <div class="block-mode-options">
         <span class="options-label">{$_('gameControls.blockAfter')}</span>
         <div class="options-values" role="radiogroup">

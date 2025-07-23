@@ -42,15 +42,4 @@
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   }
-
-  /* Адаптація для світлої теми */
-  [data-theme="light"] .floating-close-btn {
-    background: rgba(255, 255, 255, 0.4);
-    color: #333;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-  }
-
-  [data-theme="light"] .floating-close-btn:hover {
-    background: rgba(255, 255, 255, 0.7);
-  }
 </style> 

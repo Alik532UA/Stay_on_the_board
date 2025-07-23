@@ -17,6 +17,9 @@ export function createYjsGameStore(roomName = 'default-room', mapKey = 'game') {
   });
 
   // Оновлення стану (синхронізується для всіх peer)
+  /**
+   * @param {Record<string, any>} newState
+   */
   function setState(newState) {
     Object.entries(newState).forEach(([k, v]) => ymap.set(k, v));
   }
@@ -38,5 +41,5 @@ export function createYjsGameStore(roomName = 'default-room', mapKey = 'game') {
 
 // Приклад використання у компоненті:
 // import { createYjsGameStore } from '$stores/yjsGameStore';
-// const gameStore = createYjsGameStore('room-123');
-// $gameStore — реактивний стан, gameStore.setState({ ... }) — оновлення 
+// const gameState = createYjsGameStore('room-123');
+// $gameState — реактивний стан, gameState.setState({ ... }) — оновлення 

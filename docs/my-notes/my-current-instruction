@@ -1,0 +1,300 @@
+### Аналіз проблеми
+
+Дякую за вашу неймовірну наполегливість. Порожній лог після всіх наших спроб — це найважливіший доказ. Він означає, що ми шукали не там. Проблема не в логіці стану, а в самому UI-компоненті, який з якоїсь причини перестає реагувати на кліки.
+
+**Що означає порожній лог:**
+Якщо `console.log` в обробнику `on:click` не спрацьовує, це означає, що подія кліку **взагалі не доходить до кнопки**.
+
+**Нова гіпотеза (з високою ймовірністю): Проблема у взаємодії компонентів.**
+Коли рахунок оновлюється, Svelte перерендерить `ScorePanelWidget`. Цей віджет знаходиться всередині `DraggableColumns`. Цілком імовірно, що бібліотека для перетягування, реагуючи на оновлення одного зі своїх дочірніх елементів, "ламає" обробники подій на інших елементах, що знаходяться в сусідніх колонках (як `SettingsExpanderWidget`). Це пояснює, чому проблема виникає *тільки* після зміни рахунку.
+
+**Стратегія виправлення (метод ізоляції):**
+Щоб перевірити цю гіпотезу, ми проведемо експеримент: тимчасово відключимо складну систему перетягування `DraggableColumns` і відрендеримо всі віджети напряму. Якщо в такому спрощеному вигляді баг зникне, ми на 100% будемо знати, що проблема саме в `DraggableColumns`.
+
+### План для Cursor
+
+```md
+Твоя задача — тимчасово спростити структуру UI, щоб ізолювати проблемний компонент. Ми відключимо `DraggableColumns` і подивимося, чи зникне баг.
+
+1.  **Файл для редагування:** `src/lib/components/GameBoard.svelte`
+    *   **Закоментуй `DraggableColumns`:** Знайди рядок `<DraggableColumns ... />` і закоментуй його.
+    *   **Закоментуй пов'язану логіку:** Закоментуй у секції `<script>` визначення змінної `columns` та функцію `handleDrop`, оскільки вони більше не потрібні.
+    *   **Додай прямий рендеринг віджетів:** Замість закоментованого компонента, встав простий HTML-код, який рендерить всі віджети напряму в трьох колонках. Це тимчасовий макет для діагностики.
+
+#### Код для `src/lib/components/GameBoard.svelte`
+
+**Повністю заміни вміст файлу на цей код:**
+```svelte
+<script lang="ts">
+  import '../css/components/game-board.css';
+  import '../css/components/controls.css';
+  // import DraggableColumns from './DraggableColumns.svelte'; // ТИМЧАСОВО ВИМКНЕНО
+  import Modal from '$lib/components/Modal.svelte';
+  import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
+  import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore.js';
+  import { layoutStore, WIDGETS } from '$lib/stores/layoutStore.js';
+  import TopRowWidget from './widgets/TopRowWidget.svelte';
+  import ScorePanelWidget from './widgets/ScorePanelWidget.svelte';
+  import BoardWrapperWidget from './widgets/BoardWrapperWidget.svelte';
+  import ControlsPanelWidget from './widgets/ControlsPanelWidget.svelte';
+  import SettingsExpanderWidget from './widgets/SettingsExpanderWidget.svelte';
+  import { setDirection, setDistance, endGame, resetGame, startReplay, continueAfterNoMoves, finalizeGameWithBonus } from '$lib/stores/gameActions.js';
+  import * as core from '$lib/gameCore.js';
+  import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js';
+  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
+  import { get } from 'svelte/store';
+  import { onMount } from 'svelte';
+  import { _ } from 'svelte-i18n';
+  import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
+  import { gameState } from '$lib/stores/gameState.js';
+  import { animationStore } from '$lib/stores/animationStore.js';
+
+  onMount(() => {
+    settingsStore.init();
+  });
+
+  const widgetMap = {
+    [WIDGETS.TOP_ROW]: TopRowWidget,
+    [WIDGETS.SCORE_PANEL]: ScorePanelWidget,
+    [WIDGETS.BOARD_WRAPPER]: BoardWrapperWidget,
+    [WIDGETS.CONTROLS_PANEL]: ControlsPanelWidget,
+    [WIDGETS.SETTINGS_EXPANDER]: SettingsExpanderWidget,
+  };
+
+  // $: columns = $layoutStore.map(col => ({ // ТИМЧАСОВО ВИМКНЕНО
+  //   id: col.id,
+  //   label: col.id,
+  //   items: col.widgets.map(id => ({ id, label: id }))
+  // }));
+
+  $: if ($gameState.isGameOver && $gameState.gameOverReasonKey) {
+    setTimeout(() => {
+      const reasonKey = $gameState.gameOverReasonKey;
+      const finalScoreDetails = core.calculateFinalScore(get(gameState));
+      const $t = get(_);
+      const reasonValues = $gameState.gameOverReasonValues || {};
+
+      let modalConfig = {};
+
+      switch (reasonKey) {
+        case 'modal.playerNoMovesContent':
+          modalConfig = {
+            titleKey: 'modal.playerNoMovesTitle',
+            content: { reason: $t(reasonKey || ''), scoreDetails: finalScoreDetails },
+            buttons: [
+              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: continueAfterNoMoves },
+              { 
+                text: $t('modal.finishGameWithBonus', { values: { bonus: finalScoreDetails.finishBonus } }), 
+                onClick: () => finalizeGameWithBonus('modal.gameOverReasonBonus') 
+              },
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+            ]
+          };
+          break;
+        
+        case 'modal.errorContent':
+          modalConfig = {
+            titleKey: 'modal.errorTitle',
+            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: finalScoreDetails },
+            buttons: [
+              { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); }, isHot: true },
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+            ]
+          };
+          break;
+
+        case 'modal.computerNoMovesContent':
+          modalConfig = {
+            titleKey: 'modal.computerNoMovesTitle',
+            content: { reason: $t(reasonKey || ''), scoreDetails: finalScoreDetails },
+            buttons: [
+              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: continueAfterNoMoves },
+              { 
+                text: $t('modal.finishGameWithBonus', { values: { bonus: finalScoreDetails.finishBonus } }), 
+                onClick: () => finalizeGameWithBonus('modal.gameOverReasonBonus') 
+              },
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+            ]
+          };
+          break;
+
+        default:
+          modalConfig = {
+            titleKey: 'modal.gameOverTitle',
+            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: finalScoreDetails },
+            buttons: [
+              { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); }, isHot: true },
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+            ]
+          };
+          break;
+      }
+      
+      modalStore.showModal(modalConfig);
+    }, 600);
+  }
+
+  // function itemContent(item: {id: string, label: string}) { // ТИМЧАСОВО ВИМКНЕНО
+  //   const Comp = widgetMap[item.id];
+  //   if (Comp) return Comp;
+  //   return item.id;
+  // }
+
+  // function handleDrop(e: CustomEvent<{dragging: {id: string, label: string}, dragSourceCol: string, dropTargetCol: string, dropIndex: number}>) { // ТИМЧАСОВО ВИМКНЕНО
+  //   const { dragging, dragSourceCol, dropTargetCol, dropIndex } = e.detail;
+  //   layoutStore.update(cols => {
+  //     let newCols = cols.map(col => ({
+  //       ...col,
+  //       widgets: col.widgets.filter(id => id !== dragging.id)
+  //     }));
+  //     return newCols.map(col => {
+  //       if (col.id === dropTargetCol) {
+  //         const widgets = [...col.widgets];
+  //         widgets.splice(dropIndex, 0, dragging.id);
+  //         return { ...col, widgets };
+  //       }
+  //       return col;
+  //     });
+  //   });
+  // }
+
+  /**
+   * @param {string} action
+   */
+  function executeAction(action: string) {
+    switch (action) {
+      case 'up-left': setDirection('up-left'); break;
+      case 'up': setDirection('up'); break;
+      case 'up-right': setDirection('up-right'); break;
+      case 'left': setDirection('left'); break;
+      case 'right': setDirection('right'); break;
+      case 'down-left': setDirection('down-left'); break;
+      case 'down': setDirection('down'); break;
+      case 'down-right': setDirection('down-right'); break;
+      case 'confirm': confirmPlayerMove(); break;
+      case 'no-moves': claimNoMoves(); break;
+      case 'distance-1': setDistance(1); break;
+      case 'distance-2': setDistance(2); break;
+      case 'distance-3': setDistance(3); break;
+      case 'distance-4': setDistance(4); break;
+      case 'distance-5': setDistance(5); break;
+      case 'distance-6': setDistance(6); break;
+      case 'distance-7': setDistance(7); break;
+      case 'distance-8': setDistance(8); break;
+    }
+  }
+
+  function handleHotkey(e: KeyboardEvent) {
+    if (e.target && (e.target as HTMLElement).tagName !== 'BODY') return;
+    
+    const key = e.code;
+    const currentSettings = get(settingsStore);
+    const keybindings = currentSettings.keybindings;
+    const resolutions = currentSettings.keyConflictResolution;
+
+    const matchingActions = Object.entries(keybindings)
+      .filter(([, keys]) => keys.includes(key))
+      .map(([action]) => action);
+
+    if (matchingActions.length === 0) return;
+
+    if (matchingActions.length === 1) {
+      executeAction(matchingActions[0]);
+      return;
+    }
+
+    // Конфлікт!
+    if (resolutions[key]) {
+      executeAction(resolutions[key]);
+      return;
+    }
+
+    // Якщо вирішення немає, показуємо модальне вікно
+    const $t = get(_);
+    modalStore.showModal({
+      titleKey: 'modal.keyConflictTitle',
+      content: { key: key, actions: matchingActions },
+      buttons: matchingActions.map(action => ({
+        text: $t(`controlsPage.actions.${action}`),
+        onClick: () => {
+          settingsStore.resolveKeyConflict(key, action);
+          executeAction(action);
+          modalStore.closeModal();
+        }
+      }))
+    });
+  }
+</script>
+
+<div class="game-board-container">
+  <!-- <DraggableColumns {columns} itemContent={itemContent} on:drop={handleDrop} /> --> <!-- ТИМЧАСОВО ВИМКНЕНО -->
+
+  <!-- НОВИЙ БЛОК: Прямий рендеринг віджетів для діагностики -->
+  <div class="static-layout">
+    <div class="column">
+      <TopRowWidget />
+      <ScorePanelWidget />
+      <BoardWrapperWidget />
+    </div>
+    <div class="column">
+      <ControlsPanelWidget />
+    </div>
+    <div class="column">
+      <SettingsExpanderWidget />
+    </div>
+  </div>
+</div>
+
+<Modal />
+{#if $uiState.isVoiceSettingsModalOpen}
+  <VoiceSettingsModal close={closeVoiceSettingsModal} />
+{/if}
+
+<svelte:window on:keydown={handleHotkey} />
+
+<style>
+  .game-board-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  /* НОВІ СТИЛІ для статичного макета */
+  .static-layout {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+
+  @media (max-width: 1600px) {
+    .static-layout {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style>
+```
+
+### Верифікація
+
+Після цих змін:
+1.  Зроби хід, щоб рахунок став ненульовим.
+2.  Натисни `+` або `-` в налаштуваннях.
+3.  **Перевір результат:**
+    *   **Якщо модальне вікно з'явилося**, це означає, що проблема була саме в компоненті `DraggableColumns`. Ми зможемо його виправити або замінити.
+    *   **Якщо проблема залишилася**, це буде означати, що причина ще глибша, і, можливо, пов'язана з розширенням браузера. У такому випадку, наступним кроком буде перевірка в режимі "Інкогніто".
+
+Повідом мені результат цього експерименту. Це найважливіший крок у діагностиці.

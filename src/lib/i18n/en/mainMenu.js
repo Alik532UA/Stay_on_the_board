@@ -35,5 +35,6 @@ export default {
     content: "Choose a clearing type:",
     fullClear: "Clear All (resets all settings)",
     keepAppearance: "Keep Appearance (theme, language)"
-  }
+  },
+  dragAndDropTest: "Drag & Drop Test"
 }; 

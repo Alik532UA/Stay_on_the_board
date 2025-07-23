@@ -11,11 +11,18 @@
   import BoardWrapperWidget from './widgets/BoardWrapperWidget.svelte';
   import ControlsPanelWidget from './widgets/ControlsPanelWidget.svelte';
   import SettingsExpanderWidget from './widgets/SettingsExpanderWidget.svelte';
-  import { setDirection, setDistance } from '$lib/stores/gameStore.js';
+  import { setDirection, setDistance, endGame, resetGame, startReplay, continueAfterNoMoves, finalizeGameWithBonus } from '$lib/stores/gameActions.js';
+  import * as core from '$lib/gameCore.js';
   import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
+  import { _ } from 'svelte-i18n';
+  import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
+  import { gameState } from '$lib/stores/gameState.js';
+  import { animationStore } from '$lib/stores/animationStore.js';
 
   onMount(() => {
     settingsStore.init();
@@ -29,12 +36,80 @@
     [WIDGETS.SETTINGS_EXPANDER]: SettingsExpanderWidget,
   };
 
-  // Формуємо дані для DraggableColumns
   $: columns = $layoutStore.map(col => ({
     id: col.id,
     label: col.id,
     items: col.widgets.map(id => ({ id, label: id }))
   }));
+
+  $: if ($gameState.isGameOver && $gameState.gameOverReasonKey) {
+    setTimeout(() => {
+      const reasonKey = $gameState.gameOverReasonKey;
+      const $t = get(_);
+      const reasonValues = $gameState.gameOverReasonValues || {};
+
+      let modalConfig = {};
+
+      switch (reasonKey) {
+        case 'modal.playerNoMovesContent':
+          modalConfig = {
+            titleKey: 'modal.playerNoMovesTitle',
+            content: { reason: $t(reasonKey || ''), scoreDetails: $gameState },
+            buttons: [
+              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: continueAfterNoMoves },
+              { 
+                text: $t('modal.finishGameWithBonus', { values: { bonus: $gameState.boardSize } }), 
+                onClick: () => finalizeGameWithBonus('modal.gameOverReasonBonus') 
+              },
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+            ],
+            closable: false
+          };
+          break;
+        
+        case 'modal.errorContent':
+          modalConfig = {
+            titleKey: 'modal.errorTitle',
+            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: $gameState },
+            buttons: [
+              { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); modalStore.closeModal(); }, isHot: true },
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+            ],
+            closable: false
+          };
+          break;
+
+        case 'modal.computerNoMovesContent':
+          modalConfig = {
+            titleKey: 'modal.computerNoMovesTitle',
+            content: { reason: $t('modal.computerNoMovesContent'), scoreDetails: $gameState },
+            buttons: [
+              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: continueAfterNoMoves },
+              { 
+                text: $t('modal.finishGameWithBonus', { values: { bonus: $gameState.boardSize } }), 
+                onClick: () => finalizeGameWithBonus('modal.gameOverReasonBonus') 
+              },
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+            ],
+            closable: false
+          };
+          break;
+
+        default:
+          modalConfig = {
+            titleKey: 'modal.gameOverTitle',
+            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: $gameState },
+            buttons: [
+              { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); modalStore.closeModal(); }, isHot: true },
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+            ]
+          };
+          break;
+      }
+      
+      modalStore.showModal(modalConfig);
+    }, 600);
+  }
 
   function itemContent(item: {id: string, label: string}) {
     const Comp = widgetMap[item.id];
@@ -45,12 +120,10 @@
   function handleDrop(e: CustomEvent<{dragging: {id: string, label: string}, dragSourceCol: string, dropTargetCol: string, dropIndex: number}>) {
     const { dragging, dragSourceCol, dropTargetCol, dropIndex } = e.detail;
     layoutStore.update(cols => {
-      // Видаляємо з попередньої колонки
       let newCols = cols.map(col => ({
         ...col,
         widgets: col.widgets.filter(id => id !== dragging.id)
       }));
-      // Додаємо у нову колонку
       return newCols.map(col => {
         if (col.id === dropTargetCol) {
           const widgets = [...col.widgets];
@@ -62,28 +135,71 @@
     });
   }
 
-  function handleHotkey(e: KeyboardEvent) {
-    if (e.target && (e.target as HTMLElement).tagName === 'INPUT') return;
-    const key = e.code;
-    const keybindings = get(settingsStore).keybindings;
-    // Напрямки
-    if (keybindings['up-left']?.includes(key)) return setDirection('up-left');
-    if (keybindings['up']?.includes(key)) return setDirection('up');
-    if (keybindings['up-right']?.includes(key)) return setDirection('up-right');
-    if (keybindings['left']?.includes(key)) return setDirection('left');
-    if (keybindings['right']?.includes(key)) return setDirection('right');
-    if (keybindings['down-left']?.includes(key)) return setDirection('down-left');
-    if (keybindings['down']?.includes(key)) return setDirection('down');
-    if (keybindings['down-right']?.includes(key)) return setDirection('down-right');
-    // Відстані
-    for (let i = 1; i <= 8; i++) {
-      if (keybindings[`distance-${i}`]?.includes(key)) return setDistance(i);
+  /**
+   * @param {string} action
+   */
+  function executeAction(action: string) {
+    switch (action) {
+      case 'up-left': setDirection('up-left'); break;
+      case 'up': setDirection('up'); break;
+      case 'up-right': setDirection('up-right'); break;
+      case 'left': setDirection('left'); break;
+      case 'right': setDirection('right'); break;
+      case 'down-left': setDirection('down-left'); break;
+      case 'down': setDirection('down'); break;
+      case 'down-right': setDirection('down-right'); break;
+      case 'confirm': confirmPlayerMove(); break;
+      case 'no-moves': claimNoMoves(); break;
+      case 'distance-1': setDistance(1); break;
+      case 'distance-2': setDistance(2); break;
+      case 'distance-3': setDistance(3); break;
+      case 'distance-4': setDistance(4); break;
+      case 'distance-5': setDistance(5); break;
+      case 'distance-6': setDistance(6); break;
+      case 'distance-7': setDistance(7); break;
+      case 'distance-8': setDistance(8); break;
     }
-    // Підтвердження ходу
-    if (keybindings['confirm']?.includes(key)) return confirmPlayerMove();
-    // Немає ходів
-    if (keybindings['no-moves']?.includes(key)) return claimNoMoves();
-    // TODO: Додати інші дії (toggle-block-mode, toggle-board, increase-board, decrease-board, toggle-speech) за потреби
+  }
+
+  function handleHotkey(e: KeyboardEvent) {
+    if (e.target && (e.target as HTMLElement).tagName !== 'BODY') return;
+    
+    const key = e.code;
+    const currentSettings = get(settingsStore);
+    const keybindings = currentSettings.keybindings;
+    const resolutions = currentSettings.keyConflictResolution;
+
+    const matchingActions = Object.entries(keybindings)
+      .filter(([, keys]) => keys.includes(key))
+      .map(([action]) => action);
+
+    if (matchingActions.length === 0) return;
+
+    if (matchingActions.length === 1) {
+      executeAction(matchingActions[0]);
+      return;
+    }
+
+    // Конфлікт!
+    if (resolutions[key]) {
+      executeAction(resolutions[key]);
+      return;
+    }
+
+    // Якщо вирішення немає, показуємо модальне вікно
+    const $t = get(_);
+    modalStore.showModal({
+      titleKey: 'modal.keyConflictTitle',
+      content: { key: key, actions: matchingActions },
+      buttons: matchingActions.map(action => ({
+        text: $t(`controlsPage.actions.${action}`),
+        onClick: () => {
+          settingsStore.resolveKeyConflict(key, action);
+          executeAction(action);
+          modalStore.closeModal();
+        }
+      }))
+    });
   }
 </script>
 

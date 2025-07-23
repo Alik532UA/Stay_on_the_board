@@ -1,8 +1,11 @@
-<script>
+<script lang="ts">
   import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
   import DraggableColumns from '$lib/components/DraggableColumns.svelte';
 
-  let columns = [
+  type DndItem = { id: string; label: string };
+  type DndColumn = { id: string; label: string; items: DndItem[] };
+
+  let columns: DndColumn[] = [
     {
       id: 'left',
       label: 'Лівий блок',
@@ -23,9 +26,9 @@
     }
   ];
 
-  function handleDrop(event) {
+  function handleDrop(event: CustomEvent<{ dragging: DndItem; dragSourceCol: string; dropTargetCol: string; dropIndex: number }>) {
     const { dragging, dragSourceCol, dropTargetCol, dropIndex } = event.detail;
-    if (dragSourceCol === null || dropTargetCol === null) return;
+    if (!dragSourceCol || !dropTargetCol) return;
     // Копіюємо масиви для реактивності
     let newColumns = columns.map(col => ({ ...col, items: [...col.items] }));
     // Видаляємо з джерела

@@ -4,5 +4,6 @@ export default {
   experienced: "Ervaren",
   pro: "Pro",
   autoHideBoard: "Verberg bord automatisch",
-  changeModeTooltip: "Verander Spelmodus"
+  changeModeTooltip: "Verander Spelmodus",
+  dontShowAgain: "Toon dit venster niet opnieuw"
 }; 

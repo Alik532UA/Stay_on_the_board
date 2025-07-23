@@ -57,7 +57,9 @@
 >
   <div 
     class="modal-window" 
+    tabindex="0"
     onclick={(e) => e.stopPropagation()}
+    onkeydown={(e) => { if (e.key === 'Escape') close(); }}
     role="dialog"
     aria-modal="true"
     aria-labelledby="voice-settings-title"
