@@ -1,6 +1,8 @@
 <script>
-  import { appState, cashOutAndEndGame } from '$lib/stores/gameStore.js';
+  import { gameState } from '$lib/stores/gameState.js';
+  import { endGame } from '$lib/stores/gameActions.js';
   import { modalStore } from '$lib/stores/modalStore.js';
+  import { replayStore } from '$lib/stores/replayStore.js';
   import { _ } from 'svelte-i18n';
 
   function showPenaltyInfo() {
@@ -17,6 +19,10 @@
       contentKey: 'modal.scoreInfoContent',
       buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
     });
+  }
+
+  function cashOutAndEndGame() {
+      endGame('modal.gameOverReasonCashOut');
   }
 </script>
 
@@ -90,20 +96,20 @@
   }
 </style>
 
-{#if !$appState.isReplayMode}
+{#if !$replayStore.isReplayMode}
   <div class="score-panel game-content-block">
     <div class="score-display">
       <span class="score-label-text">{$_('gameBoard.scoreLabel')}:</span>
       <span
         class="score-value-clickable"
-        class:positive-score={$appState.score > 0}
+        class:positive-score={$gameState.score > 0}
         on:click={showScoreInfo}
         on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
         role="button"
         tabindex="0"
         title={$_('modal.scoreInfoTitle')}
-      >{$appState.score}</span>
-      {#if $appState.penaltyPoints > 0}
+      >{$gameState.score}</span>
+      {#if $gameState.penaltyPoints > 0}
         <span 
           class="penalty-display" 
           on:click={showPenaltyInfo}
@@ -111,7 +117,7 @@
           title={$_('gameBoard.penaltyHint')}
           role="button"
           tabindex="0"
-        >-{$appState.penaltyPoints}</span>
+        >-{$gameState.penaltyPoints}</span>
       {/if}
     </div>
     <button class="cash-out-btn" on:click={cashOutAndEndGame} title={$_('gameBoard.cashOut')}>

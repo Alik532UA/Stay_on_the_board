@@ -4,5 +4,6 @@ export default {
   experienced: "Досвідчений",
   pro: "Профі",
   autoHideBoard: "Автоматично приховувати дошку",
-  changeModeTooltip: "Змінити режим гри"
+  changeModeTooltip: "Змінити режим гри",
+  dontShowAgain: "Більше не показувати це вікно"
 }; 

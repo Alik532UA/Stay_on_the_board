@@ -23,13 +23,15 @@
 	import { settingsStore } from '$lib/stores/settingsStore.js';
 	import { get } from 'svelte/store';
 	import { initializeI18n, i18nReady } from '../lib/i18n/init.js';
-	import { initGameStoreSubscriptions } from '$lib/stores/gameStore.js';
 	import { assets } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { base } from '$app/paths';
 	import UpdateNotification from '$lib/components/UpdateNotification.svelte';
 	import { clearCache } from '$lib/utils/cacheManager.js';
 	import Modal from '$lib/components/Modal.svelte';
+	import { navigating } from '$app/stores';
+	import { modalStore } from '$lib/stores/modalStore.js';
+	import { afterNavigate } from '$app/navigation';
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
@@ -52,7 +54,6 @@
 			}
 			settingsStore.init(); // <-- Ініціалізуємо налаштування на клієнті
 			initializeI18n(); // Ініціалізуємо локалізацію
-			initGameStoreSubscriptions(); // Ініціалізуємо підписки для gameStore
 		} catch (error) {
 			console.error('Failed to check for app update:', error);
 		}
@@ -67,7 +68,7 @@
 		clearCache({ keepAppearance: true });
 	}
 
-	function handleDevKeys(/** @type {any} */ event) {
+	function handleDevKeys(event: KeyboardEvent) {
 		if (import.meta.env.DEV && event.code === 'BracketRight') {
 			event.preventDefault();
 			showUpdateNotice = !showUpdateNotice;
@@ -89,6 +90,10 @@
 	// 	document.documentElement.setAttribute('data-theme', 'dark');
 	// 	document.documentElement.setAttribute('data-style', 'purple');
 	// });
+
+	afterNavigate(() => {
+		modalStore.closeModal();
+	});
 </script>
 
 <svelte:window on:keydown={handleDevKeys} />

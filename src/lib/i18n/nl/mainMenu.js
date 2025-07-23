@@ -35,5 +35,6 @@ export default {
     content: "Kies een type wissen:",
     fullClear: "Alles wissen (reset alle instellingen)",
     keepAppearance: "Uiterlijk behouden (thema, taal)"
-  }
+  },
+  dragAndDropTest: "Drag & Drop Test"
 }; 

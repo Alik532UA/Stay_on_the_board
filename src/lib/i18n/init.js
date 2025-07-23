@@ -20,7 +20,7 @@ export function initializeI18n() {
     initialLocale: initialLocale,
   });
 
-  settingsStore.subscribe((/** @type {{language?: string}} */ settings) => {
+  settingsStore.subscribe((settings) => {
     if (settings.language && get(locale) !== settings.language) {
       locale.set(settings.language);
     }

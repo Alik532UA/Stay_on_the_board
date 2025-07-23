@@ -1,8 +1,8 @@
 import { writable, get } from 'svelte/store';
-import { loadAndGetVoices, filterVoicesByLang } from '$lib/speech.js';
+import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService.js';
 import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
 import { locale } from 'svelte-i18n';
-import { modalStore } from './modalStore.js';
+import { modalStore } from '$lib/stores/modalStore.js';
 
 /**
  * @typedef {Object} SettingsState
@@ -19,6 +19,8 @@ import { modalStore } from './modalStore.js';
  * @property {Record<string, string[]>} keybindings
  * @property {Record<string, string>} keyConflictResolution
  * @property {boolean} autoHideBoard
+ * @property {'beginner' | 'experienced' | 'pro' | null} gameMode
+ * @property {boolean} showGameModeModal
  */
 
 const isBrowser = typeof window !== 'undefined';
@@ -65,6 +67,8 @@ const defaultSettings = {
   autoHideBoard: false,
   keybindings: defaultKeybindings,
   keyConflictResolution: {},
+  gameMode: null,
+  showGameModeModal: true,
 };
 
 /** @param {string | null} jsonString @param {any} defaultValue */
@@ -112,6 +116,11 @@ function loadSettings() {
     autoHideBoard: localStorage.getItem('autoHideBoard') === 'true',
     keybindings: { ...defaultKeybindings, ...storedKeybindings },
     keyConflictResolution: safeJsonParse(localStorage.getItem('keyConflictResolution'), {}),
+    gameMode: ((() => {
+      const gm = localStorage.getItem('gameMode');
+      return gm === 'beginner' || gm === 'experienced' || gm === 'pro' ? gm : null;
+    })()),
+    showGameModeModal: localStorage.getItem('showGameModeModal') !== 'false', // Defaults to true if null
   };
 }
 
@@ -122,7 +131,7 @@ function createSettingsStore() {
     init: () => {
       if (isBrowser) {
         const settings = loadSettings();
-        set(settings);
+        update(current => ({ ...settings, gameMode: current.gameMode ?? settings.gameMode }));
         subscribe(currentSettings => {
           document.documentElement.setAttribute('data-theme', currentSettings.theme);
           document.documentElement.setAttribute('data-style', currentSettings.style);
@@ -155,14 +164,24 @@ function createSettingsStore() {
       set({ ...defaultSettings });
     },
     resetKeybindings: () => methods.updateSettings({ keybindings: defaultKeybindings }),
-    /**
-     * @param {boolean=} forceState
-     */
-    toggleShowBoard: (forceState) => {
+    resolveKeyConflict: (/** @type {string} */ key, /** @type {string} */ action) => {
+      update(state => {
+        const newResolution = { ...state.keyConflictResolution, [key]: action };
+        if (isBrowser) {
+          localStorage.setItem('keyConflictResolution', JSON.stringify(newResolution));
+        }
+        return { ...state, keyConflictResolution: newResolution };
+      });
+    },
+    toggleShowBoard: (/** @type {boolean|undefined} */ forceState) => {
       update(state => {
         const newState = typeof forceState === 'boolean' ? forceState : !state.showBoard;
-        if (isBrowser) localStorage.setItem('showBoard', String(newState));
-        return { ...state, showBoard: newState };
+        const newSettings = { ...state, showBoard: newState };
+
+        if (isBrowser) {
+          localStorage.setItem('showBoard', String(newSettings.showBoard));
+        }
+        return newSettings;
       });
     },
     toggleShowMoves: () => {
@@ -176,12 +195,18 @@ function createSettingsStore() {
       update(state => {
         const newShowQueenState = !state.showQueen;
         const newSettings = { ...state, showQueen: newShowQueenState };
-        if (newShowQueenState) newSettings.showMoves = true;
-        if (!newShowQueenState) newSettings.showMoves = false;
+
+        // Якщо ховаємо ферзя, ховаємо і його ходи
+        if (!newShowQueenState) {
+          newSettings.showMoves = false;
+        }
+
         if (isBrowser) {
-          localStorage.setItem('showQueen', String(newShowQueenState));
-          if (!newShowQueenState) localStorage.setItem('showMoves', 'false');
-          if (newShowQueenState) localStorage.setItem('showMoves', 'true');
+          localStorage.setItem('showQueen', String(newSettings.showQueen));
+          // Оновлюємо showMoves тільки якщо він змінився
+          if (!newShowQueenState) {
+            localStorage.setItem('showMoves', String(newSettings.showMoves));
+          }
         }
         return newSettings;
       });
@@ -191,6 +216,13 @@ function createSettingsStore() {
         const newState = !state.autoHideBoard;
         if (isBrowser) localStorage.setItem('autoHideBoard', String(newState));
         return { ...state, autoHideBoard: newState };
+      });
+    },
+    toggleBlockMode: () => {
+      update(state => {
+        const newState = !state.blockModeEnabled;
+        if (isBrowser) localStorage.setItem('blockModeEnabled', String(newState));
+        return { ...state, blockModeEnabled: newState };
       });
     },
     /**
@@ -222,28 +254,28 @@ function createSettingsStore() {
      * @param {'beginner' | 'experienced' | 'pro'} mode
      * @returns {boolean} чи потрібно показати FAQ
      */
-    applyGameModePreset: (mode) => {
+    applyGameModePreset: (mode, modal = modalStore) => {
       /** @type {Partial<SettingsState>} */
-      let settingsToApply = {};
+      let settingsToApply = { gameMode: mode };
       let showFaq = false;
       switch (mode) {
         case 'beginner':
-          settingsToApply = { showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: false, speechEnabled: false, autoHideBoard: false };
+          settingsToApply = { gameMode: mode, showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: false, speechEnabled: false, autoHideBoard: false };
           showFaq = true;
           break;
         case 'experienced':
-          settingsToApply = { showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
+          settingsToApply = { gameMode: mode, showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
           break;
         case 'pro':
-          settingsToApply = { showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
+          settingsToApply = { gameMode: mode, showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
           break;
       }
       methods.updateSettings(settingsToApply);
-      modalStore.closeModal();
+      modal.closeModal();
       return showFaq;
     }
   };
   return { subscribe, ...methods };
 }
 
-export const settingsStore = createSettingsStore(); 
+export const settingsStore = createSettingsStore();

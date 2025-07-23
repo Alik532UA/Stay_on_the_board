@@ -19,5 +19,5 @@ export default {
   q5: "How do I earn points?",
   a5: "Points are awarded for each of your moves depending on the difficulty:\n• +1 point: with the board and queen visible.\n• +2 points: with the board visible but the queen hidden.\n• +3 points: with the board hidden.\nAt the end of the game, bonuses are awarded for board size, block mode, and more. Penalty points (-2) are given for making a mirrored move in response to the computer's move.",
   q6: "How can I make the game more interesting?",
-  a6: "Try 'Pro Mode': enable 'Blocked Cells Mode', disable 'Show Board' in the settings, enable 'Move Voiceover', and play blindfolded using hotkeys. This turns the game into a powerful trainer for memory and spatial thinking."
+  a6: "Try playing in 'Pro Mode'! The best way to experience the idea of the game is to play with your eyes closed, make moves using hotkeys, and listen to the computer's move in response. Don't look at the screen—imagine the board and the game in your mind. This is a true trainer for memory and spatial thinking."
 }; 

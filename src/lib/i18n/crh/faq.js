@@ -19,5 +19,5 @@ export default {
   q5: "Nasıl puan kazanırım?",
   a5: "Her hamleniz için zorluk derecesine göre puan verilir:\n• +1 puan: Tahta ve vezir görünür.\n• +2 puan: Tahta görünür, vezir gizli.\n• +3 puan: Tahta gizli.\nOyun sonunda, tahta boyutu, blok modu ve daha fazlası için bonuslar verilir. Bilgisayarın hamlesine ayna hamlesi yaparsanız -2 ceza puanı alırsınız.",
   q6: "Oyunu nasıl daha ilginç hale getirebilirim?",
-  a6: "'Pro Modu'nu deneyin: 'Bloklu Hücreler Modu'nu etkinleştirin, ayarlardan 'Tahtayı Göster'i kapatın, 'Hamle Seslendirmesi'ni açın ve kısayol tuşlarıyla gözlerinizi kapatarak oynayın. Bu, oyunu hafıza ve mekânsal düşünme için güçlü bir antrenöre dönüştürür."
+  a6: "'Pro Modu'nda oynamayı deneyin! Oyunun fikrini en iyi şekilde yaşamanın yolu, gözlerinizi kapatarak oynamak, kısayol tuşlarıyla hamle yapmak ve bilgisayarın hamlesini dinlemektir. Ekrana bakmayın, tahtayı ve oyunu zihninizde canlandırın. Bu, hafıza ve mekânsal düşünme için gerçek bir antrenördür."
 }; 

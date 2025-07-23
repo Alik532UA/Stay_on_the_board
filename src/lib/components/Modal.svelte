@@ -1,21 +1,41 @@
-<script>
+﻿<script>
   import { modalState, modalStore } from '$lib/stores/modalStore.js';
-  import { startReplay } from '$lib/stores/gameStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
   import SvgIcons from './SvgIcons.svelte';
   import FAQModal from './FAQModal.svelte';
-
-  // Видаляю нестандартні $derived, $state, $effect
-  // Використовую стандартний Svelte store синтаксис
-  // $modalState — реактивний доступ до store
-
-  $: details = (typeof $modalState.content === 'object' && $modalState.content !== null && $modalState.content.scoreDetails)
-    ? $modalState.content.scoreDetails
-    : null;
+  import { gameState } from '$lib/stores/gameState.js';
+  import { onMount } from 'svelte';
+  import { audioControls } from '$lib/stores/audioStore.js';
 
   /** @type {HTMLButtonElement | null} */
   let hotBtn = null;
+
+  let expertVolume = 0.3;
+  let volumePercentage = 30;
+
+  onMount(() => {
+    expertVolume = audioControls.loadVolume();
+    return () => {
+      audioControls.pause();
+    };
+  });
+
+  // Реактивний блок для керування логікою
+  $: {
+    const shouldPlay = $modalState.isOpen && $modalState.titleKey === 'modal.expertModeTitle';
+
+    // Оновлюємо гучність, зберігаємо її та оновлюємо CSS-змінну для стилізації
+    audioControls.setVolume(expertVolume);
+    audioControls.saveVolume(expertVolume);
+    volumePercentage = expertVolume * 100;
+
+    if (shouldPlay) {
+      audioControls.play();
+    } else {
+      audioControls.pause();
+    }
+  }
 
   $: if ($modalState.isOpen && hotBtn) {
     setTimeout(() => {
@@ -50,22 +70,44 @@
 
 {#if $modalState.isOpen}
   <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.ok')} onclick={e => {
-    if ($modalState.titleKey === 'modal.gameOverTitle') return;
+    if (!$modalState.closable) return;
     onOverlayClick(e);
   }} onkeydown={onModalKeydown}>
     <div class="modal-window">
       <div class="modal-header">
-        {#if $modalState.titleKey === 'modal.gameOverTitle'}
-          <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
+        {#if $modalState.titleKey === 'modal.expertModeTitle'}
+          <!-- Контейнер для повзунка, якому ми передаємо CSS-змінну -->
+          <div class="volume-control-container" style="--volume-percentage: {volumePercentage}%">
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              bind:value={expertVolume}
+              class="volume-slider"
+              aria-label="Гучність"
+            />
+            <span class="volume-label">Гучність: {volumePercentage.toFixed(0)}%</span>
+          </div>
         {/if}
-        <h2 class="modal-title">{$modalState.titleKey ? $_($modalState.titleKey) : $modalState.title}</h2>
+
+        <div class="modal-title-wrapper">
+          {#if $modalState.titleKey === 'modal.gameOverTitle'}
+            <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
+          {/if}
+          <h2 class="modal-title">{$modalState.titleKey ? $_($modalState.titleKey) : $modalState.title}</h2>
+        </div>
+
         {#if !(($modalState.buttons && $modalState.buttons.length === 2 && $modalState.buttons.every(btn => typeof btn.onClick === 'function')) || $modalState.titleKey === 'modal.gameOverTitle' || ($modalState.buttons && $modalState.buttons.length === 1))}
           {#if $modalState.closable}
-            <button class="modal-close" onclick={() => { logStore.addLog('Закриття модального вікна (X)', 'info'); modalStore.closeModal(); }}>&times;</button>
+            <button class="modal-close" onclick={() => { logStore.addLog('Закриття модального вікна (X)', 'info'); modalStore.closeModal(); }}>×</button>
           {/if}
         {/if}
       </div>
       <div class="modal-content">
+        {#if typeof $modalState.content === 'object' && $modalState.content?.reason}
+          <p class="reason">{$modalState.content.reason}</p>
+        {/if}
         {#if $modalState.component}
           <svelte:component this={$modalState.component} />
         {:else if typeof $modalState.content === 'object' && $modalState.content?.isFaq}
@@ -82,22 +124,32 @@
           </p>
         {/if}
 
-        {#if details}
-          {#if typeof $modalState.content === 'object' && $modalState.content !== null}
-            <p class="reason">{$modalState.content.reason}</p>
-          {/if}
-          {#if details}
-            <div class="score-detail-row">{$_('modal.scoreDetails.baseScore')} <span>{details.baseScore}</span></div>
-            {#if details.sizeBonus > 0}
-              <div class="score-detail-row">{$_('modal.scoreDetails.sizeBonus')} <span>+{details.sizeBonus}</span></div>
+        {#if $gameState.isGameOver}
+          <div class="score-details-container">
+            <div class="score-detail-row">{$_('modal.scoreDetails.baseScore')} <span>{$gameState.baseScore ?? 0}</span></div>
+            {#if ($gameState.sizeBonus ?? 0) > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.sizeBonus')} <span>+{($gameState.sizeBonus ?? 0)}</span></div>
             {/if}
-            {#if details.blockModeBonus > 0}
-              <div class="score-detail-row">{$_('modal.scoreDetails.blockModeBonus')} <span>+{details.blockModeBonus}</span></div>
+            {#if ($gameState.blockModeBonus ?? 0) > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.blockModeBonus')} <span>+{($gameState.blockModeBonus ?? 0)}</span></div>
             {/if}
-            {#if details.jumpBonus > 0}
-              <div class="score-detail-row">{$_('modal.scoreDetails.jumpBonus')} <span>+{details.jumpBonus}</span></div>
+            {#if ($gameState.jumpBonus ?? 0) > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.jumpBonus')} <span>+{($gameState.jumpBonus ?? 0)}</span></div>
             {/if}
-          {/if}
+            {#if ($gameState.noMovesBonus ?? 0) > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.noMovesBonus')} <span>+{($gameState.noMovesBonus ?? 0)}</span></div>
+            {/if}
+            {#if ($modalState.titleKey === 'modal.gameOverTitle' && ($gameState.finishBonus ?? 0) > 0)}
+              <div class="score-detail-row">{$_('modal.scoreDetails.finishBonus')} <span>+{($gameState.finishBonus ?? 0)}</span></div>
+            {/if}
+            {#if ($gameState.totalPenalty ?? 0) > 0}
+              <div class="score-detail-row penalty">{$_('modal.scoreDetails.penalty')} <span>-{($gameState.totalPenalty ?? 0)}</span></div>
+            {/if}
+          </div>
+          <div class="final-score-container">
+            <div class="final-score-label">{$_('modal.scoreDetails.finalScore')}</div>
+            <div class="final-score-value">{$gameState.totalScore ?? 0}</div>
+          </div>
         {/if}
       </div>
       <div class="modal-buttons">
@@ -125,7 +177,7 @@
               onclick={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
             >
-              {btn.textKey ? $_(btn.textKey) : btn.text}
+              {btn.text ? btn.text : (btn.textKey ? $_(btn.textKey) : '')}
             </button>
           {/if}
         {/each}
@@ -135,6 +187,7 @@
 {/if}
 
 <style>
+/* ... (попередні стилі залишаються, але стилі для повзунка повністю замінені) ... */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -175,7 +228,6 @@
 }
 .modal-content {
   flex: 1;
-  /* overflow-y: auto; */ /* Вимикаємо скролбар для цього контейнера */
   padding: 20px 24px;
   color: var(--text-primary, #fff);
   background: transparent;
@@ -184,11 +236,17 @@
   padding: 20px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  gap: 16px;
   flex-shrink: 0;
   background: transparent;
+  position: relative;
+}
+.modal-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .modal-title {
   margin: 0;
@@ -217,6 +275,81 @@
 .modal-close:hover {
   color: #fff;
 }
+
+/* --- НОВІ, ПОКРАЩЕНІ СТИЛІ ДЛЯ ПОВЗУНКА ГУЧНОСТІ --- */
+.volume-control-container {
+  width: 85%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.volume-label {
+  font-size: 0.9em;
+  color: #aaa;
+  font-weight: 500;
+}
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  border-radius: 15px;
+  height: 20px; /* Висота для клікабельної зони */
+  background: transparent; /* Фон самого інпута прозорий */
+}
+
+/* --- Трек (доріжка) повзунка для Webkit (Chrome, Safari) --- */
+.volume-slider::-webkit-slider-runnable-track {
+  height: 14px;
+  background: linear-gradient(to right, var(--confirm-action-bg) var(--volume-percentage), #3a3f44 var(--volume-percentage));
+  border-radius: 7px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* --- Бігунок (thumb) для Webkit --- */
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -4px; /* Центрування бігунка по вертикалі */
+  height: 22px;
+  width: 22px;
+  background-color: #fff;
+  border-radius: 50%;
+  border: 5px solid var(--confirm-action-bg);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  transition: transform 0.1s ease;
+}
+.volume-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+
+/* --- Трек (доріжка) повзунка для Firefox --- */
+.volume-slider::-moz-range-track {
+  height: 14px;
+  background: linear-gradient(to right, var(--confirm-action-bg) var(--volume-percentage), #3a3f44 var(--volume-percentage));
+  border-radius: 7px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* --- Бігунок (thumb) для Firefox --- */
+.volume-slider::-moz-range-thumb {
+  height: 22px;
+  width: 22px;
+  background-color: #fff;
+  border-radius: 50%;
+  border: 5px solid var(--confirm-action-bg);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  transition: transform 0.1s ease;
+}
+.volume-slider:hover::-moz-range-thumb {
+  transform: scale(1.1);
+}
+/* --- Кінець стилів для повзунка --- */
+
 .score-detail-row {
   display: flex;
   justify-content: space-between;
@@ -232,33 +365,6 @@
   font-weight: bold;
   color: var(--text-primary);
 }
-.score-detail-row.penalty {
-  color: #f44336;
-}
-.score-detail-row.penalty span {
-  color: #f44336;
-  font-weight: bold;
-}
-.final-score-row {
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.score-label {
-  font-size: 1.1em;
-  color: var(--text-secondary, #ccc);
-  font-weight: 500;
-}
-.score-value {
-  font-size: 3em;
-  font-weight: 700;
-  color: var(--text-accent, #ff9800);
-  line-height: 1;
-}
 .modal-buttons {
     justify-content: center;
     display: flex;
@@ -271,7 +377,6 @@
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     background: transparent;
 }
-
 .modal-btn-generic {
     margin: 0;
     padding: 12px 26px;
@@ -288,12 +393,10 @@
     width: 100%;
     text-align: center;
 }
-
 .modal-btn-generic:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px 0 rgba(0,0,0,0.12);
 }
-
 .modal-btn-generic.primary, .modal-btn-generic.green-btn {
     background: var(--confirm-action-bg);
     color: var(--confirm-action-text);
@@ -317,6 +420,32 @@
   text-align: center;
   white-space: pre-line;
 }
+.score-details-container {
+  background: rgba(0,0,0,0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+.score-detail-row.penalty span {
+  color: var(--error-color);
+}
+.final-score-container {
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+.final-score-label {
+  font-size: 1em;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.final-score-value {
+  font-size: 2.8em;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
 
 @media (max-width: 480px) {
   .modal-header {
@@ -332,4 +461,4 @@
     padding: 16px;
   }
 }
-</style> 
+</style>

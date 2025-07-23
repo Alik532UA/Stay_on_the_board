@@ -1,34 +1,34 @@
 // file: svelte-app/src/lib/utils/uiHelpers.js
 
-import { modalStore } from '$lib/stores/modalStore.js';
-import { logStore } from '$lib/stores/logStore.js';
+import { modalService } from '$lib/services/modalService.js';
+import { logService } from '$lib/services/logService.js';
 import { clearCache } from '$lib/utils/cacheManager.js';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
 import GameModeModal from '$lib/components/GameModeModal.svelte';
 
 export function showGameModeSelector() {
-  modalStore.showModal({
+  modalService.showModal({
     titleKey: 'gameModes.title',
     component: GameModeModal,
-    buttons: [{ textKey: 'modal.cancel', onClick: modalStore.closeModal }],
+    buttons: [{ textKey: 'modal.cancel', onClick: modalService.closeModal }],
     closable: false,
   });
 }
 
 export function showGameInfoModal() {
-  modalStore.showModal({
+  modalService.showModal({
     titleKey: 'faq.title',
     content: { isFaq: true },
     buttons: [
-      { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },
-      { textKey: 'modal.ok', primary: true, isHot: true, onClick: modalStore.closeModal },
+      { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalService.closeModal(); }, customClass: 'blue-btn' },
+      { textKey: 'modal.ok', primary: true, isHot: true, onClick: modalService.closeModal },
     ],
   });
 }
 
 export function showClearCacheModal() {
-  modalStore.showModal({
+  modalService.showModal({
     titleKey: 'mainMenu.clearCacheModal.title',
     contentKey: 'mainMenu.clearCacheModal.content',
     buttons: [
@@ -36,9 +36,9 @@ export function showClearCacheModal() {
         textKey: 'mainMenu.clearCacheModal.fullClear',
         customClass: 'danger-btn',
         onClick: () => {
-          logStore.addLog('Повне очищення кешу', 'info');
+          logService.addLog('Повне очищення кешу', 'info');
           clearCache({ keepAppearance: false });
-          modalStore.closeModal();
+          modalService.closeModal();
         },
       },
       {
@@ -46,12 +46,12 @@ export function showClearCacheModal() {
         primary: true,
         isHot: true,
         onClick: () => {
-          logStore.addLog('Очищення кешу зі збереженням вигляду', 'info');
+          logService.addLog('Очищення кешу зі збереженням вигляду', 'info');
           clearCache({ keepAppearance: true });
-          modalStore.closeModal();
+          modalService.closeModal();
         },
       },
-      { textKey: 'modal.cancel', onClick: modalStore.closeModal },
+      { textKey: 'modal.cancel', onClick: modalService.closeModal },
     ],
   });
 } 

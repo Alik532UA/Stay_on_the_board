@@ -1,112 +1,124 @@
 import { get } from 'svelte/store';
-import { appState, _performMove, _updateAvailableMoves, _endGame, _applyPenalty, _incrementScore, resetAndCloseModal, startReplay, continueGameAndClearBlocks, finishGameWithBonus } from './stores/gameStore.js';
+import { gameState } from './stores/gameState.js';
+import { playerInputStore } from './stores/playerInputStore.js';
+import { performMove, updateAvailableMoves, endGame, resetGame, startReplay, processPlayerMove } from './stores/gameActions.js';
 import { settingsStore } from './stores/settingsStore.js';
-import { modalStore } from './stores/modalStore.js';
+import { modalService } from '$lib/services/modalService.js';
 import { agents } from './playerAgents.js';
 import * as core from './gameCore.js';
-import { speakText, langMap } from '$lib/speech.js';
+import { speakText, langMap } from '$lib/services/speechService.js';
 import { _ as t } from 'svelte-i18n';
+import { logService } from '$lib/services/logService.js';
+import { writable } from 'svelte/store';
 
-async function triggerComputerMove() {
-  const current = get(appState);
+/**
+ * @typedef {{direction: string, distance: number} | null} ComputerLastMoveDisplay
+ */
+/** @type {import('svelte/store').Writable<ComputerLastMoveDisplay>} */
+export const computerLastMoveDisplayStore = writable(null);
+
+function triggerComputerMove() {
+  const current = get(gameState);
   if (current.isGameOver || current.players[current.currentPlayerIndex]?.type !== 'ai') return;
 
-  const move = await agents.ai.getMove(current);
+  // getMove залишається асинхронним, але ми обробляємо результат у .then()
+  agents.ai.getMove(current).then(move => {
+    if (move) {
+      // Усі наступні дії - синхронні
+      computerLastMoveDisplayStore.set({ direction: move.direction, distance: move.distance });
+      playerInputStore.update(s => ({ ...s, lastComputerMove: { direction: move.direction, distance: move.distance } }));
+      gameState.update(state => ({
+        ...state,
+        moveQueue: [...state.moveQueue, { player: 2, direction: move.direction, distance: move.distance }]
+      }));
 
-  if (move) {
-    const directionKey = Object.keys(core.numToDir).find(key => core.numToDir[key] === move.direction) || move.direction;
-    console.log('[Orchestrator] Setting computer move display:', { direction: move.direction, distance: move.distance });
-    // Атомарне оновлення: одночасно очищуємо вибір гравця і встановлюємо хід комп'ютера
-    appState.update(state => ({
-      ...state,
-      computerLastMoveDisplay: { direction: move.direction, distance: move.distance },
-      lastComputerMove: { direction: move.direction, distance: move.distance },
-    }));
-    await new Promise(resolve => setTimeout(resolve, 900));
-    _performMove(move.row, move.col);
-    await new Promise(resolve => setTimeout(resolve, 600));
-    _updateAvailableMoves();
-    const latestSettings = get(settingsStore);
-    if (latestSettings.speechEnabled) {
-      const $t = get(t);
-      const directionText = $t(`speech.directions.${move.direction}`) || move.direction;
-      const textToSpeak = `${move.distance} ${directionText}.`;
-      const langCode = langMap[/** @type {keyof typeof langMap} */(latestSettings.language)] || 'uk-UA';
-      speakText(textToSpeak, langCode, latestSettings.selectedVoiceURI ?? null);
+      performMove(move.row, move.col);
+
+      const latestSettings = get(settingsStore);
+      if (latestSettings.speechEnabled) {
+        const $t = get(t);
+        const directionText = $t(`speech.directions.${move.direction}`) || move.direction;
+        const textToSpeak = `${move.distance} ${directionText}.`;
+        const langCode = langMap[/** @type {keyof typeof langMap} */(latestSettings.language)] || 'uk-UA';
+        speakText(textToSpeak, langCode, latestSettings.selectedVoiceURI ?? null);
+      }
+
+      updateAvailableMoves();
+      gameState.update(state => ({ ...state, currentPlayerIndex: 0 }));
+
+    } else {
+      // Комп'ютер не може зробити хід. Завершуємо гру, передаючи спеціальний ключ.
+      gameState.update(s => ({ ...s, finishedByNoMovesButton: true })); // Встановлюємо прапорець для правильного розрахунку бонусу
+      endGame('modal.computerNoMovesContent');
     }
-    // Повертаємо хід гравцеві
-    appState.update(state => ({ ...state, currentPlayerIndex: (state.currentPlayerIndex + 1) % state.players.length }));
-  } else {
-    const previewScoreDetails = core.calculateFinalScore({ ...current, finishedByNoMovesButton: true });
-    const $t = get(t);
-    modalStore.showModal({
-      titleKey: 'modal.computerNoMovesTitle',
-      content: { reason: $t('modal.computerNoMovesContent'), scoreDetails: previewScoreDetails },
-      buttons: [
-        { textKey: 'modal.continueGame', primary: true, isHot: true, onClick: continueGameAndClearBlocks, customClass: 'green-btn' },
-        { text: $t('modal.finishGameWithBonus', { values: { bonus: current.boardSize } }), customClass: 'blue-btn', onClick: finishGameWithBonus },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
-      ]
+  }).catch(error => {
+    const err = error instanceof Error ? error : new Error(String(error));
+    logService.addLog(`Error in triggerComputerMove: ${err.message}`, 'error');
+    modalService.showModal({
+      titleKey: 'modal.errorTitle',
+      content: 'Виникла помилка під час ходу комп\'ютера.',
     });
-  }
+  });
 }
 
-export async function confirmPlayerMove() {
-  // Негайно очищуємо доступні ходи для приховування крапок перед анімацією
-  appState.update(s => ({ ...s, availableMoves: [] }));
+export function confirmPlayerMove() {
+  const { selectedDirection, selectedDistance, isMoveInProgress } = get(playerInputStore);
+  if (isMoveInProgress) return;
 
-  if (get(settingsStore).autoHideBoard) {
-    settingsStore.toggleShowBoard(false);
+  playerInputStore.update(s => ({ ...s, isMoveInProgress: true }));
+
+  const state = get(gameState);
+  const { playerRow, playerCol, boardSize } = state;
+  const { blockModeEnabled } = get(settingsStore);
+
+  if (!selectedDirection || !selectedDistance || playerRow === null || playerCol === null) {
+    playerInputStore.update(s => ({ ...s, isMoveInProgress: false }));
+    return;
   }
-  const state = get(appState);
-  const { selectedDirection, selectedDistance, playerRow, playerCol, lastComputerMove, boardSize, blockModeEnabled } = state;
-  if (!selectedDirection || !selectedDistance || playerRow === null || playerCol === null) return;
+
+  // 1. Розраховуємо новий хід
   const [dr, dc] = core.dirMap[selectedDirection];
   const newRow = playerRow + dr * selectedDistance;
   const newCol = playerCol + dc * selectedDistance;
+
+  // 2. НЕГАЙНО оновлюємо стан гри, щоб анімація могла початися
+  gameState.update(s => ({
+    ...s,
+    moveQueue: [...s.moveQueue, { player: 1, direction: selectedDirection, distance: selectedDistance }]
+  }));
+
+  // 3. Перевіряємо, чи був хід програшним
   const isOutsideBoard = newRow < 0 || newRow >= boardSize || newCol < 0 || newCol >= boardSize;
-  const visitCount = state.cellVisitCounts[`${newRow}-${newCol}`] || 0;
+  const visitCount = get(gameState).cellVisitCounts[`${newRow}-${newCol}`] || 0;
   const isCellBlocked = blockModeEnabled && visitCount > get(settingsStore).blockOnVisitCount;
+
+  // 4. ЯВНИЙ ПОТІК КЕРУВАННЯ
   if (isOutsideBoard || isCellBlocked) {
-    _endGame(isOutsideBoard ? 'modal.gameOverReasonOut' : 'modal.gameOverReasonBlocked');
+    // Сценарій поразки
+    computerLastMoveDisplayStore.set(null); // Очищуємо показ старого ходу
+    endGame(isOutsideBoard ? 'modal.gameOverReasonOut' : 'modal.gameOverReasonBlocked');
+    playerInputStore.update(s => ({ ...s, isMoveInProgress: false }));
     return;
   }
-  const { showBoard, showQueen } = get(settingsStore);
-  let scoreChange = 1;
-  if (!showBoard) scoreChange = 3;
-  else if (!showQueen) scoreChange = 2;
-  _incrementScore(scoreChange);
-  if (lastComputerMove && selectedDistance === lastComputerMove.distance && selectedDirection === core.oppositeDirections[lastComputerMove.direction]) {
-    _applyPenalty(2);
-  }
-  _performMove(newRow, newCol);
-  // NEW LOGIC HERE
-  appState.update(s => ({
-    ...s,
-    selectedDirection: null,
-    selectedDistance: null,
-    distanceManuallySelected: false,
-    currentPlayerIndex: (s.currentPlayerIndex + 1) % s.players.length
-  }));
-  await new Promise(resolve => setTimeout(resolve, 100));
-  await triggerComputerMove();
+
+  // Якщо хід валідний — тільки тоді оновлюємо рахунок і позицію
+  processPlayerMove(playerRow, playerCol, newRow, newCol);
+  performMove(newRow, newCol);
+
+  playerInputStore.update(s => ({ ...s, selectedDirection: null, selectedDistance: null, distanceManuallySelected: false }));
+  gameState.update(s => ({ ...s, currentPlayerIndex: 1 }));
+  triggerComputerMove();
+  playerInputStore.update(s => ({ ...s, isMoveInProgress: false }));
 }
 
 export function claimNoMoves() {
-  const state = get(appState);
+  const state = get(gameState);
   if (state.availableMoves.length === 0) {
-    const previewScoreDetails = core.calculateFinalScore({ ...state, finishedByNoMovesButton: true });
-    const $t = get(t);
-    modalStore.showModal({
-      titleKey: 'modal.playerNoMovesTitle',
-      content: { reason: $t('modal.playerNoMovesContent'), scoreDetails: previewScoreDetails },
-      buttons: [
-        { textKey: 'modal.continueGame', primary: true, isHot: true, onClick: continueGameAndClearBlocks, customClass: 'green-btn' },
-        { text: $t('modal.finishGameWithBonus', { values: { bonus: state.boardSize } }), customClass: 'blue-btn', onClick: finishGameWithBonus },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
-      ]
-    });
+    // Успішна заява: гравець перемагає
+    gameState.update(s => ({ ...s, noMovesClaimsCount: (s.noMovesClaimsCount || 0) + 1 }));
+    endGame('modal.playerNoMovesContent');
   } else {
-    _endGame('modal.errorContent');
+    // Помилкова заява: гравець програє
+    endGame('modal.errorContent', { count: state.availableMoves.length });
   }
 } 

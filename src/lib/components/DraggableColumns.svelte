@@ -109,8 +109,7 @@
     flex-direction: column;
     gap: 16px;
   }
-  ul li,
-  ul.transparent-column li {
+  ul li {
     background: none !important;
     color: #fff;
     /* border: none !important; */

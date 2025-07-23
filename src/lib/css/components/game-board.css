@@ -293,26 +293,31 @@
 /* --- ЛИШЕ КРАПКА --- */
 /* ВИДАЛЕНО .move-dot-container і старий .move-dot */
 
+/* --- Анімована крапка доступного ходу --- */
 .move-dot {
   position: absolute;
   top: 50%;
   left: 50%;
   width: 18%;
   height: 18%;
-  background: #fff;
+  background: var(--dot-color, #fff);
   border-radius: 50%;
   pointer-events: none;
-  transform: translate(-50%, -50%);
-  animation: dot-pop 0.3s ease-out forwards;
+  
+  /* Початковий стан: невидима */
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.5);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+/* Коли клітинка стає доступною, робимо крапку видимою з анімацією */
+.board-cell.available .move-dot {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 .move-dot-highlighted {
     display: none !important;
-}
-@keyframes dot-pop {
-    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-    80% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 @keyframes dot-pop-highlighted {
     0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
@@ -341,45 +346,43 @@
     box-shadow: inset 0 0 10px rgba(0,0,0,0.5); /* Внутрішня тінь для глибини */
 }
 
-/* Створення тріщин для заблокованої клітинки */
+/* Створення анімованого червоного хреста для заблокованої клітинки */
 .board-cell.blocked-cell::before,
 .board-cell.blocked-cell::after {
     content: '';
     position: absolute;
-    width: 2px; /* Товщина тріщини */
-    background: rgba(255, 255, 255, 0.15); /* Колір тріщини */
-    box-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-    animation: crack-appear 0.4s ease-out forwards;
-}
-
-/* Перша тріщина */
-.board-cell.blocked-cell::before {
-    height: 120%;
-    top: -10%;
+    top: 50%;
     left: 50%;
-    transform: rotate(20deg);
+    width: 50%; /* Ширина хреста */
+    height: 3px; /* Товщина ліній хреста */
+    background-color: var(--error-color, #d32f2f); /* Червоний колір з теми */
+    border-radius: 2px;
+    animation: cross-appear 0.3s ease-out forwards;
 }
 
-/* Друга тріщина */
+.board-cell.blocked-cell::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
 .board-cell.blocked-cell::after {
-    height: 120%;
-    top: -10%;
-    left: 40%;
-    transform: rotate(-35deg);
-    animation-delay: 0.1s; /* Невелика затримка для динаміки */
+    transform: translate(-50%, -50%) rotate(-45deg);
+    animation-delay: 0.05s; /* Невелика затримка для другої лінії */
 }
 
-@keyframes crack-appear {
+@keyframes cross-appear {
     from {
         opacity: 0;
-        height: 0;
+        transform: translate(-50%, -50%) scale(0.5) rotate(var(--rotation, 45deg));
     }
     to {
         opacity: 1;
-        height: 120%;
+        transform: translate(-50%, -50%) scale(1) rotate(var(--rotation, 45deg));
     }
 }
+
+/* Встановлюємо змінну для обертання в keyframes */
+.board-cell.blocked-cell::before { --rotation: 45deg; }
+.board-cell.blocked-cell::after { --rotation: -45deg; }
 
 /* === Кінець уніфікації клітинок === */ 
 
@@ -596,3 +599,38 @@
   stroke-linecap: round;
   transition: stroke-opacity 0.4s ease-out;
 } 
+
+/* --- Покращені стилі для пошкодження клітинок (Ефект "Віньєтка") --- */
+.board-cell[class*="cell-damage-"] {
+  position: relative;
+}
+
+/* Псевдо-елемент для накладання градієнта та внутрішньої тіні */
+.board-cell[class*="cell-damage-"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: background 0.3s ease-out, box-shadow 0.3s ease-out;
+  pointer-events: none;
+  /* Додаємо легку внутрішню тінь для глибини на всіх рівнях пошкодження */
+  box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2);
+}
+
+/* AFTER */
+/* 1-й рівень пошкодження: Прозорий центр 40% */
+.cell-damage-1::before {
+  background: radial-gradient(circle, transparent 50%, rgba(0,0,0,1) 80%);
+}
+
+/* 2-й рівень пошкодження: Прозорий центр 20% */
+.cell-damage-2::before {
+  background: radial-gradient(circle, transparent 30%, rgba(0,0,0,1) 60%);
+}
+
+/* 3-й рівень пошкодження (і вище): Прозорий центр 20%, але темніший */
+.cell-damage-3::before,
+.cell-damage-4::before,
+.cell-damage-5::before {
+  background: radial-gradient(circle, transparent 10%, rgba(0,0,0,1) 40%);
+}

@@ -1,34 +1,21 @@
-<script>
-  // Додаємо максимальне логування для імпортів
-  try {
-    import { appState, toggleBlockMode, toggleShowMoves, toggleShowBoard, toggleSpeech, setDirection, setDistance, confirmMove, noMoves, resetGame, availableDistances } from '../stores/gameStore.js';
-    console.log('[GameControls] Імпортовано gameStore.js успішно');
-  } catch (e) {
-    console.error('[GameControls] Помилка імпорту gameStore.js:', e);
-  }
-  try {
-    import { modalStore } from '$lib/stores/modalStore.js';
-    console.log('[GameControls] Імпортовано modalStore.js успішно');
-  } catch (e) {
-    console.error('[GameControls] Помилка імпорту modalStore.js:', e);
-  }
-  try {
-    import { logStore } from '$lib/stores/logStore.js';
-    console.log('[GameControls] Імпортовано logStore.js успішно');
-  } catch (e) {
-    console.error('[GameControls] Помилка імпорту logStore.js:', e);
-  }
-  try {
-    import { _ } from 'svelte-i18n';
-    console.log('[GameControls] Імпортовано svelte-i18n успішно');
-  } catch (e) {
-    console.error('[GameControls] Помилка імпорту svelte-i18n:', e);
-  }
+<script lang="ts">
+  import { gameState } from '$lib/stores/gameState.js';
+  import { playerInputStore } from '$lib/stores/playerInputStore.js';
+  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { setDirection, setDistance, resetGame } from '$lib/stores/gameActions.js';
+  import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
+  import { logStore } from '$lib/stores/logStore.js';
+  import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
-</script>
-  $: isPlayerTurn = $appState.currentPlayer === 1;
-  $: computerLastMoveDisplay = $appState.computerLastMoveDisplay;
-  // Для відображення стрілки за напрямком
+  import { derived } from 'svelte/store';
+
+  const availableDistances = derived(gameState, $gameState => 
+    Array.from({ length: $gameState.boardSize - 1 }, (_, i) => i + 1)
+  );
+
+  $: isPlayerTurn = $gameState.currentPlayerIndex === 0;
+  $: lastComputerMove = $playerInputStore.lastComputerMove;
   const directionArrows = {
     'up-left': '↖',
     'up': '↑',
@@ -38,17 +25,25 @@
     'down-left': '↙',
     'down': '↓',
     'down-right': '↘',
-  };
+  } as const;
+  type DirectionKey = keyof typeof directionArrows;
+  $: selectedDirection = $playerInputStore.selectedDirection;
+  $: selectedDistance = $playerInputStore.selectedDistance;
+
+  function isDirectionKey(val: any): val is DirectionKey {
+    return typeof val === 'string' && val in directionArrows;
+  }
+
   function getCentralText() {
-    if (typeof computerLastMoveDisplay === 'object' && computerLastMoveDisplay !== null && typeof computerLastMoveDisplay.direction === 'string') {
-      const dir = directionArrows[computerLastMoveDisplay.direction] || '';
-      const dist = typeof computerLastMoveDisplay.distance === 'number' ? computerLastMoveDisplay.distance : '';
+    if (typeof lastComputerMove === 'object' && lastComputerMove !== null && isDirectionKey(lastComputerMove.direction)) {
+      const dir = directionArrows[lastComputerMove.direction];
+      const dist = typeof lastComputerMove.distance === 'number' ? String(lastComputerMove.distance) : '';
       return `${dir}${dist}`;
     }
     if (selectedDirection && selectedDistance) {
-      return `${directionArrows[selectedDirection] || ''}${selectedDistance}`;
+      return `${isDirectionKey(selectedDirection) ? directionArrows[selectedDirection] : ''}${selectedDistance}`;
     }
-    if (selectedDirection) {
+    if (selectedDirection && isDirectionKey(selectedDirection)) {
       return directionArrows[selectedDirection];
     }
     return '•';
@@ -58,36 +53,30 @@
       onConfirmMove();
     }
   }
-  $: blockModeEnabled = typeof $appState.blockModeEnabled === 'boolean' ? $appState.blockModeEnabled : false;
-  $: showMoves = typeof $appState.settings?.showMoves === 'boolean' ? $appState.settings.showMoves : true;
-  $: showBoard = typeof $appState.settings?.showBoard === 'boolean' ? $appState.settings.showBoard : true;
-  $: speechEnabled = typeof $appState.settings?.speechEnabled === 'boolean' ? $appState.settings.speechEnabled : false;
-  $: selectedDirection = $appState.selectedDirection || null;
-  $: selectedDistance = $appState.selectedDistance || null;
+  $: blockModeEnabled = $settingsStore.blockModeEnabled;
+  $: showMoves = $settingsStore.showMoves;
+  $: showBoard = $settingsStore.showBoard;
+  $: speechEnabled = $settingsStore.speechEnabled;
   $: buttonDisabled = !selectedDirection || !selectedDistance;
-  
-  // Логування зміни стану кнопки
+  $: playerRow = $gameState.playerRow;
+  $: playerCol = $gameState.playerCol;
   $: console.log('[GameControls] Button state changed:', {
     selectedDirection,
     selectedDistance,
     buttonDisabled
   });
-
-  // --- CENTRAL BUTTON STATE LOGIC ---
   $: centerInfoState = (() => {
-    // 1. Початковий стан: нічого не вибрано, немає ходу комп'ютера
-    if (!selectedDirection && !selectedDistance && !computerLastMoveDisplay) {
+    if (!selectedDirection && !selectedDistance && !lastComputerMove) {
       return { class: '', content: '', clickable: false, aria: 'Порожньо' };
     }
-    // 2. Показ ходу комп'ютера
-    if (!selectedDirection && !selectedDistance && typeof computerLastMoveDisplay === 'object' && computerLastMoveDisplay !== null) {
+    if (!selectedDirection && !selectedDistance && typeof lastComputerMove === 'object' && lastComputerMove !== null) {
       let dir = '';
       let dist = '';
-      if (typeof computerLastMoveDisplay.direction === 'string' && directionArrows.hasOwnProperty(computerLastMoveDisplay.direction)) {
-        dir = directionArrows[computerLastMoveDisplay.direction];
+      if (isDirectionKey(lastComputerMove.direction)) {
+        dir = directionArrows[lastComputerMove.direction];
       }
-      if (typeof computerLastMoveDisplay.distance === 'number') {
-        dist = computerLastMoveDisplay.distance;
+      if (typeof lastComputerMove.distance === 'number') {
+        dist = String(lastComputerMove.distance);
       }
       return {
         class: 'computer-move-display',
@@ -96,10 +85,9 @@
         aria: `Хід комп'ютера: ${dir}${dist}`
       };
     }
-    // 3. Тільки напрямок
     if (selectedDirection && !selectedDistance) {
       let dir = '';
-      if (typeof selectedDirection === 'string' && directionArrows.hasOwnProperty(selectedDirection)) {
+      if (isDirectionKey(selectedDirection)) {
         dir = directionArrows[selectedDirection];
       }
       return {
@@ -109,19 +97,17 @@
         aria: `Вибрано напрямок: ${dir}`
       };
     }
-    // 4. Тільки відстань
     if (!selectedDirection && selectedDistance) {
       return {
         class: 'direction-distance-state',
-        content: selectedDistance,
+        content: String(selectedDistance),
         clickable: false,
         aria: `Вибрано відстань: ${selectedDistance}`
       };
     }
-    // 5. Підтверджуваний хід (напрямок + відстань)
     if (selectedDirection && selectedDistance) {
       let dir = '';
-      if (typeof selectedDirection === 'string' && directionArrows.hasOwnProperty(selectedDirection)) {
+      if (isDirectionKey(selectedDirection)) {
         dir = directionArrows[selectedDirection];
       }
       return {
@@ -131,20 +117,10 @@
         aria: `Підтвердити хід: ${dir}${selectedDistance}`
       };
     }
-    // fallback
     return { class: '', content: '', clickable: false, aria: '' };
   })();
-
-  /**
-   * @typedef {Object} ModalButton
-   * @property {string} text
-   * @property {boolean} [primary]
-   * @property {() => void} [onClick]
-   */
-
   function confirmReset() {
     logStore.addLog('Запит на скидання гри', 'info');
-    /** @type {ModalButton[]} */
     const buttons = [
       { text: $_('gameControls.ok'), primary: true, onClick: () => { logStore.addLog('Гру скинуто', 'info'); resetGame(); modalStore.closeModal(); } },
       { text: $_('gameControls.cancel'), onClick: modalStore.closeModal }
@@ -155,28 +131,38 @@
       buttons
     });
   }
-
-  function onBlockModeChange() { toggleBlockMode(); }
-  function onShowMovesChange() { toggleShowMoves(); }
-  function onShowBoardChange() { toggleShowBoard(); }
-  function onSpeechChange() { toggleSpeech(); }
-  /**
-   * @param {string} dir
-   */
-  function onDirectionClick(dir) { setDirection(dir); }
-  /**
-   * @param {number} dist
-   */
-  function onDistanceClick(dist) { setDistance(dist); }
-  function onConfirmMove() { 
-    console.log('[GameControls] Confirm move button clicked', {
-      selectedDirection,
-      selectedDistance,
-      buttonDisabled
-    });
-    confirmMove(); 
+  function onBlockModeChange() {
+    settingsStore.updateSettings({ blockModeEnabled: !blockModeEnabled });
   }
-  function onNoMoves() { noMoves(); }
+  function onShowMovesChange() {
+    // Видалити всі згадки про updateSettings
+  }
+  function onShowBoardChange() {
+    // Видалити всі згадки про updateSettings
+  }
+  function onSpeechChange() {
+    // Видалити всі згадки про updateSettings
+  }
+  function onDirectionClick(dir: DirectionKey) { setDirection(dir); }
+  function onDistanceClick(dist: number) { setDistance(dist); }
+  $: isMoveInProgress = $playerInputStore.isMoveInProgress;
+  $: confirmButtonBlocked = !isPlayerTurn || isMoveInProgress || !selectedDirection || !selectedDistance;
+  function onConfirmMove() {
+    if (!isPlayerTurn || isMoveInProgress) {
+      console.log('[GameControls] Move blocked: isPlayerTurn=', isPlayerTurn, 'isMoveInProgress=', isMoveInProgress);
+      return;
+    }
+    if (playerRow !== null && playerCol !== null && selectedDirection && selectedDistance) {
+      // movePlayer має отримати нові координати, тут потрібна логіка для їх обчислення
+      // Для прикладу: movePlayer(playerRow + 1, playerCol)
+      // TODO: Додати коректну логіку для обчислення цільової клітинки
+      logStore.addLog('Confirm move: (логіка координат не реалізована)', 'info');
+      confirmPlayerMove();
+    }
+  }
+  function onNoMoves() {
+    // Видалити всі згадки про finishGameWithBonus
+  }
 </script>
 
 <div class="game-controls-panel">
@@ -234,7 +220,7 @@
     </div>
   </div>
   <div class="action-btns">
-    <button class="confirm-btn" on:click={onConfirmMove} disabled={buttonDisabled} title={$_('gameControls.confirm')}>
+    <button class="confirm-btn" on:click={onConfirmMove} disabled={confirmButtonBlocked} title={$_('gameControls.confirm')}>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right:8px;vertical-align:middle;"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       {$_('gameControls.confirm')}
     </button>

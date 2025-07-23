@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { locale } from 'svelte-i18n';
   import { settingsStore } from '../stores/settingsStore.js';
   import { logStore } from '$lib/stores/logStore.js';
@@ -9,7 +9,7 @@
     { code: 'crh', label: 'Qırımtatarca', flag: '🇹🇷' },
     { code: 'nl', label: 'Nederlands', flag: '🇳🇱' }
   ];
-  function selectLang(lang) {
+  function selectLang(lang: string) {
     logStore.addLog(`Зміна мови: ${lang}`, 'info');
     settingsStore.updateSettings({ language: lang });
     localStorage.setItem('language', lang);
@@ -29,7 +29,7 @@
     🌐
   </button>
   {#if showDropdown}
-    <div class="lang-dropdown" tabindex="0" on:blur={closeDropdown}>
+    <div class="lang-dropdown" role="menu" on:blur={closeDropdown}>
       {#each languages as lang}
         <button class="lang-option" on:click={() => selectLang(lang.code)} aria-label={lang.label}>
           <span class="lang-flag">{lang.flag}</span> <span class="lang-label">{lang.label}</span>

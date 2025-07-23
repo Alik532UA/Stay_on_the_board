@@ -35,5 +35,6 @@ export default {
     content: "Temizleme türüni saylañız:",
     fullClear: "Episini temizle (bütün sozlamalarnı sıfırlar)",
     keepAppearance: "Körünüşni saqla (tema, til)"
-  }
+  },
+  dragAndDropTest: "Süyrep Taşuv Testi"
 }; 

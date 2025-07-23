@@ -1,10 +1,10 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
   import ReplayViewer from '$lib/components/ReplayViewer.svelte';
   import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
   import { navigateToMainMenu } from '$lib/utils/navigation.js';
 
-  let moveHistory = null;
+  let moveHistory: any = null;
   let boardSize = 4; // Значення за замовчуванням
 
   onMount(() => {

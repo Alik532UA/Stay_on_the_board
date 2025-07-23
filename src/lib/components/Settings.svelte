@@ -188,13 +188,6 @@ select:focus, select:hover {
   color: #fff;
   transform: scale(0.97);
 }
-.reset-icon {
-  margin-right: 8px;
-  transition: transform 0.18s;
-}
-.reset-btn:active .reset-icon {
-  transform: rotate(-30deg) scale(0.92);
-}
 .reset-hint {
   color: #ffe082;
   font-size: 0.98em;
@@ -205,10 +198,5 @@ select:focus, select:hover {
 .settings-group label,
 .settings-group select {
   opacity: 1 !important;
-}
-.settings-group label[disabled],
-.settings-group select:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed;
 }
 </style> 

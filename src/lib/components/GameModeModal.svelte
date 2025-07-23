@@ -4,25 +4,63 @@
   import { modalStore } from '$lib/stores/modalStore.js';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
-  import { setBoardSize } from '$lib/stores/gameStore.js';
+  import { setBoardSize } from '$lib/stores/gameActions.js';
+  import { get } from 'svelte/store';
+  import { gameState } from '$lib/stores/gameState';
 
   /**
    * @param {'beginner' | 'experienced' | 'pro'} mode
    */
   function selectMode(mode) {
     const shouldShowFaq = settingsStore.applyGameModePreset(mode);
-    setBoardSize(4);
-    if (shouldShowFaq) {
-      setTimeout(() => {
-        modalStore.showModal({
-          titleKey: 'faq.title',
-          content: { isFaq: true },
-          buttons: [
-            { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },
-            { textKey: 'modal.ok', primary: true, isHot: true, onClick: modalStore.closeModal }
-          ]
-        });
-      }, 100);
+    const { score, penaltyPoints, boardSize } = get(gameState);
+    if (score === 0 && penaltyPoints === 0 && boardSize !== 4) {
+      setBoardSize(4);
+      gotoAfterFaq();
+    } else if (boardSize !== 4) {
+      modalStore.showModal({
+        titleKey: 'modal.resetScoreTitle',
+        contentKey: 'modal.resetScoreContent',
+        buttons: [
+          {
+            textKey: 'modal.resetScoreConfirm',
+            customClass: 'green-btn',
+            isHot: true,
+            onClick: () => {
+              setBoardSize(4);
+              modalStore.closeModal();
+              gotoAfterFaq();
+            }
+          },
+          { textKey: 'modal.resetScoreCancel', onClick: modalStore.closeModal }
+        ]
+      });
+    } else {
+      gotoAfterFaq();
+    }
+
+    function gotoAfterFaq() {
+      if (shouldShowFaq) {
+        setTimeout(() => {
+          modalStore.showModal({
+            titleKey: 'faq.title',
+            content: { isFaq: true },
+            buttons: [
+              { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },
+              { textKey: 'modal.ok', primary: true, isHot: true, onClick: modalStore.closeModal }
+            ]
+          });
+        }, 100);
+      }
+      goto(`${base}/game`);
+    }
+  }
+
+  /** @param {Event} event */
+  function handleCheckboxChange(event) {
+    const input = /** @type {HTMLInputElement} */ (event.currentTarget);
+    if (input && typeof input.checked === 'boolean') {
+      settingsStore.updateSettings({ showGameModeModal: !input.checked });
     }
   }
 </script>
@@ -39,6 +77,22 @@
   </button>
 </div>
 
+<div class="show-again-checkbox">
+  <label class="ios-switch-label">
+    <div class="switch-content-wrapper">
+      <div class="ios-switch">
+        <input 
+          type="checkbox" 
+          checked={!$settingsStore.showGameModeModal} 
+          on:change={handleCheckboxChange} 
+        />
+        <span class="slider"></span>
+      </div>
+      <span>{$_('gameModes.dontShowAgain')}</span>
+    </div>
+  </label>
+</div>
+
 <style>
   .modal-buttons {
     display: flex;
@@ -46,4 +100,54 @@
     gap: 16px;
     padding-top: 16px;
   }
+  .show-again-checkbox {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+  }
+  .ios-switch-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.08em;
+    min-height: 40px;
+    gap: 12px;
+    cursor: pointer;
+  }
+  .switch-content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ios-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    min-width: 44px;
+    min-height: 24px;
+  }
+  .ios-switch input { display: none; }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--toggle-off-bg, #555);
+    border-radius: 12px;
+    transition: background 0.2s;
+  }
+  .slider:before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  input:checked + .slider { background: var(--control-selected, #4caf50); }
+  input:checked + .slider:before { transform: translateX(20px); }
 </style> 

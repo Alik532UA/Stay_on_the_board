@@ -19,5 +19,5 @@ export default {
   q5: "Hoe verdien ik punten?",
   a5: "Punten worden toegekend voor elke zet, afhankelijk van de moeilijkheidsgraad:\n• +1 punt: met zichtbaar bord en dame.\n• +2 punten: met zichtbaar bord, maar dame verborgen.\n• +3 punten: met verborgen bord.\nAan het einde van het spel worden bonussen toegekend voor bordgrootte, blokmodus en meer. Strafpunten (-2) worden gegeven voor een spiegelzet als reactie op de zet van de computer.",
   q6: "Hoe maak ik het spel interessanter?",
-  a6: "Probeer de 'Pro-modus': schakel 'Geblokkeerde cellen-modus' in, schakel 'Bord tonen' uit in de instellingen, zet 'Zet-voiceover' aan en speel geblinddoekt met sneltoetsen. Dit maakt van het spel een krachtige trainer voor geheugen en ruimtelijk inzicht."
+  a6: "Probeer te spelen in de 'Pro-modus'! De beste manier om het idee van het spel te ervaren is door met gesloten ogen te spelen, zetten te doen met sneltoetsen en naar de zet van de computer te luisteren. Kijk niet naar het scherm, maar stel het bord en het spel voor in je hoofd. Dit is een echte training voor geheugen en ruimtelijk inzicht."
 }; 

@@ -3,7 +3,7 @@ import { settingsStore } from './stores/settingsStore.js';
 import { get } from 'svelte/store';
 
 /**
- * @typedef {import('./stores/gameStore').AppState} AppState
+ * @typedef {import('./stores/gameState').GameState} AppState
  */
 
 /**

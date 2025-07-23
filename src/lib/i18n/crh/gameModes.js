@@ -4,5 +4,6 @@ export default {
   experienced: "Tecribeli",
   pro: "Professional",
   autoHideBoard: "Tahtanı avtomatik gizle",
-  changeModeTooltip: "Oyun rejimini deñiştir"
+  changeModeTooltip: "Oyun rejimini deñiştir",
+  dontShowAgain: "Bu pencerni bir daa kösterme"
 }; 

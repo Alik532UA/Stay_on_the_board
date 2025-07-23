@@ -14,7 +14,7 @@
   <label class="limit-path-toggle">
     <input 
       type="checkbox" 
-      bind:checked={limitReplayPath} 
+      checked={limitReplayPath} 
       on:change={() => dispatch('toggleLimitPath')} 
     />
     <span>{$_('replay.limitPath')}</span>
