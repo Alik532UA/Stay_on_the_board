@@ -11,7 +11,7 @@ on:
   # Дозволяє запускати цей воркфлоу вручну з вкладки Actions
   workflow_dispatch:
 
-# Встановлюємо дозволи для GITHUB_TOKEN, щоб дозволити розгортання на GitHub Pages
+# Встановлюємо дозволи для GITHUB_TOKEN, щоб дозволити розгортання на GitHub Pages 
 permissions:
   contents: read
   pages: write
