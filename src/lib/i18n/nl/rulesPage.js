@@ -1,5 +1,6 @@
 export default {
   title: "Spelregels 'Blijf op het bord'",
+  slogan: "De regels zijn eenvoudiger dan je denkt!",
   goalTitle: "Speldoel",
   goalText: "'Blijf op het bord' is een strategisch uithoudingsspel. Spelers verplaatsen om de beurt één gedeeld stuk. Jouw doel is om het zo lang mogelijk op het bord te houden en je tegenstander tot een fout te dwingen.",
   moveProcessTitle: "Zetproces",

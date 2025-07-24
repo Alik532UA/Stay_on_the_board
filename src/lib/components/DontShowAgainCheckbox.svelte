@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { _ } from 'svelte-i18n';
   let dontShowAgain = false;
   $: dontShowAgain = !$settingsStore.showGameModeModal;
 
-  function handleCheckboxChange(event) {
-    const input = event.currentTarget;
+  function handleCheckboxChange(event: Event) {
+    const input = event.currentTarget as HTMLInputElement;
     if (input && typeof input.checked === 'boolean') {
       settingsStore.updateSettings({ showGameModeModal: !input.checked });
     }

@@ -19,3 +19,5 @@ https://www.svgrepo.com/show/532195/menu.svg
 https://www.svgrepo.com/show/395467/lock.svg
 
 https://www.svgrepo.com/show/395471/lock-open.svg
+
+https://www.svgrepo.com/show/480394/boxing-glove-pictogram.svg

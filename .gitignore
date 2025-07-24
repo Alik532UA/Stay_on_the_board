@@ -22,3 +22,6 @@ bundle-stats.html
 
 # OS files
 .DS_Store
+
+# Test reports
+/test-reports/

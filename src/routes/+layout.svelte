@@ -126,11 +126,7 @@
 	{/if}
 </div>
 
-<Modal>
-	{#if $modalState.titleKey === 'gameModes.title' || $modalState.titleKey === 'modal.expertModeTitle'}
-		<DontShowAgainCheckbox slot="dont-show-again-checkbox" />
-	{/if}
-</Modal>
+<Modal />
 
 <style>
 	.app {

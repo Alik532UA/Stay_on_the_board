@@ -78,7 +78,7 @@
       <div class="modal-header">
         {#if $modalState.titleKey === 'modal.expertModeTitle'}
           <!-- Контейнер для повзунка, якому ми передаємо CSS-змінну -->
-          <div class="volume-control-container" style="--volume-percentage: {volumePercentage}%">
+          <div class="volume-control-container" style="--volume-percentage: {volumePercentage}%; position: relative;">
             <input
               type="range"
               min="0"
@@ -88,6 +88,9 @@
               class="volume-slider"
               aria-label={$_('voiceSettings.volume')}
             />
+            <span class="volume-thumb-svg" style="left: calc((100% - 32px) * {expertVolume});">
+              <SvgIcons name="boxing-glove-pictogram-1" />
+            </span>
             <span class="volume-label">{$_('voiceSettings.volumeLabel')}: {volumePercentage.toFixed(0)}%</span>
           </div>
         {/if}
@@ -185,6 +188,7 @@
         {#if $modalState.titleKey === 'gameModes.title' || $modalState.titleKey === 'modal.expertModeTitle'}
           <DontShowAgainCheckbox />
         {/if}
+        <slot />
       </div>
     </div>
   </div>
@@ -287,6 +291,7 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  position: relative;
 }
 .volume-label {
   font-size: 0.9em;
@@ -317,13 +322,12 @@
 .volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  margin-top: -4px; /* Центрування бігунка по вертикалі */
-  height: 22px;
-  width: 22px;
-  background-color: #fff;
-  border-radius: 50%;
-  border: 5px solid var(--confirm-action-bg);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  margin-top: -4px;
+  height: 32px;
+  width: 32px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   transition: transform 0.1s ease;
 }
 .volume-slider:hover::-webkit-slider-thumb {
@@ -341,16 +345,27 @@
 
 /* --- Бігунок (thumb) для Firefox --- */
 .volume-slider::-moz-range-thumb {
-  height: 22px;
-  width: 22px;
-  background-color: #fff;
-  border-radius: 50%;
-  border: 5px solid var(--confirm-action-bg);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-  transition: transform 0.1s ease;
+  height: 32px;
+  width: 32px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 .volume-slider:hover::-moz-range-thumb {
   transform: scale(1.1);
+}
+
+.volume-thumb-svg {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(calc(-50% - 16px)) rotate(130deg);
+  pointer-events: none;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  /* transition: left 0.2s; */
+  filter: drop-shadow(0 0 0.8px #4caf50) drop-shadow(0 0 0.8px #4caf50) drop-shadow(0 0 0.8px #4caf50) drop-shadow(0 0 0.8px #4caf50);
 }
 /* --- Кінець стилів для повзунка --- */
 
@@ -368,18 +383,6 @@
 .score-detail-row span {
   font-weight: bold;
   color: var(--text-primary);
-}
-.modal-buttons {
-    justify-content: center;
-    display: flex;
-    flex-direction: column;
-    padding: 24px;
-    gap: 12px;
-    width: 100%;
-    box-sizing: border-box;
-    flex-shrink: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    background: transparent;
 }
 .modal-btn-generic {
     margin: 0;
@@ -472,9 +475,6 @@
     font-size: 1.6em;
   }
   .modal-content {
-    padding: 16px;
-  }
-  .modal-buttons {
     padding: 16px;
   }
 }

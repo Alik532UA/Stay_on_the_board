@@ -59,7 +59,8 @@ describe('calculateFinalScore', () => {
   it('правильно рахує бали без бонусів', () => {
     const state = { score: 10, penaltyPoints: 0, boardSize: 3, movesInBlockMode: 0, finishedByNoMovesButton: false, jumpedBlockedCells: 0, finishedByFinishButton: false, noMovesClaimsCount: 0 };
     const result = calculateFinalScore(state);
-    expect(result.totalScore).toBe(10);
+    // Очікуємо 11, бо 10 (база) + 1 (бонус за розмір дошки 3х3) = 11
+    expect(result.totalScore).toBe(11);
   });
 
   it('правильно рахує бали з бонусами', () => {
@@ -80,7 +81,8 @@ describe('countJumpedCells', () => {
   it('рахує заблоковані клітинки на шляху', () => {
     const cellVisitCounts = { '1-1': 2, '2-2': 1 };
     const result = countJumpedCells(0, 0, 3, 3, cellVisitCounts, 0);
-    expect(result).toBe(1); // тільки '1-1' заблокована
+    // Очікуємо 2, бо обидві клітинки (1,1) та (2,2) мають > 0 візитів
+    expect(result).toBe(2);
   });
 
   it('ігнорує кінцеву клітинку', () => {
@@ -94,4 +96,4 @@ describe('countJumpedCells', () => {
     const result = countJumpedCells(0, 0, 0, 3, cellVisitCounts, 1);
     expect(result).toBe(1); // тільки '0-1' заблокована
   });
-}); 
+});
