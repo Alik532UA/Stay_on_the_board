@@ -1,6 +1,6 @@
 // file: svelte-app/src/lib/utils/uiHelpers.js
 
-import { modalService } from '$lib/services/modalService.js';
+import { modalStore } from '$lib/stores/modalStore.js';
 import { logService } from '$lib/services/logService.js';
 import { clearCache } from '$lib/utils/cacheManager.js';
 import { goto } from '$app/navigation';
@@ -17,12 +17,12 @@ export function showGameModeSelector() {
 }
 
 export function showGameInfoModal() {
-  modalService.showModal({
+  modalStore.showModal({
     titleKey: 'faq.title',
     content: { isFaq: true },
     buttons: [
-      { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalService.closeModal(); }, customClass: 'blue-btn' },
-      { textKey: 'modal.ok', primary: true, isHot: true, onClick: modalService.closeModal },
+      { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },
+      { textKey: 'modal.ok', primary: true, isHot: true, onClick: modalStore.closeModal },
     ],
   });
 }
