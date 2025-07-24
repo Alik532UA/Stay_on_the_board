@@ -153,4 +153,36 @@
   }
   input:checked + .slider { background: var(--control-selected, #4caf50); }
   input:checked + .slider:before { transform: translateX(20px); }
+  .show-again-checkbox .ios-switch {
+    position: relative;
+    width: 44px !important;
+    height: 24px !important;
+    min-width: 44px !important;
+    min-height: 24px !important;
+    display: inline-block;
+  }
+  .show-again-checkbox .ios-switch input { display: none; }
+  .show-again-checkbox .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--toggle-off-bg, #555);
+    border-radius: 12px;
+    transition: background 0.2s;
+    width: 44px !important;
+    height: 24px !important;
+  }
+  .show-again-checkbox .slider:before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 20px !important;
+    height: 20px !important;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  .show-again-checkbox input:checked + .slider { background: var(--control-selected, #4caf50); }
+  .show-again-checkbox input:checked + .slider:before { transform: translateX(20px); }
 </style> 
