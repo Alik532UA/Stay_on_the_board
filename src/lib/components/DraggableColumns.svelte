@@ -4,6 +4,7 @@
   import { slide } from 'svelte/transition';
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
   import { onMount } from 'svelte';
+  import { _ } from 'svelte-i18n';
 
   export let columns: { id: string, label: string, items: { id: string, label: string }[] }[];
   export let itemContent: (item: any) => any = item => item.label;
@@ -144,6 +145,20 @@
   ul.editing-column li {
     border: 1.5px dashed #888;
   }
+  .dnd-edit-instruction {
+    max-width: 300px;
+    min-width: 220px;
+    word-break: break-word;
+    white-space: pre-line;
+    padding: 14px 18px;
+    font-size: 1.08em;
+    background: #666;
+    color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px #0008;
+    opacity: 0.92;
+    pointer-events: none;
+  }
 </style>
 
 <div class="dnd-columns-container" style="margin-top: {isHorizontalLayout ? '11vh' : '0'};">
@@ -178,6 +193,7 @@
 
 {#if isDragging && dragging && $columnStyleMode === 'editing'}
   <div
+    class="dnd-edit-instruction"
     style="
       position: fixed;
       top: 0;
@@ -185,15 +201,8 @@
       pointer-events: none;
       z-index: 9999;
       transform: translate({dragX}px, {dragY}px) scale(1.05);
-      background: #666;
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 6px;
-      box-shadow: 0 4px 16px #0008;
-      opacity: 0.85;
-      font-size: 1.1em;
     "
   >
-    {dragging.label}
+    {$_('ui.dndEditInstruction')}
   </div>
 {/if} 

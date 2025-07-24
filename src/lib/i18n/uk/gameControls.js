@@ -9,5 +9,6 @@ export default {
   voiceSettingsTitle: "Налаштування голосу",
   selectDistance: "Оберіть відстань",
   confirm: "Підтвердити",
-  noMovesTitle: "Ходів немає"
+  noMovesTitle: "Ходів немає",
+  selectDirectionAndDistance: "Оберіть напрямок та відстань"
 }; 

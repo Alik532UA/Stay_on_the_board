@@ -86,9 +86,9 @@
               step="0.01"
               bind:value={expertVolume}
               class="volume-slider"
-              aria-label="Гучність"
+              aria-label={$_('voiceSettings.volume')}
             />
-            <span class="volume-label">Гучність: {volumePercentage.toFixed(0)}%</span>
+            <span class="volume-label">{$_('voiceSettings.volumeLabel')}: {volumePercentage.toFixed(0)}%</span>
           </div>
         {/if}
 

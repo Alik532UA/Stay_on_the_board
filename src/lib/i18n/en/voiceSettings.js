@@ -20,5 +20,7 @@ export default {
   platformAndroid: "Any browser on mobile devices.",
   iosNotice: "iOS support is currently in development. We are working on a fix and hope to resolve it soon.",
   iosWarning: "Attention! Due to technical features of iOS, voiceover may work unstably, especially for computer moves. We are working to improve this feature.",
-  close: "Close"
+  close: "Close",
+  volume: "Volume",
+  volumeLabel: "Volume"
 }; 

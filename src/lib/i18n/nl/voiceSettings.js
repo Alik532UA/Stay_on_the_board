@@ -20,5 +20,7 @@ export default {
   platformAndroid: "Elke browser op mobiele apparaten.",
   iosNotice: "iOS-ondersteuning is momenteel in ontwikkeling. We werken aan een oplossing en hopen dit snel op te lossen.",
   iosWarning: "Let op! Door technische beperkingen van iOS kan spraak soms onstabiel werken, vooral voor zetten van de computer. We werken aan verbetering van deze functie.",
-  close: "Sluiten"
+  close: "Sluiten",
+  volume: "Volume",
+  volumeLabel: "Volume"
 }; 

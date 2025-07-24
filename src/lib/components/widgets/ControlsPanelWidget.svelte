@@ -9,6 +9,7 @@
   import SvgIcons from '../SvgIcons.svelte';
   import { get } from 'svelte/store';
   import { computerLastMoveDisplayStore } from '$lib/gameOrchestrator.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
 
   $: isPlayerTurn = $gameState.players[$gameState.currentPlayerIndex]?.type === 'human';
   const directionArrows = { 'up-left': '↖', 'up': '↑', 'up-right': '↗', 'left': '←', 'right': '→', 'down-left': '↙', 'down': '↓', 'down-right': '↘' } as const;
@@ -76,6 +77,18 @@
     if (dists.length === 5 || dists.length === 6) return chunk(dists, 3);
     return chunk(dists, 4);
   })();
+
+  function onConfirmClick() {
+    if (buttonDisabled) {
+      modalStore.showModal({
+        titleKey: 'modal.confirmMoveHintTitle',
+        contentKey: 'modal.confirmMoveHintContent',
+        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+      });
+      return;
+    }
+    confirmPlayerMove();
+  }
 </script>
 
 <style>
@@ -204,20 +217,31 @@
     background: var(--confirm-action-bg);
     color: var(--confirm-action-text);
   }
-  .confirm-btn:disabled {
+  .confirm-btn.disabled {
     background: var(--disabled-bg);
     color: var(--disabled-text);
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
+    pointer-events: auto;
+    opacity: 0.6;
   }
   .no-moves-btn {
     background: var(--warning-action-bg);
     color: var(--warning-action-text);
   }
+  .select-direction-label {
+    width: 100%;
+    text-align: center;
+    font-size: 1.13em;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+  }
 </style>
 
 <div class="game-controls-panel">
+  <div class="select-direction-label">{$_('gameControls.selectDirectionAndDistance')}</div>
   <div class="directions directions-3x3">
     <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => onDirectionClick('up-left')} title={`${$_('tooltips.up-left')}
 (${$settingsStore.keybindings['up-left'].join(', ')})`}>↖</button>
@@ -240,7 +264,6 @@
 (${$settingsStore.keybindings['down-right'].join(', ')})`}>↘</button>
   </div>
   <div class="distance-select">
-    <div>{$_('gameControls.selectDistance')}</div>
     <div class="distance-btns" style="--num-columns: {numColumns};">
       {#each $availableDistances as dist}
         <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" on:click={() => onDistanceClick(dist)}>{dist}</button>
@@ -248,8 +271,13 @@
     </div>
   </div>
   <div class="action-btns">
-    <button class="confirm-btn" on:click={confirmPlayerMove} disabled={buttonDisabled} title={`${$_('tooltips.confirm')}
-(${$settingsStore.keybindings['confirm']})`}>
+    <button
+      class="confirm-btn{buttonDisabled ? ' disabled' : ''}"
+      on:click={onConfirmClick}
+      aria-disabled={buttonDisabled}
+      title={`${$_('tooltips.confirm')}
+(${$settingsStore.keybindings['confirm']})`}
+    >
       <SvgIcons name="confirm" />
       {$_('gameControls.confirm')}
     </button>

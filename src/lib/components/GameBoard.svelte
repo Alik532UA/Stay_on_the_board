@@ -11,7 +11,7 @@
   import BoardWrapperWidget from './widgets/BoardWrapperWidget.svelte';
   import ControlsPanelWidget from './widgets/ControlsPanelWidget.svelte';
   import SettingsExpanderWidget from './widgets/SettingsExpanderWidget.svelte';
-  import { setDirection, setDistance, endGame, resetGame, startReplay, continueAfterNoMoves, finalizeGameWithBonus } from '$lib/stores/gameActions.js';
+  import { setDirection, setDistance, endGame, resetGame, startReplay, continueAfterNoMoves, finalizeGameWithBonus, setBoardSize } from '$lib/stores/gameActions.js';
   import * as core from '$lib/gameCore.js';
   import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
@@ -135,10 +135,26 @@
     });
   }
 
+  function changeBoardSize(increment: number) {
+    const currentSize = get(gameState).boardSize;
+    const newSize = currentSize + increment;
+    if (newSize >= 2 && newSize <= 9) {
+      setBoardSize(newSize);
+    }
+  }
+
   /**
    * @param {string} action
    */
   function executeAction(action: string) {
+    switch (action) {
+      case 'increase-board':
+        changeBoardSize(1);
+        break;
+      case 'decrease-board':
+        changeBoardSize(-1);
+        break;
+    }
     switch (action) {
       case 'up-left': setDirection('up-left'); break;
       case 'up': setDirection('up'); break;
@@ -162,12 +178,23 @@
   }
 
   function handleHotkey(e: KeyboardEvent) {
+    console.log('[HOTKEY]', { key: e.key, code: e.code, keyCode: e.keyCode });
     if (e.target && (e.target as HTMLElement).tagName !== 'BODY') return;
     
     const key = e.code;
     const currentSettings = get(settingsStore);
     const keybindings = currentSettings.keybindings;
     const resolutions = currentSettings.keyConflictResolution;
+
+    // Додаю явну підтримку '=' та '-' для різних розкладок і браузерів
+    if (e.key === '=' || e.key === '+' || e.code === 'Equal') {
+      executeAction('increase-board');
+      return;
+    }
+    if (e.key === '-' || e.key === '_' || e.code === 'Minus') {
+      executeAction('decrease-board');
+      return;
+    }
 
     const matchingActions = Object.entries(keybindings)
       .filter(([, keys]) => keys.includes(key))

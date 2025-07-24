@@ -40,5 +40,7 @@ export default {
   expertModeTitle: "Don't push the horses!",
   expertModeContent: "Je schakelt de modus voor hard blokkeren van cellen in. Dit maakt het spel moeilijker en sommige cellen worden na meerdere bezoeken niet meer beschikbaar. Doorgaan?",
   expertModeConfirm: "Zeker!",
-  expertModeCancel: "Annuleren"
+  expertModeCancel: "Annuleren",
+  confirmMoveHintTitle: "Hoe bevestig je een zet?",
+  confirmMoveHintContent: "Gebruik de pijltjestoetsen om een richting te kiezen en de cijfertoetsen om een afstand te selecteren. Je kunt je zet alleen bevestigen als zowel richting als afstand zijn gekozen."
 }; 

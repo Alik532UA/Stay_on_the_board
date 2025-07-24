@@ -9,5 +9,6 @@ export default {
   voiceSettingsTitle: "Spraakinstellingen",
   selectDistance: "Selecteer Afstand",
   confirm: "Bevestig",
-  noMovesTitle: "Geen Zetten"
+  noMovesTitle: "Geen Zetten",
+  selectDirectionAndDistance: "Kies richting en afstand"
 }; 
