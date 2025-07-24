@@ -331,7 +331,7 @@
 </style>
 
 <div class="settings-expander {isOpen ? 'open' : ''}">
-  <div class="settings-summary" tabindex="0" aria-label={$_('gameControls.settings')} on:click={toggleExpander} bind:this={summaryRef}>
+  <div class="settings-summary" role="button" aria-label={$_('gameControls.settings')} on:click={toggleExpander} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleExpander()} bind:this={summaryRef} tabindex="0">
     {$_('gameControls.settings')}
     <span class="expander-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
   </div>

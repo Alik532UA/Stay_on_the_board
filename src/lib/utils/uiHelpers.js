@@ -8,10 +8,10 @@ import { base } from '$app/paths';
 import GameModeModal from '$lib/components/GameModeModal.svelte';
 
 export function showGameModeSelector() {
-  modalService.showModal({
+  modalStore.showModal({
     titleKey: 'gameModes.title',
     component: GameModeModal,
-    buttons: [{ textKey: 'modal.cancel', onClick: modalService.closeModal }],
+    buttons: [{ textKey: 'modal.cancel', onClick: modalStore.closeModal }],
     closable: false,
   });
 }
@@ -28,7 +28,7 @@ export function showGameInfoModal() {
 }
 
 export function showClearCacheModal() {
-  modalService.showModal({
+  modalStore.showModal({
     titleKey: 'mainMenu.clearCacheModal.title',
     contentKey: 'mainMenu.clearCacheModal.content',
     buttons: [
@@ -38,7 +38,7 @@ export function showClearCacheModal() {
         onClick: () => {
           logService.addLog('Повне очищення кешу', 'info');
           clearCache({ keepAppearance: false });
-          modalService.closeModal();
+          modalStore.closeModal();
         },
       },
       {
@@ -48,10 +48,10 @@ export function showClearCacheModal() {
         onClick: () => {
           logService.addLog('Очищення кешу зі збереженням вигляду', 'info');
           clearCache({ keepAppearance: true });
-          modalService.closeModal();
+          modalStore.closeModal();
         },
       },
-      { textKey: 'modal.cancel', onClick: modalService.closeModal },
+      { textKey: 'modal.cancel', onClick: modalStore.closeModal },
     ],
   });
 } 

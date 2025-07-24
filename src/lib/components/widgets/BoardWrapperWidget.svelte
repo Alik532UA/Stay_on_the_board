@@ -12,7 +12,7 @@
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
 
-  let boardSize = $derived(Number($gameState.boardSize));
+  const boardSize = derived(gameState, $gameState => Number($gameState.boardSize));
   
   // Слідкуємо, чи був зроблений хід гравця (moveQueue останній елемент - player: 1)
   const shouldHideBoard = derived([
@@ -88,7 +88,7 @@
   {#if $settingsStore.showBoard}
     <div 
       class="board-bg-wrapper game-content-block{ $shouldHideBoard ? ' hidden' : '' }"
-      style="--board-size: {boardSize}"
+      style="--board-size: {$boardSize}"
       onclick={showBoardClickHint} 
       onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
       role="button"
@@ -96,9 +96,9 @@
       aria-label="Ігрове поле"
       transition:scaleAndSlide={{ duration: 600, easing: quintOut }}
     >
-      <div class="game-board" style="--board-size: {boardSize}" role="grid">
-        {#each Array(boardSize) as _, rowIdx (rowIdx)}
-          {#each Array(boardSize) as _, colIdx (colIdx)}
+      <div class="game-board" style="--board-size: {$boardSize}" role="grid">
+        {#each Array($boardSize) as _, rowIdx (rowIdx)}
+          {#each Array($boardSize) as _, colIdx (colIdx)}
             <div
               class="board-cell {getDamageClass(rowIdx, colIdx, $animationStore.cellVisitCounts, $settingsStore)}"
               class:light={(rowIdx + colIdx) % 2 === 0}
@@ -122,7 +122,7 @@
         
         {#if $settingsStore.showQueen && $animationStore.row !== null && $animationStore.col !== null}
           <div class="player-piece"
-            style="top: {$animationStore.row * (100 / boardSize)}%; left: {$animationStore.col * (100 / boardSize)}%; z-index: 10;">
+            style="top: {$animationStore.row * (100 / $boardSize)}%; left: {$animationStore.col * (100 / $boardSize)}%; z-index: 10;">
             <div class="piece-container">
               <SvgIcons name="queen" />
             </div>

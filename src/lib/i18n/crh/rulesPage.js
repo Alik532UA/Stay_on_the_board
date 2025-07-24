@@ -1,5 +1,6 @@
 export default {
   title: "'Tahtada Qalmaq' Oyun Qaydaları",
+  slogan: "Qaydalar oylagandan daa añlayışlı!",
   goalTitle: "Oyun Maqsadı",
   goalText: "'Tahtada Qalmaq' — stratejik sabırlılıq oyunıdır. Oyunçılar nöbetleşe bir ortak figuranı areket ettirirler. Maqsadınız — onu mümkün olduğu qadar uzun müddet tahtada saqlamaq ve raqibinizni hata yapmağa zorlamaqtır.",
   moveProcessTitle: "Areket Prosesi",

@@ -1,5 +1,6 @@
 export default {
   title: "Game Rules 'Stay on the Board'",
+  slogan: "The rules are simpler than you think!",
   goalTitle: "Game Goal",
   goalText: "'Stay on the Board' is a strategic endurance game. Players take turns moving a single shared piece. Your goal is to keep it on the board as long as possible and force your opponent to make a mistake.",
   moveProcessTitle: "Move Process",
