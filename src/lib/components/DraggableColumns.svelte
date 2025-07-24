@@ -121,6 +121,18 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 400px;
+    max-width: 100vw;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  @media (max-width: 600px) {
+    ul {
+      width: 95vw !important;
+      max-width: 100vw !important;
+      min-width: 0 !important;
+      box-sizing: border-box;
+    }
   }
   ul li {
     background: none !important;
@@ -167,8 +179,8 @@
       bind:this={colRefs[i]}
       class:editing-column={$columnStyleMode === 'editing'}
       style={$columnStyleMode === 'editing'
-        ? 'padding: 0; background: none; border-radius: 8px; width: 400px; list-style: none; min-height: 80px;'
-        : 'padding: 16px; background: #222; border-radius: 8px; width: 400px; list-style: none; min-height: 80px;'}
+        ? 'padding: 0; background: none; border-radius: 8px; list-style: none; min-height: 80px;'
+        : 'padding: 16px; background: #222; border-radius: 8px; list-style: none; min-height: 80px;'}
       transition:slide={{ duration: 500 }}
     >
       {#if $columnStyleMode !== 'editing'}
