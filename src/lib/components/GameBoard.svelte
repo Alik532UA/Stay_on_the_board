@@ -154,6 +154,12 @@
       case 'decrease-board':
         changeBoardSize(-1);
         break;
+      case 'toggle-block-mode':
+        settingsStore.toggleBlockMode();
+        break;
+      case 'toggle-board':
+        settingsStore.toggleShowBoard();
+        break;
     }
     switch (action) {
       case 'up-left': setDirection('up-left'); break;

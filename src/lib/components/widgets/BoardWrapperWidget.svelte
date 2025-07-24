@@ -8,9 +8,46 @@
   import { quintOut } from 'svelte/easing';
   import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.js';
   import { animationStore } from '$lib/stores/animationStore.js';
+  import { derived } from 'svelte/store';
+  import { get } from 'svelte/store';
+  import { onMount } from 'svelte';
 
   let boardSize = $derived(Number($gameState.boardSize));
   
+  // Слідкуємо, чи був зроблений хід гравця (moveQueue останній елемент - player: 1)
+  const shouldHideBoard = derived([
+    settingsStore,
+    gameState
+  ], ([$settingsStore, $gameState]) => {
+    if (!$settingsStore.autoHideBoard) return false;
+    const lastMove = $gameState.moveQueue?.[$gameState.moveQueue.length - 1];
+    return lastMove && lastMove.player === 1;
+  });
+
+  onMount(() => {
+    let lastRow = $gameState.playerRow;
+    let lastCol = $gameState.playerCol;
+    const unsubscribe = gameState.subscribe(($gameState) => {
+      if (
+        get(settingsStore).autoHideBoard &&
+        get(settingsStore).showBoard &&
+        ($gameState.playerRow !== lastRow || $gameState.playerCol !== lastCol)
+      ) {
+        lastRow = $gameState.playerRow;
+        lastCol = $gameState.playerCol;
+        setTimeout(() => {
+          if (get(settingsStore).showBoard) {
+            settingsStore.toggleShowBoard(false);
+          }
+        }, 0);
+      } else {
+        lastRow = $gameState.playerRow;
+        lastCol = $gameState.playerCol;
+      }
+    });
+    return unsubscribe;
+  });
+
   function isAvailable(row: number, col: number) {
     return $settingsStore.showMoves && $animationStore.showAvailableMoveDots && $gameState.availableMoves && $gameState.availableMoves.some(move => move.row === row && move.col === col);
   }
@@ -27,7 +64,7 @@
   function onCellRightClick(event: MouseEvent, row: number, col: number) {
     event.preventDefault();
     if ($settingsStore.blockModeEnabled && !(row === $gameState.playerRow && col === $gameState.playerCol)) {
-      const blocked = isCellBlocked(row, col, $gameState.cellVisitCounts, $settingsStore);
+      const blocked = isCellBlocked(row, col, $animationStore.cellVisitCounts, $settingsStore);
       logStore.addLog(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`, 'info');
     }
   }
@@ -50,7 +87,7 @@
 {#key $gameState.gameId}
   {#if $settingsStore.showBoard}
     <div 
-      class="board-bg-wrapper game-content-block"
+      class="board-bg-wrapper game-content-block{ $shouldHideBoard ? ' hidden' : '' }"
       style="--board-size: {boardSize}"
       onclick={showBoardClickHint} 
       onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
