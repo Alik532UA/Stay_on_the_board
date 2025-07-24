@@ -7,6 +7,7 @@
   import { gameState } from '$lib/stores/gameState.js';
   import { onMount } from 'svelte';
   import { audioControls } from '$lib/stores/audioStore.js';
+  import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
 
   /** @type {HTMLButtonElement | null} */
   let hotBtn = null;
@@ -152,7 +153,7 @@
           </div>
         {/if}
       </div>
-      <div class="modal-buttons">
+      <div class="modal-action-buttons">
         {#each $modalState.buttons as btn, i (i)}
           {#if btn.isHot && !$modalState.buttons.slice(0, i).some(b => b.isHot)}
             <button
@@ -181,6 +182,9 @@
             </button>
           {/if}
         {/each}
+        {#if $modalState.titleKey === 'gameModes.title' || $modalState.titleKey === 'modal.expertModeTitle'}
+          <DontShowAgainCheckbox />
+        {/if}
       </div>
     </div>
   </div>
@@ -445,6 +449,19 @@
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1;
+}
+
+.modal-action-buttons {
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
 }
 
 @media (max-width: 480px) {

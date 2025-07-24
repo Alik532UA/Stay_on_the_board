@@ -7,59 +7,35 @@
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import SvgIcons from '../SvgIcons.svelte';
   import { get } from 'svelte/store';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
   import VoiceSettingsModalWrapper from '$lib/components/VoiceSettingsModalWrapper.svelte';
+  import { slide } from 'svelte/transition';
   let expanderRef: HTMLDetailsElement;
   let summaryRef: HTMLElement;
   let isOpen = true;
-  function toggleExpander() {
+  let contentRef: HTMLDivElement;
+  let contentHeight = 0;
+  async function toggleExpander() {
     isOpen = !isOpen;
-    if (expanderRef) expanderRef.open = isOpen;
-  }
-  onMount(() => {
-    function handleHotkey(e: KeyboardEvent) {
-      if (e.code === 'F2') {
-        e.preventDefault();
-        toggleExpander();
-        if (summaryRef) summaryRef.focus();
-        return;
-      }
-      const key = e.code;
-      const keybindings = get(settingsStore).keybindings;
-      // Toggle block mode
-      if (keybindings['toggle-block-mode']?.includes(key)) {
-        settingsStore.updateSettings({ blockModeEnabled: !$settingsStore.blockModeEnabled });
-        e.preventDefault();
-        return;
-      }
-      // Toggle board
-      if (keybindings['toggle-board']?.includes(key)) {
-        settingsStore.toggleShowBoard();
-        e.preventDefault();
-        return;
-      }
-      // Increase board
-      if (keybindings['increase-board']?.includes(key)) {
-        changeBoardSize(1);
-        e.preventDefault();
-        return;
-      }
-      // Decrease board
-      if (keybindings['decrease-board']?.includes(key)) {
-        changeBoardSize(-1);
-        e.preventDefault();
-        return;
-      }
-      // Toggle speech
-      if (keybindings['toggle-speech']?.includes(key)) {
-        settingsStore.toggleSpeech();
-        e.preventDefault();
-        return;
-      }
+    await tick();
+    if (contentRef) {
+      contentHeight = contentRef.scrollHeight;
     }
-    window.addEventListener('keydown', handleHotkey);
-    return () => window.removeEventListener('keydown', handleHotkey);
+  }
+  let isHorizontalLayout = true;
+
+  function updateLayoutMode() {
+    isHorizontalLayout = window.innerWidth > 1270;
+  }
+
+  onMount(() => {
+    if (contentRef) {
+      contentHeight = contentRef.scrollHeight;
+    }
+    updateLayoutMode();
+    window.addEventListener('resize', updateLayoutMode);
+    return () => window.removeEventListener('resize', updateLayoutMode);
   });
 
   $: showMoves = $settingsStore.showMoves;
@@ -81,13 +57,13 @@
    * @param {number} count
    */
   function selectBlockCount(count: number) {
-    const hasSeenWarning = localStorage.getItem('hasSeenExpertModeWarning');
-    if (count > 0 && !hasSeenWarning) {
+    // Видаляю localStorage.hasSeenExpertModeWarning
+    if (count > 0 && $settingsStore.showGameModeModal) {
       modalStore.showModal({
         titleKey: 'modal.expertModeTitle',
         contentKey: 'modal.expertModeContent',
         buttons: [
-          { textKey: 'modal.expertModeConfirm', primary: true, isHot: true, onClick: () => { localStorage.setItem('hasSeenExpertModeWarning', 'true'); settingsStore.updateSettings({ blockOnVisitCount: count }); modalStore.closeModal(); } },
+          { textKey: 'modal.expertModeConfirm', primary: true, isHot: true, onClick: () => { settingsStore.updateSettings({ blockOnVisitCount: count }); modalStore.closeModal(); } },
           { textKey: 'modal.expertModeCancel', onClick: modalStore.closeModal }
         ]
       });
@@ -110,12 +86,13 @@
     background: linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
     border-radius: 16px;
     border: 1.5px solid rgba(255,255,255,0.18);
-    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.13); /* нейтральна тінь */
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.13);
     transition: background 0.25s, box-shadow 0.25s;
+    margin-bottom: 16px;
   }
   .settings-expander:hover {
     background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%);
-    box-shadow: 0 12px 40px 0 rgba(0,0,0,0.18); /* нейтральна тінь */
+    box-shadow: 0 12px 40px 0 rgba(0,0,0,0.18);
   }
   .settings-summary {
     position: relative;
@@ -132,33 +109,37 @@
     display: flex;
     align-items: center;
     min-height: 44px;
+    outline: none;
   }
-  .settings-expander[open] > .settings-summary {
+  .settings-summary:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  .settings-expander.open > .settings-summary {
     border-radius: 16px 16px 0 0;
-    margin-bottom: 12px;
   }
   .expander-arrow {
     position: absolute;
     right: 16px;
     top: 50%;
-    transform: translateY(-50%);
-    transition: transform 0.4s ease-out;
+    transform: translateY(-50%) rotate(0deg);
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
   }
-  .settings-expander[open] .expander-arrow {
+  .settings-expander.open .expander-arrow {
     transform: translateY(-50%) rotate(180deg);
   }
-  .toggles {
+  .expander-content {
     overflow: hidden;
     max-height: 0;
     opacity: 0;
-    transition: max-height 0.4s ease-out, opacity 0.3s ease-out, padding 0.4s ease-out;
+    transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.3s cubic-bezier(0.4,0,0.2,1), padding 0.5s cubic-bezier(0.4,0,0.2,1);
     padding: 0 16px;
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
-  .settings-expander[open] > .toggles {
-    max-height: 600px;
+  .settings-expander.open > .expander-content {
+    max-height: 1200px;
     opacity: 1;
     padding: 0 16px 16px 16px;
   }
@@ -304,6 +285,7 @@
     margin-bottom: 0;
     justify-content: flex-start;
     align-items: center;
+    margin-top: 8px;
   }
   .game-mode-btn {
     background: var(--control-bg);
@@ -348,12 +330,13 @@
   }
 </style>
 
-<details class="settings-expander" bind:this={expanderRef} open>
-  <summary class="settings-summary" bind:this={summaryRef} tabindex="0" aria-label={$_('gameControls.settings')}>
+<div class="settings-expander {isOpen ? 'open' : ''}">
+  <div class="settings-summary" tabindex="0" aria-label={$_('gameControls.settings')} on:click={toggleExpander} bind:this={summaryRef}>
     {$_('gameControls.settings')}
     <span class="expander-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-  </summary>
-  <div class="toggles">
+  </div>
+  <div class="expander-content" bind:this={contentRef} style="max-height: {isOpen ? contentRef ? contentRef.scrollHeight + 'px' : '1200px' : '0px'}; opacity: {isOpen ? 1 : 0};">
+    <!-- Весь існуючий контент toggles переносимо сюди -->
     <div class="game-mode-row">
       <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => settingsStore.applyGameModePreset('beginner')}>Новачок</button>
       <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => settingsStore.applyGameModePreset('experienced')}>Досвідчений</button>
@@ -436,6 +419,7 @@
       <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={$settingsStore.autoHideBoard} on:change={handleToggleAutoHideBoard} /><span class="slider"></span></div><span>{$_('gameModes.autoHideBoard')}</span></div>
     </label>
     <hr class="game-mode-divider" />
+    {#if isHorizontalLayout}
     <div class="setting-item">
       <span>Рухати елементи меню</span>
       <div style="display: flex; gap: 8px;">
@@ -457,5 +441,6 @@
         </button>
       </div>
     </div>
+    {/if}
   </div>
-</details> 
+</div> 

@@ -7,6 +7,7 @@
   import { setBoardSize } from '$lib/stores/gameActions.js';
   import { get } from 'svelte/store';
   import { gameState } from '$lib/stores/gameState';
+  import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
 
   /**
    * @param {'beginner' | 'experienced' | 'pro'} mode
@@ -69,7 +70,7 @@
   }
 </script>
 
-<div class="modal-buttons">
+<div class="game-mode-buttons">
   <button class="modal-btn-generic green-btn" on:click={() => selectMode('beginner')}>
     {$_('gameModes.beginner')}
   </button>
@@ -81,30 +82,14 @@
   </button>
 </div>
 
-<div class="show-again-checkbox">
-  <label class="ios-switch-label">
-    <div class="switch-content-wrapper">
-      <div class="ios-switch">
-        <input 
-          type="checkbox"
-          bind:checked={dontShowAgain}
-          on:change={handleCheckboxChange}
-        />
-        <span class="slider"></span>
-      </div>
-      <span>{$_('gameModes.dontShowAgain')}</span>
-    </div>
-  </label>
-</div>
-
 <style>
-  .modal-buttons {
+  .game-mode-buttons {
     display: flex;
     flex-direction: column;
     gap: 16px;
     padding-top: 16px;
   }
-  .show-again-checkbox {
+  .dont-show-again-checkbox {
     margin-top: 24px;
     padding-top: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -154,7 +139,7 @@
   }
   input:checked + .slider { background: var(--control-selected, #4caf50); }
   input:checked + .slider:before { transform: translateX(20px); }
-  .show-again-checkbox .ios-switch {
+  .dont-show-again-checkbox .ios-switch {
     position: relative;
     width: 44px !important;
     height: 24px !important;
@@ -162,8 +147,8 @@
     min-height: 24px !important;
     display: inline-block;
   }
-  .show-again-checkbox .ios-switch input { display: none; }
-  .show-again-checkbox .slider {
+  .dont-show-again-checkbox .ios-switch input { display: none; }
+  .dont-show-again-checkbox .slider {
     position: absolute;
     cursor: pointer;
     inset: 0;
@@ -173,7 +158,7 @@
     width: 44px !important;
     height: 24px !important;
   }
-  .show-again-checkbox .slider:before {
+  .dont-show-again-checkbox .slider:before {
     content: '';
     position: absolute;
     left: 2px;
@@ -184,6 +169,6 @@
     border-radius: 50%;
     transition: transform 0.2s;
   }
-  .show-again-checkbox input:checked + .slider { background: var(--control-selected, #4caf50); }
-  .show-again-checkbox input:checked + .slider:before { transform: translateX(20px); }
+  .dont-show-again-checkbox input:checked + .slider { background: var(--control-selected, #4caf50); }
+  .dont-show-again-checkbox input:checked + .slider:before { transform: translateX(20px); }
 </style> 
