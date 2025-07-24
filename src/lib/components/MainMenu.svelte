@@ -203,9 +203,11 @@
     <div class="main-menu-title">{$_('mainMenu.title')}</div>
     <div class="main-menu-subtitle">
       {$_('mainMenu.menu')}
-      <span class="dev-version" role="button" tabindex="0" onclick={() => showDevMenu = !showDevMenu} onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (showDevMenu = !showDevMenu)}>
-        dev v.{$appVersion}
-      </span>
+      {#if isDev}
+        <span class="dev-version" role="button" tabindex="0" onclick={() => showDevMenu = !showDevMenu} onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (showDevMenu = !showDevMenu)}>
+          dev v.{$appVersion}
+        </span>
+      {/if}
     </div>
     <div id="main-menu-buttons">
       <button class="modal-button secondary" onclick={() => navigateTo('/game')}>{$_('mainMenu.playVsComputer')}</button>
