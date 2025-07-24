@@ -56,9 +56,12 @@
     }
   }
 
+  let dontShowAgain = false;
+  $: dontShowAgain = !$settingsStore.showGameModeModal;
+
   /** @param {Event} event */
   function handleCheckboxChange(event) {
-    const input = /** @type {HTMLInputElement} */ (event.currentTarget);
+    const input = /** @type {HTMLInputElement|null} */ (event.currentTarget);
     if (input && typeof input.checked === 'boolean') {
       settingsStore.updateSettings({ showGameModeModal: !input.checked });
     }
@@ -82,9 +85,9 @@
     <div class="switch-content-wrapper">
       <div class="ios-switch">
         <input 
-          type="checkbox" 
-          checked={!$settingsStore.showGameModeModal} 
-          on:change={handleCheckboxChange} 
+          type="checkbox"
+          bind:checked={dontShowAgain}
+          on:change={handleCheckboxChange}
         />
         <span class="slider"></span>
       </div>
