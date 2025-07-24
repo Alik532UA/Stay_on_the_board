@@ -221,6 +221,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    padding-bottom: 24px;
   }
 </style> 

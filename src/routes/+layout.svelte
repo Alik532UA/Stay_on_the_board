@@ -32,6 +32,8 @@
 	import { navigating } from '$app/stores';
 	import { modalStore } from '$lib/stores/modalStore.js';
 	import { afterNavigate } from '$app/navigation';
+	import DontShowAgainCheckbox from '$lib/components/DontShowAgainCheckbox.svelte';
+	import { modalState } from '$lib/stores/modalStore.js';
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
@@ -124,7 +126,11 @@
 	{/if}
 </div>
 
-<Modal />
+<Modal>
+	{#if $modalState.titleKey === 'gameModes.title' || $modalState.titleKey === 'modal.expertModeTitle'}
+		<DontShowAgainCheckbox slot="dont-show-again-checkbox" />
+	{/if}
+</Modal>
 
 <style>
 	.app {

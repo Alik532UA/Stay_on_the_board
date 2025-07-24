@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
+  import { slide } from 'svelte/transition';
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
 
   export let columns: { id: string, label: string, items: { id: string, label: string }[] }[];
@@ -82,7 +83,7 @@
     flex-direction: row;
     transition: gap 0.6s cubic-bezier(0.4,0,0.2,1), padding 0.6s cubic-bezier(0.4,0,0.2,1), margin 0.6s cubic-bezier(0.4,0,0.2,1);
   }
-  @media (max-width: 1600px) {
+  @media (max-width: 1270px) {
     .dnd-columns-container {
       flex-direction: column;
       align-items: center;
@@ -142,8 +143,7 @@
       style={$columnStyleMode === 'editing'
         ? 'padding: 0; background: none; border-radius: 8px; width: 400px; list-style: none; min-height: 80px;'
         : 'padding: 16px; background: #222; border-radius: 8px; width: 400px; list-style: none; min-height: 80px;'}
-      in:fade={{ duration: 600 }}
-      out:fade={{ duration: 600 }}
+      transition:slide={{ duration: 500 }}
     >
       {#if $columnStyleMode !== 'editing'}
         <b style="color: #fff;">{col.label}</b>
@@ -152,8 +152,7 @@
         <li
           style="padding: 12px; margin: 8px 0; background: none; color: #fff; border-radius: 4px; {($columnStyleMode === 'editing') ? 'cursor: grab;' : 'cursor: default;'} opacity: {dragging && dragging.id === item.id ? 0.5 : 1};"
           on:pointerdown={($columnStyleMode === 'editing') ? (e) => handlePointerDown(e, item, col.id) : undefined}
-          in:fade={{ duration: 600 }}
-          out:fade={{ duration: 600 }}
+          transition:slide={{ duration: 500 }}
         >
           {#if typeof itemContent(item) === 'function'}
             <svelte:component this={itemContent(item)} />
