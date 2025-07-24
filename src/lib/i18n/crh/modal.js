@@ -40,5 +40,7 @@ export default {
   expertModeTitle: "Don't push the horses!",
   expertModeContent: "Siz qattiy hücre bloklama rejimini açaqsınız. Bu oyunnı zorlaştırır ve bazı hücreler birqaç ziyaretten sonra kullanılamaz olur. Devam etmek ister misiniz?",
   expertModeConfirm: "Elbette!",
-  expertModeCancel: "İptal"
+  expertModeCancel: "İptal",
+  confirmMoveHintTitle: "Hamle nasıl onaylanır?",
+  confirmMoveHintContent: "Yön seçmek için ok tuşlarını ve mesafe seçmek için rakam tuşlarını kullanın. Hem yön hem de mesafe seçildiğinde hamleyi onaylayabilirsiniz."
 }; 

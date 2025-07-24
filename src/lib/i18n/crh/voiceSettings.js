@@ -20,5 +20,7 @@ export default {
   platformAndroid: "Mobil cihazlarda her brauzer.",
   iosNotice: "iOS desteği şimdilik inkişafta. Biz bu mesele üzerinde çalışamız ve yaqında hal etmege ümit etemiz.",
   iosWarning: "Diqqat! iOS'un texnik hususiyetleri sebebinden, sesli oynatma bazen sabit olmayabilir, hususan kompyuter areketleri içün. Biz bu funksiyanı yaxşılamağa çalışamız.",
-  close: "Qapat"
+  close: "Qapat",
+  volume: "Ses",
+  volumeLabel: "Ses"
 }; 

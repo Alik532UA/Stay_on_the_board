@@ -338,9 +338,9 @@
   <div class="expander-content" bind:this={contentRef} style="max-height: {isOpen ? contentRef ? contentRef.scrollHeight + 'px' : '1200px' : '0px'}; opacity: {isOpen ? 1 : 0};">
     <!-- Весь існуючий контент toggles переносимо сюди -->
     <div class="game-mode-row">
-      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => settingsStore.applyGameModePreset('beginner')}>Новачок</button>
-      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => settingsStore.applyGameModePreset('experienced')}>Досвідчений</button>
-      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'pro'} on:click={() => settingsStore.applyGameModePreset('pro')}>Профі</button>
+      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => settingsStore.applyGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
+      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => settingsStore.applyGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
+      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'pro'} on:click={() => settingsStore.applyGameModePreset('pro')}>{$_('gameModes.pro')}</button>
     </div>
     <hr class="game-mode-divider" />
     <div class="setting-item board-size-control">
@@ -421,7 +421,7 @@
     <hr class="game-mode-divider" />
     {#if isHorizontalLayout}
     <div class="setting-item">
-      <span>Рухати елементи меню</span>
+      <span>{$_('ui.moveMenuItems')}</span>
       <div style="display: flex; gap: 8px;">
         <button
           class="menu-style-btn"

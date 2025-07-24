@@ -40,5 +40,7 @@ export default {
   expertModeTitle: "Don't push the horses!",
   expertModeContent: "You are enabling the hard cell blocking mode. This will make the game harder, and some cells will become unavailable after several visits. Continue?",
   expertModeConfirm: "Sure!",
-  expertModeCancel: "Cancel"
+  expertModeCancel: "Cancel",
+  confirmMoveHintTitle: "How to confirm a move?",
+  confirmMoveHintContent: "Use the arrow keys to select a direction and the number keys to select a distance. You can confirm your move only when both direction and distance are selected."
 }; 

@@ -9,5 +9,6 @@ export default {
   voiceSettingsTitle: "Voice Settings",
   selectDistance: "Select Distance",
   confirm: "Confirm",
-  noMovesTitle: "No Moves"
+  noMovesTitle: "No Moves",
+  selectDirectionAndDistance: "Select direction and distance"
 }; 

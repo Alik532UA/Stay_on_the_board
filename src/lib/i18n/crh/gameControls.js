@@ -9,5 +9,6 @@ export default {
   voiceSettingsTitle: "Ses Sozlamaları",
   selectDistance: "Mesafeni sayla",
   confirm: "Tasdiqla",
-  noMovesTitle: "Areket yoq"
+  noMovesTitle: "Areket yoq",
+  selectDirectionAndDistance: "Yön ve mesafe seçin"
 }; 
