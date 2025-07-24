@@ -3,6 +3,7 @@
   import { fade } from 'svelte/transition';
   import { slide } from 'svelte/transition';
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
+  import { onMount } from 'svelte';
 
   export let columns: { id: string, label: string, items: { id: string, label: string }[] }[];
   export let itemContent: (item: any) => any = item => item.label;
@@ -17,6 +18,16 @@
   let dropTargetCol: string | null = null;
   let dropIndex: number | null = null;
   let colRefs: HTMLUListElement[] = [];
+  let isHorizontalLayout = true;
+
+  function updateLayoutMode() {
+    isHorizontalLayout = window.innerWidth > 1270;
+  }
+  onMount(() => {
+    updateLayoutMode();
+    window.addEventListener('resize', updateLayoutMode);
+    return () => window.removeEventListener('resize', updateLayoutMode);
+  });
 
   function handlePointerDown(e: PointerEvent, item: { id: string, label: string }, colId: string) {
     dragging = item;
@@ -135,7 +146,7 @@
   }
 </style>
 
-<div class="dnd-columns-container">
+<div class="dnd-columns-container" style="margin-top: {isHorizontalLayout ? '11vh' : '0'};">
   {#each columns as col, i}
     <ul
       bind:this={colRefs[i]}
