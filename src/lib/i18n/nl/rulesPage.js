@@ -8,7 +8,7 @@ export default {
   step1: "Stap 1: Kies een richting.",
   step1Text: "Klik op een van de 8 pijlen die overeenkomen met de bewegingsrichtingen:",
   step2: "Stap 2: Kies een afstand.",
-  step2Text: "Klik op een knop met een cijfer dat aangeeft hoeveel vakjes het stuk moet verplaatsen. De maximale afstand hangt af van de bordgrootte (N-1).",
+  step2Text: "Druk op de knop met een cijfer om aan te geven hoeveel vakjes het stuk moet verplaatsen.",
   step3: "Stap 3: Bevestig de zet.",
   step3Text: "Klik op de grote groene knop om je zet te voltooien.",
   winLossTitle: "Winst- en Verliesvoorwaarden",

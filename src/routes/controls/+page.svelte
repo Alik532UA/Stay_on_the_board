@@ -122,13 +122,19 @@
                   class:conflict={conflicts.has(key)}
                   on:click={() => listenForKey(action, i)}
                 >
-                  {listeningFor?.action === action && listeningFor?.index === i ? $_('controlsPage.pressKey') : key || 'N/A'}
+                  {listeningFor?.action === action && listeningFor?.index === i
+                    ? $_('controlsPage.pressKey')
+                    : (key ? key.replace(/^Key|^Digit/, '') : 'N/A')}
                 </button>
                 <button class="remove-key-btn" title={$_('controlsPage.removeKey')} on:click={() => removeKey(action, i)}>×</button>
               </div>
             {/each}
             {#if (keybindings[action]?.length || 0) < 8}
-              <button class="add-key-btn" on:click={() => listenForKey(action, -1)}>+</button>
+              {#if listeningFor?.action === action && listeningFor?.index === -1}
+                <span class="press-key-hint">{$_('controlsPage.pressKey') || 'Натисніть клавішу'}</span>
+              {:else}
+                <button class="add-key-btn" on:click={() => listenForKey(action, -1)}>+</button>
+              {/if}
             {/if}
           </div>
         </div>
@@ -185,7 +191,7 @@
     position: relative;
   }
   .key-button {
-    min-width: 100px;
+    min-width: 50px;
     text-align: center;
     padding: 0.5rem 1rem;
     border: 1px solid var(--border-color);
@@ -256,5 +262,28 @@
     border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
+  }
+  .press-key-hint {
+    display: inline-block;
+    min-width: 120px;
+    padding: 0.6rem 1.2rem;
+    background: linear-gradient(90deg, #ffe082 0%, #ffd54f 100%);
+    color: #b26a00;
+    border: 2px solid #ffb300;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.08em;
+    box-shadow: 0 2px 12px 0 rgba(255, 193, 7, 0.18);
+    animation: pressKeyPulse 1.2s infinite alternate, fadeIn 0.2s;
+    letter-spacing: 0.5px;
+  }
+  @keyframes pressKeyPulse {
+    from { box-shadow: 0 2px 12px 0 rgba(255, 193, 7, 0.18); }
+    to { box-shadow: 0 4px 24px 0 rgba(255, 193, 7, 0.38); background: linear-gradient(90deg, #fffde7 0%, #ffe082 100%); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 </style> 

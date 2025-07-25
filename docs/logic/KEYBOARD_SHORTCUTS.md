@@ -104,3 +104,14 @@ The center-info element provides visual feedback about the current game state:
 5. **Distance Cycling**: On 3x3 boards, pressing the same direction 3 times cycles: 1 → 2 → 1
 6. **Manual Distance**: If you manually select a distance, it will be preserved when changing direction
 7. **Automatic Distance**: Automatically selected distances reset to 1 when changing direction 
+
+---
+
+## ВАЖЛИВО ДЛЯ РОЗРОБНИКІВ: логіка вибору дії для KeyS/І
+
+- При першому натисканні S/І (KeyS), якщо ця клавіша призначена до кількох дій, показується модальне вікно з вибором дії.
+- Після вибору KeyS видаляється з усіх інших дій і призначається лише до вибраної дії.
+- Це критично для зрозумілого UX і уникнення конфліктів гарячих клавіш.
+- Не змінюйте цю логіку під час рефакторингу без повного тестування!
+
+Деталі див. у handleHotkey (GameBoard.svelte). 

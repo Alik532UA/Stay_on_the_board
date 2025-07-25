@@ -221,6 +221,29 @@
 
     // Якщо вирішення немає, показуємо модальне вікно
     const $t = get(_);
+    if (key === 'KeyS' && matchingActions.length > 1) {
+      // Спеціальна логіка для KeyS/І: пропонуємо вибір і після вибору перепризначаємо KeyS лише на одну дію
+      modalStore.showModal({
+        titleKey: 'modal.keyConflictTitle',
+        content: { key: key, actions: matchingActions },
+        buttons: matchingActions.map(action => ({
+          text: $t(`controlsPage.actions.${action}`),
+          onClick: () => {
+            // Видаляємо KeyS з усіх дій
+            const newKeybindings = { ...keybindings };
+            Object.keys(newKeybindings).forEach(act => {
+              newKeybindings[act] = (newKeybindings[act] || []).filter(k => k !== 'KeyS');
+            });
+            // Додаємо KeyS лише до вибраної дії
+            newKeybindings[action] = [...(newKeybindings[action] || []), 'KeyS'];
+            settingsStore.updateSettings({ keybindings: newKeybindings });
+            executeAction(action);
+            modalStore.closeModal();
+          }
+        }))
+      });
+      return;
+    }
     modalStore.showModal({
       titleKey: 'modal.keyConflictTitle',
       content: { key: key, actions: matchingActions },

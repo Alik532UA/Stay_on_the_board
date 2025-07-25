@@ -1,3 +1,11 @@
+<!--
+ВАЖЛИВО! Архітектурний принцип: візуалізація дошки (game-board) асинхронна та незалежна від логіки гри та center-info.
+- 'game-board' не впливає на 'center-info' і не змінює логіку гри.
+- 'center-info' і логіка гри не знають про стан візуалізації дошки.
+- Логіка гри не повинна залежати від DOM, анімацій чи рендерингу.
+
+Це критично для коректної роботи анімацій, UX та масштабованості. Не спрощуйте і не змінюйте цю логіку під час рефакторингу!
+-->
 <script lang="ts">
   import { gameState } from '$lib/stores/gameState.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
@@ -24,6 +32,17 @@
     return lastMove && lastMove.player === 1;
   });
 
+  // --- Додаємо автозапуск чекбоксів перед першим ходом користувача ---
+  function enableAllGameCheckboxesIfNeeded() {
+    const s = get(settingsStore);
+    let changed = false;
+    if (!s.showBoard) { settingsStore.toggleShowBoard(true); changed = true; }
+    if (!s.showQueen) { settingsStore.toggleShowQueen(); changed = true; }
+    if (!s.showMoves) { settingsStore.toggleShowMoves(); changed = true; }
+    // Якщо showQueen був вимкнений, showMoves міг автоматично вимкнутись, тому ще раз вмикаємо
+    if (!get(settingsStore).showMoves) { settingsStore.toggleShowMoves(); }
+  }
+
   onMount(() => {
     let lastRow = $gameState.playerRow;
     let lastCol = $gameState.playerCol;
@@ -43,6 +62,10 @@
       } else {
         lastRow = $gameState.playerRow;
         lastCol = $gameState.playerCol;
+      }
+      // --- Після автоприховування дошки ---
+      if ($gameState.moveQueue && $gameState.moveQueue.length === 0) {
+        enableAllGameCheckboxesIfNeeded();
       }
     });
     return unsubscribe;

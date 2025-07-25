@@ -21,7 +21,17 @@
     const currentLocale = get(locale) || 'uk';
     try {
       const allVoices = await loadAndGetVoices();
-      availableVoices = filterVoicesByLang(allVoices, currentLocale);
+      let mainVoices = filterVoicesByLang(allVoices, currentLocale);
+      if (currentLocale !== 'en') {
+        // Додаємо англійські голоси в кінець списку
+        const enVoices = filterVoicesByLang(allVoices, 'en');
+        // Уникаємо дублікатів (на випадок, якщо англійський голос вже є у mainVoices)
+        const mainVoiceURIs = new Set(mainVoices.map(v => v.voiceURI));
+        const onlyEn = enVoices.filter(v => !mainVoiceURIs.has(v.voiceURI));
+        availableVoices = [...mainVoices, ...onlyEn];
+      } else {
+        availableVoices = mainVoices;
+      }
     } catch (error) {
       console.error("Помилка завантаження голосів:", error);
     }
@@ -39,7 +49,15 @@
     const currentLocale = get(locale) || 'uk';
     try {
       const allVoices = await loadAndGetVoices();
-      availableVoices = filterVoicesByLang(allVoices, currentLocale);
+      let mainVoices = filterVoicesByLang(allVoices, currentLocale);
+      if (currentLocale !== 'en') {
+        const enVoices = filterVoicesByLang(allVoices, 'en');
+        const mainVoiceURIs = new Set(mainVoices.map(v => v.voiceURI));
+        const onlyEn = enVoices.filter(v => !mainVoiceURIs.has(v.voiceURI));
+        availableVoices = [...mainVoices, ...onlyEn];
+      } else {
+        availableVoices = mainVoices;
+      }
     } catch (error) {
       console.error("Помилка повторного завантаження голосів:", error);
     }
@@ -123,16 +141,11 @@
           {/if}
           {#if showDetails}
             <div class="details-text">
-              <h4>{$_('voiceSettings.reasonTitle')}</h4>
-              <p>{$_('voiceSettings.reasonContent')}</p>
-              {#if !isEdge}
-                <h4>{$_('voiceSettings.recommendationsTitle')}</h4>
-                <p>{$_('voiceSettings.recommendationsContent')}</p>
-                <ul>
-                  <li>{$_('voiceSettings.platformEdge')}</li>
-                  <li>{$_('voiceSettings.platformAndroid')}</li>
-                </ul>
-              {/if}
+              <p>{$_('voiceSettings.recommendationsContent')}</p>
+              <ul>
+                <li>{$_('voiceSettings.platformEdge')}</li>
+                <li>{$_('voiceSettings.platformAndroid')}</li>
+              </ul>
             </div>
           {/if}
         </div>

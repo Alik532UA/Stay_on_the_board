@@ -14,6 +14,13 @@
         const replayData = JSON.parse(replayDataJSON);
         moveHistory = replayData.moveHistory;
         boardSize = replayData.boardSize;
+        // Додаємо автозапуск через 1 секунду
+        setTimeout(() => {
+          const event = new CustomEvent('toggleAutoPlay', { detail: 'forward' });
+          // Знаходимо ReplayViewer і ReplayControls у DOM
+          const controls = document.querySelector('.replay-controls .play-pause:last-child');
+          if (controls) (controls as HTMLElement).click();
+        }, 1000);
       } catch (e) {
         console.error("Failed to parse replay data", e);
         navigateToMainMenu();
@@ -29,7 +36,7 @@
 
 <div class="replay-page-container">
   {#if moveHistory}
-    <ReplayViewer {moveHistory} {boardSize} />
+    <ReplayViewer {moveHistory} {boardSize} autoPlayForward={true} />
   {:else}
     <p>Завантаження даних для перегляду...</p>
   {/if}
