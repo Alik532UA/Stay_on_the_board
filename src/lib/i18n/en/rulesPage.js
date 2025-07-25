@@ -8,7 +8,7 @@ export default {
   step1: "Step 1: Choose a direction.",
   step1Text: "Click one of the 8 arrow buttons corresponding to movement directions:",
   step2: "Step 2: Choose a distance.",
-  step2Text: "Click a button with a number indicating how many cells to move the piece. The maximum distance depends on the board size (N-1).",
+  step2Text: "Press the button with a number to select how many cells to move the piece.",
   step3: "Step 3: Confirm the move.",
   step3Text: "Click the large green button to complete your move.",
   winLossTitle: "Win and Loss Conditions",

@@ -11,6 +11,7 @@
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
   import VoiceSettingsModalWrapper from '$lib/components/VoiceSettingsModalWrapper.svelte';
   import { slide } from 'svelte/transition';
+  import { layoutStore } from '$lib/stores/layoutStore.js';
   let expanderRef: HTMLDetailsElement;
   let summaryRef: HTMLElement;
   let isOpen = true;
@@ -438,6 +439,16 @@
           class:active={$columnStyleMode === 'editing'}
         >
           <SvgIcons name="editing" />
+        </button>
+        <button
+          class="menu-style-btn"
+          aria-label="Скинути положення меню"
+          title={$_('ui.resetMenuLayout') || 'Скинути положення елементів меню'}
+          on:click={() => layoutStore.resetLayout()}
+        >
+          <span style="width:50%;height:50%;display:flex;align-items:center;justify-content:center;">
+            <SvgIcons name="clear-cache" />
+          </span>
         </button>
       </div>
     </div>

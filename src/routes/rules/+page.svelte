@@ -93,7 +93,7 @@
   <div class="rules-card rules-goal">
     <span class="rules-card-icon">🎯</span>
     <h2>{$_('rulesPage.goalTitle')}</h2>
-    <p>{$_('rulesPage.goalText')}</p>
+    <p>{@html $_('rulesPage.goalText')}</p>
   </div>
 
   <div class="rules-card rules-move-process">

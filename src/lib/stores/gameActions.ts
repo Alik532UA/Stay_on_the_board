@@ -28,7 +28,16 @@ let autoPlayInterval: ReturnType<typeof setInterval> | null = null;
  */
 export function resetGame(options: { newSize?: number } = {}) {
   const { newSize } = options;
-  settingsStore.toggleShowBoard(true);
+  // ВАЖЛИВО! Не видаляти і не змінювати цю логіку під час рефакторингу!
+  // ---------------------------------------------------------------
+  // Цей виклик гарантує, що чекбокси 'Показати ферзя' (showQueen) та 'Показувати доступні ходи' (showMoves)
+  // будуть увімкнені ДО старту нової гри. Це критично для UX:
+  // - Якщо вмикати їх після старту гри або після першого ходу, виникає візуальне блимання дошки (showBoard)
+  // - Якщо не вмикати їх, користувач може не побачити фігури чи підсвітки ходів на початку
+  // - showBoard тут НЕ чіпаємо, бо autoHideBoard може бути true і дошка має залишатися прихованою
+  // Якщо ви змінюєте цю частину — ОБОВʼЯЗКОВО перевірте, що не виникає блимання і всі чекбокси працюють як треба!
+  settingsStore.updateSettings({ showQueen: true, showMoves: true });
+  // showBoard не чіпаємо, бо autoHideBoard може бути true
   const currentState = get(gameState);
   const size = newSize ?? currentState.boardSize;
 

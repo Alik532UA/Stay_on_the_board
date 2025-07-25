@@ -10,8 +10,15 @@
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.js';
   import { get } from 'svelte/store';
+  import { onMount } from 'svelte';
 
-  let { moveHistory, boardSize } = $props<{ moveHistory: any[]; boardSize: number }>();
+  let { moveHistory, boardSize, autoPlayForward = false } = $props<{ moveHistory: any[]; boardSize: number; autoPlayForward?: boolean }>();
+
+  onMount(() => {
+    if (autoPlayForward) {
+      setTimeout(() => toggleAutoPlay('forward'), 1000);
+    }
+  });
 
   const replayState = writable({
     isReplayMode: true,
@@ -34,20 +41,20 @@
 
   function toggleAutoPlay(direction: 'forward' | 'backward') {
     if (autoPlayInterval) clearInterval(autoPlayInterval);
-    
     const currentDirection = $replayState.autoPlayDirection;
-    
+    const s = $replayState;
+    // Якщо play вперед і вже на останньому кроці — почати з початку
+    if (direction === 'forward' && s.replayCurrentStep >= s.moveHistory.length - 1) {
+      goToStep(0);
+    }
     if (currentDirection === direction) {
       replayState.update(s => ({ ...s, autoPlayDirection: 'paused' }));
       return;
     }
-
     replayState.update(s => ({ ...s, autoPlayDirection: direction }));
-
     autoPlayInterval = setInterval(() => {
       const s = $replayState;
       const nextStep = s.replayCurrentStep + (direction === 'forward' ? 1 : -1);
-      
       if (nextStep >= 0 && nextStep < s.moveHistory.length) {
         goToStep(nextStep);
       } else {

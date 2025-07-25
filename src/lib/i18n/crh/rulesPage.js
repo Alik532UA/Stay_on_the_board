@@ -8,7 +8,7 @@ export default {
   step1: "Adım 1: Yön seçin.",
   step1Text: "Areket yönlerini gösteren 8 ok düğmesinden birine basın:",
   step2: "Adım 2: Mesafe seçin.",
-  step2Text: "Figuranı ne qadar hücrege areket ettirecegizni köstergen rakamlı düğmeye basıñız. Maksimum mesafe tahta ölçüsüne bağlıdır (N-1).",
+  step2Text: "Taşnı neçe hücrege köçürmek içün raqamlı düymeni basıñız.",
   step3: "Adım 3: Areketni tasdiqlayın.",
   step3Text: "Büyük yeşil düğmeye basıp areketiñizni tamamlañız.",
   winLossTitle: "Qazanma ve Yutqazma Şartları",

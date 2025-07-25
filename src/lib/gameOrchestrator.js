@@ -36,11 +36,42 @@ function triggerComputerMove() {
 
       const latestSettings = get(settingsStore);
       if (latestSettings.speechEnabled) {
-        const $t = get(t);
-        const directionText = $t(`speech.directions.${move.direction}`) || move.direction;
-        const textToSpeak = `${move.distance} ${directionText}.`;
-        const langCode = langMap[/** @type {keyof typeof langMap} */(latestSettings.language)] || 'uk-UA';
-        speakText(textToSpeak, langCode, latestSettings.selectedVoiceURI ?? null);
+        // Визначаємо мову для озвучення
+        let speechLang = langMap[/** @type {keyof typeof langMap} */(latestSettings.language)] || 'uk-UA';
+        let speechVoice = latestSettings.selectedVoiceURI ?? null;
+        let allVoices = (typeof window !== 'undefined' && 'speechSynthesis' in window) ? window.speechSynthesis.getVoices() : [];
+        let selectedVoiceObj = speechVoice ? allVoices.find(v => v.voiceURI === speechVoice) : null;
+        if (!selectedVoiceObj) {
+          // fallback: шукаємо голос для потрібної мови
+          const fallbackVoices = allVoices.filter(v => v.lang === speechLang);
+          if (!fallbackVoices.length) {
+            // fallback: якщо голосу потрібної мови немає, шукаємо англійський
+            const enVoices = allVoices.filter(v => v.lang.startsWith('en'));
+            if (enVoices.length) {
+              speechLang = 'en-US';
+              speechVoice = enVoices[0].voiceURI;
+            }
+          }
+        } else {
+          speechLang = selectedVoiceObj.lang;
+        }
+        // Формуємо текст для озвучення відповідно до мови озвучення
+        let textToSpeak = '';
+        if (speechLang.startsWith('en')) {
+          // English: distance + direction (word)
+          const directionEn = {
+            'up-left': 'up left', 'up': 'up', 'up-right': 'up right',
+            'left': 'left', 'right': 'right',
+            'down-left': 'down left', 'down': 'down', 'down-right': 'down right'
+          };
+          textToSpeak = `${move.distance} ${directionEn[String(move.direction)] ?? move.direction}.`;
+        } else {
+          // Інші мови: distance + direction (локалізовано)
+          const $t = get(t);
+          const directionText = $t(`speech.directions.${move.direction}`) || move.direction;
+          textToSpeak = `${move.distance} ${directionText}.`;
+        }
+        speakText(textToSpeak, speechLang, speechVoice);
       }
 
       updateAvailableMoves();
@@ -94,6 +125,8 @@ export function confirmPlayerMove() {
 
   // 4. ЯВНИЙ ПОТІК КЕРУВАННЯ
   if (isOutsideBoard || isCellBlocked) {
+    // Додаємо хід, що призвів до поразки, у moveHistory
+    performMove(newRow, newCol);
     // Сценарій поразки
     computerLastMoveDisplayStore.set(null); // Очищуємо показ старого ходу
     endGame(isOutsideBoard ? 'modal.gameOverReasonOut' : 'modal.gameOverReasonBlocked');

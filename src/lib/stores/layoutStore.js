@@ -64,4 +64,8 @@ export const layoutStore = {
   subscribe,
   set,
   update,
+  resetLayout: () => {
+    set(defaultLayout);
+    saveLayout(defaultLayout);
+  },
 }; 
