@@ -4,7 +4,7 @@
   import { modalStore } from '$lib/stores/modalStore.js';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
-  import { setBoardSize } from '$lib/stores/gameActions.js';
+  import { gameOrchestrator } from '$lib/gameOrchestrator.js';
   import { get } from 'svelte/store';
   import { gameState } from '$lib/stores/gameState';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
@@ -16,7 +16,7 @@
     const shouldShowFaq = settingsStore.applyGameModePreset(mode);
     const { score, penaltyPoints, boardSize } = get(gameState);
     if (score === 0 && penaltyPoints === 0 && boardSize !== 4) {
-      setBoardSize(4);
+      gameOrchestrator.setBoardSize(4);
       gotoAfterFaq();
     } else if (boardSize !== 4) {
       modalStore.showModal({
@@ -28,7 +28,7 @@
             customClass: 'green-btn',
             isHot: true,
             onClick: () => {
-              setBoardSize(4);
+              gameOrchestrator.setBoardSize(4);
               modalStore.closeModal();
               gotoAfterFaq();
             }

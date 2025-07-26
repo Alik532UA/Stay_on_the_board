@@ -1,5 +1,5 @@
 <script>
-  import { navigateBack } from '$lib/utils/navigation.js';
+  import { navigationService } from '$lib/services/navigationService.js';
   import { _ } from 'svelte-i18n';
 </script>
 
@@ -7,7 +7,7 @@
   class="floating-close-btn" 
   aria-label={$_('ui.closeAndReturnToMenu') || 'Закрити і повернутися в меню'}
   title={$_('ui.closeAndReturnToMenu') || 'Закрити і повернутися в меню'}
-  onclick={navigateBack}
+  onclick={navigationService.goBack}
 >
   &times;
 </button>

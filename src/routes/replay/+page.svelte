@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import ReplayViewer from '$lib/components/ReplayViewer.svelte';
   import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
-  import { navigateToMainMenu } from '$lib/utils/navigation.js';
+  import { navigationService } from '$lib/services/navigationService.js';
 
   let moveHistory: any = null;
   let boardSize = 4; // Значення за замовчуванням
@@ -23,11 +23,11 @@
         }, 1000);
       } catch (e) {
         console.error("Failed to parse replay data", e);
-        navigateToMainMenu();
+        navigationService.goToMainMenu();
       }
     } else {
       // Якщо даних немає (прямий захід на сторінку), перенаправляємо
-      navigateToMainMenu();
+      navigationService.goToMainMenu();
     }
   });
 </script>

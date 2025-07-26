@@ -1,88 +1,26 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/gameState.js';
   import { playerInputStore } from '$lib/stores/playerInputStore.js';
-  import { setDirection, setDistance } from '$lib/stores/gameActions.js';
-  import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js';
-  import { derived } from 'svelte/store';
+  import { setDirection, setDistance } from '$lib/services/gameLogicService.js';
+  import { gameOrchestrator } from '$lib/gameOrchestrator.js';
   import { _ } from 'svelte-i18n';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import SvgIcons from '../SvgIcons.svelte';
   import { get } from 'svelte/store';
-  import { lastComputerMove } from '$lib/stores/derivedState.js';
+  import { centerInfo, isConfirmButtonDisabled, availableDistances, distanceRows } from '$lib/stores/derivedState.js';
   import { modalStore } from '$lib/stores/modalStore.js';
 
   $: isPlayerTurn = $gameState.players[$gameState.currentPlayerIndex]?.type === 'human';
-  const directionArrows = { 'up-left': '↖', 'up': '↑', 'up-right': '↗', 'left': '←', 'right': '→', 'down-left': '↙', 'down': '↓', 'down-right': '↘' } as const;
-  type DirectionKey = keyof typeof directionArrows;
 
   $: selectedDirection = $playerInputStore.selectedDirection;
   $: selectedDistance = $playerInputStore.selectedDistance;
 
-  const availableDistances = derived(gameState, $gameState => 
-    Array.from({ length: $gameState.boardSize - 1 }, (_, i) => i + 1)
-  );
-
-  function isDirectionKey(val: any): val is DirectionKey {
-    return typeof val === 'string' && val in directionArrows;
-  }
-
-  $: centerInfoState = (() => {
-    const computerMove = $lastComputerMove;
-    const { selectedDirection, selectedDistance } = $playerInputStore;
-
-    // ПРІОРИТЕТ 1: Ввід гравця
-    if (selectedDirection && selectedDistance) {
-      const dir = isDirectionKey(selectedDirection) ? directionArrows[selectedDirection] : '';
-      return { class: 'confirm-btn-active', content: `${dir}${selectedDistance}`, clickable: isPlayerTurn, aria: `Підтвердити хід: ${dir}${selectedDistance}` };
-    }
-    if (selectedDirection) {
-      const dir = isDirectionKey(selectedDirection) ? directionArrows[selectedDirection] : '';
-      return { class: 'direction-distance-state', content: dir, clickable: false, aria: `Вибрано напрямок: ${dir}` };
-    }
-
-    // ПРІОРИТЕТ 2: Останній хід комп'ютера (тільки якщо гравець нічого не вибирає)
-    if (computerMove) {
-      const dir = isDirectionKey(computerMove.direction) ? directionArrows[computerMove.direction] : '';
-      const dist = computerMove.distance || '';
-      return { class: 'computer-move-display', content: `${dir}${dist}`, clickable: false, aria: `Хід комп'ютера: ${dir}${dist}` };
-    }
-
-    // ПРІОРИТЕТ 3: Стан за замовчуванням
-    return { class: '', content: '', clickable: false, aria: 'Порожньо' };
-  })();
-
-  function onCentralClick() { if (selectedDirection && selectedDistance && isPlayerTurn) confirmPlayerMove(); }
-  function onDirectionClick(dir: DirectionKey) { setDirection(dir); }
+  function onCentralClick() { if (selectedDirection && selectedDistance && isPlayerTurn) gameOrchestrator.confirmPlayerMove(); }
+  function onDirectionClick(dir: any) { setDirection(dir); }
   function onDistanceClick(dist: number) { setDistance(dist); }
   
-  $: buttonDisabled = !selectedDirection || !selectedDistance;
-
-  $: numColumns = ((count) => {
-    if (count <= 4) return count;
-    if (count === 5 || count === 6) return 3;
-    return 4;
-  })($availableDistances.length);
-
-  /**
-   * Розбиває масив на підмасиви по n елементів
-   * @param {any[]} arr
-   * @param {number} n
-   */
-  function chunk(arr: any[], n: number) {
-    const res = [];
-    for (let i = 0; i < arr.length; i += n) res.push(arr.slice(i, i + n));
-    return res;
-  }
-
-  $: distanceRows = (() => {
-    const dists = $availableDistances;
-    if (dists.length <= 4) return [dists];
-    if (dists.length === 5 || dists.length === 6) return chunk(dists, 3);
-    return chunk(dists, 4);
-  })();
-
   function onConfirmClick() {
-    if (buttonDisabled) {
+    if ($isConfirmButtonDisabled) {
       modalStore.showModal({
         titleKey: 'modal.confirmMoveHintTitle',
         contentKey: 'modal.confirmMoveHintContent',
@@ -90,7 +28,7 @@
       });
       return;
     }
-    confirmPlayerMove();
+    gameOrchestrator.confirmPlayerMove();
   }
 </script>
 
@@ -187,10 +125,15 @@
   }
   .distance-btns {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 18px;
     justify-content: center;
     margin-top: 10px;
+  }
+  .distance-row {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
   }
   .action-btns {
     display: flex;
@@ -254,8 +197,16 @@
 (${$settingsStore.keybindings['up-right'].join(', ')})`}>↗</button>
     <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" on:click={() => onDirectionClick('left')} title={`${$_('tooltips.left')}
 (${$settingsStore.keybindings['left'].join(', ')})`}>←</button>
-    <button id="center-info" class="control-btn center-info {centerInfoState.class}" type="button" aria-label={centerInfoState.aria} on:click={onCentralClick} disabled={!centerInfoState.clickable}>
-      {String(centerInfoState.content)}
+    <button
+      id="center-info"
+      class="control-btn center-info {$centerInfo.class}"
+      type="button"
+      aria-label={$centerInfo.aria}
+      on:click={$centerInfo.clickable ? onCentralClick : undefined}
+      tabindex="0"
+      disabled={!$centerInfo.clickable}
+    >
+      {String($centerInfo.content)}
     </button>
     <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" on:click={() => onDirectionClick('right')} title={`${$_('tooltips.right')}
 (${$settingsStore.keybindings['right'].join(', ')})`}>→</button>
@@ -267,17 +218,21 @@
 (${$settingsStore.keybindings['down-right'].join(', ')})`}>↘</button>
   </div>
   <div class="distance-select">
-    <div class="distance-btns" style="--num-columns: {numColumns};">
-      {#each $availableDistances as dist}
-        <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" on:click={() => onDistanceClick(dist)}>{dist}</button>
+    <div class="distance-btns">
+      {#each $distanceRows as distRow}
+        <div class="distance-row">
+          {#each distRow as dist}
+            <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" on:click={() => onDistanceClick(dist)}>{dist}</button>
+          {/each}
+        </div>
       {/each}
     </div>
   </div>
   <div class="action-btns">
     <button
-      class="confirm-btn{buttonDisabled ? ' disabled' : ''}"
+      class="confirm-btn{$isConfirmButtonDisabled ? ' disabled' : ''}"
       on:click={onConfirmClick}
-      aria-disabled={buttonDisabled}
+      aria-disabled={$isConfirmButtonDisabled}
       title={`${$_('tooltips.confirm')}
 (${$settingsStore.keybindings['confirm']})`}
     >
@@ -285,7 +240,7 @@
       {$_('gameControls.confirm')}
     </button>
     {#if $settingsStore.blockModeEnabled}
-      <button class="no-moves-btn" on:click={claimNoMoves} title={`${$_('tooltips.no-moves')}
+      <button class="no-moves-btn" on:click={gameOrchestrator.claimNoMoves} title={`${$_('tooltips.no-moves')}
 (${$settingsStore.keybindings['no-moves']})`}>
         <SvgIcons name="no-moves" />
         {$_('gameControls.noMovesTitle')}

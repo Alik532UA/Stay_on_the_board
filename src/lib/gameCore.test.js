@@ -5,7 +5,7 @@ import {
   getAvailableMoves,
   calculateFinalScore,
   countJumpedCells
-} from './gameCore';
+} from '$lib/services/gameLogicService';
 
 // createEmptyBoard(size)
 describe('createEmptyBoard', () => {

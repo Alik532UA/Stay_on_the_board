@@ -1,6 +1,6 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/gameState.js';
-  import { setBoardSize } from '$lib/stores/gameActions.js';
+  import { gameOrchestrator } from '$lib/gameOrchestrator.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { _ } from 'svelte-i18n';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
@@ -50,7 +50,7 @@
     const currentSize = get(gameState).boardSize;
     const newSize = currentSize + increment;
     if (newSize >= 2 && newSize <= 9) {
-      setBoardSize(newSize);
+      gameOrchestrator.setBoardSize(newSize);
     }
   }
 

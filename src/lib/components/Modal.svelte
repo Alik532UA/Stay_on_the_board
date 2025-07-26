@@ -6,7 +6,7 @@
   import FAQModal from './FAQModal.svelte';
   import { gameState } from '$lib/stores/gameState.js';
   import { onMount } from 'svelte';
-  import { audioControls } from '$lib/stores/audioStore.js';
+  import { audioService } from '$lib/services/audioService.js';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
 
   /** @type {HTMLButtonElement | null} */
@@ -16,9 +16,9 @@
   let volumePercentage = 30;
 
   onMount(() => {
-    expertVolume = audioControls.loadVolume();
+    expertVolume = audioService.loadVolume();
     return () => {
-      audioControls.pause();
+      audioService.pause();
     };
   });
 
@@ -27,14 +27,14 @@
     const shouldPlay = $modalState.isOpen && $modalState.titleKey === 'modal.expertModeTitle';
 
     // Оновлюємо гучність, зберігаємо її та оновлюємо CSS-змінну для стилізації
-    audioControls.setVolume(expertVolume);
-    audioControls.saveVolume(expertVolume);
+    audioService.setVolume(expertVolume);
+    audioService.saveVolume(expertVolume);
     volumePercentage = expertVolume * 100;
 
     if (shouldPlay) {
-      audioControls.play();
+      audioService.play();
     } else {
-      audioControls.pause();
+      audioService.pause();
     }
   }
 

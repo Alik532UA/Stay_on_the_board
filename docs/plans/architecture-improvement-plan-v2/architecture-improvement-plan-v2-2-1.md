@@ -1,0 +1,5 @@
+- [ ] **Спростити `ControlsPanelWidget.svelte`:**
+    - [ ] Видалити реактивні змінні `buttonDisabled` та `confirmButtonBlocked`.
+    - [ ] Імпортувати `isConfirmButtonDisabled` з `derivedState.ts`.
+    - [ ] Використовувати `$isConfirmButtonDisabled` для стану кнопки "Підтвердити".
+    - [ ] Видалити реактивний блок `$: distanceRows` та імпортувати `distanceRows` з `derivedState.ts`.

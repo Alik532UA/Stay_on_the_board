@@ -2,13 +2,15 @@
   import '../css/layouts/main-menu.css';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { gameState } from '$lib/stores/gameState.js';
-  import { resetGame } from '$lib/stores/gameActions.js';
+  import { navigateToGame } from '$lib/services/uiService.js';
   import { logStore } from '../stores/logStore.js';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { _ , isLoading, locale } from 'svelte-i18n';
   import SvgIcons from './SvgIcons.svelte';
   import { appVersion } from '$lib/stores/versionStore.js';
+  import { currentLanguageFlagSvg } from '$lib/stores/derivedState.js';
+  import { languages } from '$lib/constants.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { clearCache } from '$lib/utils/cacheManager.js';
   import { requestGameModeModal } from '$lib/stores/uiStore.js';
@@ -23,20 +25,6 @@
   let showWipNotice = false;
   let showDevMenu = false; // <-- НОВА ЗМІННА СТАНУ
 
-  const languages = [
-    { code: 'uk', svg: `<svg width="32" height="24" viewBox="0 0 32 24"><rect width="32" height="12" y="0" fill="#0057B7"/><rect width="32" height="12" y="12" fill="#FFD700"/></svg>` },
-    { code: 'en', svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 30" width="32" height="24">
-    <clipPath id="t">
-        <path d="M25,15h25v15zv15h-25zh-25v-15zv-15h25z"/>
-    </clipPath>
-    <path d="M0,0v30h50v-30z" fill="#012169"/>
-    <path d="M0,0 50,30M50,0 0,30" stroke="#fff" stroke-width="6"/>
-    <path d="M0,0 50,30M50,0 0,30" clip-path="url(#t)" stroke="#C8102E" stroke-width="4"/>
-    <path d="M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z" fill="#C8102E" stroke="#FFF" stroke-width="2"/>
-</svg>` },
-    { code: 'crh', svg: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 350 195"><path fill="#00a3dd" d="M0 0h350v195H0z"/><path d="M40 30v30H30v10h20V40h20v30H60v10h30V70H80V40h20v30h20V60h-10V30Z" style="fill:#f8d80e"/></svg>` },
-    { code: 'nl', svg: `<svg width="32" height="24" viewBox="0 0 32 24"><rect width="32" height="8" y="0" fill="#21468b"/><rect width="32" height="8" y="8" fill="#fff"/><rect width="32" height="8" y="16" fill="#ae1c28"/></svg>` }
-  ];
   /** @param {string} lang */
   function selectLang(lang) {
     logStore.addLog(`Зміна мови: ${lang}`, 'info');
@@ -48,32 +36,9 @@
   function toggleLangDropdown() { showLangDropdown = !showLangDropdown; }
   function openWipNotice() { showWipNotice = true; }
   $: settings = $settingsStore;
-  $: currentFlagSvg = languages.find(lang => lang.code === $settingsStore.language)?.svg || languages[0].svg;
 
   /** @param {string} route */
   function navigateTo(route) {
-    if (route === '/game') {
-      // --- Виправлена логіка ---
-      if (get(gameState).isGameOver) {
-        resetGame();
-      }
-      settingsStore.init();
-      // Перевіряємо налаштування
-      if (get(settingsStore).showGameModeModal) {
-        modalStore.showModal({
-          titleKey: 'gameModes.title',
-          component: GameModeModal,
-          closable: true
-        });
-      } else {
-        const currentMode = get(settingsStore).gameMode;
-        if (!currentMode) {
-          settingsStore.applyGameModePreset('beginner');
-        }
-        goto(`${base}/game`);
-      }
-      return;
-    }
     logStore.addLog(`Навігація: ${route}`, 'info');
     goto(`${base}${route}`);
   }
@@ -118,12 +83,12 @@
       </button>
       <button class="main-menu-icon" title={$_('mainMenu.language')} aria-label={$_('mainMenu.language')} onclick={toggleLangDropdown}>
         <span class="main-menu-icon-inner">
-          {@html currentFlagSvg}
+          {@html $currentLanguageFlagSvg}
         </span>
       </button>
       {#if showLangDropdown}
         <div class="lang-dropdown main-menu-lang-dropdown" role="dialog" aria-modal="true" tabindex="0" onclick={(e) => { e.stopPropagation(); }} onkeydown={(e) => (e.key === 'Escape') && (showLangDropdown = false)}>
-          {#each languages as lang}
+          {#each languages as lang (lang.code)}
             <button class="lang-option" onclick={() => selectLang(lang.code)} aria-label={lang.code}>
               {@html lang.svg}
             </button>
@@ -210,7 +175,7 @@
       {/if}
     </div>
     <div id="main-menu-buttons">
-      <button class="modal-button secondary" onclick={() => navigateTo('/game')}>{$_('mainMenu.playVsComputer')}</button>
+      <button class="modal-button secondary" onclick={navigateToGame}>{$_('mainMenu.playVsComputer')}</button>
       <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice}>{$_('mainMenu.localGame')}</button>
       <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice}>{$_('mainMenu.playOnline')}</button>
       <!-- <button class="modal-button secondary" on:click={() => navigateTo('/settings')}>{$_('mainMenu.settings')}</button> -->
