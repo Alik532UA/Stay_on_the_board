@@ -15,7 +15,6 @@ import { writable } from 'svelte/store';
  * @property {Direction | null} selectedDirection
  * @property {number | null} selectedDistance
  * @property {boolean} distanceManuallySelected
- * @property {ComputerMove | null} lastComputerMove
  * @property {boolean} isMoveInProgress // Додаємо прапорець для блокування введення
  */
 
@@ -24,7 +23,6 @@ const initialState = {
   selectedDirection: null,
   selectedDistance: null,
   distanceManuallySelected: false,
-  lastComputerMove: null,
   isMoveInProgress: false, // Додаємо прапорець
 };
 
