@@ -7,7 +7,7 @@ import { settingsStore } from './settingsStore.js';
 import * as core from '$lib/gameCore.js';
 import { _ as t } from 'svelte-i18n';
 import { navigateToMainMenu } from '$lib/utils/navigation.js';
-import { computerLastMoveDisplayStore } from '$lib/gameOrchestrator.js';
+import { lastComputerMove } from './derivedState.js';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
 import { modalStore } from './modalStore.js';
@@ -58,7 +58,6 @@ export function resetGame(options: { newSize?: number } = {}) {
     selectedDirection: null,
     selectedDistance: null,
     distanceManuallySelected: false,
-    lastComputerMove: null,
     isMoveInProgress: false,
   });
 
@@ -142,9 +141,6 @@ export function setDirection(dir: import('$lib/gameCore').Direction) {
     }
     return { ...state, selectedDirection: dir, selectedDistance: newDistance, distanceManuallySelected: newManuallySelected };
   });
-  if (get(computerLastMoveDisplayStore)) {
-    computerLastMoveDisplayStore.set(null);
-  }
 }
 
 /**
@@ -153,9 +149,6 @@ export function setDirection(dir: import('$lib/gameCore').Direction) {
  */
 export function setDistance(dist: number) {
   playerInputStore.update(state => ({ ...state, selectedDistance: dist, distanceManuallySelected: true }));
-  if (get(computerLastMoveDisplayStore)) {
-    computerLastMoveDisplayStore.set(null);
-  }
 }
 
 /**
@@ -221,7 +214,8 @@ export function updateAvailableMoves() {
  */
 export function processPlayerMove(startRow: number, startCol: number, newRow: number, newCol: number) {
   const settings = get(settingsStore);
-  const { lastComputerMove, selectedDistance, selectedDirection } = get(playerInputStore);
+  const computerMove = get(lastComputerMove);
+  const { selectedDistance, selectedDirection } = get(playerInputStore);
   const { cellVisitCounts, score: oldScore } = get(gameState);
 
   // 1. Розрахунок базових балів за хід
@@ -235,10 +229,10 @@ export function processPlayerMove(startRow: number, startCol: number, newRow: nu
   let penaltyChange = 0;
   if (
     !settings.blockModeEnabled &&
-    lastComputerMove &&
-    selectedDirection === core.oppositeDirections[lastComputerMove.direction] &&
+    computerMove &&
+    selectedDirection === core.oppositeDirections[computerMove.direction] &&
     selectedDistance != null &&
-    selectedDistance <= lastComputerMove.distance
+    selectedDistance <= computerMove.distance
   ) {
     penaltyChange = 2;
   }

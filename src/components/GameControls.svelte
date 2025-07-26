@@ -15,7 +15,7 @@
   );
 
   $: isPlayerTurn = $gameState.currentPlayerIndex === 0;
-  $: lastComputerMove = $playerInputStore.lastComputerMove;
+  import { lastComputerMove } from '$lib/stores/derivedState.js';
   const directionArrows = {
     'up-left': '↖',
     'up': '↑',
@@ -35,9 +35,9 @@
   }
 
   function getCentralText() {
-    if (typeof lastComputerMove === 'object' && lastComputerMove !== null && isDirectionKey(lastComputerMove.direction)) {
-      const dir = directionArrows[lastComputerMove.direction];
-      const dist = typeof lastComputerMove.distance === 'number' ? String(lastComputerMove.distance) : '';
+    if ($lastComputerMove && isDirectionKey($lastComputerMove.direction)) {
+      const dir = directionArrows[$lastComputerMove.direction];
+      const dist = typeof $lastComputerMove.distance === 'number' ? String($lastComputerMove.distance) : '';
       return `${dir}${dist}`;
     }
     if (selectedDirection && selectedDistance) {
@@ -69,14 +69,14 @@
     if (!selectedDirection && !selectedDistance && !lastComputerMove) {
       return { class: '', content: '', clickable: false, aria: 'Порожньо' };
     }
-    if (!selectedDirection && !selectedDistance && typeof lastComputerMove === 'object' && lastComputerMove !== null) {
+    if (!selectedDirection && !selectedDistance && $lastComputerMove) {
       let dir = '';
       let dist = '';
-      if (isDirectionKey(lastComputerMove.direction)) {
-        dir = directionArrows[lastComputerMove.direction];
+      if (isDirectionKey($lastComputerMove.direction)) {
+        dir = directionArrows[$lastComputerMove.direction];
       }
-      if (typeof lastComputerMove.distance === 'number') {
-        dist = String(lastComputerMove.distance);
+      if (typeof $lastComputerMove.distance === 'number') {
+        dist = String($lastComputerMove.distance);
       }
       return {
         class: 'computer-move-display',

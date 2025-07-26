@@ -8,7 +8,7 @@
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import SvgIcons from '../SvgIcons.svelte';
   import { get } from 'svelte/store';
-  import { computerLastMoveDisplayStore } from '$lib/gameOrchestrator.js';
+  import { lastComputerMove } from '$lib/stores/derivedState.js';
   import { modalStore } from '$lib/stores/modalStore.js';
 
   $: isPlayerTurn = $gameState.players[$gameState.currentPlayerIndex]?.type === 'human';
@@ -27,24 +27,27 @@
   }
 
   $: centerInfoState = (() => {
-    const computerMove = $computerLastMoveDisplayStore;
+    const computerMove = $lastComputerMove;
+    const { selectedDirection, selectedDistance } = $playerInputStore;
 
+    // ПРІОРИТЕТ 1: Ввід гравця
+    if (selectedDirection && selectedDistance) {
+      const dir = isDirectionKey(selectedDirection) ? directionArrows[selectedDirection] : '';
+      return { class: 'confirm-btn-active', content: `${dir}${selectedDistance}`, clickable: isPlayerTurn, aria: `Підтвердити хід: ${dir}${selectedDistance}` };
+    }
+    if (selectedDirection) {
+      const dir = isDirectionKey(selectedDirection) ? directionArrows[selectedDirection] : '';
+      return { class: 'direction-distance-state', content: dir, clickable: false, aria: `Вибрано напрямок: ${dir}` };
+    }
+
+    // ПРІОРИТЕТ 2: Останній хід комп'ютера (тільки якщо гравець нічого не вибирає)
     if (computerMove) {
       const dir = isDirectionKey(computerMove.direction) ? directionArrows[computerMove.direction] : '';
       const dist = computerMove.distance || '';
       return { class: 'computer-move-display', content: `${dir}${dist}`, clickable: false, aria: `Хід комп'ютера: ${dir}${dist}` };
     }
 
-    if (selectedDirection && selectedDistance) {
-      const dir = isDirectionKey(selectedDirection) ? directionArrows[selectedDirection] : '';
-      return { class: 'confirm-btn-active', content: `${dir}${selectedDistance}`, clickable: isPlayerTurn, aria: `Підтвердити хід: ${dir}${selectedDistance}` };
-    }
-
-    if (selectedDirection) {
-      const dir = isDirectionKey(selectedDirection) ? directionArrows[selectedDirection] : '';
-      return { class: 'direction-distance-state', content: dir, clickable: false, aria: `Вибрано напрямок: ${dir}` };
-    }
-
+    // ПРІОРИТЕТ 3: Стан за замовчуванням
     return { class: '', content: '', clickable: false, aria: 'Порожньо' };
   })();
 

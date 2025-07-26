@@ -11,11 +11,7 @@ import { _ as t } from 'svelte-i18n';
 import { logService } from '$lib/services/logService.js';
 import { writable } from 'svelte/store';
 
-/**
- * @typedef {{direction: string, distance: number} | null} ComputerLastMoveDisplay
- */
-/** @type {import('svelte/store').Writable<ComputerLastMoveDisplay>} */
-export const computerLastMoveDisplayStore = writable(null);
+
 
 function triggerComputerMove() {
   const current = get(gameState);
@@ -25,8 +21,6 @@ function triggerComputerMove() {
   agents.ai.getMove(current).then(move => {
     if (move) {
       // Усі наступні дії - синхронні
-      computerLastMoveDisplayStore.set({ direction: move.direction, distance: move.distance });
-      playerInputStore.update(s => ({ ...s, lastComputerMove: { direction: move.direction, distance: move.distance } }));
       gameState.update(state => ({
         ...state,
         moveQueue: [...state.moveQueue, { player: 2, direction: move.direction, distance: move.distance }]
@@ -64,7 +58,8 @@ function triggerComputerMove() {
             'left': 'left', 'right': 'right',
             'down-left': 'down left', 'down': 'down', 'down-right': 'down right'
           };
-          textToSpeak = `${move.distance} ${directionEn[String(move.direction)] ?? move.direction}.`;
+          // @ts-ignore - move.direction може бути будь-яким рядком, але це безпечно
+          textToSpeak = `${move.distance} ${directionEn[move.direction] || move.direction}.`;
         } else {
           // Інші мови: distance + direction (локалізовано)
           const $t = get(t);
@@ -128,7 +123,6 @@ export function confirmPlayerMove() {
     // Додаємо хід, що призвів до поразки, у moveHistory
     performMove(newRow, newCol);
     // Сценарій поразки
-    computerLastMoveDisplayStore.set(null); // Очищуємо показ старого ходу
     endGame(isOutsideBoard ? 'modal.gameOverReasonOut' : 'modal.gameOverReasonBlocked');
     playerInputStore.update(s => ({ ...s, isMoveInProgress: false }));
     return;
