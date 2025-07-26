@@ -11,9 +11,8 @@
   import BoardWrapperWidget from './widgets/BoardWrapperWidget.svelte';
   import ControlsPanelWidget from './widgets/ControlsPanelWidget.svelte';
   import SettingsExpanderWidget from './widgets/SettingsExpanderWidget.svelte';
-  import { setDirection, setDistance, endGame, resetGame, startReplay, continueAfterNoMoves, finalizeGameWithBonus, setBoardSize } from '$lib/stores/gameActions.js';
-  import * as core from '$lib/gameCore.js';
-  import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js';
+  import { setDirection, setDistance, resetGame } from '$lib/services/gameLogicService.js';
+  import { gameOrchestrator } from '$lib/gameOrchestrator.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { get } from 'svelte/store';
@@ -23,9 +22,12 @@
   import { base } from '$app/paths';
   import { gameState } from '$lib/stores/gameState.js';
   import { animationStore } from '$lib/stores/animationStore.js';
+  import { shouldHideBoard } from '$lib/stores/derivedState.js';
 
   onMount(() => {
     settingsStore.init();
+    // --- Скидаємо гру для коректної ініціалізації при перезавантаженні ---
+    resetGame();
   });
 
   const widgetMap = {
@@ -56,12 +58,12 @@
             titleKey: 'modal.playerNoMovesTitle',
             content: { reason: $t(reasonKey || ''), scoreDetails: $gameState },
             buttons: [
-              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: continueAfterNoMoves },
+              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: gameOrchestrator.continueAfterNoMoves },
               { 
                 text: $t('modal.finishGameWithBonus', { values: { bonus: $gameState.boardSize } }), 
-                onClick: () => finalizeGameWithBonus('modal.gameOverReasonBonus') 
+                onClick: () => gameOrchestrator.finalizeGameWithBonus('modal.gameOverReasonBonus') 
               },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
             ],
             closable: false
           };
@@ -73,7 +75,7 @@
             content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: $gameState },
             buttons: [
               { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); modalStore.closeModal(); }, isHot: true },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
             ],
             closable: false
           };
@@ -84,12 +86,12 @@
             titleKey: 'modal.computerNoMovesTitle',
             content: { reason: $t('modal.computerNoMovesContent'), scoreDetails: $gameState },
             buttons: [
-              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: continueAfterNoMoves },
+              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: gameOrchestrator.continueAfterNoMoves },
               { 
                 text: $t('modal.finishGameWithBonus', { values: { bonus: $gameState.boardSize } }), 
-                onClick: () => finalizeGameWithBonus('modal.gameOverReasonBonus') 
+                onClick: () => gameOrchestrator.finalizeGameWithBonus('modal.gameOverReasonBonus') 
               },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
             ],
             closable: false
           };
@@ -101,7 +103,7 @@
             content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: $gameState },
             buttons: [
               { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); modalStore.closeModal(); }, isHot: true },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
+              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
             ]
           };
           break;
@@ -139,7 +141,7 @@
     const currentSize = get(gameState).boardSize;
     const newSize = currentSize + increment;
     if (newSize >= 2 && newSize <= 9) {
-      setBoardSize(newSize);
+      gameOrchestrator.setBoardSize(newSize);
     }
   }
 
@@ -170,8 +172,8 @@
       case 'down-left': setDirection('down-left'); break;
       case 'down': setDirection('down'); break;
       case 'down-right': setDirection('down-right'); break;
-      case 'confirm': confirmPlayerMove(); break;
-      case 'no-moves': claimNoMoves(); break;
+      case 'confirm': gameOrchestrator.confirmPlayerMove(); break;
+      case 'no-moves': gameOrchestrator.claimNoMoves(); break;
       case 'distance-1': setDistance(1); break;
       case 'distance-2': setDistance(2); break;
       case 'distance-3': setDistance(3); break;

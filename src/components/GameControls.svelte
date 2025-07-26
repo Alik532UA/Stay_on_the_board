@@ -2,8 +2,8 @@
   import { gameState } from '$lib/stores/gameState.js';
   import { playerInputStore } from '$lib/stores/playerInputStore.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
-  import { setDirection, setDistance, resetGame } from '$lib/stores/gameActions.js';
-  import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js';
+  import { setDirection, setDistance, resetGame } from '$lib/services/gameLogicService.js';
+  import { gameOrchestrator } from '$lib/gameOrchestrator.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
@@ -157,11 +157,11 @@
       // Для прикладу: movePlayer(playerRow + 1, playerCol)
       // TODO: Додати коректну логіку для обчислення цільової клітинки
       logStore.addLog('Confirm move: (логіка координат не реалізована)', 'info');
-      confirmPlayerMove();
+      gameOrchestrator.confirmPlayerMove();
     }
   }
   function onNoMoves() {
-    // Видалити всі згадки про finishGameWithBonus
+    gameOrchestrator.claimNoMoves();
   }
 </script>
 

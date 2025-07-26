@@ -1,5 +1,4 @@
-// src/lib/stores/audioStore.js
-
+// src/lib/services/audioService.js
 import { base } from '$app/paths';
 
 /** @type {HTMLAudioElement|null} */
@@ -22,7 +21,7 @@ const getAudio = () => {
   return audioInstance;
 };
 
-export const audioControls = {
+export const audioService = {
   /**
    * Починає відтворення музики.
    */
@@ -78,4 +77,4 @@ export const audioControls = {
       localStorage.setItem('expertModeVolume', String(volume));
     }
   }
-};
+}; 

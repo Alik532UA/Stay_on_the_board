@@ -46,6 +46,12 @@
   onMount(() => {
     let lastRow = $gameState.playerRow;
     let lastCol = $gameState.playerCol;
+    
+    // Вмикаємо чекбокси при старті нової гри
+    if ($gameState.moveHistory.length === 1) {
+      enableAllGameCheckboxesIfNeeded();
+    }
+    
     const unsubscribe = gameState.subscribe(($gameState) => {
       if (
         get(settingsStore).autoHideBoard &&
@@ -64,7 +70,8 @@
         lastCol = $gameState.playerCol;
       }
       // --- Після автоприховування дошки ---
-      if ($gameState.moveQueue && $gameState.moveQueue.length === 0) {
+      // Вмикаємо чекбокси тільки після початку гри (є ходи в історії), а не при ініціалізації
+      if ($gameState.moveQueue && $gameState.moveQueue.length === 0 && $gameState.moveHistory.length > 1) {
         enableAllGameCheckboxesIfNeeded();
       }
     });
@@ -72,7 +79,26 @@
   });
 
   function isAvailable(row: number, col: number) {
-    return $settingsStore.showMoves && $animationStore.showAvailableMoveDots && $gameState.availableMoves && $gameState.availableMoves.some(move => move.row === row && move.col === col);
+    // Повертаємо перевірку прапорця з animationStore
+    // Додатково перевіряємо, що ферзь з'явився (visualRow і visualCol не null)
+    const result = $settingsStore.showMoves && 
+           $animationStore.showAvailableMoveDots && 
+           $animationStore.visualRow !== null && 
+           $animationStore.visualCol !== null &&
+           get(gameState).availableMoves.some(move => move.row === row && move.col === col);
+    
+    // Логуємо тільки для першої клітинки, щоб не засмічувати консоль
+    if (row === 0 && col === 0) {
+      console.log('BoardWrapper: isAvailable(0,0) =', result, 
+                  'showMoves =', $settingsStore.showMoves,
+                  'showAvailableMoveDots =', $animationStore.showAvailableMoveDots,
+                  'visualRow =', $animationStore.visualRow,
+                  'visualCol =', $animationStore.visualCol,
+                  'availableMoves.length =', get(gameState).availableMoves.length,
+                  'gameId =', get(gameState).gameId);
+    }
+    
+    return result;
   }
 
   function showBoardClickHint(e: Event) {
@@ -87,7 +113,7 @@
   function onCellRightClick(event: MouseEvent, row: number, col: number) {
     event.preventDefault();
     if ($settingsStore.blockModeEnabled && !(row === $gameState.playerRow && col === $gameState.playerCol)) {
-      const blocked = isCellBlocked(row, col, $animationStore.cellVisitCounts, $settingsStore);
+      const blocked = isCellBlocked(row, col, $animationStore.visualCellVisitCounts, $settingsStore);
       logStore.addLog(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`, 'info');
     }
   }
@@ -123,10 +149,10 @@
         {#each Array($boardSize) as _, rowIdx (rowIdx)}
           {#each Array($boardSize) as _, colIdx (colIdx)}
             <div
-              class="board-cell {getDamageClass(rowIdx, colIdx, $animationStore.cellVisitCounts, $settingsStore)}"
+              class="board-cell {getDamageClass(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $settingsStore)}"
               class:light={(rowIdx + colIdx) % 2 === 0}
               class:dark={(rowIdx + colIdx) % 2 !== 0}
-              class:blocked-cell={isCellBlocked(rowIdx, colIdx, $animationStore.cellVisitCounts, $settingsStore)}
+              class:blocked-cell={isCellBlocked(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $settingsStore)}
               class:available={isAvailable(rowIdx, colIdx)}
               aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
               oncontextmenu={(e) => onCellRightClick(e, rowIdx, colIdx)}
@@ -134,7 +160,7 @@
               tabindex="0"
             >
               
-              {#if isCellBlocked(rowIdx, colIdx, $animationStore.cellVisitCounts, $settingsStore)}
+              {#if isCellBlocked(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $settingsStore)}
                 <!-- Хрест тепер рендериться через CSS -->
               {:else}
                 <span class="move-dot"></span>
@@ -143,9 +169,9 @@
           {/each}
         {/each}
         
-        {#if $settingsStore.showQueen && $animationStore.row !== null && $animationStore.col !== null}
+        {#if $settingsStore.showQueen && $animationStore.visualRow !== null && $animationStore.visualCol !== null}
           <div class="player-piece"
-            style="top: {$animationStore.row * (100 / $boardSize)}%; left: {$animationStore.col * (100 / $boardSize)}%; z-index: 10;">
+            style="top: {$animationStore.visualRow * (100 / $boardSize)}%; left: {$animationStore.visualCol * (100 / $boardSize)}%; z-index: 10;">
             <div class="piece-container">
               <SvgIcons name="queen" />
             </div>

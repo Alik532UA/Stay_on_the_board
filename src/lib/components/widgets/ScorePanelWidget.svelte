@@ -1,6 +1,6 @@
 <script>
   import { gameState } from '$lib/stores/gameState.js';
-  import { endGame } from '$lib/stores/gameActions.js';
+  import { gameOrchestrator } from '$lib/gameOrchestrator.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { replayStore } from '$lib/stores/replayStore.js';
   import { _ } from 'svelte-i18n';
@@ -22,7 +22,7 @@
   }
 
   function cashOutAndEndGame() {
-      endGame('modal.gameOverReasonCashOut');
+      gameOrchestrator.endGame('modal.gameOverReasonCashOut');
   }
 </script>
 

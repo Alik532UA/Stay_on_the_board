@@ -1,10 +1,20 @@
 <script>
-  import { navigateToMainMenu } from '$lib/utils/navigation.js';
+  import { navigationService } from '$lib/services/navigationService.js';
   import { _ } from 'svelte-i18n';
   import SvgIcons from '../SvgIcons.svelte';
   import { showGameModeSelector, showGameInfoModal } from '$lib/utils/uiHelpers.js';
   import { clearCache } from '$lib/utils/cacheManager.js';
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
+
+  function handleMainMenuClick() {
+    try {
+      navigationService.goToMainMenu();
+    } catch (error) {
+      console.error('Error navigating to main menu:', error);
+      // Fallback: direct navigation
+      window.location.href = '/';
+    }
+  }
 </script>
 
 <style>
@@ -14,7 +24,7 @@
 </style>
 
 <div class="game-board-top-row">
-  <button class="main-menu-btn" title={$_('gameBoard.mainMenu')} on:click={navigateToMainMenu}>
+  <button class="main-menu-btn" title={$_('gameBoard.mainMenu')} on:click={handleMainMenuClick}>
     <SvgIcons name="home" />
   </button>
   {#if false}
