@@ -5,6 +5,23 @@
   import { _, locale } from 'svelte-i18n';
   import { lastComputerMove, isPlayerTurn, isPauseBetweenMoves } from '$lib/stores/derivedState.ts';
   import { i18nReady } from '$lib/i18n/init.js';
+  import { slide, scale } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
+
+  // Функція для комбінованої анімації
+  function scaleAndSlide(node: HTMLElement, params: any) {
+      const slideTrans = slide(node, params);
+      const scaleTrans = scale(node, params);
+
+      return {
+          duration: params.duration,
+          easing: params.easing,
+          css: (t: number, u: number) => `
+              ${slideTrans.css ? slideTrans.css(t, u) : ''}
+              ${scaleTrans.css ? scaleTrans.css(t, u) : ''}
+          `
+      };
+  }
 
   // Реактивні змінні для відстеження змін
   $: $gameState;
@@ -225,13 +242,13 @@
 <style>
   .game-info-widget {
     background: var(--bg-secondary);
-    padding: 12px;
+    /* Змінено padding та видалено min-height для плавної анімації */
+    padding: 20px 12px;
     border-radius: var(--unified-border-radius);
     box-shadow: var(--unified-shadow);
     text-align: center;
     font-size: 1.1em;
     color: var(--text-primary, #222);
-    min-height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -239,19 +256,8 @@
     /* Glassmorphism */
     backdrop-filter: var(--unified-backdrop-filter);
     border: var(--unified-border);
-    /* Анімація для приховування */
-    opacity: 1;
-    transform: scale(1);
-    max-height: 200px;
+    max-height: 200px; /* Залишаємо для обмеження */
     overflow: hidden;
-  }
-
-  .game-info-widget.hidden {
-    opacity: 0;
-    transform: scale(0.8);
-    max-height: 0;
-    padding: 0;
-    margin: 0;
   }
 
   .game-info-content {
@@ -282,20 +288,25 @@
 </style>
 
 {#if $i18nReady}
-  <div class="game-info-widget" 
-       class:player-turn={$isPlayerTurn && !$playerInputStore.selectedDirection && !$playerInputStore.selectedDistance}
-       class:computer-turn={!$isPlayerTurn && !$lastComputerMove}
-       class:game-over={$gameState.isGameOver}
-       class:pause={$isPauseBetweenMoves}
-       class:hidden={!$settingsStore.showGameInfoWidget}>
-    <div class="game-info-content" class:fade-out={isAnimating}>
-      {displayMessage}
+  {#if $settingsStore.showGameInfoWidget}
+    <div class="game-info-widget" 
+         class:player-turn={$isPlayerTurn && !$playerInputStore.selectedDirection && !$playerInputStore.selectedDistance}
+         class:computer-turn={!$isPlayerTurn && !$lastComputerMove}
+         class:game-over={$gameState.isGameOver}
+         class:pause={$isPauseBetweenMoves}
+         transition:scaleAndSlide={{ duration: 400, easing: quintOut }}
+    >
+      <div class="game-info-content" class:fade-out={isAnimating}>
+        {displayMessage}
+      </div>
     </div>
-  </div>
+  {/if}
 {:else}
-  <div class="game-info-widget" class:hidden={!$settingsStore.showGameInfoWidget}>
-    <div class="game-info-content">
-      Loading...
+  {#if $settingsStore.showGameInfoWidget}
+    <div class="game-info-widget" transition:scaleAndSlide={{ duration: 400, easing: quintOut }}>
+      <div class="game-info-content">
+        Loading...
+      </div>
     </div>
-  </div>
+  {/if}
 {/if} 
