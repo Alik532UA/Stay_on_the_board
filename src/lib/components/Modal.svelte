@@ -238,7 +238,8 @@
   border-radius: 24px;
   width: 100%;
   max-width: 400px;
-  max-height: 90vh;
+  max-height: 85vh;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -258,6 +259,27 @@
   color: var(--text-primary, #fff);
   background: transparent;
   border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  overflow-y: auto;
+  max-height: 60vh;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 .modal-header {
   padding: 20px 24px;
@@ -472,6 +494,96 @@
   line-height: 1;
 }
 
+/* Адаптивні стилі для компактного відображення */
+@media (max-width: 480px) {
+  .modal-window {
+    max-height: 80vh;
+    margin: 8px;
+  }
+  
+  .modal-header {
+    padding: 20px 16px 12px;
+  }
+  .modal-title {
+    font-size: 1.6em;
+  }
+  .modal-content {
+    padding: 16px;
+    max-height: 50vh;
+  }
+  
+  /* Компактний режим для фінального рахунку */
+  .final-score-container {
+    padding: 12px;
+  }
+  
+  .final-score-label {
+    font-size: 0.9em;
+    margin-bottom: 4px;
+  }
+  
+  .final-score-value {
+    font-size: 2.2em;
+  }
+  
+  /* Компактний режим для деталей рахунку */
+  .score-details-container {
+    padding: 10px 12px;
+    margin-bottom: 16px;
+  }
+  
+  .score-detail-row {
+    padding: 6px 0;
+    font-size: 0.9em;
+  }
+  
+  .reason {
+    font-size: 1em;
+    margin-bottom: 20px;
+  }
+}
+
+/* Дуже компактний режим для дуже маленьких екранів */
+@media (max-width: 360px) {
+  .modal-window {
+    max-height: 75vh;
+    margin: 4px;
+  }
+  
+  .modal-content {
+    max-height: 45vh;
+    padding: 12px;
+  }
+  
+  .final-score-container {
+    padding: 8px;
+  }
+  
+  .final-score-label {
+    font-size: 0.8em;
+    margin-bottom: 2px;
+  }
+  
+  .final-score-value {
+    font-size: 1.8em;
+  }
+  
+  .score-details-container {
+    padding: 8px 10px;
+    margin-bottom: 12px;
+  }
+  
+  .score-detail-row {
+    padding: 4px 0;
+    font-size: 0.85em;
+  }
+  
+  .reason {
+    font-size: 0.9em;
+    margin-bottom: 16px;
+  }
+}
+
 .modal-action-buttons {
   justify-content: center;
   display: flex;
@@ -484,15 +596,5 @@
   background: transparent;
 }
 
-@media (max-width: 480px) {
-  .modal-header {
-    padding: 20px 16px 12px;
-  }
-  .modal-title {
-    font-size: 1.6em;
-  }
-  .modal-content {
-    padding: 16px;
-  }
-}
+
 </style>
