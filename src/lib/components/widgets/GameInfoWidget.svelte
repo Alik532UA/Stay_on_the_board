@@ -1,6 +1,7 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/gameState.js';
   import { playerInputStore } from '$lib/stores/playerInputStore.js';
+  import { settingsStore } from '$lib/stores/settingsStore.js';
   import { _, locale } from 'svelte-i18n';
   import { lastComputerMove, isPlayerTurn, isPauseBetweenMoves } from '$lib/stores/derivedState.ts';
   import { i18nReady } from '$lib/i18n/init.js';
@@ -238,6 +239,19 @@
     /* Glassmorphism */
     backdrop-filter: var(--unified-backdrop-filter);
     border: var(--unified-border);
+    /* Анімація для приховування */
+    opacity: 1;
+    transform: scale(1);
+    max-height: 200px;
+    overflow: hidden;
+  }
+
+  .game-info-widget.hidden {
+    opacity: 0;
+    transform: scale(0.8);
+    max-height: 0;
+    padding: 0;
+    margin: 0;
   }
 
   .game-info-content {
@@ -272,13 +286,14 @@
        class:player-turn={$isPlayerTurn && !$playerInputStore.selectedDirection && !$playerInputStore.selectedDistance}
        class:computer-turn={!$isPlayerTurn && !$lastComputerMove}
        class:game-over={$gameState.isGameOver}
-       class:pause={$isPauseBetweenMoves}>
+       class:pause={$isPauseBetweenMoves}
+       class:hidden={!$settingsStore.showGameInfoWidget}>
     <div class="game-info-content" class:fade-out={isAnimating}>
       {displayMessage}
     </div>
   </div>
 {:else}
-  <div class="game-info-widget">
+  <div class="game-info-widget" class:hidden={!$settingsStore.showGameInfoWidget}>
     <div class="game-info-content">
       Loading...
     </div>

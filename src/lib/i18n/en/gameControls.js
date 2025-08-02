@@ -3,6 +3,7 @@ export default {
   showBoard: "Show Board",
   showQueen: "Show Queen",
   showMoves: "Show Available Moves",
+  showGameInfoWidget: "Show Info Widget",
   blockMode: "Blocked Cells Mode",
   blockAfter: "Block after:",
   speech: "Voiceover",

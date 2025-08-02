@@ -391,6 +391,18 @@
     <label class="ios-switch-label">
       <div class="switch-content-wrapper">
         <div class="ios-switch">
+          <input type="checkbox" checked={$settingsStore.showGameInfoWidget} on:change={() => settingsStore.toggleShowGameInfoWidget()} />
+          <span class="slider"></span>
+        </div>
+        <span>{$_('gameControls.showGameInfoWidget')}</span>
+      </div>
+    </label>
+    <label class="ios-switch-label">
+      <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={$settingsStore.autoHideBoard} on:change={handleToggleAutoHideBoard} /><span class="slider"></span></div><span>{$_('gameModes.autoHideBoard')}</span></div>
+    </label>
+    <label class="ios-switch-label">
+      <div class="switch-content-wrapper">
+        <div class="ios-switch">
           <input 
             type="checkbox" 
             checked={$settingsStore.blockModeEnabled} 
@@ -416,9 +428,6 @@
       <button class="menu-style-btn settings-icon-btn" title={$_('gameControls.voiceSettingsTitle')} on:click|stopPropagation={openVoiceSettingsModal}>
         <SvgIcons name="voice-settings" />
       </button>
-    </label>
-    <label class="ios-switch-label">
-      <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={$settingsStore.autoHideBoard} on:change={handleToggleAutoHideBoard} /><span class="slider"></span></div><span>{$_('gameModes.autoHideBoard')}</span></div>
     </label>
     <hr class="game-mode-divider" />
     {#if isHorizontalLayout}

@@ -22,6 +22,7 @@ import { gameState } from './gameState'; // <-- 1. Імпортуй gameState
  * @property {boolean} autoHideBoard
  * @property {'beginner' | 'experienced' | 'pro' | null} gameMode
  * @property {boolean} showGameModeModal
+ * @property {boolean} showGameInfoWidget
  */
 
 const isBrowser = typeof window !== 'undefined';
@@ -70,6 +71,7 @@ const defaultSettings = {
   keyConflictResolution: {},
   gameMode: null,
   showGameModeModal: true,
+  showGameInfoWidget: true,
 };
 
 /** @param {string | null} jsonString @param {any} defaultValue */
@@ -124,6 +126,7 @@ function loadSettings() {
       return gm === 'beginner' || gm === 'experienced' || gm === 'pro' ? gm : null;
     })()),
     showGameModeModal: localStorage.getItem('showGameModeModal') !== 'false', // Defaults to true if null
+    showGameInfoWidget: localStorage.getItem('showGameInfoWidget') !== 'false', // Defaults to true if null
   };
   } catch (error) {
     console.error('❌ Помилка завантаження налаштувань:', error);
@@ -232,6 +235,13 @@ function createSettingsStore() {
         return { ...state, autoHideBoard: newState };
       });
     },
+    toggleShowGameInfoWidget: () => {
+      update(state => {
+        const newState = !state.showGameInfoWidget;
+        if (isBrowser) localStorage.setItem('showGameInfoWidget', String(newState));
+        return { ...state, showGameInfoWidget: newState };
+      });
+    },
     toggleBlockMode: () => {
       update(state => {
         const newState = !state.blockModeEnabled;
@@ -297,14 +307,14 @@ function createSettingsStore() {
       let showFaq = false;
       switch (mode) {
         case 'beginner':
-          settingsToApply = { gameMode: mode, showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: false, speechEnabled: false, autoHideBoard: false };
+          settingsToApply = { gameMode: mode, showBoard: true, showQueen: true, showMoves: true, showGameInfoWidget: true, blockModeEnabled: false, speechEnabled: false, autoHideBoard: false };
           showFaq = true;
           break;
         case 'experienced':
-          settingsToApply = { gameMode: mode, showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
+          settingsToApply = { gameMode: mode, showBoard: true, showQueen: true, showMoves: true, showGameInfoWidget: true, blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
           break;
         case 'pro':
-          settingsToApply = { gameMode: mode, showBoard: true, showQueen: true, showMoves: true, blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
+          settingsToApply = { gameMode: mode, showBoard: true, showQueen: true, showMoves: true, showGameInfoWidget: true, blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
           break;
       }
       methods.updateSettings(settingsToApply);

@@ -3,6 +3,7 @@ export default {
   showBoard: "Показати дошку",
   showQueen: "Показати ферзя",
   showMoves: "Показувати доступні ходи",
+  showGameInfoWidget: "Показувати інформаційне віджет",
   blockMode: "Режим заблокованих клітинок",
   blockAfter: "Блокувати після:",
   speech: "Озвучування ходів",
