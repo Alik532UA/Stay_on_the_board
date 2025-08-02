@@ -257,10 +257,10 @@
   padding: 20px 24px;
   color: var(--text-primary, #fff);
   background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
 }
 .modal-header {
   padding: 20px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -481,7 +481,6 @@
   width: 100%;
   box-sizing: border-box;
   flex-shrink: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
   background: transparent;
 }
 
