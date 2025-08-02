@@ -11,14 +11,27 @@
   import { focusManager } from '$lib/stores/focusManager.js';
 
   let hotBtn: HTMLButtonElement | null = null;
+  let modalContent: HTMLDivElement | null = null;
 
   let expertVolume = 0.3;
   let volumePercentage = 30;
+  let isCompactScoreMode = false;
 
   onMount(() => {
     expertVolume = audioService.loadVolume();
+    
+    // Додаємо обробник resize для перевірки компактного режиму
+    const handleResize = () => {
+      if ($modalState.isOpen) {
+        checkCompactMode();
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
     return () => {
       audioService.pause();
+      window.removeEventListener('resize', handleResize);
     };
   });
 
@@ -40,6 +53,20 @@
 
   $: if ($modalState.isOpen && hotBtn) {
     focusManager.focusWithDelay(hotBtn, 50);
+  }
+
+  // Функція для перевірки, чи потрібен компактний режим
+  function checkCompactMode() {
+    if (modalContent) {
+      const hasScroll = modalContent.scrollHeight > modalContent.clientHeight;
+      isCompactScoreMode = hasScroll;
+    }
+  }
+
+  // Перевіряємо компактний режим при зміні стану модального вікна
+  $: if ($modalState.isOpen && modalContent) {
+    // Невелика затримка для забезпечення рендерингу
+    setTimeout(checkCompactMode, 100);
   }
 
   function onModalKeydown(e: KeyboardEvent) {
@@ -106,7 +133,7 @@
           {/if}
         {/if}
       </div>
-      <div class="modal-content">
+      <div class="modal-content" bind:this={modalContent}>
         {#if typeof $modalState.content === 'object' && $modalState.content && 'reason' in $modalState.content}
           <p class="reason">{$modalState.content.reason}</p>
         {/if}
@@ -148,9 +175,16 @@
               <div class="score-detail-row penalty">{$_('modal.scoreDetails.penalty')} <span>-{($modalState.content as any)?.scoreDetails?.totalPenalty ?? $gameState.totalPenalty ?? 0}</span></div>
             {/if}
           </div>
-          <div class="final-score-container">
-            <div class="final-score-label">{$_('modal.scoreDetails.finalScore')}</div>
-            <div class="final-score-value">{($modalState.content as any).scoreDetails.totalScore ?? ($modalState.content as any).scoreDetails.score ?? 0}</div>
+          <div class="final-score-container" class:compact={isCompactScoreMode}>
+            {#if isCompactScoreMode}
+              <div class="final-score-compact">
+                <span class="final-score-label-inline">{$_('modal.scoreDetails.finalScore')}</span>
+                <span class="final-score-value-inline">{($modalState.content as any).scoreDetails.totalScore ?? ($modalState.content as any).scoreDetails.score ?? 0}</span>
+              </div>
+            {:else}
+              <div class="final-score-label">{$_('modal.scoreDetails.finalScore')}</div>
+              <div class="final-score-value">{($modalState.content as any).scoreDetails.totalScore ?? ($modalState.content as any).scoreDetails.score ?? 0}</div>
+            {/if}
           </div>
         {/if}
       </div>
@@ -494,6 +528,31 @@
   line-height: 1;
 }
 
+/* Компактний режим для фінального рахунку */
+.final-score-container.compact {
+  padding: 12px;
+}
+
+.final-score-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.final-score-label-inline {
+  font-size: 1em;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.final-score-value-inline {
+  font-size: 2.2em;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
 /* Адаптивні стилі для компактного відображення */
 @media (max-width: 480px) {
   .modal-window {
@@ -517,6 +576,10 @@
     padding: 12px;
   }
   
+  .final-score-container.compact {
+    padding: 10px;
+  }
+  
   .final-score-label {
     font-size: 0.9em;
     margin-bottom: 4px;
@@ -524,6 +587,14 @@
   
   .final-score-value {
     font-size: 2.2em;
+  }
+  
+  .final-score-label-inline {
+    font-size: 0.9em;
+  }
+  
+  .final-score-value-inline {
+    font-size: 1.8em;
   }
   
   /* Компактний режим для деталей рахунку */
@@ -559,6 +630,10 @@
     padding: 8px;
   }
   
+  .final-score-container.compact {
+    padding: 6px;
+  }
+  
   .final-score-label {
     font-size: 0.8em;
     margin-bottom: 2px;
@@ -566,6 +641,14 @@
   
   .final-score-value {
     font-size: 1.8em;
+  }
+  
+  .final-score-label-inline {
+    font-size: 0.8em;
+  }
+  
+  .final-score-value-inline {
+    font-size: 1.5em;
   }
   
   .score-details-container {
