@@ -11,8 +11,9 @@
   import BoardWrapperWidget from './widgets/BoardWrapperWidget.svelte';
   import ControlsPanelWidget from './widgets/ControlsPanelWidget.svelte';
   import SettingsExpanderWidget from './widgets/SettingsExpanderWidget.svelte';
-  import { setDirection, setDistance, resetGame } from '$lib/services/gameLogicService.js';
-  import { gameOrchestrator } from '$lib/gameOrchestrator.js';
+  import GameInfoWidget from './widgets/GameInfoWidget.svelte';
+  import { setDirection, setDistance, resetGame, calculateFinalScore } from '$lib/services/gameLogicService.js';
+  import { gameOrchestrator } from '$lib/gameOrchestrator';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { get } from 'svelte/store';
@@ -22,12 +23,18 @@
   import { base } from '$app/paths';
   import { gameState } from '$lib/stores/gameState.js';
   import { animationStore } from '$lib/stores/animationStore.js';
-  import { shouldHideBoard } from '$lib/stores/derivedState.js';
+  import { shouldHideBoard } from '$lib/stores/derivedState.ts';
 
   onMount(() => {
     settingsStore.init();
-    // --- Скидаємо гру для коректної ініціалізації при перезавантаженні ---
-    resetGame();
+    
+    // Перевіряємо, чи гра НЕ завершена і НЕ в паузі на модальному вікні,
+    // перед тим як скидати стан. Це збереже стан при поверненні зі сторінки перегляду.
+    const currentState = get(gameState);
+    if (!currentState.isGameOver && !currentState.noMovesClaimed) {
+      resetGame();
+      animationStore.initialize();
+    }
   });
 
   const widgetMap = {
@@ -36,6 +43,7 @@
     [WIDGETS.BOARD_WRAPPER]: BoardWrapperWidget,
     [WIDGETS.CONTROLS_PANEL]: ControlsPanelWidget,
     [WIDGETS.SETTINGS_EXPANDER]: SettingsExpanderWidget,
+    [WIDGETS.GAME_INFO]: GameInfoWidget,
   };
 
   $: columns = $layoutStore.map(col => ({
@@ -56,7 +64,7 @@
         case 'modal.playerNoMovesContent':
           modalConfig = {
             titleKey: 'modal.playerNoMovesTitle',
-            content: { reason: $t(reasonKey || ''), scoreDetails: $gameState },
+            content: { reason: $t(reasonKey || ''), scoreDetails: calculateFinalScore($gameState as any) },
             buttons: [
               { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: gameOrchestrator.continueAfterNoMoves },
               { 
@@ -72,7 +80,7 @@
         case 'modal.errorContent':
           modalConfig = {
             titleKey: 'modal.errorTitle',
-            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: $gameState },
+            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: calculateFinalScore($gameState as any) },
             buttons: [
               { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); modalStore.closeModal(); }, isHot: true },
               { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
@@ -84,7 +92,7 @@
         case 'modal.computerNoMovesContent':
           modalConfig = {
             titleKey: 'modal.computerNoMovesTitle',
-            content: { reason: $t('modal.computerNoMovesContent'), scoreDetails: $gameState },
+            content: { reason: $t('modal.computerNoMovesContent'), scoreDetails: calculateFinalScore($gameState as any) },
             buttons: [
               { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: gameOrchestrator.continueAfterNoMoves },
               { 
@@ -100,7 +108,7 @@
         default:
           modalConfig = {
             titleKey: 'modal.gameOverTitle',
-            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: $gameState },
+            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: calculateFinalScore($gameState as any) },
             buttons: [
               { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); modalStore.closeModal(); }, isHot: true },
               { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }

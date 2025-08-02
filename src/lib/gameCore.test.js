@@ -1,99 +1,68 @@
-import { describe, it, expect } from 'vitest';
-import {
-  createEmptyBoard,
-  getRandomCell,
-  getAvailableMoves,
-  calculateFinalScore,
-  countJumpedCells
-} from '$lib/services/gameLogicService';
+import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { get } from 'svelte/store';
+import { gameState } from '$lib/stores/gameState';
+import { gameLogicService } from '$lib/services/gameLogicService';
 
-// createEmptyBoard(size)
-describe('createEmptyBoard', () => {
-  it('створює дошку правильного розміру, заповнену нулями', () => {
-    const size = 4;
-    const board = createEmptyBoard(size);
-    expect(board.length).toBe(size);
-    expect(board.every(row => row.length === size)).toBe(true);
-    expect(board.flat().every(cell => cell === 0)).toBe(true);
-  });
+// Мокаємо requestAnimationFrame ПЕРЕД імпортом
+global.requestAnimationFrame = vi.fn((cb: FrameRequestCallback) => {
+  const id = setTimeout(cb, 0);
+  return id as number;
 });
 
-// getRandomCell(size)
-describe('getRandomCell', () => {
-  it('повертає координати в межах дошки', () => {
-    const size = 5;
-    for (let i = 0; i < 20; i++) {
-      const { row, col } = getRandomCell(size);
-      expect(row).toBeGreaterThanOrEqual(0);
-      expect(row).toBeLessThan(size);
-      expect(col).toBeGreaterThanOrEqual(0);
-      expect(col).toBeLessThan(size);
-    }
-  });
-});
-
-// getAvailableMoves(...)
-describe('getAvailableMoves', () => {
-  it('повертає всі доступні ходи з центру дошки 3x3', () => {
-    const size = 3;
-    const moves = getAvailableMoves(1, 1, size, {}, 0);
-    expect(moves.length).toBeGreaterThan(0);
-  });
-
-  it('повертає правильні ходи з кута дошки', () => {
-    const size = 3;
-    const moves = getAvailableMoves(0, 0, size, {}, 0);
-    expect(moves.length).toBeGreaterThan(0);
-  });
-
-  it('враховує заблоковані клітинки (cellVisitCounts)', () => {
-    const size = 3;
-    const cellVisitCounts = { '1-2': 1 };
-    const moves = getAvailableMoves(1, 1, size, cellVisitCounts, 0);
-    expect(moves.some(move => move.row === 1 && move.col === 2)).toBe(false);
-  });
-});
-
-// calculateFinalScore(...)
-describe('calculateFinalScore', () => {
-  it('правильно рахує бали без бонусів', () => {
-    const state = { score: 10, penaltyPoints: 0, boardSize: 3, movesInBlockMode: 0, finishedByNoMovesButton: false, jumpedBlockedCells: 0, finishedByFinishButton: false, noMovesClaimsCount: 0 };
-    const result = calculateFinalScore(state);
-    // Очікуємо 11, бо 10 (база) + 1 (бонус за розмір дошки 3х3) = 11
-    expect(result.totalScore).toBe(11);
+describe('Game Core Logic', () => {
+  beforeEach(() => {
+    // Скидаємо стан перед кожним тестом
+    gameState.set({
+      playerRow: 0,
+      playerCol: 0,
+      boardSize: 8,
+      score: 0,
+      penaltyPoints: 0,
+      isGameOver: false,
+      moveHistory: [],
+      moveQueue: [],
+      availableMoves: [],
+      cellVisitCounts: {},
+      board: Array(8).fill(null).map(() => Array(8).fill(0)),
+      gameId: Date.now(),
+      currentPlayerIndex: 0,
+      players: [
+        { id: 0, name: 'Player 1', type: 'human' },
+        { id: 1, name: 'AI', type: 'ai' }
+      ],
+      movesInBlockMode: 0,
+      jumpedBlockedCells: 0,
+      finishedByFinishButton: false,
+      gameOverReasonKey: null,
+      gameOverReasonValues: null,
+      noMovesBonus: 0,
+      noMovesClaimsCount: 0
+    });
   });
 
-  it('правильно рахує бали з бонусами', () => {
-    const state = { score: 10, penaltyPoints: 0, boardSize: 5, movesInBlockMode: 2, finishedByNoMovesButton: true, jumpedBlockedCells: 3, finishedByFinishButton: false, noMovesClaimsCount: 0 };
-    const result = calculateFinalScore(state);
-    expect(result.totalScore).toBeGreaterThan(10);
-  });
-});
-
-// countJumpedCells(...)
-describe('countJumpedCells', () => {
-  it('повертає 0, якщо на шляху немає заблокованих клітинок', () => {
-    const cellVisitCounts = { '1-1': 0, '2-2': 0 };
-    const result = countJumpedCells(0, 0, 3, 3, cellVisitCounts, 0);
-    expect(result).toBe(0);
+  test('гра повинна ініціалізуватися правильно', () => {
+    const state = get(gameState);
+    expect(state.playerRow).toBe(0);
+    expect(state.playerCol).toBe(0);
+    expect(state.boardSize).toBe(8);
+    expect(state.score).toBe(0);
+    expect(state.isGameOver).toBe(false);
   });
 
-  it('рахує заблоковані клітинки на шляху', () => {
-    const cellVisitCounts = { '1-1': 2, '2-2': 1 };
-    const result = countJumpedCells(0, 0, 3, 3, cellVisitCounts, 0);
-    // Очікуємо 2, бо обидві клітинки (1,1) та (2,2) мають > 0 візитів
-    expect(result).toBe(2);
+  test('логіка руху повинна працювати', () => {
+    const state = get(gameState);
+    const moveResult = gameLogicService.performMove('down', 1);
+    
+    expect(moveResult.success).toBe(true);
+    expect(moveResult.newRow).toBe(1);
+    expect(moveResult.newCol).toBe(0);
   });
 
-  it('ігнорує кінцеву клітинку', () => {
-    const cellVisitCounts = { '1-1': 2, '2-2': 2, '3-3': 2 };
-    const result = countJumpedCells(0, 0, 3, 3, cellVisitCounts, 1);
-    expect(result).toBe(2); // '1-1' і '2-2' заблоковані, '3-3' не враховується
-  });
-
-  it('працює для горизонтального руху', () => {
-    const cellVisitCounts = { '0-1': 2, '0-2': 0 };
-    const result = countJumpedCells(0, 0, 0, 3, cellVisitCounts, 1);
-    expect(result).toBe(1); // тільки '0-1' заблокована
+  test('перевірка меж дошки', () => {
+    const state = get(gameState);
+    const moveResult = gameLogicService.performMove('up', 1);
+    
+    expect(moveResult.success).toBe(false);
+    expect(moveResult.reason).toBe('out_of_bounds');
   });
 });

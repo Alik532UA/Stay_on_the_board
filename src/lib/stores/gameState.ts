@@ -3,15 +3,17 @@
  * This is the single source of truth for the game's current situation.
  */
 import { writable } from 'svelte/store';
-import * as gameLogicService from '$lib/services/gameLogicService';
+import { createEmptyBoard, getRandomCell, getAvailableMoves } from '$lib/utils/boardUtils.ts';
+
+// Імпортуємо типи з gameLogicService
+import type { Direction, Move } from '$lib/services/gameLogicService';
 
 const initialBoardSize = 4;
-const { row: initialRow, col: initialCol } = gameLogicService.getRandomCell(initialBoardSize);
 
 export type PlayerType = 'human' | 'ai' | 'remote';
 export interface Player { id: number; type: PlayerType; name: string; }
 export type CellVisitCounts = Record<string, number>;
-export interface MoveHistoryEntry { pos: {row: number, col: number}, blocked: {row: number, col: number}[], visits?: CellVisitCounts }
+export interface MoveHistoryEntry { pos: {row: number, col: number}, blocked: {row: number, col: number}[], visits?: CellVisitCounts, blockModeEnabled?: boolean }
 export interface GameState {
   /** Унікальний ідентифікатор поточної гри, змінюється при кожному перезапуску. */
   gameId: number;
@@ -24,7 +26,7 @@ export interface GameState {
   /** Поточна колонка, де знаходиться ферзь, або null якщо не встановлено. */
   playerCol: number|null;
   /** Масив доступних ходів для поточного стану. */
-  availableMoves: gameLogicService.Move[];
+  availableMoves: Move[];
   /** Масив гравців (людина, комп'ютер, онлайн). */
   players: Player[];
   /** Індекс поточного гравця у масиві players. */
@@ -69,18 +71,25 @@ export interface GameState {
   totalScore?: number;
   /** Кількість заявок "немає ходів". */
   noMovesClaimsCount: number;
+  /** Чи заявлено "немає ходів" і гра в паузі. */
+  noMovesClaimed: boolean;
+  /** Чи це перший хід у грі. */
+  isFirstMove: boolean;
+  /** Чи гра була продовжена після паузи. */
+  wasResumed: boolean;
 }
 
-export function createInitialState(): GameState {
-  const board = gameLogicService.createEmptyBoard(initialBoardSize);
+export function createInitialState(size = initialBoardSize): GameState {
+  const { row: initialRow, col: initialCol } = getRandomCell(size);
+  const board = createEmptyBoard(size);
   board[initialRow][initialCol] = 1;
   return {
     gameId: Date.now(),
-    boardSize: initialBoardSize,
+    boardSize: size,
     board,
     playerRow: initialRow,
     playerCol: initialCol,
-    availableMoves: gameLogicService.getAvailableMoves(initialRow, initialCol, initialBoardSize, {}, 0),
+    availableMoves: getAvailableMoves(initialRow, initialCol, size, {}, 0, board, false),
     players: [
       { id: 1, type: 'human', name: 'Гравець' },
       { id: 2, type: 'ai', name: 'Комп\'ютер' }
@@ -93,11 +102,15 @@ export function createInitialState(): GameState {
     jumpedBlockedCells: 0,
     finishedByFinishButton: false,
     cellVisitCounts: {},
-    moveHistory: [{ pos: { row: initialRow, col: initialCol }, blocked: [], visits: {} }],
+    moveHistory: [{ pos: { row: initialRow, col: initialCol }, blocked: [], visits: {}, blockModeEnabled: false }],
     gameOverReasonKey: null,
     gameOverReasonValues: null,
     moveQueue: [],
     noMovesClaimsCount: 0,
+    noMovesClaimed: false,
+    noMovesBonus: 0,
+    isFirstMove: true,
+    wasResumed: false,
   };
 }
 

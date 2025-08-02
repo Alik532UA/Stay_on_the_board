@@ -26,7 +26,7 @@ export default {
   blockModeText: "A more complex and strategic mode. The cell from which a move was made becomes blocked and unavailable for future moves. This forces players to plan their route carefully.",
   noMovesButtonTitle: "'No Moves' Button",
   noMovesButtonText1: "If you believe the piece has no valid moves left, you can press this button. The system will check your claim:",
-  noMovesWin: "If you are correct (there are truly no moves) — you win.",
+  noMovesWin: "If you are correct (there are truly no moves) — you receive a bonus, the board is completely cleared of blocked cells, and you continue your turn.",
   noMovesLoss: "If you are wrong (at least one move exists) — you lose.",
   noMovesButtonText2: "This is a risky but sometimes necessary strategy to win in a difficult situation.",
   scoringTitle: "Scoring System",

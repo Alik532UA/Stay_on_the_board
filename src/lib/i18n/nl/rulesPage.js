@@ -26,7 +26,7 @@ export default {
   blockModeText: "Een complexere en strategischere modus. Het vakje waarvandaan een zet is gedaan, wordt geblokkeerd en is niet meer beschikbaar voor volgende zetten. Dit dwingt spelers om hun route zorgvuldig te plannen.",
   noMovesButtonTitle: "Knop 'Geen zetten'",
   noMovesButtonText1: "Als je denkt dat het stuk geen geldige zetten meer heeft, kun je op deze knop drukken. Het systeem controleert je claim:",
-  noMovesWin: "Als je gelijk hebt (er zijn echt geen zetten) — win je.",
+  noMovesWin: "Als je gelijk hebt (er zijn echt geen zetten) — krijg je een bonus, het bord wordt volledig gewist van geblokkeerde vakjes, en je gaat door met je beurt.",
   noMovesLoss: "Als je ongelijk hebt (er is nog minstens één zet) — verlies je.",
   noMovesButtonText2: "Dit is een risicovolle maar soms noodzakelijke strategie om te winnen in een moeilijke situatie.",
   scoringTitle: "Puntensysteem",

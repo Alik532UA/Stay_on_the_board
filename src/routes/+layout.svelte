@@ -22,7 +22,7 @@
 	import '../app.css';
 	import { settingsStore } from '$lib/stores/settingsStore.js';
 	import { get } from 'svelte/store';
-	import { initializeI18n, i18nReady } from '../lib/i18n/init.js';
+	import { initializeI18n, i18nReady } from '$lib/i18n/init.js';
 	import { assets } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { base } from '$app/paths';

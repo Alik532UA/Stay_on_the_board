@@ -9,7 +9,7 @@
   import { _ , isLoading, locale } from 'svelte-i18n';
   import SvgIcons from './SvgIcons.svelte';
   import { appVersion } from '$lib/stores/versionStore.js';
-  import { currentLanguageFlagSvg } from '$lib/stores/derivedState.js';
+  import { currentLanguageFlagSvg } from '$lib/stores/derivedState.ts';
   import { languages } from '$lib/constants.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { clearCache } from '$lib/utils/cacheManager.js';

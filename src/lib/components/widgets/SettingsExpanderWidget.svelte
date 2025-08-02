@@ -1,6 +1,6 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/gameState.js';
-  import { gameOrchestrator } from '$lib/gameOrchestrator.js';
+  import { gameOrchestrator } from '$lib/gameOrchestrator';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { _ } from 'svelte-i18n';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
@@ -85,15 +85,16 @@
   .settings-expander {
     width: 100%;
     background: linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
-    border-radius: 16px;
-    border: 1.5px solid rgba(255,255,255,0.18);
-    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.13);
+    border-radius: var(--unified-border-radius);
+    border: var(--unified-border);
+    box-shadow: var(--unified-shadow);
     transition: background 0.25s, box-shadow 0.25s;
     margin-bottom: 16px;
+    backdrop-filter: var(--unified-backdrop-filter);
   }
   .settings-expander:hover {
     background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%);
-    box-shadow: 0 12px 40px 0 rgba(0,0,0,0.18);
+    box-shadow: var(--unified-shadow-hover);
   }
   .settings-summary {
     position: relative;
@@ -103,7 +104,7 @@
     letter-spacing: 0.02em;
     color: #fff;
     background: none;
-    border-radius: 16px;
+    border-radius: var(--unified-border-radius);
     cursor: pointer;
     user-select: none;
     transition: background 0.2s, margin-bottom 0.4s ease-out;
@@ -117,7 +118,7 @@
     box-shadow: none;
   }
   .settings-expander.open > .settings-summary {
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--unified-border-radius) var(--unified-border-radius) 0 0;
   }
   .expander-arrow {
     position: absolute;

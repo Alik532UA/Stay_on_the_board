@@ -61,6 +61,7 @@ export const actions = {
 		}
 
 		cookies.set('sverdle', game.toString(), { path: '/' });
+		return { success: true };
 	},
 
 	restart: async ({ cookies }) => {

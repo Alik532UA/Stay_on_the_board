@@ -1,4 +1,13 @@
 // --- Чисті функції та константи для ігрової логіки (ex-gameCore.ts) ---
+import { Figure, MoveDirection } from '../models/Figure';
+import type { MoveDirectionType } from '../models/Figure';
+import { get } from 'svelte/store';
+import { playerInputStore } from '../stores/playerInputStore';
+import { gameState, createInitialState } from '../stores/gameState'; // Тепер цей імпорт безпечний
+import { getAvailableMoves, isCellBlocked } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
+import { settingsStore } from '../stores/settingsStore.js';
+import { stateManager } from './stateManager';
+
 
 export type Direction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right';
 export interface Move {
@@ -15,58 +24,10 @@ export interface GameState {
   jumpedBlockedCells: number;
   finishedByFinishButton: boolean;
   noMovesClaimsCount: number;
+  noMovesBonus: number;
 }
 
-export function createEmptyBoard(size: number): number[][] {
-  return Array.from({ length: size }, () => Array(size).fill(0));
-}
-
-export function getRandomCell(size: number): { row: number; col: number } {
-  return {
-    row: Math.floor(Math.random() * size),
-    col: Math.floor(Math.random() * size)
-  };
-}
-
-export function getAvailableMoves(
-  row: number,
-  col: number,
-  size: number,
-  cellVisitCounts: Record<string, number> = {},
-  blockOnVisitCount: number = 0
-): Move[] {
-  if (row === null || col === null) return [];
-  const moves: Move[] = [];
-  const directions: { dr: number; dc: number; direction: Direction }[] = [
-    { dr: -1, dc: 0, direction: 'up' },
-    { dr: 1, dc: 0, direction: 'down' },
-    { dr: 0, dc: -1, direction: 'left' },
-    { dr: 0, dc: 1, direction: 'right' },
-    { dr: -1, dc: -1, direction: 'up-left' },
-    { dr: -1, dc: 1, direction: 'up-right' },
-    { dr: 1, dc: -1, direction: 'down-left' },
-    { dr: 1, dc: 1, direction: 'down-right' },
-  ];
-  const visitMap = cellVisitCounts;
-  const isBlocked = (r: number, c: number) => {
-    const visitCount = visitMap[`${r}-${c}`] || 0;
-    return visitCount > blockOnVisitCount;
-  };
-
-  for (const { dr, dc, direction } of directions) {
-    for (let dist = 1; dist < size; dist++) {
-      const nr = row + dr * dist;
-      const nc = col + dc * dist;
-      if (nr < 0 || nc < 0 || nr >= size || nc >= size) {
-        break;
-      }
-      if (!isBlocked(nr, nc)) {
-        moves.push({ row: nr, col: nc, direction, distance: dist });
-      }
-    }
-  }
-  return moves;
-}
+// Функції createEmptyBoard, getRandomCell, getAvailableMoves були перенесені в boardUtils.ts
 
 export const dirMap: Record<Direction, [number, number]> = {
   'up': [-1, 0],
@@ -113,30 +74,30 @@ export interface FinalScore {
 }
 
 export function calculateFinalScore(state: GameState): FinalScore {
-  const { score, penaltyPoints, boardSize, movesInBlockMode, jumpedBlockedCells } = state;
+  const { score, penaltyPoints, boardSize, movesInBlockMode, jumpedBlockedCells, finishedByFinishButton, noMovesBonus } = state;
   
   const baseScore = score;
   const totalPenalty = penaltyPoints;
   let sizeBonus = 0;
-  let percent = 0;
   if (baseScore > 0) {
-    percent = (boardSize * boardSize) / 100;
+    const percent = (boardSize * boardSize) / 100;
     sizeBonus = Math.round(baseScore * percent);
   }
   const blockModeBonus = movesInBlockMode;
-  const noMovesBonus = boardSize * (state.noMovesClaimsCount || 0);
-  const finishBonus = state.finishedByFinishButton ? boardSize : 0;
+  const finishBonus = finishedByFinishButton ? boardSize : 0;
   const jumpBonus = jumpedBlockedCells;
-  const totalScore = baseScore + sizeBonus + blockModeBonus + jumpBonus - totalPenalty + noMovesBonus + finishBonus;
+  
+  const totalScore = baseScore + sizeBonus + blockModeBonus + jumpBonus - totalPenalty + (noMovesBonus || 0) + finishBonus;
+  
   return {
     baseScore,
     totalPenalty,
     sizeBonus,
     blockModeBonus,
     jumpBonus,
-    noMovesBonus,
-    totalScore,
-    finishBonus
+    noMovesBonus: noMovesBonus || 0,
+    finishBonus,
+    totalScore
   };
 }
 
@@ -163,11 +124,69 @@ export function countJumpedCells(
   return jumpedCount;
 }
 
+/**
+ * Обчислює зміни рахунку для одного ходу.
+ * @returns Зміни для стану гри.
+ */
+function calculateMoveScore(
+  currentState: any, // Використовуємо any для доступу до всіх полів gameState
+  newPosition: { row: number; col: number },
+  playerIndex: number,
+  settings: any // Використовуємо any для доступу до всіх полів settingsStore
+): { score: number; penaltyPoints: number; movesInBlockMode: number; jumpedBlockedCells: number } {
+  
+  let newScore = currentState.score;
+  let newPenaltyPoints = currentState.penaltyPoints;
+  let newMovesInBlockMode = currentState.movesInBlockMode;
+  let newJumpedBlockedCells = currentState.jumpedBlockedCells;
+
+  // 1. Нараховуємо бали тільки за хід гравця
+  if (playerIndex === 0) {
+    if (!settings.showBoard) {
+      newScore += 3;
+    } else if (!settings.showQueen) {
+      newScore += 2;
+    } else {
+      newScore += 1;
+    }
+  }
+
+  // 2. Перевірка на штраф за "дзеркальний" хід
+  if (playerIndex === 0 && currentState.moveHistory.length >= 2) {
+    const computerOriginPosition = currentState.moveHistory[currentState.moveHistory.length - 2].pos;
+    // Перевіряємо чи це об'єкт (нова структура) або масив (стара структура)
+    const computerRow = Array.isArray(computerOriginPosition) ? computerOriginPosition[0] : computerOriginPosition.row;
+    const computerCol = Array.isArray(computerOriginPosition) ? computerOriginPosition[1] : computerOriginPosition.col;
+    if (newPosition.row === computerRow && newPosition.col === computerCol) {
+      newPenaltyPoints += 2;
+    }
+  }
+
+  // 3. Підрахунок ходів у режимі блокування
+  if (settings.blockModeEnabled) {
+    newMovesInBlockMode += 1;
+  }
+
+  // 4. Підрахунок бонусів за перестрибування
+  const jumpedCount = countJumpedCells(
+    currentState.playerRow,
+    currentState.playerCol,
+    newPosition.row,
+    newPosition.col,
+    currentState.cellVisitCounts,
+    settings.blockOnVisitCount
+  );
+  newJumpedBlockedCells += jumpedCount;
+
+  return {
+    score: newScore,
+    penaltyPoints: newPenaltyPoints,
+    movesInBlockMode: newMovesInBlockMode,
+    jumpedBlockedCells: newJumpedBlockedCells,
+  };
+}
+
 // --- Мутатори стану (ex-gameActions.ts) ---
-import { get } from 'svelte/store';
-import { gameState, createInitialState } from '../stores/gameState.js';
-import { playerInputStore } from '../stores/playerInputStore.js';
-import { settingsStore } from '../stores/settingsStore.js';
 
 /**
  * @file Contains all pure functions (actions) that mutate the game's state.
@@ -175,94 +194,166 @@ import { settingsStore } from '../stores/settingsStore.js';
  */
 
 export function resetGame(options: { newSize?: number } = {}) {
-  const { newSize } = options;
-  settingsStore.updateSettings({ showQueen: true, showMoves: true });
-  const currentState = get(gameState);
-  const size = newSize ?? currentState.boardSize;
-
-  const newState = createInitialState();
-  newState.boardSize = size;
-
-  const { row, col } = getRandomCell(size);
+  const newSize = options.newSize ?? get(gameState).boardSize;
+  const newState = createInitialState(newSize);
   
-  newState.playerRow = row;
-  newState.playerCol = col;
-  newState.board = createEmptyBoard(size);
-  newState.board[row][col] = 1;
-  newState.moveHistory = [{ pos: { row, col }, blocked: [], visits: {} }];
-  newState.availableMoves = getAvailableMoves(row, col, size, {}, get(settingsStore).blockOnVisitCount);
-
   gameState.set(newState);
-
-  playerInputStore.set({
-    selectedDirection: null,
-    selectedDistance: null,
-    distanceManuallySelected: false,
-    isMoveInProgress: false,
+  
+  // Гарантуємо, що дошка та ферзь видимі на початку нової гри
+  settingsStore.updateSettings({
+    showBoard: true,
+    showQueen: true,
+    showMoves: true
   });
+  
+  // animationStore автоматично скидається при зміні gameId
 }
 
 export function setDirection(dir: Direction) {
-  playerInputStore.update(state => {
-    const { boardSize } = get(gameState);
-    const maxDist = boardSize - 1;
-    let newDistance = state.selectedDistance;
-    let newManuallySelected = state.distanceManuallySelected;
+  const currentInput = get(playerInputStore);
+  const { boardSize } = get(gameState);
+  const maxDist = boardSize - 1;
+  let newDistance = currentInput.selectedDistance;
+  let newManuallySelected = currentInput.distanceManuallySelected;
 
-    if (state.selectedDirection !== dir) {
-      if (!state.distanceManuallySelected) {
-        newDistance = 1;
-        newManuallySelected = false;
-      }
-    } else {
-      if (!state.distanceManuallySelected) {
-        newDistance = (!state.selectedDistance || state.selectedDistance >= maxDist) ? 1 : state.selectedDistance + 1;
-        newManuallySelected = false;
-      }
+  if (currentInput.selectedDirection !== dir) {
+    if (!currentInput.distanceManuallySelected) {
+      newDistance = 1;
+      newManuallySelected = false;
     }
-    return { ...state, selectedDirection: dir, selectedDistance: newDistance, distanceManuallySelected: newManuallySelected };
-  });
+  } else {
+    if (!currentInput.distanceManuallySelected) {
+      newDistance = (!currentInput.selectedDistance || currentInput.selectedDistance >= maxDist) ? 1 : currentInput.selectedDistance + 1;
+      newManuallySelected = false;
+    }
+  }
+
+  // Оновлюємо playerInputStore
+  playerInputStore.update(state => ({
+    ...state,
+    selectedDirection: dir,
+    selectedDistance: newDistance,
+    distanceManuallySelected: newManuallySelected
+  }));
+  
+  console.log('🎯 setDirection: встановлено напрямок', { dir, newDistance, newManuallySelected });
 }
 
 export function setDistance(dist: number) {
-  playerInputStore.update(state => ({ ...state, selectedDistance: dist, distanceManuallySelected: true }));
+  // Оновлюємо playerInputStore
+  playerInputStore.update(state => ({
+    ...state,
+    selectedDistance: dist,
+    distanceManuallySelected: true
+  }));
+  
+  console.log('🎯 setDistance: встановлено відстань', { dist });
 }
 
-export function performMove(newRow: number, newCol: number) {
-  gameState.update(state => {
-    const { playerRow, playerCol, boardSize } = state;
-    if (playerRow === null || playerCol === null) return state;
+/**
+ * Виконує хід (гравця або комп'ютера)
+ * @param direction Напрямок ходу
+ * @param distance Відстань ходу
+ * @param playerIndex Індекс гравця (0 для гравця, 1 для комп'ютера)
+ */
+export async function performMove(direction: MoveDirectionType, distance: number, playerIndex: number = 0) {
+  console.log('🎮 performMove: початок з параметрами:', { direction, distance, playerIndex });
+  
+  const currentState = get(gameState);
+  const settings = get(settingsStore);
+  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
 
-    const newBoard = state.board.map(row => row.slice());
-    if (playerRow >= 0 && playerRow < boardSize && playerCol >= 0 && playerCol < boardSize) {
-      newBoard[playerRow][playerCol] = 0;
-    }
-    if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {
-      newBoard[newRow][newCol] = 1;
-    }
-    const newVisitCounts = { ...state.cellVisitCounts };
-    if (get(settingsStore).blockModeEnabled) {
-      const cellKey = `${playerRow}-${playerCol}`;
-      newVisitCounts[cellKey] = (newVisitCounts[cellKey] || 0) + 1;
-    }
-    return {
-      ...state,
-      board: newBoard,
-      playerRow: newRow,
-      playerCol: newCol,
-      cellVisitCounts: newVisitCounts,
-      moveHistory: [...state.moveHistory, { pos: { row: newRow, col: newCol }, blocked: [], visits: newVisitCounts }],
-    };
-  });
-  updateAvailableMoves();
+  const newPosition = figure.calculateNewPosition(direction, distance);
+
+  // 1. Перевірка виходу за межі дошки
+  if (!figure.isValidPosition(newPosition.row, newPosition.col)) {
+    console.log('❌ performMove: вихід за межі дошки');
+    return { success: false, reason: 'out_of_bounds' };
+  }
+
+  // 2. Перевірка ходу на заблоковану клітинку
+  if (isCellBlocked(newPosition.row, newPosition.col, currentState.cellVisitCounts, settings)) {
+    console.log('❌ performMove: хід на заблоковану клітинку');
+    return { success: false, reason: 'blocked_cell' };
+  }
+
+  // --- Якщо всі перевірки пройдено, виконуємо хід ---
+  
+  const updatedCellVisitCounts = { ...currentState.cellVisitCounts };
+  const startCellKey = `${currentState.playerRow}-${currentState.playerCol}`;
+  updatedCellVisitCounts[startCellKey] = (updatedCellVisitCounts[startCellKey] || 0) + 1;
+
+  const scoreChanges = calculateMoveScore(currentState, newPosition, playerIndex, settings);
+
+  const newAvailableMoves = getAvailableMoves(
+    newPosition.row,
+    newPosition.col,
+    currentState.boardSize,
+    updatedCellVisitCounts,
+    settings.blockOnVisitCount,
+    currentState.board,
+    settings.blockModeEnabled // <-- Додай цей параметр
+  );
+
+  const newBoard = currentState.board.map(row => [...row]);
+  if (currentState.playerRow !== null && currentState.playerCol !== null) {
+    newBoard[currentState.playerRow][currentState.playerCol] = 0;
+  }
+  newBoard[newPosition.row][newPosition.col] = 1;
+
+  const updatedMoveQueue = [...currentState.moveQueue, {
+    player: playerIndex + 1,
+    direction,
+    distance,
+    to: { row: newPosition.row, col: newPosition.col }
+  }];
+
+  const updatedMoveHistory = [...currentState.moveHistory, {
+    pos: { row: newPosition.row, col: newPosition.col },
+    blocked: [] as {row: number, col: number}[],
+    visits: { ...updatedCellVisitCounts },
+    blockModeEnabled: settings.blockModeEnabled // <-- ДОДАЙ ЦЕЙ РЯДОК
+  }];
+
+  const changes = {
+    board: newBoard,
+    playerRow: newPosition.row,
+    playerCol: newPosition.col,
+    cellVisitCounts: updatedCellVisitCounts,
+    moveQueue: updatedMoveQueue,
+    moveHistory: updatedMoveHistory,
+    availableMoves: newAvailableMoves,
+    ...scoreChanges
+  };
+
+  await stateManager.applyChanges('PERFORM_MOVE', changes, `Move: ${direction}${distance}`);
+  
+  console.log('🎮 performMove: завершено успішно');
+  return { success: true, newPosition };
 }
 
+/**
+ * Отримати доступні ходи для поточної позиції використовуючи клас Figure
+ */
+export function getAvailableMovesForFigure() {
+  const currentState = get(gameState);
+  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
+  return figure.getAvailableMoves();
+}
+
+/**
+ * Перевірити чи валідний хід використовуючи клас Figure
+ */
+export function isValidMove(direction: MoveDirectionType, distance: number) {
+  const currentState = get(gameState);
+  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
+  return figure.canMove(direction, distance);
+}
+
+/**
+ * Оновити доступні ходи
+ */
 export function updateAvailableMoves() {
-  gameState.update(state => {
-    const { playerRow, playerCol, boardSize, cellVisitCounts } = state;
-    if (playerRow === null || playerCol === null) return state;
-    const { blockOnVisitCount } = get(settingsStore);
-    const newAvailableMoves = getAvailableMoves(playerRow, playerCol, boardSize, cellVisitCounts, blockOnVisitCount);
-    return { ...state, availableMoves: newAvailableMoves };
-  });
+  const availableMoves = getAvailableMovesForFigure();
+  stateManager.applyChanges('UPDATE_AVAILABLE_MOVES', { availableMoves }, 'Update available moves');
 } 

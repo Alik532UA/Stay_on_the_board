@@ -1,12 +1,13 @@
 <!--
-ВАЖЛИВО! Архітектурний принцип: візуалізація дошки (game-board) асинхронна та незалежна від логіки гри та center-info.
-- 'game-board' не впливає на 'center-info' і не змінює логіку гри.
-- 'center-info' і логіка гри не знають про стан візуалізації дошки.
-- Логіка гри не повинна залежати від DOM, анімацій чи рендерингу.
-
-Це критично для коректної роботи анімацій, UX та масштабованості. Не спрощуйте і не змінюйте цю логіку під час рефакторингу!
+ВАЖЛИВО! Архітектурний принцип: пауза (затримка) після ходу гравця реалізується лише у візуалізації дошки (animationStore),
+логіка гри та center-info оновлюються миттєво і не залежать від цієї паузи. Це гарантує SoC, SSoT, UDF.
 -->
 <script lang="ts">
+  // ВАЖЛИВО! Заборонено напряму змінювати moveQueue або board з UI-компонента!
+  // Компонент лише спостерігає за станом гри і ініціює анімацію через animationStore.
+  // Всі зміни логіки гри — лише через оркестратор/сервіси.
+  //
+  // IMPORTANT: Never mutate moveQueue or board directly from UI! This component only observes state and triggers animation.
   import { gameState } from '$lib/stores/gameState.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { logStore } from '$lib/stores/logStore.js';
@@ -14,11 +15,15 @@
   import SvgIcons from '../SvgIcons.svelte';
   import { slide, scale } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
-  import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.js';
+  import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
   import { animationStore } from '$lib/stores/animationStore.js';
+  import { visualPosition, visualCellVisitCounts, visualBoardState, visualCurrentPlayerIndex } from '$lib/stores/derivedState.ts';
   import { derived } from 'svelte/store';
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
+  import { uiEffectsStore } from '$lib/stores/uiEffectsStore.js';
+  import BoardCell from './BoardCell.svelte';
+  import PlayerPiece from './PlayerPiece.svelte';
 
   const boardSize = derived(gameState, $gameState => Number($gameState.boardSize));
   
@@ -33,6 +38,7 @@
   });
 
   // --- Додаємо автозапуск чекбоксів перед першим ходом користувача ---
+  // НАВІЩО: Гарантуємо, що всі візуальні опції (showBoard, showQueen, showMoves) будуть активовані для коректного UX при старті нової гри.
   function enableAllGameCheckboxesIfNeeded() {
     const s = get(settingsStore);
     let changed = false;
@@ -44,6 +50,7 @@
   }
 
   onMount(() => {
+    // НАВІЩО: Зберігаємо попередню позицію гравця для коректного визначення зміни стану та автоприховування дошки.
     let lastRow = $gameState.playerRow;
     let lastCol = $gameState.playerCol;
     
@@ -53,18 +60,21 @@
     }
     
     const unsubscribe = gameState.subscribe(($gameState) => {
+      // НАВІЩО: Реакція на зміну позиції гравця для автоприховування дошки та повторного вмикання чекбоксів після скидання гри.
       if (
         get(settingsStore).autoHideBoard &&
         get(settingsStore).showBoard &&
-        ($gameState.playerRow !== lastRow || $gameState.playerCol !== lastCol)
+        ($gameState.playerRow !== lastRow || $gameState.playerCol !== lastCol) &&
+        $gameState.moveHistory.length > 1 // <-- ДОДАЙ ЦЕЙ РЯДОК
       ) {
         lastRow = $gameState.playerRow;
         lastCol = $gameState.playerCol;
-        setTimeout(() => {
-          if (get(settingsStore).showBoard) {
-            settingsStore.toggleShowBoard(false);
-          }
-        }, 0);
+        // setTimeout(() => {
+        //   if (get(settingsStore).showBoard) {
+        //     settingsStore.toggleShowBoard(false);
+        //   }
+        // }, 0);
+        uiEffectsStore.autoHideBoard(0);
       } else {
         lastRow = $gameState.playerRow;
         lastCol = $gameState.playerCol;
@@ -78,22 +88,42 @@
     return unsubscribe;
   });
 
+  let prevGameId: number|null = null;
+  // Видаляємо prevMoveQueueLength, оскільки анімація тепер керується через animationStore
+  // НАВІЩО: Відстежуємо зміну gameId для скидання стану при новій грі.
+  gameState.subscribe(($gameState) => {
+    // Якщо нова гра — скидаємо лічильник
+    if ($gameState.gameId !== prevGameId) {
+      prevGameId = $gameState.gameId;
+      console.log('[BoardWrapperWidget] Нова гра, скидаємо стан');
+    }
+    // Анімація тепер керується через animationStore.visualMoveQueue
+    // Не потрібно викликати animateLastMove тут
+  });
+
   function isAvailable(row: number, col: number) {
-    // Повертаємо перевірку прапорця з animationStore
-    // Додатково перевіряємо, що ферзь з'явився (visualRow і visualCol не null)
+    // НАВІЩО: Визначаємо, чи доступна клітинка для ходу, використовуючи derived stores для уникнення дублювання логіки та забезпечення SSoT.
+    const visualPos = get(visualPosition);
+    
+    // Показуємо точки тільки якщо немає анімації, ферзь з'явився, і настала черга гравця
     const result = $settingsStore.showMoves && 
-           $animationStore.showAvailableMoveDots && 
-           $animationStore.visualRow !== null && 
-           $animationStore.visualCol !== null &&
-           get(gameState).availableMoves.some(move => move.row === row && move.col === col);
+                   !$animationStore.isAnimating && 
+                   $visualCurrentPlayerIndex === 0 && // Використовуємо ВІЗУАЛЬНИЙ індекс
+                   $animationStore.isComputerMoveCompleted && // <-- НОВА УМОВА
+                   visualPos.row !== null && 
+                   visualPos.col !== null &&
+                   get(gameState).availableMoves.some(move => move.row === row && move.col === col);
     
     // Логуємо тільки для першої клітинки, щоб не засмічувати консоль
     if (row === 0 && col === 0) {
       console.log('BoardWrapper: isAvailable(0,0) =', result, 
                   'showMoves =', $settingsStore.showMoves,
-                  'showAvailableMoveDots =', $animationStore.showAvailableMoveDots,
-                  'visualRow =', $animationStore.visualRow,
-                  'visualCol =', $animationStore.visualCol,
+                  'isAnimating =', $animationStore.isAnimating,
+                  'isComputerMoveCompleted =', $animationStore.isComputerMoveCompleted, // <-- Додано для дебагу
+                  'visualCurrentPlayerIndex =', $visualCurrentPlayerIndex,
+                  'logicalCurrentPlayerIndex =', $gameState.currentPlayerIndex,
+                  'visualRow =', visualPos.row,
+                  'visualCol =', visualPos.col,
                   'availableMoves.length =', get(gameState).availableMoves.length,
                   'gameId =', get(gameState).gameId);
     }
@@ -110,10 +140,11 @@
     });
   }
 
-  function onCellRightClick(event: MouseEvent, row: number, col: number) {
+  function onCellRightClick(event: MouseEvent, row: number, col: number): void {
     event.preventDefault();
     if ($settingsStore.blockModeEnabled && !(row === $gameState.playerRow && col === $gameState.playerCol)) {
-      const blocked = isCellBlocked(row, col, $animationStore.visualCellVisitCounts, $settingsStore);
+      const visualCounts = get(visualCellVisitCounts);
+      const blocked = isCellBlocked(row, col, visualCounts, $settingsStore);
       logStore.addLog(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`, 'info');
     }
   }
@@ -148,34 +179,26 @@
       <div class="game-board" style="--board-size: {$boardSize}" role="grid">
         {#each Array($boardSize) as _, rowIdx (rowIdx)}
           {#each Array($boardSize) as _, colIdx (colIdx)}
-            <div
-              class="board-cell {getDamageClass(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $settingsStore)}"
-              class:light={(rowIdx + colIdx) % 2 === 0}
-              class:dark={(rowIdx + colIdx) % 2 !== 0}
-              class:blocked-cell={isCellBlocked(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $settingsStore)}
-              class:available={isAvailable(rowIdx, colIdx)}
-              aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
-              oncontextmenu={(e) => onCellRightClick(e, rowIdx, colIdx)}
-              role="gridcell"
-              tabindex="0"
-            >
-              
-              {#if isCellBlocked(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $settingsStore)}
-                <!-- Хрест тепер рендериться через CSS -->
-              {:else}
-                <span class="move-dot"></span>
-              {/if}
-            </div>
+            <BoardCell
+              {rowIdx}
+              {colIdx}
+              visualCellVisitCounts={$visualCellVisitCounts}
+              settingsStore={$settingsStore}
+              isAvailable={isAvailable(rowIdx, colIdx)}
+              visualPosition={$visualPosition}
+              boardState={$visualBoardState}
+              gameState={$gameState}
+              on:cellRightClick={(e) => onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
+            />
           {/each}
         {/each}
         
-        {#if $settingsStore.showQueen && $animationStore.visualRow !== null && $animationStore.visualCol !== null}
-          <div class="player-piece"
-            style="top: {$animationStore.visualRow * (100 / $boardSize)}%; left: {$animationStore.visualCol * (100 / $boardSize)}%; z-index: 10;">
-            <div class="piece-container">
-              <SvgIcons name="queen" />
-            </div>
-          </div>
+        {#if $settingsStore.showQueen && $visualPosition.row !== null && $visualPosition.col !== null}
+          <PlayerPiece
+            row={$visualPosition.row}
+            col={$visualPosition.col}
+            boardSize={$boardSize}
+          />
         {/if}
       </div>
     </div>
@@ -183,31 +206,5 @@
 {/key}
 
 <style>
-.player-piece {
-  position: absolute;
-  width: calc(100% / var(--board-size, 4));
-  height: calc(100% / var(--board-size, 4));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  pointer-events: none;
-  /* Ось ключова зміна: transition тепер тут постійно */
-  transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1), left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
-.piece-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: crown-pop 0.5s ease-out forwards;
-}
-
-@keyframes crown-pop {
-  0% { transform: scale(0.5) rotate(-20deg); opacity: 0; }
-  60% { transform: scale(1.2) rotate(8deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0); opacity: 1; }
-}
 </style>

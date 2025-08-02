@@ -4,7 +4,7 @@
   import { modalStore } from '$lib/stores/modalStore.js';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
-  import { gameOrchestrator } from '$lib/gameOrchestrator.js';
+  import { gameOrchestrator } from '$lib/gameOrchestrator';
   import { get } from 'svelte/store';
   import { gameState } from '$lib/stores/gameState';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';

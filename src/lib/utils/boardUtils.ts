@@ -1,0 +1,99 @@
+// src/lib/utils/boardUtils.ts
+
+import type { Direction, Move } from '$lib/services/gameLogicService';
+
+/**
+ * Тип для налаштувань гри
+ */
+type SettingsState = {
+  blockModeEnabled: boolean;
+  blockOnVisitCount: number;
+};
+
+/**
+ * Створює порожню дошку заданого розміру
+ * @param size - розмір дошки (N x N)
+ * @returns двовимірний масив, заповнений нулями
+ */
+export function createEmptyBoard(size: number): number[][] {
+  return Array.from({ length: size }, () => Array(size).fill(0));
+}
+
+/**
+ * Генерує випадкову позицію на дошці
+ * @param size - розмір дошки
+ * @returns об'єкт з координатами
+ */
+export function getRandomCell(size: number): { row: number; col: number } {
+  return {
+    row: Math.floor(Math.random() * size),
+    col: Math.floor(Math.random() * size)
+  };
+}
+
+/**
+ * Розраховує доступні ходи для ферзя з заданої позиції
+ */
+export function getAvailableMoves(
+  row: number | null,
+  col: number | null,
+  size: number,
+  cellVisitCounts: Record<string, number> = {},
+  blockOnVisitCount: number = 0,
+  board: number[][] | undefined,
+  blockModeEnabled: boolean // <-- Новий параметр
+): Move[] {
+  if (row === null || col === null) return [];
+  
+  const moves: Move[] = [];
+  const directions: { dr: number; dc: number; direction: Direction }[] = [
+    { dr: -1, dc: 0, direction: 'up' },
+    { dr: 1, dc: 0, direction: 'down' },
+    { dr: 0, dc: -1, direction: 'left' },
+    { dr: 0, dc: 1, direction: 'right' },
+    { dr: -1, dc: -1, direction: 'up-left' },
+    { dr: -1, dc: 1, direction: 'up-right' },
+    { dr: 1, dc: -1, direction: 'down-left' },
+    { dr: 1, dc: 1, direction: 'down-right' },
+  ];
+  
+  const isOccupied = (r: number, c: number) => {
+    if (!board) return false;
+    return board[r] && board[r][c] !== 0;
+  };
+
+  for (const { dr, dc, direction } of directions) {
+    for (let dist = 1; dist < size; dist++) {
+      const nr = row + dr * dist;
+      const nc = col + dc * dist;
+      if (nr < 0 || nc < 0 || nr >= size || nc >= size) {
+        break;
+      }
+      // Використовуємо isCellBlocked з урахуванням blockModeEnabled
+      if (!isCellBlocked(nr, nc, cellVisitCounts, { blockModeEnabled, blockOnVisitCount }) && !isOccupied(nr, nc)) {
+        moves.push({ row: nr, col: nc, direction, distance: dist });
+      }
+    }
+  }
+  return moves;
+}
+
+/**
+ * Визначає, чи є клітинка заблокованою на основі кількості відвідувань.
+ */
+export function isCellBlocked(row: number, col: number, cellVisitCounts: Record<string, number>, settings: SettingsState): boolean {
+  const visitCount = cellVisitCounts[`${row}-${col}`] || 0;
+  return settings.blockModeEnabled && visitCount > settings.blockOnVisitCount;
+}
+
+/**
+ * Повертає CSS-клас "пошкодження" для клітинки.
+ */
+export function getDamageClass(row: number, col: number, cellVisitCounts: Record<string, number>, settings: SettingsState): string {
+  if (!settings.blockModeEnabled || settings.blockOnVisitCount === 0) return '';
+  const visitCount = cellVisitCounts[`${row}-${col}`] || 0;
+  if (visitCount > 0 && visitCount <= settings.blockOnVisitCount) {
+    return `cell-damage-${visitCount}`;
+  }
+  return '';
+} 

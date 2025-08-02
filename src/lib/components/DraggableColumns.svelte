@@ -173,7 +173,7 @@
   }
 </style>
 
-<div class="dnd-columns-container" style="margin-top: {isHorizontalLayout ? '11vh' : '0'};">
+<div class="dnd-columns-container" style="margin-top: {isHorizontalLayout ? '7vh' : '0'};">
   {#each columns as col, i}
     <ul
       bind:this={colRefs[i]}

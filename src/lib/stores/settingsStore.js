@@ -3,6 +3,7 @@ import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechServic
 import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
 import { locale } from 'svelte-i18n';
 import { modalStore } from '$lib/stores/modalStore.js';
+import { gameState } from './gameState'; // <-- 1. Імпортуй gameState
 
 /**
  * @typedef {Object} SettingsState
@@ -95,9 +96,11 @@ const convertStyle = (style) => {
 /** @returns {SettingsState} */
 function loadSettings() {
   if (!isBrowser) return defaultSettings;
-  const storedKeybindingsRaw = localStorage.getItem('keybindings');
-  let storedKeybindings = safeJsonParse(storedKeybindingsRaw, {});
-  Object.keys(storedKeybindings).forEach(action => {
+  
+  try {
+    const storedKeybindingsRaw = localStorage.getItem('keybindings');
+    let storedKeybindings = safeJsonParse(storedKeybindingsRaw, {});
+    Object.keys(storedKeybindings).forEach(action => {
     if (typeof storedKeybindings[action] === 'string') {
       storedKeybindings[action] = [storedKeybindings[action]];
     }
@@ -122,6 +125,10 @@ function loadSettings() {
     })()),
     showGameModeModal: localStorage.getItem('showGameModeModal') !== 'false', // Defaults to true if null
   };
+  } catch (error) {
+    console.error('❌ Помилка завантаження налаштувань:', error);
+    return defaultSettings;
+  }
 }
 
 function createSettingsStore() {
@@ -129,13 +136,20 @@ function createSettingsStore() {
 
   const methods = {
     init: () => {
-      if (isBrowser) {
-        const settings = loadSettings();
-        update(current => ({ ...settings, gameMode: current.gameMode ?? settings.gameMode }));
-        subscribe(currentSettings => {
-          document.documentElement.setAttribute('data-theme', currentSettings.theme);
-          document.documentElement.setAttribute('data-style', currentSettings.style);
-        });
+      try {
+        if (isBrowser) {
+          const settings = loadSettings();
+          update(current => ({ ...settings, gameMode: current.gameMode ?? settings.gameMode }));
+          subscribe(currentSettings => {
+            document.documentElement.setAttribute('data-theme', currentSettings.theme);
+            document.documentElement.setAttribute('data-style', currentSettings.style);
+          });
+        }
+        console.log('✅ settingsStore ініціалізовано успішно');
+      } catch (error) {
+        console.error('❌ Помилка ініціалізації settingsStore:', error);
+        // Використовуємо налаштування за замовчуванням при помилці
+        set(defaultSettings);
       }
     },
     updateSettings: (/** @type {Partial<SettingsState>} */ newSettings) => {
@@ -222,6 +236,29 @@ function createSettingsStore() {
       update(state => {
         const newState = !state.blockModeEnabled;
         if (isBrowser) localStorage.setItem('blockModeEnabled', String(newState));
+
+        // Якщо ми ВМИКАЄМО режим, скидаємо лічильники та додаємо запис про очищення до історії
+        if (newState) {
+          gameState.update(gs => {
+            // Створюємо новий запис для історії, що фіксує очищення дошки
+            /** @type {{ pos: { row: number, col: number }, blocked: any[], visits: {}, blockModeEnabled: boolean }} */
+            const resetHistoryEntry = { 
+              pos: { row: gs.playerRow, col: gs.playerCol }, 
+              blocked: [], 
+              visits: {}, // <-- Ключовий момент: порожній об'єкт відвідувань
+              blockModeEnabled: newState // <-- ДОДАЙ ЦЕЙ РЯДОК
+            };
+
+            return {
+              ...gs,
+              cellVisitCounts: {},
+              movesInBlockMode: 0,
+              // Додаємо новий запис до існуючої історії
+              moveHistory: [...gs.moveHistory, resetHistoryEntry]
+            };
+          });
+        }
+
         return { ...state, blockModeEnabled: newState };
       });
     },

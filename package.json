@@ -13,7 +13,8 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "diagnose": "node scripts/diagnose.js"
   },
   "devDependencies": {
     "@fontsource/fira-mono": "^5.0.0",

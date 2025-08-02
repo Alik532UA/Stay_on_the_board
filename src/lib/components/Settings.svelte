@@ -62,7 +62,7 @@
   background: rgba(58,24,86,0.97); /* темно-фіолетовий, не чорний */
   border-radius: 18px;
   padding: 32px 28px 28px 28px;
-  box-shadow: 0 8px 32px 0 rgba(80,0,80,0.22);
+  box-shadow: 0 8px 32px 0 var(--shadow-color);
   min-width: 320px;
   max-width: 380px;
   margin: 36px auto 0 auto;
