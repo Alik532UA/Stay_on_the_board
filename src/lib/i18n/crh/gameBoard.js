@@ -11,5 +11,28 @@ export default {
   details: "Tafsilât",
   infoModalTitle: "Oyun ve Onıñ Maqsadı Hakkında",
   infoModalContent: `Maqsadıñız – ortaq figurani nevbetnen areket ettirip, tahta tışına çıqarmamaq.\n\n<b>Pro Rejim: Hayal Kuvvetini Terbiye Etmek</b>\nOyunıñ asıl lezzeti, tahta hayalinizde canlanıp, kör körüne oynağa başlağanda açıladı. Sozlamalarda tahtanı gizlep, seslendirüvni açıp, qısqa yollar (hotkeys) ile oynap baqıñız. Bu, oyunnı hafıza ve mekânsal tüşüniş içün quvetli bir trenajorğa aylandıra. 3x3 tahta ile başlayınız ve zorlarnı arttırıñız!`,
-  clearCache: "Keşni temizle (DEV)"
+  clearCache: "Keşni temizle (DEV)",
+  gameInfo: {
+    gameStarted: "Oyun başladı!\nAreket yapıñız",
+    firstMove: "Oyun başladı!\nAreket yapma sırası sizde",
+    gameResumed: "Oyun devam etti, figura moladan evelki yerinde.\nSeniñ sırañ",
+    playerTurn: "Areket yapma sırası sizde",
+    computerTurn: "Kompyuter tüşüne...",
+    playerSelectedDirection: "Saylanğan yön: {direction}",
+    playerSelectedDistance: "Saylanğan mesafe: {distance}",
+    playerSelectedMove: "Saylanğan areket: {direction} {distance}",
+    computerMadeMove: "Kompyuter areket yaptı: {direction} {distance}.\nEndi sıra sizde areket yapmaq",
+    pauseBetweenMoves: "Arekteler arası mola...",
+    gameOver: "Oyun bitken"
+  },
+  directions: {
+    upLeft: "yukarı-sol",
+    up: "yukarı",
+    upRight: "yukarı-sağ",
+    left: "sol",
+    right: "sağ",
+    downLeft: "aşağı-sol",
+    down: "aşağı",
+    downRight: "aşağı-sağ"
+  }
 }; 

@@ -5,18 +5,23 @@
   import { 
     replayPosition as calculateReplayPosition, 
     replayCellVisitCounts as calculateReplayCellVisitCounts, 
-    replaySegments as calculateReplaySegments 
+    replaySegments as calculateReplaySegments,
+    replayBlockModeEnabled as calculateReplayBlockModeEnabled 
   } from '$lib/utils/replay.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
-  import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.js';
+  import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
+  import { replayAutoPlayStore } from '$lib/stores/replayAutoPlayStore.js';
 
   let { moveHistory, boardSize, autoPlayForward = false } = $props<{ moveHistory: any[]; boardSize: number; autoPlayForward?: boolean }>();
 
   onMount(() => {
     if (autoPlayForward) {
-      setTimeout(() => toggleAutoPlay('forward'), 1000);
+      setTimeout(() => {
+        // Викликаємо toggleAutoPlay з усіма трьома необхідними аргументами
+        toggleAutoPlay('forward');
+      }, 1000);
     }
   });
 
@@ -32,36 +37,15 @@
   const replayPosition = calculateReplayPosition(replayState);
   const replayCellVisitCounts = calculateReplayCellVisitCounts(replayState);
   const replaySegments = calculateReplaySegments(replayState);
+  const replayBlockModeEnabled = calculateReplayBlockModeEnabled(replayState); // <-- ДОДАЙ ЦЕЙ РЯДОК
 
   function goToStep(step: number) {
     replayState.update(s => ({ ...s, replayCurrentStep: Math.max(0, Math.min(step, s.moveHistory.length - 1)) }));
   }
 
-  let autoPlayInterval: ReturnType<typeof setInterval> | null = null;
-
   function toggleAutoPlay(direction: 'forward' | 'backward') {
-    if (autoPlayInterval) clearInterval(autoPlayInterval);
-    const currentDirection = $replayState.autoPlayDirection;
-    const s = $replayState;
-    // Якщо play вперед і вже на останньому кроці — почати з початку
-    if (direction === 'forward' && s.replayCurrentStep >= s.moveHistory.length - 1) {
-      goToStep(0);
-    }
-    if (currentDirection === direction) {
-      replayState.update(s => ({ ...s, autoPlayDirection: 'paused' }));
-      return;
-    }
-    replayState.update(s => ({ ...s, autoPlayDirection: direction }));
-    autoPlayInterval = setInterval(() => {
-      const s = $replayState;
-      const nextStep = s.replayCurrentStep + (direction === 'forward' ? 1 : -1);
-      if (nextStep >= 0 && nextStep < s.moveHistory.length) {
-        goToStep(nextStep);
-      } else {
-        if (autoPlayInterval) clearInterval(autoPlayInterval);
-        replayState.update(st => ({ ...st, autoPlayDirection: 'paused' }));
-      }
-    }, 1000);
+    // Тепер ми передаємо replayState та goToStep з локального скоупу компонента
+    replayAutoPlayStore.toggleAutoPlay(direction, replayState, goToStep);
   }
 
   function toggleLimitPath() {
@@ -75,12 +59,12 @@
       {#each Array(boardSize) as _, rowIdx}
         {#each Array(boardSize) as _, colIdx}
           <div
-            class="board-cell {getDamageClass(rowIdx, colIdx, $replayCellVisitCounts, $settingsStore)}"
+            class="board-cell {getDamageClass(rowIdx, colIdx, $replayCellVisitCounts, { blockModeEnabled: $replayBlockModeEnabled, blockOnVisitCount: $settingsStore.blockOnVisitCount })}"
             class:light={(rowIdx + colIdx) % 2 === 0}
             class:dark={(rowIdx + colIdx) % 2 !== 0}
-            class:blocked-cell={isCellBlocked(rowIdx, colIdx, $replayCellVisitCounts, $settingsStore)}
+            class:blocked-cell={isCellBlocked(rowIdx, colIdx, $replayCellVisitCounts, { blockModeEnabled: $replayBlockModeEnabled, blockOnVisitCount: $settingsStore.blockOnVisitCount })}
           >
-            {#if isCellBlocked(rowIdx, colIdx, $replayCellVisitCounts, $settingsStore)}
+            {#if isCellBlocked(rowIdx, colIdx, $replayCellVisitCounts, { blockModeEnabled: $replayBlockModeEnabled, blockOnVisitCount: $settingsStore.blockOnVisitCount })}
               <!-- Хрест тепер рендериться через CSS, як і в основній грі -->
             {/if}
           </div>

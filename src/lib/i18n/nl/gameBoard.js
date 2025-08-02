@@ -11,5 +11,28 @@ export default {
   details: "Details",
   infoModalTitle: "Over het spel en het doel",
   infoModalContent: `Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan.\n\n<b>Pro-modus: Train je verbeelding</b>\nHet echte plezier begint wanneer je het bord in je hoofd verplaatst. Probeer het bord in de instellingen uit te schakelen, voice-over aan te zetten en geblinddoekt te spelen met sneltoetsen. Dit maakt van het spel een <a href='https://youtube.com/shorts/_4n1F84wORI' target='_blank' rel='noopener noreferrer' style='color:inherit;text-decoration:none;'>krachtige</a> trainer voor geheugen en ruimtelijk inzicht. Begin met een 3x3 bord en maak het steeds moeilijker!`,
-  clearCache: "Cache wissen (DEV)"
+  clearCache: "Cache wissen (DEV)",
+  gameInfo: {
+    gameStarted: "Spel gestart!\nDoe je zet",
+    firstMove: "Spel gestart!\nJouw beurt om een zet te doen",
+    gameResumed: "Spel hervat, het stuk staat op dezelfde positie als voor de pauze.\nJouw beurt om te zetten",
+    playerTurn: "Jouw beurt om een zet te doen",
+    computerTurn: "Computer denkt na...",
+    playerSelectedDirection: "Gekozen richting: {direction}",
+    playerSelectedDistance: "Gekozen afstand: {distance}",
+    playerSelectedMove: "Gekozen zet: {direction} met {distance}",
+    computerMadeMove: "Computer verplaatste: {direction} met {distance}.\nNu jouw beurt om te zetten",
+    pauseBetweenMoves: "Pauze tussen zetten...",
+    gameOver: "Spel voorbij"
+  },
+  directions: {
+    upLeft: "boven-links",
+    up: "omhoog",
+    upRight: "boven-rechts",
+    left: "links",
+    right: "rechts",
+    downLeft: "beneden-links",
+    down: "omlaag",
+    downRight: "beneden-rechts"
+  }
 }; 

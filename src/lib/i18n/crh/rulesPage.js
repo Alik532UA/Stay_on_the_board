@@ -26,7 +26,7 @@ export default {
   blockModeText: "Daa çetin ve stratejik rejim. Areket yapılan hücre bloklanıp, kelgusi areketler içün açıq olmay. Bu, oyunçılarnı marşrutlarını diqqatnen planlamağa zorlay.",
   noMovesButtonTitle: "'Areket yoq' düğmesi",
   noMovesButtonText1: "Figuranıñ artıq heç bir geçerli areketi qalmadı dep oylasañız, bu düğmeye basıñız. Sistem beyanatıñıznı tektirir:",
-  noMovesWin: "Eger doğru olsanız (areketler doğrudan yoq) — qazanırsız.",
+  noMovesWin: "Eger doğru olsanız (areketler doğrudan yoq) — bonus alırsız, tahta bloklanğan hücrelerden tamamen temizlenir ve areketiñizni devam ettirirsiñiz.",
   noMovesLoss: "Eger yanılğan olsanız (en az bir areket bar) — yutqazasız.",
   noMovesButtonText2: "Bu, riskli, amma bazen qıyın vaziyetlerde qazanmaq içün şart strategiyadır.",
   scoringTitle: "Ballar Esaplama Sistemi",

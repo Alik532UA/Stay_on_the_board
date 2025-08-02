@@ -9,13 +9,14 @@ export const WIDGETS = {
   BOARD_WRAPPER: 'board-bg-wrapper',
   CONTROLS_PANEL: 'game-controls-panel',
   SETTINGS_EXPANDER: 'settings-expander',
+  GAME_INFO: 'game-info-widget',
 };
 
 // Структура макета за замовчуванням
 const defaultLayout = [
   {
     id: 'column-1',
-    widgets: [WIDGETS.TOP_ROW, WIDGETS.SCORE_PANEL, WIDGETS.BOARD_WRAPPER],
+    widgets: [WIDGETS.TOP_ROW, WIDGETS.GAME_INFO, WIDGETS.BOARD_WRAPPER, WIDGETS.SCORE_PANEL],
   },
   {
     id: 'column-2',

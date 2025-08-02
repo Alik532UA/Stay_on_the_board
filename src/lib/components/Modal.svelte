@@ -1,4 +1,4 @@
-﻿<script>
+﻿<script lang="ts">
   import { modalState, modalStore } from '$lib/stores/modalStore.js';
   import { logStore } from '$lib/stores/logStore.js';
   import { _ } from 'svelte-i18n';
@@ -8,9 +8,9 @@
   import { onMount } from 'svelte';
   import { audioService } from '$lib/services/audioService.js';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
+  import { focusManager } from '$lib/stores/focusManager.js';
 
-  /** @type {HTMLButtonElement | null} */
-  let hotBtn = null;
+  let hotBtn: HTMLButtonElement | null = null;
 
   let expertVolume = 0.3;
   let volumePercentage = 30;
@@ -39,12 +39,10 @@
   }
 
   $: if ($modalState.isOpen && hotBtn) {
-    setTimeout(() => {
-      if (hotBtn && typeof hotBtn.focus === 'function') hotBtn.focus();
-    }, 50);
+    focusManager.focusWithDelay(hotBtn, 50);
   }
 
-  function onModalKeydown(/** @type {any} */e) {
+  function onModalKeydown(e: KeyboardEvent) {
     if (!$modalState.isOpen || !$modalState.buttons) return;
     const idx = $modalState.buttons.findIndex(b => b.isHot);
     if (idx !== -1 && (e.key === 'Enter' || e.key === ' ' || e.code === 'Numpad5')) {
@@ -59,9 +57,9 @@
     }
   }
 
-  function onOverlayClick(/** @type {any} */ e) {
+  function onOverlayClick(e: MouseEvent) {
     if (!$modalState.closable) return;
-    const target = /** @type {HTMLElement|null} */(e.target);
+    const target = e.target as HTMLElement;
     if (target && target.classList.contains('modal-overlay')) {
       logStore.addLog('Закриття модального вікна (overlay)', 'info');
       modalStore.closeModal();
@@ -109,15 +107,15 @@
         {/if}
       </div>
       <div class="modal-content">
-        {#if typeof $modalState.content === 'object' && $modalState.content?.reason}
+        {#if typeof $modalState.content === 'object' && $modalState.content && 'reason' in $modalState.content}
           <p class="reason">{$modalState.content.reason}</p>
         {/if}
         {#if $modalState.component}
-          <svelte:component this={$modalState.component} />
-        {:else if typeof $modalState.content === 'object' && $modalState.content?.isFaq}
+          <svelte:component this={$modalState.component as any} />
+        {:else if typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq}
           <FAQModal />
-        {:else if typeof $modalState.content === 'object' && $modalState.content?.key && $modalState.content?.actions}
-          <p class="reason">{$_('modal.keyConflictContent', { values: { key: $modalState.content.key } })}</p>
+        {:else if typeof $modalState.content === 'object' && $modalState.content && 'key' in $modalState.content && 'actions' in $modalState.content}
+          <p class="reason">{$_('modal.keyConflictContent', { values: { key: $modalState.content.key as string } })}</p>
         {:else if $modalState.contentKey || (typeof $modalState.content === 'string' && $modalState.content)}
           <p class="reason">
             {#if $modalState.contentKey}
@@ -128,31 +126,31 @@
           </p>
         {/if}
 
-        {#if $gameState.isGameOver}
+        {#if $gameState.isGameOver || ($modalState.content && typeof $modalState.content === 'object' && 'scoreDetails' in $modalState.content)}
           <div class="score-details-container">
-            <div class="score-detail-row">{$_('modal.scoreDetails.baseScore')} <span>{$gameState.baseScore ?? 0}</span></div>
-            {#if ($gameState.sizeBonus ?? 0) > 0}
-              <div class="score-detail-row">{$_('modal.scoreDetails.sizeBonus')} <span>+{($gameState.sizeBonus ?? 0)}</span></div>
+            <div class="score-detail-row">{$_('modal.scoreDetails.baseScore')} <span>{($modalState.content as any).scoreDetails.baseScore ?? ($modalState.content as any).scoreDetails.score ?? 0}</span></div>
+            {#if (($modalState.content as any)?.scoreDetails?.sizeBonus ?? $gameState.sizeBonus ?? 0) > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.sizeBonus')} <span>+{($modalState.content as any)?.scoreDetails?.sizeBonus ?? $gameState.sizeBonus ?? 0}</span></div>
             {/if}
-            {#if ($gameState.blockModeBonus ?? 0) > 0}
-              <div class="score-detail-row">{$_('modal.scoreDetails.blockModeBonus')} <span>+{($gameState.blockModeBonus ?? 0)}</span></div>
+            {#if (($modalState.content as any)?.scoreDetails?.blockModeBonus ?? $gameState.blockModeBonus ?? 0) > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.blockModeBonus')} <span>+{($modalState.content as any)?.scoreDetails?.blockModeBonus ?? $gameState.blockModeBonus ?? 0}</span></div>
             {/if}
-            {#if ($gameState.jumpBonus ?? 0) > 0}
-              <div class="score-detail-row">{$_('modal.scoreDetails.jumpBonus')} <span>+{($gameState.jumpBonus ?? 0)}</span></div>
+            {#if (($modalState.content as any)?.scoreDetails?.jumpBonus ?? $gameState.jumpBonus ?? 0) > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.jumpBonus')} <span>+{($modalState.content as any)?.scoreDetails?.jumpBonus ?? $gameState.jumpBonus ?? 0}</span></div>
             {/if}
-            {#if ($gameState.noMovesBonus ?? 0) > 0}
-              <div class="score-detail-row">{$_('modal.scoreDetails.noMovesBonus')} <span>+{($gameState.noMovesBonus ?? 0)}</span></div>
+            {#if (($modalState.content as any)?.scoreDetails?.noMovesBonus ?? $gameState.noMovesBonus ?? 0) > 0}
+              <div class="score-detail-row">{$_('modal.scoreDetails.noMovesBonus')} <span>+{($modalState.content as any)?.scoreDetails?.noMovesBonus ?? $gameState.noMovesBonus ?? 0}</span></div>
             {/if}
-            {#if ($modalState.titleKey === 'modal.gameOverTitle' && ($gameState.finishBonus ?? 0) > 0)}
-              <div class="score-detail-row">{$_('modal.scoreDetails.finishBonus')} <span>+{($gameState.finishBonus ?? 0)}</span></div>
+            {#if ($modalState.titleKey === 'modal.gameOverTitle' && (($modalState.content as any)?.scoreDetails?.finishBonus ?? $gameState.finishBonus ?? 0) > 0)}
+              <div class="score-detail-row">{$_('modal.scoreDetails.finishBonus')} <span>+{($modalState.content as any)?.scoreDetails?.finishBonus ?? $gameState.finishBonus ?? 0}</span></div>
             {/if}
-            {#if ($gameState.totalPenalty ?? 0) > 0}
-              <div class="score-detail-row penalty">{$_('modal.scoreDetails.penalty')} <span>-{($gameState.totalPenalty ?? 0)}</span></div>
+            {#if (($modalState.content as any)?.scoreDetails?.totalPenalty ?? $gameState.totalPenalty ?? 0) > 0}
+              <div class="score-detail-row penalty">{$_('modal.scoreDetails.penalty')} <span>-{($modalState.content as any)?.scoreDetails?.totalPenalty ?? $gameState.totalPenalty ?? 0}</span></div>
             {/if}
           </div>
           <div class="final-score-container">
             <div class="final-score-label">{$_('modal.scoreDetails.finalScore')}</div>
-            <div class="final-score-value">{$gameState.totalScore ?? 0}</div>
+            <div class="final-score-value">{($modalState.content as any).scoreDetails.totalScore ?? ($modalState.content as any).scoreDetails.score ?? 0}</div>
           </div>
         {/if}
       </div>
@@ -166,7 +164,17 @@
               class:green-btn={btn.customClass === 'green-btn'}
               class:danger-btn={btn.customClass === 'danger-btn'}
               bind:this={hotBtn}
-              onclick={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
+              onclick={() => { 
+                logStore.addLog(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`, 'info'); 
+                console.log('Modal button clicked (hot):', { textKey: btn.textKey, text: btn.text, onClick: btn.onClick });
+                if (btn.onClick) {
+                  console.log('Executing onClick handler...');
+                  btn.onClick();
+                } else {
+                  console.log('No onClick handler, closing modal');
+                  modalStore.closeModal();
+                }
+              }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
             >
               {btn.textKey ? $_(btn.textKey) : btn.text}
@@ -178,7 +186,17 @@
               class:blue-btn={btn.customClass === 'blue-btn'}
               class:green-btn={btn.customClass === 'green-btn'}
               class:danger-btn={btn.customClass === 'danger-btn'}
-              onclick={() => { logStore.addLog(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`, 'info'); (btn.onClick || modalStore.closeModal)(); }}
+              onclick={() => { 
+                logStore.addLog(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`, 'info'); 
+                console.log('Modal button clicked (regular):', { textKey: btn.textKey, text: btn.text, onClick: btn.onClick });
+                if (btn.onClick) {
+                  console.log('Executing onClick handler...');
+                  btn.onClick();
+                } else {
+                  console.log('No onClick handler, closing modal');
+                  modalStore.closeModal();
+                }
+              }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
             >
               {btn.text ? btn.text : (btn.textKey ? $_(btn.textKey) : '')}

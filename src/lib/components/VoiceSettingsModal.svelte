@@ -310,12 +310,7 @@
     animation: fadeIn 0.4s ease-out forwards;
   }
 
-  .details-text h4 {
-    margin-top: 0;
-    margin-bottom: 8px;
-    color: #fff;
-    font-weight: 700;
-  }
+
 
   .details-text p, .details-text ul {
     margin-bottom: 12px;

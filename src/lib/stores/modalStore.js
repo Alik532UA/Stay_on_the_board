@@ -14,7 +14,7 @@ import { writable } from 'svelte/store';
  * @typedef {Object} ModalContent
  * @property {string} [reason]
  * @property {number} [score]
- * @property {any} [scoreDetails]
+ * @property {unknown} [scoreDetails]
  * @property {boolean} [isFaq]
  */
 /**
@@ -22,10 +22,10 @@ import { writable } from 'svelte/store';
  * @property {boolean} isOpen
  * @property {string} [title]
  * @property {string} [titleKey]
- * @property {string|ModalContent|any} [content]
+ * @property {string|ModalContent|unknown} [content]
  * @property {string} [contentKey]
  * @property {ModalButton[]} buttons
- * @property {any} [component]
+ * @property {unknown} [component]
  * @property {boolean} [closable]
  */
 

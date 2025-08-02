@@ -30,8 +30,8 @@
   .score-panel {
     background: var(--bg-secondary, #fff3);
     padding: 12px 16px;
-    border-radius: 12px;
-    box-shadow: var(--unified-shadow, 0 2px 12px 0 rgba(80,0,80,0.10));
+    border-radius: var(--unified-border-radius);
+    box-shadow: var(--unified-shadow);
     margin-bottom: 16px;
     text-align: center;
     font-size: 1.2em;
@@ -40,6 +40,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    backdrop-filter: var(--unified-backdrop-filter);
+    border: var(--unified-border);
   }
   .score-display {
     display: flex;
@@ -93,6 +95,10 @@
   }
   .game-content-block {
     margin-bottom: 0;
+    border: var(--unified-border);
+    border-radius: var(--unified-border-radius);
+    box-shadow: var(--unified-shadow);
+    backdrop-filter: var(--unified-backdrop-filter);
   }
 </style>
 

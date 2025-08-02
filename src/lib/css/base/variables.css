@@ -96,3 +96,21 @@
     --disabled-text: #757575;
     --toggle-off-bg: #555;
 } 
+
+/* === Уніфіковані стилі для основних елементів інтерфейсу === */
+:root {
+  /* Уніфіковане скруглення для основних елементів */
+  --unified-border-radius: 24px;
+  
+  /* Уніфікована тінь для основних елементів */
+  --unified-shadow: 0 8px 32px 0 var(--shadow-color);
+  
+  /* Уніфікована тінь при hover */
+  --unified-shadow-hover: 0 12px 40px 0 var(--shadow-color);
+  
+  /* Уніфіковане обведення */
+  --unified-border: 1.5px solid rgba(255,255,255,0.18);
+  
+  /* Уніфікований backdrop-filter */
+  --unified-backdrop-filter: blur(12px);
+} 

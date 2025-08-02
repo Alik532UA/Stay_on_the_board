@@ -7,10 +7,14 @@ export const replayPosition = (replayState) => derived(
   replayState,
   /** @param {any} $replayState */
   ($replayState) => {
-    if ($replayState.isReplayMode) {
-      return $replayState.moveHistory[$replayState.replayCurrentStep]?.pos;
-    }
-    return null;
+    if (!$replayState.isReplayMode) return null;
+    
+    // Використовуємо Math.min, щоб replayCurrentStep ніколи не виходив
+    // за межі масиву moveHistory. Це гарантує, що ми завжди
+    // отримуємо валідний запис, навіть на останньому кроці анімації.
+    const historyIndex = Math.min($replayState.replayCurrentStep, $replayState.moveHistory.length - 1);
+    
+    return $replayState.moveHistory[historyIndex]?.pos;
   }
 );
 
@@ -20,9 +24,21 @@ export const replayPosition = (replayState) => derived(
 export const replayCellVisitCounts = (replayState) => derived(
   replayState,
   /** @param {any} $replayState */
-  ($replayState) => $replayState.isReplayMode
-    ? $replayState.moveHistory[$replayState.replayCurrentStep]?.visits || {}
-    : {}
+  ($replayState) => {
+    if (!$replayState.isReplayMode) return {};
+    
+    // Визначаємо індекс запису в історії, який потрібно відобразити.
+    // Якщо поточний крок виходить за межі, використовуємо останній доступний запис.
+    const historyIndex = Math.min($replayState.replayCurrentStep, $replayState.moveHistory.length - 1);
+    
+    const currentHistoryEntry = $replayState.moveHistory[historyIndex];
+    
+    if (currentHistoryEntry && currentHistoryEntry.blockModeEnabled === false) {
+      return {};
+    }
+    
+    return currentHistoryEntry?.visits || {};
+  }
 );
 
 /**
@@ -75,5 +91,25 @@ export const replaySegments = (replayState) => derived(
       });
     }
     return segments;
+  }
+);
+
+/**
+ * @param {import('svelte/store').Readable<any>} replayState
+ */
+export const replayBlockModeEnabled = (replayState) => derived(
+  replayState,
+  /** @param {any} $replayState */
+  ($replayState) => {
+    if (!$replayState.isReplayMode) return false;
+    
+    // Визначаємо індекс запису в історії, який потрібно відобразити.
+    // Якщо поточний крок виходить за межі, використовуємо останній доступний запис.
+    const historyIndex = Math.min($replayState.replayCurrentStep, $replayState.moveHistory.length - 1);
+    
+    const currentEntry = $replayState.moveHistory[historyIndex];
+    // Повертаємо збережений стан режиму блокування для поточного кроку,
+    // або false за замовчуванням.
+    return currentEntry?.blockModeEnabled ?? false;
   }
 ); 

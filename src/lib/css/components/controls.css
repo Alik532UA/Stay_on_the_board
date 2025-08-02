@@ -300,16 +300,9 @@
     transform: scale(1.02);
 }
 
-#center-info.confirm-btn-active {
-    background: var(--confirm-btn-bg);
-    color: white;
-    border-color: var(--confirm-btn-bg);
-    animation: pulse 2s infinite;
-}
-
 #center-info.confirm-btn-active:hover {
-    background: var(--confirm-btn-hover);
-    border-color: var(--confirm-btn-hover);
+    background: #2e7d32 !important;
+    border-color: #2e7d32 !important;
     transform: scale(1.02);
 }
 
@@ -429,13 +422,11 @@
 
 .confirm-move-btn {
     width: 100%;
-    max-width: 260px;
     margin-top: 10px;
 }
 
 .no-moves-btn {
     width: 100%;
-    max-width: 260px;
 }
 
 .settings-icon {
@@ -472,13 +463,14 @@
 
 /* === Стилі для центральної кнопки керування === */
 #center-info.confirm-btn-active {
-    background: var(--confirm-btn-bg);
-    color: #fff;
-    border: 2px solid var(--confirm-btn-bg);
+    background: #43a047 !important;
+    color: #fff !important;
+    border: 2px solid #43a047 !important;
     cursor: pointer;
     font-weight: bold;
-    box-shadow: 0 0 8px var(--confirm-btn-bg);
+    box-shadow: 0 0 8px #43a047 !important;
     transition: background 0.2s, color 0.2s;
+    animation: pulse 2s infinite;
 }
 #center-info.computer-move-display {
     background: orange;

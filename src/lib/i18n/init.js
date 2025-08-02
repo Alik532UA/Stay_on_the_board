@@ -13,18 +13,25 @@ register('nl', () => import('./nl.js'));
 
 // Ця функція буде викликатися на стороні клієнта
 export function initializeI18n() {
-  const initialLocale = get(settingsStore).language || getLocaleFromNavigator() || 'uk';
+  try {
+    const initialLocale = get(settingsStore).language || getLocaleFromNavigator() || 'uk';
 
-  init({
-    fallbackLocale: 'uk',
-    initialLocale: initialLocale,
-  });
+    init({
+      fallbackLocale: 'uk',
+      initialLocale: initialLocale,
+    });
 
-  settingsStore.subscribe((settings) => {
-    if (settings.language && get(locale) !== settings.language) {
-      locale.set(settings.language);
-    }
-  });
+    settingsStore.subscribe((settings) => {
+      if (settings.language && get(locale) !== settings.language) {
+        locale.set(settings.language);
+      }
+    });
 
-  i18nReady.set(true);
+    i18nReady.set(true);
+    console.log('✅ i18n ініціалізовано успішно');
+  } catch (error) {
+    console.error('❌ Помилка ініціалізації i18n:', error);
+    // Навіть при помилці встановлюємо ready, щоб сайт не зависав на "Loading..."
+    i18nReady.set(true);
+  }
 } 

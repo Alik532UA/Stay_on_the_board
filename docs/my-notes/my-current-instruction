@@ -1,300 +1,902 @@
-### Аналіз проблеми
+```
+// src/lib/gameOrchestrator.ts
+import { get } from 'svelte/store';
+import { playerInputStore } from './stores/playerInputStore.js';
+import * as gameLogicService from '$lib/services/gameLogicService.js';
+import { settingsStore } from './stores/settingsStore.js';
+import { modalService } from '$lib/services/modalService.js';
+import { Figure } from '$lib/models/Figure.js';
+import { modalStore } from './stores/modalStore.js';
+import { agents } from './playerAgents.js';
+import { speakText, langMap } from '$lib/services/speechService.js';
+import { _ } from 'svelte-i18n';
+import { logService } from '$lib/services/logService.js';
+import { lastComputerMove } from './stores/derivedState.ts';
+import { replayStore } from './stores/replayStore.js';
+import { goto } from '$app/navigation';
+import { base } from '$app/paths';
+import { stateManager } from './services/stateManager';
+import type { Writable } from 'svelte/store';
+import { animationStore } from './stores/animationStore';
+import { gameState } from './stores/gameState';
+import { getAvailableMoves } from '$lib/utils/boardUtils.ts';
 
-Дякую за вашу неймовірну наполегливість. Порожній лог після всіх наших спроб — це найважливіший доказ. Він означає, що ми шукали не там. Проблема не в логіці стану, а в самому UI-компоненті, який з якоїсь причини перестає реагувати на кліки.
+/**
+ * Інтерфейс для стану гри (локальний для gameOrchestrator)
+ */
+export interface GameState {
+  score: number;
+  penaltyPoints: number;
+  boardSize: number;
+  playerRow: number;
+  playerCol: number;
+  isGameOver: boolean;
+  gameOverReasonKey?: string | null;
+  gameOverReasonValues?: Record<string, any> | null;
+  noMovesBonus: number;
+  noMovesClaimed?: boolean;
+  noMovesClaimsCount?: number;
+  isComputerMoveInProgress?: boolean;
+  moveHistory?: any[];
+  [key: string]: any;
+}
 
-**Що означає порожній лог:**
-Якщо `console.log` в обробнику `on:click` не спрацьовує, це означає, що подія кліку **взагалі не доходить до кнопки**.
+/**
+ * Інтерфейс для кінцевого рахунку
+ */
+export interface FinalScoreDetails {
+  baseScore: number;
+  sizeBonus: number;
+  blockModeBonus: number;
+  jumpBonus: number;
+  finishBonus: number;
+  noMovesBonus: number;
+  totalPenalty: number;
+  totalScore: number;
+}
 
-**Нова гіпотеза (з високою ймовірністю): Проблема у взаємодії компонентів.**
-Коли рахунок оновлюється, Svelte перерендерить `ScorePanelWidget`. Цей віджет знаходиться всередині `DraggableColumns`. Цілком імовірно, що бібліотека для перетягування, реагуючи на оновлення одного зі своїх дочірніх елементів, "ламає" обробники подій на інших елементах, що знаходяться в сусідніх колонках (як `SettingsExpanderWidget`). Це пояснює, чому проблема виникає *тільки* після зміни рахунку.
+/**
+ * Сервіс, що керує ігровим процесом.
+ * Він є єдиною точкою входу для дій гравця та координує
+ * оновлення стану, хід комп'ютера та побічні ефекти.
+ */
+export const gameOrchestrator = {
+  /**
+   * Встановлює новий розмір дошки, обробляючи логіку підтвердження.
+   * @param newSize - Новий розмір дошки
+   */
+  async setBoardSize(newSize: number): Promise<void> {
+    const gameStateInstance = gameState;
+    const { score, penaltyPoints, boardSize } = get(gameStateInstance);
+    if (newSize === boardSize) return;
 
-**Стратегія виправлення (метод ізоляції):**
-Щоб перевірити цю гіпотезу, ми проведемо експеримент: тимчасово відключимо складну систему перетягування `DraggableColumns` і відрендеримо всі віджети напряму. Якщо в такому спрощеному вигляді баг зникне, ми на 100% будемо знати, що проблема саме в `DraggableColumns`.
-
-### План для Cursor
-
-```md
-Твоя задача — тимчасово спростити структуру UI, щоб ізолювати проблемний компонент. Ми відключимо `DraggableColumns` і подивимося, чи зникне баг.
-
-1.  **Файл для редагування:** `src/lib/components/GameBoard.svelte`
-    *   **Закоментуй `DraggableColumns`:** Знайди рядок `<DraggableColumns ... />` і закоментуй його.
-    *   **Закоментуй пов'язану логіку:** Закоментуй у секції `<script>` визначення змінної `columns` та функцію `handleDrop`, оскільки вони більше не потрібні.
-    *   **Додай прямий рендеринг віджетів:** Замість закоментованого компонента, встав простий HTML-код, який рендерить всі віджети напряму в трьох колонках. Це тимчасовий макет для діагностики.
-
-#### Код для `src/lib/components/GameBoard.svelte`
-
-**Повністю заміни вміст файлу на цей код:**
-```svelte
-<script lang="ts">
-  import '../css/components/game-board.css';
-  import '../css/components/controls.css';
-  // import DraggableColumns from './DraggableColumns.svelte'; // ТИМЧАСОВО ВИМКНЕНО
-  import Modal from '$lib/components/Modal.svelte';
-  import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
-  import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore.js';
-  import { layoutStore, WIDGETS } from '$lib/stores/layoutStore.js';
-  import TopRowWidget from './widgets/TopRowWidget.svelte';
-  import ScorePanelWidget from './widgets/ScorePanelWidget.svelte';
-  import BoardWrapperWidget from './widgets/BoardWrapperWidget.svelte';
-  import ControlsPanelWidget from './widgets/ControlsPanelWidget.svelte';
-  import SettingsExpanderWidget from './widgets/SettingsExpanderWidget.svelte';
-  import { setDirection, setDistance, endGame, resetGame, startReplay, continueAfterNoMoves, finalizeGameWithBonus } from '$lib/stores/gameActions.js';
-  import * as core from '$lib/gameCore.js';
-  import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
-  import { modalStore } from '$lib/stores/modalStore.js';
-  import { get } from 'svelte/store';
-  import { onMount } from 'svelte';
-  import { _ } from 'svelte-i18n';
-  import { goto } from '$app/navigation';
-  import { base } from '$app/paths';
-  import { gameState } from '$lib/stores/gameState.js';
-  import { animationStore } from '$lib/stores/animationStore.js';
-
-  onMount(() => {
-    settingsStore.init();
-  });
-
-  const widgetMap = {
-    [WIDGETS.TOP_ROW]: TopRowWidget,
-    [WIDGETS.SCORE_PANEL]: ScorePanelWidget,
-    [WIDGETS.BOARD_WRAPPER]: BoardWrapperWidget,
-    [WIDGETS.CONTROLS_PANEL]: ControlsPanelWidget,
-    [WIDGETS.SETTINGS_EXPANDER]: SettingsExpanderWidget,
-  };
-
-  // $: columns = $layoutStore.map(col => ({ // ТИМЧАСОВО ВИМКНЕНО
-  //   id: col.id,
-  //   label: col.id,
-  //   items: col.widgets.map(id => ({ id, label: id }))
-  // }));
-
-  $: if ($gameState.isGameOver && $gameState.gameOverReasonKey) {
-    setTimeout(() => {
-      const reasonKey = $gameState.gameOverReasonKey;
-      const finalScoreDetails = core.calculateFinalScore(get(gameState));
-      const $t = get(_);
-      const reasonValues = $gameState.gameOverReasonValues || {};
-
-      let modalConfig = {};
-
-      switch (reasonKey) {
-        case 'modal.playerNoMovesContent':
-          modalConfig = {
-            titleKey: 'modal.playerNoMovesTitle',
-            content: { reason: $t(reasonKey || ''), scoreDetails: finalScoreDetails },
-            buttons: [
-              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: continueAfterNoMoves },
-              { 
-                text: $t('modal.finishGameWithBonus', { values: { bonus: finalScoreDetails.finishBonus } }), 
-                onClick: () => finalizeGameWithBonus('modal.gameOverReasonBonus') 
-              },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
-            ]
-          };
-          break;
-        
-        case 'modal.errorContent':
-          modalConfig = {
-            titleKey: 'modal.errorTitle',
-            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: finalScoreDetails },
-            buttons: [
-              { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); }, isHot: true },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
-            ]
-          };
-          break;
-
-        case 'modal.computerNoMovesContent':
-          modalConfig = {
-            titleKey: 'modal.computerNoMovesTitle',
-            content: { reason: $t(reasonKey || ''), scoreDetails: finalScoreDetails },
-            buttons: [
-              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: continueAfterNoMoves },
-              { 
-                text: $t('modal.finishGameWithBonus', { values: { bonus: finalScoreDetails.finishBonus } }), 
-                onClick: () => finalizeGameWithBonus('modal.gameOverReasonBonus') 
-              },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
-            ]
-          };
-          break;
-
-        default:
-          modalConfig = {
-            titleKey: 'modal.gameOverTitle',
-            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: finalScoreDetails },
-            buttons: [
-              { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); }, isHot: true },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: startReplay }
-            ]
-          };
-          break;
-      }
-      
-      modalStore.showModal(modalConfig);
-    }, 600);
-  }
-
-  // function itemContent(item: {id: string, label: string}) { // ТИМЧАСОВО ВИМКНЕНО
-  //   const Comp = widgetMap[item.id];
-  //   if (Comp) return Comp;
-  //   return item.id;
-  // }
-
-  // function handleDrop(e: CustomEvent<{dragging: {id: string, label: string}, dragSourceCol: string, dropTargetCol: string, dropIndex: number}>) { // ТИМЧАСОВО ВИМКНЕНО
-  //   const { dragging, dragSourceCol, dropTargetCol, dropIndex } = e.detail;
-  //   layoutStore.update(cols => {
-  //     let newCols = cols.map(col => ({
-  //       ...col,
-  //       widgets: col.widgets.filter(id => id !== dragging.id)
-  //     }));
-  //     return newCols.map(col => {
-  //       if (col.id === dropTargetCol) {
-  //         const widgets = [...col.widgets];
-  //         widgets.splice(dropIndex, 0, dragging.id);
-  //         return { ...col, widgets };
-  //       }
-  //       return col;
-  //     });
-  //   });
-  // }
+    if (score === 0 && penaltyPoints === 0) {
+      gameLogicService.resetGame({ newSize });
+      animationStore.initialize();
+    } else {
+      modalStore.showModal({
+        titleKey: 'modal.resetScoreTitle',
+        contentKey: 'modal.resetScoreContent',
+        buttons: [
+          { 
+            textKey: 'modal.resetScoreConfirm', 
+            customClass: 'green-btn', 
+            isHot: true, 
+            onClick: () => { 
+              gameLogicService.resetGame({ newSize }); 
+              animationStore.initialize();
+              modalStore.closeModal(); 
+            } 
+          },
+          { textKey: 'modal.resetScoreCancel', onClick: modalStore.closeModal }
+        ]
+      });
+    }
+  },
 
   /**
-   * @param {string} action
+   * Завершує гру з вказаною причиною.
+   * @param reasonKey - Ключ причини завершення
+   * @param reasonValues - Додаткові значення для причини
    */
-  function executeAction(action: string) {
-    switch (action) {
-      case 'up-left': setDirection('up-left'); break;
-      case 'up': setDirection('up'); break;
-      case 'up-right': setDirection('up-right'); break;
-      case 'left': setDirection('left'); break;
-      case 'right': setDirection('right'); break;
-      case 'down-left': setDirection('down-left'); break;
-      case 'down': setDirection('down'); break;
-      case 'down-right': setDirection('down-right'); break;
-      case 'confirm': confirmPlayerMove(); break;
-      case 'no-moves': claimNoMoves(); break;
-      case 'distance-1': setDistance(1); break;
-      case 'distance-2': setDistance(2); break;
-      case 'distance-3': setDistance(3); break;
-      case 'distance-4': setDistance(4); break;
-      case 'distance-5': setDistance(5); break;
-      case 'distance-6': setDistance(6); break;
-      case 'distance-7': setDistance(7); break;
-      case 'distance-8': setDistance(8); break;
-    }
-  }
+  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
+    const gameStateInstance = gameState;
+    const state = get(gameStateInstance);
+    const playerInput = get(playerInputStore);
+    let finalMoveHistory = [...state.moveHistory]; // Починаємо з копії поточної історії
 
-  function handleHotkey(e: KeyboardEvent) {
-    if (e.target && (e.target as HTMLElement).tagName !== 'BODY') return;
+    // Перевіряємо, чи гра завершилася через невалідний хід гравця
+    if (
+      (reasonKey === 'modal.gameOverReasonOut' || reasonKey === 'modal.gameOverReasonBlocked') &&
+      playerInput.selectedDirection &&
+      playerInput.selectedDistance
+    ) {
+      const figure = new Figure(state.playerRow, state.playerCol, state.boardSize);
+      const finalInvalidPosition = figure.calculateNewPosition(
+        playerInput.selectedDirection,
+        playerInput.selectedDistance
+      );
+
+      // Створюємо запис для програшного ходу
+      const settings = get(settingsStore); // Отримуємо поточні налаштування
+      const finalMoveHistoryEntry = {
+        pos: finalInvalidPosition,
+        blocked: [] as {row: number, col: number}[], // Не має значення для фінального ходу
+        visits: { ...state.cellVisitCounts }, // Стан клітинок перед програшним ходом
+        blockModeEnabled: settings.blockModeEnabled // <-- ДОДАЙ ЦЕЙ РЯДОК
+      };
+      finalMoveHistory.push(finalMoveHistoryEntry);
+    }
+
+    // Використовуємо тип any для state, оскільки gameLogicService очікує свій тип GameState
+    const finalScoreDetails = gameLogicService.calculateFinalScore(state as any);
     
-    const key = e.code;
-    const currentSettings = get(settingsStore);
-    const keybindings = currentSettings.keybindings;
-    const resolutions = currentSettings.keyConflictResolution;
+    // Використовуємо stateManager для завершення гри
+    const endGameChanges = {
+      isGameOver: true, 
+      moveHistory: finalMoveHistory, // <-- ВИКОРИСТОВУЄМО ОНОВЛЕНУ ІСТОРІЮ
+      baseScore: finalScoreDetails.baseScore,
+      sizeBonus: finalScoreDetails.sizeBonus,
+      blockModeBonus: finalScoreDetails.blockModeBonus,
+      jumpBonus: finalScoreDetails.jumpBonus,
+      finishBonus: finalScoreDetails.finishBonus,
+      noMovesBonus: finalScoreDetails.noMovesBonus,
+      totalPenalty: finalScoreDetails.totalPenalty,
+      totalScore: finalScoreDetails.totalScore,
+      gameOverReasonKey: reasonKey,
+      gameOverReasonValues: reasonValues,
+      cellVisitCounts: {} // --- Очищаємо заблоковані клітини ---
+    };
+    
+    await stateManager.applyChanges('END_GAME', endGameChanges, `Game ended: ${reasonKey}`);
+  },
 
-    const matchingActions = Object.entries(keybindings)
-      .filter(([, keys]) => keys.includes(key))
-      .map(([action]) => action);
+  /**
+   * Запускає відтворення гри.
+   */
+  async startReplay(): Promise<void> {
+    const state = get(gameState);
+    
+    if (state.moveHistory && state.moveHistory.length > 0) {
+      // 1. Створюємо об'єкт з даними для перегляду
+      const replayData = {
+        moveHistory: state.moveHistory,
+        boardSize: state.boardSize
+      };
 
-    if (matchingActions.length === 0) return;
+      // 2. Зберігаємо дані в sessionStorage
+      try {
+        sessionStorage.setItem('replayData', JSON.stringify(replayData));
+        // 3. Переходимо на сторінку перегляду
+        await goto(`${base}/replay`);
+      } catch (error) {
+        console.error("Failed to save replay data or navigate:", error);
+        // Можна показати повідомлення про помилку, якщо потрібно
+      }
+    } else {
+      console.warn("startReplay called with no move history.");
+    }
+  },
 
-    if (matchingActions.length === 1) {
-      executeAction(matchingActions[0]);
+  /**
+   * Завершує гру з бонусом за немає ходів.
+   * @param reasonKey - Ключ причини завершення
+   */
+  async finalizeGameWithBonus(reasonKey: string): Promise<void> {
+    // Спочатку встановлюємо прапорець, що гра завершена за ініціативою гравця з модального вікна
+    await stateManager.applyChanges(
+      'SET_FINISH_FLAG',
+      { finishedByFinishButton: true },
+      'Player chose to finish with a bonus'
+    );
+    
+    // Тепер викликаємо endGame, який використає цей прапорець для розрахунку бонусу
+    await this.endGame(reasonKey);
+  },
+
+  /**
+   * Продовжує гру після заяви про немає ходів.
+   */
+  async continueAfterNoMoves(): Promise<void> {
+    const state = get(gameState);
+    const settings = get(settingsStore);
+    const bonus = state.boardSize; // <-- Бонус дорівнює розміру дошки
+
+    const continueChanges = {
+      score: state.score + bonus, // <-- Нараховуємо бонус до основного рахунку
+      noMovesBonus: state.noMovesBonus + bonus, // <-- Додаємо до лічильника бонусів
+      cellVisitCounts: {},
+      moveHistory: [{ 
+        pos: { row: state.playerRow, col: state.playerCol }, 
+        blocked: [] as {row: number, col: number}[], 
+        visits: {},
+        blockModeEnabled: settings.blockModeEnabled
+      }],
+      moveQueue: [] as any[],
+      availableMoves: getAvailableMoves(
+        state.playerRow,
+        state.playerCol,
+        state.boardSize,
+        {},
+        settings.blockOnVisitCount,
+        state.board,
+        settings.blockModeEnabled
+      ),
+      noMovesClaimed: false,
+      isComputerMoveInProgress: false
+    };
+
+    await stateManager.applyChanges('CONTINUE_AFTER_NO_MOVES_CLAIM', continueChanges, 'Player continues after successful no-moves claim');
+    
+    animationStore.reset();
+    
+    modalStore.closeModal();
+  },
+
+  /**
+   * Підтверджує хід гравця.
+   */
+  async confirmPlayerMove(): Promise<void> {
+    const gameStateInstance = gameState;
+    const state = get(gameStateInstance);
+    const playerInput = get(playerInputStore);
+    
+    if (!playerInput.selectedDirection || !playerInput.selectedDistance) {
+      console.warn('confirmPlayerMove: немає вибраного напрямку або відстані');
       return;
     }
 
-    // Конфлікт!
-    if (resolutions[key]) {
-      executeAction(resolutions[key]);
-      return;
+    const startRow = state.playerRow;
+    const startCol = state.playerCol;
+    
+    // Розраховуємо нову позицію
+    const direction = playerInput.selectedDirection;
+    const distance = playerInput.selectedDistance;
+    
+    let newRow = startRow;
+    let newCol = startCol;
+    
+    switch (direction) {
+      case 'up':
+        newRow = Math.max(0, startRow - distance);
+        break;
+      case 'down':
+        newRow = Math.min(state.boardSize - 1, startRow + distance);
+        break;
+      case 'left':
+        newCol = Math.max(0, startCol - distance);
+        break;
+      case 'right':
+        newCol = Math.min(state.boardSize - 1, startCol + distance);
+        break;
     }
+    
+    // Виконуємо хід
+    await this._processPlayerMove(startRow, startCol, newRow, newCol);
+  },
 
-    // Якщо вирішення немає, показуємо модальне вікно
-    const $t = get(_);
-    modalStore.showModal({
-      titleKey: 'modal.keyConflictTitle',
-      content: { key: key, actions: matchingActions },
-      buttons: matchingActions.map(action => ({
-        text: $t(`controlsPage.actions.${action}`),
-        onClick: () => {
-          settingsStore.resolveKeyConflict(key, action);
-          executeAction(action);
-          modalStore.closeModal();
-        }
-      }))
-    });
-  }
-</script>
+  /**
+   * Заявляє про немає ходів.
+   */
+  async claimNoMoves(): Promise<void> {
+    const state = get(gameState);
+    const settings = get(settingsStore);
+    
+    const availableMoves = getAvailableMoves(
+      state.playerRow,
+      state.playerCol,
+      state.boardSize,
+      state.cellVisitCounts,
+      settings.blockOnVisitCount,
+      state.board,
+      settings.blockModeEnabled // <-- Додай цей параметр
+    );
 
-<div class="game-board-container">
-  <!-- <DraggableColumns {columns} itemContent={itemContent} on:drop={handleDrop} /> --> <!-- ТИМЧАСОВО ВИМКНЕНО -->
+    if (availableMoves.length > 0) {
+      // Неправильна заява - гравець програв
+      this.endGame('modal.errorContent', { count: availableMoves.length });
+    } else {
+      // Правильна заява - гравець переміг
+      // 1. Чекаємо, поки стан ГАРАНТОВАНО оновиться
+      await stateManager.applyChanges(
+        'SUCCESSFUL_NO_MOVES_CLAIM', 
+        { 
+          noMovesClaimed: true,
+          noMovesBonus: state.noMovesBonus + state.boardSize
+        }, 
+        'Player successfully claimed no moves and bonus is awarded'
+      );
 
-  <!-- НОВИЙ БЛОК: Прямий рендеринг віджетів для діагностики -->
-  <div class="static-layout">
-    <div class="column">
-      <TopRowWidget />
-      <ScorePanelWidget />
-      <BoardWrapperWidget />
-    </div>
-    <div class="column">
-      <ControlsPanelWidget />
-    </div>
-    <div class="column">
-      <SettingsExpanderWidget />
-    </div>
-  </div>
-</div>
+      // 2. Тепер отримуємо оновлений стан
+      const updatedState = get(gameState);
 
-<Modal />
-{#if $uiState.isVoiceSettingsModalOpen}
-  <VoiceSettingsModal close={closeVoiceSettingsModal} />
-{/if}
+      // 3. Розраховуємо рахунок на основі оновленого стану
+      const potentialScoreDetails = gameLogicService.calculateFinalScore(updatedState as any);
 
-<svelte:window on:keydown={handleHotkey} />
+      // 4. Показуємо модальне вікно
+      modalStore.showModal({
+        titleKey: 'modal.playerNoMovesTitle',
+        content: { 
+          reason: get(_)('modal.playerNoMovesContent'), 
+          scoreDetails: potentialScoreDetails
+        },
+        buttons: [
+          { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: this.continueAfterNoMoves.bind(this) },
+          { 
+            text: get(_)('modal.finishGameWithBonus', { values: { bonus: updatedState.boardSize } }), 
+            onClick: () => this.finalizeGameWithBonus('modal.gameOverReasonBonus') 
+          },
+          { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: this.startReplay }
+        ],
+        closable: false
+      });
+    }
+  },
 
-<style>
-  .game-board-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-  }
+  /**
+   * Обробляє хід гравця.
+   * @param startRow - Початковий ряд
+   * @param startCol - Початкова колонка
+   * @param newRow - Новий ряд
+   * @param newCol - Нова колонка
+   */
+  async _processPlayerMove(startRow: number, startCol: number, newRow: number, newCol: number): Promise<void> {
+    const playerInput = get(playerInputStore);
+    const { selectedDirection, selectedDistance } = playerInput;
 
-  /* НОВІ СТИЛІ для статичного макета */
-  .static-layout {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    width: 100%;
-  }
+    if (!selectedDirection || !selectedDistance) return;
 
-  .column {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: center;
-  }
+    const moveResult = await gameLogicService.performMove(selectedDirection, selectedDistance, 0);
 
-  @media (max-width: 1600px) {
-    .static-layout {
-      flex-direction: column;
-      align-items: center;
+    if (moveResult.success) {
+      playerInputStore.set({
+        selectedDirection: null,
+        selectedDistance: null,
+        distanceManuallySelected: false,
+        isMoveInProgress: false
+      });
+      this._triggerComputerMove();
+    } else {
+      // --- ПОЧАТОК НОВОГО КОДУ ---
+      const state = get(gameState);
+      // Обчислюємо фінальну позицію для анімації
+      const figure = new Figure(state.playerRow, state.playerCol, state.boardSize);
+      const finalInvalidPosition = figure.calculateNewPosition(
+        selectedDirection,
+        selectedDistance
+      );
+
+      // Створюємо об'єкт ходу для черги анімації
+      const finalMoveForAnimation = {
+        player: 1, // Хід гравця
+        direction: selectedDirection,
+        distance: selectedDistance,
+        to: finalInvalidPosition
+      };
+
+      // Додаємо цей хід до черги, щоб animationStore міг його відтворити
+      await stateManager.applyChanges(
+        'QUEUE_FINAL_MOVE',
+        { moveQueue: [...state.moveQueue, finalMoveForAnimation] },
+        'Queueing final losing move for animation'
+      );
+      // --- КІНЕЦЬ НОВОГО КОДУ ---
+
+      // Затримка для завершення анімації програшного ходу
+      // Тривалість анімації: 500ms + пауза після ходу гравця: 1000ms = 1500ms
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Обробка невдалих ходів (цей код вже існує, залиш його)
+      if (moveResult.reason === 'out_of_bounds') {
+        this.endGame('modal.gameOverReasonOut');
+      } else if (moveResult.reason === 'blocked_cell') {
+        this.endGame('modal.gameOverReasonBlocked');
+      }
+    }
+  },
+
+  /**
+   * Запускає хід комп'ютера.
+   */
+  async _triggerComputerMove(): Promise<void> {
+    const gameStateInstance = gameState;
+    const state = get(gameStateInstance);
+    
+    // Встановлюємо прапорець ходу комп'ютера
+    await stateManager.applyChanges('SET_COMPUTER_TURN', { isComputerMoveInProgress: true }, 'Starting computer move');
+    
+    // Логування стану перед ходом комп'ютера
+    console.log('[gameOrchestrator] _triggerComputerMove: state перед getMove', state);
+    // Отримуємо хід комп'ютера - використовуємо any для state
+    const computerMove = await agents.ai.getMove(state as any);
+    console.log('[gameOrchestrator] _triggerComputerMove: computerMove =', computerMove);
+    
+    if (computerMove) {
+      // Виконуємо хід комп'ютера
+      const { direction, distance } = computerMove;
+      console.log('[gameOrchestrator] _triggerComputerMove: performMove для компʼютера', direction, distance);
+      const moveResult = await gameLogicService.performMove(direction, distance, 1);
+      console.log('[gameOrchestrator] _triggerComputerMove: moveResult для компʼютера', moveResult);
+      console.log('[gameOrchestrator] _triggerComputerMove: moveQueue після ходу компʼютера:', get(gameStateInstance).moveQueue);
+      
+      if (!moveResult.success) {
+        // Якщо хід невалідний — показуємо модальне вікно з вибором
+        const currentState = get(gameState);
+        // 1. Чекаємо, поки стан ГАРАНТОВАНО оновиться
+        await stateManager.applyChanges(
+          'SUCCESSFUL_NO_MOVES_CLAIM', 
+          { 
+            noMovesClaimed: true,
+            noMovesBonus: currentState.noMovesBonus + currentState.boardSize
+          }, 
+          'Computer has no valid moves and bonus is awarded'
+        );
+
+        // 2. Тепер отримуємо оновлений стан
+        const updatedState = get(gameState);
+        const $t = get(_); // Отримуємо функцію перекладу
+
+        // 3. Розраховуємо рахунок на основі оновленого стану
+        const potentialScoreDetails = gameLogicService.calculateFinalScore(updatedState as any);
+
+        // 4. Показуємо модальне вікно
+        modalStore.showModal({
+          titleKey: 'modal.computerNoMovesTitle',
+          content: { 
+            reason: $t('modal.computerNoMovesContent'), 
+            scoreDetails: potentialScoreDetails
+          },
+          buttons: [
+            { 
+              textKey: 'modal.continueGame', 
+              customClass: 'green-btn', 
+              isHot: true, 
+              onClick: this.continueAfterNoMoves.bind(this) 
+            },
+            { 
+              text: $t('modal.finishGameWithBonus', { values: { bonus: updatedState.boardSize } }), 
+              onClick: () => this.finalizeGameWithBonus('modal.gameOverReasonBonus') 
+            },
+            { 
+              textKey: 'modal.watchReplay', 
+              customClass: 'blue-btn', 
+              onClick: this.startReplay 
+            }
+          ],
+          closable: false
+        });
+      } else {
+        // Обробляємо побічні ефекти
+        this._handleComputerMoveSideEffects(computerMove);
+      }
+    } else {
+      // Комп'ютер не може зробити хід - показуємо модальне вікно з вибором
+      const currentState = get(gameState);
+      // 1. Чекаємо, поки стан ГАРАНТОВАНО оновиться
+      await stateManager.applyChanges(
+        'SUCCESSFUL_NO_MOVES_CLAIM', 
+        { 
+          noMovesClaimed: true,
+          noMovesBonus: currentState.noMovesBonus + currentState.boardSize
+        }, 
+        'Computer has no moves and bonus is awarded'
+      );
+
+      // 2. Тепер отримуємо оновлений стан
+      const updatedState = get(gameState);
+      const $t = get(_); // Отримуємо функцію перекладу
+
+      // 3. Розраховуємо рахунок на основі оновленого стану
+      const potentialScoreDetails = gameLogicService.calculateFinalScore(updatedState as any);
+
+      // 4. Показуємо модальне вікно
+      modalStore.showModal({
+        titleKey: 'modal.computerNoMovesTitle',
+        content: { 
+          reason: $t('modal.computerNoMovesContent'), 
+          scoreDetails: potentialScoreDetails
+        },
+        buttons: [
+          { 
+            textKey: 'modal.continueGame', 
+            customClass: 'green-btn', 
+            isHot: true, 
+            onClick: this.continueAfterNoMoves.bind(this) 
+          },
+          { 
+            text: $t('modal.finishGameWithBonus', { values: { bonus: updatedState.boardSize } }), 
+            onClick: () => this.finalizeGameWithBonus('modal.gameOverReasonBonus') 
+          },
+          { 
+            textKey: 'modal.watchReplay', 
+            customClass: 'blue-btn', 
+            onClick: this.startReplay 
+          }
+        ],
+        closable: false
+      });
+    }
+    
+    // Скидаємо прапорець ходу комп'ютера
+    await stateManager.applyChanges('SET_PLAYER_TURN', { isComputerMoveInProgress: false }, 'Computer move completed');
+  },
+
+  /**
+   * Обробляє побічні ефекти ходу комп'ютера.
+   * @param move - Хід комп'ютера
+   */
+  _handleComputerMoveSideEffects(move: any): void {
+    // Логуємо хід
+    logService.info('Computer move', move);
+    
+    // Озвучуємо хід (якщо увімкнено) - тимчасово відключено через проблеми з типами
+    const settings = get(settingsStore);
+    if (settings.speechEnabled) {
+      console.log('Speech functionality temporarily disabled due to type issues');
+      // TODO: Виправити типи для speech функціональності
     }
   }
-</style>
+}; 
 ```
 
-### Верифікація
+```
+// --- Чисті функції та константи для ігрової логіки (ex-gameCore.ts) ---
+import { Figure, MoveDirection } from '../models/Figure';
+import type { MoveDirectionType } from '../models/Figure';
+import { get } from 'svelte/store';
+import { playerInputStore } from '../stores/playerInputStore';
+import { gameState, createInitialState } from '../stores/gameState'; // Тепер цей імпорт безпечний
+import { getAvailableMoves, isCellBlocked } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
+import { settingsStore } from '../stores/settingsStore.js';
+import { stateManager } from './stateManager';
 
-Після цих змін:
-1.  Зроби хід, щоб рахунок став ненульовим.
-2.  Натисни `+` або `-` в налаштуваннях.
-3.  **Перевір результат:**
-    *   **Якщо модальне вікно з'явилося**, це означає, що проблема була саме в компоненті `DraggableColumns`. Ми зможемо його виправити або замінити.
-    *   **Якщо проблема залишилася**, це буде означати, що причина ще глибша, і, можливо, пов'язана з розширенням браузера. У такому випадку, наступним кроком буде перевірка в режимі "Інкогніто".
 
-Повідом мені результат цього експерименту. Це найважливіший крок у діагностиці.
+export type Direction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right';
+export interface Move {
+  row: number;
+  col: number;
+  direction: Direction;
+  distance: number;
+}
+export interface GameState {
+  score: number;
+  penaltyPoints: number;
+  boardSize: number;
+  movesInBlockMode: number;
+  jumpedBlockedCells: number;
+  finishedByFinishButton: boolean;
+  noMovesClaimsCount: number;
+  noMovesBonus: number;
+}
+
+// Функції createEmptyBoard, getRandomCell, getAvailableMoves були перенесені в boardUtils.ts
+
+export const dirMap: Record<Direction, [number, number]> = {
+  'up': [-1, 0],
+  'down': [1, 0],
+  'left': [0, -1],
+  'right': [0, 1],
+  'up-left': [-1, -1],
+  'up-right': [-1, 1],
+  'down-left': [1, -1],
+  'down-right': [1, 1]
+};
+
+export const numToDir: Record<string, Direction> = {
+  '1': 'down-left',
+  '2': 'down',
+  '3': 'down-right',
+  '4': 'left',
+  '6': 'right',
+  '7': 'up-left',
+  '8': 'up',
+  '9': 'up-right'
+};
+
+export const oppositeDirections: Record<Direction, Direction> = {
+  'up': 'down',
+  'down': 'up',
+  'left': 'right',
+  'right': 'left',
+  'up-left': 'down-right',
+  'down-right': 'up-left',
+  'up-right': 'down-left',
+  'down-left': 'up-right'
+};
+
+export interface FinalScore {
+  baseScore: number;
+  totalPenalty: number;
+  sizeBonus: number;
+  blockModeBonus: number;
+  noMovesBonus: number;
+  finishBonus: number;
+  jumpBonus: number;
+  totalScore: number;
+}
+
+export function calculateFinalScore(state: GameState): FinalScore {
+  const { score, penaltyPoints, boardSize, movesInBlockMode, jumpedBlockedCells, finishedByFinishButton, noMovesBonus } = state;
+  
+  const baseScore = score;
+  const totalPenalty = penaltyPoints;
+  let sizeBonus = 0;
+  if (baseScore > 0) {
+    const percent = (boardSize * boardSize) / 100;
+    sizeBonus = Math.round(baseScore * percent);
+  }
+  const blockModeBonus = movesInBlockMode;
+  const finishBonus = finishedByFinishButton ? boardSize : 0;
+  const jumpBonus = jumpedBlockedCells;
+  
+  const totalScore = baseScore + sizeBonus + blockModeBonus + jumpBonus - totalPenalty + (noMovesBonus || 0) + finishBonus;
+  
+  return {
+    baseScore,
+    totalPenalty,
+    sizeBonus,
+    blockModeBonus,
+    jumpBonus,
+    noMovesBonus: noMovesBonus || 0,
+    finishBonus,
+    totalScore
+  };
+}
+
+export function countJumpedCells(
+  startRow: number,
+  startCol: number,
+  endRow: number,
+  endCol: number,
+  cellVisitCounts: Record<string, number>,
+  blockOnVisitCount: number
+): number {
+  let jumpedCount = 0;
+  const dr = Math.sign(endRow - startRow);
+  const dc = Math.sign(endCol - startCol);
+  const distance = Math.max(Math.abs(endRow - startRow), Math.abs(endCol - startCol));
+  for (let i = 1; i < distance; i++) {
+    const currentRow = startRow + i * dr;
+    const currentCol = startCol + i * dc;
+    const visitCount = cellVisitCounts[`${currentRow}-${currentCol}`] || 0;
+    if (visitCount > blockOnVisitCount) {
+      jumpedCount++;
+    }
+  }
+  return jumpedCount;
+}
+
+/**
+ * Обчислює зміни рахунку для одного ходу.
+ * @returns Зміни для стану гри.
+ */
+function calculateMoveScore(
+  currentState: any, // Використовуємо any для доступу до всіх полів gameState
+  newPosition: { row: number; col: number },
+  playerIndex: number,
+  settings: any // Використовуємо any для доступу до всіх полів settingsStore
+): { score: number; penaltyPoints: number; movesInBlockMode: number; jumpedBlockedCells: number } {
+  
+  let newScore = currentState.score;
+  let newPenaltyPoints = currentState.penaltyPoints;
+  let newMovesInBlockMode = currentState.movesInBlockMode;
+  let newJumpedBlockedCells = currentState.jumpedBlockedCells;
+
+  // 1. Нараховуємо бали тільки за хід гравця
+  if (playerIndex === 0) {
+    if (!settings.showBoard) {
+      newScore += 3;
+    } else if (!settings.showQueen) {
+      newScore += 2;
+    } else {
+      newScore += 1;
+    }
+  }
+
+  // 2. Перевірка на штраф за "дзеркальний" хід
+  if (playerIndex === 0 && currentState.moveHistory.length >= 2) {
+    const computerOriginPosition = currentState.moveHistory[currentState.moveHistory.length - 2].pos;
+    // Перевіряємо чи це об'єкт (нова структура) або масив (стара структура)
+    const computerRow = Array.isArray(computerOriginPosition) ? computerOriginPosition[0] : computerOriginPosition.row;
+    const computerCol = Array.isArray(computerOriginPosition) ? computerOriginPosition[1] : computerOriginPosition.col;
+    if (newPosition.row === computerRow && newPosition.col === computerCol) {
+      newPenaltyPoints += 2;
+    }
+  }
+
+  // 3. Підрахунок ходів у режимі блокування
+  if (settings.blockModeEnabled) {
+    newMovesInBlockMode += 1;
+  }
+
+  // 4. Підрахунок бонусів за перестрибування
+  const jumpedCount = countJumpedCells(
+    currentState.playerRow,
+    currentState.playerCol,
+    newPosition.row,
+    newPosition.col,
+    currentState.cellVisitCounts,
+    settings.blockOnVisitCount
+  );
+  newJumpedBlockedCells += jumpedCount;
+
+  return {
+    score: newScore,
+    penaltyPoints: newPenaltyPoints,
+    movesInBlockMode: newMovesInBlockMode,
+    jumpedBlockedCells: newJumpedBlockedCells,
+  };
+}
+
+// --- Мутатори стану (ex-gameActions.ts) ---
+
+/**
+ * @file Contains all pure functions (actions) that mutate the game's state.
+ * These are simple mutators that work exclusively with gameState and playerInputStore.
+ */
+
+export function resetGame(options: { newSize?: number } = {}) {
+  const newSize = options.newSize ?? get(gameState).boardSize;
+  const newState = createInitialState(newSize);
+  
+  gameState.set(newState);
+  
+  // Гарантуємо, що дошка та ферзь видимі на початку нової гри
+  settingsStore.updateSettings({
+    showBoard: true,
+    showQueen: true,
+    showMoves: true
+  });
+  
+  // animationStore автоматично скидається при зміні gameId
+}
+
+export function setDirection(dir: Direction) {
+  const currentInput = get(playerInputStore);
+  const { boardSize } = get(gameState);
+  const maxDist = boardSize - 1;
+  let newDistance = currentInput.selectedDistance;
+  let newManuallySelected = currentInput.distanceManuallySelected;
+
+  if (currentInput.selectedDirection !== dir) {
+    if (!currentInput.distanceManuallySelected) {
+      newDistance = 1;
+      newManuallySelected = false;
+    }
+  } else {
+    if (!currentInput.distanceManuallySelected) {
+      newDistance = (!currentInput.selectedDistance || currentInput.selectedDistance >= maxDist) ? 1 : currentInput.selectedDistance + 1;
+      newManuallySelected = false;
+    }
+  }
+
+  // Оновлюємо playerInputStore
+  playerInputStore.update(state => ({
+    ...state,
+    selectedDirection: dir,
+    selectedDistance: newDistance,
+    distanceManuallySelected: newManuallySelected
+  }));
+  
+  console.log('🎯 setDirection: встановлено напрямок', { dir, newDistance, newManuallySelected });
+}
+
+export function setDistance(dist: number) {
+  // Оновлюємо playerInputStore
+  playerInputStore.update(state => ({
+    ...state,
+    selectedDistance: dist,
+    distanceManuallySelected: true
+  }));
+  
+  console.log('🎯 setDistance: встановлено відстань', { dist });
+}
+
+/**
+ * Виконує хід (гравця або комп'ютера)
+ * @param direction Напрямок ходу
+ * @param distance Відстань ходу
+ * @param playerIndex Індекс гравця (0 для гравця, 1 для комп'ютера)
+ */
+export async function performMove(direction: MoveDirectionType, distance: number, playerIndex: number = 0) {
+  console.log('🎮 performMove: початок з параметрами:', { direction, distance, playerIndex });
+  
+  const currentState = get(gameState);
+  const settings = get(settingsStore);
+  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
+
+  const newPosition = figure.calculateNewPosition(direction, distance);
+
+  // 1. Перевірка виходу за межі дошки
+  if (!figure.isValidPosition(newPosition.row, newPosition.col)) {
+    console.log('❌ performMove: вихід за межі дошки');
+    return { success: false, reason: 'out_of_bounds' };
+  }
+
+  // 2. Перевірка ходу на заблоковану клітинку
+  if (isCellBlocked(newPosition.row, newPosition.col, currentState.cellVisitCounts, settings)) {
+    console.log('❌ performMove: хід на заблоковану клітинку');
+    return { success: false, reason: 'blocked_cell' };
+  }
+
+  // --- Якщо всі перевірки пройдено, виконуємо хід ---
+  
+  const updatedCellVisitCounts = { ...currentState.cellVisitCounts };
+  const startCellKey = `${currentState.playerRow}-${currentState.playerCol}`;
+  updatedCellVisitCounts[startCellKey] = (updatedCellVisitCounts[startCellKey] || 0) + 1;
+
+  const scoreChanges = calculateMoveScore(currentState, newPosition, playerIndex, settings);
+
+  const newAvailableMoves = getAvailableMoves(
+    newPosition.row,
+    newPosition.col,
+    currentState.boardSize,
+    updatedCellVisitCounts,
+    settings.blockOnVisitCount,
+    currentState.board,
+    settings.blockModeEnabled // <-- Додай цей параметр
+  );
+
+  const newBoard = currentState.board.map(row => [...row]);
+  if (currentState.playerRow !== null && currentState.playerCol !== null) {
+    newBoard[currentState.playerRow][currentState.playerCol] = 0;
+  }
+  newBoard[newPosition.row][newPosition.col] = 1;
+
+  const updatedMoveQueue = [...currentState.moveQueue, {
+    player: playerIndex + 1,
+    direction,
+    distance,
+    to: { row: newPosition.row, col: newPosition.col }
+  }];
+
+  const updatedMoveHistory = [...currentState.moveHistory, {
+    pos: { row: newPosition.row, col: newPosition.col },
+    blocked: [] as {row: number, col: number}[],
+    visits: { ...updatedCellVisitCounts },
+    blockModeEnabled: settings.blockModeEnabled // <-- ДОДАЙ ЦЕЙ РЯДОК
+  }];
+
+  const changes = {
+    board: newBoard,
+    playerRow: newPosition.row,
+    playerCol: newPosition.col,
+    cellVisitCounts: updatedCellVisitCounts,
+    moveQueue: updatedMoveQueue,
+    moveHistory: updatedMoveHistory,
+    availableMoves: newAvailableMoves,
+    ...scoreChanges
+  };
+
+  await stateManager.applyChanges('PERFORM_MOVE', changes, `Move: ${direction}${distance}`);
+  
+  console.log('🎮 performMove: завершено успішно');
+  return { success: true, newPosition };
+}
+
+/**
+ * Отримати доступні ходи для поточної позиції використовуючи клас Figure
+ */
+export function getAvailableMovesForFigure() {
+  const currentState = get(gameState);
+  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
+  return figure.getAvailableMoves();
+}
+
+/**
+ * Перевірити чи валідний хід використовуючи клас Figure
+ */
+export function isValidMove(direction: MoveDirectionType, distance: number) {
+  const currentState = get(gameState);
+  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
+  return figure.canMove(direction, distance);
+}
+
+/**
+ * Оновити доступні ходи
+ */
+export function updateAvailableMoves() {
+  const availableMoves = getAvailableMovesForFigure();
+  stateManager.applyChanges('UPDATE_AVAILABLE_MOVES', { availableMoves }, 'Update available moves');
+} 
+```
