@@ -27,9 +27,28 @@
 
   onMount(() => {
     settingsStore.init();
-    // Ініціалізуємо гру саме для цього режиму при вході на сторінку
-    resetGame(); 
+
+    // --- ЗМІНЕНО: Спочатку відновлюємо стан, потім ініціалізуємо гру ---
+    const savedGameOverState = sessionStorage.getItem('replayGameOverState');
+    let isRestoring = false;
+    if (savedGameOverState) {
+      try {
+        const parsedState = JSON.parse(savedGameOverState);
+        // @ts-ignore
+        gameOverStore.restoreState(parsedState);
+        sessionStorage.removeItem('replayGameOverState');
+        isRestoring = true; // Встановлюємо прапорець, що ми відновлюємо стан
+      } catch (e) {
+        console.error('Не вдалося відновити gameOverStore з sessionStorage', e);
+      }
+    }
+
+    // Ініціалізуємо гру, ТІЛЬКИ якщо ми не відновлюємо стан після перегляду
+    if (!isRestoring) {
+      resetGame();
+    }
     animationStore.initialize();
+    // --- КІНЕЦЬ НОВОГО КОДУ ---
     
     // Перевіряємо, чи є збережений стан завершення гри
     const gameOverState = get(gameOverStore);

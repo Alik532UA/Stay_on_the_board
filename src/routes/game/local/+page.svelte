@@ -16,82 +16,128 @@
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { onMount } from 'svelte';
+  import { afterNavigate } from '$app/navigation';
   import { animationStore } from '$lib/stores/animationStore.js';
   import { gameOverStore } from '$lib/stores/gameOverStore';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { gameOrchestrator } from '$lib/gameOrchestrator';
   import { get } from 'svelte/store';
   import { _ } from 'svelte-i18n';
+  import { gameState } from '$lib/stores/gameState.js';
+  import { localGameStore } from '$lib/stores/localGameStore.js';
   
   // Примітка: onMount та ініціалізація гри тут не потрібні,
   // оскільки вони відбуваються на сторінці /local-setup
 
-  onMount(() => {
-    settingsStore.init();
-    // Ініціалізуємо тільки анімації, гра вже ініціалізована з local-setup
-    animationStore.initialize();
-    
-    // Перевіряємо, чи є збережений стан завершення гри
+  /**
+   * Показує модальне вікно завершення гри, якщо це необхідно.
+   */
+  function showGameOverModalIfNeeded() {
     const gameOverState = get(gameOverStore);
+    const localGameState = get(localGameStore); // Отримуємо стан локальної гри
+    const $t = get(_);
+
     if (gameOverState.isGameOver && gameOverState.gameResult && gameOverState.gameResult.gameType === 'local') {
-      // Відновлюємо модальне вікно з результатами гри
       const { gameResult } = gameOverState;
-      const $t = get(_);
       
-      let modalConfig = {};
-      
-      // Для локальної гри використовуємо спеціальну логіку
-      if (gameResult.winner) {
-        modalConfig = {
-          titleKey: gameResult.winner === 'draw' ? 'modal.winnersTitle' : 'modal.winnerTitle',
-          content: { 
-            reason: $t(gameResult.reasonKey || '', { values: gameResult.reasonValues }), 
-            scoreDetails: gameResult.finalScoreDetails,
-            winnerName: gameResult.winner === 'player1' ? 'Гравець 1' : 
-                       gameResult.winner === 'player2' ? 'Гравець 2' : 'Нічия'
-          },
-          buttons: [
-            { 
-              textKey: 'modal.playAgain', 
-              primary: true, 
-              onClick: () => {
-                gameOrchestrator.restartLocalGame();
-              }, 
-              isHot: true 
-            },
-            { 
-              textKey: 'modal.watchReplay', 
-              customClass: 'blue-btn', 
-              onClick: () => gameOrchestrator.startReplay() 
-            }
-          ]
-        };
-      } else {
-        modalConfig = {
-          titleKey: 'modal.gameOverTitle',
-          content: { 
-            reason: $t(gameResult.reasonKey || '', { values: gameResult.reasonValues }), 
-            scoreDetails: gameResult.finalScoreDetails 
-          },
-          buttons: [
-            { 
-              textKey: 'modal.playAgain', 
-              primary: true, 
-              onClick: () => {
-                gameOrchestrator.restartLocalGame();
-              }, 
-              isHot: true 
-            },
-            { 
-              textKey: 'modal.watchReplay', 
-              customClass: 'blue-btn', 
-              onClick: () => gameOrchestrator.startReplay() 
-            }
-          ]
-        };
+      // Визначаємо переможця на основі даних з localGameStore
+      const losingPlayerIndex = get(gameState).currentPlayerIndex;
+      let winners: number[] = [];
+      let maxScore = -1;
+
+      for (let i = 0; i < localGameState.players.length; i++) {
+        if (i !== losingPlayerIndex) {
+          const playerScore = localGameState.players[i].score;
+          if (playerScore > maxScore) {
+            maxScore = playerScore;
+            winners = [i];
+          } else if (playerScore === maxScore) {
+            winners.push(i);
+          }
+        }
       }
       
-      modalStore.showModal(modalConfig);
+      if (winners.length === 0) { // Якщо всі програли
+          for (let i = 0; i < localGameState.players.length; i++) {
+              const playerScore = localGameState.players[i].score;
+              if (playerScore > maxScore) {
+                  maxScore = playerScore;
+                  winners = [i];
+              } else if (playerScore === maxScore) {
+                  winners.push(i);
+              }
+          }
+      }
+
+      const playerScores = localGameState.players.map((player, index) => ({
+        playerNumber: index + 1,
+        name: player.name,
+        score: player.score,
+        isWinner: winners.includes(index)
+      }));
+
+      let titleKey = 'modal.gameOverTitle';
+      let winnerName = '';
+      if (winners.length === 1) {
+        titleKey = 'modal.winnerTitle';
+        winnerName = localGameState.players[winners[0]].name;
+      } else if (winners.length > 1) {
+        titleKey = 'modal.winnersTitle';
+      }
+
+      const modalContent = {
+        reason: $t(gameResult.reasonKey || '', { values: { playerName: localGameState.players[losingPlayerIndex].name } }),
+        playerScores: playerScores,
+        winnerName: winnerName,
+        scoreDetails: gameResult.finalScoreDetails // Це може бути undefined, але це нормально
+      };
+
+      modalStore.showModal({
+        titleKey: titleKey,
+        content: modalContent,
+        buttons: [
+          { textKey: 'modal.playAgain', primary: true, onClick: gameOrchestrator.restartLocalGame, isHot: true },
+          { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
+        ]
+      });
+    }
+  }
+
+  onMount(() => {
+    // Залишаємо тільки первинну ініціалізацію
+    settingsStore.init();
+    animationStore.initialize();
+  });
+
+  afterNavigate(() => {
+    // Цей код буде виконуватися КОЖНОГО РАЗУ при переході на сторінку
+    const savedGameOverState = sessionStorage.getItem('replayGameOverState');
+    if (savedGameOverState) {
+      try {
+        const parsedGameOverState = JSON.parse(savedGameOverState);
+        // @ts-ignore
+        gameOverStore.restoreState(parsedGameOverState);
+        sessionStorage.removeItem('replayGameOverState');
+
+        const savedGameState = sessionStorage.getItem('replayGameState');
+        if (savedGameState) {
+          gameState.set(JSON.parse(savedGameState));
+          sessionStorage.removeItem('replayGameState');
+        }
+
+        const savedLocalGameState = sessionStorage.getItem('replayLocalGameState');
+        if (savedLocalGameState) {
+          localGameStore.restoreState(JSON.parse(savedLocalGameState));
+          sessionStorage.removeItem('replayLocalGameState');
+        }
+        
+        showGameOverModalIfNeeded();
+
+      } catch (e) {
+        console.error('Не вдалося відновити стан гри з sessionStorage', e);
+      }
+    } else {
+      showGameOverModalIfNeeded();
     }
   });
 
