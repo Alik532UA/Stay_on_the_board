@@ -108,7 +108,6 @@
 
   onMount(() => {
     // Залишаємо тільки первинну ініціалізацію
-    settingsStore.init();
     animationStore.initialize();
   });
 
@@ -143,6 +142,7 @@
       showGameOverModalIfNeeded();
     }
   });
+
 
   const widgetMap = {
     [WIDGETS.TOP_ROW]: TopRowWidget,

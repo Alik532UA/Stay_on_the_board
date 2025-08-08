@@ -88,7 +88,8 @@
     }
   }
   
-  onMount(() => { 
+  onMount(() => {
+    settingsStore.init(); // Ініціалізуємо налаштування тут
     isDev = !!import.meta.env.DEV;
     document.addEventListener('keydown', handleKeydown);
   });
