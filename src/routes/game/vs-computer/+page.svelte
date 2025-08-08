@@ -16,6 +16,7 @@
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { onMount } from 'svelte';
+  import { afterNavigate } from '$app/navigation';
   import { resetGame, calculateFinalScore } from '$lib/services/gameLogicService.js';
   import { animationStore } from '$lib/stores/animationStore.js';
   import { gameState } from '$lib/stores/gameState.js';
@@ -26,9 +27,16 @@
   import { _ } from 'svelte-i18n';
 
   onMount(() => {
-    settingsStore.init();
+    // Залишаємо тільки первинну ініціалізацію гри, якщо це не відновлення
+    const isRestoring = sessionStorage.getItem('replayGameOverState') !== null;
+    if (!isRestoring) {
+      resetGame();
+    }
+    animationStore.initialize();
+  });
 
-    // --- ЗМІНЕНО: Спочатку відновлюємо стан, потім ініціалізуємо гру ---
+  afterNavigate(() => {
+    // Цей код буде виконуватися КОЖНОГО РАЗУ при переході на сторінку
     const savedGameOverState = sessionStorage.getItem('replayGameOverState');
     let isRestoring = false;
     if (savedGameOverState) {
@@ -43,13 +51,6 @@
       }
     }
 
-    // Ініціалізуємо гру, ТІЛЬКИ якщо ми не відновлюємо стан після перегляду
-    if (!isRestoring) {
-      resetGame();
-    }
-    animationStore.initialize();
-    // --- КІНЕЦЬ НОВОГО КОДУ ---
-    
     // Перевіряємо, чи є збережений стан завершення гри
     const gameOverState = get(gameOverStore);
     if (gameOverState.isGameOver && gameOverState.gameResult) {
