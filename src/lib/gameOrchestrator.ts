@@ -419,6 +419,14 @@ export const gameOrchestrator = {
       } catch (e) {
         console.warn('Не вдалося зберегти копію localGameStore для replay', e);
       }
+      
+      // Додаємо копію gameOverStore
+      try {
+        const gameOverState = get(gameOverStore);
+        sessionStorage.setItem('replayGameOverState', JSON.stringify(gameOverState));
+      } catch (e) {
+        console.warn('Не вдалося зберегти копію gameOverStore для replay', e);
+      }
 
       console.log('Replay data created:', replayData);
 

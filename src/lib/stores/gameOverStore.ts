@@ -71,6 +71,10 @@ const createGameOverStore = () => {
         gameResult: null,
       }));
     },
+    // НОВИЙ МЕТОД для відновлення стану
+    restoreState: (newState: GameOverState) => {
+      set(newState);
+    }
   };
 };
 
