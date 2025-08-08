@@ -1,7 +1,7 @@
 ---
 type: feature-documentation
 title: Replay on Return to Game
-status: documented
+status: done
 ---
 
 ### Feature Description

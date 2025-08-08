@@ -1,6 +1,6 @@
 ---
 type: bug-report
-status: виконано
+status: done
 title: "[Вказати назву багу]"
 id: BUG-002
 date: "2024-06-09"

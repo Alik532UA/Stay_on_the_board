@@ -1,9 +1,15 @@
 ---
 id: PATTERN-001
 title: 'Архітектурний Патерн: Асинхронна Візуалізація Стану'
-status: Implemented
+status: done
 created: 2025-07-22
+last-reviewed: 2025-08-07
 ---
+
+**Пов'язані документи:**
+- [Архітектура ігрового циклу та потоку даних](GAME_LOGIC_AND_DATA_FLOW.md)
+- [Center Info Element](../elements/CENTER_INFO_ELEMENT.md)
+- [Архітектура проєкту](../ARCHITECTURE.md)
 
 ## Архітектурний Патерн: Асинхронна Візуалізація Стану
 

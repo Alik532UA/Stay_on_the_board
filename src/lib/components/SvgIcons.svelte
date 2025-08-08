@@ -35,6 +35,12 @@
     max-height: 100%;
     display: block;
   }
+  
+  .multicolor-svg {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+  }
 </style> 
 
 {#if name === 'home'}

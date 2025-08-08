@@ -11,12 +11,14 @@
   import { derived } from 'svelte/store';
   import DirectionControls from '$lib/components/widgets/DirectionControls.svelte';
   import { getCenterInfoState } from '$lib/utils/centerInfoUtil';
-  import { lastComputerMove, availableDistances, isPlayerTurn, isPauseBetweenMoves, distanceRows } from '$lib/stores/derivedState.ts';
+  import { lastComputerMove, lastPlayerMove, availableDistances, isPlayerTurn, isPauseBetweenMoves, distanceRows, previousPlayerColor } from '$lib/stores/derivedState.ts';
 
   $: $availableDistances;
   $: $isPlayerTurn;
   $: $lastComputerMove;
+  $: $lastPlayerMove;
   $: $isPauseBetweenMoves;
+  $: $previousPlayerColor;
   const directionArrows = {
     'up-left': '↖',
     'up': '↑',
@@ -70,8 +72,10 @@
     selectedDirection: selectedDirection as any,
     selectedDistance,
     lastComputerMove: $lastComputerMove,
+    lastPlayerMove: $lastPlayerMove,
     isPlayerTurn: $isPlayerTurn,
-    isPauseBetweenMoves: $isPauseBetweenMoves
+    isPauseBetweenMoves: $isPauseBetweenMoves,
+    previousPlayerColor: $previousPlayerColor
   });
 
   function handleDirection(e: CustomEvent<any>) { setDirection(e.detail); }

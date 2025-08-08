@@ -3,14 +3,15 @@
   import { _ } from 'svelte-i18n';
   import SvgIcons from '../SvgIcons.svelte';
   import { showGameModeSelector, showGameInfoModal } from '$lib/utils/uiHelpers.js';
-  import { clearCache } from '$lib/utils/cacheManager.js';
+
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
+  import { logService } from '$lib/services/logService.js';
 
   function handleMainMenuClick() {
     try {
       navigationService.goToMainMenu();
     } catch (error) {
-      console.error('Error navigating to main menu:', error);
+      logService.ui('Error navigating to main menu:', error);
       // Fallback: direct navigation
       window.location.href = '/';
     }
@@ -45,9 +46,5 @@
       {/if}
     </button>
   {/if}
-  {#if import.meta.env.DEV}
-    <button class="main-menu-btn" title={$_('gameBoard.clearCache')} on:click={() => clearCache({ keepAppearance: false })}>
-      <SvgIcons name="clear-cache" />
-    </button>
-  {/if}
+
 </div> 

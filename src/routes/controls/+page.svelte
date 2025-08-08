@@ -102,10 +102,11 @@
   });
 </script>
 
-<FloatingBackButton />
-
 <div class="controls-container">
-  <h1>{$_('controlsPage.title')}</h1>
+  <div class="header-container">
+    <FloatingBackButton />
+    <h1>{$_('controlsPage.title')}</h1>
+  </div>
 
   {#each actionGroups as group}
     <h2>{$_(group.title)}</h2>
@@ -156,6 +157,14 @@
   .controls-container {
     max-width: 800px;
     margin: 0 auto;
+  }
+  
+  .header-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
   }
   h2 {
     margin-top: 2rem;

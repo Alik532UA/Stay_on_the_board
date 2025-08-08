@@ -66,15 +66,11 @@
 
 /* Загальні стилі для Orange, що визначають "підняття" елементів */
 [data-style="orange"] .game-board,
-[data-style="orange"] .game-controls-panel,
-[data-style="orange"] .score-panel,
 [data-style="orange"] .modal-window .modal-content {
     box-shadow: 0 1px 2px 0 var(--shadow-color), 0 1px 3px 1px var(--shadow-color);
 }
 
 [data-style="orange"][data-theme="dark"] .game-board,
-[data-style="orange"][data-theme="dark"] .game-controls-panel,
-[data-style="orange"][data-theme="dark"] .score-panel,
 [data-style="orange"][data-theme="dark"] .modal-window .modal-content {
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.6), 0 1px 3px 1px rgba(0,0,0,0.3);
 }

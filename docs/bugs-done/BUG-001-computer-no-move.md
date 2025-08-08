@@ -1,6 +1,6 @@
 ---
 type: bug-report
-status: виконано
+status: done
 title: "Комп'ютер не робить хід у відповідь після ходу гравця"
 id: BUG-001
 date: "2024-06-09"

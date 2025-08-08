@@ -1,6 +1,7 @@
 // src/lib/services/navigationService.js
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
+import { logService } from './logService.js';
 
 export const navigationService = {
   /**
@@ -9,10 +10,10 @@ export const navigationService = {
    */
   goTo(route) {
     try {
-      console.log('NavigationService: Navigating to', `${base}${route}`);
+      logService.ui('NavigationService: Navigating to', `${base}${route}`);
       goto(`${base}${route}`);
     } catch (error) {
-      console.error('NavigationService: Error navigating to', route, error);
+      logService.ui('NavigationService: Error navigating to', route, error);
     }
   },
 
@@ -21,10 +22,10 @@ export const navigationService = {
    */
   goToMainMenu() {
     try {
-      console.log('NavigationService: Going to main menu');
+      logService.ui('NavigationService: Going to main menu');
       this.goTo('/');
     } catch (error) {
-      console.error('NavigationService: Error going to main menu', error);
+      logService.ui('NavigationService: Error going to main menu', error);
     }
   },
 
@@ -33,10 +34,10 @@ export const navigationService = {
    */
   goBack() {
     try {
-      console.log('NavigationService: Going back');
+      logService.ui('NavigationService: Going back');
       history.back();
     } catch (error) {
-      console.error('NavigationService: Error going back', error);
+      logService.ui('NavigationService: Error going back', error);
     }
   }
 }; 

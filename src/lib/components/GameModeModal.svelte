@@ -48,12 +48,12 @@
             content: { isFaq: true },
             buttons: [
               { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },
-              { textKey: 'modal.ok', primary: true, isHot: true, onClick: () => { modalStore.closeModal(); goto(`${base}/game`); } }
+              { textKey: 'modal.ok', primary: true, isHot: true, onClick: () => { modalStore.closeModal(); goto(`${base}/game/vs-computer`); } }
             ]
           });
         }, 100);
       } else {
-        goto(`${base}/game`);
+        goto(`${base}/game/vs-computer`);
       }
     }
   }

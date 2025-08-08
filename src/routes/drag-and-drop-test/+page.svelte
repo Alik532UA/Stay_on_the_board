@@ -1,62 +1,31 @@
 <script lang="ts">
-  import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
-  import DraggableColumns from '$lib/components/DraggableColumns.svelte';
-
-  type DndItem = { id: string; label: string };
-  type DndColumn = { id: string; label: string; items: DndItem[] };
-
-  let columns: DndColumn[] = [
-    {
-      id: 'left',
-      label: 'Лівий блок',
-      items: [
-        { id: 'a', label: 'Лівий A' },
-        { id: 'b', label: 'Лівий B' },
-        { id: 'c', label: 'Лівий C' },
-        { id: 'd', label: 'Лівий D' }
-      ]
-    },
-    {
-      id: 'right',
-      label: 'Правий блок',
-      items: [
-        { id: 'e', label: 'Правий E' },
-        { id: 'f', label: 'Правий F' }
-      ]
-    }
-  ];
-
-  function handleDrop(event: CustomEvent<{ dragging: DndItem; dragSourceCol: string; dropTargetCol: string; dropIndex: number }>) {
-    const { dragging, dragSourceCol, dropTargetCol, dropIndex } = event.detail;
-    if (!dragSourceCol || !dropTargetCol) return;
-    // Копіюємо масиви для реактивності
-    let newColumns = columns.map(col => ({ ...col, items: [...col.items] }));
-    // Видаляємо з джерела
-    const sourceCol = newColumns.find(col => col.id === dragSourceCol);
-    if (!sourceCol) return;
-    const itemIdx = sourceCol.items.findIndex(i => i.id === dragging.id);
-    if (itemIdx === -1) return;
-    const [item] = sourceCol.items.splice(itemIdx, 1);
-    // Додаємо у ціль
-    const targetCol = newColumns.find(col => col.id === dropTargetCol);
-    if (!targetCol) return;
-    targetCol.items.splice(dropIndex, 0, item);
-    columns = newColumns;
+  import ColorPicker from '$lib/components/local-setup/ColorPicker.svelte';
+  import { logService } from '$lib/services/logService.js';
+  
+  let testColor = '#e63946';
+  
+  function handleColorChange(event: CustomEvent<{ value: string }>) {
+    logService.ui('Test: Color changed to', event.detail.value);
+    testColor = event.detail.value;
   }
 </script>
 
-<FloatingBackButton />
-
-<h1 class="page-title">Test Drag and Drop</h1>
-
-<DraggableColumns {columns} on:drop={handleDrop} />
-
-<style>
-  .page-title {
-    text-align: center;
-    margin-top: 18px;
-    color: #fff;
-    font-size: 2em;
-    font-weight: bold;
-  }
-</style> 
+<div style="padding: 20px; background: #f0f0f0; min-height: 100vh;">
+  <h1>Тест ColorPicker</h1>
+  
+  <div style="margin: 20px 0;">
+    <h3>Поточний колір: {testColor}</h3>
+    <div style="width: 50px; height: 50px; background-color: {testColor}; border: 2px solid #333; border-radius: 50%; margin: 10px 0;"></div>
+  </div>
+  
+  <ColorPicker 
+    value={testColor}
+    on:change={handleColorChange}
+  />
+  
+  <div style="margin-top: 20px;">
+    <button on:click={() => testColor = '#ff0000'}>Встановити червоний</button>
+    <button on:click={() => testColor = '#00ff00'}>Встановити зелений</button>
+    <button on:click={() => testColor = '#0000ff'}>Встановити синій</button>
+  </div>
+</div> 

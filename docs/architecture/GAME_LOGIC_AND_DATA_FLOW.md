@@ -1,9 +1,15 @@
 ---
 id: ARCH-001
 title: 'Архітектура Ігрового Циклу та Потоку Даних'
-status: Active
+status: pending
 created: 2025-07-22
+last-reviewed: 2025-08-07
 ---
+
+**Пов'язані документи:**
+- [Архітектура проєкту](../ARCHITECTURE.md)
+- [Патерни асинхронної візуалізації стану](PATTERNS-asynchronous-state-visualization.md)
+- [Center Info Element](../elements/CENTER_INFO_ELEMENT.md)
 
 ## Архітектура Ігрового Циклу та Потоку Даних
 

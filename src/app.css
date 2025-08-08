@@ -47,7 +47,7 @@ h1 {
     background: var(--bg-secondary);
     padding: 16px 24px;
     border-radius: var(--unified-radius);
-    box-shadow: var(--unified-shadow);
+    box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
     margin-bottom: var(--unified-spacing);
     text-align: center;
     font-size: 1.2em;
@@ -204,6 +204,7 @@ h1 {
   margin-left: auto;
   margin-right: auto;
   box-sizing: border-box; /* Включаємо padding та border у розрахунок ширини */
+  box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
 } 
 
 /* Утилітарний клас для затемнення та розмиття фону */

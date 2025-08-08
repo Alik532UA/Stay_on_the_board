@@ -1,14 +1,143 @@
 <script>
+  // @ts-check
   import { gameState } from '$lib/stores/gameState.js';
   import { gameOrchestrator } from '$lib/gameOrchestrator.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { replayStore } from '$lib/stores/replayStore.js';
+  import { localGameStore } from '$lib/stores/localGameStore.js';
   import { _ } from 'svelte-i18n';
+
+  // Реактивні змінні для визначення поточного гравця та режиму гри
+  $: currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
+  $: isMultiplayer = $gameState.players.filter(p => p.type === 'human').length > 1;
+  $: localGamePlayers = $localGameStore.players;
+
+  /**
+   * Функція для отримання кольору гравця
+   * @param {string} playerName - Ім'я гравця
+   * @returns {string|null} Колір гравця або null
+   */
+  function getPlayerColor(playerName) {
+    const player = localGamePlayers.find(p => p.name === playerName);
+    return player ? player.color : null;
+  }
+
+  /**
+   * Функція для створення стилю з тінню кольору гравця
+   * @param {string} playerName - Ім'я гравця
+   * @returns {string} CSS стиль з тінню кольору
+   */
+  function getPlayerNameStyle(playerName) {
+    const color = getPlayerColor(playerName);
+    if (color) {
+      return `text-shadow: 0 0 8px ${color}, 0 0 12px ${color}, 0 0 16px ${color};`;
+    }
+    return '';
+  }
 
   function showPenaltyInfo() {
     modalStore.showModal({
       titleKey: 'gameBoard.penaltyInfoTitle',
       contentKey: 'gameBoard.penaltyHint',
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+    });
+  }
+
+  function showBonusInfo() {
+    // Знаходимо поточного гравця
+    const currentPlayer = localGamePlayers.find(p => p.name === $gameState.players[$gameState.currentPlayerIndex]?.name);
+    
+    if (currentPlayer && currentPlayer.bonusHistory && currentPlayer.bonusHistory.length > 0) {
+      // Формуємо детальний опис бонусних балів гравця
+      let bonusDetails = `Бонусні бали гравця ${currentPlayer.name}:\n\n`;
+      
+      currentPlayer.bonusHistory.forEach((bonus, index) => {
+        const time = new Date(bonus.timestamp).toLocaleTimeString();
+        bonusDetails += `${index + 1}. +${bonus.points} балів - ${bonus.reason} (${time})\n`;
+      });
+      
+      bonusDetails += `\nЗагальна сума бонусних балів: ${currentPlayer.bonusPoints}`;
+      
+      modalStore.showModal({
+        titleKey: 'gameBoard.bonusInfoTitle',
+        content: bonusDetails,
+        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+      });
+    } else {
+      // Якщо немає бонусних балів, показуємо загальну інформацію
+      modalStore.showModal({
+        titleKey: 'gameBoard.bonusInfoTitle',
+        contentKey: 'gameBoard.bonusHint',
+        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+      });
+    }
+  }
+
+  function showPlayerBonusInfo(/** @type {any} */ player) {
+      // Формуємо детальний опис всіх балів гравця
+  let scoreDetails = `Поточні бали гравця ${player.name}\n\n`;
+    
+    // Основні бали
+    scoreDetails += `Основні бали: +${player.score}\n`;
+    
+      // Бонусні бали
+  if (player.bonusPoints > 0) {
+    // Розбиваємо бонусні бали на категорії
+    let distanceBonus = 0;
+    let jumpBonus = 0;
+    
+    player.bonusHistory.forEach((/** @type {any} */ bonus) => {
+      // Перевіряємо чи це комбінований бонус (відстань + перестрибування)
+      if (bonus.reason.includes('хід на відстань') && bonus.reason.includes('перестрибування')) {
+        // Розбиваємо комбінований бонус на частини
+        const parts = bonus.reason.split(' + ');
+        parts.forEach((/** @type {string} */ part) => {
+          if (part.includes('хід на відстань')) {
+            const match = part.match(/\((\d+) бал\)/);
+            if (match) {
+              distanceBonus += parseInt(match[1]);
+            }
+          } else if (part.includes('перестрибування')) {
+            const match = part.match(/\((\d+) балів?\)/);
+            if (match) {
+              jumpBonus += parseInt(match[1]);
+            }
+          }
+        });
+      } else if (bonus.reason.includes('хід на відстань')) {
+        const match = bonus.reason.match(/\((\d+) бал\)/);
+        if (match) {
+          distanceBonus += parseInt(match[1]);
+        }
+      } else if (bonus.reason.includes('перестрибування')) {
+        const match = bonus.reason.match(/\((\d+) балів?\)/);
+        if (match) {
+          jumpBonus += parseInt(match[1]);
+        }
+      }
+    });
+    
+    if (distanceBonus > 0) {
+      scoreDetails += `Бонус за відстань: +${distanceBonus}\n`;
+    }
+    if (jumpBonus > 0) {
+      scoreDetails += `Бонус за перестрибування: +${jumpBonus}\n`;
+    }
+  } else {
+    scoreDetails += `Бонус за відстань: +0\n`;
+    scoreDetails += `Бонус за перестрибування: +0\n`;
+  }
+    
+    // Штрафні бали
+    scoreDetails += `Штраф за зворотній хід: -${player.penaltyPoints}\n`;
+    
+    // Загальна сума
+    const totalScore = player.score + player.bonusPoints - player.penaltyPoints;
+    scoreDetails += `\nЗагальна сума балів: ${totalScore}`;
+    
+    modalStore.showModal({
+      titleKey: 'gameBoard.bonusInfoTitle',
+      content: scoreDetails,
       buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
     });
   }
@@ -48,6 +177,25 @@
     align-items: center;
     gap: 16px;
   }
+  
+  .score-display-multiplayer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+  }
+  
+  .score-label-multiplayer {
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
   .score-value-clickable {
     cursor: pointer;
     text-decoration: none;
@@ -76,6 +224,19 @@
     transform: scale(1.1);
     background: rgba(244, 67, 54, 0.1);
   }
+  .bonus-display {
+    color: var(--positive-score-color, #4CAF50);
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+  .bonus-display:hover {
+    color: #2e7d32;
+    transform: scale(1.1);
+    background: rgba(76, 175, 80, 0.1);
+  }
   .cash-out-btn {
     background: var(--control-selected);
     color: var(--control-selected-text);
@@ -97,37 +258,93 @@
     margin-bottom: 0;
     border: var(--unified-border);
     border-radius: var(--unified-border-radius);
-    box-shadow: var(--unified-shadow);
+    box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
     backdrop-filter: var(--unified-backdrop-filter);
   }
 </style>
 
 {#if !$replayStore.isReplayMode}
   <div class="score-panel game-content-block">
-    <div class="score-display">
-      <span class="score-label-text">{$_('gameBoard.scoreLabel')}:</span>
-      <span
-        class="score-value-clickable"
-        class:positive-score={$gameState.score > 0}
-        on:click={showScoreInfo}
-        on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
-        role="button"
-        tabindex="0"
-        title={$_('modal.scoreInfoTitle')}
-      >{$gameState.score}</span>
-      {#if $gameState.penaltyPoints > 0}
-        <span 
-          class="penalty-display" 
-          on:click={showPenaltyInfo}
-          on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
-          title={$_('gameBoard.penaltyHint')}
+    {#if isMultiplayer}
+      <!-- Локальна гра - показуємо рахунок всіх гравців -->
+      <div class="score-display-multiplayer">
+        <div class="score-label-multiplayer">{$_('gameBoard.scoreLabel')}</div>
+        {#each localGamePlayers as player}
+          <div class="score-row">
+            <span style={getPlayerNameStyle(player.name)}>{player.name}:</span>
+            <span
+              class="score-value-clickable"
+              class:positive-score={player.score > 0}
+              on:click={showScoreInfo}
+              on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
+              role="button"
+              tabindex="0"
+              title={$_('modal.scoreInfoTitle')}
+            >{player.score}</span>
+                       {#if player.penaltyPoints > 0}
+             <span 
+               class="penalty-display" 
+               on:click={showPenaltyInfo}
+               on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+               title={$_('gameBoard.penaltyHint')}
+               role="button"
+               tabindex="0"
+             >-{player.penaltyPoints}</span>
+           {/if}
+           {#if player.bonusPoints > 0}
+             <span 
+               class="bonus-display" 
+               on:click={() => showPlayerBonusInfo(player)}
+               on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
+               title="Натисніть для перегляду деталей бонусних балів"
+               role="button"
+               tabindex="0"
+             >+{player.bonusPoints}</span>
+           {/if}
+          </div>
+        {/each}
+        {#if $gameState.penaltyPoints > 0}
+          <div class="score-row">
+            <span 
+              class="penalty-display" 
+              on:click={showPenaltyInfo}
+              on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+              title={$_('gameBoard.penaltyHint')}
+              role="button"
+              tabindex="0"
+            >Штраф: -{$gameState.penaltyPoints}</span>
+          </div>
+        {/if}
+      </div>
+    {:else}
+      <!-- Гра з комп'ютером - показуємо загальний рахунок -->
+      <div class="score-display">
+        <span class="score-label-text">
+          {$_('gameBoard.scoreLabel')}:
+        </span>
+        <span
+          class="score-value-clickable"
+          class:positive-score={$gameState.score > 0}
+          on:click={showScoreInfo}
+          on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
           role="button"
           tabindex="0"
-        >-{$gameState.penaltyPoints}</span>
-      {/if}
-    </div>
-    <button class="cash-out-btn" on:click={cashOutAndEndGame} title={$_('gameBoard.cashOut')}>
-      {$_('gameBoard.cashOut')}
+          title={$_('modal.scoreInfoTitle')}
+        >{$gameState.score}</span>
+        {#if $gameState.penaltyPoints > 0}
+          <span 
+            class="penalty-display" 
+            on:click={showPenaltyInfo}
+            on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+            title={$_('gameBoard.penaltyHint')}
+            role="button"
+            tabindex="0"
+          >-{$gameState.penaltyPoints}</span>
+        {/if}
+      </div>
+    {/if}
+    <button class="cash-out-btn" on:click={cashOutAndEndGame} title={isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}>
+      {@html isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}
     </button>
   </div>
 {/if} 

@@ -1,7 +1,7 @@
 ---
 id: BUG-037
 title: Stale "Available Moves" are visible when starting a new game
-status: in-progress
+status: pending
 ---
 
 ### Description

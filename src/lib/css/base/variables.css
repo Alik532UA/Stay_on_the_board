@@ -9,6 +9,7 @@
     --text-accent: #1a237e;
     --border-color: #bdc3c7;
     --shadow-color: rgba(0, 0, 0, 0.1);
+    --current-player-shadow-color: var(--shadow-color, rgba(0, 0, 0, 0.1));
     --cell-light: #f0d9b5;
     --cell-dark: #b58863;
     --cell-blocked: #858585;
@@ -62,6 +63,7 @@
     --text-accent: #64b5f6;
     --border-color: #555;
     --shadow-color: rgba(0, 0, 0, 0.3);
+    --current-player-shadow-color: var(--shadow-color, rgba(0, 0, 0, 0.3));
     --cell-light: #8d6e63;
     --cell-dark: #5d4037;
     --cell-blocked: #626262;

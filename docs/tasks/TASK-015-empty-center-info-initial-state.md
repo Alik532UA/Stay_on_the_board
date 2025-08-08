@@ -1,7 +1,7 @@
 ---
 id: TASK-015
 title: 'UI: Зробити початковий стан center-info порожнім'
-status: Done
+status: done
 created: 2025-07-22
 ---
 

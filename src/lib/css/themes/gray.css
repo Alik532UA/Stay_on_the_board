@@ -66,8 +66,6 @@
 }
 
 /* Gray ефекти */
-[data-style="gray"] .game-controls-panel,
-[data-style="gray"] .score-panel,
 [data-style="gray"] .modal-window .modal-content,
 [data-style="gray"] .control-btn,
 [data-style="gray"] .dir-btn,

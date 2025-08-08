@@ -1,6 +1,6 @@
 ---
 id: BUG-034
-status: In Progress
+status: pending
 title: 'Доступні ходи зʼявляються до завершення анімації руху фігури'
 created: 2025-07-22
 ---

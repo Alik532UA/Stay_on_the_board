@@ -1,7 +1,7 @@
 ---
 id: BUG-038
 title: New available moves appear during the computer's move animation
-status: open
+status: pending
 ---
 
 ### Description

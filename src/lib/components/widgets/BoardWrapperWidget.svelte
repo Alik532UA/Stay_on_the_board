@@ -10,7 +10,7 @@
   // IMPORTANT: Never mutate moveQueue or board directly from UI! This component only observes state and triggers animation.
   import { gameState } from '$lib/stores/gameState.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
-  import { logStore } from '$lib/stores/logStore.js';
+
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from '../SvgIcons.svelte';
   import { slide, scale } from 'svelte/transition';
@@ -24,6 +24,7 @@
   import { uiEffectsStore } from '$lib/stores/uiEffectsStore.js';
   import BoardCell from './BoardCell.svelte';
   import PlayerPiece from './PlayerPiece.svelte';
+  import { logService } from '$lib/services/logService.js';
 
   const boardSize = derived(gameState, $gameState => Number($gameState.boardSize));
   
@@ -95,7 +96,7 @@
     // Якщо нова гра — скидаємо лічильник
     if ($gameState.gameId !== prevGameId) {
       prevGameId = $gameState.gameId;
-      console.log('[BoardWrapperWidget] Нова гра, скидаємо стан');
+      logService.ui('[BoardWrapperWidget] Нова гра, скидаємо стан');
     }
     // Анімація тепер керується через animationStore.visualMoveQueue
     // Не потрібно викликати animateLastMove тут
@@ -116,7 +117,7 @@
     
     // Логуємо тільки для першої клітинки, щоб не засмічувати консоль
     if (row === 0 && col === 0) {
-      console.log('BoardWrapper: isAvailable(0,0) =', result, 
+      logService.ui('BoardWrapper: isAvailable(0,0) =', result, 
                   'showMoves =', $settingsStore.showMoves,
                   'isAnimating =', $animationStore.isAnimating,
                   'isComputerMoveCompleted =', $animationStore.isComputerMoveCompleted, // <-- Додано для дебагу
@@ -145,7 +146,7 @@
     if ($settingsStore.blockModeEnabled && !(row === $gameState.playerRow && col === $gameState.playerCol)) {
       const visualCounts = get(visualCellVisitCounts);
       const blocked = isCellBlocked(row, col, visualCounts, $settingsStore);
-      logStore.addLog(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`, 'info');
+      logService.ui(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`);
     }
   }
 

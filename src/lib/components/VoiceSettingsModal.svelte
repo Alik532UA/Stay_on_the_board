@@ -4,6 +4,7 @@
   import { loadAndGetVoices, filterVoicesByLang, resetVoicesPromise } from '$lib/speech.js';
   import { locale, _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
+  import { logService } from '$lib/services/logService.js';
 
   export let close = () => {};
 
@@ -33,7 +34,7 @@
         availableVoices = mainVoices;
       }
     } catch (error) {
-      console.error("Помилка завантаження голосів:", error);
+      logService.ui("Помилка завантаження голосів:", error);
     }
     if (selectedVoiceURI == null) selectedVoiceURI = '';
     isLoading = false;
@@ -59,7 +60,7 @@
         availableVoices = mainVoices;
       }
     } catch (error) {
-      console.error("Помилка повторного завантаження голосів:", error);
+      logService.ui("Помилка повторного завантаження голосів:", error);
     }
     isLoading = false;
   }

@@ -1,7 +1,7 @@
 ---
 id: BUG-039
 title: Old available moves fade out on game reset instead of disappearing instantly
-status: open
+status: pending
 ---
 
 ### Description

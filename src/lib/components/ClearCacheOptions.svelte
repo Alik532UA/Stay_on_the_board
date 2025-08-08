@@ -1,7 +1,7 @@
 <script>
   import { _ } from 'svelte-i18n';
   import { modalStore } from '$lib/stores/modalStore.js';
-  import { logStore } from '$lib/stores/logStore.js';
+  
   import { clearCache } from '$lib/utils/cacheManager.js';
 
   function handleClearAll() {

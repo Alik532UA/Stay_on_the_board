@@ -4,6 +4,7 @@ import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
 import { locale } from 'svelte-i18n';
 import { modalStore } from '$lib/stores/modalStore.js';
 import { gameState } from './gameState'; // <-- 1. Імпортуй gameState
+import { logService } from '../services/logService.js';
 
 /**
  * @typedef {Object} SettingsState
@@ -23,6 +24,7 @@ import { gameState } from './gameState'; // <-- 1. Імпортуй gameState
  * @property {'beginner' | 'experienced' | 'pro' | null} gameMode
  * @property {boolean} showGameModeModal
  * @property {boolean} showGameInfoWidget
+ * @property {boolean} lockSettings
  */
 
 const isBrowser = typeof window !== 'undefined';
@@ -72,6 +74,7 @@ const defaultSettings = {
   gameMode: null,
   showGameModeModal: true,
   showGameInfoWidget: true,
+  lockSettings: false,
 };
 
 /** @param {string | null} jsonString @param {any} defaultValue */
@@ -127,9 +130,10 @@ function loadSettings() {
     })()),
     showGameModeModal: localStorage.getItem('showGameModeModal') !== 'false', // Defaults to true if null
     showGameInfoWidget: localStorage.getItem('showGameInfoWidget') !== 'false', // Defaults to true if null
+    lockSettings: localStorage.getItem('lockSettings') === 'true',
   };
   } catch (error) {
-    console.error('❌ Помилка завантаження налаштувань:', error);
+    logService.init('Помилка завантаження налаштувань:', error);
     return defaultSettings;
   }
 }
@@ -148,9 +152,9 @@ function createSettingsStore() {
             document.documentElement.setAttribute('data-style', currentSettings.style);
           });
         }
-        console.log('✅ settingsStore ініціалізовано успішно');
+        logService.init('settingsStore ініціалізовано успішно');
       } catch (error) {
-        console.error('❌ Помилка ініціалізації settingsStore:', error);
+        logService.init('Помилка ініціалізації settingsStore:', error);
         // Використовуємо налаштування за замовчуванням при помилці
         set(defaultSettings);
       }

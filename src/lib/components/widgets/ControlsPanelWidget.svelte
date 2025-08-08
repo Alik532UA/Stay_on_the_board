@@ -7,16 +7,19 @@
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import SvgIcons from '../SvgIcons.svelte';
   import { get } from 'svelte/store';
-  import { availableDistances, isPlayerTurn, isConfirmButtonDisabled, lastComputerMove, isPauseBetweenMoves, distanceRows } from '$lib/stores/derivedState.ts';
+  import { availableDistances, isPlayerTurn, isConfirmButtonDisabled, lastComputerMove, lastPlayerMove, isPauseBetweenMoves, distanceRows, previousPlayerColor } from '$lib/stores/derivedState.ts';
   import { modalStore } from '$lib/stores/modalStore.js';
   import DirectionControls from './DirectionControls.svelte';
   import { getCenterInfoState } from '$lib/utils/centerInfoUtil';
+  import { logService } from '$lib/services/logService.js';
 
   $: $availableDistances;
   $: $isPlayerTurn;
   $: $isConfirmButtonDisabled;
   $: $lastComputerMove;
+  $: $lastPlayerMove;
   $: $isPauseBetweenMoves;
+  $: $previousPlayerColor;
 
   $: selectedDirection = $playerInputStore.selectedDirection;
   $: selectedDistance = $playerInputStore.selectedDistance;
@@ -25,15 +28,32 @@
     selectedDirection: selectedDirection as any,
     selectedDistance,
     lastComputerMove: $lastComputerMove,
+    lastPlayerMove: $lastPlayerMove,
     isPlayerTurn: $isPlayerTurn,
-    isPauseBetweenMoves: $isPauseBetweenMoves
+    isPauseBetweenMoves: $isPauseBetweenMoves,
+    previousPlayerColor: $previousPlayerColor
   });
 
-  function handleDirection(e: CustomEvent<any>) { setDirection(e.detail); }
-  function handleDistance(e: CustomEvent<any>) { setDistance(e.detail); }
-  function handleCentral() { if (centerInfoProps.clickable) onConfirmClick(); }
-  function handleConfirm() { onConfirmClick(); }
-  function handleNoMoves() { gameOrchestrator.claimNoMoves(); }
+  function handleDirection(e: CustomEvent<any>) { 
+    logService.action(`Click: "Напрямок: ${e.detail}" (ControlsPanelWidget)`);
+    setDirection(e.detail); 
+  }
+  function handleDistance(e: CustomEvent<any>) { 
+    logService.action(`Click: "Відстань: ${e.detail}" (ControlsPanelWidget)`);
+    setDistance(e.detail); 
+  }
+  function handleCentral() { 
+    logService.action('Click: "Центральна кнопка" (ControlsPanelWidget)');
+    if (centerInfoProps.clickable) onConfirmClick(); 
+  }
+  function handleConfirm() { 
+    logService.action('Click: "Підтвердити хід" (ControlsPanelWidget)');
+    onConfirmClick(); 
+  }
+  function handleNoMoves() { 
+    logService.action('Click: "Ходів немає" (ControlsPanelWidget)');
+    gameOrchestrator.claimNoMoves(); 
+  }
   
   function onConfirmClick() {
     if ($isConfirmButtonDisabled) {
@@ -51,7 +71,7 @@
 <style>
   .game-controls-panel {
     background: var(--bg-secondary);
-    box-shadow: var(--unified-shadow);
+    box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
     border-radius: var(--unified-border-radius);
     padding: 24px 18px;
     display: flex;

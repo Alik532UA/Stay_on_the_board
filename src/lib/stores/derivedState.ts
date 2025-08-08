@@ -8,6 +8,7 @@ import type { PlayerInputState } from './playerInputStore';
 import { settingsStore } from './settingsStore';
 import { languages } from '$lib/constants';
 import { animationStore } from './animationStore';
+import { localGameStore } from './localGameStore';
 
 /**
  * @typedef {object} ComputerMove
@@ -25,7 +26,17 @@ import { animationStore } from './animationStore';
 export const lastComputerMove = derived(
   gameState,
   ($gameState: GameState) => {
-    // Шукаємо з кінця черги останній хід, зроблений гравцем 2 (AI)
+    // Перевіряємо чи це локальна гра (більше одного людського гравця)
+    const humanPlayersCount = $gameState.players.filter(p => p.type === 'human').length;
+    const isLocalGame = humanPlayersCount > 1;
+    
+    if (isLocalGame) {
+      // В локальній грі немає комп'ютера, тому lastComputerMove завжди null
+      console.log('[lastComputerMove] Оновлено: null (локальна гра)');
+      return null;
+    }
+    
+    // Шукаємо з кінця черги останній хід, зроблений комп'ютером (player: 2)
     for (let i = $gameState.moveQueue.length - 1; i >= 0; i--) {
       const move = $gameState.moveQueue[i];
       if (move.player === 2) {
@@ -40,6 +51,32 @@ export const lastComputerMove = derived(
 );
 
 /**
+ * Derived store, що завжди містить останній хід гравця в локальній грі.
+ * Він автоматично оновлюється, коли змінюється gameState.moveQueue.
+ * @type {import('svelte/store').Readable<ComputerMove | null>}
+ */
+export const lastPlayerMove = derived(
+  gameState,
+  ($gameState: GameState) => {
+    // Перевіряємо чи це локальна гра (більше одного людського гравця)
+    const humanPlayersCount = $gameState.players.filter(p => p.type === 'human').length;
+    if (humanPlayersCount <= 1) {
+      return null; // Не локальна гра
+    }
+    
+    // В локальній грі всі гравці мають player === 1, тому беремо останній хід
+    if ($gameState.moveQueue.length > 0) {
+      const lastMove = $gameState.moveQueue[$gameState.moveQueue.length - 1];
+      const result = { direction: lastMove.direction as Direction, distance: lastMove.distance };
+      console.log('[lastPlayerMove] Оновлено:', result);
+      return result;
+    }
+    console.log('[lastPlayerMove] Оновлено: null');
+    return null; // Якщо гравці ще не ходили
+  }
+);
+
+/**
  * Derived store, що визначає, чи триває пауза між ходом гравця та комп'ютера.
  * Використовується для приховування ходу комп'ютера в center-info під час паузи.
  * @type {import('svelte/store').Readable<boolean>}
@@ -47,22 +84,32 @@ export const lastComputerMove = derived(
 export const isPauseBetweenMoves = derived(
   gameState,
   ($gameState: GameState) => {
+    // Перевіряємо чи це локальна гра (більше одного людського гравця)
+    const humanPlayersCount = $gameState.players.filter(p => p.type === 'human').length;
+    const isLocalGame = humanPlayersCount > 1;
+    
     // Пауза триває, якщо останній хід в черзі - це хід гравця (player: 1)
     // і ще немає ходу комп'ютера після нього
     const lastMove = $gameState.moveQueue[$gameState.moveQueue.length - 1];
-    console.log('[isPauseBetweenMoves] Перевірка: lastMove =', lastMove);
+    console.log('[isPauseBetweenMoves] Перевірка: lastMove =', lastMove, 'isLocalGame =', isLocalGame);
     
     if (lastMove && lastMove.player === 1) {
-      // Перевіряємо, чи є хід комп'ютера після ходу гравця
-      for (let i = $gameState.moveQueue.length - 1; i >= 0; i--) {
-        const move = $gameState.moveQueue[i];
-        if (move.player === 2) {
-          console.log('[isPauseBetweenMoves] Оновлено: false (є хід комп\'ютера)');
-          return false;
+      if (isLocalGame) {
+        // В локальній грі немає паузи між ходами гравців
+        console.log('[isPauseBetweenMoves] Оновлено: false (локальна гра, немає паузи)');
+        return false;
+      } else {
+        // Перевіряємо, чи є хід комп'ютера після ходу гравця
+        for (let i = $gameState.moveQueue.length - 1; i >= 0; i--) {
+          const move = $gameState.moveQueue[i];
+          if (move.player === 2) {
+            console.log('[isPauseBetweenMoves] Оновлено: false (є хід комп\'ютера)');
+            return false;
+          }
         }
+        console.log('[isPauseBetweenMoves] Оновлено: true (пауза між ходами)');
+        return true;
       }
-      console.log('[isPauseBetweenMoves] Оновлено: true (пауза між ходами)');
-      return true;
     }
     console.log('[isPauseBetweenMoves] Оновлено: false (не пауза)');
     return false;
@@ -160,6 +207,38 @@ export const isConfirmButtonDisabled = derived(
  */
 export const isPlayerTurn = derived(gameState, $gameState =>
   $gameState.players[$gameState.currentPlayerIndex]?.type === 'human'
+);
+
+
+
+/**
+ * Отримує колір попереднього гравця в локальній грі (який тільки що зробив хід).
+ * @type {import('svelte/store').Readable<string | null>}
+ */
+export const previousPlayerColor = derived(
+  [gameState, localGameStore],
+  ([$gameState, $localGameStore]) => {
+    // Використовуємо поточний URL для визначення типу гри
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+    const isLocalGame = currentPath.includes('/game/local');
+    
+    if (!isLocalGame) {
+      return null; // Не локальна гра
+    }
+    
+    // Отримуємо колір попереднього гравця
+    const currentPlayerIndex = $gameState.currentPlayerIndex;
+    const previousPlayerIndex = (currentPlayerIndex + $localGameStore.players.length - 1) % $localGameStore.players.length;
+    const previousPlayer = $localGameStore.players[previousPlayerIndex];
+    
+    if (previousPlayer && previousPlayer.color) {
+      console.log('[previousPlayerColor] Оновлено:', previousPlayer.color, 'для гравця', previousPlayerIndex + 1);
+      return previousPlayer.color;
+    }
+    
+    console.log('[previousPlayerColor] Оновлено: null');
+    return null;
+  }
 );
 
 export const availableDistances = derived(gameState, $gameState => 
@@ -331,6 +410,41 @@ export const visualCurrentPlayerIndex = derived(
     // Якщо останній візуальний хід був гравця (player: 1), то наступний - комп'ютера (індекс 1).
     // Якщо останній був комп'ютера (player: 2), то наступний - гравця (індекс 0).
     return lastVisualMove.player === 1 ? 1 : 0;
+  }
+);
+
+/**
+ * Обчислює колір поточного гравця для локальної гри.
+ * Використовується для зміни кольору тіней елементів інтерфейсу.
+ * @type {import('svelte/store').Readable<string | null>}
+ */
+export const currentPlayerColor = derived(
+  [gameState, localGameStore],
+  ([$gameState, $localGameStore]) => {
+    // Використовуємо поточний URL для визначення типу гри
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+    const isLocalGame = currentPath.includes('/game/local');
+    
+    console.log('[currentPlayerColor] Debug:', {
+      isLocalGame,
+      currentPath,
+      localPlayersCount: $localGameStore.players.length,
+      currentPlayerIndex: $gameState.currentPlayerIndex,
+      gameStatePlayers: $gameState.players.map(p => ({ type: p.type, name: p.name })),
+      localPlayers: $localGameStore.players.map(p => ({ name: p.name, color: p.color }))
+    });
+    
+    if (!isLocalGame) {
+      console.log('[currentPlayerColor] Not local game, returning null');
+      return null; // Не локальна гра, повертаємо null
+    }
+    
+    // В локальній грі використовуємо currentPlayerIndex з gameState
+    const currentPlayerIndex = $gameState.currentPlayerIndex;
+    const currentPlayer = $localGameStore.players[currentPlayerIndex];
+    
+    console.log('[currentPlayerColor] Local game, currentPlayerIndex:', currentPlayerIndex, 'player:', currentPlayer?.name, 'color:', currentPlayer?.color);
+    return currentPlayer ? currentPlayer.color : null;
   }
 );
 

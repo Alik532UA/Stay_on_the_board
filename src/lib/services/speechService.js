@@ -21,24 +21,24 @@ export function loadAndGetVoices() {
   voicesPromise = new Promise((resolve) => {
     const allVoices = speechSynthesis.getVoices();
     if (allVoices.length) {
-      logService.addLog(`[Speech] Voices already loaded: ${allVoices.length}`, 'debug');
+      logService.ui(`[Speech] Voices already loaded: ${allVoices.length}`);
       voices.set(/** @type {any} */(allVoices));
       return resolve(allVoices);
     }
     speechSynthesis.onvoiceschanged = () => {
       const updatedVoices = speechSynthesis.getVoices();
-      logService.addLog(`[Speech] 'voiceschanged' event fired. Loaded ${updatedVoices.length} voices.`, 'debug');
+      logService.ui(`[Speech] 'voiceschanged' event fired. Loaded ${updatedVoices.length} voices.`);
       voices.set(/** @type {any} */(updatedVoices));
       resolve(updatedVoices);
     };
     setTimeout(() => {
         const finalCheckVoices = speechSynthesis.getVoices();
         if (finalCheckVoices.length) {
-            logService.addLog(`[Speech] Fallback check loaded ${finalCheckVoices.length} voices.`, 'debug');
+            logService.ui(`[Speech] Fallback check loaded ${finalCheckVoices.length} voices.`);
             voices.set(/** @type {any} */(finalCheckVoices));
             resolve(finalCheckVoices);
         } else {
-            logService.addLog('[Speech] No voices loaded after fallback.', 'warn');
+            logService.ui('[Speech] No voices loaded after fallback.');
             resolve([]);
         }
     }, 1000);
@@ -64,9 +64,9 @@ loadAndGetVoices();
  */
 export function filterVoicesByLang(voiceList, langCode) {
   if (!voiceList) return [];
-  logService.addLog(`[Speech] Filtering for langCode: "${langCode}". Total voices: ${voiceList.length}`, 'debug');
+  logService.ui(`[Speech] Filtering for langCode: "${langCode}". Total voices: ${voiceList.length}`);
   const filtered = voiceList.filter(voice => voice.lang.startsWith(langCode));
-  logService.addLog(`[Speech] Found ${filtered.length} voices for "${langCode}".`, 'debug');
+  logService.ui(`[Speech] Found ${filtered.length} voices for "${langCode}".`);
   return filtered;
 }
 
@@ -80,7 +80,7 @@ export function speakText(textToSpeak, lang, voiceURI) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window) || !textToSpeak) return;
   const allVoices = speechSynthesis.getVoices();
   if (allVoices.length === 0) {
-      logService.addLog('[Speech] Speak called, but no voices are available.', 'warn');
+      logService.ui('[Speech] Speak called, but no voices are available.');
       loadAndGetVoices();
       return;
   }
@@ -95,13 +95,13 @@ export function speakText(textToSpeak, lang, voiceURI) {
       utterance.voice = selectedVoice;
       utterance.lang = selectedVoice.lang;
     } else {
-      logService.addLog(`[Speech] Voice with URI "${voiceURI}" not found. Using default for lang "${lang}".`, 'warn');
+      logService.ui(`[Speech] Voice with URI "${voiceURI}" not found. Using default for lang "${lang}".`);
       utterance.lang = lang;
     }
   } else {
     utterance.lang = lang;
   }
-  logService.addLog(`[Speech] Attempting to speak: "${textToSpeak}"`, 'info');
+  logService.ui(`[Speech] Attempting to speak: "${textToSpeak}"`);
   setTimeout(() => {
     window.speechSynthesis.speak(utterance);
   }, 50);
