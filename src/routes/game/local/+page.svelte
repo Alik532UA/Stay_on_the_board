@@ -78,18 +78,21 @@
 
       let titleKey = 'modal.gameOverTitle';
       let winnerName = '';
+      let winnerNames = '';
       if (winners.length === 1) {
         titleKey = 'modal.winnerTitle';
         winnerName = localGameState.players[winners[0]].name;
       } else if (winners.length > 1) {
         titleKey = 'modal.winnersTitle';
+        winnerNames = winners.map(i => localGameState.players[i].name).join(', ');
       }
 
       const modalContent = {
         reason: $t(gameResult.reasonKey || '', { values: { playerName: localGameState.players[losingPlayerIndex].name } }),
         playerScores: playerScores,
         winnerName: winnerName,
-        scoreDetails: gameResult.finalScoreDetails // Це може бути undefined, але це нормально
+        winnerNumbers: winnerNames, // Додаємо імена переможців
+        scoreDetails: gameResult.finalScoreDetails
       };
 
       modalStore.showModal({

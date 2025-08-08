@@ -357,22 +357,35 @@ export const gameOrchestrator = {
   async restartLocalGame(): Promise<void> {
     const localGameState = get(localGameStore);
     const currentGameState = get(gameState);
-    
-    // Зберігаємо поточні налаштування гравців
-    const players = [...localGameState.players];
+
+    // 1. Зберігаємо дані гравців та налаштування дошки
+    const playersData = localGameState.players.map(p => ({ name: p.name, color: p.color }));
     const boardSize = currentGameState.boardSize;
+
+    // 2. Виконуємо повний скид гри до стану за замовчуванням
+    gameLogicService.resetGame({ newSize: boardSize });
+
+    // 3. Оновлюємо дані гравців у localGameStore
+    localGameStore.resetPlayersWithData(playersData);
+
+    // 4. Оновлюємо дані гравців у gameState, щоб вони відповідали localGameStore
+    const newLocalState = get(localGameStore);
+    const newPlayersForGameState = newLocalState.players.map(p => ({
+      id: p.id,
+      name: p.name,
+      type: 'human' // В локальній грі всі гравці - люди
+    }));
     
-    // Скидаємо гравців з збереженням імен та кольорів
-    localGameStore.resetPlayersWithData(players.map(p => ({ name: p.name, color: p.color })));
-    
-    // Встановлюємо розмір дошки
-    await this.setBoardSize(boardSize);
-    
-    // Скидаємо стан завершення гри
+    await stateManager.applyChanges(
+      'RESTART_LOCAL_GAME',
+      { players: newPlayersForGameState, currentPlayerIndex: 0 },
+      'Updating players for new local game'
+    );
+
+    // 5. Скидаємо стан завершення гри та закриваємо модальне вікно
     gameOverStore.resetGameOverState();
-    
-    // Закриваємо модальне вікно
     modalStore.closeModal();
+    animationStore.initialize();
   },
 
   /**
