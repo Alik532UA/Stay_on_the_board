@@ -5,6 +5,7 @@ export interface CenterInfoProps {
   content: string;
   clickable: boolean;
   aria: string;
+  backgroundColor?: string; // Додаємо опціональний колір фону
 }
 
 const directionArrows: Record<DirectionKey, string> = {
@@ -22,21 +23,27 @@ export function getCenterInfoState({
   selectedDirection,
   selectedDistance,
   lastComputerMove,
+  lastPlayerMove,
   isPlayerTurn,
-  isPauseBetweenMoves = false
+  isPauseBetweenMoves = false,
+  previousPlayerColor = null
 }: {
   selectedDirection: DirectionKey | null;
   selectedDistance: number | null;
   lastComputerMove?: { direction?: DirectionKey; distance?: number } | null;
+  lastPlayerMove?: { direction?: DirectionKey; distance?: number } | null;
   isPlayerTurn: boolean;
   isPauseBetweenMoves?: boolean;
+  previousPlayerColor?: string | null;
 }): CenterInfoProps {
   console.log('[centerInfoUtil] getCenterInfoState викликано:', {
     selectedDirection,
     selectedDistance,
     lastComputerMove,
+    lastPlayerMove,
     isPlayerTurn,
-    isPauseBetweenMoves
+    isPauseBetweenMoves,
+    previousPlayerColor
   });
   
   // Якщо є вибраний хід - показуємо його
@@ -104,8 +111,28 @@ export function getCenterInfoState({
     };
   }
   
+  // Якщо немає вибраного ходу і є останній хід гравця (для локальних ігор)
+  if (!selectedDirection && !selectedDistance && !lastComputerMove && lastPlayerMove) {
+    let dir = '';
+    let dist = '';
+    if (lastPlayerMove.direction && directionArrows[lastPlayerMove.direction]) {
+      dir = directionArrows[lastPlayerMove.direction];
+    }
+    if (typeof lastPlayerMove.distance === 'number') {
+      dist = String(lastPlayerMove.distance);
+    }
+    console.log('[centerInfoUtil] Показуємо останній хід гравця:', `${dir}${dist}`);
+    return {
+      class: 'player-move-display',
+      content: `${dir}${dist}`,
+      clickable: false,
+      aria: `Останній хід гравця: ${dir}${dist}`,
+      backgroundColor: previousPlayerColor || '#43a047' // Використовуємо колір гравця або зелений за замовчуванням
+    };
+  }
+  
   // Якщо немає нічого
-  if (!selectedDirection && !selectedDistance && !lastComputerMove) {
+  if (!selectedDirection && !selectedDistance && !lastComputerMove && !lastPlayerMove) {
     return { class: '', content: '', clickable: false, aria: 'Порожньо' };
   }
   

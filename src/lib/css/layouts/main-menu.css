@@ -191,6 +191,12 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Для локальної гри робимо фон прозорим */
+#game-container[data-local-game="true"],
+#game-container {
+    background: transparent !important;
+}
+
 .cell,
 .control-btn,
 .modal-button {
@@ -292,7 +298,7 @@
     background: var(--bg-secondary);
     padding: 16px 24px;
     border-radius: var(--unified-radius);
-    box-shadow: var(--unified-shadow);
+    box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
     margin-bottom: var(--unified-spacing);
     text-align: center;
 }
@@ -1116,12 +1122,14 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
   з відображенням SVG, не змінюючи його вигляд.
 */
 .main-menu-icon .multicolor-svg {
-  width: 32px !important;
+  width: 44px !important;
+  height: 44px !important;
+  /* width: 32px !important;
   height: 32px !important;
   min-width: 32px !important;
   min-height: 32px !important;
   max-width: 32px !important;
-  max-height: 32px !important;
+  max-height: 32px !important; */
   display: inline-block !important;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);

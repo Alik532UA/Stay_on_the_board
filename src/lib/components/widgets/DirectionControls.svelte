@@ -3,6 +3,7 @@
   import SvgIcons from '../SvgIcons.svelte';
   import { _ } from 'svelte-i18n';
   import { getCenterInfoState } from '$lib/utils/centerInfoUtil';
+  import { logService } from '$lib/services/logService.js';
 
   export let selectedDirection: string | null = null;
   export let selectedDistance: number | null = null;
@@ -21,18 +22,23 @@
   const dispatch = createEventDispatcher();
 
   function handleDirection(dir: string) {
+    logService.action(`Click: "Напрямок: ${dir}" (DirectionControls)`);
     dispatch('direction', dir);
   }
   function handleDistance(dist: number) {
+    logService.action(`Click: "Відстань: ${dist}" (DirectionControls)`);
     dispatch('distance', dist);
   }
   function handleCentral() {
+    logService.action('Click: "Центральна кнопка" (DirectionControls)');
     dispatch('central');
   }
   function handleConfirm() {
+    logService.action('Click: "Підтвердити хід" (DirectionControls)');
     dispatch('confirm');
   }
   function handleNoMoves() {
+    logService.action('Click: "Ходів немає" (DirectionControls)');
     dispatch('noMoves');
   }
 </script>
@@ -50,6 +56,7 @@
       on:click={centerInfoProps.clickable ? handleCentral : undefined}
       tabindex="0"
       disabled={!centerInfoProps.clickable}
+      style={centerInfoProps.backgroundColor ? `background-color: ${centerInfoProps.backgroundColor} !important` : ''}
     >
       {centerInfoProps.content}
     </button>

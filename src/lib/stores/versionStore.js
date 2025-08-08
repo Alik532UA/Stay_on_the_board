@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 import { base } from '$app/paths';
 import { browser } from '$app/environment'; // <-- 1. Імпортуйте 'browser'
+import { logService } from '../services/logService.js';
 
 /** @type {import('svelte/store').Writable<string | null>} */
 export const appVersion = writable(null);
@@ -22,7 +23,7 @@ export async function loadVersion() {
     const data = await response.json();
     appVersion.set(data.version);
   } catch (error) {
-    console.error('Could not load app version:', error);
+    logService.init('Could not load app version:', error);
     appVersion.set('?.?.?'); // Встановлюємо заглушку в разі помилки
   }
 }

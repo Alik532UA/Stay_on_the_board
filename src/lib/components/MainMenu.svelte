@@ -3,7 +3,8 @@
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { gameState } from '$lib/stores/gameState.js';
   import { navigateToGame } from '$lib/services/uiService.js';
-  import { logStore } from '../stores/logStore.js';
+  import { logService } from '$lib/services/logService.js';
+  
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { _ , isLoading, locale } from 'svelte-i18n';
@@ -23,27 +24,35 @@
   let showLangDropdown = false;
   let showThemeDropdown = false;
   let showWipNotice = false;
-  let showDevMenu = false; // <-- НОВА ЗМІННА СТАНУ
-
+  let showDevMenu = false;
   /** @param {string} lang */
   function selectLang(lang) {
-    logStore.addLog(`Зміна мови: ${lang}`, 'info');
+    logService.action(`Click: "Мова: ${lang}" (MainMenu)`);
+    logService.ui(`Зміна мови: ${lang}`);
     settingsStore.updateSettings({ language: lang });
     localStorage.setItem('language', lang);
     locale.set(lang);
     showLangDropdown = false;
   }
-  function toggleLangDropdown() { showLangDropdown = !showLangDropdown; }
-  function openWipNotice() { showWipNotice = true; }
+  function toggleLangDropdown() {
+    logService.action('Click: "Мова" (MainMenu)');
+    showLangDropdown = !showLangDropdown;
+  }
+  function openWipNotice() {
+    logService.action('Click: "Play Online (WIP)" (MainMenu)');
+    showWipNotice = true;
+  }
   $: settings = $settingsStore;
 
   /** @param {string} route */
   function navigateTo(route) {
-    logStore.addLog(`Навігація: ${route}`, 'info');
+    logService.action(`Click: "Навігація: ${route}" (MainMenu)`);
+    logService.ui(`Навігація: ${route}`);
     goto(`${base}${route}`);
   }
 
   function showClearCacheModal() {
+    logService.action('Click: "Очистити кеш" (MainMenu)');
     modalStore.showModal({
       titleKey: 'mainMenu.clearCacheModal.title',
       component: ClearCacheOptions,
@@ -55,20 +64,77 @@
 
   /** @param {string} style @param {string} theme */
   function selectTheme(style, theme) {
-    logStore.addLog(`Зміна теми: ${style}, ${theme}`, 'info');
+    logService.action(`Click: "Тема: ${style} ${theme}" (MainMenu)`);
+    logService.ui(`Зміна теми: ${style}, ${theme}`);
     settingsStore.updateSettings({ style, theme });
     showThemeDropdown = false;
   }
 
   function closeDropdowns() {
+    logService.action('Click: "Закрити дропдауни" (MainMenu)');
     showThemeDropdown = false;
     showLangDropdown = false;
     showWipNotice = false;
-    showDevMenu = false; // <-- ДОДАНО
+    showDevMenu = false;
   }
 
   let isDev = false;
-  onMount(() => { isDev = !!import.meta.env.DEV; });
+  
+  function handleKeydown(/** @type {KeyboardEvent} */ event) {
+    // L або Д (українська Д) для переходу в local-setup (тільки в DEV)
+    if ((event.key === 'l' || event.key === 'д' || event.key === 'L' || event.key === 'Д') && import.meta.env.DEV) {
+      event.preventDefault();
+      navigateTo('/local-setup');
+    }
+  }
+  
+  onMount(() => { 
+    isDev = !!import.meta.env.DEV;
+    document.addEventListener('keydown', handleKeydown);
+  });
+  
+  import { onDestroy } from 'svelte';
+  onDestroy(() => {
+    document.removeEventListener('keydown', handleKeydown);
+  });
+
+  function handleDevMenu() {
+    logService.action('Click: "dev version" (MainMenu)');
+    showDevMenu = !showDevMenu;
+  }
+  function handleDevMenuBtn() {
+    logService.action('Click: "Drag and Drop Test" (MainMenu)');
+    navigateTo('/drag-and-drop-test');
+    showDevMenu = false;
+  }
+  function handlePlayVsComputer() {
+    logService.action(`Click: "Гра проти комп'ютера" (MainMenu)`);
+    navigateToGame();
+  }
+  function handleLocalGame() {
+    logService.action('Click: "Локальна гра" (MainMenu)');
+    navigateTo('/local-setup');
+  }
+  function handleControls() {
+    logService.action('Click: "Управління" (MainMenu)');
+    navigateTo('/controls');
+  }
+  function handleRules() {
+    logService.action('Click: "Правила" (MainMenu)');
+    navigateTo('/rules');
+  }
+  function handleSupporters() {
+    logService.action('Click: "Підтримати" (MainMenu)');
+    navigateTo('/supporters');
+  }
+  function handleDonate() {
+    logService.action('Click: "Donate" (MainMenu)');
+    navigateTo('/supporters');
+  }
+  function handleOverlayClose() {
+    logService.action('Click: "Закрити overlay" (MainMenu)');
+    closeDropdowns();
+  }
 </script>
 
 <main class="main-menu">
@@ -110,7 +176,7 @@
     {#if showDevMenu}
       <div class="dev-menu" role="dialog" tabindex="0" onclick={(e) => { e.stopPropagation(); }} onkeydown={(e) => (e.key === 'Escape') && (showDevMenu = false)}>
         <h3>dev</h3>
-        <button class="modal-button secondary" onclick={() => { navigateTo('/drag-and-drop-test'); showDevMenu = false; }}>
+        <button class="modal-button secondary" onclick={handleDevMenuBtn}>
           {$_('mainMenu.dragAndDropTest')}
         </button>
         <!-- Сюди можна додавати нові dev-кнопки -->
@@ -123,7 +189,7 @@
           <button class="wip-close-btn" onclick={closeDropdowns}>×</button>
           <h3>{$_('mainMenu.wipNotice.title')}</h3>
           <p>{$_('mainMenu.wipNotice.description')}</p>
-          <button class="wip-donate-btn" onclick={() => window.open('https://send.monobank.ua/jar/8TPmFKQTCK', '_blank', 'noopener,noreferrer')}>
+          <button class="wip-donate-btn" onclick={handleDonate}>
             {$_('mainMenu.donate')}
           </button>
         </div>
@@ -169,19 +235,19 @@
     <div class="main-menu-subtitle">
       {$_('mainMenu.menu')}
       {#if isDev}
-        <span class="dev-version" role="button" tabindex="0" onclick={() => showDevMenu = !showDevMenu} onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (showDevMenu = !showDevMenu)}>
+        <span class="dev-version" role="button" tabindex="0" onclick={handleDevMenu} onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleDevMenu()}>
           dev v.{$appVersion}
         </span>
       {/if}
     </div>
     <div id="main-menu-buttons">
-      <button class="modal-button secondary" onclick={navigateToGame}>{$_('mainMenu.playVsComputer')}</button>
-      <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice}>{$_('mainMenu.localGame')}</button>
+      <button class="modal-button secondary" onclick={handlePlayVsComputer}>{$_('mainMenu.playVsComputer')}</button>
+      <button class="modal-button secondary" onclick={handleLocalGame}>{$_('mainMenu.localGame')}</button>
       <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice}>{$_('mainMenu.playOnline')}</button>
       <!-- <button class="modal-button secondary" on:click={() => navigateTo('/settings')}>{$_('mainMenu.settings')}</button> -->
-      <button class="modal-button secondary" onclick={() => navigateTo('/controls')}>{$_('mainMenu.controls')}</button>
-      <button class="modal-button secondary" onclick={() => navigateTo('/rules')}>{$_('mainMenu.rules')}</button>
-      <button class="modal-button secondary" onclick={() => navigateTo('/supporters')}>{$_('mainMenu.supporters')}</button>
+      <button class="modal-button secondary" onclick={handleControls}>{$_('mainMenu.controls')}</button>
+      <button class="modal-button secondary" onclick={handleRules}>{$_('mainMenu.rules')}</button>
+      <button class="modal-button secondary" onclick={handleSupporters}>{$_('mainMenu.supporters')}</button>
       <button class="modal-button danger" onclick={showClearCacheModal}>{$_('mainMenu.clearCache')}</button>
     </div>
   {/if}

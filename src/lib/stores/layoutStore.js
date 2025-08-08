@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import { logService } from '../services/logService.js';
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -41,7 +42,7 @@ function loadLayout() {
       return JSON.parse(savedLayout);
     }
   } catch (e) {
-    console.error('Failed to load layout from localStorage', e);
+    logService.init('Failed to load layout from localStorage', e);
   }
   return defaultLayout;
 }

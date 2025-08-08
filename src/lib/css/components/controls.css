@@ -322,6 +322,13 @@
     border: none !important;
 }
 
+#center-info.player-move-display {
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    /* Колір фону буде встановлюватися динамічно через inline стиль */
+}
+
 @keyframes pulse {
     0% {
         box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);

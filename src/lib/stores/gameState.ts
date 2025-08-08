@@ -65,6 +65,8 @@ export interface GameState {
   finishBonus?: number;
   /** Бонус за "немає ходів". */
   noMovesBonus?: number;
+  /** Бонус за відстань (ходи на відстань більше 1). */
+  distanceBonus?: number;
   /** Загальна сума штрафів. */
   totalPenalty?: number;
   /** Фінальний рахунок. */
@@ -79,10 +81,22 @@ export interface GameState {
   wasResumed: boolean;
 }
 
-export function createInitialState(size = initialBoardSize): GameState {
+export interface GameStateConfig {
+  size?: number;
+  players?: Player[];
+}
+
+export function createInitialState(config: GameStateConfig = {}): GameState {
+  const size = config.size ?? initialBoardSize;
+  const players = config.players ?? [
+    { id: 1, type: 'human', name: 'Гравець' },
+    { id: 2, type: 'ai', name: 'Комп\'ютер' }
+  ];
+  
   const { row: initialRow, col: initialCol } = getRandomCell(size);
   const board = createEmptyBoard(size);
   board[initialRow][initialCol] = 1;
+  
   return {
     gameId: Date.now(),
     boardSize: size,
@@ -90,10 +104,7 @@ export function createInitialState(size = initialBoardSize): GameState {
     playerRow: initialRow,
     playerCol: initialCol,
     availableMoves: getAvailableMoves(initialRow, initialCol, size, {}, 0, board, false),
-    players: [
-      { id: 1, type: 'human', name: 'Гравець' },
-      { id: 2, type: 'ai', name: 'Комп\'ютер' }
-    ],
+    players,
     currentPlayerIndex: 0,
     isGameOver: false,
     score: 0,
@@ -109,6 +120,7 @@ export function createInitialState(size = initialBoardSize): GameState {
     noMovesClaimsCount: 0,
     noMovesClaimed: false,
     noMovesBonus: 0,
+    distanceBonus: 0,
     isFirstMove: true,
     wasResumed: false,
   };

@@ -30,6 +30,6 @@ export function navigateToGame() {
       // Просто викликаємо метод з пресетом за замовчуванням
       settingsStore.applyGameModePreset('beginner');
     }
-    navigationService.goTo('/game');
+    navigationService.goTo('/game/vs-computer');
   }
 } 

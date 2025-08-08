@@ -3,10 +3,12 @@ import { Figure, MoveDirection } from '../models/Figure';
 import type { MoveDirectionType } from '../models/Figure';
 import { get } from 'svelte/store';
 import { playerInputStore } from '../stores/playerInputStore';
-import { gameState, createInitialState } from '../stores/gameState'; // Тепер цей імпорт безпечний
+import { gameState, createInitialState, type Player } from '../stores/gameState'; // Тепер цей імпорт безпечний
 import { getAvailableMoves, isCellBlocked } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
 import { settingsStore } from '../stores/settingsStore.js';
 import { stateManager } from './stateManager';
+import { localGameStore } from '../stores/localGameStore.js';
+import { logService } from './logService.js';
 
 
 export type Direction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right';
@@ -25,6 +27,7 @@ export interface GameState {
   finishedByFinishButton: boolean;
   noMovesClaimsCount: number;
   noMovesBonus: number;
+  distanceBonus: number; // Бонус за ходи на відстань більше 1
 }
 
 // Функції createEmptyBoard, getRandomCell, getAvailableMoves були перенесені в boardUtils.ts
@@ -70,11 +73,12 @@ export interface FinalScore {
   noMovesBonus: number;
   finishBonus: number;
   jumpBonus: number;
+  distanceBonus: number; // Бонус за відстань
   totalScore: number;
 }
 
 export function calculateFinalScore(state: GameState): FinalScore {
-  const { score, penaltyPoints, boardSize, movesInBlockMode, jumpedBlockedCells, finishedByFinishButton, noMovesBonus } = state;
+  const { score, penaltyPoints, boardSize, movesInBlockMode, jumpedBlockedCells, finishedByFinishButton, noMovesBonus, distanceBonus } = state;
   
   const baseScore = score;
   const totalPenalty = penaltyPoints;
@@ -87,7 +91,7 @@ export function calculateFinalScore(state: GameState): FinalScore {
   const finishBonus = finishedByFinishButton ? boardSize : 0;
   const jumpBonus = jumpedBlockedCells;
   
-  const totalScore = baseScore + sizeBonus + blockModeBonus + jumpBonus - totalPenalty + (noMovesBonus || 0) + finishBonus;
+  const totalScore = baseScore + sizeBonus + blockModeBonus + jumpBonus + (distanceBonus || 0) - totalPenalty + (noMovesBonus || 0) + finishBonus;
   
   return {
     baseScore,
@@ -97,6 +101,7 @@ export function calculateFinalScore(state: GameState): FinalScore {
     jumpBonus,
     noMovesBonus: noMovesBonus || 0,
     finishBonus,
+    distanceBonus: distanceBonus || 0,
     totalScore
   };
 }
@@ -107,8 +112,14 @@ export function countJumpedCells(
   endRow: number,
   endCol: number,
   cellVisitCounts: Record<string, number>,
-  blockOnVisitCount: number
+  blockOnVisitCount: number,
+  blockModeEnabled: boolean = false
 ): number {
+  // Якщо режим блокування вимкнений, не рахуємо перестрибнуті клітинки
+  if (!blockModeEnabled) {
+    return 0;
+  }
+  
   let jumpedCount = 0;
   const dr = Math.sign(endRow - startRow);
   const dc = Math.sign(endCol - startCol);
@@ -132,13 +143,17 @@ function calculateMoveScore(
   currentState: any, // Використовуємо any для доступу до всіх полів gameState
   newPosition: { row: number; col: number },
   playerIndex: number,
-  settings: any // Використовуємо any для доступу до всіх полів settingsStore
-): { score: number; penaltyPoints: number; movesInBlockMode: number; jumpedBlockedCells: number } {
+  settings: any, // Використовуємо any для доступу до всіх полів settingsStore
+  distance: number = 1, // Додаємо параметр distance для розрахунку бонусних балів
+  direction?: string // Додаємо параметр direction для перевірки "дзеркальних" ходів
+): { score: number; penaltyPoints: number; movesInBlockMode: number; jumpedBlockedCells: number; bonusPoints: number; distanceBonus: number; currentJumpedCount: number } {
   
   let newScore = currentState.score;
   let newPenaltyPoints = currentState.penaltyPoints;
   let newMovesInBlockMode = currentState.movesInBlockMode;
   let newJumpedBlockedCells = currentState.jumpedBlockedCells;
+  let newBonusPoints = 0; // Додаємо змінну для бонусних балів
+  let newDistanceBonus = currentState.distanceBonus || 0; // Додаємо змінну для бонусів за відстань
 
   // 1. Нараховуємо бали тільки за хід гравця
   if (playerIndex === 0) {
@@ -152,14 +167,46 @@ function calculateMoveScore(
   }
 
   // 2. Перевірка на штраф за "дзеркальний" хід
-  if (playerIndex === 0 && currentState.moveHistory.length >= 2) {
-    const computerOriginPosition = currentState.moveHistory[currentState.moveHistory.length - 2].pos;
-    // Перевіряємо чи це об'єкт (нова структура) або масив (стара структура)
-    const computerRow = Array.isArray(computerOriginPosition) ? computerOriginPosition[0] : computerOriginPosition.row;
-    const computerCol = Array.isArray(computerOriginPosition) ? computerOriginPosition[1] : computerOriginPosition.col;
-    if (newPosition.row === computerRow && newPosition.col === computerCol) {
-      newPenaltyPoints += 2;
+  // Для локальних ігор штрафні бали не додаються до загального penaltyPoints,
+  // а тільки до рахунку конкретного гравця в localGameStore
+  const humanPlayersCount = currentState.players.filter((p: any) => p.type === 'human').length;
+  const currentPlayer = currentState.players[playerIndex];
+  const isHumanMove = currentPlayer?.type === 'human';
+  
+  logService.logic(`calculateMoveScore: humanPlayersCount = ${humanPlayersCount}, playerIndex = ${playerIndex}, isHumanMove = ${isHumanMove}`);
+  
+  // Перевіряємо "дзеркальний" хід тільки для ходів гравця (не комп'ютера)
+  if (isHumanMove && direction && currentState.moveQueue.length >= 1) {
+    // Знаходимо останній хід комп'ютера
+    const lastComputerMove = currentState.moveQueue[currentState.moveQueue.length - 1];
+    
+    // Перевіряємо чи це був хід комп'ютера (player !== 0)
+    if (lastComputerMove && lastComputerMove.player !== 0) {
+      const isMirror = isMirrorMove(
+        direction,
+        distance,
+        lastComputerMove.direction,
+        lastComputerMove.distance
+      );
+      
+      logService.logic(`calculateMoveScore: перевіряємо "дзеркальний" хід:`, {
+        currentMove: { direction, distance },
+        computerMove: { direction: lastComputerMove.direction, distance: lastComputerMove.distance },
+        isMirrorMove: isMirror
+      });
+      
+      if (isMirror) {
+        // Для локальних ігор не додаємо штрафні бали до загального penaltyPoints
+        if (humanPlayersCount <= 1) {
+          logService.score(`calculateMoveScore: додаємо 2 штрафних бали до загального penaltyPoints (single player game)`);
+          newPenaltyPoints += 2;
+        } else {
+          logService.score(`calculateMoveScore: НЕ додаємо штрафні бали до загального penaltyPoints (local game), будуть додані до гравця в performMove`);
+        }
+      }
     }
+  } else if (!isHumanMove) {
+    logService.logic(`calculateMoveScore: пропускаємо перевірку "дзеркального" ходу для комп'ютера`);
   }
 
   // 3. Підрахунок ходів у режимі блокування
@@ -174,16 +221,75 @@ function calculateMoveScore(
     newPosition.row,
     newPosition.col,
     currentState.cellVisitCounts,
-    settings.blockOnVisitCount
+    settings.blockOnVisitCount,
+    settings.blockModeEnabled
   );
   newJumpedBlockedCells += jumpedCount;
+
+  // 5. Підрахунок бонусних балів за ходи на відстань більше 1
+  if (distance > 1) {
+    newDistanceBonus += 1; // Бонус = +1 бал за хід на відстань більше 1 (незалежно від відстані)
+    newBonusPoints += 1; // Також додаємо до загальних бонусних балів для локальної гри
+    logService.score(`calculateMoveScore: додаємо 1 бонусний бал за хід на відстань ${distance}`);
+  }
+
+  // 6. Підрахунок бонусних балів за перестрибування заблокованих клітинок
+  // Бонуси за перестрибування нараховуються тільки коли blockModeEnabled = true
+  if (jumpedCount > 0 && settings.blockModeEnabled) {
+    newBonusPoints += jumpedCount; // Бонус = кількість перестрибнутих заблокованих клітинок
+    logService.score(`calculateMoveScore: додаємо ${jumpedCount} бонусних балів за перестрибування ${jumpedCount} заблокованих клітинок`);
+  } else if (jumpedCount > 0 && !settings.blockModeEnabled) {
+    logService.score(`calculateMoveScore: пропускаємо бонуси за перестрибування (blockModeEnabled = false)`);
+  }
 
   return {
     score: newScore,
     penaltyPoints: newPenaltyPoints,
     movesInBlockMode: newMovesInBlockMode,
     jumpedBlockedCells: newJumpedBlockedCells,
+    bonusPoints: newBonusPoints,
+    distanceBonus: newDistanceBonus,
+    currentJumpedCount: jumpedCount
   };
+}
+
+// --- Допоміжні функції ---
+
+/**
+ * Перевіряє чи є хід "дзеркальним" відносно попереднього ходу комп'ютера
+ * @param currentDirection - напрямок поточного ходу гравця
+ * @param currentDistance - відстань поточного ходу гравця
+ * @param computerDirection - напрямок попереднього ходу комп'ютера
+ * @param computerDistance - відстань попереднього ходу комп'ютера
+ * @returns true якщо хід є "дзеркальним"
+ */
+function isMirrorMove(
+  currentDirection: string,
+  currentDistance: number,
+  computerDirection: string,
+  computerDistance: number
+): boolean {
+  // Визначаємо протилежні напрямки
+  const oppositeDirections: Record<string, string> = {
+    'up': 'down',
+    'down': 'up',
+    'left': 'right',
+    'right': 'left',
+    'up-left': 'down-right',
+    'up-right': 'down-left',
+    'down-left': 'up-right',
+    'down-right': 'up-left'
+  };
+
+  const oppositeDirection = oppositeDirections[computerDirection];
+  
+  // Перевіряємо чи поточний хід у протилежному напрямку
+  if (currentDirection !== oppositeDirection) {
+    return false;
+  }
+
+  // Перевіряємо чи відстань гравця менша або дорівнює відстані комп'ютера
+  return currentDistance <= computerDistance;
 }
 
 // --- Мутатори стану (ex-gameActions.ts) ---
@@ -193,18 +299,41 @@ function calculateMoveScore(
  * These are simple mutators that work exclusively with gameState and playerInputStore.
  */
 
-export function resetGame(options: { newSize?: number } = {}) {
+export function resetGame(options: { newSize?: number; players?: Player[]; settings?: any } = {}) {
   const newSize = options.newSize ?? get(gameState).boardSize;
-  const newState = createInitialState(newSize);
+  
+  const newState = createInitialState({
+    size: newSize,
+    players: options.players
+  });
   
   gameState.set(newState);
   
-  // Гарантуємо, що дошка та ферзь видимі на початку нової гри
-  settingsStore.updateSettings({
-    showBoard: true,
-    showQueen: true,
-    showMoves: true
-  });
+  // Застосовуємо налаштування з локальної гри, якщо вони передані
+  if (options.settings) {
+    settingsStore.updateSettings({
+      blockModeEnabled: options.settings.blockModeEnabled,
+      autoHideBoard: options.settings.autoHideBoard,
+      lockSettings: options.settings.lockSettings,
+      // Гарантуємо, що дошка видима на початку гри
+      showBoard: true,
+      showQueen: true,
+      showMoves: true
+    });
+  } else {
+    // Стандартні налаштування видимості для нової гри
+    settingsStore.updateSettings({
+      showBoard: true,
+      showQueen: true,
+      showMoves: true
+    });
+  }
+  
+  // Скидаємо рахунки гравців в локальній грі
+  const humanPlayersCount = newState.players.filter(p => p.type === 'human').length;
+  if (humanPlayersCount > 1) {
+    localGameStore.resetScores();
+  }
   
   // animationStore автоматично скидається при зміні gameId
 }
@@ -236,7 +365,7 @@ export function setDirection(dir: Direction) {
     distanceManuallySelected: newManuallySelected
   }));
   
-  console.log('🎯 setDirection: встановлено напрямок', { dir, newDistance, newManuallySelected });
+  logService.logic('setDirection: встановлено напрямок', { dir, newDistance, newManuallySelected });
 }
 
 export function setDistance(dist: number) {
@@ -247,7 +376,7 @@ export function setDistance(dist: number) {
     distanceManuallySelected: true
   }));
   
-  console.log('🎯 setDistance: встановлено відстань', { dist });
+  logService.logic('setDistance: встановлено відстань', { dist });
 }
 
 /**
@@ -257,7 +386,7 @@ export function setDistance(dist: number) {
  * @param playerIndex Індекс гравця (0 для гравця, 1 для комп'ютера)
  */
 export async function performMove(direction: MoveDirectionType, distance: number, playerIndex: number = 0) {
-  console.log('🎮 performMove: початок з параметрами:', { direction, distance, playerIndex });
+  logService.logic('performMove: початок з параметрами:', { direction, distance, playerIndex });
   
   const currentState = get(gameState);
   const settings = get(settingsStore);
@@ -267,13 +396,13 @@ export async function performMove(direction: MoveDirectionType, distance: number
 
   // 1. Перевірка виходу за межі дошки
   if (!figure.isValidPosition(newPosition.row, newPosition.col)) {
-    console.log('❌ performMove: вихід за межі дошки');
+    logService.logic('performMove: вихід за межі дошки');
     return { success: false, reason: 'out_of_bounds' };
   }
 
   // 2. Перевірка ходу на заблоковану клітинку
   if (isCellBlocked(newPosition.row, newPosition.col, currentState.cellVisitCounts, settings)) {
-    console.log('❌ performMove: хід на заблоковану клітинку');
+    logService.logic('performMove: хід на заблоковану клітинку');
     return { success: false, reason: 'blocked_cell' };
   }
 
@@ -283,7 +412,7 @@ export async function performMove(direction: MoveDirectionType, distance: number
   const startCellKey = `${currentState.playerRow}-${currentState.playerCol}`;
   updatedCellVisitCounts[startCellKey] = (updatedCellVisitCounts[startCellKey] || 0) + 1;
 
-  const scoreChanges = calculateMoveScore(currentState, newPosition, playerIndex, settings);
+  const scoreChanges = calculateMoveScore(currentState, newPosition, playerIndex, settings, distance, direction);
 
   const newAvailableMoves = getAvailableMoves(
     newPosition.row,
@@ -328,7 +457,106 @@ export async function performMove(direction: MoveDirectionType, distance: number
 
   await stateManager.applyChanges('PERFORM_MOVE', changes, `Move: ${direction}${distance}`);
   
-  console.log('🎮 performMove: завершено успішно');
+  // Оновлюємо рахунок гравця в локальній грі
+  const currentStateAfterMove = get(gameState);
+  const humanPlayersCount = currentStateAfterMove.players.filter(p => p.type === 'human').length;
+  
+  // Перевіряємо "дзеркальний" хід для single player гри (гра з комп'ютером)
+  if (humanPlayersCount <= 1 && playerIndex === 0) { // Гравець (не комп'ютер)
+    // Додаємо бонусні бали за відстань до GameState для гри з комп'ютером
+    if (scoreChanges.distanceBonus > 0) {
+      logService.score(`performMove (single player): додаємо ${scoreChanges.distanceBonus} бонусних балів за відстань до GameState`);
+    }
+    
+    if (currentState.moveQueue.length >= 1) {
+      // Знаходимо останній хід комп'ютера
+      const lastComputerMove = currentState.moveQueue[currentState.moveQueue.length - 1];
+      
+      // Перевіряємо чи це був хід комп'ютера (player !== 0)
+      if (lastComputerMove && lastComputerMove.player !== 0) {
+        const isMirror = isMirrorMove(
+          direction,
+          distance,
+          lastComputerMove.direction,
+          lastComputerMove.distance
+        );
+        
+        logService.logic(`performMove (single player): перевіряємо "дзеркальний" хід:`, {
+          currentMove: { direction, distance },
+          computerMove: { direction: lastComputerMove.direction, distance: lastComputerMove.distance },
+          isMirrorMove: isMirror
+        });
+        
+        if (isMirror) {
+          logService.score(`performMove (single player): додаємо 2 штрафних бали за "дзеркальний" хід`);
+          // Штрафні бали вже додані в calculateMoveScore для single player гри
+        }
+      }
+    }
+  }
+  if (humanPlayersCount > 1) {
+    // Це локальна гра, додаємо бали до рахунку поточного гравця
+    const currentPlayer = currentStateAfterMove.players[playerIndex];
+    if (currentPlayer) {
+      const localGameState = get(localGameStore);
+      const localPlayer = localGameState.players.find(p => p.name === currentPlayer.name);
+      if (localPlayer) {
+        // Додаємо бали за хід (1 бал за кожен хід)
+        logService.score(`performMove: додаємо 1 бал гравцю ${currentPlayer.name} за хід`);
+        localGameStore.addPlayerScore(localPlayer.id, 1);
+        
+        // Додаємо бонусні бали (включають як ходи на відстань більше 1, так і перестрибування заблокованих клітинок)
+        if (scoreChanges.bonusPoints > 0) {
+          logService.score(`performMove: додаємо ${scoreChanges.bonusPoints} бонусних балів гравцю ${currentPlayer.name} (включають ходи на відстань > 1 та перестрибування заблокованих клітинок)`);
+          
+          // Формуємо детальний опис бонусних балів
+          let bonusReason = '';
+          if (distance > 1 && scoreChanges.currentJumpedCount > 0) {
+            bonusReason = `хід на відстань ${distance} (1 бал) + перестрибування ${scoreChanges.currentJumpedCount} заблокованих клітинок (${scoreChanges.currentJumpedCount} балів)`;
+          } else if (distance > 1) {
+            bonusReason = `хід на відстань ${distance} (1 бал)`;
+          } else if (scoreChanges.currentJumpedCount > 0) {
+            bonusReason = `перестрибування ${scoreChanges.currentJumpedCount} заблокованих клітинок (${scoreChanges.currentJumpedCount} балів)`;
+          }
+          
+          localGameStore.addPlayerBonusPoints(localPlayer.id, scoreChanges.bonusPoints, bonusReason);
+        }
+        
+        // Перевіряємо чи був "дзеркальний" хід для нарахування штрафних балів
+        // Перевіряємо тільки для ходів гравця (не комп'ютера)
+        if (currentPlayer.type === 'human' && currentState.moveQueue.length >= 1) {
+          // Знаходимо останній хід комп'ютера
+          const lastComputerMove = currentState.moveQueue[currentState.moveQueue.length - 1];
+          
+          // Перевіряємо чи це був хід комп'ютера (player !== 0)
+          if (lastComputerMove && lastComputerMove.player !== 0) {
+            const isMirror = isMirrorMove(
+              direction,
+              distance,
+              lastComputerMove.direction,
+              lastComputerMove.distance
+            );
+            
+            logService.logic(`performMove: перевіряємо "дзеркальний" хід:`, {
+              currentMove: { direction, distance },
+              computerMove: { direction: lastComputerMove.direction, distance: lastComputerMove.distance },
+              isMirrorMove: isMirror
+            });
+            
+            if (isMirror) {
+              logService.score(`performMove: додаємо 2 штрафних бали гравцю ${currentPlayer.name} за "дзеркальний" хід`);
+              localGameStore.addPlayerPenaltyPoints(localPlayer.id, 2);
+              logService.score(`performMove: штрафні бали додано гравцю ${currentPlayer.name}`);
+            }
+          }
+        } else if (currentPlayer.type !== 'human') {
+          logService.logic(`performMove: пропускаємо перевірку "дзеркального" ходу для комп'ютера`);
+        }
+      }
+    }
+  }
+  
+  logService.logic('performMove: завершено успішно');
   return { success: true, newPosition };
 }
 

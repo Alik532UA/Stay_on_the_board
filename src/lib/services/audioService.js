@@ -1,5 +1,6 @@
 // src/lib/services/audioService.js
 import { base } from '$app/paths';
+import { logService } from './logService.js';
 
 /** @type {HTMLAudioElement|null} */
 let audioInstance = null;
@@ -30,7 +31,7 @@ export const audioService = {
     if (audio && audio.paused) {
       // Завжди починаємо спочатку при виклику play
       audio.currentTime = 0;
-      audio.play().catch(e => console.error("Audio play failed:", e));
+      audio.play().catch(e => logService.ui("Audio play failed:", e));
     }
   },
 

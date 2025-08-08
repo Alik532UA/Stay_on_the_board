@@ -12,12 +12,18 @@
   import VoiceSettingsModalWrapper from '$lib/components/VoiceSettingsModalWrapper.svelte';
   import { slide } from 'svelte/transition';
   import { layoutStore } from '$lib/stores/layoutStore.js';
+  import { logService } from '$lib/services/logService.js';
   let expanderRef: HTMLDetailsElement;
   let summaryRef: HTMLElement;
   let isOpen = true;
   let contentRef: HTMLDivElement;
   let contentHeight = 0;
   async function toggleExpander() {
+    logService.action('Click: "Розгорнути/Згорнути налаштування" (SettingsExpanderWidget)');
+    // Перевіряємо, чи заблоковані налаштування
+    if ($settingsStore.lockSettings) {
+      return;
+    }
     isOpen = !isOpen;
     await tick();
     if (contentRef) {
@@ -47,6 +53,7 @@
    * @param {number} increment
    */
   function changeBoardSize(increment: number) {
+    logService.action(`Click: "Змінити розмір дошки: ${increment > 0 ? '+' : ''}${increment}" (SettingsExpanderWidget)`);
     const currentSize = get(gameState).boardSize;
     const newSize = currentSize + increment;
     if (newSize >= 2 && newSize <= 9) {
@@ -58,6 +65,7 @@
    * @param {number} count
    */
   function selectBlockCount(count: number) {
+    logService.action(`Click: "Вибір кількості блоків: ${count}" (SettingsExpanderWidget)`);
     // Видаляю localStorage.hasSeenExpertModeWarning
     if (count > 0 && $settingsStore.showGameModeModal) {
       modalStore.showModal({
@@ -77,6 +85,7 @@
    * @param {Event} event
    */
   function handleToggleAutoHideBoard(event: Event) {
+    logService.action('Click: "Автоматично приховувати дошку" (SettingsExpanderWidget)');
     settingsStore.toggleAutoHideBoard();
   }
 </script>
@@ -87,7 +96,7 @@
     background: linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
     border-radius: var(--unified-border-radius);
     border: var(--unified-border);
-    box-shadow: var(--unified-shadow);
+    box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
     transition: background 0.25s, box-shadow 0.25s;
     margin-bottom: 16px;
     backdrop-filter: var(--unified-backdrop-filter);
@@ -95,6 +104,16 @@
   .settings-expander:hover {
     background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%);
     box-shadow: var(--unified-shadow-hover);
+  }
+  
+  .settings-expander.disabled {
+    opacity: 0.6;
+    pointer-events: none; /* Забороняє всі кліки */
+    cursor: not-allowed;
+  }
+  
+  .settings-summary.disabled {
+    cursor: not-allowed;
   }
   .settings-summary {
     position: relative;
@@ -332,8 +351,17 @@
   }
 </style>
 
-<div class="settings-expander {isOpen ? 'open' : ''}">
-  <div class="settings-summary" role="button" aria-label={$_('gameControls.settings')} on:click={toggleExpander} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleExpander()} bind:this={summaryRef} tabindex="0">
+<div class="settings-expander {isOpen ? 'open' : ''}" class:disabled={$settingsStore.lockSettings}>
+  <div 
+    class="settings-summary" 
+    class:disabled={$settingsStore.lockSettings}
+    role="button" 
+    aria-label={$_('gameControls.settings')} 
+    on:click={toggleExpander} 
+    on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleExpander()} 
+    bind:this={summaryRef} 
+    tabindex={$settingsStore.lockSettings ? -1 : 0}
+  >
     {$_('gameControls.settings')}
     <span class="expander-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
   </div>

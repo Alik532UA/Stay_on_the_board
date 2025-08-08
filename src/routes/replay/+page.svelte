@@ -3,6 +3,8 @@
   import ReplayViewer from '$lib/components/ReplayViewer.svelte';
   import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
   import { navigationService } from '$lib/services/navigationService.js';
+  import { logService } from '$lib/services/logService.js';
+  import { gameOverStore } from '$lib/stores/gameOverStore';
 
   let moveHistory: any = null;
   let boardSize = 4; // Значення за замовчуванням
@@ -14,6 +16,73 @@
         const replayData = JSON.parse(replayDataJSON);
         moveHistory = replayData.moveHistory;
         boardSize = replayData.boardSize;
+        
+        // Перевіряємо, чи є збережений стан завершення гри
+        const replayGameStateJSON = sessionStorage.getItem('replayGameState');
+        if (replayGameStateJSON) {
+          try {
+            const replayGameState = JSON.parse(replayGameStateJSON);
+            // Відновлюємо стан завершення гри з sessionStorage
+            if (replayGameState.isGameOver && replayGameState.gameOverReasonKey) {
+              let winner: 'player1' | 'player2' | 'draw' | null = null;
+              let player1Score = replayGameState.score || 0;
+              let player2Score = 0;
+              
+              // Якщо це локальна гра, отримуємо дані з localGameStore
+              if (replayData.gameType === 'local') {
+                const replayLocalGameStateJSON = sessionStorage.getItem('replayLocalGameState');
+                if (replayLocalGameStateJSON) {
+                  try {
+                    const replayLocalGameState = JSON.parse(replayLocalGameStateJSON);
+                    player1Score = replayLocalGameState.players[0]?.score || 0;
+                    player2Score = replayLocalGameState.players[1]?.score || 0;
+                    
+                    // Визначаємо переможця для локальної гри
+                    if (replayLocalGameState.players && replayLocalGameState.players.length > 0) {
+                      const maxScore = Math.max(...replayLocalGameState.players.map((p: any) => p.score));
+                      const winners = replayLocalGameState.players
+                        .map((p: any, index: number) => ({ score: p.score, index }))
+                        .filter((p: any) => p.score === maxScore);
+                      
+                      if (winners.length === 1) {
+                        winner = `player${winners[0].index + 1}` as 'player1' | 'player2';
+                      } else if (winners.length > 1) {
+                        winner = 'draw';
+                      }
+                    }
+                  } catch (e) {
+                    logService.ui("Failed to parse local game state", e);
+                  }
+                }
+              }
+              
+              const gameResult = {
+                score: {
+                  player1: player1Score,
+                  player2: player2Score,
+                },
+                winner,
+                reasonKey: replayGameState.gameOverReasonKey,
+                reasonValues: replayGameState.gameOverReasonValues,
+                finalScoreDetails: {
+                  baseScore: replayGameState.baseScore || 0,
+                  sizeBonus: replayGameState.sizeBonus || 0,
+                  blockModeBonus: replayGameState.blockModeBonus || 0,
+                  jumpBonus: replayGameState.jumpBonus || 0,
+                  finishBonus: replayGameState.finishBonus || 0,
+                  noMovesBonus: replayGameState.noMovesBonus || 0,
+                  totalPenalty: replayGameState.totalPenalty || 0,
+                  totalScore: replayGameState.totalScore || 0,
+                },
+                gameType: replayData.gameType || 'vs-computer',
+              };
+              gameOverStore.setGameOver(gameResult);
+            }
+          } catch (e) {
+            logService.ui("Failed to restore game over state", e);
+          }
+        }
+        
         // Додаємо автозапуск через 1 секунду
         setTimeout(() => {
           const event = new CustomEvent('toggleAutoPlay', { detail: 'forward' });
@@ -22,7 +91,7 @@
           if (controls) (controls as HTMLElement).click();
         }, 1000);
       } catch (e) {
-        console.error("Failed to parse replay data", e);
+        logService.ui("Failed to parse replay data", e);
         navigationService.goToMainMenu();
       }
     } else {

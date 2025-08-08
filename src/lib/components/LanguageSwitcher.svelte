@@ -1,7 +1,8 @@
 <script lang="ts">
   import { locale } from 'svelte-i18n';
   import { settingsStore } from '../stores/settingsStore.js';
-  import { logStore } from '$lib/stores/logStore.js';
+import { logService } from '$lib/services/logService.js';
+  
   let showDropdown = false;
   const languages = [
     { code: 'uk', label: 'Українська', flag: '🇺🇦' },
@@ -10,7 +11,7 @@
     { code: 'nl', label: 'Nederlands', flag: '🇳🇱' }
   ];
   function selectLang(lang: string) {
-    logStore.addLog(`Зміна мови: ${lang}`, 'info');
+    logService.ui(`Зміна мови: ${lang}`);
     settingsStore.updateSettings({ language: lang });
     localStorage.setItem('language', lang);
     locale.set(lang);

@@ -3,10 +3,11 @@
   import { _ } from 'svelte-i18n';
 </script>
 
-<FloatingBackButton />
-
 <div class="supporters-container">
-  <h1>{$_('supportersPage.title')}</h1>
+  <div class="header-container">
+    <FloatingBackButton />
+    <h1>{$_('supportersPage.title')}</h1>
+  </div>
   <p class="gratitude-text">{$_('supportersPage.gratitudeText')}</p>
   
   <div class="supporters-list">
@@ -28,6 +29,14 @@
     max-width: 800px;
     margin: 2rem auto;
     color: var(--text-primary);
+  }
+  
+  .header-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
   }
   .gratitude-text {
     font-size: 1.2em;

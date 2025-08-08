@@ -34,6 +34,8 @@
 	import { afterNavigate } from '$app/navigation';
 	import DontShowAgainCheckbox from '$lib/components/DontShowAgainCheckbox.svelte';
 	import { modalState } from '$lib/stores/modalStore.js';
+	import { logService } from '$lib/services/logService.js';
+	import PlayerColorProvider from '$lib/components/PlayerColorProvider.svelte';
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
@@ -57,7 +59,7 @@
 			settingsStore.init(); // <-- Ініціалізуємо налаштування на клієнті
 			initializeI18n(); // Ініціалізуємо локалізацію
 		} catch (error) {
-			console.error('Failed to check for app update:', error);
+			logService.init('Failed to check for app update:', error);
 		}
 	});
 
@@ -127,6 +129,7 @@
 </div>
 
 <Modal />
+<PlayerColorProvider />
 
 <style>
 	.app {

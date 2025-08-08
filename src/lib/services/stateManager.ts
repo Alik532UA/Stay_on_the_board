@@ -99,6 +99,8 @@ export class StateManager {
       case 'NO_MOVES_CLAIM':
       case 'CONTINUE_GAME':
       case 'FINALIZE_GAME':
+      case 'FIRST_MOVE_COMPLETED':
+      case 'ADVANCE_TURN':
         // Ці дії не потребують спеціальної валідації
         break;
       default:
@@ -243,7 +245,7 @@ export class StateManager {
       });
 
       // Логуємо зміни
-      logService.info('State change applied', {
+      logService.state('State change applied', {
         action,
         oldState: { playerRow: oldState.playerRow, playerCol: oldState.playerCol },
         changes: { playerRow: changes.playerRow, playerCol: changes.playerCol },

@@ -3,8 +3,6 @@
   import { _ } from 'svelte-i18n';
 </script>
 
-<FloatingBackButton />
-
 <!-- СТАРИЙ КОНТЕНТ ЗБЕРЕЖЕНО ДЛЯ ПОРІВНЯННЯ
 <h1>{$_('rulesPage.title')}</h1>
 
@@ -85,9 +83,13 @@
 
 <div class="rules-page">
   <div class="rules-header">
-    <span class="rules-icon">♛</span>
-    <h1>{$_('rulesPage.title')}</h1>
-    <div class="rules-slogan">{$_('rulesPage.slogan')}</div>
+    <div class="header-container">
+      <FloatingBackButton />
+             <div class="title-container">
+         <h1>{$_('rulesPage.title')}</h1>
+         <div class="rules-slogan">{$_('rulesPage.slogan')}</div>
+       </div>
+    </div>
   </div>
 
   <div class="rules-card rules-goal">
@@ -213,10 +215,20 @@
   align-items: center;
   gap: 0.5rem;
 }
-.rules-icon {
-  font-size: 2.5em;
-  margin-bottom: 0.2em;
+
+.header-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+ .title-container {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   gap: 0.5rem;
+ }
 .rules-slogan {
   font-size: 1.1em;
   color: var(--text-secondary, #888);
