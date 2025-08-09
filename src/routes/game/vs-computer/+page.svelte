@@ -32,6 +32,7 @@
     if (!isRestoring) {
       resetGame();
     }
+    gameOrchestrator.setCurrentGameMode('vs-computer');
     animationStore.initialize();
   });
 

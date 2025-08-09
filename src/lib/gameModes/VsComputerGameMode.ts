@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 import { _, locale } from 'svelte-i18n';
 import type { IGameMode } from './gameMode.interface';
 import { speakText } from '$lib/services/speechService';
-import { lastComputerMove } from '$lib/stores/derivedState';
+import { lastComputerMove, availableMoves as derivedAvailableMoves } from '$lib/stores/derivedState';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService';
 import { playerInputStore } from '$lib/stores/playerInputStore';
@@ -127,21 +127,10 @@ export class VsComputerGameMode implements IGameMode {
   }
 
   async claimNoMoves(): Promise<void> {
-    const state = get(gameState);
-    const settings = get(settingsStore);
+    const currentAvailableMoves = get(derivedAvailableMoves);
 
-    const availableMoves = getAvailableMoves(
-      state.playerRow!,
-      state.playerCol!,
-      state.boardSize,
-      state.cellVisitCounts,
-      settings.blockOnVisitCount,
-      state.board,
-      settings.blockModeEnabled
-    );
-
-    if (availableMoves.length > 0) {
-      this.endGame('modal.errorContent', { count: availableMoves.length });
+    if (currentAvailableMoves.length > 0) {
+      this.endGame('modal.errorContent', { count: currentAvailableMoves.length });
     } else {
       this.handleNoMoves('human');
     }

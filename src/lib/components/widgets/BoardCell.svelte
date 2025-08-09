@@ -4,6 +4,7 @@
   export let visualCellVisitCounts: Record<string, number>;
   export let settingsStore: any;
   export let isAvailable: boolean;
+  export let isPenalty = false;
   export const visualPosition: { row: number|null, col: number|null } = { row: null, col: null };
   export const boardState: any = {};
   export const gameState: any = {};
@@ -30,6 +31,41 @@
   {#if blocked}
     <!-- Хрест рендериться через CSS -->
   {:else}
-    <span class="move-dot"></span>
+    <span class="move-dot" class:is-penalty={isPenalty}></span>
   {/if}
-</div> 
+</div>
+
+<style>
+  .board-cell {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .move-dot {
+    width: 12px;
+    height: 12px;
+    background-color: #2ecc71 !important; /* Green */
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none; /* Щоб не заважали клікам */
+  }
+
+  .available .move-dot {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .move-dot.is-penalty {
+    background-color: #e74c3c !important; /* Red */
+  }
+
+</style>

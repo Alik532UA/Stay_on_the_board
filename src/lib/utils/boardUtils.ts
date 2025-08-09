@@ -41,7 +41,8 @@ export function getAvailableMoves(
   cellVisitCounts: Record<string, number> = {},
   blockOnVisitCount: number = 0,
   board: number[][] | undefined,
-  blockModeEnabled: boolean // <-- Новий параметр
+  blockModeEnabled: boolean, // <-- Новий параметр
+  lastPlayerMove: { direction: string, distance: number } | null
 ): Move[] {
   if (row === null || col === null) return [];
   
@@ -71,11 +72,52 @@ export function getAvailableMoves(
       }
       // Використовуємо isCellBlocked з урахуванням blockModeEnabled
       if (!isCellBlocked(nr, nc, cellVisitCounts, { blockModeEnabled, blockOnVisitCount }) && !isOccupied(nr, nc)) {
-        moves.push({ row: nr, col: nc, direction, distance: dist });
+        let isPenalty = false;
+        if (lastPlayerMove && !blockModeEnabled) {
+          isPenalty = isMirrorMove(direction, dist, lastPlayerMove.direction, lastPlayerMove.distance);
+        }
+        moves.push({ row: nr, col: nc, direction, distance: dist, isPenalty });
       }
     }
   }
   return moves;
+}
+
+/**
+ * Перевіряє чи є хід "дзеркальним" відносно попереднього ходу комп'ютера
+ * @param currentDirection - напрямок поточного ходу гравця
+ * @param currentDistance - відстань поточного ходу гравця
+ * @param computerDirection - напрямок попереднього ходу комп'ютера
+ * @param computerDistance - відстань попереднього ходу комп'ютера
+ * @returns true якщо хід є "дзеркальним"
+ */
+export function isMirrorMove(
+  currentDirection: string,
+  currentDistance: number,
+  computerDirection: string,
+  computerDistance: number
+): boolean {
+  // Визначаємо протилежні напрямки
+  const oppositeDirections: Record<string, string> = {
+    'up': 'down',
+    'down': 'up',
+    'left': 'right',
+    'right': 'left',
+    'up-left': 'down-right',
+    'up-right': 'down-left',
+    'down-left': 'up-right',
+    'down-right': 'up-left'
+  };
+
+  const isOpposite = oppositeDirections[currentDirection] === computerDirection;
+
+  // Перевіряємо чи поточний хід у протилежному напрямку
+  if (!isOpposite) {
+    return false;
+  }
+
+  // Перевіряємо чи відстань гравця менша або дорівнює відстані комп'ютера
+  return currentDistance <= computerDistance;
 }
 
 /**

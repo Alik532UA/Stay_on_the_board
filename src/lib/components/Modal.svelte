@@ -144,7 +144,7 @@
           {/if}
         {/if}
       </div>
-      <div class="modal-content" bind:this={modalContent}>
+      <div class="modal-content" class:is-faq={typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq} bind:this={modalContent}>
         {#if typeof $modalState.content === 'object' && $modalState.content && 'reason' in $modalState.content}
           <p class="reason">{$modalState.content.reason}</p>
         {/if}
@@ -338,6 +338,31 @@
   max-height: 60vh;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.modal-content.is-faq {
+  text-align: left;
+  padding-right: 10px;
+}
+
+.modal-content.is-faq::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content.is-faq::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.modal-content.is-faq::-webkit-scrollbar-thumb {
+  background-color: var(--text-accent, #ff9800);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.modal-content.is-faq::-webkit-scrollbar-thumb:hover {
+  background-color: #fff;
 }
 
 .modal-content::-webkit-scrollbar {

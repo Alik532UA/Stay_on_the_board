@@ -74,7 +74,7 @@
                 
                 if (gameType === 'local') {
                   // Для локальної гри використовуємо спеціальну функцію
-                  gameOrchestrator.restartLocalGame();
+                  gameOrchestrator.restartGame();
                 } else {
                   // Для гри проти комп'ютера використовуємо звичайний скид
                   gameOrchestrator.setBoardSize(get(gameState).boardSize);
@@ -115,11 +115,8 @@
           if (replayData.gameType === 'vs-computer' && replayGameState) {
             // Відновлюємо gameOverStore для коректного відображення модального вікна та рахунку
             gameOverStore.setGameOver({
-              score: {
-                player1: replayGameState.score || 0,
-                player2: 0
-              },
-              winner: null, // для vs-computer winner не використовується
+              scores: [{ playerId: 0, score: replayGameState.score || 0 }],
+              winners: null, // для vs-computer winner не використовується
               reasonKey: replayGameState.gameOverReasonKey || null,
               reasonValues: replayGameState.gameOverReasonValues || null,
               finalScoreDetails: {
@@ -161,30 +158,20 @@
   }
 </script>
 
-<div class="floating-back-container">
-  <button 
-    class="floating-back-btn" 
-    aria-label={$_('ui.goBack') || 'Повернутися назад'}
-    title={$_('ui.goBack') || 'Повернутися назад'}
-    onclick={handleBackClick}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="19" y1="12" x2="5" y2="12"></line>
-      <polyline points="12 19 5 12 12 5"></polyline>
-    </svg>
-  </button>
-</div>
+<button
+  class="floating-back-btn"
+  aria-label={$_('ui.goBack') || 'Повернутися назад'}
+  title={$_('ui.goBack') || 'Повернутися назад'}
+  onclick={handleBackClick}
+>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
+  </svg>
+</button>
 
 <style>
-  .floating-back-container {
-    position: relative;
-    display: inline-block;
-  }
-  
   .floating-back-btn {
-    position: absolute;
-    top: 0;
-    left: -80px;
     width: 52px;
     height: 52px;
     border-radius: 50%;
@@ -200,6 +187,7 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-right: 1rem;
   }
   .floating-back-btn:hover {
     background: rgba(0, 0, 0, 0.4);

@@ -18,50 +18,21 @@
   ];
 </script>
 
-<div class="faq-container">
-  {#each faqItems as item, i}
-    <details class="faq-item">
-      <summary>
-        {$_(item.q)}
-        <span class="faq-arrow" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="24" height="24">
-            <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-      </summary>
-      <p>{@html $_(item.a)}</p>
-    </details>
-  {/each}
-</div>
+{#each faqItems as item, i}
+  <details class="faq-item">
+    <summary>
+      {$_(item.q)}
+      <span class="faq-arrow" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </summary>
+    <p>{@html $_(item.a)}</p>
+  </details>
+{/each}
 
 <style>
-  .faq-container {
-    text-align: left;
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 10px;
-  }
-
-  /* --- СТИЛІ ДЛЯ СКРОЛБАРУ --- */
-  .faq-container::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  .faq-container::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-  }
-
-  .faq-container::-webkit-scrollbar-thumb {
-    background-color: var(--text-accent, #ff9800);
-    border-radius: 4px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-  }
-
-  .faq-container::-webkit-scrollbar-thumb:hover {
-    background-color: #fff;
-  }
   .faq-item {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 16px 0;

@@ -17,7 +17,7 @@
   import { quintOut } from 'svelte/easing';
   import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
   import { animationStore } from '$lib/stores/animationStore.js';
-  import { visualPosition, visualCellVisitCounts, visualBoardState, visualCurrentPlayerIndex } from '$lib/stores/derivedState.ts';
+  import { visualPosition, visualCellVisitCounts, visualBoardState, currentPlayer, availableMoves } from '$lib/stores/derivedState.ts';
   import { derived } from 'svelte/store';
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
@@ -102,34 +102,33 @@
     // Не потрібно викликати animateLastMove тут
   });
 
-  function isAvailable(row: number, col: number) {
-    // НАВІЩО: Визначаємо, чи доступна клітинка для ходу, використовуючи derived stores для уникнення дублювання логіки та забезпечення SSoT.
-    const visualPos = get(visualPosition);
-    
-    // Показуємо точки тільки якщо немає анімації, ферзь з'явився, і настала черга гравця
-    const result = $settingsStore.showMoves && 
-                   !$animationStore.isAnimating && 
-                   $visualCurrentPlayerIndex === 0 && // Використовуємо ВІЗУАЛЬНИЙ індекс
-                   $animationStore.isComputerMoveCompleted && // <-- НОВА УМОВА
-                   visualPos.row !== null && 
-                   visualPos.col !== null &&
-                   get(gameState).availableMoves.some(move => move.row === row && move.col === col);
-    
-    // Логуємо тільки для першої клітинки, щоб не засмічувати консоль
-    if (row === 0 && col === 0) {
-      logService.ui('BoardWrapper: isAvailable(0,0) =', result, 
-                  'showMoves =', $settingsStore.showMoves,
-                  'isAnimating =', $animationStore.isAnimating,
-                  'isComputerMoveCompleted =', $animationStore.isComputerMoveCompleted, // <-- Додано для дебагу
-                  'visualCurrentPlayerIndex =', $visualCurrentPlayerIndex,
-                  'logicalCurrentPlayerIndex =', $gameState.currentPlayerIndex,
-                  'visualRow =', visualPos.row,
-                  'visualCol =', visualPos.col,
-                  'availableMoves.length =', get(gameState).availableMoves.length,
-                  'gameId =', get(gameState).gameId);
+  const showAvailableMoves = derived(
+    [settingsStore, animationStore, currentPlayer],
+    ([$settingsStore, $animationStore, $currentPlayer]) => {
+      return (
+        $settingsStore.showMoves &&
+        !$animationStore.isAnimating &&
+        $currentPlayer?.type === 'human' &&
+        $animationStore.isComputerMoveCompleted
+      );
+    }
+  );
+
+  function getMoveInfo(row: number, col: number) {
+    if (!$showAvailableMoves) {
+      return { isAvailable: false, isPenalty: false };
+    }
+
+    const move = get(availableMoves).find(m => m.row === row && m.col === col);
+
+    if (move) {
+      return {
+        isAvailable: true,
+        isPenalty: move.isPenalty || false
+      };
     }
     
-    return result;
+    return { isAvailable: false, isPenalty: false };
   }
 
   function showBoardClickHint(e: Event) {
@@ -180,12 +179,14 @@
       <div class="game-board" style="--board-size: {$boardSize}" role="grid">
         {#each Array($boardSize) as _, rowIdx (rowIdx)}
           {#each Array($boardSize) as _, colIdx (colIdx)}
+            {@const moveInfo = getMoveInfo(rowIdx, colIdx)}
             <BoardCell
               {rowIdx}
               {colIdx}
               visualCellVisitCounts={$visualCellVisitCounts}
               settingsStore={$settingsStore}
-              isAvailable={isAvailable(rowIdx, colIdx)}
+              isAvailable={moveInfo.isAvailable}
+              isPenalty={moveInfo.isPenalty}
               visualPosition={$visualPosition}
               boardState={$visualBoardState}
               gameState={$gameState}

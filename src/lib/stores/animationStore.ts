@@ -1,5 +1,6 @@
 // src/lib/stores/animationStore.ts
 import { writable, get, type Writable } from 'svelte/store';
+import { isLocalGame } from './derivedState';
 
 // ВАЖЛИВО! Цей store працює ЛИШЕ з візуальним станом для анімації.
 // Заборонено напряму змінювати moveQueue або board логічного стану гри з animationStore!
@@ -118,11 +119,12 @@ function createAnimationService() {
 
     const isPlayerMove = move.player === 1;
     const animationDuration = 500;
-    const pauseAfterMove = isPlayerMove ? 1000 : 100;
+    
+    const pauseAfterMove = isPlayerMove && !get(isLocalGame) ? 1000 : 100;
 
     setTimeout(() => {
-      if (!isPlayerMove) {
-        // Якщо це був хід комп'ютера, встановлюємо прапорець
+      if (!isPlayerMove || get(isLocalGame)) {
+        // Встановлюємо прапорець після ходу комп'ютера, або після будь-якого ходу в локальній грі
         update(s => ({ ...s, isComputerMoveCompleted: true }));
       }
 

@@ -25,7 +25,7 @@ export interface GameState {
   playerRow: number|null;
   /** Поточна колонка, де знаходиться ферзь, або null якщо не встановлено. */
   playerCol: number|null;
-  /** Масив доступних ходів для поточного стану. */
+  /** @deprecated Масив доступних ходів тепер є derived store в derivedState.ts */
   availableMoves: Move[];
   /** Масив гравців (людина, комп'ютер, онлайн). */
   players: Player[];
@@ -101,7 +101,7 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
     board,
     playerRow: initialRow,
     playerCol: initialCol,
-    availableMoves: getAvailableMoves(initialRow, initialCol, size, {}, 0, board, false),
+    availableMoves: [], // Ініціалізуємо як порожній, оскільки він буде обчислений в derived store
     players,
     currentPlayerIndex: 0,
     isGameOver: false,

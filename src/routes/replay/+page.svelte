@@ -24,7 +24,7 @@
             const replayGameState = JSON.parse(replayGameStateJSON);
             // Відновлюємо стан завершення гри з sessionStorage
             if (replayGameState.isGameOver && replayGameState.gameOverReasonKey) {
-              let winner: 'player1' | 'player2' | 'draw' | null = null;
+              let winnerIndexes: number[] = [];
               let player1Score = replayGameState.score || 0;
               let player2Score = 0;
               
@@ -44,11 +44,7 @@
                         .map((p: any, index: number) => ({ score: p.score, index }))
                         .filter((p: any) => p.score === maxScore);
                       
-                      if (winners.length === 1) {
-                        winner = `player${winners[0].index + 1}` as 'player1' | 'player2';
-                      } else if (winners.length > 1) {
-                        winner = 'draw';
-                      }
+                      winnerIndexes = winners.map((w: any) => w.index);
                     }
                   } catch (e) {
                     logService.ui("Failed to parse local game state", e);
@@ -57,11 +53,11 @@
               }
               
               const gameResult = {
-                score: {
-                  player1: player1Score,
-                  player2: player2Score,
-                },
-                winner,
+                scores: [
+                  { playerId: 0, score: player1Score },
+                  { playerId: 1, score: player2Score }
+                ],
+                winners: winnerIndexes,
                 reasonKey: replayGameState.gameOverReasonKey,
                 reasonValues: replayGameState.gameOverReasonValues,
                 finalScoreDetails: {
@@ -101,7 +97,10 @@
   });
 </script>
 
-<FloatingBackButton />
+<div class="header-container">
+  <FloatingBackButton />
+  <h1>Перегляд повтору</h1>
+</div>
 
 <div class="replay-page-container">
   {#if moveHistory}
@@ -112,12 +111,18 @@
 </div>
 
 <style>
+  .header-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
   .replay-page-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
     width: 100%;
     padding: 1rem;
     box-sizing: border-box;

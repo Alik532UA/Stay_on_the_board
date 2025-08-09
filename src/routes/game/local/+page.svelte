@@ -16,7 +16,7 @@
   import PlayerTurnIndicator from '$lib/components/widgets/PlayerTurnIndicator.svelte';
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
   import { settingsStore } from '$lib/stores/settingsStore.js';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { afterNavigate } from '$app/navigation';
   import { animationStore } from '$lib/stores/animationStore.js';
   import { gameOverStore } from '$lib/stores/gameOverStore';
@@ -47,9 +47,12 @@
 
   onMount(() => {
     // Ініціалізуємо режим гри та анімації
-    gameOrchestrator.activeGameMode = new LocalGameMode();
-    gameOrchestrator.activeGameMode.initialize(get(gameState));
+    gameOrchestrator.setCurrentGameMode('local');
     animationStore.initialize();
+  });
+
+  onDestroy(() => {
+    // localGameStore.reset(); // Ця логіка більше не потрібна
   });
 
   afterNavigate(() => {
