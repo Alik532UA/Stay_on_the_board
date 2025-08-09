@@ -102,6 +102,7 @@ export class StateManager {
       case 'FIRST_MOVE_COMPLETED':
       case 'ADVANCE_TURN':
       case 'END_GAME_LOCAL':
+      case 'UPDATE_LAST_PLAYER_MOVE':
         // Ці дії не потребують спеціальної валідації
         break;
       default:

@@ -8,5 +8,6 @@ export default {
   'down': "Aşağı",
   'down-right': "Aşağı-oñğa",
   'confirm': "Areketni tasdiqla",
-  'no-moves': '"Areket yoq" dep bildir'
-}; 
+  'no-moves': '"Areket yoq" dep bildir',
+  'localGameSettings': 'Lokal oyun ayarları'
+};

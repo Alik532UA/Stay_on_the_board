@@ -233,6 +233,9 @@
     
     // За замовчуванням - черга гравця
     logService.ui('GameInfoWidget: Returning default playerTurn state');
+    if (isLocalGame) {
+      return `playerTurn-${$gameState.currentPlayerIndex}`;
+    }
     return 'playerTurn';
   })();
   
@@ -322,9 +325,6 @@
         previousState 
       });
       pendingState = currentState;
-      // ВАЖЛИВО: Негайно оновлюємо displayMessage для нового стану
-      // щоб уникнути показу застарілого тексту при швидких ходах
-      displayMessage = getMessageForState();
     } else if (currentState === previousState && !isAnimating) {
       // Додаткова діагностика: коли стан не змінюється
       logService.ui('State unchanged, no animation needed:', {

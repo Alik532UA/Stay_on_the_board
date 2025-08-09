@@ -1,17 +1,17 @@
 <script>
   import { _ } from 'svelte-i18n';
   import { modalStore } from '$lib/stores/modalStore.js';
-  
+  import { logService } from '$lib/services/logService.js';
   import { clearCache } from '$lib/utils/cacheManager.js';
 
   function handleClearAll() {
-    logStore.addLog('Повне очищення кешу', 'info');
+    logService.action('Повне очищення кешу');
     clearCache({ keepAppearance: false });
     modalStore.closeModal();
   }
 
   function handleKeepAppearance() {
-    logStore.addLog('Очищення кешу зі збереженням вигляду', 'info');
+    logService.action('Очищення кешу зі збереженням вигляду');
     clearCache({ keepAppearance: true });
     modalStore.closeModal();
   }

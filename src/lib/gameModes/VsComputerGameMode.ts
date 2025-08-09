@@ -1,6 +1,8 @@
 import { get } from 'svelte/store';
-import { _ } from 'svelte-i18n';
+import { _, locale } from 'svelte-i18n';
 import type { IGameMode } from './gameMode.interface';
+import { speakText } from '$lib/services/speechService';
+import { lastComputerMove } from '$lib/stores/derivedState';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService';
 import { playerInputStore } from '$lib/stores/playerInputStore';
@@ -197,6 +199,18 @@ export class VsComputerGameMode implements IGameMode {
       if (!moveResult.success) {
         this.handleNoMoves('computer');
       } else {
+        const settings = get(settingsStore);
+        if (settings.speechEnabled) {
+          const lastMove = get(lastComputerMove);
+          if (lastMove) {
+            const directionKey = lastMove.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+            const moveDirection = get(_)('gameBoard.directions.' + directionKey);
+            const textToSpeak = `${moveDirection} ${lastMove.distance}`;
+            const lang = get(locale) || 'uk';
+            speakText(textToSpeak, lang, settings.selectedVoiceURI);
+          }
+        }
+        
         const currentState = get(gameState);
         if (currentState.wasResumed) {
           await stateManager.applyChanges(

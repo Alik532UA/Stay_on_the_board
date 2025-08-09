@@ -12,6 +12,7 @@ import type { FinalScoreDetails } from '$lib/gameOrchestrator';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { localGameStore } from '$lib/stores/localGameStore';
 import { logService } from '$lib/services/logService';
+import { lastPlayerMove } from '$lib/stores/derivedState';
 
 export class LocalGameMode implements IGameMode {
   initialize(initialState: GameState): void {
@@ -50,12 +51,23 @@ export class LocalGameMode implements IGameMode {
     // і оновлення gameState через UPDATE_SCORE.
     // Рахунок гравця буде похідним від bonusPoints - penaltyPoints.
 
+    // Оновлюємо gameState з останнім ходом, щоб оновити derived store
+    const { selectedDirection, selectedDistance } = get(playerInputStore);
+    if (selectedDirection && selectedDistance) {
+      stateManager.applyChanges(
+        'UPDATE_LAST_PLAYER_MOVE',
+        { lastPlayerMove: { direction: selectedDirection, distance: selectedDistance } },
+        'Updating last player move for UI'
+      );
+    }
+
     playerInputStore.set({
       selectedDirection: null,
       selectedDistance: null,
       distanceManuallySelected: false,
       isMoveInProgress: false
     });
+
     this.advanceToNextPlayer();
   }
 
@@ -112,6 +124,7 @@ export class LocalGameMode implements IGameMode {
 
     gameLogicService.resetGame({ newSize: boardSize });
     localGameStore.resetPlayersWithData(playersData);
+    localGameStore.snapshotScores(); // Робимо знімок нульових рахунків
 
     const newLocalState = get(localGameStore);
     const newPlayersForGameState = newLocalState.players.map(p => ({

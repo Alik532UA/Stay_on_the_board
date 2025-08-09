@@ -309,6 +309,11 @@ export function resetGame(options: { newSize?: number; players?: Player[]; setti
     size: newSize,
     players: options.players
   });
+
+  // Якщо гравці передані, використовуємо їх
+  if (options.players) {
+    newState.players = options.players;
+  }
   
   gameState.set(newState);
   
@@ -459,7 +464,8 @@ export async function performMove(direction: MoveDirectionType, distance: number
     penaltyPoints: scoreChanges.penaltyPoints,
     movesInBlockMode: scoreChanges.movesInBlockMode,
     jumpedBlockedCells: scoreChanges.jumpedBlockedCells,
-    distanceBonus: scoreChanges.distanceBonus
+    distanceBonus: scoreChanges.distanceBonus,
+    isFirstMove: false
   };
 
   await stateManager.applyChanges('PERFORM_MOVE', changes, `Move: ${direction}${distance}`);
