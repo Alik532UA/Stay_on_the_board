@@ -8,5 +8,6 @@ export default {
   'down': "Omlaag",
   'down-right': "Schuin omlaag-rechts",
   'confirm': "Zet bevestigen",
-  'no-moves': 'Aangeven "Geen Zetten"'
-}; 
+  'no-moves': 'Aangeven "Geen Zetten"',
+  'localGameSettings': 'Lokale Spelinstellingen'
+};

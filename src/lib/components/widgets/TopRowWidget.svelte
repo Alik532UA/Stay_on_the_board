@@ -3,6 +3,7 @@
   import { _ } from 'svelte-i18n';
   import SvgIcons from '../SvgIcons.svelte';
   import { showGameModeSelector, showGameInfoModal } from '$lib/utils/uiHelpers.js';
+  import { page } from '$app/stores';
 
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
   import { logService } from '$lib/services/logService.js';
@@ -16,6 +17,10 @@
       window.location.href = '/';
     }
   }
+
+  function handleLocalSetupClick() {
+    navigationService.goTo('/local-setup');
+  }
 </script>
 
 <style>
@@ -28,9 +33,9 @@
   <button class="main-menu-btn" title={$_('gameBoard.mainMenu')} on:click={handleMainMenuClick}>
     <SvgIcons name="home" />
   </button>
-  {#if false}
-    <button class="main-menu-btn" title={$_('gameModes.changeModeTooltip')} on:click={showGameModeSelector}>
-      <SvgIcons name="game-mode" />
+  {#if $page.route.id?.includes('/game/local')}
+    <button class="main-menu-btn" title={$_('tooltips.localGameSettings')} on:click={handleLocalSetupClick}>
+      <SvgIcons name="hamburger-menu" />
     </button>
   {/if}
   <button class="main-menu-btn" title={$_('gameBoard.info')} on:click={showGameInfoModal}>
@@ -47,4 +52,4 @@
     </button>
   {/if}
 
-</div> 
+</div>

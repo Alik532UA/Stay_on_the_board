@@ -8,9 +8,9 @@ import { Figure } from '$lib/models/Figure.js';
 import { modalStore } from './stores/modalStore.js';
 import { agents } from './playerAgents.js';
 import { speakText, langMap } from '$lib/services/speechService.js';
-import { _ } from 'svelte-i18n';
+import { _, locale } from 'svelte-i18n';
 import { logService } from '$lib/services/logService.js';
-import { lastComputerMove } from './stores/derivedState.ts';
+import { lastComputerMove, lastPlayerMove } from './stores/derivedState.ts';
 import { replayStore } from './stores/replayStore.js';
 import { base } from '$app/paths';
 import { goto } from '$app/navigation';
@@ -228,7 +228,17 @@ export const gameOrchestrator = {
     if (!this.activeGameMode) this.initializeGameMode();
     const playerInput = get(playerInputStore);
     if (!playerInput.selectedDirection || !playerInput.selectedDistance) return;
+    
     await this.activeGameMode!.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
+
+    const settings = get(settingsStore);
+    if (settings.speechEnabled && this._determineGameType() === 'local') {
+      const directionKey = playerInput.selectedDirection.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+      const direction = get(_)('gameBoard.directions.' + directionKey);
+      const textToSpeak = `${direction} ${playerInput.selectedDistance}`;
+      const lang = get(locale) || 'uk';
+      speakText(textToSpeak, lang, settings.selectedVoiceURI);
+    }
   },
 
   async claimNoMoves(): Promise<void> {

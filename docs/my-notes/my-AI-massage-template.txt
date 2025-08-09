@@ -117,7 +117,37 @@ npm run check
 8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
 9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
 =======================================================================================
+кнопки не працюють:
+"Очистити все (скине всі налаштування)"
+"Зберегти вигляд (тема, мова)"
+
+ClearCacheOptions.svelte:8 
+ Uncaught ReferenceError: logStore is not defined
+    at HTMLButtonElement.handleClearAll (ClearCacheOptions.svelte:8:5)
+    at events.js:61:21
+    at without_reactive_context (shared.js:44:10)
+    at HTMLButtonElement.target_handler (events.js:60:11)
+ClearCacheOptions.svelte:14 
+ Uncaught ReferenceError: logStore is not defined
+    at HTMLButtonElement.handleKeepAppearance (ClearCacheOptions.svelte:14:5)
+    at events.js:61:21
+    at without_reactive_context (shared.js:44:10)
+    at HTMLButtonElement.target_handler (events.js:60:11)
+
 =======================================================================================
+Коли додаєш нових гравців
+Актуальний результат: імена "Гравець 5", "Гравець 6", "Гравець 7", "Гравець 8"
+Очікуваний результат: випадкове ім'я з цього списку: 
+Alik
+Noah
+Jack
+Mateo
+Lucas
+Sofia
+Olivia
+Nora
+Lucia
+Emilia
 =======================================================================================
 =======================================================================================
 =======================================================================================

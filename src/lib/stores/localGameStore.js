@@ -57,6 +57,23 @@ const getRandomColor = () => {
   return availableColors[randomIndex];
 };
 
+const availableNames = [
+  'Alik', 'Noah', 'Jack', 'Mateo', 'Lucas', 'Sofia', 'Olivia', 'Nora', 'Lucia', 'Emilia'
+];
+
+/**
+ * @param {string[]} usedNames - Масив імен, які вже використовуються
+ * @returns {string} Випадкове ім'я, яке ще не використовується
+ */
+const getRandomUnusedName = (usedNames) => {
+  const unusedNames = availableNames.filter(name => !usedNames.includes(name));
+  if (unusedNames.length === 0) {
+    return `Гравець ${usedNames.length + 1}`;
+  }
+  const randomIndex = Math.floor(Math.random() * unusedNames.length);
+  return unusedNames[randomIndex];
+};
+
 // Функція для отримання випадкового кольору, який ще не використовується
 /**
  * @param {string[]} usedColors - Масив кольорів, які вже використовуються
@@ -118,7 +135,7 @@ function createLocalGameStore() {
         
         const newPlayer = {
           id: generateId(),
-          name: `Гравець ${state.players.length + 1}`,
+          name: getRandomUnusedName(state.players.map(p => p.name)),
           color: getRandomUnusedColor(usedColors),
           score: 0,
           penaltyPoints: 0,

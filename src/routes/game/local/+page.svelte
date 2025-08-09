@@ -26,6 +26,7 @@
   import { _ } from 'svelte-i18n';
   import { gameState } from '$lib/stores/gameState.js';
   import { localGameStore } from '$lib/stores/localGameStore.js';
+  import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
   
   // Примітка: onMount та ініціалізація гри тут не потрібні,
   // оскільки вони відбуваються на сторінці /local-setup
@@ -45,7 +46,9 @@
   }
 
   onMount(() => {
-    // Залишаємо тільки первинну ініціалізацію
+    // Ініціалізуємо режим гри та анімації
+    gameOrchestrator.activeGameMode = new LocalGameMode();
+    gameOrchestrator.activeGameMode.initialize(get(gameState));
     animationStore.initialize();
   });
 

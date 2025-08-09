@@ -8,5 +8,6 @@ export default {
   'down': "Down",
   'down-right': "Down-Right",
   'confirm': "Confirm Move",
-  'no-moves': 'Declare "No Moves"'
-}; 
+  'no-moves': 'Declare "No Moves"',
+  'localGameSettings': 'Local Game Settings'
+};

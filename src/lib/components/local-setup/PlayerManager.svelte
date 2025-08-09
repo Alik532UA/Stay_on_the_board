@@ -15,7 +15,8 @@
     const gamePlayers = players.map(player => ({
       id: player.id,
       name: player.name,
-      type: 'human' as const
+      type: 'human' as const,
+      score: player.score
     }));
     
     // Ініціалізуємо стан гри з поточними налаштуваннями
@@ -28,6 +29,9 @@
         lockSettings: settings.lockSettings
       }
     });
+
+    // Робимо знімок початкових (нульових) рахунків перед стартом
+    localGameStore.snapshotScores();
 
     // Переходимо на сторінку локальної гри
     navigationService.goTo('/game/local');
@@ -124,8 +128,11 @@
     font-size: 1em;
   }
   .remove-player-btn {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+    max-height: 32px;
+    padding: 0;
     border-radius: 50%;
     border: none;
     background: var(--error-color);
@@ -134,6 +141,11 @@
     font-weight: bold;
     cursor: pointer;
     transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Prevent the button from shrinking */
+    align-self: center;
   }
   .remove-player-btn:disabled {
     background: var(--disabled-bg);

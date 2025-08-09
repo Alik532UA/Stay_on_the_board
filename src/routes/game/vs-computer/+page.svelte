@@ -83,7 +83,9 @@
   $: columns = $layoutStore.map(col => ({
     id: col.id,
     label: col.id,
-    items: col.widgets.map(id => ({ id, label: id }))
+    items: col.widgets
+      .filter(id => id !== WIDGETS.PLAYER_TURN_INDICATOR)
+      .map(id => ({ id, label: id }))
   }));
 
   // НАВІЩО: Логіка модальних вікон залишається тут, оскільки вона специфічна

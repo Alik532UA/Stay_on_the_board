@@ -29,13 +29,13 @@ export default {
     gameOver: "Гра завершена"
   },
   directions: {
-    upLeft: "вгору-вліво",
+    upLeft: "по діагоналі вгору-вліво",
     up: "вгору",
-    upRight: "вгору-вправо",
+    upRight: "по діагоналі вгору-вправо",
     left: "вліво",
     right: "вправо",
-    downLeft: "вниз-вліво",
+    downLeft: "по діагоналі вниз-вліво",
     down: "вниз",
-    downRight: "вниз-вправо"
+    downRight: "по діагоналі вниз-вправо"
   }
 }; 

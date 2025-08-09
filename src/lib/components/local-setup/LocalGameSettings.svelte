@@ -93,7 +93,8 @@
 
 <style>
   .settings-card {
-    background: var(--bg-secondary);
+    background: linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
+    backdrop-filter: var(--unified-backdrop-filter);
     padding: 24px;
     border-radius: var(--unified-border-radius);
     box-shadow: var(--unified-shadow);

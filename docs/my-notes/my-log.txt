@@ -1,0 +1,282 @@
+Stay_on_the_board/:1  Error handling response: TypeError: Cannot read properties of undefined (reading 'features')
+    at chrome-extension://jjkchpdmjjdmalgembblgafllbpcjlei/mcafee_wa_contentplg.js:2719:35
+Stay_on_the_board/:1  Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+client:733 [vite] connecting...
+client:827 [vite] connected.
+logService.js:105 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+logService.js:82 [UI] [Speech] 'voiceschanged' event fired. Loaded 325 voices.
+derivedState.ts:428 [currentPlayerColor] Debug: {isLocalGame: false, currentPath: '/Stay_on_the_board/', localPlayersCount: 4, currentPlayerIndex: 0, gameStatePlayers: Array(2), …}
+derivedState.ts:438 [currentPlayerColor] Not local game, returning null
+PlayerColorProvider.svelte:80 [PlayerColorProvider] Removing shadow color, using default
+PlayerColorProvider.svelte:84 [PlayerColorProvider] CSS variable after removal: 
+init.js:31 ✅ i18n ініціалізовано успішно
+logService.js:82 [UI] [Speech] Fallback check loaded 325 voices.
+logService.js:82 [ACTION] Click: "Локальна гра" (MainMenu)
+logService.js:82 [ACTION] Click: "Навігація: /local-setup" (MainMenu)
+logService.js:82 [UI] Навігація: /local-setup
+ColorPicker.svelte:28 ColorPicker: value prop changed to #9b5de5
+ColorPicker.svelte:30 ColorPicker: currentValue updated to #9b5de5
+ColorPicker.svelte:28 ColorPicker: value prop changed to #f4a261
+ColorPicker.svelte:30 ColorPicker: currentValue updated to #f4a261
+ColorPicker.svelte:28 ColorPicker: value prop changed to #457b9d
+ColorPicker.svelte:30 ColorPicker: currentValue updated to #457b9d
+ColorPicker.svelte:28 ColorPicker: value prop changed to #2a9d8f
+ColorPicker.svelte:30 ColorPicker: currentValue updated to #2a9d8f
+logService.js:82 [ACTION] Click: "Почати гру" (PlayerManager)
+derivedState.ts:428 [currentPlayerColor] Debug: {isLocalGame: false, currentPath: '/Stay_on_the_board/local-setup', localPlayersCount: 4, currentPlayerIndex: 0, gameStatePlayers: Array(4), …}
+derivedState.ts:438 [currentPlayerColor] Not local game, returning null
+derivedState.ts:428 [currentPlayerColor] Debug: {isLocalGame: false, currentPath: '/Stay_on_the_board/local-setup', localPlayersCount: 4, currentPlayerIndex: 0, gameStatePlayers: Array(4), …}
+derivedState.ts:438 [currentPlayerColor] Not local game, returning null
+logService.js:80 [STATE] localGameStore: snapshotting scores (4) [0, 0, 0, 0]
+derivedState.ts:428 [currentPlayerColor] Debug: {isLocalGame: false, currentPath: '/Stay_on_the_board/local-setup', localPlayersCount: 4, currentPlayerIndex: 0, gameStatePlayers: Array(4), …}
+derivedState.ts:438 [currentPlayerColor] Not local game, returning null
+logService.js:80 [UI] NavigationService: Navigating to /Stay_on_the_board/game/local
+derivedState.ts:35 [lastComputerMove] Оновлено: null (локальна гра)
+derivedState.ts:94 [isPauseBetweenMoves] Перевірка: lastMove = undefined isLocalGame = true
+derivedState.ts:114 [isPauseBetweenMoves] Оновлено: false (не пауза)
+derivedState.ts:74 [lastPlayerMove] Оновлено: null
+logService.js:80 [UI] GameInfoWidget Animation Logic: {currentState: 'firstMove', previousState: '', pendingState: '', isAnimating: false, isInitialized: false, …}
+logService.js:82 [UI] Initializing GameInfoWidget
+logService.js:80 [UI] getMessageForState called with state: firstMove
+logService.js:80 [UI] Returning localGame firstMove message: Гра почалась!<br><span style="text-shadow: 0 0 8px #9b5de5, 0 0 12px #9b5de5, 0 0 16px #9b5de5;">den</span> ваша черга робити хід
+logService.js:80 [UI] getMessageForState called with state: firstMove
+logService.js:80 [UI] Returning localGame firstMove message: Гра почалась!<br><span style="text-shadow: 0 0 8px #9b5de5, 0 0 12px #9b5de5, 0 0 16px #9b5de5;">den</span> ваша черга робити хід
+logService.js:80 [UI] GameInfoWidget Debug: {i18nReady: true, locale: 'uk', playerTurn: 'Ваша черга робити хід', currentState: 'firstMove', previousState: 'firstMove', …}
+logService.js:80 [UI] GameInfoWidget currentState calculation: {isGameOver: false, isFirstMove: true, wasResumed: false, lastComputerMove: null, lastPlayerMove: null, …}
+logService.js:82 [UI] [BoardWrapperWidget] Нова гра, скидаємо стан
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 1, gameStateCol: 3, visualMoveQueueLength: 0, visualMoveQueue: Array(0), isPlayingAnimation: false}
+derivedState.ts:335 [visualPosition] Використовуємо логічну позицію: {row: 1, col: 3}
+logService.js:80 [UI] BoardWrapper: isAvailable(0,0) = false showMoves = true isAnimating = false isComputerMoveCompleted = true visualCurrentPlayerIndex = 0 logicalCurrentPlayerIndex = 0 visualRow = 1 visualCol = 3 availableMoves.length = 9 gameId = 1754753716357
+derivedState.ts:235 [previousPlayerColor] Оновлено: #2a9d8f для гравця 4
+centerInfoUtil.ts:39 [centerInfoUtil] getCenterInfoState викликано: {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+animationStore.ts:178 AnimationStore: Нова гра, gameId змінився з 1754753711785 на 1754753716357
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 1, gameStateCol: 3, visualMoveQueueLength: 0, visualMoveQueue: Array(0), isPlayingAnimation: false}
+derivedState.ts:335 [visualPosition] Використовуємо логічну позицію: {row: 1, col: 3}
+animationStore.ts:191 AnimationStore: Очищено animationQueue при зміні gameId
+logService.js:80 [UI] BoardWrapper: isAvailable(0,0) = false showMoves = true isAnimating = false isComputerMoveCompleted = true visualCurrentPlayerIndex = 0 logicalCurrentPlayerIndex = 0 visualRow = 1 visualCol = 3 availableMoves.length = 9 gameId = 1754753716357
+logService.js:82 [ACTION] Click: "Напрямок: right" (DirectionControls)
+logService.js:82 [ACTION] Click: "Напрямок: right" (ControlsPanelWidget)
+logService.js:80 [LOGIC] setDirection: встановлено напрямок {dir: 'right', newDistance: 1, newManuallySelected: false}
+centerInfoUtil.ts:39 [centerInfoUtil] getCenterInfoState викликано: {selectedDirection: 'right', selectedDistance: 1, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+centerInfoUtil.ts:55 [centerInfoUtil] Показуємо підтверджуваний хід: →1
+logService.js:82 [ACTION] Click: "Напрямок: left" (DirectionControls)
+logService.js:82 [ACTION] Click: "Напрямок: left" (ControlsPanelWidget)
+logService.js:80 [LOGIC] setDirection: встановлено напрямок {dir: 'left', newDistance: 1, newManuallySelected: false}
+centerInfoUtil.ts:39 [centerInfoUtil] getCenterInfoState викликано: {selectedDirection: 'left', selectedDistance: 1, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+centerInfoUtil.ts:55 [centerInfoUtil] Показуємо підтверджуваний хід: ←1
+logService.js:82 [ACTION] Click: "Центральна кнопка" (DirectionControls)
+logService.js:82 [ACTION] Click: "Центральна кнопка" (ControlsPanelWidget)
+logService.js:80 [LOGIC] performMove: початок з параметрами: {direction: 'left', distance: 1, playerIndex: 0}
+logService.js:82 [LOGIC] calculateMoveScore: humanPlayersCount = 4, playerIndex = 0, isHumanMove = true
+stateManager.ts:210 🎮 StateManager.applyChanges: початок з: {action: 'PERFORM_MOVE', changes: {…}, reason: 'Move: left1'}
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 1
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 2
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 1, col: 2, boardValue: 0}
+derivedState.ts:428 [currentPlayerColor] Debug: {isLocalGame: true, currentPath: '/Stay_on_the_board/game/local', localPlayersCount: 4, currentPlayerIndex: 0, gameStatePlayers: Array(4), …}
+derivedState.ts:446 [currentPlayerColor] Local game, currentPlayerIndex: 0 player: den color: #9b5de5
+derivedState.ts:35 [lastComputerMove] Оновлено: null (локальна гра)
+derivedState.ts:94 [isPauseBetweenMoves] Перевірка: lastMove = {player: 1, direction: 'left', distance: 1, to: {…}} isLocalGame = true
+derivedState.ts:99 [isPauseBetweenMoves] Оновлено: false (локальна гра, немає паузи)
+derivedState.ts:71 [lastPlayerMove] Оновлено: {direction: 'left', distance: 1}
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 1, gameStateCol: 2, visualMoveQueueLength: 0, visualMoveQueue: Array(0), isPlayingAnimation: false}
+derivedState.ts:335 [visualPosition] Використовуємо логічну позицію: {row: 1, col: 2}
+derivedState.ts:235 [previousPlayerColor] Оновлено: #2a9d8f для гравця 4
+animationStore.ts:78 [animationStore] addToAnimationQueue викликано з move: {player: 1, direction: 'left', distance: 1, to: {…}}
+animationStore.ts:81 [animationStore] addToAnimationQueue: нова черга: [{…}]
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 1, gameStateCol: 2, visualMoveQueueLength: 0, visualMoveQueue: Array(0), isPlayingAnimation: false}
+derivedState.ts:335 [visualPosition] Використовуємо логічну позицію: {row: 1, col: 2}
+stateManager.ts:271 🎮 StateManager.applyPlayerInputChanges: {changes: {…}, reason: 'Move: left1'}
+stateManager.ts:279 🎮 StateManager.applyAnimationChanges: {changes: {…}, reason: 'Move: left1'}
+logService.js:80 [STATE] State change applied {action: 'PERFORM_MOVE', oldState: {…}, changes: {…}, reason: 'Move: left1'}
+stateManager.ts:257 ✅ StateManager.applyChanges: успішно завершено
+logService.js:80 [UI] GameInfoWidget Animation Logic: {currentState: 'firstMove', previousState: 'firstMove', pendingState: '', isAnimating: false, isInitialized: true, …}
+logService.js:80 [UI] State unchanged, no animation needed: {currentState: 'firstMove', previousState: 'firstMove', isAnimating: false, displayMessage: 'Гра почалась!<br><span style="text-shadow: 0 0 8px...'}
+logService.js:80 [UI] GameInfoWidget Debug: {i18nReady: true, locale: 'uk', playerTurn: 'Ваша черга робити хід', currentState: 'firstMove', previousState: 'firstMove', …}
+logService.js:80 [UI] GameInfoWidget currentState calculation: {isGameOver: false, isFirstMove: true, wasResumed: false, lastComputerMove: null, lastPlayerMove: {…}, …}
+logService.js:80 [UI] BoardWrapper: isAvailable(0,0) = false showMoves = true isAnimating = false isComputerMoveCompleted = true visualCurrentPlayerIndex = 0 logicalCurrentPlayerIndex = 0 visualRow = 1 visualCol = 2 availableMoves.length = 10 gameId = 1754753716357
+centerInfoUtil.ts:39 [centerInfoUtil] getCenterInfoState викликано: {selectedDirection: 'left', selectedDistance: 1, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+centerInfoUtil.ts:55 [centerInfoUtil] Показуємо підтверджуваний хід: ←1
+PlayerColorProvider.svelte:36 [PlayerColorProvider] Setting shadow color: rgba(155, 93, 229, 0.5)
+PlayerColorProvider.svelte:40 [PlayerColorProvider] Actual CSS variable value: rgba(155, 93, 229, 0.5)
+logService.js:82 [LOGIC] performMove: завершено успішно
+stateManager.ts:210 🎮 StateManager.applyChanges: початок з: {action: 'UPDATE_LAST_PLAYER_MOVE', changes: {…}, reason: 'Updating last player move for UI'}
+stateManager.ts:210 🎮 StateManager.applyChanges: початок з: {action: 'ADVANCE_TURN', changes: {…}, reason: 'Turn advanced to player 1'}
+centerInfoUtil.ts:39 [centerInfoUtil] getCenterInfoState викликано: {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+centerInfoUtil.ts:124 [centerInfoUtil] Показуємо останній хід гравця: ←1
+derivedState.ts:428 [currentPlayerColor] Debug: {isLocalGame: true, currentPath: '/Stay_on_the_board/game/local', localPlayersCount: 4, currentPlayerIndex: 0, gameStatePlayers: Array(4), …}
+derivedState.ts:446 [currentPlayerColor] Local game, currentPlayerIndex: 0 player: den color: #9b5de5
+derivedState.ts:35 [lastComputerMove] Оновлено: null (локальна гра)
+derivedState.ts:94 [isPauseBetweenMoves] Перевірка: lastMove = {player: 1, direction: 'left', distance: 1, to: {…}} isLocalGame = true
+derivedState.ts:99 [isPauseBetweenMoves] Оновлено: false (локальна гра, немає паузи)
+derivedState.ts:71 [lastPlayerMove] Оновлено: {direction: 'left', distance: 1}
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 1, gameStateCol: 2, visualMoveQueueLength: 0, visualMoveQueue: Array(0), isPlayingAnimation: false}
+derivedState.ts:335 [visualPosition] Використовуємо логічну позицію: {row: 1, col: 2}
+derivedState.ts:235 [previousPlayerColor] Оновлено: #2a9d8f для гравця 4
+stateManager.ts:271 🎮 StateManager.applyPlayerInputChanges: {changes: {…}, reason: 'Updating last player move for UI'}
+stateManager.ts:279 🎮 StateManager.applyAnimationChanges: {changes: {…}, reason: 'Updating last player move for UI'}
+logService.js:80 [STATE] State change applied {action: 'UPDATE_LAST_PLAYER_MOVE', oldState: {…}, changes: {…}, reason: 'Updating last player move for UI'}
+stateManager.ts:257 ✅ StateManager.applyChanges: успішно завершено
+derivedState.ts:428 [currentPlayerColor] Debug: {isLocalGame: true, currentPath: '/Stay_on_the_board/game/local', localPlayersCount: 4, currentPlayerIndex: 1, gameStatePlayers: Array(4), …}
+derivedState.ts:446 [currentPlayerColor] Local game, currentPlayerIndex: 1 player: Khaaaa color: #f4a261
+derivedState.ts:35 [lastComputerMove] Оновлено: null (локальна гра)
+derivedState.ts:94 [isPauseBetweenMoves] Перевірка: lastMove = {player: 1, direction: 'left', distance: 1, to: {…}} isLocalGame = true
+derivedState.ts:99 [isPauseBetweenMoves] Оновлено: false (локальна гра, немає паузи)
+derivedState.ts:71 [lastPlayerMove] Оновлено: {direction: 'left', distance: 1}
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 1, gameStateCol: 2, visualMoveQueueLength: 0, visualMoveQueue: Array(0), isPlayingAnimation: false}
+derivedState.ts:335 [visualPosition] Використовуємо логічну позицію: {row: 1, col: 2}
+derivedState.ts:235 [previousPlayerColor] Оновлено: #9b5de5 для гравця 1
+stateManager.ts:271 🎮 StateManager.applyPlayerInputChanges: {changes: {…}, reason: 'Turn advanced to player 1'}
+stateManager.ts:279 🎮 StateManager.applyAnimationChanges: {changes: {…}, reason: 'Turn advanced to player 1'}
+logService.js:80 [STATE] State change applied {action: 'ADVANCE_TURN', oldState: {…}, changes: {…}, reason: 'Turn advanced to player 1'}
+stateManager.ts:257 ✅ StateManager.applyChanges: успішно завершено
+logService.js:80 [UI] GameInfoWidget Animation Logic: {currentState: 'firstMove', previousState: 'firstMove', pendingState: '', isAnimating: false, isInitialized: true, …}
+logService.js:80 [UI] State unchanged, no animation needed: {currentState: 'firstMove', previousState: 'firstMove', isAnimating: false, displayMessage: 'Гра почалась!<br><span style="text-shadow: 0 0 8px...'}
+logService.js:80 [UI] GameInfoWidget Debug: {i18nReady: true, locale: 'uk', playerTurn: 'Ваша черга робити хід', currentState: 'firstMove', previousState: 'firstMove', …}
+logService.js:80 [UI] GameInfoWidget currentState calculation: {isGameOver: false, isFirstMove: true, wasResumed: false, lastComputerMove: null, lastPlayerMove: {…}, …}
+logService.js:80 [UI] BoardWrapper: isAvailable(0,0) = false showMoves = true isAnimating = false isComputerMoveCompleted = true visualCurrentPlayerIndex = 0 logicalCurrentPlayerIndex = 1 visualRow = 1 visualCol = 2 availableMoves.length = 10 gameId = 1754753716357
+centerInfoUtil.ts:39 [centerInfoUtil] getCenterInfoState викликано: {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+centerInfoUtil.ts:124 [centerInfoUtil] Показуємо останній хід гравця: ←1
+PlayerColorProvider.svelte:36 [PlayerColorProvider] Setting shadow color: rgba(244, 162, 97, 0.5)
+PlayerColorProvider.svelte:40 [PlayerColorProvider] Actual CSS variable value: rgba(244, 162, 97, 0.5)
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 1, gameStateCol: 2, visualMoveQueueLength: 0, visualMoveQueue: Array(0), isPlayingAnimation: true}
+derivedState.ts:335 [visualPosition] Використовуємо логічну позицію: {row: 1, col: 2}
+animationStore.ts:112 [animationStore] playNextAnimation: анімуємо хід: {player: 1, direction: 'left', distance: 1, to: {…}}
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 1, gameStateCol: 2, visualMoveQueueLength: 1, visualMoveQueue: Array(1), isPlayingAnimation: true}
+derivedState.ts:326 [visualPosition] Використовуємо анімовану позицію: {row: 1, col: 2} з ходу: {player: 1, direction: 'left', distance: 1, to: {…}}
+logService.js:80 [UI] BoardWrapper: isAvailable(0,0) = false showMoves = true isAnimating = true isComputerMoveCompleted = false visualCurrentPlayerIndex = 1 logicalCurrentPlayerIndex = 1 visualRow = 1 visualCol = 2 availableMoves.length = 10 gameId = 1754753716357
+PlayerColorProvider.svelte:45 [PlayerColorProvider] Found 5 elements to check
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 0 (game-info-widget s--msS_1jZMzGA player-turn): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px, CSS variable = rgba(244, 162, 97, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 1 (board-bg-wrapper game-content-block s-XnBeJEugBbJd): box-shadow = none, CSS variable = rgba(244, 162, 97, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 2 (game-board s-XnBeJEugBbJd): box-shadow = none, CSS variable = rgba(244, 162, 97, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 3 (score-panel game-content-block s--RMMc23vVzhz): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px, CSS variable = rgba(244, 162, 97, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 4 (game-controls-panel s-_h1WoJDwmKMZ): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px, CSS variable = rgba(244, 162, 97, 0.5)
+PlayerColorProvider.svelte:59 [PlayerColorProvider] Total elements with box-shadow: 37
+PlayerColorProvider.svelte:45 [PlayerColorProvider] Found 5 elements to check
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 0 (game-info-widget s--msS_1jZMzGA player-turn): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px, CSS variable = rgba(244, 162, 97, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 1 (board-bg-wrapper game-content-block s-XnBeJEugBbJd): box-shadow = none, CSS variable = rgba(244, 162, 97, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 2 (game-board s-XnBeJEugBbJd): box-shadow = none, CSS variable = rgba(244, 162, 97, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 3 (score-panel game-content-block s--RMMc23vVzhz): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px, CSS variable = rgba(244, 162, 97, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 4 (game-controls-panel s-_h1WoJDwmKMZ): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px, CSS variable = rgba(244, 162, 97, 0.5)
+PlayerColorProvider.svelte:59 [PlayerColorProvider] Total elements with box-shadow: 37
+PlayerColorProvider.svelte:71 [PlayerColorProvider] Delayed check: Found 5 elements
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 0 (game-info-widget s--msS_1jZMzGA player-turn): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 1 (board-bg-wrapper game-content-block s-XnBeJEugBbJd): box-shadow = none
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 2 (game-board s-XnBeJEugBbJd): box-shadow = none
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 3 (score-panel game-content-block s--RMMc23vVzhz): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 4 (game-controls-panel s-_h1WoJDwmKMZ): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px
+PlayerColorProvider.svelte:71 [PlayerColorProvider] Delayed check: Found 5 elements
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 0 (game-info-widget s--msS_1jZMzGA player-turn): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 1 (board-bg-wrapper game-content-block s-XnBeJEugBbJd): box-shadow = none
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 2 (game-board s-XnBeJEugBbJd): box-shadow = none
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 3 (score-panel game-content-block s--RMMc23vVzhz): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 4 (game-controls-panel s-_h1WoJDwmKMZ): box-shadow = rgba(244, 162, 97, 0.5) 0px 0px 16px -8px
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 1, gameStateCol: 2, visualMoveQueueLength: 1, visualMoveQueue: Array(1), isPlayingAnimation: true}
+derivedState.ts:326 [visualPosition] Використовуємо анімовану позицію: {row: 1, col: 2} з ходу: {player: 1, direction: 'left', distance: 1, to: {…}}
+animationStore.ts:135 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 1, gameStateCol: 2, visualMoveQueueLength: 1, visualMoveQueue: Array(1), isPlayingAnimation: false}
+derivedState.ts:326 [visualPosition] Використовуємо анімовану позицію: {row: 1, col: 2} з ходу: {player: 1, direction: 'left', distance: 1, to: {…}}
+logService.js:80 [UI] BoardWrapper: isAvailable(0,0) = false showMoves = true isAnimating = false isComputerMoveCompleted = false visualCurrentPlayerIndex = 1 logicalCurrentPlayerIndex = 1 visualRow = 1 visualCol = 2 availableMoves.length = 10 gameId = 1754753716357
+logService.js:82 [ACTION] Click: "Напрямок: down-left" (DirectionControls)
+logService.js:82 [ACTION] Click: "Напрямок: down-left" (ControlsPanelWidget)
+logService.js:80 [LOGIC] setDirection: встановлено напрямок {dir: 'down-left', newDistance: 1, newManuallySelected: false}
+centerInfoUtil.ts:39 [centerInfoUtil] getCenterInfoState викликано: {selectedDirection: 'down-left', selectedDistance: 1, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+centerInfoUtil.ts:55 [centerInfoUtil] Показуємо підтверджуваний хід: ↙1
+logService.js:82 [ACTION] Click: "Центральна кнопка" (DirectionControls)
+logService.js:82 [ACTION] Click: "Центральна кнопка" (ControlsPanelWidget)
+logService.js:80 [LOGIC] performMove: початок з параметрами: {direction: 'down-left', distance: 1, playerIndex: 1}
+logService.js:82 [LOGIC] calculateMoveScore: humanPlayersCount = 4, playerIndex = 1, isHumanMove = true
+logService.js:80 [LOGIC] calculateMoveScore: перевіряємо "дзеркальний" хід: {currentMove: {…}, computerMove: {…}, isMirrorMove: false}
+stateManager.ts:210 🎮 StateManager.applyChanges: початок з: {action: 'PERFORM_MOVE', changes: {…}, reason: 'Move: down-left1'}
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 2
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 1
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 2, col: 1, boardValue: 0}
+derivedState.ts:428 [currentPlayerColor] Debug: {isLocalGame: true, currentPath: '/Stay_on_the_board/game/local', localPlayersCount: 4, currentPlayerIndex: 1, gameStatePlayers: Array(4), …}
+derivedState.ts:446 [currentPlayerColor] Local game, currentPlayerIndex: 1 player: Khaaaa color: #f4a261
+derivedState.ts:35 [lastComputerMove] Оновлено: null (локальна гра)
+derivedState.ts:94 [isPauseBetweenMoves] Перевірка: lastMove = {player: 2, direction: 'down-left', distance: 1, to: {…}} isLocalGame = true
+derivedState.ts:114 [isPauseBetweenMoves] Оновлено: false (не пауза)
+derivedState.ts:71 [lastPlayerMove] Оновлено: {direction: 'down-left', distance: 1}
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 2, gameStateCol: 1, visualMoveQueueLength: 1, visualMoveQueue: Array(1), isPlayingAnimation: false}
+derivedState.ts:326 [visualPosition] Використовуємо анімовану позицію: {row: 1, col: 2} з ходу: {player: 1, direction: 'left', distance: 1, to: {…}}
+derivedState.ts:235 [previousPlayerColor] Оновлено: #9b5de5 для гравця 1
+animationStore.ts:78 [animationStore] addToAnimationQueue викликано з move: {player: 2, direction: 'down-left', distance: 1, to: {…}}
+animationStore.ts:81 [animationStore] addToAnimationQueue: нова черга: [{…}]
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 2, gameStateCol: 1, visualMoveQueueLength: 0, visualMoveQueue: Array(0), isPlayingAnimation: false}
+derivedState.ts:335 [visualPosition] Використовуємо логічну позицію: {row: 2, col: 1}
+stateManager.ts:271 🎮 StateManager.applyPlayerInputChanges: {changes: {…}, reason: 'Move: down-left1'}
+stateManager.ts:279 🎮 StateManager.applyAnimationChanges: {changes: {…}, reason: 'Move: down-left1'}
+logService.js:80 [STATE] State change applied {action: 'PERFORM_MOVE', oldState: {…}, changes: {…}, reason: 'Move: down-left1'}
+stateManager.ts:257 ✅ StateManager.applyChanges: успішно завершено
+logService.js:80 [UI] GameInfoWidget Animation Logic: {currentState: 'firstMove', previousState: 'firstMove', pendingState: '', isAnimating: false, isInitialized: true, …}
+logService.js:80 [UI] State unchanged, no animation needed: {currentState: 'firstMove', previousState: 'firstMove', isAnimating: false, displayMessage: 'Гра почалась!<br><span style="text-shadow: 0 0 8px...'}
+logService.js:80 [UI] GameInfoWidget Debug: {i18nReady: true, locale: 'uk', playerTurn: 'Ваша черга робити хід', currentState: 'firstMove', previousState: 'firstMove', …}
+logService.js:80 [UI] GameInfoWidget currentState calculation: {isGameOver: false, isFirstMove: true, wasResumed: false, lastComputerMove: null, lastPlayerMove: {…}, …}
+logService.js:80 [UI] BoardWrapper: isAvailable(0,0) = false showMoves = true isAnimating = false isComputerMoveCompleted = false visualCurrentPlayerIndex = 0 logicalCurrentPlayerIndex = 1 visualRow = 2 visualCol = 1 availableMoves.length = 10 gameId = 1754753716357
+centerInfoUtil.ts:39 [centerInfoUtil] getCenterInfoState викликано: {selectedDirection: 'down-left', selectedDistance: 1, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+centerInfoUtil.ts:55 [centerInfoUtil] Показуємо підтверджуваний хід: ↙1
+logService.js:82 [LOGIC] performMove: завершено успішно
+stateManager.ts:210 🎮 StateManager.applyChanges: початок з: {action: 'UPDATE_LAST_PLAYER_MOVE', changes: {…}, reason: 'Updating last player move for UI'}
+stateManager.ts:210 🎮 StateManager.applyChanges: початок з: {action: 'ADVANCE_TURN', changes: {…}, reason: 'Turn advanced to player 2'}
+centerInfoUtil.ts:39 [centerInfoUtil] getCenterInfoState викликано: {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+centerInfoUtil.ts:124 [centerInfoUtil] Показуємо останній хід гравця: ↙1
+derivedState.ts:428 [currentPlayerColor] Debug: {isLocalGame: true, currentPath: '/Stay_on_the_board/game/local', localPlayersCount: 4, currentPlayerIndex: 1, gameStatePlayers: Array(4), …}
+derivedState.ts:446 [currentPlayerColor] Local game, currentPlayerIndex: 1 player: Khaaaa color: #f4a261
+derivedState.ts:35 [lastComputerMove] Оновлено: null (локальна гра)
+derivedState.ts:94 [isPauseBetweenMoves] Перевірка: lastMove = {player: 2, direction: 'down-left', distance: 1, to: {…}} isLocalGame = true
+derivedState.ts:114 [isPauseBetweenMoves] Оновлено: false (не пауза)
+derivedState.ts:71 [lastPlayerMove] Оновлено: {direction: 'down-left', distance: 1}
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 2, gameStateCol: 1, visualMoveQueueLength: 0, visualMoveQueue: Array(0), isPlayingAnimation: false}
+derivedState.ts:335 [visualPosition] Використовуємо логічну позицію: {row: 2, col: 1}
+derivedState.ts:235 [previousPlayerColor] Оновлено: #9b5de5 для гравця 1
+stateManager.ts:271 🎮 StateManager.applyPlayerInputChanges: {changes: {…}, reason: 'Updating last player move for UI'}
+stateManager.ts:279 🎮 StateManager.applyAnimationChanges: {changes: {…}, reason: 'Updating last player move for UI'}
+logService.js:80 [STATE] State change applied {action: 'UPDATE_LAST_PLAYER_MOVE', oldState: {…}, changes: {…}, reason: 'Updating last player move for UI'}
+stateManager.ts:257 ✅ StateManager.applyChanges: успішно завершено
+derivedState.ts:428 [currentPlayerColor] Debug: {isLocalGame: true, currentPath: '/Stay_on_the_board/game/local', localPlayersCount: 4, currentPlayerIndex: 2, gameStatePlayers: Array(4), …}
+derivedState.ts:446 [currentPlayerColor] Local game, currentPlayerIndex: 2 player: Destroyter94 color: #457b9d
+derivedState.ts:35 [lastComputerMove] Оновлено: null (локальна гра)
+derivedState.ts:94 [isPauseBetweenMoves] Перевірка: lastMove = {player: 2, direction: 'down-left', distance: 1, to: {…}} isLocalGame = true
+derivedState.ts:114 [isPauseBetweenMoves] Оновлено: false (не пауза)
+derivedState.ts:71 [lastPlayerMove] Оновлено: {direction: 'down-left', distance: 1}
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 2, gameStateCol: 1, visualMoveQueueLength: 0, visualMoveQueue: Array(0), isPlayingAnimation: false}
+derivedState.ts:335 [visualPosition] Використовуємо логічну позицію: {row: 2, col: 1}
+derivedState.ts:235 [previousPlayerColor] Оновлено: #f4a261 для гравця 2
+stateManager.ts:271 🎮 StateManager.applyPlayerInputChanges: {changes: {…}, reason: 'Turn advanced to player 2'}
+stateManager.ts:279 🎮 StateManager.applyAnimationChanges: {changes: {…}, reason: 'Turn advanced to player 2'}
+logService.js:80 [STATE] State change applied {action: 'ADVANCE_TURN', oldState: {…}, changes: {…}, reason: 'Turn advanced to player 2'}
+stateManager.ts:257 ✅ StateManager.applyChanges: успішно завершено
+logService.js:80 [UI] GameInfoWidget Animation Logic: {currentState: 'firstMove', previousState: 'firstMove', pendingState: '', isAnimating: false, isInitialized: true, …}
+logService.js:80 [UI] State unchanged, no animation needed: {currentState: 'firstMove', previousState: 'firstMove', isAnimating: false, displayMessage: 'Гра почалась!<br><span style="text-shadow: 0 0 8px...'}
+logService.js:80 [UI] GameInfoWidget Debug: {i18nReady: true, locale: 'uk', playerTurn: 'Ваша черга робити хід', currentState: 'firstMove', previousState: 'firstMove', …}
+logService.js:80 [UI] GameInfoWidget currentState calculation: {isGameOver: false, isFirstMove: true, wasResumed: false, lastComputerMove: null, lastPlayerMove: {…}, …}
+logService.js:80 [UI] BoardWrapper: isAvailable(0,0) = false showMoves = true isAnimating = false isComputerMoveCompleted = false visualCurrentPlayerIndex = 0 logicalCurrentPlayerIndex = 2 visualRow = 2 visualCol = 1 availableMoves.length = 10 gameId = 1754753716357
+centerInfoUtil.ts:39 [centerInfoUtil] getCenterInfoState викликано: {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+centerInfoUtil.ts:124 [centerInfoUtil] Показуємо останній хід гравця: ↙1
+PlayerColorProvider.svelte:36 [PlayerColorProvider] Setting shadow color: rgba(69, 123, 157, 0.5)
+PlayerColorProvider.svelte:40 [PlayerColorProvider] Actual CSS variable value: rgba(69, 123, 157, 0.5)
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 2, gameStateCol: 1, visualMoveQueueLength: 0, visualMoveQueue: Array(0), isPlayingAnimation: true}
+derivedState.ts:335 [visualPosition] Використовуємо логічну позицію: {row: 2, col: 1}
+animationStore.ts:112 [animationStore] playNextAnimation: анімуємо хід: {player: 2, direction: 'down-left', distance: 1, to: {…}}
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 2, gameStateCol: 1, visualMoveQueueLength: 1, visualMoveQueue: Array(1), isPlayingAnimation: true}
+derivedState.ts:326 [visualPosition] Використовуємо анімовану позицію: {row: 2, col: 1} з ходу: {player: 2, direction: 'down-left', distance: 1, to: {…}}
+logService.js:80 [UI] BoardWrapper: isAvailable(0,0) = false showMoves = true isAnimating = true isComputerMoveCompleted = false visualCurrentPlayerIndex = 0 logicalCurrentPlayerIndex = 2 visualRow = 2 visualCol = 1 availableMoves.length = 10 gameId = 1754753716357
+PlayerColorProvider.svelte:45 [PlayerColorProvider] Found 5 elements to check
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 0 (game-info-widget s--msS_1jZMzGA player-turn): box-shadow = rgba(69, 123, 157, 0.5) 0px 0px 16px -8px, CSS variable = rgba(69, 123, 157, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 1 (board-bg-wrapper game-content-block s-XnBeJEugBbJd): box-shadow = none, CSS variable = rgba(69, 123, 157, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 2 (game-board s-XnBeJEugBbJd): box-shadow = none, CSS variable = rgba(69, 123, 157, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 3 (score-panel game-content-block s--RMMc23vVzhz): box-shadow = rgba(69, 123, 157, 0.5) 0px 0px 16px -8px, CSS variable = rgba(69, 123, 157, 0.5)
+PlayerColorProvider.svelte:50 [PlayerColorProvider] Element 4 (game-controls-panel s-_h1WoJDwmKMZ): box-shadow = rgba(69, 123, 157, 0.5) 0px 0px 16px -8px, CSS variable = rgba(69, 123, 157, 0.5)
+PlayerColorProvider.svelte:59 [PlayerColorProvider] Total elements with box-shadow: 37
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 2, gameStateCol: 1, visualMoveQueueLength: 1, visualMoveQueue: Array(1), isPlayingAnimation: true}
+derivedState.ts:326 [visualPosition] Використовуємо анімовану позицію: {row: 2, col: 1} з ходу: {player: 2, direction: 'down-left', distance: 1, to: {…}}
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 2, gameStateCol: 1, visualMoveQueueLength: 1, visualMoveQueue: Array(1), isPlayingAnimation: true}
+derivedState.ts:326 [visualPosition] Використовуємо анімовану позицію: {row: 2, col: 1} з ходу: {player: 2, direction: 'down-left', distance: 1, to: {…}}
+derivedState.ts:311 [visualPosition] Оновлення: {gameStateRow: 2, gameStateCol: 1, visualMoveQueueLength: 1, visualMoveQueue: Array(1), isPlayingAnimation: false}
+derivedState.ts:326 [visualPosition] Використовуємо анімовану позицію: {row: 2, col: 1} з ходу: {player: 2, direction: 'down-left', distance: 1, to: {…}}
+logService.js:80 [UI] BoardWrapper: isAvailable(0,0) = false showMoves = true isAnimating = false isComputerMoveCompleted = true visualCurrentPlayerIndex = 0 logicalCurrentPlayerIndex = 2 visualRow = 2 visualCol = 1 availableMoves.length = 10 gameId = 1754753716357
+PlayerColorProvider.svelte:71 [PlayerColorProvider] Delayed check: Found 5 elements
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 0 (game-info-widget s--msS_1jZMzGA player-turn): box-shadow = rgba(69, 123, 157, 0.5) 0px 0px 16px -8px
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 1 (board-bg-wrapper game-content-block s-XnBeJEugBbJd): box-shadow = none
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 2 (game-board s-XnBeJEugBbJd): box-shadow = none
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 3 (score-panel game-content-block s--RMMc23vVzhz): box-shadow = rgba(69, 123, 157, 0.5) 0px 0px 16px -8px
+PlayerColorProvider.svelte:75 [PlayerColorProvider] Delayed Element 4 (game-controls-panel s-_h1WoJDwmKMZ): box-shadow = rgba(69, 123, 157, 0.5) 0px 0px 16px -8px
