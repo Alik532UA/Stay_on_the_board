@@ -334,6 +334,7 @@ function createLocalGameStore() {
       set(createInitialState());
     },
 
+
     /** Відновлює стан з збережених даних */
     restoreState: (/** @type {LocalGameState} */ savedState) => {
       set(savedState);

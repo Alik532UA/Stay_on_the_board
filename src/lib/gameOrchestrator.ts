@@ -59,14 +59,19 @@ export interface ModalContent {
 export const gameOrchestrator = {
   activeGameMode: null as IGameMode | null,
 
-  initializeGameMode() {
-    const gameType = this._determineGameType();
-    if (gameType === 'local') {
+  setCurrentGameMode(mode: 'local' | 'vs-computer') {
+    logService.GAME_MODE(`Setting game mode to: ${mode}`);
+    if (mode === 'local') {
       this.activeGameMode = new LocalGameMode();
     } else {
       this.activeGameMode = new VsComputerGameMode();
     }
     this.activeGameMode.initialize(get(gameState));
+  },
+
+  initializeGameMode() {
+    const gameType = this._determineGameType();
+    this.setCurrentGameMode(gameType as 'local' | 'vs-computer');
   },
   /**
    * Встановлює новий розмір дошки, обробляючи логіку підтвердження.
@@ -204,7 +209,8 @@ export const gameOrchestrator = {
         {},
         settings.blockOnVisitCount,
         state.board,
-        settings.blockModeEnabled
+        settings.blockModeEnabled,
+        null
       ),
       noMovesClaimed: false,
       isComputerMoveInProgress: false,

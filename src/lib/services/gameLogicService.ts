@@ -4,7 +4,8 @@ import type { MoveDirectionType } from '../models/Figure';
 import { get } from 'svelte/store';
 import { playerInputStore } from '../stores/playerInputStore';
 import { gameState, createInitialState, type Player } from '../stores/gameState'; // Тепер цей імпорт безпечний
-import { getAvailableMoves, isCellBlocked } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
+import { getAvailableMoves, isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
+import { lastPlayerMove } from '$lib/stores/derivedState';
 import { settingsStore } from '../stores/settingsStore.js';
 import { stateManager } from './stateManager';
 import { localGameStore } from '../stores/localGameStore.js';
@@ -17,6 +18,7 @@ export interface Move {
   col: number;
   direction: Direction;
   distance: number;
+  isPenalty?: boolean;
 }
 export interface GameState {
   players: Player[];
@@ -177,7 +179,7 @@ function calculateMoveScore(
   logService.logic(`calculateMoveScore: humanPlayersCount = ${humanPlayersCount}, playerIndex = ${playerIndex}, isHumanMove = ${isHumanMove}`);
   
   // Перевіряємо "дзеркальний" хід тільки для ходів гравця (не комп'ютера)
-  if (isHumanMove && direction && currentState.moveQueue.length >= 1) {
+  if (isHumanMove && direction && currentState.moveQueue.length >= 1 && !settings.blockModeEnabled) {
     // Знаходимо останній хід комп'ютера
     const lastComputerMove = currentState.moveQueue[currentState.moveQueue.length - 1];
     
@@ -266,34 +268,6 @@ function calculateMoveScore(
  * @param computerDistance - відстань попереднього ходу комп'ютера
  * @returns true якщо хід є "дзеркальним"
  */
-function isMirrorMove(
-  currentDirection: string,
-  currentDistance: number,
-  computerDirection: string,
-  computerDistance: number
-): boolean {
-  // Визначаємо протилежні напрямки
-  const oppositeDirections: Record<string, string> = {
-    'up': 'down',
-    'down': 'up',
-    'left': 'right',
-    'right': 'left',
-    'up-left': 'down-right',
-    'up-right': 'down-left',
-    'down-left': 'up-right',
-    'down-right': 'up-left'
-  };
-
-  const oppositeDirection = oppositeDirections[computerDirection];
-  
-  // Перевіряємо чи поточний хід у протилежному напрямку
-  if (currentDirection !== oppositeDirection) {
-    return false;
-  }
-
-  // Перевіряємо чи відстань гравця менша або дорівнює відстані комп'ютера
-  return currentDistance <= computerDistance;
-}
 
 // --- Мутатори стану (ex-gameActions.ts) ---
 
@@ -422,15 +396,7 @@ export async function performMove(direction: MoveDirectionType, distance: number
 
   const scoreChanges = calculateMoveScore(currentState, newPosition, playerIndex, settings, distance, direction);
 
-  const newAvailableMoves = getAvailableMoves(
-    newPosition.row,
-    newPosition.col,
-    currentState.boardSize,
-    updatedCellVisitCounts,
-    settings.blockOnVisitCount,
-    currentState.board,
-    settings.blockModeEnabled // <-- Додай цей параметр
-  );
+  const lastMove = { direction, distance };
 
   const newBoard = currentState.board.map(row => [...row]);
   if (currentState.playerRow !== null && currentState.playerCol !== null) {
@@ -459,7 +425,6 @@ export async function performMove(direction: MoveDirectionType, distance: number
     cellVisitCounts: updatedCellVisitCounts,
     moveQueue: updatedMoveQueue,
     moveHistory: updatedMoveHistory,
-    availableMoves: newAvailableMoves,
     players: scoreChanges.players,
     penaltyPoints: scoreChanges.penaltyPoints,
     movesInBlockMode: scoreChanges.movesInBlockMode,
@@ -531,11 +496,3 @@ export function isValidMove(direction: MoveDirectionType, distance: number) {
   const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
   return figure.canMove(direction, distance);
 }
-
-/**
- * Оновити доступні ходи
- */
-export function updateAvailableMoves() {
-  const availableMoves = getAvailableMovesForFigure();
-  stateManager.applyChanges('UPDATE_AVAILABLE_MOVES', { availableMoves }, 'Update available moves');
-} 

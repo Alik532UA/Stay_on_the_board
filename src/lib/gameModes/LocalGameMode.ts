@@ -4,6 +4,8 @@ import type { IGameMode } from './gameMode.interface';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService';
 import { playerInputStore } from '$lib/stores/playerInputStore';
+import { settingsStore } from '$lib/stores/settingsStore';
+import { getAvailableMoves } from '$lib/utils/boardUtils';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { stateManager } from '$lib/services/stateManager';
 import { modalStore } from '$lib/stores/modalStore';
@@ -244,5 +246,7 @@ export class LocalGameMode implements IGameMode {
       { currentPlayerIndex: nextPlayerIndex },
       `Turn advanced to player ${nextPlayerIndex}`
     );
+
+    // Оновлення availableMoves тепер відбувається реактивно через derived store
   }
 }

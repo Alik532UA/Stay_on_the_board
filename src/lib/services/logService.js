@@ -10,17 +10,19 @@
       ANIMATION: 'animation', // Для animationStore та візуальних ефектів
       INIT: 'init',         // Для ініціалізації сторів та сервісів
       ACTION: 'action',     // Для дій користувача (кліки, хоткеї)
+      GAME_MODE: 'game_mode' // Для логіки ігрових режимів
     };
     
     // 2. Конфігурація за замовчуванням (всі групи увімкнені)
     const defaultConfig = {
       [LOG_GROUPS.STATE]: true,
       [LOG_GROUPS.LOGIC]: true,
-      [LOG_GROUPS.SCORE]: true,
-      [LOG_GROUPS.UI]: true,
+      [LOG_GROUPS.SCORE]: false,
+      [LOG_GROUPS.UI]: false,
       [LOG_GROUPS.ANIMATION]: false,
       [LOG_GROUPS.INIT]: false,
-      [LOG_GROUPS.ACTION]: true,
+      [LOG_GROUPS.ACTION]: false,
+      [LOG_GROUPS.GAME_MODE]: true,
     };
     
     const STORAGE_KEY = 'logConfig';
@@ -64,6 +66,7 @@
       [LOG_GROUPS.UI]: 'color: #FF9800; font-weight: bold;',    // Orange
       [LOG_GROUPS.ANIMATION]: 'color: #E91E63; font-weight: bold;', // Pink
       [LOG_GROUPS.INIT]: 'color: #00BCD4; font-weight: bold;',     // Cyan
+      [LOG_GROUPS.GAME_MODE]: 'color: #FF5722; font-weight: bold;', // Deep Orange
       [LOG_GROUPS.ACTION]: 'color: #FFEB3B; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;', // Yellow on dark
     };
     
@@ -93,6 +96,7 @@
       animation: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.ANIMATION, message, ...data),
       init: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.INIT, message, ...data),
       action: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.ACTION, message, ...data),
+      GAME_MODE: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.GAME_MODE, message, ...data),
     };
     
     // 5. Глобальний контролер для зручності розробника-людини

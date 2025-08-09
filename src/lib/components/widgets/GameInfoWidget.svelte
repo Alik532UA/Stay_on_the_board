@@ -84,7 +84,7 @@
         const currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
         const playerColor = getPlayerColor(currentPlayer.name);
         const playerStyle = playerColor ? `style="${getPlayerNameStyle(currentPlayer.name)}"` : '';
-        const message = `Гра почалась!<br><span ${playerStyle}>${currentPlayer.name}</span> ваша черга робити хід`;
+        const message = `Гра почалась!<br><div><span class="player-name-plate" ${playerStyle}>${currentPlayer.name}</span>, ваша черга робити хід</div>`;
         logService.ui('Returning localGame firstMove message:', message);
         return message;
       } else {
@@ -139,7 +139,7 @@
                         $lastPlayerMove.direction === 'down-right' ? $_('gameBoard.directions.downRight') :
                         $lastPlayerMove.direction;
       
-      const message = `<span ${previousPlayerStyle}>${previousPlayer.name}</span> зробив хід: ${direction} на ${$lastPlayerMove.distance}.<br><span ${currentPlayerStyle}>${currentPlayer.name}</span> ваша черга робити хід!`;
+      const message = `<div class="message-line-1"><span class="player-name-plate" ${previousPlayerStyle}>${previousPlayer.name}</span> зробив хід: ${direction} на ${$lastPlayerMove.distance}.</div><div class="message-line-2"><span class="player-name-plate" ${currentPlayerStyle}>${currentPlayer.name}</span> ваша черга робити хід!</div>`;
       logService.ui('Returning localGame playerMadeMove message:', message);
       return message;
     } else if ($isPauseBetweenMoves) {
@@ -152,7 +152,7 @@
         const currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
         const currentPlayerColor = getPlayerColor(currentPlayer.name);
         const currentPlayerStyle = currentPlayerColor ? `style="${getPlayerNameStyle(currentPlayer.name)}"` : '';
-        const message = `Хід гравця: <span ${currentPlayerStyle}>${currentPlayer.name}</span>`;
+        const message = `Хід гравця: <span class="player-name-plate" ${currentPlayerStyle}>${currentPlayer.name}</span>`;
         logService.ui('Returning localGame playerTurn message:', message);
         return message;
       }
@@ -168,7 +168,7 @@
         const currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
         const currentPlayerColor = getPlayerColor(currentPlayer.name);
         const currentPlayerStyle = currentPlayerColor ? `style="${getPlayerNameStyle(currentPlayer.name)}"` : '';
-        const message = `Гра почалась!<br><span ${currentPlayerStyle}>${currentPlayer.name}</span> ваша черга робити хід`;
+        const message = `Гра почалась!<br><div><span class="player-name-plate" ${currentPlayerStyle}>${currentPlayer.name}</span>, ваша черга робити хід</div>`;
         logService.ui('Returning localGame gameStarted message:', message);
         return message;
       } else {
@@ -357,7 +357,8 @@
   function getPlayerNameStyle(playerName: string): string {
     const color = getPlayerColor(playerName);
     if (color) {
-      return `text-shadow: 0 0 8px ${color}, 0 0 12px ${color}, 0 0 16px ${color};`;
+      // Повертаємо стиль для фону
+      return `background-color: ${color};`;
     }
     return '';
   }
@@ -370,7 +371,6 @@
     padding: 20px 12px;
     border-radius: var(--unified-border-radius);
     box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
-    text-align: center;
     font-size: 1.1em;
     color: var(--text-primary, #222);
     display: flex;
@@ -387,11 +387,25 @@
   .game-info-content {
     font-weight: 500;
     line-height: 1.4;
-    max-width: 100%;
+    width: 100%;
     word-wrap: break-word;
     opacity: 1;
     transition: opacity 0.3s ease-in-out;
     white-space: pre-line;
+    white-space: pre-line;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  :global(.message-line-1) {
+    text-align: left;
+    width: 100%;
+  }
+
+  :global(.message-line-2) {
+    text-align: right;
+    width: 100%;
   }
 
   .game-info-content.fade-out {
@@ -399,6 +413,18 @@
   }
 
 
+
+ :global(.player-name-plate) {
+   display: inline-block;
+   padding: 0px 8px;
+   border-radius: 12px;
+   color: #ffffff;
+   font-weight: bold;
+   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+   border: 1px solid rgba(255, 255, 255, 0.3);
+   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+   transition: all 0.3s ease;
+ }
 
   /* Всі стани використовують той самий фон, що й game-controls-panel */
   .game-info-widget.player-turn,

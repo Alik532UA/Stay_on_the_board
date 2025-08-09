@@ -30,7 +30,7 @@
   function getPlayerNameStyle(playerName) {
     const color = getPlayerColor(playerName);
     if (color) {
-      return `text-shadow: 0 0 8px ${color}, 0 0 12px ${color}, 0 0 16px ${color};`;
+      return `background-color: ${color};`;
     }
     return '';
   }
@@ -222,6 +222,18 @@
     box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
     backdrop-filter: var(--unified-backdrop-filter);
   }
+
+  .player-name-plate {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
 </style>
 
 {#if !$replayStore.isReplayMode}
@@ -232,7 +244,7 @@
         <div class="score-label-multiplayer">{$_('gameBoard.scoreLabel')}</div>
         {#each localGamePlayers as player}
           <div class="score-row">
-            <span style={getPlayerNameStyle(player.name)}>{player.name}:</span>
+            <span class="player-name-plate" style={getPlayerNameStyle(player.name)}>{player.name}</span>
             <!-- Оновлена логіка відображення рахунку -->
             {#if player.bonusPoints === 0 && player.penaltyPoints === 0}
               <span
