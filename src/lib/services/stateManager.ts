@@ -101,6 +101,7 @@ export class StateManager {
       case 'FINALIZE_GAME':
       case 'FIRST_MOVE_COMPLETED':
       case 'ADVANCE_TURN':
+      case 'END_GAME_LOCAL':
         // Ці дії не потребують спеціальної валідації
         break;
       default:

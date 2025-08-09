@@ -36,96 +36,38 @@
   });
 
   afterNavigate(() => {
-    // Цей код буде виконуватися КОЖНОГО РАЗУ при переході на сторінку
     const savedGameOverState = sessionStorage.getItem('replayGameOverState');
-    let isRestoring = false;
     if (savedGameOverState) {
       try {
         const parsedState = JSON.parse(savedGameOverState);
         // @ts-ignore
         gameOverStore.restoreState(parsedState);
         sessionStorage.removeItem('replayGameOverState');
-        isRestoring = true; // Встановлюємо прапорець, що ми відновлюємо стан
+
+        const savedGameState = sessionStorage.getItem('replayGameState');
+        if (savedGameState) {
+          gameState.set(JSON.parse(savedGameState));
+          sessionStorage.removeItem('replayGameState');
+        }
+
+        const gameOverState = get(gameOverStore);
+        if (gameOverState.isGameOver && gameOverState.gameResult) {
+          const { reasonKey, reasonValues } = gameOverState.gameResult;
+          // Ініціалізуємо режим гри, якщо його ще немає
+          if (!gameOrchestrator.activeGameMode) {
+            gameOrchestrator.initializeGameMode();
+          }
+          // Відновлюємо модальне вікно "немає ходів"
+          if (reasonKey === 'modal.computerNoMovesContent' || reasonKey === 'modal.playerNoMovesContent') {
+            const playerType = reasonKey === 'modal.computerNoMovesContent' ? 'computer' : 'human';
+            gameOrchestrator.activeGameMode.handleNoMoves(playerType);
+          } else {
+            gameOrchestrator.endGame(reasonKey, reasonValues);
+          }
+        }
       } catch (e) {
         console.error('Не вдалося відновити gameOverStore з sessionStorage', e);
       }
-    }
-
-    // Перевіряємо, чи є збережений стан завершення гри
-    const gameOverState = get(gameOverStore);
-    if (gameOverState.isGameOver && gameOverState.gameResult) {
-      // Відновлюємо модальне вікно з результатами гри
-      const { gameResult } = gameOverState;
-      const $t = get(_);
-      
-      let modalConfig = {};
-      
-      switch (gameResult.reasonKey) {
-        case 'modal.playerNoMovesContent':
-          modalConfig = {
-            titleKey: 'modal.playerNoMovesTitle',
-            content: { reason: $t(gameResult.reasonKey || ''), scoreDetails: gameResult.finalScoreDetails },
-            buttons: [
-              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: gameOrchestrator.continueAfterNoMoves },
-              { 
-                text: $t('modal.finishGameWithBonus', { values: { bonus: get(gameState).boardSize } }), 
-                onClick: () => gameOrchestrator.finalizeGameWithBonus('modal.gameOverReasonBonus') 
-              },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
-            ],
-            closable: false
-          };
-          break;
-        
-        case 'modal.errorContent':
-          modalConfig = {
-            titleKey: 'modal.errorTitle',
-            content: { reason: $t(gameResult.reasonKey || '', { values: gameResult.reasonValues }), scoreDetails: gameResult.finalScoreDetails },
-            buttons: [
-              { textKey: 'modal.playAgain', primary: true, onClick: () => { 
-                resetGame(); 
-                gameOverStore.resetGameOverState();
-                modalStore.closeModal(); 
-              }, isHot: true },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
-            ],
-            closable: false
-          };
-          break;
-
-        case 'modal.computerNoMovesContent':
-          modalConfig = {
-            titleKey: 'modal.computerNoMovesTitle',
-            content: { reason: $t('modal.computerNoMovesContent'), scoreDetails: gameResult.finalScoreDetails },
-            buttons: [
-              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: gameOrchestrator.continueAfterNoMoves },
-              { 
-                text: $t('modal.finishGameWithBonus', { values: { bonus: get(gameState).boardSize } }), 
-                onClick: () => gameOrchestrator.finalizeGameWithBonus('modal.gameOverReasonBonus') 
-              },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
-            ],
-            closable: false
-          };
-          break;
-
-        default:
-          modalConfig = {
-            titleKey: 'modal.gameOverTitle',
-            content: { reason: $t(gameResult.reasonKey || '', { values: gameResult.reasonValues }), scoreDetails: gameResult.finalScoreDetails },
-            buttons: [
-              { textKey: 'modal.playAgain', primary: true, onClick: () => { 
-                resetGame(); 
-                gameOverStore.resetGameOverState();
-                modalStore.closeModal(); 
-              }, isHot: true },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
-            ]
-          };
-          break;
-      }
-      
-      modalStore.showModal(modalConfig);
     }
   });
 
@@ -146,74 +88,7 @@
 
   // НАВІЩО: Логіка модальних вікон залишається тут, оскільки вона специфічна
   // для ігрового процесу, а не для layout
-  $: if ($gameState.isGameOver && $gameState.gameOverReasonKey) {
-    setTimeout(() => {
-      const reasonKey = $gameState.gameOverReasonKey;
-      const $t = get(_);
-      const reasonValues = $gameState.gameOverReasonValues || {};
-
-      let modalConfig = {};
-
-      switch (reasonKey) {
-        case 'modal.playerNoMovesContent':
-          modalConfig = {
-            titleKey: 'modal.playerNoMovesTitle',
-            content: { reason: $t(reasonKey || ''), scoreDetails: calculateFinalScore($gameState as any) },
-            buttons: [
-              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: gameOrchestrator.continueAfterNoMoves },
-              { 
-                text: $t('modal.finishGameWithBonus', { values: { bonus: $gameState.boardSize } }), 
-                onClick: () => gameOrchestrator.finalizeGameWithBonus('modal.gameOverReasonBonus') 
-              },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
-            ],
-            closable: false
-          };
-          break;
-        
-        case 'modal.errorContent':
-          modalConfig = {
-            titleKey: 'modal.errorTitle',
-            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: calculateFinalScore($gameState as any) },
-            buttons: [
-              { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); modalStore.closeModal(); }, isHot: true },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
-            ],
-            closable: false
-          };
-          break;
-
-        case 'modal.computerNoMovesContent':
-          modalConfig = {
-            titleKey: 'modal.computerNoMovesTitle',
-            content: { reason: $t('modal.computerNoMovesContent'), scoreDetails: calculateFinalScore($gameState as any) },
-            buttons: [
-              { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: gameOrchestrator.continueAfterNoMoves },
-              { 
-                text: $t('modal.finishGameWithBonus', { values: { bonus: $gameState.boardSize } }), 
-                onClick: () => gameOrchestrator.finalizeGameWithBonus('modal.gameOverReasonBonus') 
-              },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
-            ],
-            closable: false
-          };
-          break;
-
-        default:
-          modalConfig = {
-            titleKey: 'modal.gameOverTitle',
-            content: { reason: $t(reasonKey || '', { values: reasonValues }), scoreDetails: calculateFinalScore($gameState as any) },
-            buttons: [
-              { textKey: 'modal.playAgain', primary: true, onClick: () => { resetGame(); modalStore.closeModal(); }, isHot: true },
-              { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
-            ]
-          };
-          break;
-      }
-      
-      modalStore.showModal(modalConfig);
-    }, 600);
-  }
+  // Ця логіка тепер обробляється в `endGame` відповідного режиму гри
 
   function itemContent(item: {id: string, label: string}) {
     const Comp = widgetMap[item.id];

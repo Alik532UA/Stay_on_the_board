@@ -35,7 +35,7 @@ export default {
     penalty: "Keri areketler içün ceza:",
     finalScore: "Neticedeki esap:",
     yourScore: "Siziñ esabıñız:",
-    playerScore: "Oyuncu {playerNumber}: {score} bal"
+    playerScore: "{playerName}: {score} bal"
   },
   boardClickTitle: "Oyun nasıl idare etilir?",
   boardClickContent: "Oyun tahtada degil, aşağıdaki idare paneli vastasınen idare etile. Yönelişni saylamaq içün oqlarnı ve mesafeni saylamaq içün raqamlı döğmelerni qullanıñız. Tahta tek areketlerni közetmek içündür.",

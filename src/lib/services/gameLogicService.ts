@@ -19,7 +19,7 @@ export interface Move {
   distance: number;
 }
 export interface GameState {
-  score: number;
+  players: Player[];
   penaltyPoints: number;
   boardSize: number;
   movesInBlockMode: number;
@@ -78,9 +78,9 @@ export interface FinalScore {
 }
 
 export function calculateFinalScore(state: GameState): FinalScore {
-  const { score, penaltyPoints, boardSize, movesInBlockMode, jumpedBlockedCells, finishedByFinishButton, noMovesBonus, distanceBonus } = state;
+  const { players, penaltyPoints, boardSize, movesInBlockMode, jumpedBlockedCells, finishedByFinishButton, noMovesBonus, distanceBonus } = state;
   
-  const baseScore = score;
+  const baseScore = players.reduce((acc, p) => acc + p.score, 0);
   const totalPenalty = penaltyPoints;
   let sizeBonus = 0;
   if (baseScore > 0) {
@@ -146,23 +146,26 @@ function calculateMoveScore(
   settings: any, // Використовуємо any для доступу до всіх полів settingsStore
   distance: number = 1, // Додаємо параметр distance для розрахунку бонусних балів
   direction?: string // Додаємо параметр direction для перевірки "дзеркальних" ходів
-): { score: number; penaltyPoints: number; movesInBlockMode: number; jumpedBlockedCells: number; bonusPoints: number; distanceBonus: number; currentJumpedCount: number } {
+): { players: Player[]; penaltyPoints: number; movesInBlockMode: number; jumpedBlockedCells: number; bonusPoints: number; distanceBonus: number; currentJumpedCount: number; penaltyPointsForMove: number; } {
   
-  let newScore = currentState.score;
+  const newPlayers = JSON.parse(JSON.stringify(currentState.players)); // Deep copy
+  const currentPlayer = newPlayers[playerIndex];
+  const isHumanMove = currentPlayer?.type === 'human';
   let newPenaltyPoints = currentState.penaltyPoints;
   let newMovesInBlockMode = currentState.movesInBlockMode;
   let newJumpedBlockedCells = currentState.jumpedBlockedCells;
   let newBonusPoints = 0; // Додаємо змінну для бонусних балів
   let newDistanceBonus = currentState.distanceBonus || 0; // Додаємо змінну для бонусів за відстань
+  let penaltyPointsForMove = 0;
 
   // 1. Нараховуємо бали тільки за хід гравця
-  if (playerIndex === 0) {
+  if (isHumanMove) {
     if (!settings.showBoard) {
-      newScore += 3;
+      currentPlayer.score += 3;
     } else if (!settings.showQueen) {
-      newScore += 2;
+      currentPlayer.score += 2;
     } else {
-      newScore += 1;
+      currentPlayer.score += 1;
     }
   }
 
@@ -170,8 +173,6 @@ function calculateMoveScore(
   // Для локальних ігор штрафні бали не додаються до загального penaltyPoints,
   // а тільки до рахунку конкретного гравця в localGameStore
   const humanPlayersCount = currentState.players.filter((p: any) => p.type === 'human').length;
-  const currentPlayer = currentState.players[playerIndex];
-  const isHumanMove = currentPlayer?.type === 'human';
   
   logService.logic(`calculateMoveScore: humanPlayersCount = ${humanPlayersCount}, playerIndex = ${playerIndex}, isHumanMove = ${isHumanMove}`);
   
@@ -202,6 +203,7 @@ function calculateMoveScore(
           newPenaltyPoints += 2;
         } else {
           logService.score(`calculateMoveScore: НЕ додаємо штрафні бали до загального penaltyPoints (local game), будуть додані до гравця в performMove`);
+          penaltyPointsForMove = 2;
         }
       }
     }
@@ -243,13 +245,14 @@ function calculateMoveScore(
   }
 
   return {
-    score: newScore,
+    players: newPlayers,
     penaltyPoints: newPenaltyPoints,
     movesInBlockMode: newMovesInBlockMode,
     jumpedBlockedCells: newJumpedBlockedCells,
     bonusPoints: newBonusPoints,
     distanceBonus: newDistanceBonus,
-    currentJumpedCount: jumpedCount
+    currentJumpedCount: jumpedCount,
+    penaltyPointsForMove: penaltyPointsForMove
   };
 }
 
@@ -452,7 +455,11 @@ export async function performMove(direction: MoveDirectionType, distance: number
     moveQueue: updatedMoveQueue,
     moveHistory: updatedMoveHistory,
     availableMoves: newAvailableMoves,
-    ...scoreChanges
+    players: scoreChanges.players,
+    penaltyPoints: scoreChanges.penaltyPoints,
+    movesInBlockMode: scoreChanges.movesInBlockMode,
+    jumpedBlockedCells: scoreChanges.jumpedBlockedCells,
+    distanceBonus: scoreChanges.distanceBonus
   };
 
   await stateManager.applyChanges('PERFORM_MOVE', changes, `Move: ${direction}${distance}`);
@@ -494,70 +501,11 @@ export async function performMove(direction: MoveDirectionType, distance: number
       }
     }
   }
-  if (humanPlayersCount > 1) {
-    // Це локальна гра, додаємо бали до рахунку поточного гравця
-    const currentPlayer = currentStateAfterMove.players[playerIndex];
-    if (currentPlayer) {
-      const localGameState = get(localGameStore);
-      const localPlayer = localGameState.players.find(p => p.name === currentPlayer.name);
-      if (localPlayer) {
-        // Додаємо бали за хід (1 бал за кожен хід)
-        logService.score(`performMove: додаємо 1 бал гравцю ${currentPlayer.name} за хід`);
-        localGameStore.addPlayerScore(localPlayer.id, 1);
-        
-        // Додаємо бонусні бали (включають як ходи на відстань більше 1, так і перестрибування заблокованих клітинок)
-        if (scoreChanges.bonusPoints > 0) {
-          logService.score(`performMove: додаємо ${scoreChanges.bonusPoints} бонусних балів гравцю ${currentPlayer.name} (включають ходи на відстань > 1 та перестрибування заблокованих клітинок)`);
-          
-          // Формуємо детальний опис бонусних балів
-          let bonusReason = '';
-          if (distance > 1 && scoreChanges.currentJumpedCount > 0) {
-            bonusReason = `хід на відстань ${distance} (1 бал) + перестрибування ${scoreChanges.currentJumpedCount} заблокованих клітинок (${scoreChanges.currentJumpedCount} балів)`;
-          } else if (distance > 1) {
-            bonusReason = `хід на відстань ${distance} (1 бал)`;
-          } else if (scoreChanges.currentJumpedCount > 0) {
-            bonusReason = `перестрибування ${scoreChanges.currentJumpedCount} заблокованих клітинок (${scoreChanges.currentJumpedCount} балів)`;
-          }
-          
-          localGameStore.addPlayerBonusPoints(localPlayer.id, scoreChanges.bonusPoints, bonusReason);
-        }
-        
-        // Перевіряємо чи був "дзеркальний" хід для нарахування штрафних балів
-        // Перевіряємо тільки для ходів гравця (не комп'ютера)
-        if (currentPlayer.type === 'human' && currentState.moveQueue.length >= 1) {
-          // Знаходимо останній хід комп'ютера
-          const lastComputerMove = currentState.moveQueue[currentState.moveQueue.length - 1];
-          
-          // Перевіряємо чи це був хід комп'ютера (player !== 0)
-          if (lastComputerMove && lastComputerMove.player !== 0) {
-            const isMirror = isMirrorMove(
-              direction,
-              distance,
-              lastComputerMove.direction,
-              lastComputerMove.distance
-            );
-            
-            logService.logic(`performMove: перевіряємо "дзеркальний" хід:`, {
-              currentMove: { direction, distance },
-              computerMove: { direction: lastComputerMove.direction, distance: lastComputerMove.distance },
-              isMirrorMove: isMirror
-            });
-            
-            if (isMirror) {
-              logService.score(`performMove: додаємо 2 штрафних бали гравцю ${currentPlayer.name} за "дзеркальний" хід`);
-              localGameStore.addPlayerPenaltyPoints(localPlayer.id, 2);
-              logService.score(`performMove: штрафні бали додано гравцю ${currentPlayer.name}`);
-            }
-          }
-        } else if (currentPlayer.type !== 'human') {
-          logService.logic(`performMove: пропускаємо перевірку "дзеркального" ходу для комп'ютера`);
-        }
-      }
-    }
-  }
+  // Логіка нарахування балів для локальної гри тепер знаходиться в `LocalGameMode`
+  // і оновлює `gameState` напряму. `localGameStore` більше не використовується для рахунку.
   
   logService.logic('performMove: завершено успішно');
-  return { success: true, newPosition };
+  return { success: true, newPosition, bonusPoints: scoreChanges.bonusPoints, penaltyPoints: scoreChanges.penaltyPointsForMove };
 }
 
 /**

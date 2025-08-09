@@ -71,7 +71,7 @@
 <style>
   .game-controls-panel {
     background: var(--bg-secondary);
-    box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
+    box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
     border-radius: var(--unified-border-radius);
     padding: 24px 18px;
     display: flex;

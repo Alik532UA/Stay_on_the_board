@@ -19,7 +19,7 @@ import { logService } from '../services/logService.js';
  * @property {number} penaltyPoints - Штрафні бали
  * @property {number} bonusPoints - Бонусні бали
  * @property {BonusEntry[]} bonusHistory - Історія бонусних балів
- */
+*/
 
 /**
  * @typedef {Object} GameSettings
@@ -33,7 +33,8 @@ import { logService } from '../services/logService.js';
  * @typedef {Object} LocalGameState
  * @property {Player[]} players - Список гравців
  * @property {GameSettings} settings - Налаштування гри
- */
+ * @property {number[]} scoresAtRoundStart - Рахунки на початок раунду
+*/
 
 // Функція для генерації унікального ID
 const generateId = () => Date.now() + Math.random();
@@ -84,11 +85,12 @@ const createInitialState = () => {
   
   return {
     players: [
-             { id: generateId(), name: 'Гравець 1', color: player1Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
-       { id: generateId(), name: 'Гравець 2', color: player2Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
-       { id: generateId(), name: 'Гравець 3', color: player3Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
-       { id: generateId(), name: 'Гравець 4', color: player4Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) }
+             { id: generateId(), name: 'den', color: player1Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
+       { id: generateId(), name: 'Khaaaa', color: player2Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
+       { id: generateId(), name: 'Destroyter94', color: player3Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
+       { id: generateId(), name: 'MrGrom', color: player4Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) }
     ],
+    scoresAtRoundStart: [0, 0, 0, 0],
     settings: {
       boardSize: 4,
       blockModeEnabled: false,
@@ -296,6 +298,17 @@ function createLocalGameStore() {
           ...state,
           settings: { ...state.settings, ...newSettings }
         };
+      });
+    },
+
+    /**
+     * Зберігає рахунки всіх гравців на початок раунду
+     */
+    snapshotScores: () => {
+      update(state => {
+        const scores = state.players.map(p => p.bonusPoints - p.penaltyPoints);
+        logService.state('localGameStore: snapshotting scores', scores);
+        return { ...state, scoresAtRoundStart: scores };
       });
     },
 

@@ -96,7 +96,7 @@
     background: linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
     border-radius: var(--unified-border-radius);
     border: var(--unified-border);
-    box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
+    box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
     transition: background 0.25s, box-shadow 0.25s;
     margin-bottom: 16px;
     backdrop-filter: var(--unified-backdrop-filter);
@@ -392,7 +392,7 @@
     <label class="ios-switch-label">
       <div class="switch-content-wrapper">
         <div class="ios-switch">
-          <input type="checkbox" checked={$settingsStore.showBoard} on:change={() => settingsStore.toggleShowBoard()} />
+          <input type="checkbox" checked={$settingsStore.showBoard} on:change={() => settingsStore.toggleShowBoard(undefined)} />
           <span class="slider"></span>
         </div>
         <span>{$_('gameControls.showBoard')}</span>

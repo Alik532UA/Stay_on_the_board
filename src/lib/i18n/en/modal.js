@@ -35,7 +35,7 @@ export default {
     penalty: "Penalty for reverse moves:",
     finalScore: "Final score:",
     yourScore: "Your score:",
-    playerScore: "Player {playerNumber}: {score} points"
+    playerScore: "{playerName}: {score} points"
   },
   boardClickTitle: "How to control the game?",
   boardClickContent: "The game is controlled not on the board, but with the control panel below. Use the arrows to select a direction and the number buttons to select a distance. The board is only for observing the moves.",
