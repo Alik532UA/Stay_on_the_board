@@ -34,7 +34,6 @@
     --font-family-monospace: 'Fira Mono', monospace;
     --unified-radius: 18px;
     --unified-spacing: 24px;
-    --unified-shadow: 0 8px 32px #0008;
     --modal-header-color: #fff;
     --modal-body-color: #eee;
     --modal-footer-gap: 16px;
@@ -63,7 +62,7 @@
     --text-accent: #64b5f6;
     --border-color: #555;
     --shadow-color: rgba(0, 0, 0, 0.3);
-    --current-player-shadow-color: var(--shadow-color, rgba(0, 0, 0, 0.3));
+    --current-player-shadow-color: var(--shadow-color, rgba(0, 0, 0, 0.8));
     --cell-light: #8d6e63;
     --cell-dark: #5d4037;
     --cell-blocked: #626262;
@@ -105,10 +104,13 @@
   --unified-border-radius: 24px;
   
   /* Уніфікована тінь для основних елементів */
-  --unified-shadow: 0 8px 32px 0 var(--shadow-color);
+  --unified-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
   
   /* Уніфікована тінь при hover */
-  --unified-shadow-hover: 0 12px 40px 0 var(--shadow-color);
+  --unified-shadow-hover: 0 6px 20px 0 rgba(0, 0, 0, 0.5);
+
+  /* Тінь для динамічних віджетів, що змінюють колір */
+  --dynamic-widget-shadow: 0 0 16px -8px;
   
   /* Уніфіковане обведення */
   --unified-border: 1.5px solid rgba(255,255,255,0.18);

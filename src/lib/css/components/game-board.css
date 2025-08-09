@@ -215,7 +215,7 @@
   height: auto;
   margin-bottom: 32px;
   max-width: 100%;
-  box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
+  /* box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color); */
 }
 .board-bg-wrapper.hidden {
   opacity: 0;
@@ -238,7 +238,7 @@
   min-height: 0;
   background: transparent;
   border-radius: 24px;
-  box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
+  box-shadow: none;
   overflow: visible;
   margin: 0 auto;
   transition: background 0.2s, width 0.2s, height 0.2s;
@@ -532,7 +532,7 @@
   margin-right: auto;
   box-sizing: border-box;
   backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
+  /* box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color); */
   border: 1.5px solid rgba(255,255,255,0.18);
   transition: width 0.2s;
 }

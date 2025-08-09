@@ -369,7 +369,7 @@
     /* Змінено padding та видалено min-height для плавної анімації */
     padding: 20px 12px;
     border-radius: var(--unified-border-radius);
-    box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
+    box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
     text-align: center;
     font-size: 1.1em;
     color: var(--text-primary, #222);
@@ -406,7 +406,7 @@
   .game-info-widget.game-over,
   .game-info-widget.pause {
     background: var(--bg-secondary);
-    box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
+    box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
     border: var(--unified-border);
   }
 </style>

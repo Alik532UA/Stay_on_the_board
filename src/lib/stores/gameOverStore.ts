@@ -4,11 +4,8 @@ import { writable } from 'svelte/store';
  * Інтерфейс для результатів гри
  */
 export interface GameResult {
-  score: {
-    player1: number;
-    player2: number;
-  };
-  winner: 'player1' | 'player2' | 'draw' | null;
+  scores: { playerId: number; score: number }[];
+  winners: number[]; // Масив ID переможців
   reasonKey: string | null;
   reasonValues: Record<string, any> | null;
   finalScoreDetails?: {

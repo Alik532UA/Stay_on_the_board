@@ -170,16 +170,20 @@
              <div class="player-scores-container">
                <h3>Рахунки гравців:</h3>
                {#each ($modalState.content as any).playerScores as playerScore}
-                 <div class="player-score-row" class:winner={playerScore.isWinner}>
-                   <span class="player-name">{$_('modal.scoreDetails.playerScore', { 
-                     values: { 
-                       playerNumber: playerScore.playerNumber, 
-                       score: playerScore.score 
-                     } 
-                   })}</span>
-                   {#if playerScore.isWinner}
-                     <span class="winner-badge">🏆</span>
-                   {/if}
+                 <div class="player-score-row" class:winner={playerScore.isWinner} class:loser={playerScore.isLoser}>
+                   <span class="player-name">
+                     {#if playerScore.isWinner}
+                       <span class="winner-badge">🏆</span>
+                     {:else if playerScore.isLoser}
+                       <span class="loser-badge">🐚</span>
+                     {/if}
+                     {$_('modal.scoreDetails.playerScore', {
+                       values: {
+                         playerName: playerScore.playerName,
+                         score: playerScore.score
+                       }
+                     })}
+                   </span>
                  </div>
                {/each}
              </div>
@@ -684,11 +688,17 @@
   
   .player-name {
     flex: 1;
+    display: flex;
+    align-items: center;
   }
-  
-  .winner-badge {
-    margin-left: 10px;
+
+  .winner-badge, .loser-badge {
+    margin-right: 10px;
     font-size: 1.2em;
+  }
+
+  .player-score-row.loser {
+    color: var(--text-secondary);
   }
 }
 

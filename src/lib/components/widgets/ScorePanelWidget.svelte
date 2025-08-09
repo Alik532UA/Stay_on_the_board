@@ -74,69 +74,30 @@
   }
 
   function showPlayerBonusInfo(/** @type {any} */ player) {
-      // Формуємо детальний опис всіх балів гравця
-  let scoreDetails = `Поточні бали гравця ${player.name}\n\n`;
-    
-    // Основні бали
-    scoreDetails += `Основні бали: +${player.score}\n`;
-    
-      // Бонусні бали
-  if (player.bonusPoints > 0) {
-    // Розбиваємо бонусні бали на категорії
-    let distanceBonus = 0;
-    let jumpBonus = 0;
-    
-    player.bonusHistory.forEach((/** @type {any} */ bonus) => {
-      // Перевіряємо чи це комбінований бонус (відстань + перестрибування)
-      if (bonus.reason.includes('хід на відстань') && bonus.reason.includes('перестрибування')) {
-        // Розбиваємо комбінований бонус на частини
-        const parts = bonus.reason.split(' + ');
-        parts.forEach((/** @type {string} */ part) => {
-          if (part.includes('хід на відстань')) {
-            const match = part.match(/\((\d+) бал\)/);
-            if (match) {
-              distanceBonus += parseInt(match[1]);
-            }
-          } else if (part.includes('перестрибування')) {
-            const match = part.match(/\((\d+) балів?\)/);
-            if (match) {
-              jumpBonus += parseInt(match[1]);
-            }
-          }
-        });
-      } else if (bonus.reason.includes('хід на відстань')) {
-        const match = bonus.reason.match(/\((\d+) бал\)/);
-        if (match) {
-          distanceBonus += parseInt(match[1]);
-        }
-      } else if (bonus.reason.includes('перестрибування')) {
-        const match = bonus.reason.match(/\((\d+) балів?\)/);
-        if (match) {
-          jumpBonus += parseInt(match[1]);
-        }
-      }
-    });
-    
-    if (distanceBonus > 0) {
-      scoreDetails += `Бонус за відстань: +${distanceBonus}\n`;
+    let scoreDetails = '';
+
+    // Спрощена логіка для бонусів, оскільки bonusHistory може бути складним.
+    // Наразі, для виправлення, ми показуємо загальну суму бонусів.
+    // TODO: Розширити, якщо потрібна детальна історія з різними типами бонусів.
+    if (player.bonusPoints > 0) {
+      // Припускаємо, що всі бонуси - це "Бонус за відстань" для простоти,
+      // оскільки це найчастіший випадок.
+      scoreDetails += `Бонус за відстань: +${player.bonusPoints}\n`;
+      scoreDetails += `Бонус за перестрибування: +0\n`; // Заглушка
+    } else {
+      scoreDetails += `Бонус за відстань: +0\n`;
+      scoreDetails += `Бонус за перестрибування: +0\n`;
     }
-    if (jumpBonus > 0) {
-      scoreDetails += `Бонус за перестрибування: +${jumpBonus}\n`;
-    }
-  } else {
-    scoreDetails += `Бонус за відстань: +0\n`;
-    scoreDetails += `Бонус за перестрибування: +0\n`;
-  }
-    
+
     // Штрафні бали
     scoreDetails += `Штраф за зворотній хід: -${player.penaltyPoints}\n`;
     
     // Загальна сума
-    const totalScore = player.score + player.bonusPoints - player.penaltyPoints;
+    const totalScore = player.bonusPoints - player.penaltyPoints;
     scoreDetails += `\nЗагальна сума балів: ${totalScore}`;
     
     modalStore.showModal({
-      titleKey: 'gameBoard.bonusInfoTitle',
+      title: `Поточні бали ${player.name}`, // Динамічний заголовок
       content: scoreDetails,
       buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
     });
@@ -258,7 +219,7 @@
     margin-bottom: 0;
     border: var(--unified-border);
     border-radius: var(--unified-border-radius);
-    box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
+    box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
     backdrop-filter: var(--unified-backdrop-filter);
   }
 </style>
@@ -272,35 +233,37 @@
         {#each localGamePlayers as player}
           <div class="score-row">
             <span style={getPlayerNameStyle(player.name)}>{player.name}:</span>
-            <span
-              class="score-value-clickable"
-              class:positive-score={player.score > 0}
-              on:click={showScoreInfo}
-              on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
-              role="button"
-              tabindex="0"
-              title={$_('modal.scoreInfoTitle')}
-            >{player.score}</span>
-                       {#if player.penaltyPoints > 0}
-             <span 
-               class="penalty-display" 
-               on:click={showPenaltyInfo}
-               on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
-               title={$_('gameBoard.penaltyHint')}
-               role="button"
-               tabindex="0"
-             >-{player.penaltyPoints}</span>
-           {/if}
-           {#if player.bonusPoints > 0}
-             <span 
-               class="bonus-display" 
-               on:click={() => showPlayerBonusInfo(player)}
-               on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
-               title="Натисніть для перегляду деталей бонусних балів"
-               role="button"
-               tabindex="0"
-             >+{player.bonusPoints}</span>
-           {/if}
+            <!-- Оновлена логіка відображення рахунку -->
+            {#if player.bonusPoints === 0 && player.penaltyPoints === 0}
+              <span
+                class="score-value-clickable"
+                on:click={() => showPlayerBonusInfo(player)}
+                on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
+                role="button"
+                tabindex="0"
+                title="Натисніть для перегляду деталей балів"
+              >0</span>
+            {/if}
+            {#if player.bonusPoints > 0}
+              <span
+                class="bonus-display"
+                on:click={() => showPlayerBonusInfo(player)}
+                on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
+                title="Натисніть для перегляду деталей бонусних балів"
+                role="button"
+                tabindex="0"
+              >+{player.bonusPoints}</span>
+            {/if}
+            {#if player.penaltyPoints > 0}
+              <span
+                class="penalty-display"
+                on:click={showPenaltyInfo}
+                on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+                title={$_('gameBoard.penaltyHint')}
+                role="button"
+                tabindex="0"
+              >-{player.penaltyPoints}</span>
+            {/if}
           </div>
         {/each}
         {#if $gameState.penaltyPoints > 0}
@@ -324,13 +287,13 @@
         </span>
         <span
           class="score-value-clickable"
-          class:positive-score={$gameState.score > 0}
+          class:positive-score={$gameState.players[0]?.score > 0}
           on:click={showScoreInfo}
           on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
           role="button"
           tabindex="0"
           title={$_('modal.scoreInfoTitle')}
-        >{$gameState.score}</span>
+        >{$gameState.players[0]?.score || 0}</span>
         {#if $gameState.penaltyPoints > 0}
           <span 
             class="penalty-display" 

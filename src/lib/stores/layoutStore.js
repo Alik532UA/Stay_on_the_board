@@ -11,13 +11,14 @@ export const WIDGETS = {
   CONTROLS_PANEL: 'game-controls-panel',
   SETTINGS_EXPANDER: 'settings-expander',
   GAME_INFO: 'game-info-widget',
+  PLAYER_TURN_INDICATOR: 'player-turn-indicator',
 };
 
 // Структура макета за замовчуванням
 const defaultLayout = [
   {
     id: 'column-1',
-    widgets: [WIDGETS.TOP_ROW, WIDGETS.GAME_INFO, WIDGETS.BOARD_WRAPPER, WIDGETS.SCORE_PANEL],
+    widgets: [WIDGETS.TOP_ROW, WIDGETS.GAME_INFO, WIDGETS.PLAYER_TURN_INDICATOR, WIDGETS.BOARD_WRAPPER, WIDGETS.SCORE_PANEL],
   },
   {
     id: 'column-2',

@@ -11,7 +11,7 @@ import type { Direction, Move } from '$lib/services/gameLogicService';
 const initialBoardSize = 4;
 
 export type PlayerType = 'human' | 'ai' | 'remote';
-export interface Player { id: number; type: PlayerType; name: string; }
+export interface Player { id: number; type: PlayerType; name: string; score: number; }
 export type CellVisitCounts = Record<string, number>;
 export interface MoveHistoryEntry { pos: {row: number, col: number}, blocked: {row: number, col: number}[], visits?: CellVisitCounts, blockModeEnabled?: boolean }
 export interface GameState {
@@ -33,8 +33,6 @@ export interface GameState {
   currentPlayerIndex: number;
   /** Чи завершена гра. */
   isGameOver: boolean;
-  /** Поточний рахунок. */
-  score: number;
   /** Поточні штрафні очки. */
   penaltyPoints: number;
   /** Кількість ходів у block mode. */
@@ -89,8 +87,8 @@ export interface GameStateConfig {
 export function createInitialState(config: GameStateConfig = {}): GameState {
   const size = config.size ?? initialBoardSize;
   const players = config.players ?? [
-    { id: 1, type: 'human', name: 'Гравець' },
-    { id: 2, type: 'ai', name: 'Комп\'ютер' }
+    { id: 1, type: 'human', name: 'Гравець', score: 0 },
+    { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0 }
   ];
   
   const { row: initialRow, col: initialCol } = getRandomCell(size);
@@ -107,7 +105,6 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
     players,
     currentPlayerIndex: 0,
     isGameOver: false,
-    score: 0,
     penaltyPoints: 0,
     movesInBlockMode: 0,
     jumpedBlockedCells: 0,

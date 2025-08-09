@@ -13,6 +13,7 @@
   import ControlsPanelWidget from '$lib/components/widgets/ControlsPanelWidget.svelte';
   import SettingsExpanderWidget from '$lib/components/widgets/SettingsExpanderWidget.svelte';
   import GameInfoWidget from '$lib/components/widgets/GameInfoWidget.svelte';
+  import PlayerTurnIndicator from '$lib/components/widgets/PlayerTurnIndicator.svelte';
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { onMount } from 'svelte';
@@ -34,75 +35,12 @@
    */
   function showGameOverModalIfNeeded() {
     const gameOverState = get(gameOverStore);
-    const localGameState = get(localGameStore); // Отримуємо стан локальної гри
-    const $t = get(_);
-
     if (gameOverState.isGameOver && gameOverState.gameResult && gameOverState.gameResult.gameType === 'local') {
-      const { gameResult } = gameOverState;
-      
-      // Визначаємо переможця на основі даних з localGameStore
-      const losingPlayerIndex = get(gameState).currentPlayerIndex;
-      let winners: number[] = [];
-      let maxScore = -1;
-
-      for (let i = 0; i < localGameState.players.length; i++) {
-        if (i !== losingPlayerIndex) {
-          const playerScore = localGameState.players[i].score;
-          if (playerScore > maxScore) {
-            maxScore = playerScore;
-            winners = [i];
-          } else if (playerScore === maxScore) {
-            winners.push(i);
-          }
-        }
+      const { reasonKey, reasonValues } = gameOverState.gameResult;
+      if (!gameOrchestrator.activeGameMode) {
+        gameOrchestrator.initializeGameMode();
       }
-      
-      if (winners.length === 0) { // Якщо всі програли
-          for (let i = 0; i < localGameState.players.length; i++) {
-              const playerScore = localGameState.players[i].score;
-              if (playerScore > maxScore) {
-                  maxScore = playerScore;
-                  winners = [i];
-              } else if (playerScore === maxScore) {
-                  winners.push(i);
-              }
-          }
-      }
-
-      const playerScores = localGameState.players.map((player, index) => ({
-        playerNumber: index + 1,
-        name: player.name,
-        score: player.score,
-        isWinner: winners.includes(index)
-      }));
-
-      let titleKey = 'modal.gameOverTitle';
-      let winnerName = '';
-      let winnerNames = '';
-      if (winners.length === 1) {
-        titleKey = 'modal.winnerTitle';
-        winnerName = localGameState.players[winners[0]].name;
-      } else if (winners.length > 1) {
-        titleKey = 'modal.winnersTitle';
-        winnerNames = winners.map(i => localGameState.players[i].name).join(', ');
-      }
-
-      const modalContent = {
-        reason: $t(gameResult.reasonKey || '', { values: { playerName: localGameState.players[losingPlayerIndex].name } }),
-        playerScores: playerScores,
-        winnerName: winnerName,
-        winnerNumbers: winnerNames, // Додаємо імена переможців
-        scoreDetails: gameResult.finalScoreDetails
-      };
-
-      modalStore.showModal({
-        titleKey: titleKey,
-        content: modalContent,
-        buttons: [
-          { textKey: 'modal.playAgain', primary: true, onClick: gameOrchestrator.restartLocalGame, isHot: true },
-          { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: gameOrchestrator.startReplay }
-        ]
-      });
+      gameOrchestrator.endGame(reasonKey, reasonValues);
     }
   }
 
@@ -151,6 +89,7 @@
     [WIDGETS.CONTROLS_PANEL]: ControlsPanelWidget,
     [WIDGETS.SETTINGS_EXPANDER]: SettingsExpanderWidget,
     [WIDGETS.GAME_INFO]: GameInfoWidget,
+    [WIDGETS.PLAYER_TURN_INDICATOR]: PlayerTurnIndicator,
   };
 
   $: columns = $layoutStore.map(col => ({

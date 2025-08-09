@@ -10,9 +10,31 @@
   });
 
   // Реактивно оновлюємо CSS змінну при зміні кольору поточного гравця
+  /**
+   * Converts a hex color to an rgba color with a given opacity.
+   * @param {string} hex - The hex color string (e.g., "#RRGGBB").
+   * @param {number} alpha - The alpha transparency (0 to 1).
+   * @returns {string} The rgba color string.
+   */
+  function hexToRgba(hex: string, alpha: number): string {
+    if (!hex || !/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+      return 'rgba(0,0,0,0)'; // Return transparent if hex is invalid
+    }
+    let c = hex.substring(1).split('');
+    if (c.length === 3) {
+      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    }
+    const num = parseInt(c.join(''), 16);
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
   $: if (rootElement && $currentPlayerColor) {
-    console.log('[PlayerColorProvider] Setting shadow color:', $currentPlayerColor);
-    rootElement.style.setProperty('--current-player-shadow-color', $currentPlayerColor);
+    const shadowColorRgba = hexToRgba($currentPlayerColor, 0.5);
+    console.log('[PlayerColorProvider] Setting shadow color:', shadowColorRgba);
+    rootElement.style.setProperty('--current-player-shadow-color', shadowColorRgba);
     // Перевіряємо, чи змінна встановилася
     const actualValue = rootElement.style.getPropertyValue('--current-player-shadow-color');
     console.log('[PlayerColorProvider] Actual CSS variable value:', actualValue);
