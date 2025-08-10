@@ -13,6 +13,9 @@
   import { slide } from 'svelte/transition';
   import { layoutStore } from '$lib/stores/layoutStore.js';
   import { logService } from '$lib/services/logService.js';
+  import ToggleButton from '../ToggleButton.svelte';
+  import { blurOnClick } from '$lib/utils/actions';
+
   let expanderRef: HTMLDetailsElement;
   let summaryRef: HTMLElement;
   let isOpen = true;
@@ -20,15 +23,10 @@
   let contentHeight = 0;
   async function toggleExpander() {
     logService.action('Click: "Розгорнути/Згорнути налаштування" (SettingsExpanderWidget)');
-    // Перевіряємо, чи заблоковані налаштування
     if ($settingsStore.lockSettings) {
       return;
     }
     isOpen = !isOpen;
-    await tick();
-    if (contentRef) {
-      contentHeight = contentRef.scrollHeight;
-    }
   }
   let isHorizontalLayout = true;
 
@@ -36,22 +34,69 @@
     isHorizontalLayout = window.innerWidth > 1270;
   }
 
+  function fitTextAction(node: HTMLElement, dependency: any) {
+    const buttons = Array.from(node.querySelectorAll('.settings-expander__row-btn')) as HTMLElement[];
+
+    const fit = () => {
+      if (buttons.length === 0) return;
+
+      // Reset font size to get natural width
+      buttons.forEach(btn => btn.style.fontSize = '');
+
+      // Allow the browser to render the changes
+      tick().then(() => {
+        const initialFontSize = parseFloat(getComputedStyle(buttons[0]).fontSize);
+        let currentFontSize = initialFontSize;
+
+        const fontSizeStep = 0.5; // <-- Змінюйте це значення для налаштування кроку зменшення шрифту
+        // Iteratively reduce font size until it fits
+        while (node.scrollWidth > node.clientWidth && currentFontSize > 12) {
+          currentFontSize -= fontSizeStep;
+          buttons.forEach(btn => btn.style.fontSize = `${currentFontSize}px`);
+        }
+      });
+    };
+
+    const observer = new ResizeObserver(fit);
+    observer.observe(node);
+    
+    // Initial fit after the DOM has been updated
+    tick().then(fit);
+
+    return {
+      update(newDependency: any) {
+        tick().then(fit);
+      },
+      destroy() {
+        observer.disconnect();
+      }
+    };
+  }
+
   onMount(() => {
-    if (contentRef) {
-      contentHeight = contentRef.scrollHeight;
-    }
     updateLayoutMode();
     window.addEventListener('resize', updateLayoutMode);
-    return () => window.removeEventListener('resize', updateLayoutMode);
+    return () => {
+      window.removeEventListener('resize', updateLayoutMode);
+    };
   });
 
-  $: showMoves = $settingsStore.showMoves;
-  $: showBoard = $settingsStore.showBoard;
+  $: {
+    // Re-calculate height when blockModeEnabled changes, as it affects content size
+    const blockModeDependency = $settingsStore.blockModeEnabled;
+
+    if (isOpen && contentRef) {
+      tick().then(() => {
+        contentHeight = contentRef.scrollHeight;
+      });
+    } else {
+      contentHeight = 0;
+    }
+  }
+
+
   $: speechEnabled = $settingsStore.speechEnabled;
 
-  /**
-   * @param {number} increment
-   */
   function changeBoardSize(increment: number) {
     logService.action(`Click: "Змінити розмір дошки: ${increment > 0 ? '+' : ''}${increment}" (SettingsExpanderWidget)`);
     const currentSize = get(gameState).boardSize;
@@ -61,12 +106,8 @@
     }
   }
 
-  /**
-   * @param {number} count
-   */
   function selectBlockCount(count: number) {
     logService.action(`Click: "Вибір кількості блоків: ${count}" (SettingsExpanderWidget)`);
-    // Видаляю localStorage.hasSeenExpertModeWarning
     if (count > 0 && $settingsStore.showGameModeModal) {
       modalStore.showModal({
         titleKey: 'modal.expertModeTitle',
@@ -81,43 +122,78 @@
     }
   }
 
-  /**
-   * @param {Event} event
-   */
   function handleToggleAutoHideBoard(event: Event) {
     logService.action('Click: "Автоматично приховувати дошку" (SettingsExpanderWidget)');
     settingsStore.toggleAutoHideBoard();
+  }
+
+  const icons = ['visibility_off', 'grid_on', 'view_in_ar', 'rule'];
+
+  const toggleFunctions = [
+    () => settingsStore.updateSettings({ showBoard: false, showPiece: false, showMoves: false }),
+    () => {
+      const current = get(settingsStore).showBoard;
+      if (!current) {
+        settingsStore.updateSettings({ showBoard: true });
+      }
+    },
+    () => {
+      const current = get(settingsStore).showPiece;
+      if (current) {
+        settingsStore.updateSettings({ showPiece: false, showMoves: false });
+      } else {
+        settingsStore.updateSettings({ showBoard: true, showPiece: true });
+      }
+    },
+    () => {
+      const current = get(settingsStore).showMoves;
+      if (current) {
+        settingsStore.updateSettings({ showMoves: false });
+      } else {
+        settingsStore.updateSettings({ showBoard: true, showPiece: true, showMoves: true });
+      }
+    }
+  ];
+
+  function getIsActive(i: number) {
+    switch (i) {
+      case 0: return !$settingsStore.showBoard;
+      case 1: return $settingsStore.showBoard;
+      case 2: return $settingsStore.showPiece;
+      case 3: return $settingsStore.showMoves;
+      default: return false;
+    }
   }
 </script>
 
 <style>
   .settings-expander {
-    width: 100%;
-    background: linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
+    --button-height: 36px;
+    --summary-height: 64px;
+    --button-padding: 4px 8px;
+    --button-border-width: 1.5px;
+    --button-border-radius: 8px;
+    --button-font-size: 1em;
+    /* width: 100%; */
+    background: var(--bg-secondary);
     border-radius: var(--unified-border-radius);
     border: var(--unified-border);
     box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
     transition: background 0.25s, box-shadow 0.25s;
-    margin-bottom: 16px;
+    /* margin-bottom: 16px; */
     backdrop-filter: var(--unified-backdrop-filter);
   }
   .settings-expander:hover {
-    background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%);
     box-shadow: var(--unified-shadow-hover);
   }
-  
   .settings-expander.disabled {
     opacity: 0.6;
-    pointer-events: none; /* Забороняє всі кліки */
+    pointer-events: none;
     cursor: not-allowed;
   }
-  
-  .settings-summary.disabled {
-    cursor: not-allowed;
-  }
-  .settings-summary {
+  .settings-expander__summary {
     position: relative;
-    padding: 16px 20px;
+    padding: 0 20px;
     font-weight: 700;
     font-size: 1.18em;
     letter-spacing: 0.02em;
@@ -129,27 +205,32 @@
     transition: background 0.2s, margin-bottom 0.4s ease-out;
     display: flex;
     align-items: center;
-    min-height: 44px;
+    height: var(--summary-height);
+    min-height: var(--summary-height);
+    box-sizing: border-box;
     outline: none;
   }
-  .settings-summary:focus {
+  .settings-expander__summary.disabled {
+    cursor: not-allowed;
+  }
+  .settings-expander__summary:focus {
     outline: none;
     box-shadow: none;
   }
-  .settings-expander.open > .settings-summary {
+  .settings-expander.open > .settings-expander__summary {
     border-radius: var(--unified-border-radius) var(--unified-border-radius) 0 0;
   }
-  .expander-arrow {
+  .settings-expander__arrow {
     position: absolute;
     right: 16px;
     top: 50%;
     transform: translateY(-50%) rotate(0deg);
     transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
   }
-  .settings-expander.open .expander-arrow {
+  .settings-expander.open .settings-expander__arrow {
     transform: translateY(-50%) rotate(180deg);
   }
-  .expander-content {
+  .settings-expander__content {
     overflow: hidden;
     max-height: 0;
     opacity: 0;
@@ -159,178 +240,106 @@
     flex-direction: column;
     gap: 12px;
   }
-  .settings-expander.open > .expander-content {
+  .settings-expander.open > .settings-expander__content {
     max-height: 1200px;
     opacity: 1;
     padding: 0 16px 16px 16px;
   }
-  .setting-item {
+  .settings-expander__setting-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
     font-size: 1.08em;
     padding: 0;
-    min-height: 40px;
     gap: 12px;
   }
-  .board-size-control {
-    gap: 18px;
-  }
-  .size-adjuster {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .adjust-btn {
-    background: var(--control-bg);
-    color: var(--text-primary);
-    border: 1.5px solid #888;
-    border-radius: 8px;
-    width: 40px;
-    height: 40px;
-    font-size: 1.2em;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.18s, color 0.18s, border 0.18s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-  }
-  .adjust-btn:hover, .adjust-btn:focus {
-    background: var(--control-selected);
-    color: var(--control-selected-text);
-    border-color: var(--control-selected);
-    outline: none;
-  }
-  .count-selector-btn {
-    background: var(--control-bg);
-    color: var(--text-primary);
-    border: 1.5px solid #888;
-    border-radius: 8px;
-    width: 40px;
-    height: 40px;
+  .settings-expander__label {
+    font-weight: 700;
     font-size: 1em;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.18s, color 0.18s, border 0.18s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
+    text-align: center;
+    flex-grow: 1;
   }
-  .count-selector-btn.active, .count-selector-btn:hover, .count-selector-btn:focus {
-    background: var(--control-selected);
-    color: var(--control-selected-text);
-    border-color: var(--control-selected);
-    outline: none;
-  }
-  .menu-style-btn, .settings-icon-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    aspect-ratio: 1/1;
-    border-radius: 8px;
-    border: 1.5px solid #888;
-    background: none;
-    cursor: pointer;
-    padding: 0;
-    box-sizing: border-box;
-    transition: background 0.18s, border 0.18s;
-  }
-  .menu-style-btn.active, .menu-style-btn:focus, .menu-style-btn:hover,
-  .settings-icon-btn:focus, .settings-icon-btn:hover {
-    background: var(--control-selected);
-    border-color: var(--control-selected);
-    outline: none;
-  }
-  .ios-switch-label {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 1.08em;
-    min-height: 40px;
+  .settings-expander__button-group {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-  }
-  .switch-content-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .ios-switch {
-    position: relative;
-    width: 44px;
-    height: 24px;
-    min-width: 44px;
-    min-height: 24px;
-  }
-  .ios-switch input { display: none; }
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    inset: 0;
-    background: var(--toggle-off-bg);
-    border-radius: 12px;
-    transition: background 0.2s;
-  }
-  .slider:before {
-    content: '';
-    position: absolute;
-    left: 2px;
-    top: 2px;
-    width: 20px;
-    height: 20px;
-    background: #fff;
-    border-radius: 50%;
-    transition: transform 0.2s;
-  }
-  input:checked + .slider { background: var(--control-selected); }
-  input:checked + .slider:before { transform: translateX(20px); }
-  .ios-switch-label.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-  .block-mode-options {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 0 8px 50px;
-    gap: 10px;
-  }
-  .game-mode-row {
-    display: flex;
-    gap: 14px;
-    margin-bottom: 0;
-    justify-content: flex-start;
-    align-items: center;
     margin-top: 8px;
   }
-  .game-mode-btn {
+  .settings-expander__button-group--three {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .settings-expander__size-adjuster {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .settings-expander__square-btn {
     background: var(--control-bg);
     color: var(--text-primary);
-    border: 1.5px solid #888;
-    border-radius: 8px;
-    padding: 0 18px;
-    height: 40px;
-    min-width: 40px;
-    font-size: 1em;
+    border: var(--button-border-width) solid #888;
+    border-radius: var(--button-border-radius);
+    width: var(--button-height);
+    min-width: var(--button-height);
+    height: var(--button-height);
+    min-height: var(--button-height);
+    box-sizing: border-box;
+    font-size: calc(var(--button-height) * 0.5);
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, border 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .settings-expander__square-btn:hover, .settings-expander__square-btn.active {
+    background: var(--control-selected);
+    color: var(--control-selected-text);
+    border-color: var(--control-selected);
+    outline: none;
+  }
+  .settings-expander__current-size {
+    font-weight: 500;
+  }
+  .settings-expander__options-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 0 12px;
+    gap: 12px;
+  }
+  .settings-expander__game-mode-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .settings-expander__row-btn {
+    background: var(--control-bg);
+    color: var(--text-primary);
+    border: var(--button-border-width) solid #888;
+    border-radius: var(--button-border-radius);
+    padding: 0 calc(var(--button-height) * 0.3);
+    height: var(--button-height);
+    min-height: var(--button-height);
+    
+    box-sizing: border-box;
+    font-size: calc(var(--button-height) * 0.4);
     font-weight: 600;
     cursor: pointer;
     transition: background 0.18s, color 0.18s, border 0.18s;
     display: flex;
     align-items: center;
     justify-content: center;
+    white-space: nowrap;
   }
-  .game-mode-btn:hover, .game-mode-btn:focus {
-    background: var(--control-selected);
-    color: var(--control-selected-text);
+  .settings-expander__row-btn:hover, .settings-expander__row-btn:focus {
     border-color: var(--control-selected);
+    color: var(--text-primary);
     outline: none;
   }
-  .game-mode-btn.active {
+  .settings-expander__row-btn.active {
     background: var(--control-selected);
     color: var(--control-selected-text);
     border-color: var(--control-selected);
@@ -338,132 +347,135 @@
     transform: scale(1.07);
     z-index: 1;
   }
-  .game-mode-divider {
+  .settings-expander__divider {
     border: none;
     border-top: 1.5px solid var(--border-color, #444);
     margin: 0;
     width: 100%;
   }
-  .options-values {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
+  .settings-expander__section-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    text-align: center;
+    font-size: 1.1em;
   }
 </style>
 
 <div class="settings-expander {isOpen ? 'open' : ''}" class:disabled={$settingsStore.lockSettings}>
-  <div 
-    class="settings-summary" 
+  <div
+    class="settings-expander__summary"
     class:disabled={$settingsStore.lockSettings}
-    role="button" 
-    aria-label={$_('gameControls.settings')} 
-    on:click={toggleExpander} 
-    on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleExpander()} 
-    bind:this={summaryRef} 
+    role="button"
+    aria-label={$_('gameControls.settings')}
+    on:click={toggleExpander}
+    on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleExpander()}
+    bind:this={summaryRef}
     tabindex={$settingsStore.lockSettings ? -1 : 0}
   >
     {$_('gameControls.settings')}
-    <span class="expander-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <span class="settings-expander__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
   </div>
-  <div class="expander-content" bind:this={contentRef} style="max-height: {isOpen ? contentRef ? contentRef.scrollHeight + 'px' : '1200px' : '0px'}; opacity: {isOpen ? 1 : 0};">
-    <!-- Весь існуючий контент toggles переносимо сюди -->
-    <div class="game-mode-row">
-      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => settingsStore.applyGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
-      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => settingsStore.applyGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
-      <button class="game-mode-btn" class:active={$settingsStore.gameMode === 'pro'} on:click={() => settingsStore.applyGameModePreset('pro')}>{$_('gameModes.pro')}</button>
+  <div class="settings-expander__content" bind:this={contentRef} style="max-height: {contentHeight}px; opacity: {isOpen ? 1 : 0};">
+    <div class="settings-expander__game-mode-row" use:fitTextAction={$_('gameModes.beginner')}>
+      <button class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => settingsStore.applyGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
+      <button class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => settingsStore.applyGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
+      <button class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'pro'} on:click={() => settingsStore.applyGameModePreset('pro')}>{$_('gameModes.pro')}</button>
     </div>
-    <hr class="game-mode-divider" />
-    <div class="setting-item board-size-control">
-      <span>{$_('settings.boardSize')}</span>
-      <div class="size-adjuster">
-        <button 
-          class="adjust-btn" 
+    <hr class="settings-expander__divider" />
+    <div class="settings-expander__setting-item">
+      <span class="settings-expander__label">{$_('settings.boardSize')}</span>
+      <div class="settings-expander__size-adjuster">
+        <button
+          class="settings-expander__square-btn"
+          use:blurOnClick
           on:click={() => changeBoardSize(-1)}
           disabled={$gameState.boardSize <= 2}
         >-</button>
-        <span class="current-size">{$gameState.boardSize}x{$gameState.boardSize}</span>
-        <button 
-          class="adjust-btn" 
+        <span class="settings-expander__current-size">{$gameState.boardSize}x{$gameState.boardSize}</span>
+        <button
+          class="settings-expander__square-btn"
+          use:blurOnClick
           on:click={() => changeBoardSize(1)}
           disabled={$gameState.boardSize >= 9}
         >+</button>
       </div>
     </div>
-    <label class="ios-switch-label">
-      <div class="switch-content-wrapper">
-        <div class="ios-switch">
-          <input type="checkbox" checked={$settingsStore.showBoard} on:change={() => settingsStore.toggleShowBoard(undefined)} />
-          <span class="slider"></span>
-        </div>
-        <span>{$_('gameControls.showBoard')}</span>
-      </div>
-    </label>
-    <label class="ios-switch-label" class:disabled={!$settingsStore.showBoard}>
-      <div class="switch-content-wrapper">
-        <div class="ios-switch">
-          <input type="checkbox" checked={$settingsStore.showPiece} on:change={settingsStore.toggleShowPiece} disabled={!$settingsStore.showBoard} />
-          <span class="slider"></span>
-        </div>
-        <span>{$_('gameControls.showPiece')}</span>
-      </div>
-    </label>
-    <label class="ios-switch-label" class:disabled={!$settingsStore.showBoard || !$settingsStore.showPiece}>
-      <div class="switch-content-wrapper">
-        <div class="ios-switch">
-          <input type="checkbox" checked={$settingsStore.showMoves} on:change={settingsStore.toggleShowMoves} disabled={!$settingsStore.showBoard || !$settingsStore.showPiece} />
-          <span class="slider"></span>
-        </div>
-        <span>{$_('gameControls.showMoves')}</span>
-      </div>
-    </label>
-    <label class="ios-switch-label">
-      <div class="switch-content-wrapper">
-        <div class="ios-switch">
-          <input type="checkbox" checked={$settingsStore.showGameInfoWidget} on:change={() => settingsStore.toggleShowGameInfoWidget()} />
-          <span class="slider"></span>
-        </div>
-        <span>{$_('gameControls.showGameInfoWidget')}</span>
-      </div>
-    </label>
-    <label class="ios-switch-label">
-      <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={$settingsStore.autoHideBoard} on:change={handleToggleAutoHideBoard} /><span class="slider"></span></div><span>{$_('gameModes.autoHideBoard')}</span></div>
-    </label>
-    <label class="ios-switch-label">
-      <div class="switch-content-wrapper">
-        <div class="ios-switch">
-          <input 
-            type="checkbox" 
-            checked={$settingsStore.blockModeEnabled} 
-            on:change={settingsStore.toggleBlockMode} 
-          />
-          <span class="slider"></span>
-        </div>
-        <span>{$_('gameControls.blockMode')}</span>
-      </div>
-    </label>
+    <div class="settings-expander__button-group" use:fitTextAction={$_('settings.visibility.hidden')}>
+      {#each [$_('settings.visibility.hidden'), $_('settings.visibility.boardOnly'), $_('settings.visibility.withPiece'), $_('settings.visibility.withMoves')] as label, i}
+        <button
+          class="settings-expander__row-btn"
+          class:active={getIsActive(i)}
+          on:click={toggleFunctions[i]}
+        >
+          <SvgIcons name={icons[i]} />
+          {label}
+        </button>
+      {/each}
+    </div>
+    <hr class="settings-expander__divider" />
+    <h3 class="settings-expander__section-title">{$_('settings.gameInfoWidget.title')}</h3>
+    <div class="settings-expander__button-group settings-expander__button-group--three" use:fitTextAction={$_('settings.gameInfoWidget.hidden')}>
+      <button
+        class="settings-expander__row-btn"
+        class:active={$settingsStore.showGameInfoWidget === 'hidden'}
+        on:click={() => settingsStore.setGameInfoWidgetState('hidden')}
+      >
+        {$_('settings.gameInfoWidget.hidden')}
+      </button>
+      <button
+        class="settings-expander__row-btn"
+        class:active={$settingsStore.showGameInfoWidget === 'shown'}
+        on:click={() => settingsStore.setGameInfoWidgetState('shown')}
+      >
+        {$_('settings.gameInfoWidget.shown')}
+      </button>
+      <button
+        class="settings-expander__row-btn"
+        class:active={$settingsStore.showGameInfoWidget === 'compact'}
+        on:click={() => settingsStore.setGameInfoWidgetState('compact')}
+      >
+        {$_('settings.gameInfoWidget.compact')}
+      </button>
+    </div>
+    <hr class="settings-expander__divider" />
+    <ToggleButton
+      label={$_('gameModes.autoHideBoard')}
+      checked={$settingsStore.autoHideBoard}
+      on:toggle={handleToggleAutoHideBoard}
+    />
+    <ToggleButton
+      label={$_('gameControls.blockMode')}
+      checked={$settingsStore.blockModeEnabled}
+      on:toggle={settingsStore.toggleBlockMode}
+    />
     {#if $settingsStore.blockModeEnabled}
-      <div class="block-mode-options">
-        <span class="options-label">{$_('gameControls.blockAfter')}</span>
-        <div class="options-values" role="radiogroup">
+      <div class="settings-expander__options-group">
+        <span class="settings-expander__label">{$_('gameControls.blockAfter')}</span>
+        <div class="settings-expander__button-group" use:fitTextAction={$settingsStore.blockOnVisitCount}>
           {#each [0, 1, 2, 3] as count}
-            <button class="count-selector-btn" class:active={$settingsStore.blockOnVisitCount === count} on:click={() => selectBlockCount(count)}>{count}</button>
+            <button class="settings-expander__square-btn" class:active={$settingsStore.blockOnVisitCount === count} on:click={() => selectBlockCount(count)}>{count}</button>
           {/each}
         </div>
       </div>
     {/if}
-    <label class="ios-switch-label">
-      <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" bind:checked={speechEnabled} on:change={() => settingsStore.toggleSpeech(speechEnabled)} /><span class="slider"></span></div><span>{$_('gameControls.speech')}</span></div>
-      <button class="menu-style-btn settings-icon-btn" title={$_('gameControls.voiceSettingsTitle')} on:click|stopPropagation={openVoiceSettingsModal}>
+    <div class="settings-expander__setting-item">
+      <ToggleButton
+        label={$_('gameControls.speech')}
+        checked={speechEnabled}
+        on:toggle={() => settingsStore.toggleSpeech(undefined)}
+      />
+      <button class="settings-expander__square-btn" use:blurOnClick title={$_('gameControls.voiceSettingsTitle')} on:click|stopPropagation={openVoiceSettingsModal}>
         <SvgIcons name="voice-settings" />
       </button>
-    </label>
-    <hr class="game-mode-divider" />
+    </div>
+    <hr class="settings-expander__divider" />
     {#if isHorizontalLayout}
-    <div class="setting-item">
-      <span>{$_('ui.moveMenuItems')}</span>
-      <div style="display: flex; gap: 8px;">
+    <div class="settings-expander__setting-item">
+      <span class="settings-expander__label">{$_('ui.moveMenuItems')}</span>
+      <div style="display: flex; gap: 12px;">
         <button
-          class="menu-style-btn"
+          class="settings-expander__square-btn"
           aria-label="Fixed mode"
           on:click={() => columnStyleMode.set('fixed')}
           class:active={$columnStyleMode === 'fixed'}
@@ -471,7 +483,7 @@
           <SvgIcons name="fixed" />
         </button>
         <button
-          class="menu-style-btn"
+          class="settings-expander__square-btn"
           aria-label="Editing mode"
           on:click={() => columnStyleMode.set('editing')}
           class:active={$columnStyleMode === 'editing'}
@@ -479,7 +491,8 @@
           <SvgIcons name="editing" />
         </button>
         <button
-          class="menu-style-btn"
+          class="settings-expander__square-btn"
+          use:blurOnClick
           aria-label="Скинути положення меню"
           title={$_('ui.resetMenuLayout') || 'Скинути положення елементів меню'}
           on:click={() => layoutStore.resetLayout()}
@@ -492,4 +505,4 @@
     </div>
     {/if}
   </div>
-</div> 
+</div>

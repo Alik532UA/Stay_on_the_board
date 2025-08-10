@@ -8,6 +8,7 @@
 
   export let columns: { id: string, label: string, items: { id: string, label: string, props?: any }[] }[];
   export let itemContent: (item: any) => any = item => item.label;
+  export let class_name = '';
 
   const dispatch = createEventDispatcher();
 
@@ -173,10 +174,11 @@
   }
 </style>
 
-<div class="dnd-columns-container" style="margin-top: {isHorizontalLayout ? '7vh' : '0'};">
+<div class="dnd-columns-container {class_name}" style="margin-top: {isHorizontalLayout ? '7vh' : '0'};">
   {#each columns as col, i}
     <ul
       bind:this={colRefs[i]}
+      class="dnd-column"
       class:editing-column={$columnStyleMode === 'editing'}
       style={$columnStyleMode === 'editing'
         ? 'padding: 0; background: none; border-radius: 8px; list-style: none; min-height: 80px;'
@@ -184,19 +186,22 @@
       transition:slide={{ duration: 500 }}
     >
       {#if $columnStyleMode !== 'editing'}
-        <b style="color: #fff;">{col.label}</b>
+        <b class="dnd-column-header" style="color: #fff;">{col.label}</b>
       {/if}
       {#each col.items as item, j (item.id)}
         <li
+          class="dnd-item"
           style="padding: 12px; margin: 8px 0; background: none; color: #fff; border-radius: 4px; {($columnStyleMode === 'editing') ? 'cursor: grab;' : 'cursor: default;'} opacity: {dragging && dragging.id === item.id ? 0.5 : 1};"
           on:pointerdown={($columnStyleMode === 'editing') ? (e) => handlePointerDown(e, item, col.id) : undefined}
           transition:slide={{ duration: 500 }}
         >
-          {#if typeof itemContent(item) === 'function'}
-            <svelte:component this={itemContent(item)} {...item.props} />
-          {:else}
-            {itemContent(item)}
-          {/if}
+          <div class="dnd-item-content">
+            {#if typeof itemContent(item) === 'function'}
+              <svelte:component this={itemContent(item)} {...item.props} />
+            {:else}
+              {itemContent(item)}
+            {/if}
+          </div>
         </li>
       {/each}
     </ul>

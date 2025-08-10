@@ -86,7 +86,7 @@ import { computerPlayerService } from '$lib/services/computerPlayer';
 
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
     const state = get(gameState);
-    const finalScoreDetails = gameLogicService.calculateFinalScore(state as any);
+    const finalScoreDetails = gameLogicService.calculateFinalScore(state as any, 'local');
 
     const endGameChanges = {
       isGameOver: true,
@@ -149,8 +149,65 @@ import { computerPlayerService } from '$lib/services/computerPlayer';
   }
 
   async claimNoMoves(): Promise<void> {
-    // В локальній грі немає механізму "заявити про немає ходів"
-    logService.logic('claimNoMoves is not applicable in LocalGameMode');
+    const state = get(gameState);
+    const settings = get(settingsStore);
+    const availableMoves = getAvailableMoves(
+      state.playerRow,
+      state.playerCol,
+      state.boardSize,
+      state.cellVisitCounts,
+      settings.blockOnVisitCount,
+      state.board,
+      settings.blockModeEnabled,
+      null
+    );
+
+    if (Object.keys(availableMoves).length > 0) {
+      // Якщо ходи є, гравець програв
+      const currentPlayerName = state.players[state.currentPlayerIndex].name;
+      this.endGame('modal.gameOverReasonPlayerLied', { playerName: currentPlayerName });
+    } else {
+      // Якщо ходів немає, показуємо модальне вікно
+      this._handleLocalNoMoves();
+    }
+  }
+
+  private _handleLocalNoMoves(): void {
+    const state = get(gameState);
+    const currentPlayerName = state.players[state.currentPlayerIndex].name;
+
+    modalStore.showModal({
+      titleKey: 'modal.noMovesTitle',
+      contentKey: 'modal.noMovesLocalGameContent',
+      content: { playerName: currentPlayerName },
+      buttons: [
+        {
+          textKey: 'modal.continueGame',
+          onClick: () => this._continueLocalGameAfterNoMoves(),
+          primary: true,
+          isHot: true
+        },
+        {
+          textKey: 'modal.endGame',
+          onClick: () => this.endGame('modal.gameOverReasonNoMovesLeft')
+        },
+        {
+          textKey: 'modal.reviewRecord',
+          customClass: 'blue-btn',
+          onClick: () => gameOrchestrator.startReplay()
+        }
+      ]
+    });
+  }
+
+  private async _continueLocalGameAfterNoMoves(): Promise<void> {
+    await stateManager.applyChanges(
+      'CONTINUE_LOCAL_GAME',
+      { blockedCells: [] },
+      'Clearing blocked cells and continuing local game'
+    );
+    modalStore.closeModal();
+    this.advanceToNextPlayer();
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {

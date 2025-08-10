@@ -100,7 +100,7 @@
   </svg>
 {/if}
 {#if name === 'voice-settings'}
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Налаштування голосу">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -2 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Налаштування голосу">
     <path d="M20,4c-2.2,0-4,1.8-4,4v6v4l6-3h3c2.2,0,4-1.8,4-4V8c0-2.2-1.8-4-4-4H20z"/>
     <line x1="20" y1="8" x2="23" y2="8"/>
     <line x1="20" y1="11" x2="21" y2="11"/>

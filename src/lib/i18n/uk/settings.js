@@ -19,13 +19,19 @@ export default {
   styleOrange: "Помаранчева",
   reset: "Скинути налаштування",
   resetHint: "Повернути всі налаштування до стандартних значень",
-  boardSize: "Розмір дошки",
+  boardSize: "Дошка",
   boardSizeText: "Ви можете змінювати розмір ігрового поля від 2x2 до 9x9.",
   visibility: {
     title: "Видимість на дошці",
-    hidden: "Сховано",
-    boardOnly: "Лише дошка",
-    withPiece: "З фігурою",
-    withMoves: "З ходами"
+    hidden: "сховати",
+    boardOnly: "показати",
+    withPiece: "з фігурою",
+    withMoves: "з ходами"
+  },
+  gameInfoWidget: {
+    title: "Інформаційний віджет",
+    hidden: "сховати",
+    shown: "показати",
+    compact: "скорочено"
   }
 };
