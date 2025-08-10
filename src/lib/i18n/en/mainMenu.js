@@ -36,5 +36,8 @@ export default {
     fullClear: "Clear All (resets all settings)",
     keepAppearance: "Keep Appearance (theme, language)"
   },
+  gameModeModal: {
+    title: "Select Game Mode"
+  },
   dragAndDropTest: "Drag & Drop Test"
 }; 

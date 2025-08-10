@@ -2,7 +2,7 @@
   import '../css/layouts/main-menu.css';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { gameState } from '$lib/stores/gameState.js';
-  import { navigateToGame } from '$lib/services/uiService.js';
+  import { navigateToGame } from '$lib/services/uiService';
   import { logService } from '$lib/services/logService.js';
   
   import { goto } from '$app/navigation';
@@ -18,7 +18,6 @@
   import ClearCacheOptions from './ClearCacheOptions.svelte';
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
-  import { modalService } from '$lib/services/modalService.js';
   import GameModeModal from '$lib/components/GameModeModal.svelte';
 
   let showLangDropdown = false;
@@ -57,7 +56,7 @@
       titleKey: 'mainMenu.clearCacheModal.title',
       component: ClearCacheOptions,
       buttons: [
-        { textKey: 'modal.cancel', onClick: modalStore.closeModal }
+        { textKey: 'modal.cancel', onClick: () => modalStore.closeModal() }
       ]
     });
   }
@@ -110,7 +109,18 @@
   }
   function handlePlayVsComputer() {
     logService.action(`Click: "Гра проти комп'ютера" (MainMenu)`);
-    navigateToGame();
+    const settings = get(settingsStore);
+    if (settings.showGameModeModal) {
+      modalStore.showModal({
+        titleKey: 'mainMenu.gameModeModal.title',
+        component: GameModeModal,
+        buttons: [
+          { textKey: 'modal.close', onClick: () => modalStore.closeModal() }
+        ]
+      });
+    } else {
+      navigateToGame();
+    }
   }
   function handleLocalGame() {
     logService.action('Click: "Локальна гра" (MainMenu)');

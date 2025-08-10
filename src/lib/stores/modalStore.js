@@ -46,18 +46,16 @@ export const modalState = { subscribe };
 /**
  * @param {{ title?: string, titleKey?: string, content?: string|ModalContent|any, contentKey?: string, buttons?: ModalButton[], component?: any, closable?: boolean }} param0
  */
-function showModal({ title, titleKey, content, contentKey, buttons, component, closable = true }) {
+export function showModal({ title, titleKey, content, contentKey, buttons, component, closable = true }) {
   set({ isOpen: true, title, titleKey, content, contentKey, buttons: buttons || [], component, closable });
 }
 
-function closeModal() {
+export function closeModal() {
   set({ ...initialState });
 }
-
-export { closeModal };
 
 export const modalStore = {
   subscribe,
   showModal,
-  closeModal: () => set({ ...initialState })
-}; 
+  closeModal
+};

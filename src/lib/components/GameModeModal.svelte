@@ -14,7 +14,8 @@
    */
   function selectMode(mode) {
     const shouldShowFaq = settingsStore.applyGameModePreset(mode);
-    const { score, penaltyPoints, boardSize } = get(gameState);
+    const { penaltyPoints, boardSize, players } = get(gameState);
+    const score = players[0]?.score ?? 0;
     if (score === 0 && penaltyPoints === 0 && boardSize !== 4) {
       gameOrchestrator.setBoardSize(4);
       gotoAfterFaq();
@@ -81,6 +82,7 @@
     {$_('gameModes.pro')}
   </button>
 </div>
+<DontShowAgainCheckbox />
 
 <style>
   .game-mode-buttons {

@@ -276,8 +276,8 @@ function calculateMoveScore(
  * These are simple mutators that work exclusively with gameState and playerInputStore.
  */
 
-export function resetGame(options: { newSize?: number; players?: Player[]; settings?: any } = {}) {
-  const newSize = options.newSize ?? get(gameState).boardSize;
+export function resetGame(options: { newSize?: number; players?: Player[]; settings?: any } = {}, currentState: any) {
+  const newSize = options.newSize ?? currentState.boardSize;
   
   const newState = createInitialState({
     size: newSize,
@@ -312,7 +312,7 @@ export function resetGame(options: { newSize?: number; players?: Player[]; setti
   }
   
   // Скидаємо рахунки гравців в локальній грі
-  const humanPlayersCount = newState.players.filter(p => p.type === 'human').length;
+  const humanPlayersCount = newState.players.filter((p: Player) => p.type === 'human').length;
   if (humanPlayersCount > 1) {
     localGameStore.resetScores();
   }
@@ -367,11 +367,15 @@ export function setDistance(dist: number) {
  * @param distance Відстань ходу
  * @param playerIndex Індекс гравця (0 для гравця, 1 для комп'ютера)
  */
-export async function performMove(direction: MoveDirectionType, distance: number, playerIndex: number = 0) {
+export async function performMove(
+  direction: MoveDirectionType,
+  distance: number,
+  playerIndex: number = 0,
+  currentState: any,
+  settings: any
+) {
   logService.logic('performMove: початок з параметрами:', { direction, distance, playerIndex });
   
-  const currentState = get(gameState);
-  const settings = get(settingsStore);
   const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
 
   const newPosition = figure.calculateNewPosition(direction, distance);
@@ -398,7 +402,7 @@ export async function performMove(direction: MoveDirectionType, distance: number
 
   const lastMove = { direction, distance };
 
-  const newBoard = currentState.board.map(row => [...row]);
+  const newBoard = currentState.board.map((row: number[]) => [...row]);
   if (currentState.playerRow !== null && currentState.playerCol !== null) {
     newBoard[currentState.playerRow][currentState.playerCol] = 0;
   }

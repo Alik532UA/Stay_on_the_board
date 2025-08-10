@@ -25,12 +25,13 @@
   import { gameOrchestrator } from '$lib/gameOrchestrator';
   import { get } from 'svelte/store';
   import { _ } from 'svelte-i18n';
+  import { gameStore } from '$lib/stores/gameStore';
 
   onMount(() => {
     // Залишаємо тільки первинну ініціалізацію гри, якщо це не відновлення
     const isRestoring = sessionStorage.getItem('replayGameOverState') !== null;
     if (!isRestoring) {
-      resetGame();
+      resetGame({}, get(gameState));
     }
     gameOrchestrator.setCurrentGameMode('vs-computer');
     animationStore.initialize();
@@ -55,13 +56,14 @@
         if (gameOverState.isGameOver && gameOverState.gameResult) {
           const { reasonKey, reasonValues } = gameOverState.gameResult;
           // Ініціалізуємо режим гри, якщо його ще немає
-          if (!gameOrchestrator.activeGameMode) {
+          const activeGameMode = get(gameStore).mode;
+          if (!activeGameMode) {
             gameOrchestrator.initializeGameMode();
           }
           // Відновлюємо модальне вікно "немає ходів"
           if (reasonKey === 'modal.computerNoMovesContent' || reasonKey === 'modal.playerNoMovesContent') {
             const playerType = reasonKey === 'modal.computerNoMovesContent' ? 'computer' : 'human';
-            gameOrchestrator.activeGameMode.handleNoMoves(playerType);
+            activeGameMode?.handleNoMoves(playerType);
           } else {
             gameOrchestrator.endGame(reasonKey, reasonValues);
           }
