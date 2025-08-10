@@ -384,6 +384,12 @@
     overflow: hidden;
   }
 
+  .game-info-widget.compact {
+    padding: 8px 12px;
+    min-height: 40px;
+    font-size: 0.9em;
+  }
+
   .game-info-content {
     font-weight: 500;
     line-height: 1.4;
@@ -438,12 +444,13 @@
 </style>
 
 {#if $i18nReady}
-  {#if $settingsStore.showGameInfoWidget}
-    <div class="game-info-widget" 
+  {#if $settingsStore.showGameInfoWidget !== 'hidden'}
+    <div class="game-info-widget"
          class:player-turn={$isPlayerTurn && !$playerInputStore.selectedDirection && !$playerInputStore.selectedDistance}
          class:computer-turn={!$isPlayerTurn && !$lastComputerMove}
          class:game-over={$gameState.isGameOver}
          class:pause={$isPauseBetweenMoves}
+         class:compact={$settingsStore.showGameInfoWidget === 'compact'}
          transition:scaleAndSlide={{ duration: 400, easing: quintOut }}
     >
       <div class="game-info-content" class:fade-out={isAnimating}>
@@ -452,11 +459,11 @@
     </div>
   {/if}
 {:else}
-  {#if $settingsStore.showGameInfoWidget}
-    <div class="game-info-widget" transition:scaleAndSlide={{ duration: 400, easing: quintOut }}>
+  {#if $settingsStore.showGameInfoWidget !== 'hidden'}
+    <div class="game-info-widget" class:compact={$settingsStore.showGameInfoWidget === 'compact'} transition:scaleAndSlide={{ duration: 400, easing: quintOut }}>
       <div class="game-info-content">
         Loading...
       </div>
     </div>
   {/if}
-{/if} 
+{/if}

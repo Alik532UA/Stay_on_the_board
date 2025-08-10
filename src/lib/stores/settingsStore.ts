@@ -24,7 +24,7 @@ export interface SettingsState {
   autoHideBoard: boolean;
   gameMode: 'beginner' | 'experienced' | 'pro' | null;
   showGameModeModal: boolean;
-  showGameInfoWidget: boolean;
+  showGameInfoWidget: 'hidden' | 'shown' | 'compact';
   lockSettings: boolean;
 }
 
@@ -74,7 +74,7 @@ const defaultSettings: SettingsState = {
   keyConflictResolution: {},
   gameMode: null,
   showGameModeModal: true,
-  showGameInfoWidget: true,
+  showGameInfoWidget: 'shown',
   lockSettings: false,
 };
 
@@ -133,7 +133,7 @@ function loadSettings(): SettingsState {
     keyConflictResolution: safeJsonParse(localStorage.getItem('keyConflictResolution'), {}),
     gameMode: localStorage.getItem('gameMode') as 'beginner' | 'experienced' | 'pro' | null,
     showGameModeModal: localStorage.getItem('showGameModeModal') !== 'false',
-    showGameInfoWidget: localStorage.getItem('showGameInfoWidget') !== 'false',
+    showGameInfoWidget: (localStorage.getItem('showGameInfoWidget') as 'hidden' | 'shown' | 'compact') || 'shown',
     lockSettings: localStorage.getItem('lockSettings') === 'true',
   };
   const gameMode = loadedSettings.gameMode;
@@ -260,15 +260,14 @@ function createSettingsStore() {
         return { ...state, autoHideBoard: newState };
       });
     },
-    toggleShowGameInfoWidget: () => {
-      update(state => {
-        const newState = !state.showGameInfoWidget;
-        if (isBrowser) localStorage.setItem('showGameInfoWidget', String(newState));
+    setGameInfoWidgetState: (newState: 'hidden' | 'shown' | 'compact') => {
+      update((state: SettingsState) => {
+        if (isBrowser) localStorage.setItem('showGameInfoWidget', newState);
         return { ...state, showGameInfoWidget: newState };
       });
     },
     toggleBlockMode: () => {
-      update(state => {
+      update((state: SettingsState) => {
         const newState = !state.blockModeEnabled;
         if (isBrowser) localStorage.setItem('blockModeEnabled', String(newState));
         if (newState) {
@@ -326,14 +325,14 @@ function createSettingsStore() {
       let showFaq = false;
       switch (mode) {
         case 'beginner':
-          settingsToApply = { gameMode: mode, showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: true, blockModeEnabled: false, speechEnabled: false, autoHideBoard: false };
+          settingsToApply = { gameMode: mode, showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: false, speechEnabled: false, autoHideBoard: false };
           showFaq = true;
           break;
         case 'experienced':
-          settingsToApply = { gameMode: mode, showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: true, blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
+          settingsToApply = { gameMode: mode, showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
           break;
         case 'pro':
-          settingsToApply = { gameMode: mode, showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: true, blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
+          settingsToApply = { gameMode: mode, showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
           break;
       }
       methods.updateSettings(settingsToApply);

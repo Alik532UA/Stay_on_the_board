@@ -79,9 +79,9 @@ export interface FinalScore {
   totalScore: number;
 }
 
-export function calculateFinalScore(state: GameState): FinalScore {
+export function calculateFinalScore(state: GameState, gameMode: 'local' | 'vs-computer'): FinalScore {
   const { players, penaltyPoints, boardSize, movesInBlockMode, jumpedBlockedCells, finishedByFinishButton, noMovesBonus, distanceBonus } = state;
-  
+
   const baseScore = players.reduce((acc, p) => acc + p.score, 0);
   const totalPenalty = penaltyPoints;
   let sizeBonus = 0;
@@ -92,16 +92,17 @@ export function calculateFinalScore(state: GameState): FinalScore {
   const blockModeBonus = movesInBlockMode;
   const finishBonus = finishedByFinishButton ? boardSize : 0;
   const jumpBonus = jumpedBlockedCells;
-  
-  const totalScore = baseScore + sizeBonus + blockModeBonus + jumpBonus + (distanceBonus || 0) - totalPenalty + (noMovesBonus || 0) + finishBonus;
-  
+  const finalNoMovesBonus = gameMode === 'local' ? 0 : noMovesBonus || 0;
+
+  const totalScore = baseScore + sizeBonus + blockModeBonus + jumpBonus + (distanceBonus || 0) - totalPenalty + finalNoMovesBonus + finishBonus;
+
   return {
     baseScore,
     totalPenalty,
     sizeBonus,
     blockModeBonus,
     jumpBonus,
-    noMovesBonus: noMovesBonus || 0,
+    noMovesBonus: finalNoMovesBonus,
     finishBonus,
     distanceBonus: distanceBonus || 0,
     totalScore

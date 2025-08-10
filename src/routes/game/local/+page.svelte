@@ -16,7 +16,6 @@
   import GameInfoWidget from '$lib/components/widgets/GameInfoWidget.svelte';
   import PlayerTurnIndicator from '$lib/components/widgets/PlayerTurnIndicator.svelte';
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
-  import BoardVisibilitySlider from '$lib/components/widgets/BoardVisibilitySlider.svelte';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { onMount, onDestroy } from 'svelte';
   import { afterNavigate } from '$app/navigation';
@@ -99,8 +98,7 @@
     [WIDGETS.CONTROLS_PANEL]: ControlsPanelWidget,
     [WIDGETS.SETTINGS_EXPANDER]: SettingsExpanderWidget,
     [WIDGETS.GAME_INFO]: GameInfoWidget,
-    [WIDGETS.PLAYER_TURN_INDICATOR]: PlayerTurnIndicator,
-    [WIDGETS.BOARD_VISIBILITY_SLIDER]: BoardVisibilitySlider,
+    [WIDGETS.PLAYER_TURN_INDICATOR]: PlayerTurnIndicator
   };
 
   $: columns = $i18nReady ? $layoutStore.map(col => ({
@@ -108,17 +106,6 @@
     label: col.id,
     items: col.widgets.map(id => {
       const item: { id: string, label: string, props?: any } = { id, label: id };
-      if (id === WIDGETS.BOARD_VISIBILITY_SLIDER) {
-        item.props = {
-          title: $_('settings.visibility.title'),
-          labels: [
-            $_('settings.visibility.hidden'),
-            $_('settings.visibility.boardOnly'),
-            $_('settings.visibility.withPiece'),
-            $_('settings.visibility.withMoves')
-          ]
-        };
-      }
       return item;
     })
   })) : [];
@@ -146,5 +133,5 @@
   }
 </script>
 
-<DraggableColumns {columns} itemContent={itemContent} on:drop={handleDrop} />
+<DraggableColumns {columns} itemContent={itemContent} on:drop={handleDrop} class_name="game-layout" />
 <DevClearCacheButton /> 

@@ -82,7 +82,7 @@ export class VsComputerGameMode implements IGameMode {
 
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
     const state = get(gameState);
-    const finalScoreDetails = gameLogicService.calculateFinalScore(state as any);
+    const finalScoreDetails = gameLogicService.calculateFinalScore(state as any, 'vs-computer');
 
     const endGameChanges = {
       isGameOver: true,
@@ -232,7 +232,7 @@ export class VsComputerGameMode implements IGameMode {
     );
 
     const updatedState = get(gameState);
-    const potentialScoreDetails = gameLogicService.calculateFinalScore(updatedState as any);
+    const potentialScoreDetails = gameLogicService.calculateFinalScore(updatedState as any, 'vs-computer');
     const titleKey = playerType === 'human' ? 'modal.playerNoMovesTitle' : 'modal.computerNoMovesTitle';
     const contentKey = playerType === 'human' ? 'modal.playerNoMovesContent' : 'modal.computerNoMovesContent';
 
