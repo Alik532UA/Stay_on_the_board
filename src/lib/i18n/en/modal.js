@@ -43,6 +43,7 @@ export default {
   scoreInfoContent: `Points per move:\n• +1 point: with the board and queen visible.\n• +2 points: with the board visible, but the queen hidden.\n• +3 points: with the board hidden (hardest mode).\n\nAdditional bonus points are awarded automatically at the end of the game:\n• Board Size Bonus.\n• Blocked Cells Mode Bonus.\n• 'No Moves' Button Bonus.\n• Jump Bonus for jumping over blocked cells.\n• Distance Bonus (+1 point for each move with distance greater than 1).`,
   watchReplay: "Watch Replay",
   cancel: "Cancel",
+  close: "Close",
   expertModeTitle: "Don't push the horses!",
   expertModeContent: "You are enabling the hard cell blocking mode. This will make the game harder, and some cells will become unavailable after several visits. Continue?",
   expertModeConfirm: "Sure!",

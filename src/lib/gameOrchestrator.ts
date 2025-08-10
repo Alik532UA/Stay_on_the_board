@@ -3,7 +3,6 @@ import { get } from 'svelte/store';
 import { playerInputStore } from './stores/playerInputStore.js';
 import * as gameLogicService from '$lib/services/gameLogicService.js';
 import { settingsStore } from './stores/settingsStore.js';
-import { modalService } from '$lib/services/modalService.js';
 import { Figure } from '$lib/models/Figure.js';
 import { modalStore } from './stores/modalStore.js';
 import { agents } from './playerAgents.js';
@@ -18,6 +17,8 @@ import { stateManager } from './services/stateManager';
 import type { Writable } from 'svelte/store';
 import { animationStore } from './stores/animationStore';
 import { gameState } from './stores/gameState';
+import { replayService } from './services/replayService';
+import { gameStore } from './stores/gameStore';
 import { localGameStore } from './stores/localGameStore';
 import { gameOverStore } from './stores/gameOverStore';
 import { getAvailableMoves } from '$lib/utils/boardUtils.ts';
@@ -57,16 +58,16 @@ export interface ModalContent {
 }
 
 export const gameOrchestrator = {
-  activeGameMode: null as IGameMode | null,
-
   setCurrentGameMode(mode: 'local' | 'vs-computer') {
     logService.GAME_MODE(`Setting game mode to: ${mode}`);
+    let gameMode: IGameMode;
     if (mode === 'local') {
-      this.activeGameMode = new LocalGameMode();
+      gameMode = new LocalGameMode();
     } else {
-      this.activeGameMode = new VsComputerGameMode();
+      gameMode = new VsComputerGameMode();
     }
-    this.activeGameMode.initialize(get(gameState));
+    gameMode.initialize(get(gameState));
+    gameStore.setMode(gameMode);
   },
 
   initializeGameMode() {
@@ -83,7 +84,7 @@ export const gameOrchestrator = {
     if (newSize === boardSize) return;
 
     if (score === 0 && penaltyPoints === 0) {
-      gameLogicService.resetGame({ newSize });
+      gameLogicService.resetGame({ newSize }, get(gameState));
     } else {
       modalStore.showModal({
         titleKey: 'modal.resetScoreTitle',
@@ -94,7 +95,7 @@ export const gameOrchestrator = {
             customClass: 'green-btn',
             isHot: true,
             onClick: () => {
-              gameLogicService.resetGame({ newSize });
+              gameLogicService.resetGame({ newSize }, get(gameState));
               modalStore.closeModal();
             }
           },
@@ -105,43 +106,24 @@ export const gameOrchestrator = {
   },
 
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
-    if (!this.activeGameMode) this.initializeGameMode();
-    await this.activeGameMode!.endGame(reasonKey, reasonValues);
+    const activeGameMode = get(gameStore).mode;
+    if (!activeGameMode) this.initializeGameMode();
+    await activeGameMode!.endGame(reasonKey, reasonValues);
   },
 
   async restartGame(): Promise<void> {
-    if (!this.activeGameMode) this.initializeGameMode();
-    await this.activeGameMode!.restartGame();
+    const activeGameMode = get(gameStore).mode;
+    if (!activeGameMode) this.initializeGameMode();
+    await activeGameMode!.restartGame();
   },
 
   /**
    * Запускає відтворення гри.
    */
   async startReplay(): Promise<void> {
-    const state = get(gameState);
-    if (state.moveHistory && state.moveHistory.length > 0) {
-      const replayData = {
-        moveHistory: state.moveHistory,
-        boardSize: state.boardSize,
-        gameType: this._determineGameType()
-      };
-
-      try {
-        sessionStorage.setItem('replayGameState', JSON.stringify(state));
-        const localGameState = get(localGameStore);
-        if (replayData.gameType === 'local') {
-          sessionStorage.setItem('replayLocalGameState', JSON.stringify(localGameState));
-        }
-        const gameOverState = get(gameOverStore);
-        sessionStorage.setItem('replayGameOverState', JSON.stringify(gameOverState));
-        sessionStorage.setItem('replayData', JSON.stringify(replayData));
-        await goto(`${base}/replay`);
-      } catch (error) {
-        console.error("Failed to save replay data or navigate:", error);
-      }
-    } else {
-      console.warn("startReplay called with no move history.");
-    }
+    const gameType = this._determineGameType();
+    replayService.saveReplayData(gameType);
+    await goto(`${base}/replay`);
   },
 
   /**
@@ -231,11 +213,12 @@ export const gameOrchestrator = {
   },
 
   async confirmPlayerMove(): Promise<void> {
-    if (!this.activeGameMode) this.initializeGameMode();
+    const activeGameMode = get(gameStore).mode;
+    if (!activeGameMode) this.initializeGameMode();
     const playerInput = get(playerInputStore);
     if (!playerInput.selectedDirection || !playerInput.selectedDistance) return;
     
-    await this.activeGameMode!.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
+    await activeGameMode!.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
 
     const settings = get(settingsStore);
     if (settings.speechEnabled && this._determineGameType() === 'local') {
@@ -248,9 +231,11 @@ export const gameOrchestrator = {
   },
 
   async claimNoMoves(): Promise<void> {
-    if (!this.activeGameMode) this.initializeGameMode();
-    await this.activeGameMode!.claimNoMoves();
+    const activeGameMode = get(gameStore).mode;
+    if (!activeGameMode) this.initializeGameMode();
+    await activeGameMode!.claimNoMoves();
   },
 
   // All the logic is now delegated to the activeGameMode
+
 };

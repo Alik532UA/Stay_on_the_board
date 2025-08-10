@@ -24,7 +24,8 @@ export class VsComputerGameMode implements IGameMode {
 
   async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
     const state = get(gameState);
-    const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex);
+    const settings = get(settingsStore);
+    const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex, state, settings);
 
     if (moveResult.success) {
       this.onPlayerMoveSuccess();
@@ -122,7 +123,7 @@ export class VsComputerGameMode implements IGameMode {
   }
 
   async restartGame(): Promise<void> {
-    gameLogicService.resetGame();
+    gameLogicService.resetGame({}, get(gameState));
     modalStore.closeModal();
   }
 
@@ -183,7 +184,8 @@ export class VsComputerGameMode implements IGameMode {
 
     if (computerMove) {
       const { direction, distance } = computerMove;
-      const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex);
+      const settings = get(settingsStore);
+      const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex, state, settings);
 
       if (!moveResult.success) {
         this.handleNoMoves('computer');

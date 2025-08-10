@@ -23,7 +23,8 @@ export class LocalGameMode implements IGameMode {
 
   async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
     const state = get(gameState);
-    const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex);
+    const settings = get(settingsStore);
+    const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex, state, settings);
 
     if (moveResult.success) {
       // TypeScript не може звузити тип в `onPlayerMoveSuccess`, тому робимо це тут
@@ -124,7 +125,7 @@ export class LocalGameMode implements IGameMode {
     const playersData = localGameState.players.map(p => ({ name: p.name, color: p.color }));
     const boardSize = currentGameState.boardSize;
 
-    gameLogicService.resetGame({ newSize: boardSize });
+    gameLogicService.resetGame({ newSize: boardSize }, get(gameState));
     localGameStore.resetPlayersWithData(playersData);
     localGameStore.snapshotScores(); // Робимо знімок нульових рахунків
 

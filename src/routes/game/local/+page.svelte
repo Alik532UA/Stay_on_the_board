@@ -27,6 +27,7 @@
   import { gameState } from '$lib/stores/gameState.js';
   import { localGameStore } from '$lib/stores/localGameStore.js';
   import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
+  import { gameStore } from '$lib/stores/gameStore';
   
   // Примітка: onMount та ініціалізація гри тут не потрібні,
   // оскільки вони відбуваються на сторінці /local-setup
@@ -38,7 +39,7 @@
     const gameOverState = get(gameOverStore);
     if (gameOverState.isGameOver && gameOverState.gameResult && gameOverState.gameResult.gameType === 'local') {
       const { reasonKey, reasonValues } = gameOverState.gameResult;
-      if (!gameOrchestrator.activeGameMode) {
+      if (!get(gameStore).mode) {
         gameOrchestrator.initializeGameMode();
       }
       gameOrchestrator.endGame(reasonKey, reasonValues);

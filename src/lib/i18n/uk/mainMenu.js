@@ -36,5 +36,8 @@ export default {
     fullClear: "Очистити все (скине всі налаштування)",
     keepAppearance: "Зберегти вигляд (тема, мова)"
   },
+  gameModeModal: {
+    title: "Вибір режиму гри"
+  },
   dragAndDropTest: "Тест перетягування"
 }; 
