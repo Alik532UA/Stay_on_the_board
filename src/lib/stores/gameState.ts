@@ -10,7 +10,7 @@ import type { Direction, Move } from '$lib/services/gameLogicService';
 
 const initialBoardSize = 4;
 
-export type PlayerType = 'human' | 'ai' | 'remote';
+export type PlayerType = 'human' | 'ai' | 'remote' | 'computer';
 export interface Player { id: number; type: PlayerType; name: string; score: number; }
 export type CellVisitCounts = Record<string, number>;
 export interface MoveHistoryEntry { pos: {row: number, col: number}, blocked: {row: number, col: number}[], visits?: CellVisitCounts, blockModeEnabled?: boolean }

@@ -401,16 +401,16 @@
     <label class="ios-switch-label" class:disabled={!$settingsStore.showBoard}>
       <div class="switch-content-wrapper">
         <div class="ios-switch">
-          <input type="checkbox" checked={$settingsStore.showQueen} on:change={settingsStore.toggleShowQueen} disabled={!$settingsStore.showBoard} />
+          <input type="checkbox" checked={$settingsStore.showPiece} on:change={settingsStore.toggleShowPiece} disabled={!$settingsStore.showBoard} />
           <span class="slider"></span>
         </div>
-        <span>{$_('gameControls.showQueen')}</span>
+        <span>{$_('gameControls.showPiece')}</span>
       </div>
     </label>
-    <label class="ios-switch-label" class:disabled={!$settingsStore.showBoard || !$settingsStore.showQueen}>
+    <label class="ios-switch-label" class:disabled={!$settingsStore.showBoard || !$settingsStore.showPiece}>
       <div class="switch-content-wrapper">
         <div class="ios-switch">
-          <input type="checkbox" checked={$settingsStore.showMoves} on:change={settingsStore.toggleShowMoves} disabled={!$settingsStore.showBoard || !$settingsStore.showQueen} />
+          <input type="checkbox" checked={$settingsStore.showMoves} on:change={settingsStore.toggleShowMoves} disabled={!$settingsStore.showBoard || !$settingsStore.showPiece} />
           <span class="slider"></span>
         </div>
         <span>{$_('gameControls.showMoves')}</span>
@@ -452,7 +452,7 @@
       </div>
     {/if}
     <label class="ios-switch-label">
-      <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" bind:checked={speechEnabled} on:change={() => settingsStore.toggleSpeech()} /><span class="slider"></span></div><span>{$_('gameControls.speech')}</span></div>
+      <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" bind:checked={speechEnabled} on:change={() => settingsStore.toggleSpeech(speechEnabled)} /><span class="slider"></span></div><span>{$_('gameControls.speech')}</span></div>
       <button class="menu-style-btn settings-icon-btn" title={$_('gameControls.voiceSettingsTitle')} on:click|stopPropagation={openVoiceSettingsModal}>
         <SvgIcons name="voice-settings" />
       </button>

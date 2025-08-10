@@ -1,7 +1,7 @@
 export default {
   settings: "Налаштування",
   showBoard: "Показати дошку",
-  showQueen: "Показати ферзя",
+  showPiece: "Показати фігуру",
   showMoves: "Показувати доступні ходи",
   showGameInfoWidget: "Показувати інформаційне віджет",
   blockMode: "Режим заблокованих клітинок",

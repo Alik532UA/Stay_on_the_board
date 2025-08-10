@@ -2,7 +2,7 @@
 import { get } from 'svelte/store';
 import { playerInputStore } from './stores/playerInputStore.js';
 import * as gameLogicService from '$lib/services/gameLogicService.js';
-import { settingsStore } from './stores/settingsStore.js';
+import { settingsStore } from './stores/settingsStore';
 import { Figure } from '$lib/models/Figure.js';
 import { modalStore } from './stores/modalStore.js';
 import { agents } from './playerAgents.js';

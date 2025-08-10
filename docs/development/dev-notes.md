@@ -35,10 +35,10 @@ last-reviewed: 2025-01-27
 ```html
 <!-- Всередині циклу, що рендерить клітинки -->
 {#if rowIdx === playerRow && colIdx === playerCol}
-  {#each [{ id: 'queen' }] as item (item.id)}
-    <div animate:flip={{ duration: 600, easing: quintOut }}>
-      <SvgIcons name="queen" />
-    </div>
+  {#each [{ id: 'piece' }] as item (item.id)}
+     <div animate:flip={{ duration: 600, easing: quintOut }}>
+       <SvgIcons name="piece" />
+     </div>
   {/each}
 {/if}
 ```

@@ -1,6 +1,6 @@
 // svelte-app/src/lib/i18n/init.js
 import { register, init, getLocaleFromNavigator, locale } from 'svelte-i18n';
-import { settingsStore } from '$lib/stores/settingsStore.js';
+import { settingsStore } from '$lib/stores/settingsStore.ts';
 import { get, writable } from 'svelte/store';
 
 export const i18nReady = writable(false);

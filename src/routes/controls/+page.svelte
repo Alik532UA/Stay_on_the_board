@@ -1,10 +1,10 @@
 <script>
   import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
   import { _ } from 'svelte-i18n';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { settingsStore } from '$lib/stores/settingsStore.ts';
   import { onMount } from 'svelte';
 
-  /** @type {{ action: string, index: number } | null} */
+  /** @type {{ action: import('$lib/stores/settingsStore.ts').KeybindingAction, index: number } | null} */
   let listeningFor = null;
 
   /**
@@ -50,7 +50,7 @@
   })();
 
   /**
-   * @param {string} action
+   * @param {import('$lib/stores/settingsStore.ts').KeybindingAction} action
    * @param {number} [index=-1]
    */
   function listenForKey(action, index = -1) {
@@ -58,18 +58,15 @@
   }
 
   /**
-   * @param {string} action
+   * @param {import('$lib/stores/settingsStore.ts').KeybindingAction} action
    * @param {number} index
    */
   function removeKey(action, index) {
-    const updatedKeys = [...keybindings[action]];
+    const newKeybindings = { ...$settingsStore.keybindings };
+    const updatedKeys = [...newKeybindings[action]];
     updatedKeys.splice(index, 1);
-    settingsStore.updateSettings({
-      keybindings: {
-        ...keybindings,
-        [action]: updatedKeys
-      }
-    });
+    newKeybindings[action] = updatedKeys;
+    settingsStore.updateSettings({ keybindings: newKeybindings });
   }
 
   /** @param {KeyboardEvent} event */
@@ -81,7 +78,7 @@
         return;
       }
       const { action, index } = listeningFor;
-      const newKeybindings = { ...keybindings };
+      const newKeybindings = { ...$settingsStore.keybindings };
       const keysForAction = [...(newKeybindings[action] || [])];
       if (index !== -1) {
         keysForAction[index] = event.code;
@@ -121,20 +118,20 @@
                   class="key-button"
                   class:listening={listeningFor?.action === action && listeningFor?.index === i}
                   class:conflict={conflicts.has(key)}
-                  on:click={() => listenForKey(action, i)}
+                  on:click={() => listenForKey(/** @type {import('$lib/stores/settingsStore').KeybindingAction} */(action), i)}
                 >
                   {listeningFor?.action === action && listeningFor?.index === i
                     ? $_('controlsPage.pressKey')
                     : (key ? key.replace(/^Key|^Digit/, '') : 'N/A')}
                 </button>
-                <button class="remove-key-btn" title={$_('controlsPage.removeKey')} on:click={() => removeKey(action, i)}>×</button>
+                <button class="remove-key-btn" title={$_('controlsPage.removeKey')} on:click={() => removeKey(/** @type {import('$lib/stores/settingsStore').KeybindingAction} */(action), i)}>×</button>
               </div>
             {/each}
             {#if (keybindings[action]?.length || 0) < 8}
               {#if listeningFor?.action === action && listeningFor?.index === -1}
                 <span class="press-key-hint">{$_('controlsPage.pressKey') || 'Натисніть клавішу'}</span>
               {:else}
-                <button class="add-key-btn" on:click={() => listenForKey(action, -1)}>+</button>
+                <button class="add-key-btn" on:click={() => listenForKey(/** @type {import('$lib/stores/settingsStore').KeybindingAction} */(action), -1)}>+</button>
               {/if}
             {/if}
           </div>

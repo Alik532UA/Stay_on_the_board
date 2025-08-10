@@ -20,7 +20,7 @@
 <script lang="ts">
 	import Header from './Header.svelte';
 	import '../app.css';
-	import { settingsStore } from '$lib/stores/settingsStore.js';
+	import { settingsStore } from '$lib/stores/settingsStore.ts';
 	import { get } from 'svelte/store';
 	import { initializeI18n, i18nReady } from '$lib/i18n/init.js';
 	import { assets } from '$app/paths';

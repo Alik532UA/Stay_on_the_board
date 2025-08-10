@@ -6,7 +6,7 @@ status: pending
 
 ### Description
 
-After the player makes a move, the computer's counter-move is animated on the board. During this animation, the new set of available moves (for the player's next turn) appears before the queen piece has finished moving to its new square.
+After the player makes a move, the computer's counter-move is animated on the board. During this animation, the new set of available moves (for the player's next turn) appears before the piece has finished moving to its new square.
 
 ### Steps to Reproduce
 
@@ -16,8 +16,8 @@ After the player makes a move, the computer's counter-move is animated on the bo
 
 ### Actual Result
 
-The queen piece starts animating to its new position. While it is still in transit, the dots indicating the next set of available moves appear on the board.
+The piece starts animating to its new position. While it is still in transit, the dots indicating the next set of available moves appear on the board.
 
 ### Expected Result
 
-The queen piece should complete its animation to the new square. Only after the animation is finished should the new set of available move dots appear. 
+The piece should complete its animation to the new square. Only after the animation is finished should the new set of available move dots appear.

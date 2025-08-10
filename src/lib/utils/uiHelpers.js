@@ -36,7 +36,7 @@ export function showClearCacheModal() {
         textKey: 'mainMenu.clearCacheModal.fullClear',
         customClass: 'danger-btn',
         onClick: () => {
-          logService.addLog('Повне очищення кешу', 'info');
+          logService.ui('Повне очищення кешу', 'info');
           clearCache({ keepAppearance: false });
           modalStore.closeModal();
         },
@@ -46,7 +46,7 @@ export function showClearCacheModal() {
         primary: true,
         isHot: true,
         onClick: () => {
-          logService.addLog('Очищення кешу зі збереженням вигляду', 'info');
+          logService.ui('Очищення кешу зі збереженням вигляду', 'info');
           clearCache({ keepAppearance: true });
           modalStore.closeModal();
         },

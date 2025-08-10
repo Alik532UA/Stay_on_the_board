@@ -1,6 +1,6 @@
 import * as gameLogicService from '$lib/services/gameLogicService.js';
 import { getAvailableMoves } from '$lib/utils/boardUtils.ts';
-import { settingsStore } from './stores/settingsStore.js';
+import { settingsStore } from './stores/settingsStore.ts';
 import { get } from 'svelte/store';
 
 /**
@@ -18,7 +18,7 @@ function getComputerMove(state) {
   if (playerRow === null || playerCol === null) return null;
   
   // Передаємо поточний стан дошки, щоб врахувати зайняті клітинки
-  const moves = getAvailableMoves(playerRow, playerCol, boardSize, cellVisitCounts, blockOnVisitCount, board, blockModeEnabled);
+  const moves = getAvailableMoves(playerRow, playerCol, boardSize, cellVisitCounts, blockOnVisitCount, board, blockModeEnabled, null);
   if (!moves.length) return null;
 
   const chosenMove = moves[Math.floor(Math.random() * moves.length)];

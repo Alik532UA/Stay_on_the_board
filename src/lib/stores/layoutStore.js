@@ -12,6 +12,7 @@ export const WIDGETS = {
   SETTINGS_EXPANDER: 'settings-expander',
   GAME_INFO: 'game-info-widget',
   PLAYER_TURN_INDICATOR: 'player-turn-indicator',
+  BOARD_VISIBILITY_SLIDER: 'board-visibility-slider',
 };
 
 // Структура макета за замовчуванням
@@ -26,7 +27,7 @@ const defaultLayout = [
   },
   {
     id: 'column-3',
-    widgets: [WIDGETS.SETTINGS_EXPANDER],
+    widgets: [WIDGETS.SETTINGS_EXPANDER, WIDGETS.BOARD_VISIBILITY_SLIDER],
   },
 ];
 

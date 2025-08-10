@@ -6,7 +6,7 @@
   import { onMount } from 'svelte';
   import { _ } from 'svelte-i18n';
 
-  export let columns: { id: string, label: string, items: { id: string, label: string }[] }[];
+  export let columns: { id: string, label: string, items: { id: string, label: string, props?: any }[] }[];
   export let itemContent: (item: any) => any = item => item.label;
 
   const dispatch = createEventDispatcher();
@@ -193,7 +193,7 @@
           transition:slide={{ duration: 500 }}
         >
           {#if typeof itemContent(item) === 'function'}
-            <svelte:component this={itemContent(item)} />
+            <svelte:component this={itemContent(item)} {...item.props} />
           {:else}
             {itemContent(item)}
           {/if}

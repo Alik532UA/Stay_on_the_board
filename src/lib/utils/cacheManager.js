@@ -24,7 +24,7 @@ export function clearCache(options = {}) {
     keysToKeep.add('speechEnabled');
     keysToKeep.add('selectedVoiceURI');
     keysToKeep.add('blockModeEnabled');
-    keysToKeep.add('showQueen');
+    keysToKeep.add('showPiece');
     keysToKeep.add('blockOnVisitCount');
     keysToKeep.add('keybindings');
     keysToKeep.add('keyConflictResolution');

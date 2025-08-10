@@ -25,12 +25,11 @@ describe('Local Game Integration', () => {
       playerCol: 1,
       availableMoves: [],
       players: [
-        { id: 1, type: 'human', name: 'Гравець' },
-        { id: 2, type: 'ai', name: 'Комп\'ютер' }
+        { id: 1, type: 'human', name: 'Гравець', score: 0 },
+        { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0 }
       ],
       currentPlayerIndex: 0,
       isGameOver: false,
-      score: 0,
       penaltyPoints: 0,
       movesInBlockMode: 0,
       jumpedBlockedCells: 0,
@@ -65,7 +64,8 @@ describe('Local Game Integration', () => {
       const gamePlayers = localState.players.map(player => ({
         id: player.id,
         name: player.name,
-        type: /** @type {const} */ ('human')
+        type: /** @type {const} */ ('human'),
+        score: 0
       }));
 
       expect(gamePlayers).toHaveLength(3);
@@ -110,7 +110,8 @@ describe('Local Game Integration', () => {
       const gamePlayers = localState.players.map(player => ({
         id: player.id,
         name: player.name,
-        type: /** @type {const} */ ('human')
+        type: /** @type {const} */ ('human'),
+        score: 0
       }));
 
       // Ініціалізуємо гру
@@ -147,7 +148,8 @@ describe('Local Game Integration', () => {
       const gamePlayers = localState.players.map(player => ({
         id: player.id,
         name: player.name,
-        type: /** @type {const} */ ('human')
+        type: /** @type {const} */ ('human'),
+        score: 0
       }));
 
       // Ініціалізуємо гру
@@ -207,7 +209,7 @@ describe('Local Game Integration', () => {
         autoHideBoard: localState.settings.autoHideBoard,
         lockSettings: localState.settings.lockSettings,
         showBoard: true,
-        showQueen: true,
+        showPiece: true,
         showMoves: true
       });
 
@@ -216,7 +218,7 @@ describe('Local Game Integration', () => {
       expect(settingsState.autoHideBoard).toBe(true);
       expect(settingsState.lockSettings).toBe(true);
       expect(settingsState.showBoard).toBe(true);
-      expect(settingsState.showQueen).toBe(true);
+      expect(settingsState.showPiece).toBe(true);
       expect(settingsState.showMoves).toBe(true);
     });
   });
@@ -230,7 +232,8 @@ describe('Local Game Integration', () => {
       const gamePlayers = localState.players.map(player => ({
         id: player.id,
         name: player.name,
-        type: /** @type {const} */ ('human')
+        type: /** @type {const} */ ('human'),
+        score: 0
       }));
 
       expect(gamePlayers).toHaveLength(2);
@@ -250,7 +253,8 @@ describe('Local Game Integration', () => {
       const gamePlayers = localState.players.map(player => ({
         id: player.id,
         name: player.name,
-        type: /** @type {const} */ ('human')
+        type: /** @type {const} */ ('human'),
+        score: 0
       }));
 
       expect(gamePlayers).toHaveLength(8);
@@ -282,7 +286,8 @@ describe('Local Game Integration', () => {
       const gamePlayers = localState.players.map(player => ({
         id: player.id,
         name: player.name || `Гравець ${player.id}`,
-        type: /** @type {const} */ ('human')
+        type: /** @type {const} */ ('human'),
+        score: 0
       }));
 
       expect(gamePlayers[0].name).toBe('');

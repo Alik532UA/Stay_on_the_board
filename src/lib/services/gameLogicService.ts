@@ -6,7 +6,7 @@ import { playerInputStore } from '../stores/playerInputStore';
 import { gameState, createInitialState, type Player } from '../stores/gameState'; // Тепер цей імпорт безпечний
 import { getAvailableMoves, isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
 import { lastPlayerMove } from '$lib/stores/derivedState';
-import { settingsStore } from '../stores/settingsStore.js';
+import { settingsStore } from '../stores/settingsStore';
 import { stateManager } from './stateManager';
 import { localGameStore } from '../stores/localGameStore.js';
 import { logService } from './logService.js';
@@ -164,7 +164,7 @@ function calculateMoveScore(
   if (isHumanMove) {
     if (!settings.showBoard) {
       currentPlayer.score += 3;
-    } else if (!settings.showQueen) {
+    } else if (!settings.showPiece) {
       currentPlayer.score += 2;
     } else {
       currentPlayer.score += 1;
@@ -299,14 +299,14 @@ export function resetGame(options: { newSize?: number; players?: Player[]; setti
       lockSettings: options.settings.lockSettings,
       // Гарантуємо, що дошка видима на початку гри
       showBoard: true,
-      showQueen: true,
+      showPiece: true,
       showMoves: true
     });
   } else {
     // Стандартні налаштування видимості для нової гри
     settingsStore.updateSettings({
       showBoard: true,
-      showQueen: true,
+      showPiece: true,
       showMoves: true
     });
   }

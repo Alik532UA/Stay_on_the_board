@@ -15,8 +15,8 @@ When the user clicks "Грати ще раз" (Play Again) from the "Game Over" 
 
 ### Actual Result
 
-The board briefly shows the "Available Moves" from the previous game. Then, the new "Available Moves" for the new game appear. Finally, the queen piece animates into its new starting position.
+The board briefly shows the "Available Moves" from the previous game. Then, the new "Available Moves" for the new game appear. Finally, the piece animates into its new starting position.
 
 ### Expected Result
 
-The board should first become completely empty (no queen, no available moves). Then, the queen should smoothly appear in its new random position. After the queen has appeared, the new "Available Moves" should fade in. 
+The board should first become completely empty (no piece, no available moves). Then, the piece should smoothly appear in its new random position. After the piece has appeared, the new "Available Moves" should fade in.

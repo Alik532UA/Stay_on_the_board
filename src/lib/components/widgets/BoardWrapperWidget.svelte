@@ -39,14 +39,14 @@
   });
 
   // --- Додаємо автозапуск чекбоксів перед першим ходом користувача ---
-  // НАВІЩО: Гарантуємо, що всі візуальні опції (showBoard, showQueen, showMoves) будуть активовані для коректного UX при старті нової гри.
+  // НАВІЩО: Гарантуємо, що всі візуальні опції (showBoard, showPiece, showMoves) будуть активовані для коректного UX при старті нової гри.
   function enableAllGameCheckboxesIfNeeded() {
     const s = get(settingsStore);
     let changed = false;
     if (!s.showBoard) { settingsStore.toggleShowBoard(true); changed = true; }
-    if (!s.showQueen) { settingsStore.toggleShowQueen(); changed = true; }
+    if (!s.showPiece) { settingsStore.toggleShowPiece(); changed = true; }
     if (!s.showMoves) { settingsStore.toggleShowMoves(); changed = true; }
-    // Якщо showQueen був вимкнений, showMoves міг автоматично вимкнутись, тому ще раз вмикаємо
+    // Якщо showPiece був вимкнений, showMoves міг автоматично вимкнутись, тому ще раз вмикаємо
     if (!get(settingsStore).showMoves) { settingsStore.toggleShowMoves(); }
   }
 
@@ -195,7 +195,7 @@
           {/each}
         {/each}
         
-        {#if $settingsStore.showQueen && $visualPosition.row !== null && $visualPosition.col !== null}
+        {#if $settingsStore.showPiece && $visualPosition.row !== null && $visualPosition.col !== null}
           <PlayerPiece
             row={$visualPosition.row}
             col={$visualPosition.col}

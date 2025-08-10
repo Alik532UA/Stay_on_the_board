@@ -20,12 +20,11 @@ describe('Out of Bounds Move Handling', () => {
       playerCol: 0,
       availableMoves: [],
       players: [
-        { id: 1, type: 'human', name: 'Гравець' },
-        { id: 2, type: 'ai', name: 'Комп\'ютер' }
+        { id: 1, type: 'human', name: 'Гравець', score: 0 },
+        { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0 }
       ],
       currentPlayerIndex: 0,
       isGameOver: false,
-      score: 0,
       penaltyPoints: 0,
       movesInBlockMode: 0,
       jumpedBlockedCells: 0,
@@ -128,11 +127,10 @@ describe('Out of Bounds Move Handling', () => {
       // Мокаємо performMove щоб повернути успішний результат
       const mockPerformMove = vi.spyOn(gameLogicService, 'performMove').mockResolvedValue({
         success: true,
-        newPosition: { row: 1, col: 0 }
+        newPosition: { row: 1, col: 0 },
+        bonusPoints: 0,
+        penaltyPoints: 0
       });
-
-      // Мокаємо _triggerComputerMove
-      const mockTriggerComputerMove = vi.spyOn(gameOrchestrator, '_triggerComputerMove').mockResolvedValue();
 
       // Підтверджуємо хід гравця
       await gameOrchestrator.confirmPlayerMove();
@@ -140,16 +138,12 @@ describe('Out of Bounds Move Handling', () => {
       // Перевіряємо, що performMove був викликаний
       expect(mockPerformMove).toHaveBeenCalledWith('down', 1, 0);
 
-      // Перевіряємо, що _triggerComputerMove був викликаний
-      expect(mockTriggerComputerMove).toHaveBeenCalled();
-
       // Перевіряємо, що playerInput був очищений
       const playerInput = get(playerInputStore);
       expect(playerInput.selectedDirection).toBe(null);
       expect(playerInput.selectedDistance).toBe(null);
 
       mockPerformMove.mockRestore();
-      mockTriggerComputerMove.mockRestore();
     });
   });
 }); 

@@ -221,7 +221,7 @@ author: ""
       {#if ($appState.isReplayMode || $settingsStore.showQueen) && $replayPosition}
         {#key $appState.gameId}
           <div class="player-piece" style="top: {$replayPosition.row * (100 / $appState.boardSize)}%; left: {$replayPosition.col * (100 / $appState.boardSize)}%;">
-            <div class="piece-container"><SvgIcons name="queen" /></div>
+            <div class="piece-container"><SvgIcons name="piece" /></div>
           </div>
         {/key}
       {/if}

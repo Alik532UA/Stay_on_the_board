@@ -2,7 +2,8 @@
   import { localGameStore } from '$lib/stores/localGameStore.js';
   import { _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
-  import { resetGame } from '$lib/services/gameLogicService.js';
+  import { resetGame } from '$lib/services/gameLogicService';
+  import type { PlayerType } from '$lib/stores/gameState';
   import { navigationService } from '$lib/services/navigationService.js';
   import ColorPicker from './ColorPicker.svelte';
   import { logService } from '$lib/services/logService.js';
@@ -15,20 +16,23 @@
     const gamePlayers = players.map(player => ({
       id: player.id,
       name: player.name,
-      type: 'human' as const,
+      type: player.isComputer ? 'computer' : 'human',
       score: player.score
-    }));
+    } as const));
     
     // Ініціалізуємо стан гри з поточними налаштуваннями
-    resetGame({
-      newSize: settings.boardSize,
-      players: gamePlayers,
-      settings: {
-        blockModeEnabled: settings.blockModeEnabled,
-        autoHideBoard: settings.autoHideBoard,
-        lockSettings: settings.lockSettings
-      }
-    });
+    resetGame(
+      {
+        newSize: settings.boardSize,
+        players: gamePlayers,
+        settings: {
+          blockModeEnabled: settings.blockModeEnabled,
+          autoHideBoard: settings.autoHideBoard,
+          lockSettings: settings.lockSettings
+        }
+      },
+      get(localGameStore)
+    );
 
     // Робимо знімок початкових (нульових) рахунків перед стартом
     localGameStore.snapshotScores();
@@ -44,7 +48,7 @@
   <div class="player-list">
     {#each $localGameStore.players as player (player.id)}
       <div class="player-row">
-        <ColorPicker 
+        <ColorPicker
           value={player.color}
           on:change={(e) => {
             console.log('PlayerManager: ColorPicker change event received', e.detail);
@@ -52,15 +56,22 @@
             localGameStore.updatePlayer(player.id, { color: e.detail.value });
           }}
         />
-        <input 
-          type="text" 
+        <button
+          class="player-type-btn"
+          title={$_('localGame.togglePlayerType')}
+          on:click={() => localGameStore.updatePlayer(player.id, { isComputer: !player.isComputer })}
+        >
+          {player.isComputer ? '🤖' : '👤'}
+        </button>
+        <input
+          type="text"
           class="player-name-input"
           placeholder="Ім'я гравця"
           bind:value={player.name}
           on:input={(e) => localGameStore.updatePlayer(player.id, { name: e.currentTarget.value })}
         />
-        <button 
-          class="remove-player-btn" 
+        <button
+          class="remove-player-btn"
           title={$_('localGame.removePlayer')}
           on:click={() => {
             logService.action(`Click: "Видалити гравця: ${player.name}" (PlayerManager)`);
@@ -116,6 +127,23 @@
     display: flex;
     align-items: center;
     gap: 12px;
+  }
+
+  .player-type-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 8px;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
 
   .player-name-input {

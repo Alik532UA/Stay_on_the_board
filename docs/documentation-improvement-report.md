@@ -20,7 +20,7 @@
 ### ✅ Крок 2: Покращення взаємних посилань
 
 - [x] Додано перехресні посилання між ключовими документами:
-  - `docs/archive/bug-reports/BUG-026-queen-position-skips-player-move.md` → `docs/architecture/PATTERNS-asynchronous-state-visualization.md`
+  - `docs/archive/bug-reports/BUG-026-piece-position-skips-player-move.md` → `docs/architecture/PATTERNS-asynchronous-state-visualization.md`
   - `docs/elements/CENTER_INFO_ELEMENT.md` → `docs/logic/UI_COMPONENTS.md`
   - `docs/plans/architecture-improvement-plan-v4.md` → `docs/ARCHITECTURE.md`
   - `docs/architecture/GAME_LOGIC_AND_DATA_FLOW.md` → пов'язані документи
@@ -91,7 +91,7 @@
 - `docs/development/DEV_NOTES.md` - додано метадані та посилання
 - `docs/elements/CENTER_INFO_ELEMENT.md` - додано посилання
 - `docs/plans/architecture-improvement-plan-v4.md` - додано посилання
-- `docs/archive/bug-reports/BUG-026-queen-position-skips-player-move.md` - додано посилання
+- `docs/archive/bug-reports/BUG-026-piece-position-skips-player-move.md` - додано посилання
 - 25+ файлів з уніфікованими статусами
 
 ---

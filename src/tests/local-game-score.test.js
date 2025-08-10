@@ -22,14 +22,13 @@ describe('Local Game Score', () => {
       boardSize: 4,
       playerRow: 2,
       playerCol: 2,
-      score: 0,
       isGameOver: false,
       isFirstMove: false,
       wasResumed: false,
       currentPlayerIndex: 0,
       players: [
-        { id: 1, type: 'human', name: 'Гравець 1' },
-        { id: 2, type: 'human', name: 'Гравець 2' }
+        { id: 1, type: 'human', name: 'Гравець 1', score: 0 },
+        { id: 2, type: 'human', name: 'Гравець 2', score: 0 }
       ],
       moveQueue: [],
       availableMoves: [],

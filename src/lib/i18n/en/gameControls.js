@@ -1,7 +1,7 @@
 export default {
   settings: "Settings",
   showBoard: "Show Board",
-  showQueen: "Show Queen",
+  showPiece: "Show Piece",
   showMoves: "Show Available Moves",
   showGameInfoWidget: "Show Info Widget",
   blockMode: "Blocked Cells Mode",

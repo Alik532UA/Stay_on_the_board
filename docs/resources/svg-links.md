@@ -10,7 +10,7 @@ https://www.svgrepo.com/show/375990/clear-all.svg
 
 https://www.svgrepo.com/show/165233/coin.svg
 
-https://www.svgrepo.com/show/210409/monarchy-queen.svg
+https://www.svgrepo.com/show/493135/piece.svg
 
 https://www.svgrepo.com/show/384145/female-user-talk-chat.svg
 

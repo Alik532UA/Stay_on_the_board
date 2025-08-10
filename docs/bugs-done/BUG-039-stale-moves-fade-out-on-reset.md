@@ -6,7 +6,7 @@ status: pending
 
 ### Description
 
-When starting a new game by clicking "Play Again", the available move dots from the previous game don't disappear instantly. Instead, they perform a fade-out animation, which overlaps with the appearance of the new queen, creating a visually incorrect sequence.
+When starting a new game by clicking "Play Again", the available move dots from the previous game don't disappear instantly. Instead, they perform a fade-out animation, which overlaps with the appearance of the new piece, creating a visually incorrect sequence.
 
 ### Steps to Reproduce
 
@@ -17,11 +17,11 @@ When starting a new game by clicking "Play Again", the available move dots from 
 
 1.  The old "Available Moves" are visible.
 2.  The old "Available Moves" slowly fade out.
-3.  While they are fading, the new queen appears.
+3.  While they are fading, the new piece appears.
 4.  The new "Available Moves" appear.
 
 ### Expected Result
 
-1.  The board is instantly empty (no queen, no move dots).
-2.  The new queen smoothly appears.
-3.  After the queen has appeared, the new "Available Moves" fade in. 
+1.  The board is instantly empty (no piece, no move dots).
+2.  The new piece smoothly appears.
+3.  After the piece has appeared, the new "Available Moves" fade in.

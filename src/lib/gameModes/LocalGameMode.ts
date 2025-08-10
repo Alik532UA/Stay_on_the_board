@@ -15,11 +15,13 @@ import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { localGameStore } from '$lib/stores/localGameStore';
 import { logService } from '$lib/services/logService';
 import { lastPlayerMove } from '$lib/stores/derivedState';
-
-export class LocalGameMode implements IGameMode {
-  initialize(initialState: GameState): void {
-    // Ініціалізація для локальної гри відбувається в `local-setup`
-  }
+import { computerPlayerService } from '$lib/services/computerPlayer';
+ 
+ export class LocalGameMode implements IGameMode {
+   initialize(initialState: GameState): void {
+     // Ініціалізація для локальної гри відбувається в `local-setup`
+     this.checkComputerTurn();
+   }
 
   async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
     const state = get(gameState);
@@ -133,7 +135,7 @@ export class LocalGameMode implements IGameMode {
     const newPlayersForGameState = newLocalState.players.map(p => ({
       id: p.id,
       name: p.name,
-      type: 'human' as const
+      type: p.isComputer ? 'computer' : 'human'
     }));
 
     await stateManager.applyChanges(
@@ -159,7 +161,7 @@ export class LocalGameMode implements IGameMode {
     return get(localGameStore).players.map(p => ({
       id: p.id,
       name: p.name,
-      type: 'human',
+      type: p.isComputer ? 'computer' : 'human',
       score: p.score
     }));
   }
@@ -249,5 +251,25 @@ export class LocalGameMode implements IGameMode {
     );
 
     // Оновлення availableMoves тепер відбувається реактивно через derived store
+
+    this.checkComputerTurn();
+  }
+
+  private async checkComputerTurn(): Promise<void> {
+    const state = get(gameState);
+    const currentPlayer = state.players[state.currentPlayerIndex];
+
+    if (currentPlayer.type === 'computer') {
+      // Додаємо невелику затримку для імітації "роздумів" комп'ютера
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const move = await computerPlayerService.makeMove();
+      if (move) {
+        await this.handlePlayerMove(move.direction, move.distance);
+      } else {
+        // Якщо комп'ютер не може зробити хід, це означає кінець гри для нього
+        this.endGame('modal.gameOverReasonPlayerBlocked');
+      }
+    }
   }
 }
