@@ -19,13 +19,12 @@ describe('Multiplayer Game Logic', () => {
       playerCol: 1,
       availableMoves: [],
       players: [
-        { id: 1, type: 'human', name: 'Гравець 1' },
-        { id: 2, type: 'human', name: 'Гравець 2' },
-        { id: 3, type: 'ai', name: 'Комп\'ютер' }
+        { id: 1, type: 'human', name: 'Гравець 1', score: 0 },
+        { id: 2, type: 'human', name: 'Гравець 2', score: 0 },
+        { id: 3, type: 'ai', name: 'Комп\'ютер', score: 0 }
       ],
       currentPlayerIndex: 0,
       isGameOver: false,
-      score: 0,
       penaltyPoints: 0,
       movesInBlockMode: 0,
       jumpedBlockedCells: 0,
@@ -160,9 +159,9 @@ describe('Multiplayer Game Logic', () => {
       gameState.set({
         ...get(gameState),
         players: [
-          { id: 1, type: 'human', name: 'Гравець 1' },
-          { id: 2, type: 'human', name: 'Гравець 2' },
-          { id: 3, type: 'human', name: 'Гравець 3' }
+          { id: 1, type: 'human', name: 'Гравець 1', score: 0 },
+          { id: 2, type: 'human', name: 'Гравець 2', score: 0 },
+          { id: 3, type: 'human', name: 'Гравець 3', score: 0 }
         ]
       });
 
@@ -189,8 +188,8 @@ describe('Multiplayer Game Logic', () => {
       gameState.set({
         ...get(gameState),
         players: [
-          { id: 1, type: 'ai', name: 'AI 1' },
-          { id: 2, type: 'ai', name: 'AI 2' }
+          { id: 1, type: 'ai', name: 'AI 1', score: 0 },
+          { id: 2, type: 'ai', name: 'AI 2', score: 0 }
         ],
         currentPlayerIndex: 0
       });
@@ -218,7 +217,7 @@ describe('Multiplayer Game Logic', () => {
       gameState.set({
         ...get(gameState),
         players: [
-          { id: 1, type: 'human', name: 'Єдиний гравець' }
+          { id: 1, type: 'human', name: 'Єдиний гравець', score: 0 }
         ],
         currentPlayerIndex: 0
       });
@@ -243,7 +242,8 @@ describe('Multiplayer Game Logic', () => {
       const manyPlayers = Array.from({ length: 5 }, (_, i) => ({
         id: i + 1,
         type: /** @type {const} */ ('human'),
-        name: `Гравець ${i + 1}`
+        name: `Гравець ${i + 1}`,
+        score: 0
       }));
 
       gameState.set({

@@ -20,12 +20,11 @@ describe('Game Logic - Правила ходів', () => {
       playerCol: 1,
       availableMoves: [],
       players: [
-        { id: 1, type: 'human', name: 'Гравець' },
-        { id: 2, type: 'ai', name: 'Комп\'ютер' }
+        { id: 1, type: 'human', name: 'Гравець', score: 0 },
+        { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0 }
       ],
       currentPlayerIndex: 0,
       isGameOver: false,
-      score: 0,
       penaltyPoints: 0,
       movesInBlockMode: 0,
       jumpedBlockedCells: 0,

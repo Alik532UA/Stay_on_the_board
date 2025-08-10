@@ -40,12 +40,11 @@ describe('Replay Functionality', () => {
       playerCol: 2,
       availableMoves: [],
       players: [
-        { id: 1, type: 'human', name: 'Player' },
-        { id: 2, type: 'ai', name: 'AI' }
+        { id: 1, type: 'human', name: 'Player', score: 0 },
+        { id: 2, type: 'ai', name: 'AI', score: 0 }
       ],
       currentPlayerIndex: 0,
       isGameOver: false,
-      score: 10,
       penaltyPoints: 0,
       movesInBlockMode: 0,
       jumpedBlockedCells: 0,

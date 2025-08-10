@@ -11,10 +11,12 @@
   import ScorePanelWidget from '$lib/components/widgets/ScorePanelWidget.svelte';
   import BoardWrapperWidget from '$lib/components/widgets/BoardWrapperWidget.svelte';
   import ControlsPanelWidget from '$lib/components/widgets/ControlsPanelWidget.svelte';
+  import { logService } from '$lib/services/logService.js';
   import SettingsExpanderWidget from '$lib/components/widgets/SettingsExpanderWidget.svelte';
   import GameInfoWidget from '$lib/components/widgets/GameInfoWidget.svelte';
   import PlayerTurnIndicator from '$lib/components/widgets/PlayerTurnIndicator.svelte';
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
+  import BoardVisibilitySlider from '$lib/components/widgets/BoardVisibilitySlider.svelte';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { onMount, onDestroy } from 'svelte';
   import { afterNavigate } from '$app/navigation';
@@ -24,6 +26,7 @@
   import { gameOrchestrator } from '$lib/gameOrchestrator';
   import { get } from 'svelte/store';
   import { _ } from 'svelte-i18n';
+  import { i18nReady } from '$lib/i18n/init.js';
   import { gameState } from '$lib/stores/gameState.js';
   import { localGameStore } from '$lib/stores/localGameStore.js';
   import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
@@ -97,18 +100,31 @@
     [WIDGETS.SETTINGS_EXPANDER]: SettingsExpanderWidget,
     [WIDGETS.GAME_INFO]: GameInfoWidget,
     [WIDGETS.PLAYER_TURN_INDICATOR]: PlayerTurnIndicator,
+    [WIDGETS.BOARD_VISIBILITY_SLIDER]: BoardVisibilitySlider,
   };
 
-  $: columns = $layoutStore.map(col => ({
+  $: columns = $i18nReady ? $layoutStore.map(col => ({
     id: col.id,
     label: col.id,
-    items: col.widgets.map(id => ({ id, label: id }))
-  }));
+    items: col.widgets.map(id => {
+      const item: { id: string, label: string, props?: any } = { id, label: id };
+      if (id === WIDGETS.BOARD_VISIBILITY_SLIDER) {
+        item.props = {
+          title: $_('settings.visibility.title'),
+          labels: [
+            $_('settings.visibility.hidden'),
+            $_('settings.visibility.boardOnly'),
+            $_('settings.visibility.withPiece'),
+            $_('settings.visibility.withMoves')
+          ]
+        };
+      }
+      return item;
+    })
+  })) : [];
 
   function itemContent(item: {id: string, label: string}) {
-    const Comp = widgetMap[item.id];
-    if (Comp) return Comp;
-    return item.id;
+    return widgetMap[item.id] || item.id;
   }
 
   function handleDrop(e: CustomEvent<{dragging: {id: string, label: string}, dragSourceCol: string, dropTargetCol: string, dropIndex: number}>) {

@@ -21,7 +21,6 @@ describe('Store Synchronization Tests', () => {
       playerRow: 0,
       playerCol: 0,
       boardSize: 8,
-      score: 0,
       penaltyPoints: 0,
       isGameOver: false,
       moveHistory: [],
@@ -32,8 +31,8 @@ describe('Store Synchronization Tests', () => {
       gameId: Date.now(),
       currentPlayerIndex: 0,
       players: [
-        { id: 0, name: 'Player 1', type: 'human' },
-        { id: 1, name: 'AI', type: 'ai' }
+        { id: 0, name: 'Player 1', type: 'human', score: 0 },
+        { id: 1, name: 'AI', type: 'ai', score: 0 }
       ],
       movesInBlockMode: 0,
       jumpedBlockedCells: 0,
@@ -57,6 +56,5 @@ describe('Store Synchronization Tests', () => {
     // Логічні дані не повинні змінитися
     expect(currentGameState.playerRow).toBe(initialGameState.playerRow);
     expect(currentGameState.playerCol).toBe(initialGameState.playerCol);
-    expect(currentGameState.score).toBe(initialGameState.score);
   });
 }); 

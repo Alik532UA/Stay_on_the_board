@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { settingsStore } from '$lib/stores/settingsStore.ts';
   import { _ } from 'svelte-i18n';
   let dontShowAgain = false;
   $: dontShowAgain = !$settingsStore.showGameModeModal;

@@ -1,7 +1,7 @@
 export default {
   settings: "Instellingen",
   showBoard: "Toon Bord",
-  showQueen: "Toon Koningin",
+  showPiece: "Toon Stuk",
   showMoves: "Toon Beschikbare Zetten",
   showGameInfoWidget: "Toon Info Widget",
   blockMode: "Geblokkeerde Cellen Modus",

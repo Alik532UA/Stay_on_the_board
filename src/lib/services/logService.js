@@ -16,13 +16,13 @@
     // 2. Конфігурація за замовчуванням (всі групи увімкнені)
     const defaultConfig = {
       [LOG_GROUPS.STATE]: true,
-      [LOG_GROUPS.LOGIC]: true,
+      [LOG_GROUPS.LOGIC]: false,
       [LOG_GROUPS.SCORE]: false,
-      [LOG_GROUPS.UI]: false,
+      [LOG_GROUPS.UI]: true,
       [LOG_GROUPS.ANIMATION]: false,
       [LOG_GROUPS.INIT]: false,
       [LOG_GROUPS.ACTION]: false,
-      [LOG_GROUPS.GAME_MODE]: true,
+      [LOG_GROUPS.GAME_MODE]: false,
     };
     
     const STORAGE_KEY = 'logConfig';

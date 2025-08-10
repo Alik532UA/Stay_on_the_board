@@ -16,6 +16,7 @@ import { logService } from '../services/logService.js';
  * @property {string} name - Ім'я гравця
  * @property {string} color - Колір гравця
  * @property {number} score - Рахунок гравця
+ * @property {boolean} isComputer - Чи є гравець комп'ютером
  * @property {number} penaltyPoints - Штрафні бали
  * @property {number} bonusPoints - Бонусні бали
  * @property {BonusEntry[]} bonusHistory - Історія бонусних балів
@@ -102,10 +103,10 @@ const createInitialState = () => {
   
   return {
     players: [
-             { id: generateId(), name: 'den', color: player1Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
-       { id: generateId(), name: 'Khaaaa', color: player2Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
-       { id: generateId(), name: 'Destroyter94', color: player3Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
-       { id: generateId(), name: 'MrGrom', color: player4Color, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) }
+      { id: generateId(), name: 'den', color: player1Color, score: 0, isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
+      { id: generateId(), name: 'Khaaaa', color: player2Color, score: 0, isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
+      { id: generateId(), name: 'Destroyter94', color: player3Color, score: 0, isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) },
+      { id: generateId(), name: 'MrGrom', color: player4Color, score: 0, isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) }
     ],
     scoresAtRoundStart: [0, 0, 0, 0],
     settings: {
@@ -138,6 +139,7 @@ function createLocalGameStore() {
           name: getRandomUnusedName(state.players.map(p => p.name)),
           color: getRandomUnusedColor(usedColors),
           score: 0,
+          isComputer: false,
           penaltyPoints: 0,
           bonusPoints: 0,
           bonusHistory: /** @type {BonusEntry[]} */ ([])
@@ -163,6 +165,7 @@ function createLocalGameStore() {
           name: name,
           color: color,
           score: 0,
+          isComputer: false,
           penaltyPoints: 0,
           bonusPoints: 0,
           bonusHistory: /** @type {BonusEntry[]} */ ([])
@@ -298,7 +301,7 @@ function createLocalGameStore() {
       update(state => {
         return {
           ...state,
-          players: state.players.map(p => ({ ...p, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) }))
+          players: state.players.map(p => ({ ...p, score: 0, isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: /** @type {BonusEntry[]} */ ([]) }))
         };
       });
     },
@@ -351,6 +354,7 @@ function createLocalGameStore() {
           name: playerData.name,
           color: playerData.color,
           score: 0,
+          isComputer: false,
           penaltyPoints: 0,
           bonusPoints: 0,
           bonusHistory: /** @type {BonusEntry[]} */ ([])

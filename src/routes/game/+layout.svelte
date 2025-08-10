@@ -7,7 +7,7 @@
   import Modal from '$lib/components/Modal.svelte';
   import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
   import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore.js';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { settingsStore } from '$lib/stores/settingsStore.ts';
   import { get } from 'svelte/store';
   import { setDirection, setDistance } from '$lib/services/gameLogicService.js';
   import { gameOrchestrator } from '$lib/gameOrchestrator';
@@ -40,7 +40,7 @@
         settingsStore.toggleBlockMode();
         break;
       case 'toggle-board':
-        settingsStore.toggleShowBoard();
+        settingsStore.toggleShowBoard(undefined);
         break;
     }
     switch (action) {

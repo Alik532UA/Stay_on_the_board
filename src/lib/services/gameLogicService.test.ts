@@ -23,7 +23,6 @@ describe('Game Logic Service', () => {
       playerRow: 0,
       playerCol: 0,
       boardSize: 8,
-      score: 0,
       penaltyPoints: 0,
       isGameOver: false,
       moveHistory: [],
@@ -34,8 +33,8 @@ describe('Game Logic Service', () => {
       gameId: Date.now(),
       currentPlayerIndex: 0,
       players: [
-        { id: 0, name: 'Player 1', type: 'human' },
-        { id: 1, name: 'AI', type: 'ai' }
+        { id: 0, name: 'Player 1', type: 'human', score: 0 },
+        { id: 1, name: 'AI', type: 'ai', score: 0 }
       ],
       movesInBlockMode: 0,
       jumpedBlockedCells: 0,
@@ -52,7 +51,7 @@ describe('Game Logic Service', () => {
 
   test('performMove повинен працювати правильно', async () => {
     const state = get(gameState);
-    const moveResult = await performMove('down', 1);
+    const moveResult = await performMove('down', 1, 0, get(gameState), get(settingsStore));
     
     expect(moveResult.success).toBe(true);
     expect(moveResult.newPosition).toBeDefined();
@@ -61,7 +60,7 @@ describe('Game Logic Service', () => {
   });
 
   test('performMove повинен перевіряти межі дошки', async () => {
-    const moveResult = await performMove('up', 1);
+    const moveResult = await performMove('up', 1, 0, get(gameState), get(settingsStore));
     
     expect(moveResult.success).toBe(false);
     // Перевіряємо, що є помилка або error властивість
@@ -73,7 +72,7 @@ describe('Game Logic Service', () => {
     gameState.update(state => ({ ...state, boardSize: 8 }));
     
     // Скидаємо гру з новим розміром 6
-    resetGame({ newSize: 6 });
+    resetGame({ newSize: 6 }, get(gameState));
     
     const newState = get(gameState);
     
@@ -92,7 +91,7 @@ describe('Game Logic Service', () => {
     gameState.update(state => ({ ...state, boardSize: 5 }));
     
     // Скидаємо гру без вказівки нового розміру
-    resetGame();
+    resetGame({}, get(gameState));
     
     const newState = get(gameState);
     
@@ -105,18 +104,18 @@ describe('Game Logic Service', () => {
     // Спочатку вимикаємо всі налаштування видимості
     settingsStore.updateSettings({
       showBoard: false,
-      showQueen: false,
+      showPiece: false,
       showMoves: false
     });
     
     // Скидаємо гру
-    resetGame();
+    resetGame({}, get(gameState));
     
     const settings = get(settingsStore);
     
     // Перевіряємо, що налаштування видимості встановлені в true
     expect(settings.showBoard).toBe(true);
-    expect(settings.showQueen).toBe(true);
+    expect(settings.showPiece).toBe(true);
     expect(settings.showMoves).toBe(true);
   });
 }); 

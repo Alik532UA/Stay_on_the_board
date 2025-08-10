@@ -20,7 +20,6 @@ describe('StateManager', () => {
       playerRow: 0,
       playerCol: 0,
       boardSize: 8,
-      score: 0,
       penaltyPoints: 0,
       isGameOver: false,
       moveHistory: [{ pos: { row: 0, col: 0 }, blocked: [], visits: {} }],
@@ -31,8 +30,8 @@ describe('StateManager', () => {
       gameId: Date.now(),
       currentPlayerIndex: 0,
       players: [
-        { id: 0, name: 'Player 1', type: 'human' },
-        { id: 1, name: 'AI', type: 'ai' }
+        { id: 0, name: 'Player 1', type: 'human', score: 0 },
+        { id: 1, name: 'AI', type: 'ai', score: 0 }
       ],
       movesInBlockMode: 0,
       jumpedBlockedCells: 0,
@@ -70,8 +69,7 @@ describe('StateManager', () => {
   test('stateManager повинен застосовувати зміни стану', async () => {
     const changes = {
       playerRow: 2,
-      playerCol: 2,
-      score: 10
+      playerCol: 2
     };
 
     const result = await stateManager.applyChanges('MOVE_PLAYER', changes, 'Test move');
@@ -80,6 +78,5 @@ describe('StateManager', () => {
     const state = get(gameState);
     expect(state.playerRow).toBe(2);
     expect(state.playerCol).toBe(2);
-    expect(state.score).toBe(10);
   });
 }); 

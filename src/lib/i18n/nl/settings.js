@@ -20,5 +20,12 @@ export default {
   reset: "Instellingen resetten",
   resetHint: "Alle instellingen terugzetten naar hun standaardwaarden",
   boardSize: "Bordgrootte",
-  boardSizeText: "Je kunt de grootte van het speelveld veranderen van 2x2 naar 9x9."
-}; 
+  boardSizeText: "Je kunt de grootte van het speelveld veranderen van 2x2 naar 9x9.",
+  visibility: {
+    title: "Zichtbaarheid van het bord",
+    hidden: "Verborgen",
+    boardOnly: "Alleen bord",
+    withPiece: "Met stuk",
+    withMoves: "Met zetten"
+  }
+};

@@ -40,14 +40,13 @@ describe('Local Game Messages', () => {
       boardSize: 5,
       playerRow: 2,
       playerCol: 2,
-      score: 0,
       isGameOver: false,
       isFirstMove: false,
       wasResumed: false,
       currentPlayerIndex: 0,
       players: [
-        /** @type {any} */ ({ name: 'Гравець 1', type: 'human', color: '#ff0000' }),
-        /** @type {any} */ ({ name: 'Гравець 2', type: 'human', color: '#00ff00' })
+        /** @type {any} */ ({ name: 'Гравець 1', type: 'human', color: '#ff0000', score: 0 }),
+        /** @type {any} */ ({ name: 'Гравець 2', type: 'human', color: '#00ff00', score: 0 })
       ],
       moveQueue: [],
       availableMoves: [],
@@ -124,8 +123,8 @@ describe('Local Game Messages', () => {
       gameState.update(state => ({
         ...state,
         players: [
-          { id: 1, name: 'Гравець', type: 'human' },
-          { id: 2, name: 'Комп\'ютер', type: 'ai' }
+          { id: 1, name: 'Гравець', type: 'human', score: 0 },
+          { id: 2, name: 'Комп\'ютер', type: 'ai', score: 0 }
         ],
         moveQueue: [
           { player: 1, direction: 'up', distance: 1, row: 1, col: 2 }
@@ -157,8 +156,8 @@ describe('Local Game Messages', () => {
       gameState.update(state => ({
         ...state,
         players: [
-          { id: 1, name: 'Гравець', type: 'human' },
-          { id: 2, name: 'Комп\'ютер', type: 'ai' }
+          { id: 1, name: 'Гравець', type: 'human', score: 0 },
+          { id: 2, name: 'Комп\'ютер', type: 'ai', score: 0 }
         ],
         moveQueue: [
           { player: 1, direction: 'up', distance: 1, row: 1, col: 2 },
@@ -193,8 +192,8 @@ describe('Local Game Messages', () => {
       gameState.update(state => ({
         ...state,
         players: [
-          { id: 1, name: 'Гравець', type: 'human' },
-          { id: 2, name: 'Комп\'ютер', type: 'ai' }
+          { id: 1, name: 'Гравець', type: 'human', score: 0 },
+          { id: 2, name: 'Комп\'ютер', type: 'ai', score: 0 }
         ],
         moveQueue: [
           { player: 1, direction: 'up', distance: 1, row: 1, col: 2 }
@@ -210,8 +209,8 @@ describe('Local Game Messages', () => {
       gameState.update(state => ({
         ...state,
         players: [
-          { id: 1, name: 'Гравець', type: 'human' },
-          { id: 2, name: 'Комп\'ютер', type: 'ai' }
+          { id: 1, name: 'Гравець', type: 'human', score: 0 },
+          { id: 2, name: 'Комп\'ютер', type: 'ai', score: 0 }
         ],
         moveQueue: [
           { player: 1, direction: 'up', distance: 1, row: 1, col: 2 },

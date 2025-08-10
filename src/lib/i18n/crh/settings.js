@@ -20,5 +20,12 @@ export default {
   reset: "Sozlamalarnı sıfırla",
   resetHint: "Bütün sozlamalarnı standart qıymetlerge qaytar",
   boardSize: "Tahta ölçüsi",
-  boardSizeText: "Oyun meydanınıñ ölçüsini 2x2-den 9x9-ğa qadar deñiştirmek mümkün."
-}; 
+  boardSizeText: "Oyun meydanınıñ ölçüsini 2x2-den 9x9-ğa qadar deñiştirmek mümkün.",
+  visibility: {
+    title: "Tahta körünüvi",
+    hidden: "Gizli",
+    boardOnly: "Yalıñız tahta",
+    withPiece: "Taşnen",
+    withMoves: "Areketlernen"
+  }
+};

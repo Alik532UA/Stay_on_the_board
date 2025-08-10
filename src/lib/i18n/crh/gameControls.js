@@ -1,7 +1,7 @@
 export default {
   settings: "Sozlamalar",
   showBoard: "Tahtanı köster",
-  showQueen: "Vezirni köster",
+  showPiece: "Taşnı köster",
   showMoves: "Mümkün areketlerni köster",
   showGameInfoWidget: "Ma'lumot vidjetini köster",
   blockMode: "Bloklanğan hücreler rejimi",

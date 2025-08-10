@@ -1,11 +1,12 @@
 <script lang="ts">
+  import { get } from 'svelte/store';
   import { gameState } from '$lib/stores/gameState.js';
   import { playerInputStore } from '$lib/stores/playerInputStore.js';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { settingsStore } from '$lib/stores/settingsStore.ts';
   import { setDirection, setDistance, resetGame } from '$lib/services/gameLogicService.js';
   import { gameOrchestrator } from '$lib/gameOrchestrator';
   import { modalStore } from '$lib/stores/modalStore.js';
-  import { logStore } from '$lib/stores/logStore.js';
+  import { logService } from '$lib/services/logService.js';
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { derived } from 'svelte/store';
@@ -84,9 +85,9 @@
   function handleConfirm() { onConfirmMove(); }
   function handleNoMoves() { onNoMoves(); }
   function confirmReset() {
-    logStore.addLog('Запит на скидання гри', 'info');
+    logService.logic('Запит на скидання гри');
     const buttons = [
-      { text: $_('gameControls.ok'), primary: true, onClick: () => { logStore.addLog('Гру скинуто', 'info'); resetGame(); modalStore.closeModal(); } },
+      { text: $_('gameControls.ok'), primary: true, onClick: () => { logService.logic('Гру скинуто'); resetGame(undefined, get(gameState)); modalStore.closeModal(); } },
       { text: $_('gameControls.cancel'), onClick: modalStore.closeModal }
     ];
     modalStore.showModal({
@@ -120,7 +121,7 @@
       // movePlayer має отримати нові координати, тут потрібна логіка для їх обчислення
       // Для прикладу: movePlayer(playerRow + 1, playerCol)
       // TODO: Додати коректну логіку для обчислення цільової клітинки
-      logStore.addLog('Confirm move: (логіка координат не реалізована)', 'info');
+      logService.logic('Confirm move: (логіка координат не реалізована)');
       gameOrchestrator.confirmPlayerMove();
     }
   }

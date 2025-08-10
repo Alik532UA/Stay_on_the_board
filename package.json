@@ -1,7 +1,7 @@
 {
   "name": "stay-on-the-board",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.4.2",
   "type": "module",
   "scripts": {
     "test": "vitest",
