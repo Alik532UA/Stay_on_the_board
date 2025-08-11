@@ -26,7 +26,7 @@
   <div class="settings-list">
     <!-- Керування розміром дошки -->
     <div class="setting-item">
-      <span>{$_('settings.boardSize')}</span>
+      <span class="setting-label">{$_('settings.boardSizeLabel')}</span>
       <div class="size-adjuster">
         <button
           class="adjust-btn"
@@ -78,6 +78,20 @@
 </div>
 
 <style>
+  .setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.08em;
+    padding: 0;
+    gap: 12px;
+  }
+  .setting-label {
+    font-weight: 700;
+    font-size: 1em;
+    text-align: left;
+    flex-grow: 1;
+  }
   .settings-card {
     background: linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
     backdrop-filter: var(--unified-backdrop-filter);

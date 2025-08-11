@@ -20,6 +20,7 @@ export default {
   reset: "Скинути налаштування",
   resetHint: "Повернути всі налаштування до стандартних значень",
   boardSize: "Дошка",
+  boardSizeLabel: "Розмір дошки",
   boardSizeText: "Ви можете змінювати розмір ігрового поля від 2x2 до 9x9.",
   visibility: {
     title: "Видимість на дошці",

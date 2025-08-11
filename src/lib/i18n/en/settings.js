@@ -19,7 +19,8 @@ export default {
   styleOrange: "Orange",
   reset: "Reset Settings",
   resetHint: "Return all settings to their default values",
-  boardSize: "Board size",
+  boardSize: "Board",
+  boardSizeLabel: "Board size",
   boardSizeText: "You can change the size of the game board from 2x2 to 9x9.",
   visibility: {
     title: "Board Visibility",
