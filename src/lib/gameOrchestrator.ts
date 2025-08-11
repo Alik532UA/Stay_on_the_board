@@ -123,7 +123,8 @@ export const gameOrchestrator = {
    */
   async startReplay(): Promise<void> {
     const gameType = this._determineGameType();
-    replayService.saveReplayData(gameType);
+    const modalContext = this._getCurrentModalContext();
+    replayService.saveReplayData(gameType, modalContext);
     await goto(`${base}/replay`);
   },
 
@@ -243,4 +244,34 @@ export const gameOrchestrator = {
 
   // All the logic is now delegated to the activeGameMode
 
+  _getCurrentModalContext() {
+    const modalState = get(modalStore);
+    if (!modalState.isOpen) return null;
+
+    const serializableButtons = modalState.buttons.map(btn => {
+      let action = null;
+      if (btn.onClick) {
+        const onClickString = btn.onClick.toString();
+        if (onClickString.includes('continueAfterNoMoves')) action = 'continueAfterNoMoves';
+        else if (onClickString.includes('finalizeGameWithBonus')) action = 'finalizeGameWithBonus';
+        else if (onClickString.includes('startReplay')) action = 'startReplay';
+        else if (onClickString.includes('restartGame')) action = 'playAgain';
+      }
+      return {
+        textKey: btn.textKey,
+        text: btn.text,
+        customClass: btn.customClass,
+        isHot: btn.isHot,
+        action: action,
+        bonus: (btn as any).bonus
+      };
+    });
+
+    return {
+      titleKey: modalState.titleKey,
+      content: modalState.content,
+      buttons: serializableButtons,
+      closable: modalState.closable
+    };
+  }
 };

@@ -59,35 +59,10 @@
   });
 
   afterNavigate(() => {
-    // Цей код буде виконуватися КОЖНОГО РАЗУ при переході на сторінку
-    const savedGameOverState = sessionStorage.getItem('replayGameOverState');
-    if (savedGameOverState) {
-      try {
-        const parsedGameOverState = JSON.parse(savedGameOverState);
-        // @ts-ignore
-        gameOverStore.restoreState(parsedGameOverState);
-        sessionStorage.removeItem('replayGameOverState');
-
-        const savedGameState = sessionStorage.getItem('replayGameState');
-        if (savedGameState) {
-          gameState.set(JSON.parse(savedGameState));
-          sessionStorage.removeItem('replayGameState');
-        }
-
-        const savedLocalGameState = sessionStorage.getItem('replayLocalGameState');
-        if (savedLocalGameState) {
-          localGameStore.restoreState(JSON.parse(savedLocalGameState));
-          sessionStorage.removeItem('replayLocalGameState');
-        }
-        
-        showGameOverModalIfNeeded();
-
-      } catch (e) {
-        console.error('Не вдалося відновити стан гри з sessionStorage', e);
-      }
-    } else {
-      showGameOverModalIfNeeded();
-    }
+    // При поверненні з replay, FloatingBackButton вже відновив стан.
+    // Для інших випадків (наприклад, оновлення сторінки) може знадобитися
+    // логіка відновлення, але поточна реалізація конфліктує.
+    // showGameOverModalIfNeeded();
   });
 
 

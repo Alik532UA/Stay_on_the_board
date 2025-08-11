@@ -28,50 +28,13 @@
   import { gameStore } from '$lib/stores/gameStore';
 
   onMount(() => {
-    // Залишаємо тільки первинну ініціалізацію гри, якщо це не відновлення
-    const isRestoring = sessionStorage.getItem('replayGameOverState') !== null;
-    if (!isRestoring) {
+    // Ініціалізуємо гру, тільки якщо вона не була вже завершена (наприклад, при поверненні з replay)
+    const isGameOver = get(gameOverStore).isGameOver;
+    if (!isGameOver) {
       resetGame({}, get(gameState));
     }
     gameOrchestrator.setCurrentGameMode('vs-computer');
     animationStore.initialize();
-  });
-
-  afterNavigate(() => {
-    const savedGameOverState = sessionStorage.getItem('replayGameOverState');
-    if (savedGameOverState) {
-      try {
-        const parsedState = JSON.parse(savedGameOverState);
-        // @ts-ignore
-        gameOverStore.restoreState(parsedState);
-        sessionStorage.removeItem('replayGameOverState');
-
-        const savedGameState = sessionStorage.getItem('replayGameState');
-        if (savedGameState) {
-          gameState.set(JSON.parse(savedGameState));
-          sessionStorage.removeItem('replayGameState');
-        }
-
-        const gameOverState = get(gameOverStore);
-        if (gameOverState.isGameOver && gameOverState.gameResult) {
-          const { reasonKey, reasonValues } = gameOverState.gameResult;
-          // Ініціалізуємо режим гри, якщо його ще немає
-          const activeGameMode = get(gameStore).mode;
-          if (!activeGameMode) {
-            gameOrchestrator.initializeGameMode();
-          }
-          // Відновлюємо модальне вікно "немає ходів"
-          if (reasonKey === 'modal.computerNoMovesContent' || reasonKey === 'modal.playerNoMovesContent') {
-            const playerType = reasonKey === 'modal.computerNoMovesContent' ? 'computer' : 'human';
-            activeGameMode?.handleNoMoves(playerType);
-          } else {
-            gameOrchestrator.endGame(reasonKey, reasonValues);
-          }
-        }
-      } catch (e) {
-        console.error('Не вдалося відновити gameOverStore з sessionStorage', e);
-      }
-    }
   });
 
   const widgetMap = {

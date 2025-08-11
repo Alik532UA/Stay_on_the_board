@@ -5,13 +5,14 @@ import { gameOverStore } from '$lib/stores/gameOverStore';
 import { logService } from './logService';
 
 export const replayService = {
-  saveReplayData(gameType: string) {
+  saveReplayData(gameType: string, modalContext: any = null) {
     const state = get(gameState);
     if (state.moveHistory && state.moveHistory.length > 0) {
       const replayData = {
         moveHistory: state.moveHistory,
         boardSize: state.boardSize,
-        gameType: gameType
+        gameType: gameType,
+        modalContext: modalContext
       };
 
       try {
