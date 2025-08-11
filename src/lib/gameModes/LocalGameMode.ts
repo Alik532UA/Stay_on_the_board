@@ -96,7 +96,7 @@ import { computerPlayerService } from '$lib/services/computerPlayer';
     };
     await stateManager.applyChanges('END_GAME_LOCAL', endGameChanges, `Local game ended: ${reasonKey}`);
 
-    const { winners } = this.determineWinner(state);
+    const { winners } = this.determineWinner(state, reasonKey);
     gameOverStore.setGameOver({
       scores: get(localGameStore).scoresAtRoundStart.map((score, index) => ({
         playerId: state.players[index].id,
@@ -203,7 +203,7 @@ import { computerPlayerService } from '$lib/services/computerPlayer';
   private async _continueLocalGameAfterNoMoves(): Promise<void> {
     await stateManager.applyChanges(
       'CONTINUE_LOCAL_GAME',
-      { blockedCells: [] },
+      { cellVisitCounts: {} },
       'Clearing blocked cells and continuing local game'
     );
     modalStore.closeModal();
@@ -223,22 +223,27 @@ import { computerPlayerService } from '$lib/services/computerPlayer';
     }));
   }
 
-  determineWinner(state: GameState) {
+  determineWinner(state: GameState, reasonKey: string) {
     const localGameState = get(localGameStore);
-    const losingPlayerIndex = state.currentPlayerIndex;
     const scores = localGameState.scoresAtRoundStart;
 
+    // Якщо гра завершилася через те, що гравець здався (бо немає ходів),
+    // переможець визначається за балами серед УСІХ гравців.
+    // В інших випадках (вихід за поле, неправдива заява), поточний гравець програє.
+    const isNoMovesSurrender = reasonKey === 'modal.gameOverReasonNoMovesLeft';
+    const losingPlayerIndex = isNoMovesSurrender ? -1 : state.currentPlayerIndex;
+
     let maxScore = -Infinity;
-    // Визначаємо максимальний рахунок серед гравців, що залишились
+    // Визначаємо максимальний рахунок
     for (let i = 0; i < scores.length; i++) {
-      if (i !== losingPlayerIndex) {
+      if (i !== losingPlayerIndex) { // Виключаємо гравця, що програв, якщо такий є
         if (scores[i] > maxScore) {
           maxScore = scores[i];
         }
       }
     }
 
-    // Знаходимо всіх гравців, що залишились, з максимальним рахунком
+    // Знаходимо всіх гравців з максимальним рахунком
     const winners: number[] = [];
     for (let i = 0; i < scores.length; i++) {
       if (i !== losingPlayerIndex && scores[i] === maxScore) {
@@ -256,7 +261,7 @@ import { computerPlayerService } from '$lib/services/computerPlayer';
     const localGameState = get(localGameStore);
     const losingPlayerIndex = state.currentPlayerIndex;
     const losingPlayerName = localGameState.players[losingPlayerIndex].name;
-    const { winners, winningPlayerIndex } = this.determineWinner(state);
+    const { winners, winningPlayerIndex } = this.determineWinner(state, reasonKey);
 
     const modalReason = get(_)(reasonKey, { values: { playerName: losingPlayerName } });
 

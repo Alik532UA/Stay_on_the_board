@@ -191,7 +191,7 @@
            {:else}
              <!-- Показуємо деталі рахунку тільки для гри проти комп'ютера -->
              <div class="score-details-container">
-               <div class="score-detail-row">{$_('modal.scoreDetails.baseScore')} <span>{($modalState.content as any).scoreDetails.baseScore ?? ($modalState.content as any).scoreDetails.score ?? 0}</span></div>
+               <div class="score-detail-row">{$_('modal.scoreDetails.baseScore')} <span>{($modalState.content as any)?.scoreDetails?.baseScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span></div>
                {#if (($modalState.content as any)?.scoreDetails?.sizeBonus ?? $gameState.sizeBonus ?? 0) > 0}
                  <div class="score-detail-row">{$_('modal.scoreDetails.sizeBonus')} <span>+{($modalState.content as any)?.scoreDetails?.sizeBonus ?? $gameState.sizeBonus ?? 0}</span></div>
                {/if}
@@ -218,11 +218,11 @@
                {#if isCompactScoreMode}
                  <div class="final-score-compact">
                    <span class="final-score-label-inline">{$_('modal.scoreDetails.finalScore')}</span>
-                   <span class="final-score-value-inline">{($modalState.content as any).scoreDetails.totalScore ?? ($modalState.content as any).scoreDetails.score ?? 0}</span>
+                   <span class="final-score-value-inline">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span>
                  </div>
                {:else}
                  <div class="final-score-label">{$_('modal.scoreDetails.finalScore')}</div>
-                 <div class="final-score-value">{($modalState.content as any).scoreDetails.totalScore ?? ($modalState.content as any).scoreDetails.score ?? 0}</div>
+                 <div class="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</div>
                {/if}
              </div>
            {/if}
