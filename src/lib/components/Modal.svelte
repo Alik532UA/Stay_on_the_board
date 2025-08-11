@@ -1,7 +1,8 @@
 ﻿<script lang="ts">
   import { modalState, modalStore } from '$lib/stores/modalStore.js';
 
-  import { _ } from 'svelte-i18n';
+  import { _, init } from 'svelte-i18n';
+  import { i18nReady } from '$lib/i18n/init.js';
   import SvgIcons from './SvgIcons.svelte';
   import FAQModal from './FAQModal.svelte';
   import { gameState } from '$lib/stores/gameState.js';
@@ -126,14 +127,12 @@
             <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
           {/if}
           <h2 class="modal-title">
-            {#if $modalState.titleKey === 'modal.winnersTitle' && ($modalState.content as any)?.winnerNumbers}
-              {$_($modalState.titleKey, { values: { winnerNumbers: ($modalState.content as any).winnerNumbers } })}
-            {:else if $modalState.titleKey === 'modal.winnerTitle' && ($modalState.content as any)?.winnerName}
-              {$_($modalState.titleKey, { values: { winnerNumber: ($modalState.content as any).winnerName } })}
-            {:else if $modalState.titleKey === 'modal.winnerTitle' && ($modalState.content as any)?.winnerNumber}
-              {$_($modalState.titleKey, { values: { winnerNumber: ($modalState.content as any).winnerNumber } })}
+            {#if $i18nReady && $modalState.titleKey}
+              {@html $_($modalState.titleKey, {
+                values: $modalState.content as any
+              })}
             {:else}
-              {$modalState.titleKey ? $_($modalState.titleKey) : $modalState.title}
+              {$modalState.title}
             {/if}
           </h2>
         </div>
@@ -154,13 +153,15 @@
           <FAQModal />
         {:else if typeof $modalState.content === 'object' && $modalState.content && 'key' in $modalState.content && 'actions' in $modalState.content}
           <p class="reason">{$_('modal.keyConflictContent', { values: { key: $modalState.content.key as string } })}</p>
-        {:else if $modalState.contentKey || (typeof $modalState.content === 'string' && $modalState.content)}
+        {:else if $modalState.contentKey}
           <p class="reason">
-            {#if $modalState.contentKey}
-              {@html $_($modalState.contentKey)}
-            {:else if typeof $modalState.content === 'string'}
-              {@html $modalState.content}
-            {/if}
+            {@html $_($modalState.contentKey, {
+              values: $modalState.content as any
+            })}
+          </p>
+        {:else if typeof $modalState.content === 'string' && $modalState.content}
+          <p class="reason">
+            {@html $modalState.content}
           </p>
         {/if}
 
@@ -251,7 +252,7 @@
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
             >
-              {btn.textKey ? $_(btn.textKey) : btn.text}
+              {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
             </button>
           {:else}
             <button
@@ -274,7 +275,7 @@
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
             >
-              {btn.text ? btn.text : (btn.textKey ? $_(btn.textKey) : '')}
+              {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
             </button>
           {/if}
         {/each}
