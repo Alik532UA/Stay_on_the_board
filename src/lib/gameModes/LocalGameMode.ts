@@ -177,7 +177,7 @@ import { computerPlayerService } from '$lib/services/computerPlayer';
     const currentPlayerName = state.players[state.currentPlayerIndex].name;
 
     modalStore.showModal({
-      titleKey: 'modal.noMovesTitle',
+      titleKey: 'modal.playerNoMovesTitle',
       contentKey: 'modal.noMovesLocalGameContent',
       content: { playerName: currentPlayerName },
       buttons: [

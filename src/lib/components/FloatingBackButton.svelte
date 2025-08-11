@@ -12,67 +12,66 @@
 
   function handleBackClick() {
     logService.ui('FloatingBackButton: handleBackClick called');
-    const replayData = replayService.loadReplayData();
-    if (replayData) {
-      // The replayService has already restored the game state.
-      // We just need to handle the UI aspects here.
-      if (replayData.modalContext) {
-        const $t = get(_);
-        const modalContext = replayData.modalContext;
-        const buttons = modalContext.buttons.map((btn: any) => {
-          const buttonConfig: any = {
-            textKey: btn.textKey,
-            customClass: btn.customClass,
-            isHot: btn.isHot
-          };
-          if (btn.action === 'continueAfterNoMoves') {
-            buttonConfig.onClick = gameOrchestrator.continueAfterNoMoves.bind(gameOrchestrator);
-          } else if (btn.action === 'finalizeGameWithBonus') {
-            buttonConfig.onClick = () => gameOrchestrator.finalizeGameWithBonus('modal.gameOverReasonBonus');
-          } else if (btn.action === 'startReplay') {
-            buttonConfig.onClick = gameOrchestrator.startReplay.bind(gameOrchestrator);
-          } else if (btn.action === 'playAgain') {
-            buttonConfig.onClick = () => {
-              const gameType = replayData.gameType || 'vs-computer';
-              if (gameType === 'local') {
-                gameOrchestrator.restartGame();
-              } else {
-                gameOrchestrator.setBoardSize(get(gameState).boardSize);
-                modalStore.closeModal();
-              }
-            };
-          }
-          if (btn.text === 'modal.finishGameWithBonus') {
-            buttonConfig.text = $t('modal.finishGameWithBonus', { values: { bonus: btn.bonus } });
-          }
-          return buttonConfig;
-        });
-
-        modalStore.showModal({
-          titleKey: modalContext.titleKey,
-          content: {
-            reason: modalContext.content.reasonValues ?
-              $t(modalContext.content.reason, { values: modalContext.content.reasonValues }) :
-              $t(modalContext.content.reason),
-            scoreDetails: modalContext.content.scoreDetails
-          },
-          buttons,
-          closable: modalContext.closable
-        });
-
-        const gameType = replayData.gameType || 'vs-computer';
-        if (gameType === 'local') {
-          navigationService.goTo('/game/local');
-        } else {
-          navigationService.goTo('/game/vs-computer');
-        }
-        return;
-      }
-    }
+    // Встановлюємо прапорець, щоб повідомити root layout, що не потрібно закривати модальне вікно
+    sessionStorage.setItem('isRestoringReplay', 'true');
     
-    logService.ui('FloatingBackButton: No modal context found, using goBack()');
-    // Якщо контексту немає, використовуємо звичайну навігацію назад
-    navigationService.goBack();
+    const replayData = replayService.loadReplayData();
+
+    if (replayData && replayData.modalContext) {
+      logService.ui('FloatingBackButton: Modal context found, restoring modal', replayData.modalContext);
+      const modalContext = replayData.modalContext;
+
+      // Re-create buttons with direct calls to the orchestrator
+      const buttons = modalContext.buttons.map((btn: any) => {
+        const newBtn: any = { ...btn };
+        delete newBtn.action; // Remove the action string
+
+        switch (btn.action) {
+          case 'continueAfterNoMoves':
+            newBtn.onClick = () => gameOrchestrator.continueAfterNoMoves();
+            break;
+          case 'finalizeGameWithBonus':
+            newBtn.onClick = () => gameOrchestrator.finalizeGameWithBonus('modal.gameOverReasonBonus');
+            break;
+          case 'startReplay':
+            newBtn.onClick = () => gameOrchestrator.startReplay();
+            break;
+          case 'playAgain':
+            newBtn.onClick = () => {
+              modalStore.closeModal(); // Спочатку закриваємо модальне вікно
+              gameOrchestrator.restartGame();
+            };
+            break;
+          default:
+            // Для кнопок типу "Завершити гру", які мають складнішу логіку
+            if (btn.textKey === 'modal.endGame') {
+                 newBtn.onClick = () => gameOrchestrator.endGame('modal.gameOverReasonNoMovesLeft');
+            } else if (btn.action === 'startReplay') {
+                 newBtn.onClick = () => gameOrchestrator.startReplay();
+            }
+            else {
+                 newBtn.onClick = () => modalStore.closeModal();
+            }
+            break;
+        }
+        return newBtn;
+      });
+
+      modalStore.showModal({
+        titleKey: modalContext.titleKey,
+        content: modalContext.content,
+        buttons: buttons,
+        closable: modalContext.closable
+      });
+
+      // Navigate back to the correct game page
+      const gameType = replayData.gameType || 'vs-computer';
+      navigationService.goTo(`/game/${gameType}`);
+
+    } else {
+      logService.ui('FloatingBackButton: No modal context found, using goBack()');
+      navigationService.goBack();
+    }
   }
 </script>
 

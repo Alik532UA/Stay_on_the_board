@@ -96,6 +96,11 @@
 	// });
 
 	afterNavigate(() => {
+		// Не закриваємо модальне вікно, якщо ми щойно відновили його зі сторінки replay
+		if (sessionStorage.getItem('isRestoringReplay')) {
+			sessionStorage.removeItem('isRestoringReplay');
+			return;
+		}
 		modalStore.closeModal();
 	});
 </script>
