@@ -101,7 +101,7 @@ export function speakText(textToSpeak, lang, voiceURI) {
   } else {
     utterance.lang = lang;
   }
-  logService.ui(`[Speech] Attempting to speak: "${textToSpeak}"`);
+  logService.speech(`[Speech] Attempting to speak: "${textToSpeak}" with lang: ${utterance.lang}`);
   setTimeout(() => {
     window.speechSynthesis.speak(utterance);
   }, 50);

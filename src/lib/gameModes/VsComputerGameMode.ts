@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 import { _, locale } from 'svelte-i18n';
 import type { IGameMode } from './gameMode.interface';
 import { speakText } from '$lib/services/speechService';
+import { moveDirections } from '$lib/utils/translations';
 import { lastComputerMove, availableMoves as derivedAvailableMoves } from '$lib/stores/derivedState';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService';
@@ -194,11 +195,15 @@ export class VsComputerGameMode implements IGameMode {
         if (settings.speechEnabled) {
           const lastMove = get(lastComputerMove);
           if (lastMove) {
+            const allVoices = window.speechSynthesis.getVoices();
+            const selectedVoice = allVoices.find(v => v.voiceURI === settings.selectedVoiceURI);
+            const speechLang = selectedVoice ? selectedVoice.lang.split('-')[0] : (get(locale) || 'uk');
+
             const directionKey = lastMove.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-            const moveDirection = get(_)('gameBoard.directions.' + directionKey);
+            // @ts-ignore
+            const moveDirection = moveDirections[speechLang][directionKey];
             const textToSpeak = `${moveDirection} ${lastMove.distance}`;
-            const lang = get(locale) || 'uk';
-            speakText(textToSpeak, lang, settings.selectedVoiceURI);
+            speakText(textToSpeak, speechLang, settings.selectedVoiceURI);
           }
         }
         
