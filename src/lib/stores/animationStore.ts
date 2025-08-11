@@ -110,7 +110,6 @@ function createAnimationService() {
     }
 
     const move = state.animationQueue[0];
-    console.log('[animationStore] playNextAnimation: анімуємо хід:', move);
     
     update(s => ({
       ...s,

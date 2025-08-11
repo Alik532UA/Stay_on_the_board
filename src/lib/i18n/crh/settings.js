@@ -19,7 +19,8 @@ export default {
   styleOrange: "Turuncu",
   reset: "Sozlamalarnı sıfırla",
   resetHint: "Bütün sozlamalarnı standart qıymetlerge qaytar",
-  boardSize: "Tahta ölçüsi",
+  boardSize: "Tahta",
+  boardSizeLabel: "Tahta ölçüsi",
   boardSizeText: "Oyun meydanınıñ ölçüsini 2x2-den 9x9-ğa qadar deñiştirmek mümkün.",
   visibility: {
     title: "Tahta körünüvi",

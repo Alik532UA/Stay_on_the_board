@@ -19,7 +19,8 @@ export default {
   styleOrange: "Oranje",
   reset: "Instellingen resetten",
   resetHint: "Alle instellingen terugzetten naar hun standaardwaarden",
-  boardSize: "Bordgrootte",
+  boardSize: "Bord",
+  boardSizeLabel: "Bordgrootte",
   boardSizeText: "Je kunt de grootte van het speelveld veranderen van 2x2 naar 9x9.",
   visibility: {
     title: "Zichtbaarheid van het bord",
