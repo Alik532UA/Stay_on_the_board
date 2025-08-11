@@ -1,0 +1,74 @@
+client:733 [vite] connecting...
+client:827 [vite] connected.
+vs-computer:1  Error handling response: TypeError: Cannot read properties of undefined (reading 'features')
+    at chrome-extension://jjkchpdmjjdmalgembblgafllbpcjlei/mcafee_wa_contentplg.js:2719:35
+vs-computer:1  Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+logService.js:113 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+PlayerColorProvider.svelte:80 [PlayerColorProvider] Removing shadow color, using default
+PlayerColorProvider.svelte:84 [PlayerColorProvider] CSS variable after removal: 
+init.js:31 ✅ i18n ініціалізовано успішно
+animationStore.ts:180 AnimationStore: Нова гра, gameId змінився з 1754940939657 на 1754940939721
+animationStore.ts:193 AnimationStore: Очищено animationQueue при зміні gameId
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 3
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 1
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 3, col: 1, boardValue: 0}
+animationStore.ts:79 [animationStore] addToAnimationQueue викликано з move: {player: 1, direction: 'right', distance: 1, to: {…}}
+animationStore.ts:82 [animationStore] addToAnimationQueue: нова черга: [{…}]
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 0
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 1
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 0, col: 1, boardValue: 0}
+animationStore.ts:79 [animationStore] addToAnimationQueue викликано з move: {player: 2, direction: 'up', distance: 3, to: {…}}
+animationStore.ts:82 [animationStore] addToAnimationQueue: нова черга: (2) [{…}, {…}]
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 1, direction: 'right', distance: 1, to: {…}}
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 1, direction: 'right', distance: 1, to: {…}}
+animationStore.ts:137 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 2, direction: 'up', distance: 3, to: {…}}
+animationStore.ts:137 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 1
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 2
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 1, col: 2, boardValue: 0}
+animationStore.ts:79 [animationStore] addToAnimationQueue викликано з move: {player: 1, direction: 'down-right', distance: 1, to: {…}}
+animationStore.ts:82 [animationStore] addToAnimationQueue: нова черга: [{…}]
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 0
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 2
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 0, col: 2, boardValue: 0}
+animationStore.ts:79 [animationStore] addToAnimationQueue викликано з move: {player: 2, direction: 'up', distance: 1, to: {…}}
+animationStore.ts:82 [animationStore] addToAnimationQueue: нова черга: (2) [{…}, {…}]
+logService.js:88 [SPEECH] [Speech] Attempting to speak: "вгору 1" with lang: uk-UA
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 1, direction: 'down-right', distance: 1, to: {…}}
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 1, direction: 'down-right', distance: 1, to: {…}}
+animationStore.ts:137 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 2, direction: 'up', distance: 1, to: {…}}
+animationStore.ts:137 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 1
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 3
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 1, col: 3, boardValue: 0}
+animationStore.ts:79 [animationStore] addToAnimationQueue викликано з move: {player: 1, direction: 'down-right', distance: 1, to: {…}}
+animationStore.ts:82 [animationStore] addToAnimationQueue: нова черга: [{…}]
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 3
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 3
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 3, col: 3, boardValue: 0}
+animationStore.ts:79 [animationStore] addToAnimationQueue викликано з move: {player: 2, direction: 'down', distance: 2, to: {…}}
+animationStore.ts:82 [animationStore] addToAnimationQueue: нова черга: (2) [{…}, {…}]
+logService.js:88 [SPEECH] [Speech] Attempting to speak: "вниз 2" with lang: uk-UA
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 1, direction: 'down-right', distance: 1, to: {…}}
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 1, direction: 'down-right', distance: 1, to: {…}}
+animationStore.ts:137 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 2, direction: 'down', distance: 2, to: {…}}
+animationStore.ts:137 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 2
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 2
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 2, col: 2, boardValue: 0}
+animationStore.ts:79 [animationStore] addToAnimationQueue викликано з move: {player: 1, direction: 'up-left', distance: 1, to: {…}}
+animationStore.ts:82 [animationStore] addToAnimationQueue: нова черга: [{…}]
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 3
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 3
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 3, col: 3, boardValue: 0}
+animationStore.ts:79 [animationStore] addToAnimationQueue викликано з move: {player: 2, direction: 'down-right', distance: 1, to: {…}}
+animationStore.ts:82 [animationStore] addToAnimationQueue: нова черга: (2) [{…}, {…}]
+logService.js:88 [SPEECH] [Speech] Attempting to speak: "вниз-вправо 1" with lang: uk-UA
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 1, direction: 'up-left', distance: 1, to: {…}}
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 1, direction: 'up-left', distance: 1, to: {…}}
+animationStore.ts:113 [animationStore] playNextAnimation: анімуємо хід: {player: 2, direction: 'down-right', distance: 1, to: {…}}
+animationStore.ts:137 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone
+animationStore.ts:137 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone

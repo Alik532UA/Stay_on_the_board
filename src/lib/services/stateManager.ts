@@ -207,58 +207,29 @@ export class StateManager {
    * @returns Promise<boolean> - Чи успішно застосовано зміни
    */
   async applyChanges(action: string, changes: GameStateChanges, reason: string = ''): Promise<boolean> {
-    console.log('🎮 StateManager.applyChanges: початок з:', { action, changes, reason });
-
     try {
-      // Валідація змін
       const validation = await this.validateChanges(action, changes);
       if (!validation.isValid) {
-        console.error('❌ StateManager.applyChanges: валідація не пройшла:', validation.errors);
+        logService.state('StateManager validation failed', { action, reason, errors: validation.errors });
         return false;
       }
-
       if (validation.warnings.length > 0) {
-        console.warn('⚠️ StateManager.applyChanges: попередження:', validation.warnings);
+        logService.state('StateManager validation warnings', { action, reason, warnings: validation.warnings });
       }
 
-      // Отримуємо поточний стан
-      const currentState = await this.getCurrentState();
-      const oldState = { ...currentState };
-
-      // Застосовуємо зміни до gameState
       const gameStateInstance = await this.getGameState();
       gameStateInstance.update((currentState: any) => ({
         ...currentState,
         ...changes
       }));
 
-      // Застосовуємо зміни до playerInputStore
-      this.applyPlayerInputChanges(changes, reason);
+      this.addToHistory({ action, changes, timestamp: new Date(), reason });
 
-      // Застосовуємо зміни до animationStore
-      this.applyAnimationChanges(changes, reason);
+      logService.state(`Applied change: ${action}`, { reason, changes });
 
-      // Додаємо до історії
-      this.addToHistory({
-        action,
-        changes,
-        timestamp: new Date(),
-        reason
-      });
-
-      // Логуємо зміни
-      logService.state('State change applied', {
-        action,
-        oldState: { playerRow: oldState.playerRow, playerCol: oldState.playerCol },
-        changes: { playerRow: changes.playerRow, playerCol: changes.playerCol },
-        reason
-      });
-
-      console.log('✅ StateManager.applyChanges: успішно завершено');
       return true;
-
     } catch (error) {
-      console.error('❌ StateManager.applyChanges: помилка:', error);
+      logService.state('StateManager applyChanges failed', { action, reason, error });
       return false;
     }
   }
@@ -266,18 +237,12 @@ export class StateManager {
   /**
    * Застосовує зміни до playerInputStore
    */
-  applyPlayerInputChanges(changes: GameStateChanges, reason: string = ''): void {
-    // Логіка застосування змін до playerInputStore
-    console.log('🎮 StateManager.applyPlayerInputChanges:', { changes, reason });
-  }
+  applyPlayerInputChanges(changes: GameStateChanges, reason: string = ''): void {}
 
   /**
    * Застосовує зміни до animationStore
    */
-  applyAnimationChanges(changes: GameStateChanges, reason: string = ''): void {
-    // Логіка застосування змін до animationStore
-    console.log('🎮 StateManager.applyAnimationChanges:', { changes, reason });
-  }
+  applyAnimationChanges(changes: GameStateChanges, reason: string = ''): void {}
 
   /**
    * Додає запис до історії змін
