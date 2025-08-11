@@ -36,23 +36,12 @@ export function getCenterInfoState({
   isPauseBetweenMoves?: boolean;
   previousPlayerColor?: string | null;
 }): CenterInfoProps {
-  console.log('[centerInfoUtil] getCenterInfoState викликано:', {
-    selectedDirection,
-    selectedDistance,
-    lastComputerMove,
-    lastPlayerMove,
-    isPlayerTurn,
-    isPauseBetweenMoves,
-    previousPlayerColor
-  });
-  
   // Якщо є вибраний хід - показуємо його
   if (selectedDirection && selectedDistance) {
     let dir = '';
     if (directionArrows[selectedDirection]) {
       dir = directionArrows[selectedDirection];
     }
-    console.log('[centerInfoUtil] Показуємо підтверджуваний хід:', `${dir}${selectedDistance}`);
     return {
       class: 'confirm-btn-active',
       content: `${dir}${selectedDistance}`,
@@ -89,11 +78,9 @@ export function getCenterInfoState({
   if (!selectedDirection && !selectedDistance && lastComputerMove) {
     // Якщо зараз пауза між ходами - приховуємо хід комп'ютера
     if (isPauseBetweenMoves) {
-      console.log('[centerInfoUtil] Приховуємо хід комп\'ютера під час паузи');
       return { class: '', content: '', clickable: false, aria: 'Пауза між ходами' };
     }
     
-    // Інакше показуємо хід комп'ютера
     let dir = '';
     let dist = '';
     if (lastComputerMove.direction && directionArrows[lastComputerMove.direction]) {
@@ -102,7 +89,6 @@ export function getCenterInfoState({
     if (typeof lastComputerMove.distance === 'number') {
       dist = String(lastComputerMove.distance);
     }
-    console.log('[centerInfoUtil] Показуємо хід комп\'ютера:', `${dir}${dist}`);
     return {
       class: 'computer-move-display',
       content: `${dir}${dist}`,
@@ -121,7 +107,6 @@ export function getCenterInfoState({
     if (typeof lastPlayerMove.distance === 'number') {
       dist = String(lastPlayerMove.distance);
     }
-    console.log('[centerInfoUtil] Показуємо останній хід гравця:', `${dir}${dist}`);
     return {
       class: 'player-move-display',
       content: `${dir}${dist}`,

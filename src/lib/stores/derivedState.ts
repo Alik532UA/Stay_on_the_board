@@ -2,6 +2,7 @@
 import { derived, get } from 'svelte/store';
 import { page } from '$app/stores';
 import { gameState } from './gameState';
+import { logService } from '$lib/services/logService';
 import type { GameState } from './gameState';
 import type { Direction } from '$lib/services/gameLogicService';
 import { playerInputStore } from './playerInputStore';
@@ -38,21 +39,16 @@ export const lastComputerMove = derived(
   ([$gameState, $isLocalGame]) => {
     if ($isLocalGame) {
       // В локальній грі немає комп'ютера, тому lastComputerMove завжди null
-      console.log('[lastComputerMove] Оновлено: null (локальна гра)');
       return null;
     }
     
-    // Шукаємо з кінця черги останній хід, зроблений комп'ютером (player: 2)
     for (let i = $gameState.moveQueue.length - 1; i >= 0; i--) {
       const move = $gameState.moveQueue[i];
       if (move.player === 2) {
-        const result = { direction: move.direction as Direction, distance: move.distance };
-        console.log('[lastComputerMove] Оновлено:', result);
-        return result;
+        return { direction: move.direction as Direction, distance: move.distance };
       }
     }
-    console.log('[lastComputerMove] Оновлено: null');
-    return null; // Якщо комп'ютер ще не ходив
+    return null;
   }
 );
 
@@ -149,7 +145,6 @@ export const centerInfo = derived(
         clickable: isPlayerTurn,
         aria: `Підтвердити хід: ${dir}${selectedDistance}`
       };
-      console.log('[centerInfo] Оновлено (input):', info);
       return info;
     }
     if (selectedDirection) {
@@ -160,7 +155,6 @@ export const centerInfo = derived(
         clickable: false,
         aria: `Вибрано напрямок: ${dir}`
       };
-      console.log('[centerInfo] Оновлено (direction):', info);
       return info;
     }
     if ($lastComputerMove) {
@@ -172,11 +166,9 @@ export const centerInfo = derived(
         clickable: false,
         aria: `Хід комп'ютера: ${dir}${dist}`
       };
-      console.log('[centerInfo] Оновлено (computer):', info);
       return info;
     }
     info = { class: '', content: '•', clickable: false, aria: 'Порожньо' };
-    console.log('[centerInfo] Оновлено (default):', info);
     return info;
   }
 ); 
@@ -330,32 +322,17 @@ export const shouldHideBoard = derived(
 export const visualPosition = derived(
   [gameState, animationStore],
   ([$gameState, $animationStore]) => {
-    console.log('[visualPosition] Оновлення:', {
-      gameStateRow: $gameState.playerRow,
-      gameStateCol: $gameState.playerCol,
-      visualMoveQueueLength: $animationStore.visualMoveQueue?.length,
-      visualMoveQueue: $animationStore.visualMoveQueue,
-      isPlayingAnimation: $animationStore.isPlayingAnimation
-    });
-    
-    // Якщо є ходи в visualMoveQueue — показуємо позицію після останнього анімованого ходу
     if ($animationStore.visualMoveQueue && $animationStore.visualMoveQueue.length > 0) {
       const lastAnimatedMove = $animationStore.visualMoveQueue[$animationStore.visualMoveQueue.length - 1];
-      const result = {
+      return {
         row: lastAnimatedMove.to?.row ?? $gameState.playerRow,
         col: lastAnimatedMove.to?.col ?? $gameState.playerCol
       };
-      console.log('[visualPosition] Використовуємо анімовану позицію:', result, 'з ходу:', lastAnimatedMove);
-      return result;
     }
-    
-    // Якщо черга пуста — показуємо поточну позицію з gameState
-    const result = {
+    return {
       row: $gameState.playerRow,
       col: $gameState.playerCol
     };
-    console.log('[visualPosition] Використовуємо логічну позицію:', result);
-    return result;
   }
 );
 
