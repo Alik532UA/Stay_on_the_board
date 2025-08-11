@@ -28,9 +28,9 @@
   import { gameStore } from '$lib/stores/gameStore';
 
   onMount(() => {
-    // Ініціалізуємо гру, тільки якщо вона не була вже завершена (наприклад, при поверненні з replay)
-    const isGameOver = get(gameOverStore).isGameOver;
-    if (!isGameOver) {
+    // Ініціалізуємо гру, тільки якщо це не відновлення зі сторінки replay
+    const isRestoring = sessionStorage.getItem('isRestoringReplay') === 'true';
+    if (!isRestoring) {
       resetGame({}, get(gameState));
     }
     gameOrchestrator.setCurrentGameMode('vs-computer');
