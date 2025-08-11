@@ -1,0 +1,42 @@
+export const moveDirections = {
+  en: {
+    up: 'up',
+    down: 'down',
+    left: 'left',
+    right: 'right',
+    upRight: 'up-right',
+    upLeft: 'up-left',
+    downRight: 'down-right',
+    downLeft: 'down-left',
+  },
+  uk: {
+    up: 'вгору',
+    down: 'вниз',
+    left: 'вліво',
+    right: 'вправо',
+    upRight: 'вгору-вправо',
+    upLeft: 'вгору-вліво',
+    downRight: 'вниз-вправо',
+    downLeft: 'вниз-вліво',
+  },
+  crh: {
+    up: 'yuqary',
+    down: 'aşağı',
+    left: 'solğa',
+    right: 'sağğa',
+    upRight: 'yuqary-sağğa',
+    upLeft: 'yuqary-solğa',
+    downRight: 'aşağı-sağğa',
+    downLeft: 'aşağı-solğa',
+  },
+  nl: {
+    up: 'omhoog',
+    down: 'omlaag',
+    left: 'links',
+    right: 'rechts',
+    upRight: 'omhoog-rechts',
+    upLeft: 'omhoog-links',
+    downRight: 'omlaag-rechts',
+    downLeft: 'omlaag-links',
+  }
+};

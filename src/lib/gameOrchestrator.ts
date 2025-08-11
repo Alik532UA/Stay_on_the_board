@@ -8,6 +8,7 @@ import { modalStore } from './stores/modalStore.js';
 import { agents } from './playerAgents.js';
 import { speakText, langMap } from '$lib/services/speechService.js';
 import { _, locale } from 'svelte-i18n';
+import { moveDirections } from '$lib/utils/translations';
 import { logService } from '$lib/services/logService.js';
 import { lastComputerMove, lastPlayerMove } from './stores/derivedState.ts';
 import { replayStore } from './stores/replayStore.js';
@@ -222,11 +223,15 @@ export const gameOrchestrator = {
 
     const settings = get(settingsStore);
     if (settings.speechEnabled && this._determineGameType() === 'local') {
+      const allVoices = window.speechSynthesis.getVoices();
+      const selectedVoice = allVoices.find(v => v.voiceURI === settings.selectedVoiceURI);
+      const speechLang = selectedVoice ? selectedVoice.lang.split('-')[0] : (get(locale) || 'uk');
+      
       const directionKey = playerInput.selectedDirection.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-      const direction = get(_)('gameBoard.directions.' + directionKey);
+      // @ts-ignore
+      const direction = moveDirections[speechLang][directionKey];
       const textToSpeak = `${direction} ${playerInput.selectedDistance}`;
-      const lang = get(locale) || 'uk';
-      speakText(textToSpeak, lang, settings.selectedVoiceURI);
+      speakText(textToSpeak, speechLang, settings.selectedVoiceURI);
     }
   },
 
