@@ -145,7 +145,7 @@ export class VsComputerGameMode implements IGameMode {
     ];
   }
 
-  determineWinner(state: GameState) {
+  determineWinner(state: GameState, reasonKey: string) {
     // У грі проти комп'ютера немає концепції переможця, лише рахунок
     return { winners: [] as number[], winningPlayerIndex: -1 };
   }

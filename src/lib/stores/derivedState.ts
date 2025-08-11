@@ -342,25 +342,27 @@ export const visualPosition = derived(
  * @type {import('svelte/store').Readable<Record<string, number>>}
  */
 export const visualCellVisitCounts = derived(
-  [visualPosition, gameState],
-  ([$visualPosition, $gameState]) => {
-    // Якщо візуальна позиція ще не визначена, показуємо початковий стан
+  [visualPosition, gameState, animationStore],
+  ([$visualPosition, $gameState, $animationStore]) => {
+    // Якщо гра не анімується, візуальний стан ПОВИНЕН відповідати логічному.
+    // Це виправляє баг, коли cellVisitCounts скидається, але візуалізація не оновлюється.
+    if (!$animationStore.isAnimating) {
+      return $gameState.cellVisitCounts;
+    }
+
+    // Якщо анімація триває, використовуємо стару логіку для відображення історичного стану.
     if (!$visualPosition || $visualPosition.row === null || $visualPosition.col === null) {
       return $gameState.moveHistory[0]?.visits || {};
     }
 
-    // Знаходимо в історії останній запис, що відповідає поточній ВІЗУАЛЬНІЙ позиції фігури.
-    // Це гарантує, що ми показуємо стан "visits" саме на момент прибуття фігури в цю точку.
     const relevantHistoryEntry = [...$gameState.moveHistory].reverse().find(entry =>
       entry.pos.row === $visualPosition.row && entry.pos.col === $visualPosition.col
     );
 
-    // Якщо такий запис знайдено, повертаємо його стан відвідувань.
     if (relevantHistoryEntry && relevantHistoryEntry.visits) {
       return relevantHistoryEntry.visits;
     }
 
-    // Як запасний варіант, повертаємо найостанніший відомий стан.
     return $gameState.moveHistory[$gameState.moveHistory.length - 1]?.visits || {};
   }
 );

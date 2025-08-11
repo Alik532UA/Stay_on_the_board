@@ -59,7 +59,7 @@ export interface IGameMode {
    * @param state - Кінцевий стан гри.
    * @returns Об'єкт з інформацією про переможця.
    */
-  determineWinner(state: GameState): {
+  determineWinner(state: GameState, reasonKey: string): {
     winners: number[];
     winningPlayerIndex: number;
   };
