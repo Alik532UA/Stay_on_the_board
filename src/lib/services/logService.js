@@ -18,7 +18,7 @@
     const defaultConfig = {
       [LOG_GROUPS.STATE]: true,
       [LOG_GROUPS.LOGIC]: true,
-      [LOG_GROUPS.SCORE]: false,
+      [LOG_GROUPS.SCORE]: true,
       [LOG_GROUPS.UI]: true,
       [LOG_GROUPS.ANIMATION]: false,
       [LOG_GROUPS.INIT]: false,
