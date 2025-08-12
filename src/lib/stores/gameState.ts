@@ -82,6 +82,7 @@ export interface GameState {
 export interface GameStateConfig {
   size?: number;
   players?: Player[];
+  testMode?: boolean;
 }
 
 export function createInitialState(config: GameStateConfig = {}): GameState {
@@ -91,7 +92,7 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
     { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0 }
   ];
   
-  const { row: initialRow, col: initialCol } = getRandomCell(size);
+  const { row: initialRow, col: initialCol } = config.testMode ? { row: 0, col: 0 } : getRandomCell(size);
   const board = createEmptyBoard(size);
   board[initialRow][initialCol] = 1;
   

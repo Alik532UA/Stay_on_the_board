@@ -26,6 +26,7 @@ export interface SettingsState {
   showGameModeModal: boolean;
   showGameInfoWidget: 'hidden' | 'shown' | 'compact';
   lockSettings: boolean;
+  testMode: boolean;
 }
 
 const isBrowser = typeof window !== 'undefined';
@@ -76,6 +77,7 @@ const defaultSettings: SettingsState = {
   showGameModeModal: true,
   showGameInfoWidget: 'shown',
   lockSettings: false,
+  testMode: false,
 };
 
 /**
@@ -135,6 +137,7 @@ function loadSettings(): SettingsState {
     showGameModeModal: localStorage.getItem('showGameModeModal') !== 'false',
     showGameInfoWidget: (localStorage.getItem('showGameInfoWidget') as 'hidden' | 'shown' | 'compact') || 'shown',
     lockSettings: localStorage.getItem('lockSettings') === 'true',
+    testMode: localStorage.getItem('testMode') === 'true',
   };
   const gameMode = loadedSettings.gameMode;
   return {
