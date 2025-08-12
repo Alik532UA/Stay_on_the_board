@@ -10,7 +10,6 @@ import { playerInputStore } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { stateManager } from '$lib/services/stateManager';
-import { agents } from '$lib/playerAgents';
 import { modalStore } from '$lib/stores/modalStore';
 import { gameOrchestrator } from '$lib/gameOrchestrator';
 import type { FinalScoreDetails } from '$lib/gameOrchestrator';
@@ -181,7 +180,7 @@ export class VsComputerGameMode implements IGameMode {
     const state = get(gameState);
     await stateManager.applyChanges('SET_COMPUTER_TURN', { isComputerMoveInProgress: true }, 'Starting computer move');
 
-    const computerMove = await agents.ai.getMove(state as any);
+    const computerMove = gameLogicService.getComputerMove();
 
     if (computerMove) {
       const { direction, distance } = computerMove;

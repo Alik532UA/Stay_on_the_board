@@ -15,8 +15,6 @@ import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { localGameStore } from '$lib/stores/localGameStore';
 import { logService } from '$lib/services/logService';
 import { lastPlayerMove } from '$lib/stores/derivedState';
-import { computerPlayerService } from '$lib/services/computerPlayer';
- 
  export class LocalGameMode implements IGameMode {
    initialize(initialState: GameState): void {
      // Ініціалізація для локальної гри відбувається в `local-setup`
@@ -325,7 +323,7 @@ import { computerPlayerService } from '$lib/services/computerPlayer';
       // Додаємо невелику затримку для імітації "роздумів" комп'ютера
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      const move = await computerPlayerService.makeMove();
+      const move = gameLogicService.getComputerMove();
       if (move) {
         await this.handlePlayerMove(move.direction, move.distance);
       } else {

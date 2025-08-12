@@ -36,6 +36,7 @@
 	import { modalState } from '$lib/stores/modalStore.js';
 	import { logService } from '$lib/services/logService.js';
 	import PlayerColorProvider from '$lib/components/PlayerColorProvider.svelte';
+	import TestModeWidget from '$lib/components/widgets/TestModeWidget.svelte';
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
@@ -136,11 +137,24 @@
 <Modal />
 <PlayerColorProvider />
 
+{#if $settingsStore.testMode}
+	<div class="test-mode-widget-wrapper">
+		<TestModeWidget />
+	</div>
+{/if}
+
 <style>
 	.app {
 		display: flex;
 		flex-direction: column;
 		min-height: 100vh;
+	}
+
+	.test-mode-widget-wrapper {
+		position: fixed;
+		bottom: 60px; /* Adjust as needed */
+		right: 10px;
+		z-index: 1001; /* Higher than other elements */
 	}
 
 	main {

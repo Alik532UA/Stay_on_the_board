@@ -5,7 +5,6 @@ import * as gameLogicService from '$lib/services/gameLogicService.js';
 import { settingsStore } from './stores/settingsStore';
 import { Figure } from '$lib/models/Figure.js';
 import { modalStore } from './stores/modalStore.js';
-import { agents } from './playerAgents.js';
 import { speakText, langMap } from '$lib/services/speechService.js';
 import { _, locale } from 'svelte-i18n';
 import { moveDirections } from '$lib/utils/translations';

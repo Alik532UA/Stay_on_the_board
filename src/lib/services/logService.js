@@ -11,7 +11,8 @@
       INIT: 'init',         // Для ініціалізації сторів та сервісів
       ACTION: 'action',     // Для дій користувача (кліки, хоткеї)
       GAME_MODE: 'game_mode', // Для логіки ігрових режимів
-      SPEECH: 'speech'      // Для логів, пов'язаних з озвученням
+      SPEECH: 'speech',      // Для логів, пов'язаних з озвученням
+      TEST_MODE: 'test_mode' // Для логів, пов'язаних з тестовим режимом
     };
     
     // 2. Конфігурація за замовчуванням (всі групи увімкнені)
@@ -25,6 +26,7 @@
       [LOG_GROUPS.ACTION]: false,
       [LOG_GROUPS.GAME_MODE]: true,
       [LOG_GROUPS.SPEECH]: false,
+      [LOG_GROUPS.TEST_MODE]: true,
     };
     
     const STORAGE_KEY = 'logConfig';
@@ -71,6 +73,7 @@
       [LOG_GROUPS.GAME_MODE]: 'color: #FF5722; font-weight: bold;', // Deep Orange
       [LOG_GROUPS.ACTION]: 'color: #FFEB3B; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;', // Yellow on dark
       [LOG_GROUPS.SPEECH]: 'color: #8E44AD; font-weight: bold;', // Purple
+      [LOG_GROUPS.TEST_MODE]: 'color: #FBC02D; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;', // Yellow on dark
     };
     
     /**
@@ -101,6 +104,7 @@
       action: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.ACTION, message, ...data),
       GAME_MODE: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.GAME_MODE, message, ...data),
       speech: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.SPEECH, message, ...data),
+      testMode: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.TEST_MODE, message, ...data),
     };
     
     // 5. Глобальний контролер для зручності розробника-людини
