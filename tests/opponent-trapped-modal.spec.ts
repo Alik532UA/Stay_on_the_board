@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { setBoardSize, startNewGame, setBlockMode, BlockModeState, makeMove } from './utils';
 
-test.describe('[Done] Модальне вікно "Суперник у пастці"', () => {
+test.describe('Модальне вікно "Суперник у пастці"', () => {
   
   test.beforeEach(async ({ page }) => {
     await startNewGame(page);
     await setBoardSize(page, 2);
   });
 
-  test('Повинно відображатися, коли режим блокування УВІМКНЕНО', async ({ page }) => {
+  test('Повинно відображатися, коли режим блокування УВІМКНЕНО', { tag: '@done' }, async ({ page }) => {
     // Вмикаємо режим блокування клітинок
     await setBlockMode(page, BlockModeState.On);
 
@@ -22,7 +22,7 @@ test.describe('[Done] Модальне вікно "Суперник у паст�
     await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.computerNoMovesTitle');
   });
 
-  test('НЕ повинно відображатися, коли режим блокування ВИМКНЕНО', async ({ page }) => {
+  test('НЕ повинно відображатися, коли режим блокування ВИМКНЕНО', { tag: '@bug' }, async ({ page }) => {
     // Переконуємося, що режим блокування клітинок вимкнений
     await setBlockMode(page, BlockModeState.Off);
 
