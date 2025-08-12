@@ -37,6 +37,7 @@
 	import { logService } from '$lib/services/logService.js';
 	import PlayerColorProvider from '$lib/components/PlayerColorProvider.svelte';
 	import TestModeWidget from '$lib/components/widgets/TestModeWidget.svelte';
+	import { gameOrchestrator } from '$lib/gameOrchestrator';
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
@@ -61,6 +62,10 @@
 			initializeI18n(); // Ініціалізуємо локалізацію
 		} catch (error) {
 			logService.init('Failed to check for app update:', error);
+		}
+
+		if (import.meta.env.DEV || get(settingsStore).testMode) {
+			(window as any).gameOrchestrator = gameOrchestrator;
 		}
 	});
 

@@ -30,15 +30,6 @@
 {/if}
 
 <style>
-  .hidden {
-    display: none;
-  }
-  .test-mode-container {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 1000;
-  }
   .test-mode-toggle {
     position: fixed;
     bottom: 10px;
