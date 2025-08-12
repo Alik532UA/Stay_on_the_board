@@ -252,7 +252,7 @@
       {/if}
     </div>
     <div id="main-menu-buttons">
-      <button class="modal-button secondary" onclick={handlePlayVsComputer}>{$_('mainMenu.playVsComputer')}</button>
+      <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="play-vs-computer-btn">{$_('mainMenu.playVsComputer')}</button>
       <button class="modal-button secondary" onclick={handleLocalGame}>{$_('mainMenu.localGame')}</button>
       <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice}>{$_('mainMenu.playOnline')}</button>
       <!-- <button class="modal-button secondary" on:click={() => navigateTo('/settings')}>{$_('mainMenu.settings')}</button> -->

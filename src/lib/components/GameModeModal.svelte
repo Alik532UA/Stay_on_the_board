@@ -72,13 +72,13 @@
 </script>
 
 <div class="game-mode-buttons">
-  <button class="modal-btn-generic green-btn" on:click={() => selectMode('beginner')}>
+  <button class="modal-btn-generic green-btn" on:click={() => selectMode('beginner')} data-testid="beginner-mode-btn">
     {$_('gameModes.beginner')}
   </button>
-  <button class="modal-btn-generic blue-btn" on:click={() => selectMode('experienced')}>
+  <button class="modal-btn-generic blue-btn" on:click={() => selectMode('experienced')} data-testid="experienced-mode-btn">
     {$_('gameModes.experienced')}
   </button>
-  <button class="modal-btn-generic danger-btn" on:click={() => selectMode('pro')}>
+  <button class="modal-btn-generic danger-btn" on:click={() => selectMode('pro')} data-testid="pro-mode-btn">
     {$_('gameModes.pro')}
   </button>
 </div>
