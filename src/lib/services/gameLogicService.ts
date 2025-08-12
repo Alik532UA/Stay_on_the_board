@@ -10,6 +10,7 @@ import { settingsStore } from '../stores/settingsStore';
 import { stateManager } from './stateManager';
 import { localGameStore } from '../stores/localGameStore.js';
 import { logService } from './logService.js';
+import { testModeStore } from '$lib/stores/testModeStore';
 
 
 export type Direction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right';
@@ -502,4 +503,41 @@ export function isValidMove(direction: MoveDirectionType, distance: number) {
   const currentState = get(gameState);
   const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
   return figure.canMove(direction, distance);
+}
+
+export function getComputerMove(): { direction: MoveDirectionType; distance: number } | null {
+  const testModeState = get(testModeStore);
+  logService.testMode('gameLogicService: отримано стан testModeStore', testModeState);
+
+  if (testModeState.computerMoveMode === 'manual' && testModeState.manualComputerMove.direction && testModeState.manualComputerMove.distance) {
+    logService.testMode('gameLogicService: виконується ручний хід', testModeState.manualComputerMove);
+    return {
+      direction: testModeState.manualComputerMove.direction as MoveDirectionType,
+      distance: testModeState.manualComputerMove.distance
+    };
+  }
+
+  logService.testMode('gameLogicService: виконується випадковий хід');
+  const state = get(gameState);
+  const settings = get(settingsStore);
+  const availableMoves = getAvailableMoves(
+    state.playerRow,
+    state.playerCol,
+    state.boardSize,
+    state.cellVisitCounts,
+    settings.blockOnVisitCount,
+    state.board,
+    settings.blockModeEnabled,
+    null
+  );
+
+  if (availableMoves.length === 0) {
+    return null;
+  }
+
+  const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+  return {
+    direction: randomMove.direction,
+    distance: randomMove.distance
+  };
 }

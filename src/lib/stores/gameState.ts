@@ -85,6 +85,9 @@ export interface GameStateConfig {
   testMode?: boolean;
 }
 
+import { get } from 'svelte/store';
+import { testModeStore } from './testModeStore';
+
 export function createInitialState(config: GameStateConfig = {}): GameState {
   const size = config.size ?? initialBoardSize;
   const players = config.players ?? [
@@ -92,7 +95,11 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
     { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0 }
   ];
   
-  const { row: initialRow, col: initialCol } = config.testMode ? { row: 0, col: 0 } : getRandomCell(size);
+  const testModeState = get(testModeStore);
+  const { row: initialRow, col: initialCol } =
+    testModeState.startPositionMode === 'predictable'
+    ? { row: 0, col: 0 }
+    : getRandomCell(size);
   const board = createEmptyBoard(size);
   board[initialRow][initialCol] = 1;
   
