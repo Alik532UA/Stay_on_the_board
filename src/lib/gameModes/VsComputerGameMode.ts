@@ -115,6 +115,8 @@ export class VsComputerGameMode implements IGameMode {
     modalStore.showModal({
       titleKey,
       content,
+      dataTestId: 'game-over-modal',
+      titleDataTestId: 'game-over-modal-title',
       buttons: [
         { textKey: 'modal.playAgain', primary: true, onClick: () => this.restartGame(), isHot: true },
         { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => gameOrchestrator.startReplay() }
