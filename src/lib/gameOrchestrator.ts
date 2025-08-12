@@ -89,6 +89,8 @@ export const gameOrchestrator = {
       modalStore.showModal({
         titleKey: 'modal.resetScoreTitle',
         contentKey: 'modal.resetScoreContent',
+        dataTestId: 'board-resize-confirm-modal',
+        titleDataTestId: 'modal-window-title',
         buttons: [
           {
             textKey: 'modal.resetScoreConfirm',
