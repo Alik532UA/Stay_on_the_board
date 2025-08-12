@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { setBoardSize, startNewGame, setBlockMode, BlockModeState, makeMove } from './utils';
 
-test.describe('[Done] Модальне вікно "Блискучий аналіз"', () => {
+test.describe('Модальне вікно "Блискучий аналіз"', () => {
 
   test.beforeEach(async ({ page }) => {
     await startNewGame(page);
     await setBoardSize(page, 3);
   });
 
-  test('Повинно відображатися, коли режим блокування УВІМКНЕНО', async ({ page }) => {
+  test('Повинно відображатися, коли режим блокування УВІМКНЕНО', { tag: '@done' }, async ({ page }) => {
     await setBlockMode(page, BlockModeState.On);
 
     await makeMove(page, 'down', 1);
@@ -32,7 +32,7 @@ test.describe('[Done] Модальне вікно "Блискучий аналі
     await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.playerNoMovesTitle');
   });
 
-  test('Повинно з\'являтися вікно "Game Over", коли режим блокування ВИМКНЕНО', async ({ page }) => {
+  test('Повинно з\'являтися вікно "Game Over", коли режим блокування ВИМКНЕНО', { tag: '@done' }, async ({ page }) => {
     await setBlockMode(page, BlockModeState.On);
     await setBlockMode(page, BlockModeState.Off);
 
