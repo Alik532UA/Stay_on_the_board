@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { setBoardSize } from './utils';
 
-test.describe('Модальне вікно "Суперник у пастці"', () => {
+test.describe('[Done] Модальне вікно "Суперник у пастці"', () => {
   test('Повинно відображатися модальне вікно "Суперник у пастці!"', async ({ page }) => {
     // 1. Зайти на головну сторінку
     await page.goto('/');
@@ -23,9 +24,8 @@ test.describe('Модальне вікно "Суперник у пастці"', 
     // Перевіряємо, що на сторінці є панель керування
     await expect(page.locator('.direction-controls-panel')).toBeVisible();
 
-    // Встановлюємо розмір дошки 2x2, двічі натиснувши кнопку зменшення
-    await page.getByTestId('decrease-board-size-btn').click();
-    await page.getByTestId('decrease-board-size-btn').click();
+    // Встановлюємо розмір дошки 2x2
+    await setBoardSize(page, 2);
 
     // Вмикаємо режим блокування клітинок
     await page.getByTestId('block-mode-toggle').click();

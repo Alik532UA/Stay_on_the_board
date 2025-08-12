@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { setBoardSize } from './utils';
 
-test.describe('Модальне вікно "Блискучий аналіз"', () => {
+test.describe('[Done] Модальне вікно "Блискучий аналіз"', () => {
   test('Повинно відображатися модальне вікно "Блискучий аналіз!"', async ({ page }) => {
     // 1. Зайти на головну сторінку
     await page.goto('/');
@@ -24,7 +25,7 @@ test.describe('Модальне вікно "Блискучий аналіз"', (
     await expect(page.locator('.direction-controls-panel')).toBeVisible();
 
     // Встановлюємо розмір дошки 3x3
-    await page.getByTestId('decrease-board-size-btn').click();
+    await setBoardSize(page, 3);
 
     // Вмикаємо режим блокування клітинок
     await page.getByTestId('block-mode-toggle').click();

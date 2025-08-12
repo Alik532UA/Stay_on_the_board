@@ -214,6 +214,7 @@
     text-align: center;
     font-size: 0.8rem;
     -moz-appearance: textfield;
+    appearance: textfield;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   .test-mode-input:focus {

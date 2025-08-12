@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Ігровий процес', () => {
+test.describe('[Done] Ігровий процес', () => {
   test('Користувач може почати гру проти комп\'ютера і зробити хід', async ({ page }) => {
     // 1. Зайти на головну сторінку
     await page.goto('/');
