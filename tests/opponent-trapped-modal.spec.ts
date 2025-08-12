@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Opponent Trapped Modal', () => {
-  test('should display "Opponent Trapped!" modal', async ({ page }) => {
+test.describe('Модальне вікно "Суперник у пастці"', () => {
+  test('Повинно відображатися модальне вікно "Суперник у пастці!"', async ({ page }) => {
     // 1. Зайти на головну сторінку
     await page.goto('/');
 
@@ -30,9 +30,6 @@ test.describe('Opponent Trapped Modal', () => {
     // Вмикаємо режим блокування клітинок
     await page.getByTestId('block-mode-toggle').click();
 
-    // Хід комп'ютера
-    // Припускаємо, що комп'ютер робить валідний хід.
-
     // Робимо хід: вправо, дистанція 1
     await page.getByTestId('dir-btn-right').click();
     await page.getByTestId('dist-btn-1').click();
@@ -51,12 +48,12 @@ test.describe('Opponent Trapped Modal', () => {
     await page.getByTestId('confirm-move-btn').click();
 
     // Додаємо паузу 7 секунд
-    await page.waitForTimeout(7000);
+    // await page.waitForTimeout(7000);
     
     // Перевіряємо, що модальне вікно з'явилося
     await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
 
-    // Перевіряємо заголовок модального вікна
-    await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveText('Суперник у пастці!');
+    // Перевіряємо заголовок модального вікна за ключем локалізації
+    await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.computerNoMovesTitle');
   });
 });
