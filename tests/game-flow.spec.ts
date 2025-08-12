@@ -10,15 +10,15 @@ test.describe('Ігровий процес', () => {
 
     // 2. Знайти і натиснути кнопку "Гра проти комп'ютера"
     // Playwright знайде кнопку за текстом, який бачить користувач
-    await page.getByRole('button', { name: 'Гра проти комп\'ютера' }).click();
+    await page.getByTestId('play-vs-computer-btn').click();
 
     // 3. Дочекатися завантаження ігрової сторінки
     // Перевіряємо, що на сторінці є панель керування
     // Додаємо крок для взаємодії з модальним вікном вибору режиму
-    await page.getByRole('button', { name: 'Новачок' }).click();
+    await page.getByTestId('beginner-mode-btn').click();
 
     // Закриваємо модальне вікно "Поширені питання"
-    await page.locator('button.modal-btn-generic:has-text("OK")').click();
+    await page.getByTestId('modal-btn-modal.ok').click();
 
     // Очікуємо завантаження сторінки після вибору режиму
     await page.waitForURL('**/game/vs-computer');

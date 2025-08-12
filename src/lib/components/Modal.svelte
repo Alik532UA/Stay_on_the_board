@@ -252,6 +252,7 @@
                 }
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
+              data-testid={`modal-btn-${btn.textKey || btn.text}`}
             >
               {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
             </button>
@@ -262,7 +263,7 @@
               class:blue-btn={btn.customClass === 'blue-btn'}
               class:green-btn={btn.customClass === 'green-btn'}
               class:danger-btn={btn.customClass === 'danger-btn'}
-              onclick={() => { 
+              onclick={() => {
                 logService.action(`Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`);
                 logService.ui(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`);
                 logService.ui('Modal button clicked (regular):', { textKey: btn.textKey, text: btn.text, onClick: btn.onClick });
@@ -275,6 +276,7 @@
                 }
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
+              data-testid={`modal-btn-${btn.textKey || btn.text}`}
             >
               {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
             </button>
