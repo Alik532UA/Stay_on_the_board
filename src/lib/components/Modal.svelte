@@ -39,7 +39,8 @@
 
   // Реактивний блок для керування логікою
   $: {
-    const shouldPlay = $modalState.isOpen && $modalState.titleKey === 'modal.expertModeTitle';
+    const isTestEnvironment = import.meta.env.CI === 'true' || import.meta.env.MODE === 'test';
+    const shouldPlay = $modalState.isOpen && $modalState.titleKey === 'modal.expertModeTitle' && !isTestEnvironment;
 
     // Оновлюємо гучність, зберігаємо її та оновлюємо CSS-змінну для стилізації
     audioService.setVolume(expertVolume);

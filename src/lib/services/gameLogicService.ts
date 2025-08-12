@@ -279,10 +279,12 @@ function calculateMoveScore(
 
 export function resetGame(options: { newSize?: number; players?: Player[]; settings?: any } = {}, currentState: any) {
   const newSize = options.newSize ?? currentState.boardSize;
+  const { testMode } = get(settingsStore);
   
   const newState = createInitialState({
     size: newSize,
-    players: options.players
+    players: options.players,
+    testMode
   });
 
   // Якщо гравці передані, використовуємо їх
