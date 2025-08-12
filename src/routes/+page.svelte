@@ -23,7 +23,7 @@
 
 {#if import.meta.env.DEV}
   <div class="test-mode-toggle">
-    <button on:click={handleTestModeChange} class:active={testMode}>
+    <button on:click={handleTestModeChange} class:active={testMode} data-testid="test-mode-btn">
       Test Mode: {testMode ? 'ON' : 'OFF'}
     </button>
   </div>
