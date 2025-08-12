@@ -4,6 +4,7 @@
   export let label: string;
   export let checked: boolean;
   export let disabled: boolean = false;
+  export let dataTestId: string | undefined = undefined;
 
   const dispatch = createEventDispatcher();
 
@@ -19,6 +20,7 @@
   class:active={checked}
   on:click={handleClick}
   disabled={disabled}
+  data-testid={dataTestId}
 >
   {label}
 </button>

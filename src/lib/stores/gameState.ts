@@ -97,7 +97,9 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
   
   const testModeState = get(testModeStore);
   const { row: initialRow, col: initialCol } =
-    testModeState.startPositionMode === 'predictable'
+    testModeState.startPositionMode === 'manual' && testModeState.manualStartPosition
+    ? { row: testModeState.manualStartPosition.y, col: testModeState.manualStartPosition.x }
+    : testModeState.startPositionMode === 'predictable'
     ? { row: 0, col: 0 }
     : getRandomCell(size);
   const board = createEmptyBoard(size);

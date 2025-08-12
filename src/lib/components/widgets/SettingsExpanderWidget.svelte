@@ -391,6 +391,7 @@
           use:blurOnClick
           on:click={() => changeBoardSize(-1)}
           disabled={$gameState.boardSize <= 2}
+          data-testid="decrease-board-size-btn"
         >-</button>
         <span class="settings-expander__current-size">{$gameState.boardSize}x{$gameState.boardSize}</span>
         <button
@@ -398,6 +399,7 @@
           use:blurOnClick
           on:click={() => changeBoardSize(1)}
           disabled={$gameState.boardSize >= 9}
+          data-testid="increase-board-size-btn"
         >+</button>
       </div>
     </div>
@@ -448,6 +450,7 @@
       label={$_('gameControls.blockMode')}
       checked={$settingsStore.blockModeEnabled}
       on:toggle={settingsStore.toggleBlockMode}
+      dataTestId="block-mode-toggle"
     />
     {#if $settingsStore.blockModeEnabled}
       <div class="settings-expander__options-group">

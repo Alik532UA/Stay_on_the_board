@@ -15,7 +15,7 @@
       TEST_MODE: 'test_mode' // Для логів, пов'язаних з тестовим режимом
     };
     
-    // 2. Конфігурація за замовчуванням (всі групи увімкнені)
+    // 2. Конфігурація
     const defaultConfig = {
       [LOG_GROUPS.STATE]: true,
       [LOG_GROUPS.LOGIC]: true,

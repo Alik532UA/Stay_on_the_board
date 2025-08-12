@@ -4,7 +4,6 @@
   // модальні вікна, обробники глобальних гарячих клавіш та загальні стилі.
   // Це дозволяє уникнути дублювання коду (DRY).
 
-  import Modal from '$lib/components/Modal.svelte';
   import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
   import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore.js';
   import { settingsStore } from '$lib/stores/settingsStore.ts';
@@ -116,7 +115,6 @@
   <slot />
 </div>
 
-<Modal />
 {#if $uiState.isVoiceSettingsModalOpen}
   <VoiceSettingsModal close={closeVoiceSettingsModal} />
 {/if}

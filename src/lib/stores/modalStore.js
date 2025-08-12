@@ -27,6 +27,8 @@ import { writable } from 'svelte/store';
  * @property {ModalButton[]} buttons
  * @property {unknown} [component]
  * @property {boolean} [closable]
+ * @property {string} [dataTestId]
+ * @property {string} [titleDataTestId]
  */
 
 /** @type {ModalState} */
@@ -36,7 +38,9 @@ const initialState = {
   content: '',
   buttons: [],
   component: null,
-  closable: true
+  closable: true,
+  dataTestId: undefined,
+  titleDataTestId: undefined
 };
 
 const { subscribe, set } = writable(initialState);
@@ -44,10 +48,10 @@ const { subscribe, set } = writable(initialState);
 export const modalState = { subscribe };
 
 /**
- * @param {{ title?: string, titleKey?: string, content?: string|ModalContent|any, contentKey?: string, buttons?: ModalButton[], component?: any, closable?: boolean }} param0
+ * @param {{ title?: string, titleKey?: string, content?: string|ModalContent|any, contentKey?: string, buttons?: ModalButton[], component?: any, closable?: boolean, dataTestId?: string, titleDataTestId?: string }} param0
  */
-export function showModal({ title, titleKey, content, contentKey, buttons, component, closable = true }) {
-  set({ isOpen: true, title, titleKey, content, contentKey, buttons: buttons || [], component, closable });
+export function showModal({ title, titleKey, content, contentKey, buttons, component, closable = true, dataTestId, titleDataTestId }) {
+  set({ isOpen: true, title, titleKey, content, contentKey, buttons: buttons || [], component, closable, dataTestId, titleDataTestId });
 }
 
 export function closeModal() {
