@@ -3,16 +3,16 @@
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
   import { settingsStore } from '$lib/stores/settingsStore';
   import { onMount } from 'svelte';
-
+  
   let testMode = false;
-
+  
   onMount(() => {
     const unsubscribe = settingsStore.subscribe(settings => {
       testMode = settings.testMode;
     });
     return unsubscribe;
   });
-
+  
   function handleTestModeChange() {
     settingsStore.updateSettings({ testMode: !testMode });
   }
@@ -30,6 +30,15 @@
 {/if}
 
 <style>
+  .hidden {
+    display: none;
+  }
+  .test-mode-container {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+  }
   .test-mode-toggle {
     position: fixed;
     bottom: 10px;

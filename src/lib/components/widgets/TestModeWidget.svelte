@@ -1,34 +1,44 @@
 <script lang="ts">
-  import { testModeStore, type PositionMode, type ComputerMoveMode } from '$lib/stores/testModeStore';
+  import { onMount } from 'svelte';
+  import { testModeStore, type PositionMode, type ComputerMoveMode, type TestModeState } from '$lib/stores/testModeStore';
   import { logService } from '$lib/services/logService.js';
+  import { settingsStore } from '$lib/stores/settingsStore';
 
   let manualDirection: string | null = null;
-  let manualDistance: number | null = null;
+  let manualDistance: number = 1;
+  let manualX: number = 0;
+  let manualY: number = 0;
 
   function setStartPositionMode(mode: PositionMode) {
-    testModeStore.update(state => ({ ...state, startPositionMode: mode }));
+    testModeStore.update(state => ({ ...state, startPositionMode: mode, manualStartPosition: null }));
+  }
+
+  function setManualStartPosition() {
+    testModeStore.update(state => ({
+      ...state,
+      startPositionMode: 'manual',
+      manualStartPosition: { x: manualX, y: manualY }
+    }));
   }
 
   function setComputerMoveMode(mode: ComputerMoveMode) {
+    manualDirection = null;
     testModeStore.update(state => ({ ...state, computerMoveMode: mode, manualComputerMove: { direction: null, distance: null } }));
   }
 
   function handleDirection(dir: string) {
     manualDirection = dir;
-    if (manualDirection && manualDistance) {
-      setManualComputerMove(manualDirection, manualDistance);
-    }
+    // No longer auto-set on direction change
   }
 
-  function handleDistance(dist: number) {
-    manualDistance = dist;
+  function applyManualMove() {
     if (manualDirection && manualDistance) {
       setManualComputerMove(manualDirection, manualDistance);
     }
   }
 
   function setManualComputerMove(direction: string, distance: number) {
-    const newState: Partial<import('$lib/stores/testModeStore').TestModeState> = {
+    const newState: Partial<TestModeState> = {
       computerMoveMode: 'manual',
       manualComputerMove: { direction, distance }
     };
@@ -38,98 +48,234 @@
       return updatedState;
     });
   }
+  onMount(() => {
+    logService.testMode('TestModeWidget mounted');
+    const unsubscribe = settingsStore.subscribe(settings => {
+      logService.testMode('TestModeWidget settingsStore subscription fired', { testMode: settings.testMode });
+      autorun(settings.testMode);
+    });
+    return unsubscribe;
+  });
+  function autorun(isTestModeOn: boolean) {
+    logService.testMode(`autorun called with isTestModeOn: ${isTestModeOn}`);
+    if (isTestModeOn) {
+      logService.testMode('Applying ON defaults');
+      manualX = 0;
+      manualY = 0;
+      manualDirection = 'down';
+      manualDistance = 1;
+      testModeStore.update(state => ({
+        ...state,
+        startPositionMode: 'manual',
+        manualStartPosition: { x: 0, y: 0 },
+        computerMoveMode: 'manual',
+        manualComputerMove: { direction: 'down', distance: 1 }
+      }));
+    } else {
+      logService.testMode('Applying OFF defaults');
+      manualX = 0;
+      manualY = 0;
+      manualDirection = null;
+      manualDistance = 1;
+      testModeStore.update(state => ({
+        ...state,
+        startPositionMode: 'random',
+        manualStartPosition: null,
+        computerMoveMode: 'random',
+        manualComputerMove: { direction: null, distance: null }
+      }));
+    }
+  }
 </script>
 
 <div class="test-mode-widget">
-  <h3>Test Mode Controls</h3>
+  <h3 class="test-mode-widget-title">Test Mode</h3>
 
-  <div class="control-group">
-    <h4>Start Position</h4>
-    <div class="btn-group">
-      <button on:click={() => setStartPositionMode('random')} class:active={$testModeStore.startPositionMode === 'random'}>Випадково</button>
-      <button on:click={() => setStartPositionMode('predictable')} class:active={$testModeStore.startPositionMode === 'predictable'}>Передбачувано (0,0)</button>
+  <div class="test-mode-control-group">
+    <h4 class="test-mode-group-title">Start Position</h4>
+    <div class="test-mode-btn-group">
+      <button class="test-mode-row-btn" on:click={() => setStartPositionMode('random')} class:active={$testModeStore.startPositionMode === 'random'}>Random</button>
+      <button class="test-mode-row-btn" on:click={() => setStartPositionMode('manual')} class:active={$testModeStore.startPositionMode === 'manual'}>Manual</button>
     </div>
+    {#if $testModeStore.startPositionMode === 'manual'}
+      <div class="test-mode-manual-coords">
+        <div class="test-mode-input-group">
+          <label for="manualX">X</label>
+          <input id="manualX" class="test-mode-input" type="number" bind:value={manualX} min="0" max="7" data-testid="test-mode-start-pos-x">
+        </div>
+        <div class="test-mode-input-group">
+          <label for="manualY">Y</label>
+          <input id="manualY" class="test-mode-input" type="number" bind:value={manualY} min="0" max="7" data-testid="test-mode-start-pos-y">
+        </div>
+        <button class="test-mode-square-btn" on:click={setManualStartPosition} data-testid="test-mode-set-start-pos-btn">Set</button>
+      </div>
+    {/if}
   </div>
 
-  <div class="control-group">
-    <h4>Computer's Next Move</h4>
-    <div class="btn-group">
-        <button on:click={() => setComputerMoveMode('random')} class:active={$testModeStore.computerMoveMode === 'random'}>Випадково</button>
+  <hr class="test-mode-divider" />
+
+  <div class="test-mode-control-group">
+    <h4 class="test-mode-group-title">Computer's Move</h4>
+    <div class="test-mode-btn-group">
+        <button class="test-mode-row-btn" on:click={() => setComputerMoveMode('random')} class:active={$testModeStore.computerMoveMode === 'random'}>Random</button>
     </div>
-    <div class="directions-3x3">
-      <button class="dir-btn {manualDirection === 'up-left' ? 'active' : ''}" on:click={() => handleDirection('up-left')}>↖</button>
-      <button class="dir-btn {manualDirection === 'up' ? 'active' : ''}" on:click={() => handleDirection('up')}>↑</button>
-      <button class="dir-btn {manualDirection === 'up-right' ? 'active' : ''}" on:click={() => handleDirection('up-right')}>↗</button>
-      <button class="dir-btn {manualDirection === 'left' ? 'active' : ''}" on:click={() => handleDirection('left')}>←</button>
+    <div class="test-mode-directions-3x3">
+      <button class="test-mode-dir-btn" class:active={manualDirection === 'up-left'} on:click={() => handleDirection('up-left')} data-testid="test-mode-dir-btn-up-left">↖</button>
+      <button class="test-mode-dir-btn" class:active={manualDirection === 'up'} on:click={() => handleDirection('up')} data-testid="test-mode-dir-btn-up">↑</button>
+      <button class="test-mode-dir-btn" class:active={manualDirection === 'up-right'} on:click={() => handleDirection('up-right')} data-testid="test-mode-dir-btn-up-right">↗</button>
+      <button class="test-mode-dir-btn" class:active={manualDirection === 'left'} on:click={() => handleDirection('left')} data-testid="test-mode-dir-btn-left">←</button>
       <div class="placeholder"></div>
-      <button class="dir-btn {manualDirection === 'right' ? 'active' : ''}" on:click={() => handleDirection('right')}>→</button>
-      <button class="dir-btn {manualDirection === 'down-left' ? 'active' : ''}" on:click={() => handleDirection('down-left')}>↙</button>
-      <button class="dir-btn {manualDirection === 'down' ? 'active' : ''}" on:click={() => handleDirection('down')}>↓</button>
-      <button class="dir-btn {manualDirection === 'down-right' ? 'active' : ''}" on:click={() => handleDirection('down-right')}>↘</button>
+      <button class="test-mode-dir-btn" class:active={manualDirection === 'right'} on:click={() => handleDirection('right')} data-testid="test-mode-dir-btn-right">→</button>
+      <button class="test-mode-dir-btn" class:active={manualDirection === 'down-left'} on:click={() => handleDirection('down-left')} data-testid="test-mode-dir-btn-down-left">↙</button>
+      <button class="test-mode-dir-btn" class:active={manualDirection === 'down'} on:click={() => handleDirection('down')} data-testid="test-mode-dir-btn-down">↓</button>
+      <button class="test-mode-dir-btn" class:active={manualDirection === 'down-right'} on:click={() => handleDirection('down-right')} data-testid="test-mode-dir-btn-down-right">↘</button>
     </div>
-    <div class="distance-btns">
-        <div class="distance-row">
-            <button class="dist-btn {manualDistance === 1 ? 'active' : ''}" on:click={() => handleDistance(1)}>1</button>
-            <button class="dist-btn {manualDistance === 2 ? 'active' : ''}" on:click={() => handleDistance(2)}>2</button>
-            <button class="dist-btn {manualDistance === 3 ? 'active' : ''}" on:click={() => handleDistance(3)}>3</button>
-        </div>
+    <div class="test-mode-manual-move-controls">
+      <div class="test-mode-input-group">
+        <label for="manualDist">Dist</label>
+        <input id="manualDist" class="test-mode-input" type="number" bind:value={manualDistance} min="1" max="7" data-testid="test-mode-move-dist-input">
+      </div>
+      <button class="test-mode-square-btn" on:click={applyManualMove} data-testid="test-mode-set-move-btn">Set</button>
     </div>
   </div>
 </div>
 
 <style>
   .test-mode-widget {
-    border: 1px solid var(--border-color, #555);
-    padding: 1rem;
-    border-radius: 8px;
-    background: var(--background-color, #2a2a2a);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    width: 280px;
-  }
-  .control-group {
-    margin-bottom: 1rem;
-  }
-  .btn-group {
+    background: var(--background-alt, #1e1e1e);
+    border-radius: var(--unified-border-radius, 12px);
+    padding: 0.5rem;
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 150px;
   }
-  button {
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    border: 1px solid #777;
-    background: #444;
-    color: white;
+  .test-mode-widget-title {
+    font-weight: 700;
+    text-align: center;
+    color: var(--text-color, #fff);
+    margin-bottom: 0.25rem;
+  }
+  .test-mode-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .test-mode-group-title {
+    font-weight: 500;
+    color: var(--text-muted, #aaa);
+    border-bottom: 1px solid var(--border-color, #444);
+    padding-bottom: 0.125rem;
+    margin-bottom: 0.25rem;
+  }
+  .test-mode-btn-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+  .test-mode-row-btn {
+    background: var(--control-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 0 0.4rem;
+    line-height: 1.5;
+    font-size: 0.8rem;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    min-height: 32px;
+  }
+  .test-mode-row-btn:hover {
+    border-color: var(--control-selected);
+  }
+  .test-mode-row-btn.active {
+    background: var(--control-selected);
+    color: var(--accent-text, #000000);
+    border-color: var(--control-selected);
+  }
+  .test-mode-manual-coords {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr) 30px;
+    gap: 0.25rem;
+    align-items: end;
+  }
+  .test-mode-input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.125rem;
+  }
+  .test-mode-input-group label {
+    font-size: 0.7rem;
+    color: var(--text-muted, #aaa);
+  }
+  .test-mode-input {
+    width: 100%;
+    background: var(--input-bg, #111);
+    border: 1px solid var(--input-border, #555);
+    color: var(--text-color, #fff);
+    border-radius: 12px;
+    padding: 0.1rem 0;
+    text-align: center;
+    font-size: 0.8rem;
+    -moz-appearance: textfield;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .test-mode-input:focus {
+    outline: none;
+    border-color: var(--control-selected, #007acc);
+    box-shadow: 0 0 0 2px var(--control-selected-shadow, rgba(0, 122, 204, 0.5));
+  }
+  .test-mode-input::-webkit-outer-spin-button,
+  .test-mode-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .test-mode-square-btn {
+    background: var(--control-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 12px;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
   }
-  button.active {
-    background: #ff9800;
-    border-color: #ff9800;
+  .test-mode-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 0.125rem 0;
   }
-  .directions-3x3 {
+  .test-mode-directions-3x3 {
     display: grid;
-    grid-template-columns: repeat(3, 50px);
-    grid-template-rows: repeat(3, 50px);
-    gap: 10px;
-    margin-top: 0.5rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.125rem;
+  }
+  .test-mode-dir-btn {
+    background: var(--control-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 16px;
+    min-width: 100%;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
     justify-content: center;
+    font-family: 'M PLUS Rounded 1c', sans-serif !important;
   }
-  .dir-btn {
-    width: 50px;
-    height: 50px;
-    font-size: 1.5em;
+  .test-mode-dir-btn.active {
+    background: var(--control-selected);
+    color: var(--accent-text, #000000);
   }
-  .distance-btns {
-      margin-top: 0.5rem;
-  }
-  .distance-row {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-  }
-  .dist-btn {
-      width: 40px;
-      height: 40px;
-      font-size: 1.2em;
+  .test-mode-manual-move-controls {
+    display: grid;
+    grid-template-columns: 1fr 30px;
+    gap: 0.25rem;
+    align-items: end;
   }
 </style>

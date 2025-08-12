@@ -138,7 +138,7 @@
 <PlayerColorProvider />
 
 {#if $settingsStore.testMode}
-	<div class="test-mode-widget-wrapper">
+	<div class="test-mode-container">
 		<TestModeWidget />
 	</div>
 {/if}
@@ -150,11 +150,11 @@
 		min-height: 100vh;
 	}
 
-	.test-mode-widget-wrapper {
+	.test-mode-container {
 		position: fixed;
-		bottom: 60px; /* Adjust as needed */
+		bottom: 60px;
 		right: 10px;
-		z-index: 1001; /* Higher than other elements */
+		z-index: 1001;
 	}
 
 	main {
