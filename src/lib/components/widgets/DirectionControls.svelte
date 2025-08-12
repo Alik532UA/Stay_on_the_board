@@ -45,10 +45,10 @@
 
 <div class="direction-controls-panel">
   <div class="directions-3x3">
-    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => handleDirection('up-left')}>↖</button>
-    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" on:click={() => handleDirection('up')}>↑</button>
-    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" on:click={() => handleDirection('up-right')}>↗</button>
-    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" on:click={() => handleDirection('left')}>←</button>
+    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => handleDirection('up-left')} data-testid="dir-btn-up-left">↖</button>
+    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" on:click={() => handleDirection('up')} data-testid="dir-btn-up">↑</button>
+    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" on:click={() => handleDirection('up-right')} data-testid="dir-btn-up-right">↗</button>
+    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" on:click={() => handleDirection('left')} data-testid="dir-btn-left">←</button>
     <button id="center-info"
       class="control-btn center-info {centerInfoProps.class}"
       type="button"
@@ -60,24 +60,24 @@
     >
       {centerInfoProps.content}
     </button>
-    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" on:click={() => handleDirection('right')}>→</button>
-    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" on:click={() => handleDirection('down-left')}>↙</button>
-    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" on:click={() => handleDirection('down')}>↓</button>
-    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" on:click={() => handleDirection('down-right')}>↘</button>
+    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" on:click={() => handleDirection('right')} data-testid="dir-btn-right">→</button>
+    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" on:click={() => handleDirection('down-left')} data-testid="dir-btn-down-left">↙</button>
+    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" on:click={() => handleDirection('down')} data-testid="dir-btn-down">↓</button>
+    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" on:click={() => handleDirection('down-right')} data-testid="dir-btn-down-right">↘</button>
   </div>
   <div class="distance-select">
     <div class="distance-btns">
       {#each distanceRows as row}
         <div class="distance-row">
           {#each row as dist}
-            <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" on:click={() => handleDistance(dist)}>{dist}</button>
+            <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" on:click={() => handleDistance(dist)} data-testid={`dist-btn-${dist}`}>{dist}</button>
           {/each}
         </div>
       {/each}
     </div>
   </div>
   <div class="action-btns">
-    <button class="confirm-btn {confirmButtonBlocked ? 'disabled' : ''}" on:click={handleConfirm} title={$_('gameControls.confirm')}>
+    <button class="confirm-btn {confirmButtonBlocked ? 'disabled' : ''}" on:click={handleConfirm} title={$_('gameControls.confirm')} data-testid="confirm-move-btn">
       <SvgIcons name="confirm" />
       {$_('gameControls.confirm')}
     </button>

@@ -6,7 +6,7 @@ test.describe('Ігровий процес', () => {
     await page.goto('/');
 
     // Вмикаємо Test Mode
-    await page.locator('button:has-text("Test Mode")').click();
+    await page.getByTestId('test-mode-btn').click();
 
     // 2. Знайти і натиснути кнопку "Гра проти комп'ютера"
     // Playwright знайде кнопку за текстом, який бачить користувач
@@ -27,11 +27,11 @@ test.describe('Ігровий процес', () => {
     await expect(page.locator('.direction-controls-panel')).toBeVisible();
 
     // 4. Зробити хід: натиснути стрілку "вправо", потім відстань "1"
-    await page.locator('button.dir-btn:has-text("→")').click();
-    await page.locator('button.dist-btn:has-text("1")').click();
+    await page.getByTestId('dir-btn-right').click();
+    await page.getByTestId('dist-btn-1').click();
 
     // 5. Натиснути кнопку "Підтвердити"
-    await page.locator('button.confirm-btn').click();
+    await page.getByTestId('confirm-move-btn').click();
 
     // 6. Перевірити результат
     // Наприклад, перевіримо, що в панелі рахунку з'явився рахунок > 0
