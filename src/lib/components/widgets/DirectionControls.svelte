@@ -82,7 +82,7 @@
       {$_('gameControls.confirm')}
     </button>
     {#if blockModeEnabled}
-      <button class="no-moves-btn" on:click={handleNoMoves} title={$_('gameControls.noMovesTitle')}>
+      <button class="no-moves-btn" on:click={handleNoMoves} title={$_('gameControls.noMovesTitle')} data-testid="no-moves-btn">
         <SvgIcons name="no-moves" />
         {$_('gameControls.noMovesTitle')}
       </button>

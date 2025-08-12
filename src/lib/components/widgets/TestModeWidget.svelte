@@ -28,14 +28,9 @@
 
   function handleDirection(dir: string) {
     manualDirection = dir;
-    // No longer auto-set on direction change
+    setManualComputerMove(dir, manualDistance);
   }
 
-  function applyManualMove() {
-    if (manualDirection && manualDistance) {
-      setManualComputerMove(manualDirection, manualDistance);
-    }
-  }
 
   function setManualComputerMove(direction: string, distance: number) {
     const newState: Partial<TestModeState> = {
@@ -135,7 +130,6 @@
         <label for="manualDist">Dist</label>
         <input id="manualDist" class="test-mode-input" type="number" bind:value={manualDistance} min="1" max="7" data-testid="test-mode-move-dist-input">
       </div>
-      <button class="test-mode-square-btn" on:click={applyManualMove} data-testid="test-mode-set-move-btn">Set</button>
     </div>
   </div>
 </div>

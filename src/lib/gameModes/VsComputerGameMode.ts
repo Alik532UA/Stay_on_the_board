@@ -255,7 +255,7 @@ export class VsComputerGameMode implements IGameMode {
         { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => gameOrchestrator.startReplay() }
       ],
       closable: false,
-      dataTestId: 'opponent-trapped-modal',
+      dataTestId: playerType === 'human' ? 'player-no-moves-modal' : 'opponent-trapped-modal',
       titleDataTestId: 'opponent-trapped-modal-title'
     });
   }
