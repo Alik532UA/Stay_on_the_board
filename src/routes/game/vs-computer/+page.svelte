@@ -22,7 +22,7 @@
   import { gameState } from '$lib/stores/gameState.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { gameOverStore } from '$lib/stores/gameOverStore';
-  import { gameOrchestrator } from '$lib/gameOrchestrator';
+  import { gameModeService } from '$lib/services/gameModeService';
   import { get } from 'svelte/store';
   import { _ } from 'svelte-i18n';
   import { gameStore } from '$lib/stores/gameStore';
@@ -33,7 +33,7 @@
     if (!isRestoring) {
       resetGame({}, get(gameState));
     }
-    gameOrchestrator.setCurrentGameMode('vs-computer');
+    gameModeService.setCurrentGameMode('vs-computer');
     animationStore.initialize();
   });
 
