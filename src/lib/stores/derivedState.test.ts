@@ -46,6 +46,7 @@ describe('Derived State Tests', () => {
       wasResumed: false
     });
   });
+  animationStore.reset();
 
   test('зміни в animationStore не повинні впливати на логічні дані', () => {
     const initialGameState = get(gameState);

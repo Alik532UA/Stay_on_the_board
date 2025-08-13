@@ -26,7 +26,7 @@ npm run check
 2. Виставити інший пріоритет
 3. тощо
 =======================================================================================
-Створи файл `architecture-improvement-plan-v11.md` в папці "\Stay_on_the_board\docs\plans"
+Створи файл `architecture-improvement-plan-v12.md` в папці "\Stay_on_the_board\docs\plans"
 у першій частині:
 Проведи комплексний аудит коду за наступними критеріями:
 

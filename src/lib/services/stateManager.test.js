@@ -8,9 +8,9 @@ import { gameState } from '$lib/stores/gameState';
 import { stateManager } from '$lib/services/stateManager';
 
 // Мокаємо requestAnimationFrame
-global.requestAnimationFrame = vi.fn((cb: FrameRequestCallback) => {
+global.requestAnimationFrame = vi.fn((cb) => {
   const id = setTimeout(cb, 0);
-  return id as number;
+  return id;
 });
 
 describe('StateManager', () => {

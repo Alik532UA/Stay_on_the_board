@@ -3155,7 +3155,60 @@ Start Position: "Manual" x0 y0
 Актуальний результат: підтверджується тільки після натискання кнопки "test-mode-square-btn"
 Очікуваний результат: підтверджується одразу при натисканні на кнопку напрямку "test-mode-dir-btn-*"
 =======================================================================================
+**Правила**: Ознайомся та дотримуйся правил з @/docs/my-notes/AI_AGENT_RULES.md 
+**Мова**: мова спілкування в чаті українська
+
+Поточні завдання:
+виправити баг:
+
+Error: Timed out 5000ms waiting for expect(locator).not.toBeVisible()
+
+Locator: getByTestId('opponent-trapped-modal')
+Expected: not visible
+Received: visible
+Call log:
+  - Expect "not toBeVisible" with timeout 5000ms
+  - waiting for getByTestId('opponent-trapped-modal')
+    8 × locator resolved to <div class="modal-window s-CbKqU8tqPnSX" data-testid="opponent-trapped-modal">…</div>
+      - unexpected value "visible"
+
+Тест знайшов помилку в програмі
+Актуальний результат: "opponent-trapped-modal" "Суперник у пастці!" на екрані
+Очікуваний результат: "opponent-trapped-modal" "Суперник у пастці!" не повинно бути, бо режим заблокованих клітинок вимкнений, а як наслідок комп'ютера не може були заблокованим.
+
+проаналізуй чи це пов'язано з проблемами які опсині в @/docs/plans/architecture-improvement-plan-v11.md і в @/docs/plans/refactor-game-orchestrator-plan.md 
+якщо пов'язано, тоді вирішуй проблему комплексно та глобально, а не намагайся латати "костилями"
+
 =======================================================================================
+після рефакторінгу з @/docs/plans/architecture-improvement-plan-v11.md і з @/docs/plans/refactor-game-orchestrator-plan.md
+в "режимі" Гра проти комп'ютера є помилка в консолі:
+```
+error-handling.js:36 
+ Uncaught TypeError: gameOrchestrator.setCurrentGameMode is not a function
+    at +page.svelte:36:22
+    at run (utils.js:39:9)
+    at Array.map (<anonymous>)
+    at lifecycle.js:51:41
+    at untrack (runtime.js:727:10)
+    at $effect (lifecycle.js:51:15)
+    at update_reaction (runtime.js:287:53)
+    at update_effect (runtime.js:467:18)
+    at flush_queued_effects (batch.js:549:5)
+    at #process (batch.js:206:4)
+(anonymous)	@	+page.svelte:36
+run	@	utils.js:39
+(anonymous)	@	lifecycle.js:51
+untrack	@	runtime.js:727
+$effect	@	lifecycle.js:51
+update_reaction	@	runtime.js:287
+update_effect	@	runtime.js:467
+flush_queued_effects	@	batch.js:549
+#process	@	batch.js:206
+flush_effects	@	batch.js:383
+flush	@	batch.js:330
+(anonymous)	@	batch.js:460
+dequeue	@	batch.js:62
+```
 =======================================================================================
 =======================================================================================
 =======================================================================================

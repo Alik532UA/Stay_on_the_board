@@ -1,10 +1,10 @@
 import { writable, get } from 'svelte/store';
-import type { IGameMode } from '$lib/gameModes/gameMode.interface';
+import type { BaseGameMode } from '$lib/gameModes/BaseGameMode';
 import { gameState, type GameState } from './gameState';
 import { localGameStore, type LocalGameState } from './localGameStore';
 
 export interface Game {
-  mode: IGameMode | null;
+  mode: BaseGameMode | null;
   state: GameState;
   localState?: LocalGameState;
 }
@@ -26,7 +26,7 @@ const createGameStore = () => {
 
   return {
     subscribe,
-    setMode: (mode: IGameMode) => {
+    setMode: (mode: BaseGameMode) => {
       update(game => ({ ...game, mode }));
     }
   };

@@ -2,7 +2,7 @@
   import { gameState } from '$lib/stores/gameState.js';
   import { playerInputStore } from '$lib/stores/playerInputStore.js';
   import { setDirection, setDistance } from '$lib/services/gameLogicService.js';
-  import { gameOrchestrator } from '$lib/gameOrchestrator';
+  import { userActionService } from '$lib/services/userActionService';
   import { _ } from 'svelte-i18n';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import SvgIcons from '../SvgIcons.svelte';
@@ -52,7 +52,7 @@
   }
   function handleNoMoves() { 
     logService.action('Click: "Ходів немає" (ControlsPanelWidget)');
-    gameOrchestrator.claimNoMoves(); 
+    userActionService.claimNoMoves();
   }
   
   function onConfirmClick() {
@@ -64,7 +64,7 @@
       });
       return;
     }
-    gameOrchestrator.confirmPlayerMove();
+    userActionService.confirmMove();
   }
 </script>
 

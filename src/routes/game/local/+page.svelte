@@ -22,7 +22,7 @@
   import { animationStore } from '$lib/stores/animationStore.js';
   import { gameOverStore } from '$lib/stores/gameOverStore';
   import { modalStore } from '$lib/stores/modalStore.js';
-  import { gameOrchestrator } from '$lib/gameOrchestrator';
+  import { gameModeService } from '$lib/services/gameModeService';
   import { get } from 'svelte/store';
   import { _ } from 'svelte-i18n';
   import { i18nReady } from '$lib/i18n/init.js';
@@ -42,15 +42,15 @@
     if (gameOverState.isGameOver && gameOverState.gameResult && gameOverState.gameResult.gameType === 'local') {
       const { reasonKey, reasonValues } = gameOverState.gameResult;
       if (!get(gameStore).mode) {
-        gameOrchestrator.initializeGameMode();
+        gameModeService.initializeGameMode();
       }
-      gameOrchestrator.endGame(reasonKey, reasonValues);
+      gameModeService.endGame(reasonKey, reasonValues);
     }
   }
 
   onMount(() => {
     // Ініціалізуємо режим гри та анімації
-    gameOrchestrator.setCurrentGameMode('local');
+    gameModeService.setCurrentGameMode('local');
     animationStore.initialize();
   });
 

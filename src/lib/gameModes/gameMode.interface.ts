@@ -1,5 +1,5 @@
 import type { GameState, Player } from '$lib/stores/gameState';
-import type { FinalScoreDetails } from '$lib/gameOrchestrator';
+import type { FinalScoreDetails } from '$lib/models/score';
 import type { MoveDirectionType } from '$lib/models/Figure';
 
 /**
@@ -14,27 +14,6 @@ export interface IGameMode {
    */
   initialize(initialState: GameState): void;
 
-  /**
-   * Обробляє хід гравця.
-   * @param direction - Напрямок ходу.
-   * @param distance - Відстань ходу.
-   * @returns Promise, що вирішується, коли хід повністю оброблено.
-   */
-  handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void>;
-
-  /**
-   * Завершує гру.
-   * @param reasonKey - Ключ причини завершення гри.
-   * @param reasonValues - Додаткові значення для форматування повідомлення.
-   * @returns Promise, що вирішується, коли логіка завершення гри виконана.
-   */
-  endGame(reasonKey: string, reasonValues?: Record<string, any>): Promise<void>;
-
-  /**
-   * Перезапускає гру в поточному режимі.
-   * @returns Promise, що вирішується після перезапуску.
-   */
-  restartGame(): Promise<void>;
 
   /**
    * Обробляє заявку гравця про відсутність ходів.

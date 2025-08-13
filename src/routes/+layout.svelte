@@ -38,6 +38,8 @@
 	import PlayerColorProvider from '$lib/components/PlayerColorProvider.svelte';
 	import TestModeWidget from '$lib/components/widgets/TestModeWidget.svelte';
 	import { gameOrchestrator } from '$lib/gameOrchestrator';
+	import { userActionService } from '$lib/services/userActionService';
+	import { gameModeService } from '$lib/services/gameModeService';
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
@@ -65,7 +67,9 @@
 		}
 
 		if (import.meta.env.DEV || get(settingsStore).testMode) {
-			(window as any).gameOrchestrator = gameOrchestrator;
+			(window as any).gameOrchestrator = gameOrchestrator; // Залишаємо для зворотної сумісності, поки всі тести не переведено
+			(window as any).userActionService = userActionService;
+			(window as any).gameModeService = gameModeService;
 		}
 	});
 

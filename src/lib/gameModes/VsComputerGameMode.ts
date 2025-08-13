@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { _, locale } from 'svelte-i18n';
-import type { IGameMode } from './gameMode.interface';
+import { BaseGameMode } from './BaseGameMode';
 import { speakText } from '$lib/services/speechService';
 import { moveDirections } from '$lib/utils/translations';
 import { lastComputerMove, availableMoves as derivedAvailableMoves } from '$lib/stores/derivedState';
@@ -12,121 +12,14 @@ import { gameOverStore } from '$lib/stores/gameOverStore';
 import { stateManager } from '$lib/services/stateManager';
 import { modalStore } from '$lib/stores/modalStore';
 import { gameOrchestrator } from '$lib/gameOrchestrator';
-import type { FinalScoreDetails } from '$lib/gameOrchestrator';
+import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { getAvailableMoves } from '$lib/utils/boardUtils';
 import { logService } from '$lib/services/logService';
 
-export class VsComputerGameMode implements IGameMode {
+export class VsComputerGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
     // У цьому режимі ініціалізація відбувається через стандартний resetGame
-  }
-
-  async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
-    const state = get(gameState);
-    const settings = get(settingsStore);
-    const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex, state, settings);
-
-    if (moveResult.success) {
-      this.onPlayerMoveSuccess();
-    } else {
-      this.onPlayerMoveFailure(moveResult.reason, direction, distance);
-    }
-  }
-
-  private async onPlayerMoveSuccess(): Promise<void> {
-    const currentState = get(gameState);
-    if (currentState.isFirstMove) {
-      await stateManager.applyChanges('FIRST_MOVE_COMPLETED', { isFirstMove: false }, 'First move completed');
-    }
-    if (currentState.wasResumed) {
-      await stateManager.applyChanges('RESET_WAS_RESUMED', { wasResumed: false }, 'Resetting wasResumed after successful player move');
-    }
-
-    playerInputStore.set({
-      selectedDirection: null,
-      selectedDistance: null,
-      distanceManuallySelected: false,
-      isMoveInProgress: false
-    });
-
-    this.advanceToNextPlayer();
-  }
-
-  private async onPlayerMoveFailure(reason: string | undefined, direction: MoveDirectionType, distance: number): Promise<void> {
-    const state = get(gameState);
-    const figure = new Figure(state.playerRow!, state.playerCol!, state.boardSize);
-    const finalInvalidPosition = figure.calculateNewPosition(direction, distance);
-
-    const finalMoveForAnimation = {
-      player: 1,
-      direction: direction,
-      distance: distance,
-      to: finalInvalidPosition
-    };
-
-    await stateManager.applyChanges(
-      'QUEUE_FINAL_MOVE',
-      { moveQueue: [...state.moveQueue, finalMoveForAnimation] },
-      'Queueing final losing move for animation'
-    );
-
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    if (reason === 'out_of_bounds') {
-      this.endGame('modal.gameOverReasonOut');
-    } else if (reason === 'blocked_cell') {
-      this.endGame('modal.gameOverReasonBlocked');
-    }
-  }
-
-  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
-    const state = get(gameState);
-    const finalScoreDetails = gameLogicService.calculateFinalScore(state as any, 'vs-computer');
-
-    const endGameChanges = {
-      isGameOver: true,
-      baseScore: finalScoreDetails.baseScore,
-      sizeBonus: finalScoreDetails.sizeBonus,
-      blockModeBonus: finalScoreDetails.blockModeBonus,
-      jumpBonus: finalScoreDetails.jumpBonus,
-      finishBonus: finalScoreDetails.finishBonus,
-      noMovesBonus: finalScoreDetails.noMovesBonus,
-      totalPenalty: finalScoreDetails.totalPenalty,
-      totalScore: finalScoreDetails.totalScore,
-      gameOverReasonKey: reasonKey,
-      gameOverReasonValues: reasonValues,
-      cellVisitCounts: {}
-    };
-
-    await stateManager.applyChanges('END_GAME', endGameChanges, `Game ended: ${reasonKey}`);
-
-    gameOverStore.setGameOver({
-      scores: state.players.map(p => ({ playerId: p.id, score: p.score })),
-      winners: [], // У грі проти комп'ютера переможець не визначається на цьому етапі
-      reasonKey,
-      reasonValues,
-      finalScoreDetails,
-      gameType: 'vs-computer',
-    });
-
-    const { titleKey, content } = this.createGameOverModalContent(reasonKey, reasonValues, finalScoreDetails, state);
-
-    modalStore.showModal({
-      titleKey,
-      content,
-      dataTestId: 'game-over-modal',
-      titleDataTestId: 'game-over-modal-title',
-      buttons: [
-        { textKey: 'modal.playAgain', primary: true, onClick: () => this.restartGame(), isHot: true },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => gameOrchestrator.startReplay() }
-      ]
-    });
-  }
-
-  async restartGame(): Promise<void> {
-    gameLogicService.resetGame({}, get(gameState));
-    modalStore.closeModal();
   }
 
   async claimNoMoves(): Promise<void> {
@@ -146,12 +39,12 @@ export class VsComputerGameMode implements IGameMode {
     ];
   }
 
-  determineWinner(state: GameState, reasonKey: string) {
+  public determineWinner(state: GameState, reasonKey: string) {
     // У грі проти комп'ютера немає концепції переможця, лише рахунок
     return { winners: [] as number[], winningPlayerIndex: -1 };
   }
 
-  createGameOverModalContent(reasonKey: string, reasonValues: Record<string, any> | null, finalScoreDetails: FinalScoreDetails, state: GameState) {
+  public createGameOverModalContent(reasonKey: string, reasonValues: Record<string, any> | null, finalScoreDetails: FinalScoreDetails, state: GameState) {
     const modalReason = get(_)(reasonKey, reasonValues ? { values: reasonValues } : undefined);
     return {
       titleKey: 'modal.gameOverTitle',
@@ -162,7 +55,7 @@ export class VsComputerGameMode implements IGameMode {
     };
   }
 
-  private async advanceToNextPlayer(): Promise<void> {
+  protected async advanceToNextPlayer(): Promise<void> {
     const currentState = get(gameState);
     const nextPlayerIndex = (currentState.currentPlayerIndex + 1) % currentState.players.length;
 
@@ -252,9 +145,9 @@ export class VsComputerGameMode implements IGameMode {
         { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: () => gameOrchestrator.continueAfterNoMoves() },
         {
           text: get(_)('modal.finishGameWithBonus', { values: { bonus: updatedState.boardSize } }),
-          onClick: () => gameOrchestrator.finalizeGameWithBonus('modal.gameOverReasonBonus')
+          onClick: () => gameOrchestrator.finishWithBonus('modal.gameOverReasonBonus')
         },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => gameOrchestrator.startReplay() }
+        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => gameOrchestrator.requestReplay() }
       ],
       closable: false,
       dataTestId: playerType === 'human' ? 'player-no-moves-modal' : 'opponent-trapped-modal',

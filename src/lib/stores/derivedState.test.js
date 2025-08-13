@@ -9,9 +9,9 @@ import { gameState } from '$lib/stores/gameState';
 import { animationStore } from '$lib/stores/animationStore';
 
 // Мокаємо requestAnimationFrame для тестів
-global.requestAnimationFrame = vi.fn((cb: FrameRequestCallback) => {
+global.requestAnimationFrame = vi.fn((cb) => {
   const id = setTimeout(cb, 0);
-  return id as number;
+  return id;
 });
 
 describe('Derived State Tests', () => {

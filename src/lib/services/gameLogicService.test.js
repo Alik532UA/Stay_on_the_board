@@ -48,7 +48,7 @@ describe('Game Logic Service', () => {
 
   test('performMove повинен працювати правильно', async () => {
     const state = get(gameState);
-    const moveResult = await performMove('down', 1);
+    const moveResult = await performMove('down', 1, get(gameState));
     
     expect(moveResult.success).toBe(true);
     expect(moveResult.newPosition).toBeDefined();
@@ -57,7 +57,7 @@ describe('Game Logic Service', () => {
   });
 
   test('performMove повинен перевіряти межі дошки', async () => {
-    const moveResult = await performMove('up', 1);
+    const moveResult = await performMove('up', 1, get(gameState));
     
     expect(moveResult.success).toBe(false);
     expect(moveResult.error).toBeDefined();

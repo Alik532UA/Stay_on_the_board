@@ -1,12 +1,12 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { get } from 'svelte/store';
 import { gameState } from '$lib/stores/gameState';
-import { gameLogicService } from '$lib/services/gameLogicService';
+import * as gameLogicService from '$lib/services/gameLogicService';
 
 // Мокаємо requestAnimationFrame ПЕРЕД імпортом
-global.requestAnimationFrame = vi.fn((cb: FrameRequestCallback) => {
+global.requestAnimationFrame = vi.fn((cb) => {
   const id = setTimeout(cb, 0);
-  return id as number;
+  return id;
 });
 
 describe('Game Core Logic', () => {
@@ -51,7 +51,7 @@ describe('Game Core Logic', () => {
 
   test('логіка руху повинна працювати', () => {
     const state = get(gameState);
-    const moveResult = gameLogicService.performMove('down', 1);
+    const moveResult = gameLogicService.performMove('down', 1, state);
     
     expect(moveResult.success).toBe(true);
     expect(moveResult.newRow).toBe(1);
@@ -60,7 +60,7 @@ describe('Game Core Logic', () => {
 
   test('перевірка меж дошки', () => {
     const state = get(gameState);
-    const moveResult = gameLogicService.performMove('up', 1);
+    const moveResult = gameLogicService.performMove('up', 1, state);
     
     expect(moveResult.success).toBe(false);
     expect(moveResult.reason).toBe('out_of_bounds');
