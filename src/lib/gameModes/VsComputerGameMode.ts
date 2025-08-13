@@ -16,6 +16,7 @@ import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { getAvailableMoves } from '$lib/utils/boardUtils';
 import { logService } from '$lib/services/logService';
+import { calculateFinalScore } from '$lib/services/scoreService';
 
 export class VsComputerGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
@@ -93,7 +94,7 @@ export class VsComputerGameMode extends BaseGameMode {
             const selectedVoice = allVoices.find(v => v.voiceURI === settings.selectedVoiceURI);
             const speechLang = selectedVoice ? selectedVoice.lang.split('-')[0] : (get(locale) || 'uk');
 
-            const directionKey = lastMove.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+            const directionKey = lastMove.direction.replace(/-(\w)/g, (_: string, c: string) => c.toUpperCase());
             // @ts-ignore
             const moveDirection = moveDirections[speechLang][directionKey];
             const textToSpeak = `${moveDirection} ${lastMove.distance}`;
@@ -131,7 +132,7 @@ export class VsComputerGameMode extends BaseGameMode {
     );
 
     const updatedState = get(gameState);
-    const potentialScoreDetails = gameLogicService.calculateFinalScore(updatedState as any, 'vs-computer');
+    const potentialScoreDetails = calculateFinalScore(updatedState as any, 'vs-computer');
     const titleKey = playerType === 'human' ? 'modal.playerNoMovesTitle' : 'modal.computerNoMovesTitle';
     const contentKey = playerType === 'human' ? 'modal.playerNoMovesContent' : 'modal.computerNoMovesContent';
 

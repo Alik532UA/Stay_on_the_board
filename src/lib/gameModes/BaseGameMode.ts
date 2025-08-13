@@ -3,6 +3,7 @@ import { _ } from 'svelte-i18n';
 import type { IGameMode } from './gameMode.interface';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService';
+import { calculateFinalScore } from '$lib/services/scoreService';
 import { playerInputStore } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
@@ -83,7 +84,7 @@ export abstract class BaseGameMode implements IGameMode {
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
     const state = get(gameState);
     const gameType = get(gameState).players.length > 1 ? 'local' : 'vs-computer';
-    const finalScoreDetails = gameLogicService.calculateFinalScore(state as any, gameType);
+    const finalScoreDetails = calculateFinalScore(state as any, gameType);
 
     const endGameChanges = {
       isGameOver: true,
