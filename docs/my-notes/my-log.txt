@@ -1,0 +1,63 @@
+client:733 [vite] connecting...
+client:827 [vite] connected.
+logService.js:117 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+PlayerColorProvider.svelte:80 [PlayerColorProvider] Removing shadow color, using default
+PlayerColorProvider.svelte:84 [PlayerColorProvider] CSS variable after removal: 
+init.js:31 ✅ i18n ініціалізовано успішно
+logService.js:91 [GAME_MODE] Setting game mode to: vs-computer
+animationStore.ts:179 AnimationStore: Нова гра, gameId змінився з 1755082299305 на 1755082299368
+animationStore.ts:192 AnimationStore: Очищено animationQueue при зміні gameId
+logService.js:91 [ACTION] Hotkey: "decrease-board" (GameLayout)
+logService.js:91 [ACTION] Hotkey: "decrease-board" (GameLayout)
+logService.js:91 [ACTION] Hotkey: "toggle-block-mode" (GameLayout)
+logService.js:91 [ACTION] Hotkey: "right" (GameLayout)
+logService.js:89 [LOGIC] setDirection: встановлено напрямок {dir: 'right', newDistance: 1, newManuallySelected: false}
+logService.js:91 [ACTION] Hotkey: "confirm" (GameLayout)
+logService.js:89 [LOGIC] performMove: початок з параметрами: {direction: 'right', distance: 1, playerIndex: 0}
+logService.js:91 [LOGIC] calculateMoveScore: humanPlayersCount = 1, playerIndex = 0, isHumanMove = true
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 0
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 1
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 0, col: 1, boardValue: 0}
+animationStore.ts:79 [animationStore] addToAnimationQueue викликано з move: {player: 1, direction: 'right', distance: 1, to: {…}}
+animationStore.ts:82 [animationStore] addToAnimationQueue: нова черга: [{…}]
+logService.js:89 [STATE] Applied change: PERFORM_MOVE {reason: 'Move: right1', changes: {…}}
+logService.js:91 [LOGIC] performMove: завершено успішно
+logService.js:89 [STATE] Applied change: ADVANCE_TURN {reason: 'Turn advanced to player 1', changes: {…}}
+logService.js:89 [STATE] Applied change: SET_COMPUTER_TURN {reason: 'Starting computer move', changes: {…}}
+logService.js:89 [TEST_MODE] gameLogicService: отримано стан testModeStore {startPositionMode: 'predictable', manualStartPosition: null, computerMoveMode: 'random', manualComputerMove: {…}}
+logService.js:91 [TEST_MODE] gameLogicService: виконується випадковий хід
+logService.js:89 [LOGIC] performMove: початок з параметрами: {direction: 'down-left', distance: 1, playerIndex: 1}
+logService.js:91 [LOGIC] calculateMoveScore: humanPlayersCount = 1, playerIndex = 1, isHumanMove = false
+logService.js:91 [LOGIC] calculateMoveScore: пропускаємо перевірку "дзеркального" ходу для комп'ютера
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 1
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 0
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 1, col: 0, boardValue: 0}
+animationStore.ts:79 [animationStore] addToAnimationQueue викликано з move: {player: 2, direction: 'down-left', distance: 1, to: {…}}
+animationStore.ts:82 [animationStore] addToAnimationQueue: нова черга: (2) [{…}, {…}]
+logService.js:89 [STATE] Applied change: PERFORM_MOVE {reason: 'Move: down-left1', changes: {…}}
+logService.js:91 [LOGIC] performMove: завершено успішно
+logService.js:89 [STATE] Applied change: ADVANCE_TURN {reason: 'Turn advanced to player 0', changes: {…}}
+logService.js:89 [STATE] Applied change: SET_PLAYER_TURN {reason: 'Computer move completed', changes: {…}}
+logService.js:91 [ACTION] Hotkey: "right" (GameLayout)
+logService.js:89 [LOGIC] setDirection: встановлено напрямок {dir: 'right', newDistance: 1, newManuallySelected: false}
+logService.js:91 [ACTION] Hotkey: "confirm" (GameLayout)
+logService.js:89 [LOGIC] performMove: початок з параметрами: {direction: 'right', distance: 1, playerIndex: 0}
+logService.js:91 [LOGIC] calculateMoveScore: humanPlayersCount = 1, playerIndex = 0, isHumanMove = true
+stateManager.ts:127 validatePlayerMove: перевіряємо playerRow: 1
+stateManager.ts:137 validatePlayerMove: перевіряємо playerCol: 1
+stateManager.ts:149 validatePlayerMove: перевіряємо клітинку на дошці: {row: 1, col: 1, boardValue: 0}
+animationStore.ts:79 [animationStore] addToAnimationQueue викликано з move: {player: 1, direction: 'right', distance: 1, to: {…}}
+animationStore.ts:82 [animationStore] addToAnimationQueue: нова черга: (3) [{…}, {…}, {…}]
+logService.js:89 [STATE] Applied change: PERFORM_MOVE {reason: 'Move: right1', changes: {…}}
+logService.js:89 [LOGIC] performMove (single player): перевіряємо "дзеркальний" хід: {currentMove: {…}, computerMove: {…}, isMirrorMove: false}
+logService.js:91 [LOGIC] performMove: завершено успішно
+logService.js:89 [STATE] Applied change: ADVANCE_TURN {reason: 'Turn advanced to player 1', changes: {…}}
+logService.js:89 [STATE] Applied change: SET_COMPUTER_TURN {reason: 'Starting computer move', changes: {…}}
+logService.js:89 [TEST_MODE] gameLogicService: отримано стан testModeStore {startPositionMode: 'predictable', manualStartPosition: null, computerMoveMode: 'random', manualComputerMove: {…}}
+logService.js:91 [TEST_MODE] gameLogicService: виконується випадковий хід
+logService.js:89 [STATE] StateManager validation warnings {action: 'SUCCESSFUL_NO_MOVES_CLAIM', reason: 'computer has no moves and bonus is awarded', warnings: Array(1)}
+logService.js:89 [STATE] Applied change: SUCCESSFUL_NO_MOVES_CLAIM {reason: 'computer has no moves and bonus is awarded', changes: {…}}
+logService.js:89 [STATE] Applied change: SET_PLAYER_TURN {reason: 'Computer move completed', changes: {…}}
+animationStore.ts:136 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone
+animationStore.ts:136 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone
+animationStore.ts:136 [animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone

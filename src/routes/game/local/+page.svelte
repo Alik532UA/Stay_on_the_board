@@ -27,7 +27,6 @@
   import { _ } from 'svelte-i18n';
   import { i18nReady } from '$lib/i18n/init.js';
   import { gameState } from '$lib/stores/gameState.js';
-  import { localGameStore } from '$lib/stores/localGameStore.js';
   import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
   import { gameStore } from '$lib/stores/gameStore';
   

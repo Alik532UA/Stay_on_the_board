@@ -9,7 +9,8 @@
   import { settingsStore } from '$lib/stores/settingsStore.ts';
   import { get } from 'svelte/store';
   import { setDirection, setDistance } from '$lib/services/gameLogicService.js';
-  import { gameOrchestrator } from '$lib/gameOrchestrator';
+  import { gameModeService } from '$lib/services/gameModeService';
+  import { playerInputStore } from '$lib/stores/playerInputStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { gameState } from '$lib/stores/gameState.js';
   import { goto } from '$app/navigation';
@@ -22,7 +23,7 @@
     const currentSize = get(gameState).boardSize;
     const newSize = currentSize + increment;
     if (newSize >= 2 && newSize <= 9) {
-      gameOrchestrator.setBoardSize(newSize);
+      gameState.update(s => ({...s, boardSize: newSize}));
     }
   }
 
@@ -51,8 +52,8 @@
       case 'down-left': setDirection('down-left'); break;
       case 'down': setDirection('down'); break;
       case 'down-right': setDirection('down-right'); break;
-      case 'confirm': gameOrchestrator.confirmPlayerMove(); break;
-      case 'no-moves': gameOrchestrator.claimNoMoves(); break;
+      case 'confirm': gameModeService.handlePlayerMove(get(playerInputStore).selectedDirection, get(playerInputStore).selectedDistance); break;
+      case 'no-moves': gameModeService.claimNoMoves(); break;
       case 'distance-1': setDistance(1); break;
       case 'distance-2': setDistance(2); break;
       case 'distance-3': setDistance(3); break;

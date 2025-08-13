@@ -4,13 +4,12 @@ import { page } from '$app/stores';
 import { gameState } from './gameState';
 import { logService } from '$lib/services/logService';
 import type { GameState } from './gameState';
-import type { Direction } from '$lib/services/gameLogicService';
+import type { Direction } from '$lib/utils/gameUtils';
 import { playerInputStore } from './playerInputStore';
 import type { PlayerInputState } from './playerInputStore';
 import { settingsStore } from './settingsStore';
 import { languages } from '$lib/constants';
 import { animationStore } from './animationStore';
-import { localGameStore } from './localGameStore';
 import { getAvailableMoves } from '$lib/utils/boardUtils';
 
 /**
@@ -240,16 +239,16 @@ export const availableMoves = derived(
  * @type {import('svelte/store').Readable<string | null>}
  */
 export const previousPlayerColor = derived(
-  [gameState, localGameStore, isLocalGame],
-  ([$gameState, $localGameStore, $isLocalGame]) => {
+  [gameState, isLocalGame],
+  ([$gameState, $isLocalGame]) => {
     if (!$isLocalGame) return null;
 
     const currentPlayerIndex = $gameState.currentPlayerIndex;
-    const playersCount = $localGameStore.players.length;
+    const playersCount = $gameState.players.length;
     if (playersCount === 0) return null;
 
     const previousPlayerIndex = (currentPlayerIndex + playersCount - 1) % playersCount;
-    const previousPlayer = $localGameStore.players[previousPlayerIndex];
+    const previousPlayer = $gameState.players[previousPlayerIndex];
     
     return previousPlayer?.color || null;
   }
@@ -421,12 +420,12 @@ export const currentPlayer = derived(
  * @type {import('svelte/store').Readable<string | null>}
  */
 export const currentPlayerColor = derived(
-  [gameState, localGameStore, isLocalGame],
-  ([$gameState, $localGameStore, $isLocalGame]) => {
+  [gameState, isLocalGame],
+  ([$gameState, $isLocalGame]) => {
     if (!$isLocalGame) return null;
 
     const currentPlayerIndex = $gameState.currentPlayerIndex;
-    const currentPlayer = $localGameStore.players[currentPlayerIndex];
+    const currentPlayer = $gameState.players[currentPlayerIndex];
 
     return currentPlayer?.color || null;
   }

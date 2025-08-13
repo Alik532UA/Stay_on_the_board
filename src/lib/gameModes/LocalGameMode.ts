@@ -8,20 +8,20 @@ import { settingsStore } from '$lib/stores/settingsStore';
 import { getAvailableMoves } from '$lib/utils/boardUtils';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { stateManager } from '$lib/services/stateManager';
-import { modalStore } from '$lib/stores/modalStore';
-import { gameOrchestrator } from '$lib/gameOrchestrator';
+import { userActionService } from '$lib/services/userActionService';
+import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
-import { localGameStore } from '$lib/stores/localGameStore';
 import { logService } from '$lib/services/logService';
 import { lastPlayerMove } from '$lib/stores/derivedState';
+
 export class LocalGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
-    // Ініціалізація для локальної гри відбувається в `local-setup`
+    // Initialization for local games is handled in the `local-setup` page.
     this.checkComputerTurn();
   }
 
-  async claimNoMoves(): Promise<void> {
+  async claimNoMoves(): Promise<SideEffect[]> {
     const state = get(gameState);
     const settings = get(settingsStore);
     const availableMoves = getAvailableMoves(
@@ -36,87 +36,83 @@ export class LocalGameMode extends BaseGameMode {
     );
 
     if (Object.keys(availableMoves).length > 0) {
-      // Якщо ходи є, гравець програв
+      // If moves are available, the player loses.
       const currentPlayerName = state.players[state.currentPlayerIndex].name;
-      this.endGame('modal.gameOverReasonPlayerLied', { playerName: currentPlayerName });
+      return this.endGame('modal.gameOverReasonPlayerLied', { playerName: currentPlayerName });
     } else {
-      // Якщо ходів немає, показуємо модальне вікно
-      this._handleLocalNoMoves();
+      // If there are no moves, show the modal.
+      return this._handleLocalNoMoves();
     }
   }
 
-  private _handleLocalNoMoves(): void {
+  private _handleLocalNoMoves(): SideEffect[] {
     const state = get(gameState);
     const currentPlayerName = state.players[state.currentPlayerIndex].name;
 
-    modalStore.showModal({
-      titleKey: 'modal.playerNoMovesTitle',
-      contentKey: 'modal.noMovesLocalGameContent',
-      content: { playerName: currentPlayerName },
-      buttons: [
-        {
-          textKey: 'modal.continueGame',
-          onClick: () => this._continueLocalGameAfterNoMoves(),
-          primary: true,
-          isHot: true
-        },
-        {
-          textKey: 'modal.endGame',
-          onClick: () => this.endGame('modal.gameOverReasonNoMovesLeft')
-        },
-        {
-          textKey: 'modal.reviewRecord',
-          customClass: 'blue-btn',
-          onClick: () => gameOrchestrator.requestReplay()
+    return [
+      {
+        type: 'ui/showModal',
+        payload: {
+          titleKey: 'modal.playerNoMovesTitle',
+          contentKey: 'modal.noMovesLocalGameContent',
+          content: { playerName: currentPlayerName },
+          buttons: [
+            {
+              textKey: 'modal.continueGame',
+              onClick: () => userActionService.handleModalAction('continueAfterNoMoves'),
+              primary: true,
+              isHot: true
+            },
+            {
+              textKey: 'modal.endGame',
+              onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonNoMovesLeft' })
+            },
+            {
+              textKey: 'modal.reviewRecord',
+              customClass: 'blue-btn',
+              onClick: () => userActionService.handleModalAction('requestReplay')
+            }
+          ]
         }
-      ]
-    });
+      }
+    ];
   }
 
-  private async _continueLocalGameAfterNoMoves(): Promise<void> {
+  private async _continueLocalGameAfterNoMoves(): Promise<SideEffect[]> {
     await stateManager.applyChanges(
       'CONTINUE_LOCAL_GAME',
       { cellVisitCounts: {} },
       'Clearing blocked cells and continuing local game'
     );
-    modalStore.closeModal();
     this.advanceToNextPlayer();
+    return [{ type: 'ui/closeModal' }];
   }
 
-  async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
+  async handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]> {
     logService.logic('handleNoMoves is not applicable in LocalGameMode');
+    return [];
   }
 
   getPlayersConfiguration(): Player[] {
-    return get(localGameStore).players.map(p => ({
-      id: p.id,
-      name: p.name,
-      type: p.isComputer ? 'computer' : 'human',
-      score: p.score
-    }));
+    // Player configuration is now directly in gameState
+    return get(gameState).players;
   }
 
   public determineWinner(state: GameState, reasonKey: string) {
-    const localGameState = get(localGameStore);
-    const scores = localGameState.scoresAtRoundStart;
+    const scores = state.scoresAtRoundStart;
 
-    // Якщо гра завершилася через те, що гравець здався (бо немає ходів),
-    // переможець визначається за балами серед УСІХ гравців.
-    // В інших випадках (вихід за поле, неправдива заява), поточний гравець програє.
     const isNoMovesSurrender = reasonKey === 'modal.gameOverReasonNoMovesLeft';
     const losingPlayerIndex = isNoMovesSurrender ? -1 : state.currentPlayerIndex;
 
     let maxScore = -Infinity;
-    // Визначаємо максимальний рахунок
     for (let i = 0; i < scores.length; i++) {
-      if (i !== losingPlayerIndex) { // Виключаємо гравця, що програв, якщо такий є
+      if (i !== losingPlayerIndex) {
         if (scores[i] > maxScore) {
           maxScore = scores[i];
         }
       }
     }
 
-    // Знаходимо всіх гравців з максимальним рахунком
     const winners: number[] = [];
     for (let i = 0; i < scores.length; i++) {
       if (i !== losingPlayerIndex && scores[i] === maxScore) {
@@ -124,59 +120,17 @@ export class LocalGameMode extends BaseGameMode {
       }
     }
     
-    // Якщо переможців немає (наприклад, всі програли одночасно, хоча це малоймовірно),
-    // то переможців немає.
     const winningPlayerIndex = winners.length > 0 ? winners[0] : -1;
     return { winners, winningPlayerIndex };
   }
 
-  public createGameOverModalContent(reasonKey: string, reasonValues: Record<string, any> | null, finalScoreDetails: FinalScoreDetails, state: GameState) {
-    const localGameState = get(localGameStore);
-    const losingPlayerIndex = state.currentPlayerIndex;
-    const losingPlayerName = localGameState.players[losingPlayerIndex].name;
-    const { winners, winningPlayerIndex } = this.determineWinner(state, reasonKey);
 
-    const modalReason = get(_)(reasonKey, { values: { playerName: losingPlayerName } });
-
-    const playerScores = localGameState.players.map((player, index) => ({
-      playerNumber: index + 1,
-      playerName: player.name,
-      score: localGameState.scoresAtRoundStart[index],
-      isWinner: winners.includes(index),
-      isLoser: index === losingPlayerIndex
-    }));
-
-    let titleKey = 'modal.gameOverTitle';
-    let winnerName = '';
-    let winnerNumbers = '';
-
-    if (winners.length === 1) {
-      titleKey = 'modal.winnerTitle';
-      winnerName = localGameState.players[winningPlayerIndex].name;
-    } else if (winners.length > 1) {
-      titleKey = 'modal.winnersTitle';
-      winnerNumbers = winners.map(i => localGameState.players[i].name).join(', ');
-    }
-
-    return {
-      titleKey,
-      content: {
-        reason: modalReason,
-        playerScores,
-        winnerName,
-        winnerNumbers,
-        scoreDetails: finalScoreDetails
-      }
-    };
-  }
-
-  protected async advanceToNextPlayer(): Promise<void> {
+  protected async advanceToNextPlayer(): Promise<SideEffect[]> {
     const currentState = get(gameState);
     const nextPlayerIndex = (currentState.currentPlayerIndex + 1) % currentState.players.length;
 
-    // Якщо починається нове коло, робимо знімок рахунків
     if (nextPlayerIndex === 0) {
-      localGameStore.snapshotScores();
+      gameState.snapshotScores();
     }
 
     await stateManager.applyChanges(
@@ -185,12 +139,23 @@ export class LocalGameMode extends BaseGameMode {
       `Turn advanced to player ${nextPlayerIndex}`
     );
 
-    // Оновлення availableMoves тепер відбувається реактивно через derived store
-
-    this.checkComputerTurn();
+    return this.checkComputerTurn();
   }
 
-  private async checkComputerTurn(): Promise<void> {
+  protected async applyScoreChanges(scoreChanges: any): Promise<void> {
+    const { bonusPoints, penaltyPoints } = scoreChanges;
+    const state = get(gameState);
+    const currentPlayer = state.players[state.currentPlayerIndex];
+
+    if (bonusPoints > 0) {
+      gameState.addPlayerBonusPoints(currentPlayer.id, bonusPoints);
+    }
+    if (penaltyPoints > 0) {
+      gameState.addPlayerPenaltyPoints(currentPlayer.id, penaltyPoints);
+    }
+  }
+
+  private async checkComputerTurn(): Promise<SideEffect[]> {
     const state = get(gameState);
     const currentPlayer = state.players[state.currentPlayerIndex];
 
@@ -200,11 +165,12 @@ export class LocalGameMode extends BaseGameMode {
 
       const move = gameLogicService.getComputerMove();
       if (move) {
-        await this.handlePlayerMove(move.direction, move.distance);
+        return this.handlePlayerMove(move.direction, move.distance);
       } else {
         // Якщо комп'ютер не може зробити хід, це означає кінець гри для нього
-        this.endGame('modal.gameOverReasonPlayerBlocked');
+        return this.endGame('modal.gameOverReasonPlayerBlocked');
       }
     }
+    return [];
   }
 }

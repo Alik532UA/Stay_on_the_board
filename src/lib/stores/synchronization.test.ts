@@ -31,8 +31,8 @@ describe('Store Synchronization Tests', () => {
       gameId: Date.now(),
       currentPlayerIndex: 0,
       players: [
-        { id: 0, name: 'Player 1', type: 'human', score: 0 },
-        { id: 1, name: 'AI', type: 'ai', score: 0 }
+        { id: 0, name: 'Player 1', type: 'human', score: 0, color: '#e63946', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
+        { id: 1, name: 'AI', type: 'ai', score: 0, color: '#457b9d', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
       ],
       movesInBlockMode: 0,
       jumpedBlockedCells: 0,
@@ -43,7 +43,14 @@ describe('Store Synchronization Tests', () => {
       noMovesClaimsCount: 0,
       noMovesClaimed: false,
       isFirstMove: true,
-      wasResumed: false
+      wasResumed: false,
+      settings: {
+        boardSize: 8,
+        blockModeEnabled: false,
+        autoHideBoard: false,
+        lockSettings: false
+      },
+      scoresAtRoundStart: [0, 0]
     });
   });
 

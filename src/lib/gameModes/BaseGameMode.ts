@@ -8,34 +8,35 @@ import { playerInputStore } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { stateManager } from '$lib/services/stateManager';
-import { modalStore } from '$lib/stores/modalStore';
-import { gameOrchestrator } from '$lib/gameOrchestrator';
+import { userActionService } from '$lib/services/userActionService';
+import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { logService } from '$lib/services/logService';
 
 export abstract class BaseGameMode implements IGameMode {
   abstract initialize(initialState: GameState): void;
-  abstract claimNoMoves(): Promise<void>;
-  abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
+  abstract claimNoMoves(): Promise<SideEffect[]>;
+  abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]>;
   abstract getPlayersConfiguration(): Player[];
   public abstract determineWinner(state: GameState, reasonKey: string): { winners: number[], winningPlayerIndex: number };
-  public abstract createGameOverModalContent(reasonKey: string, reasonValues: Record<string, any> | null, finalScoreDetails: FinalScoreDetails, state: GameState): any;
-  protected abstract advanceToNextPlayer(): Promise<void>;
+  protected abstract advanceToNextPlayer(): Promise<SideEffect[]>;
+  protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
 
-  async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
+  async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<SideEffect[]> {
     const state = get(gameState);
     const settings = get(settingsStore);
     const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex, state, settings);
 
     if (moveResult.success) {
-      this.onPlayerMoveSuccess(moveResult);
+      await this.applyScoreChanges(moveResult);
+      return this.onPlayerMoveSuccess(moveResult);
     } else {
-      this.onPlayerMoveFailure(moveResult.reason, direction, distance);
+      return this.onPlayerMoveFailure(moveResult.reason, direction, distance);
     }
   }
 
-  protected async onPlayerMoveSuccess(moveResult: any): Promise<void> {
+  protected async onPlayerMoveSuccess(moveResult: any): Promise<SideEffect[]> {
     const currentState = get(gameState);
     if (currentState.isFirstMove) {
       await stateManager.applyChanges('FIRST_MOVE_COMPLETED', { isFirstMove: false }, 'First move completed');
@@ -51,10 +52,10 @@ export abstract class BaseGameMode implements IGameMode {
       isMoveInProgress: false
     });
 
-    this.advanceToNextPlayer();
+    return this.advanceToNextPlayer();
   }
 
-  protected async onPlayerMoveFailure(reason: string | undefined, direction: MoveDirectionType, distance: number): Promise<void> {
+  protected async onPlayerMoveFailure(reason: string | undefined, direction: MoveDirectionType, distance: number): Promise<SideEffect[]> {
     const state = get(gameState);
     const figure = new Figure(state.playerRow!, state.playerCol!, state.boardSize);
     const finalInvalidPosition = figure.calculateNewPosition(direction, distance);
@@ -75,13 +76,14 @@ export abstract class BaseGameMode implements IGameMode {
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     if (reason === 'out_of_bounds') {
-      this.endGame('modal.gameOverReasonOut');
+      return this.endGame('modal.gameOverReasonOut');
     } else if (reason === 'blocked_cell') {
-      this.endGame('modal.gameOverReasonBlocked');
+      return this.endGame('modal.gameOverReasonBlocked');
     }
+    return [];
   }
 
-  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
+  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<SideEffect[]> {
     const state = get(gameState);
     const gameType = get(gameState).players.length > 1 ? 'local' : 'vs-computer';
     const finalScoreDetails = calculateFinalScore(state as any, gameType);
@@ -103,22 +105,22 @@ export abstract class BaseGameMode implements IGameMode {
       gameType: gameType,
     });
 
-    const { titleKey, content } = this.createGameOverModalContent(reasonKey, reasonValues, finalScoreDetails, state);
-
-    modalStore.showModal({
-      titleKey,
-      content,
-      dataTestId: 'game-over-modal',
-      titleDataTestId: 'game-over-modal-title',
-      buttons: [
-        { textKey: 'modal.playAgain', primary: true, onClick: () => this.restartGame(), isHot: true },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => gameOrchestrator.requestReplay() }
-      ]
+    sideEffectService.execute({
+      type: 'ui/showGameOverModal',
+      payload: {
+        reasonKey,
+        reasonValues,
+        finalScoreDetails,
+        gameType,
+        state
+      }
     });
+
+    return [];
   }
 
-  async restartGame(): Promise<void> {
+  async restartGame(): Promise<SideEffect[]> {
     gameLogicService.resetGame({}, get(gameState));
-    modalStore.closeModal();
+    return [{ type: 'ui/closeModal' }];
   }
 }

@@ -4,7 +4,7 @@
   import { playerInputStore } from '$lib/stores/playerInputStore.js';
   import { settingsStore } from '$lib/stores/settingsStore.ts';
   import { setDirection, setDistance, resetGame } from '$lib/services/gameLogicService.js';
-  import { gameOrchestrator } from '$lib/gameOrchestrator';
+  import { gameModeService } from '$lib/services/gameModeService';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { logService } from '$lib/services/logService.js';
   import { _ } from 'svelte-i18n';
@@ -122,11 +122,11 @@
       // Для прикладу: movePlayer(playerRow + 1, playerCol)
       // TODO: Додати коректну логіку для обчислення цільової клітинки
       logService.logic('Confirm move: (логіка координат не реалізована)');
-      gameOrchestrator.confirmPlayerMove();
+      gameModeService.handlePlayerMove(selectedDirection, selectedDistance);
     }
   }
   function onNoMoves() {
-    gameOrchestrator.claimNoMoves();
+    gameModeService.claimNoMoves();
   }
 </script>
 

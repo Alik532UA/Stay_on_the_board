@@ -1,6 +1,6 @@
 // src/lib/utils/boardUtils.ts
 
-import type { Direction, Move } from '$lib/services/gameLogicService';
+import type { Direction, Move } from '$lib/utils/gameUtils';
 
 /**
  * Тип для налаштувань гри

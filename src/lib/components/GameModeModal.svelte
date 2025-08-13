@@ -17,7 +17,7 @@
     const { penaltyPoints, boardSize, players } = get(gameState);
     const score = players[0]?.score ?? 0;
     if (score === 0 && penaltyPoints === 0 && boardSize !== 4) {
-      gameOrchestrator.setBoardSize(4);
+      gameState.updateSettings({ boardSize: 4 });
       gotoAfterFaq();
     } else if (boardSize !== 4) {
       modalStore.showModal({
@@ -29,7 +29,7 @@
             customClass: 'green-btn',
             isHot: true,
             onClick: () => {
-              gameOrchestrator.setBoardSize(4);
+              gameState.updateSettings({ boardSize: 4 });
               modalStore.closeModal();
               gotoAfterFaq();
             }

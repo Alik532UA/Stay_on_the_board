@@ -2,15 +2,15 @@
   // @ts-check
   import { gameState } from '$lib/stores/gameState.js';
   import { gameOrchestrator } from '$lib/gameOrchestrator.js';
+  import { gameModeService } from '$lib/services/gameModeService';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { replayStore } from '$lib/stores/replayStore.js';
-  import { localGameStore } from '$lib/stores/localGameStore.js';
   import { _ } from 'svelte-i18n';
 
   // Реактивні змінні для визначення поточного гравця та режиму гри
   $: currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
   $: isMultiplayer = $gameState.players.filter(p => p.type === 'human').length > 1;
-  $: localGamePlayers = $localGameStore.players;
+  $: players = $gameState.players;
 
   /**
    * Функція для отримання кольору гравця
@@ -18,7 +18,7 @@
    * @returns {string|null} Колір гравця або null
    */
   function getPlayerColor(playerName) {
-    const player = localGamePlayers.find(p => p.name === playerName);
+    const player = players.find(p => p.name === playerName);
     return player ? player.color : null;
   }
 
@@ -45,7 +45,7 @@
 
   function showBonusInfo() {
     // Знаходимо поточного гравця
-    const currentPlayer = localGamePlayers.find(p => p.name === $gameState.players[$gameState.currentPlayerIndex]?.name);
+    const currentPlayer = players[$gameState.currentPlayerIndex];
     
     if (currentPlayer && currentPlayer.bonusHistory && currentPlayer.bonusHistory.length > 0) {
       // Формуємо детальний опис бонусних балів гравця
@@ -112,7 +112,7 @@
   }
 
   function cashOutAndEndGame() {
-      gameOrchestrator.endGame('modal.gameOverReasonCashOut');
+      gameModeService.endGame('modal.gameOverReasonCashOut');
   }
 </script>
 
@@ -242,7 +242,7 @@
       <!-- Локальна гра - показуємо рахунок всіх гравців -->
       <div class="score-display-multiplayer">
         <div class="score-label-multiplayer">{$_('gameBoard.scoreLabel')}</div>
-        {#each localGamePlayers as player}
+        {#each players as player}
           <div class="score-row">
             <span class="player-name-plate" style={getPlayerNameStyle(player.name)}>{player.name}</span>
             <!-- Оновлена логіка відображення рахунку -->

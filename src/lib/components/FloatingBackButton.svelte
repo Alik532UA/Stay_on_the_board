@@ -5,10 +5,10 @@
   import { _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
   import { gameState } from '$lib/stores/gameState.js';
-  import { localGameStore } from '$lib/stores/localGameStore.js';
   import { logService } from '$lib/services/logService.js';
   import { gameOverStore } from '$lib/stores/gameOverStore.js';
   import { replayService } from '$lib/services/replayService';
+  import { gameModeService } from '$lib/services/gameModeService';
 
   function handleBackClick() {
     logService.ui('FloatingBackButton: handleBackClick called');
@@ -31,23 +31,23 @@
             newBtn.onClick = () => gameOrchestrator.continueAfterNoMoves();
             break;
           case 'finalizeGameWithBonus':
-            newBtn.onClick = () => gameOrchestrator.finalizeGameWithBonus('modal.gameOverReasonBonus');
+            newBtn.onClick = () => gameModeService.endGame('modal.gameOverReasonBonus');
             break;
           case 'startReplay':
-            newBtn.onClick = () => gameOrchestrator.startReplay();
+            newBtn.onClick = () => replayService.loadReplayData();
             break;
           case 'playAgain':
             newBtn.onClick = () => {
               modalStore.closeModal(); // Спочатку закриваємо модальне вікно
-              gameOrchestrator.restartGame();
+              gameModeService.restartGame();
             };
             break;
           default:
             // Для кнопок типу "Завершити гру", які мають складнішу логіку
             if (btn.textKey === 'modal.endGame') {
-                 newBtn.onClick = () => gameOrchestrator.endGame('modal.gameOverReasonNoMovesLeft');
+                 newBtn.onClick = () => gameModeService.endGame('modal.gameOverReasonNoMovesLeft');
             } else if (btn.action === 'startReplay') {
-                 newBtn.onClick = () => gameOrchestrator.startReplay();
+                 newBtn.onClick = () => replayService.loadReplayData();
             }
             else {
                  newBtn.onClick = () => modalStore.closeModal();
