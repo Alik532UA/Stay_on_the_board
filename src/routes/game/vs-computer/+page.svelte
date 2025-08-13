@@ -17,7 +17,8 @@
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { onMount } from 'svelte';
   import { afterNavigate } from '$app/navigation';
-  import { resetGame, calculateFinalScore } from '$lib/services/gameLogicService.js';
+  import { resetGame } from '$lib/services/gameLogicService.js';
+  import { calculateFinalScore } from '$lib/services/scoreService.js';
   import { animationStore } from '$lib/stores/animationStore.js';
   import { gameState } from '$lib/stores/gameState.js';
   import { modalStore } from '$lib/stores/modalStore.js';
