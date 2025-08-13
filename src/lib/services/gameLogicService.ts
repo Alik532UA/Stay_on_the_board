@@ -8,7 +8,6 @@ import { getAvailableMoves, isCellBlocked, isMirrorMove } from '$lib/utils/board
 import { lastPlayerMove } from '$lib/stores/derivedState';
 import { settingsStore } from '../stores/settingsStore';
 import { stateManager } from './stateManager';
-import { localGameStore } from '../stores/localGameStore.js';
 import { logService } from './logService.js';
 import { testModeStore } from '$lib/stores/testModeStore';
 import { calculateMoveScore } from './scoreService';
@@ -61,7 +60,7 @@ export function resetGame(options: { newSize?: number; players?: Player[]; setti
   // Скидаємо рахунки гравців в локальній грі
   const humanPlayersCount = newState.players.filter((p: Player) => p.type === 'human').length;
   if (humanPlayersCount > 1) {
-    localGameStore.resetScores();
+    gameState.resetScores();
   }
   
   // animationStore автоматично скидається при зміні gameId
@@ -169,6 +168,12 @@ export async function performMove(
     blockModeEnabled: settings.blockModeEnabled // <-- ДОДАЙ ЦЕЙ РЯДОК
   }];
 
+  const updatedPlayers = [...currentState.players];
+  updatedPlayers[playerIndex] = {
+    ...updatedPlayers[playerIndex],
+    score: updatedPlayers[playerIndex].score + scoreChanges.baseScoreChange
+  };
+
   const changes = {
     board: newBoard,
     playerRow: newPosition.row,
@@ -176,58 +181,27 @@ export async function performMove(
     cellVisitCounts: updatedCellVisitCounts,
     moveQueue: updatedMoveQueue,
     moveHistory: updatedMoveHistory,
-    players: scoreChanges.players,
-    penaltyPoints: scoreChanges.penaltyPoints,
-    movesInBlockMode: scoreChanges.movesInBlockMode,
-    jumpedBlockedCells: scoreChanges.jumpedBlockedCells,
-    distanceBonus: scoreChanges.distanceBonus,
+    players: updatedPlayers,
+    penaltyPoints: currentState.penaltyPoints + scoreChanges.penaltyPoints,
+    movesInBlockMode: currentState.movesInBlockMode + scoreChanges.movesInBlockModeChange,
+    jumpedBlockedCells: currentState.jumpedBlockedCells + scoreChanges.jumpedBlockedCellsChange,
+    distanceBonus: (currentState.distanceBonus || 0) + scoreChanges.distanceBonusChange,
     isFirstMove: false
   };
 
   await stateManager.applyChanges('PERFORM_MOVE', changes, `Move: ${direction}${distance}`);
   
-  // Оновлюємо рахунок гравця в локальній грі
-  const currentStateAfterMove = get(gameState);
-  const humanPlayersCount = currentStateAfterMove.players.filter(p => p.type === 'human').length;
-  
-  // Перевіряємо "дзеркальний" хід для single player гри (гра з комп'ютером)
-  if (humanPlayersCount <= 1 && playerIndex === 0) { // Гравець (не комп'ютер)
-    // Додаємо бонусні бали за відстань до GameState для гри з комп'ютером
-    if (scoreChanges.distanceBonus > 0) {
-      logService.score(`performMove (single player): додаємо ${scoreChanges.distanceBonus} бонусних балів за відстань до GameState`);
-    }
-    
-    if (currentState.moveQueue.length >= 1) {
-      // Знаходимо останній хід комп'ютера
-      const lastComputerMove = currentState.moveQueue[currentState.moveQueue.length - 1];
-      
-      // Перевіряємо чи це був хід комп'ютера (player !== 0)
-      if (lastComputerMove && lastComputerMove.player !== 0) {
-        const isMirror = isMirrorMove(
-          direction,
-          distance,
-          lastComputerMove.direction,
-          lastComputerMove.distance
-        );
-        
-        logService.logic(`performMove (single player): перевіряємо "дзеркальний" хід:`, {
-          currentMove: { direction, distance },
-          computerMove: { direction: lastComputerMove.direction, distance: lastComputerMove.distance },
-          isMirrorMove: isMirror
-        });
-        
-        if (isMirror) {
-          logService.score(`performMove (single player): додаємо 2 штрафних бали за "дзеркальний" хід`);
-          // Штрафні бали вже додані в calculateMoveScore для single player гри
-        }
-      }
-    }
-  }
-  // Логіка нарахування балів для локальної гри тепер знаходиться в `LocalGameMode`
-  // і оновлює `gameState` напряму. `localGameStore` більше не використовується для рахунку.
+  // Логіка для "дзеркального" ходу та бонусів тепер обробляється в LocalGameMode та VsComputerGameMode,
+  // які отримують `scoreChanges` і вирішують, як їх застосувати.
+  // Це робить `performMove` більш чистою функцією, що відповідає лише за сам хід.
   
   logService.logic('performMove: завершено успішно');
-  return { success: true, newPosition, bonusPoints: scoreChanges.bonusPoints, penaltyPoints: scoreChanges.penaltyPointsForMove };
+  return {
+    success: true,
+    newPosition,
+    bonusPoints: scoreChanges.bonusPoints,
+    penaltyPoints: scoreChanges.penaltyPointsForMove
+  };
 }
 
 /**
@@ -277,10 +251,35 @@ export function getComputerMove(): { direction: MoveDirectionType; distance: num
   if (availableMoves.length === 0) {
     return null;
   }
-
+  
   const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
   return {
     direction: randomMove.direction,
     distance: randomMove.distance
   };
+}
+
+export function validatePlayerMove(changes: any, currentState: any): { errors: string[], warnings: string[] } {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (changes.playerRow !== undefined) {
+    if (typeof changes.playerRow !== 'number' || changes.playerRow < 0 || changes.playerRow >= currentState.boardSize) {
+      errors.push('playerRow must be a valid board coordinate');
+    }
+  }
+
+  if (changes.playerCol !== undefined) {
+    if (typeof changes.playerCol !== 'number' || changes.playerCol < 0 || changes.playerCol >= currentState.boardSize) {
+      errors.push('playerCol must be a valid board coordinate');
+    }
+  }
+
+  if (changes.playerRow !== undefined && changes.playerCol !== undefined) {
+    if (isCellBlocked(changes.playerRow, changes.playerCol, currentState.cellVisitCounts, get(settingsStore))) {
+      errors.push('Player cannot move to a blocked cell');
+    }
+  }
+
+  return { errors, warnings };
 }

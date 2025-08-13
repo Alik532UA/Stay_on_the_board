@@ -1,8 +1,7 @@
 <script>
   import { gameState } from '$lib/stores/gameState';
-  import { localGameStore } from '$lib/stores/localGameStore';
 
-  $: players = $localGameStore.players;
+  $: players = $gameState.players;
   $: currentPlayerIndex = $gameState.currentPlayerIndex;
 </script>
 

@@ -1,8 +1,8 @@
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
-import { gameOrchestrator } from '$lib/gameOrchestrator';
+import { gameModeService } from '$lib/services/gameModeService';
 
 export function navigateToGame() {
-  gameOrchestrator.setCurrentGameMode('vs-computer');
+  gameModeService.setCurrentGameMode('vs-computer');
   goto(`${base}/game/vs-computer`);
 }

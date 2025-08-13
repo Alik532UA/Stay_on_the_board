@@ -2,7 +2,6 @@
   import { gameState } from '$lib/stores/gameState.js';
   import { playerInputStore } from '$lib/stores/playerInputStore.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
-  import { localGameStore } from '$lib/stores/localGameStore.js';
   import { _, locale } from 'svelte-i18n';
   import { lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves } from '$lib/stores/derivedState.ts';
   import { i18nReady } from '$lib/i18n/init.js';
@@ -348,8 +347,7 @@
 
   // Функція для отримання кольору гравця
   function getPlayerColor(playerName: string): string | null {
-    const localGamePlayers = $localGameStore.players;
-    const player = localGamePlayers.find(p => p.name === playerName);
+    const player = $gameState.players.find(p => p.name === playerName);
     return player ? player.color : null;
   }
 

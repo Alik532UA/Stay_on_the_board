@@ -1,6 +1,5 @@
 import { get } from 'svelte/store';
 import { gameState } from '$lib/stores/gameState';
-import { localGameStore } from '$lib/stores/localGameStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { logService } from './logService';
 
@@ -17,9 +16,6 @@ export const replayService = {
 
       try {
         sessionStorage.setItem('replayGameState', JSON.stringify(state));
-        if (gameType === 'local') {
-          sessionStorage.setItem('replayLocalGameState', JSON.stringify(get(localGameStore)));
-        }
         sessionStorage.setItem('replayGameOverState', JSON.stringify(get(gameOverStore)));
         sessionStorage.setItem('replayData', JSON.stringify(replayData));
       } catch (error) {
@@ -41,13 +37,6 @@ export const replayService = {
           sessionStorage.removeItem('replayGameState');
         }
 
-        if (replayData.gameType === 'local') {
-          const replayLocalGameStateJSON = sessionStorage.getItem('replayLocalGameState');
-          if (replayLocalGameStateJSON) {
-            localGameStore.restoreState(JSON.parse(replayLocalGameStateJSON));
-            sessionStorage.removeItem('replayLocalGameState');
-          }
-        }
 
         const replayGameOverStateJSON = sessionStorage.getItem('replayGameOverState');
         if (replayGameOverStateJSON) {

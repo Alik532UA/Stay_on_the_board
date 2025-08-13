@@ -1,5 +1,13 @@
 export type Direction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right';
 
+export interface Move {
+  row: number;
+  col: number;
+  direction: Direction;
+  distance: number;
+  isPenalty?: boolean;
+}
+
 export const dirMap: Record<Direction, [number, number]> = {
   'up': [-1, 0],
   'down': [1, 0],

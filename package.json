@@ -39,9 +39,6 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "socket.io-client": "^4.8.1",
-    "svelte-i18n": "^4.0.0",
-    "y-webrtc": "^10.3.0",
-    "yjs": "^13.6.27"
+    "svelte-i18n": "^4.0.0"
   }
 }

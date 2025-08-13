@@ -7,8 +7,9 @@ import { playerInputStore } from '$lib/stores/playerInputStore';
 import { gameStore } from '$lib/stores/gameStore';
 import { modalService } from './modalService';
 import { gameModeService } from './gameModeService';
-import { sideEffectService } from './sideEffectService';
+import { sideEffectService, type SideEffect } from './sideEffectService';
 import { replayService } from './replayService';
+import { logService } from './logService.js';
 import { stateManager } from './stateManager';
 import { gameState } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService.js';
@@ -19,22 +20,35 @@ import { animationStore } from '$lib/stores/animationStore';
 
 export const userActionService = {
   async confirmMove(): Promise<void> {
-    const activeGameMode = get(gameStore).mode;
-    if (!activeGameMode) gameModeService.initializeGameMode();
+    let activeGameMode = get(gameStore).mode;
+    if (!activeGameMode) {
+      gameModeService.initializeGameMode();
+      activeGameMode = get(gameStore).mode;
+      if (!activeGameMode) {
+        logService.logic('[userActionService.confirmMove] No active game mode found after initialization.');
+        return;
+      }
+    }
     const playerInput = get(playerInputStore);
     if (!playerInput.selectedDirection || !playerInput.selectedDistance) return;
-    
-    await get(gameStore).mode!.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
 
-    if (gameModeService._determineGameType() === 'local') {
-      sideEffectService.speakMove(playerInput.selectedDirection, playerInput.selectedDistance);
-    }
+    const sideEffects = await activeGameMode.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
+    logService.logic('[userActionService.confirmMove] Side effects from handlePlayerMove:', sideEffects);
+    sideEffects.forEach(effect => sideEffectService.execute(effect));
   },
 
   async claimNoMoves(): Promise<void> {
-    const activeGameMode = get(gameStore).mode;
-    if (!activeGameMode) gameModeService.initializeGameMode();
-    await get(gameStore).mode!.claimNoMoves();
+    let activeGameMode = get(gameStore).mode;
+    if (!activeGameMode) {
+      gameModeService.initializeGameMode();
+      activeGameMode = get(gameStore).mode;
+      if (!activeGameMode) {
+        logService.logic('[userActionService.claimNoMoves] No active game mode found after initialization.');
+        return;
+      }
+    }
+    const sideEffects = await activeGameMode.claimNoMoves();
+    sideEffects.forEach(effect => sideEffectService.execute(effect));
   },
 
   async changeBoardSize(newSize: number): Promise<void> {
@@ -50,14 +64,15 @@ export const userActionService = {
   },
 
   async requestRestart(): Promise<void> {
-    await gameModeService.restartGame();
+    const sideEffects = await gameModeService.restartGame();
+    this.executeSideEffects(sideEffects);
   },
 
   async requestReplay(): Promise<void> {
     const gameType = gameModeService._determineGameType();
     const modalContext = modalService.getCurrentModalContext();
     replayService.saveReplayData(gameType, modalContext);
-    await sideEffectService.navigateToReplay();
+    this.executeSideEffects([{ type: 'navigation/goto', payload: { path: '/replay' } }]);
   },
 
   async finishWithBonus(reasonKey: string): Promise<void> {
@@ -66,7 +81,8 @@ export const userActionService = {
       { finishedByFinishButton: true },
       'Player chose to finish with a bonus'
     );
-    await gameModeService.endGame(reasonKey);
+    const sideEffects = await gameModeService.endGame(reasonKey);
+    this.executeSideEffects(sideEffects);
   },
 
   async continueAfterNoMoves(): Promise<void> {
@@ -106,6 +122,39 @@ export const userActionService = {
     
     gameOverStore.resetGameOverState();
     animationStore.reset();
-    modalService.closeModal();
+    this.executeSideEffects([{ type: 'ui/closeModal' }]);
+  },
+
+  async handleModalAction(action: string, payload?: any): Promise<void> {
+    let sideEffects: SideEffect[] = [];
+    switch (action) {
+      case 'restartGame':
+        await this.requestRestart();
+        break;
+      case 'requestReplay':
+        await this.requestReplay();
+        break;
+      case 'finishWithBonus':
+        await this.finishWithBonus(payload.reasonKey);
+        break;
+      case 'continueAfterNoMoves':
+        await this.continueAfterNoMoves();
+        break;
+      case 'resetGame':
+        gameLogicService.resetGame({ newSize: payload.newSize }, get(gameState));
+        sideEffects = [{ type: 'ui/closeModal' }];
+        break;
+      case 'closeModal':
+        sideEffects = [{ type: 'ui/closeModal' }];
+        break;
+      default:
+        logService.logic(`[userActionService.handleModalAction] Unknown action: ${action}`);
+        break;
+    }
+    this.executeSideEffects(sideEffects);
+  },
+
+  executeSideEffects(sideEffects: SideEffect[]) {
+    sideEffects.forEach(effect => sideEffectService.execute(effect));
   }
 };

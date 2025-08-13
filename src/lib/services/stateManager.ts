@@ -7,9 +7,9 @@ import { get } from 'svelte/store';
 import { playerInputStore } from '../stores/playerInputStore.js';
 import { animationStore } from '../stores/animationStore.js';
 import { logService } from './logService.js';
-
-// Відкладаємо імпорт gameState
-let gameState: any = null;
+import { gameState } from '../stores/gameState.js';
+import { validatePlayerMove } from './gameLogicService.js';
+import { validateScoreUpdate } from './scoreService.js';
 
 export interface StateChange {
   action: string;
@@ -46,22 +46,6 @@ export class StateManager {
   }
 
   /**
-   * Отримує gameState з відкладеним імпортом
-   */
-  async getGameState(): Promise<any> {
-    if (!gameState) {
-      try {
-        const module = await import('../stores/gameState.js');
-        gameState = module.gameState;
-      } catch (error) {
-        console.error('Помилка імпорту gameState:', error);
-        throw error;
-      }
-    }
-    return gameState;
-  }
-
-  /**
    * Валідує зміни стану перед застосуванням
    */
   async validateChanges(action: string, changes: GameStateChanges): Promise<ValidationResult> {
@@ -81,32 +65,15 @@ export class StateManager {
     switch (action) {
       case 'MOVE_PLAYER':
       case 'PERFORM_MOVE':
-        await this.validatePlayerMove(changes, errors, warnings);
+        const { errors: moveErrors, warnings: moveWarnings } = validatePlayerMove(changes, get(gameState));
+        errors.push(...moveErrors);
+        warnings.push(...moveWarnings);
         break;
       case 'UPDATE_SCORE':
-        await this.validateScoreUpdate(changes, errors, warnings);
+        const { errors: scoreErrors, warnings: scoreWarnings } = validateScoreUpdate(changes, get(gameState));
+        errors.push(...scoreErrors);
+        warnings.push(...scoreWarnings);
         break;
-      case 'END_GAME':
-        await this.validateGameEnd(changes, errors, warnings);
-        break;
-      case 'RESET_GAME':
-        await this.validateGameReset(changes, errors, warnings);
-        break;
-      case 'SET_COMPUTER_TURN':
-      case 'SET_PLAYER_TURN':
-      case 'SET_COMPUTER_MOVE_PROGRESS':
-      case 'UPDATE_AVAILABLE_MOVES':
-      case 'NO_MOVES_CLAIM':
-      case 'CONTINUE_GAME':
-      case 'FINALIZE_GAME':
-      case 'FIRST_MOVE_COMPLETED':
-      case 'ADVANCE_TURN':
-      case 'END_GAME_LOCAL':
-      case 'UPDATE_LAST_PLAYER_MOVE':
-        // Ці дії не потребують спеціальної валідації
-        break;
-      default:
-        warnings.push(`Unknown action: ${action}`);
     }
 
     return {
@@ -114,89 +81,6 @@ export class StateManager {
       errors,
       warnings
     };
-  }
-
-  /**
-   * Валідує зміни позиції гравця
-   */
-  async validatePlayerMove(changes: GameStateChanges, errors: string[], warnings: string[]): Promise<void> {
-    const currentState = await this.getCurrentState();
-
-    // Валідація playerRow
-    if (changes.playerRow !== undefined) {
-      console.log('validatePlayerMove: перевіряємо playerRow:', changes.playerRow);
-      if (typeof changes.playerRow !== 'number' || changes.playerRow < 0) {
-        errors.push('playerRow must be a non-negative number');
-      } else if (changes.playerRow >= currentState.boardSize) {
-        errors.push('playerRow must be within board bounds');
-      }
-    }
-
-    // Валідація playerCol
-    if (changes.playerCol !== undefined) {
-      console.log('validatePlayerMove: перевіряємо playerCol:', changes.playerCol);
-      if (typeof changes.playerCol !== 'number' || changes.playerCol < 0) {
-        errors.push('playerCol must be a non-negative number');
-      } else if (changes.playerCol >= currentState.boardSize) {
-        errors.push('playerCol must be within board bounds');
-      }
-    }
-
-    // Перевіряємо, чи не виходить гравець за межі дошки
-    if (changes.playerRow !== undefined && changes.playerCol !== undefined) {
-      // Використовуємо поточну дошку для валідації руху
-      const board = currentState.board;
-      console.log('validatePlayerMove: перевіряємо клітинку на дошці:', {
-        row: changes.playerRow,
-        col: changes.playerCol,
-        boardValue: board[changes.playerRow] ? board[changes.playerRow][changes.playerCol] : 'undefined'
-      });
-      // Гравець може рухатися тільки на порожні клітинки (значення 0)
-      // Заблоковані клітинки мають значення більше 0
-      if (board[changes.playerRow] && board[changes.playerRow][changes.playerCol] !== 0) {
-        errors.push('Player cannot move to a blocked cell');
-      }
-    }
-  }
-
-  /**
-   * Валідує зміни рахунку
-   */
-  async validateScoreUpdate(changes: GameStateChanges, errors: string[], warnings: string[]): Promise<void> {
-    const currentState = await this.getCurrentState();
-
-    if (changes.scores !== undefined) {
-      if (!Array.isArray(changes.scores)) {
-        errors.push('scores must be an array');
-      } else if (changes.scores.length !== currentState.players.length) {
-        errors.push('scores array length must match players count');
-      } else {
-        for (let i = 0; i < changes.scores.length; i++) {
-          if (typeof changes.scores[i] !== 'number') {
-            errors.push(`score[${i}] must be a number`);
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Валідує завершення гри
-   */
-  async validateGameEnd(changes: GameStateChanges, errors: string[], warnings: string[]): Promise<void> {
-    if (changes.gameStatus !== undefined && !['playing', 'ended', 'paused'].includes(changes.gameStatus)) {
-      errors.push('gameStatus must be one of: playing, ended, paused');
-    }
-  }
-
-  /**
-   * Валідує скидання гри
-   */
-  async validateGameReset(changes: GameStateChanges, errors: string[], warnings: string[]): Promise<void> {
-    // Базова валідація для скидання гри
-    if (changes.gameId !== undefined && typeof changes.gameId !== 'number') {
-      errors.push('gameId must be a number');
-    }
   }
 
   /**
@@ -217,8 +101,7 @@ export class StateManager {
         logService.state('StateManager validation warnings', { action, reason, warnings: validation.warnings });
       }
 
-      const gameStateInstance = await this.getGameState();
-      gameStateInstance.update((currentState: any) => ({
+      gameState.update((currentState: any) => ({
         ...currentState,
         ...changes
       }));
@@ -287,8 +170,7 @@ export class StateManager {
       console.log('🔄 StateManager.undoLastChange: відміняємо зміну:', lastChange);
 
       // Відміняємо зміни (спрощена логіка)
-      const gameStateInstance = await this.getGameState();
-      gameStateInstance.update((currentState: any) => {
+      gameState.update((currentState: any) => {
         const revertedState = { ...currentState };
         
         // Відміняємо зміни (тут потрібна більш складна логіка)
@@ -309,9 +191,8 @@ export class StateManager {
    * Отримує поточний стан
    * @returns Promise<Object> - Поточний стан
    */
-  async getCurrentState(): Promise<any> {
-    const gameStateInstance = await this.getGameState();
-    return get(gameStateInstance);
+  getCurrentState(): any {
+    return get(gameState);
   }
 
   /**
@@ -323,7 +204,7 @@ export class StateManager {
     const warnings: string[] = [];
 
     try {
-      const currentState = await this.getCurrentState();
+      const currentState = this.getCurrentState();
 
       // Перевіряємо основні поля
       if (!currentState.board || !Array.isArray(currentState.board)) {
@@ -358,4 +239,4 @@ export class StateManager {
 }
 
 // Експортуємо єдиний екземпляр
-export const stateManager = new StateManager(); 
+export const stateManager = new StateManager();

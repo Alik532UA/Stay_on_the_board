@@ -1,6 +1,7 @@
 import type { GameState, Player } from '$lib/stores/gameState';
 import type { FinalScoreDetails } from '$lib/models/score';
 import type { MoveDirectionType } from '$lib/models/Figure';
+import type { SideEffect } from '$lib/services/sideEffectService';
 
 /**
  * @file Визначає загальний інтерфейс для всіх ігрових режимів.
@@ -14,18 +15,25 @@ export interface IGameMode {
    */
   initialize(initialState: GameState): void;
 
+  /**
+   * Обробляє хід гравця.
+   * @param direction - Напрямок ходу.
+   * @param distance - Відстань ходу.
+   * @returns Promise, що вирішується масивом побічних ефектів.
+   */
+  handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<SideEffect[]>;
 
   /**
    * Обробляє заявку гравця про відсутність ходів.
    * @returns Promise, що вирішується після обробки заявки.
    */
-  claimNoMoves(): Promise<void>;
+  claimNoMoves(): Promise<SideEffect[]>;
 
   /**
    * Обробляє ситуацію, коли у гравця або комп'ютера немає ходів.
    * @param playerType - Тип гравця ('human' або 'computer').
    */
-  handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
+  handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]>;
 
   /**
    * Повертає конфігурацію гравців для цього режиму.
@@ -43,18 +51,4 @@ export interface IGameMode {
     winningPlayerIndex: number;
   };
 
-  /**
-   * Створює контент для модального вікна завершення гри.
-   * @param reasonKey - Ключ причини завершення.
-   * @param reasonValues - Додаткові значення.
-   * @param finalScoreDetails - Деталі фінального рахунку.
-   * @param state - Поточний стан гри.
-   * @returns Об'єкт з контентом для модального вікна.
-   */
-  createGameOverModalContent(
-    reasonKey: string,
-    reasonValues: Record<string, any> | null,
-    finalScoreDetails: FinalScoreDetails,
-    state: GameState
-  ): { titleKey: string; content: any };
 }

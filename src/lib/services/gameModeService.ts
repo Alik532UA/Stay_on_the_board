@@ -4,11 +4,11 @@
  * within the context of the current mode.
  */
 import { get } from 'svelte/store';
+import { page } from '$app/stores';
 import { gameState } from '$lib/stores/gameState';
 import { gameStore } from '$lib/stores/gameStore';
-import { localGameStore } from '$lib/stores/localGameStore';
 import { logService } from '$lib/services/logService.js';
-import { sideEffectService } from './sideEffectService';
+import type { SideEffect } from './sideEffectService';
 import { VsComputerGameMode } from '$lib/gameModes/VsComputerGameMode';
 import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
 import { BaseGameMode } from '$lib/gameModes/BaseGameMode';
@@ -31,20 +31,37 @@ export const gameModeService = {
     this.setCurrentGameMode(gameType as 'local' | 'vs-computer');
   },
 
-  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
-    const activeGameMode = get(gameStore).mode;
-    if (!activeGameMode) this.initializeGameMode();
-    await get(gameStore).mode!.endGame(reasonKey, reasonValues);
+  _ensureGameMode(): BaseGameMode {
+    let activeGameMode = get(gameStore).mode;
+    if (!activeGameMode) {
+      this.initializeGameMode();
+      activeGameMode = get(gameStore).mode;
+    }
+    return activeGameMode!;
   },
 
-  async restartGame(): Promise<void> {
-    const activeGameMode = get(gameStore).mode;
-    if (!activeGameMode) this.initializeGameMode();
-    await get(gameStore).mode!.restartGame();
+  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<SideEffect[]> {
+    const activeGameMode = this._ensureGameMode();
+    return activeGameMode.endGame(reasonKey, reasonValues);
+  },
+
+  async restartGame(): Promise<SideEffect[]> {
+    const activeGameMode = this._ensureGameMode();
+    return activeGameMode.restartGame();
+  },
+
+  async handlePlayerMove(direction: any, distance: any): Promise<SideEffect[]> {
+    const activeGameMode = this._ensureGameMode();
+    return activeGameMode.handlePlayerMove(direction, distance);
+  },
+
+  async claimNoMoves(): Promise<SideEffect[]> {
+    const activeGameMode = this._ensureGameMode();
+    return activeGameMode.claimNoMoves();
   },
 
   _determineGameType(): string {
-    const currentPath = sideEffectService.getCurrentPath();
+    const currentPath = get(page).url.pathname;
     
     if (currentPath.includes('/game/local')) {
       return 'local';
@@ -52,7 +69,6 @@ export const gameModeService = {
       return 'vs-computer';
     }
     
-    const localGameState = get(localGameStore);
     return 'vs-computer';
   }
 };

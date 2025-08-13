@@ -1,11 +1,11 @@
 <script>
-  import { localGameStore } from '$lib/stores/localGameStore.js';
+  import { gameState } from '$lib/stores/gameState';
   import { _ } from 'svelte-i18n';
   import { logService } from '$lib/services/logService.js';
   import ToggleButton from '$lib/components/ToggleButton.svelte';
 
   // Створюємо локальні змінні для зручності доступу до налаштувань
-  $: settings = $localGameStore.settings;
+  $: settings = $gameState.settings;
 
   /**
    * Оновлює налаштування розміру дошки в store
@@ -15,7 +15,7 @@
     logService.action(`Click: "Змінити розмір дошки: ${increment > 0 ? '+' : ''}${increment}" (LocalGameSettings)`);
     const newSize = settings.boardSize + increment;
     if (newSize >= 2 && newSize <= 9) {
-      localGameStore.updateSettings({ boardSize: newSize });
+      gameState.updateSettings({ boardSize: newSize });
     }
   }
 </script>
@@ -49,7 +49,7 @@
       on:toggle={() => {
         const newCheckedState = !settings.blockModeEnabled;
         logService.action(`Click: "Режим заблокованих клітинок: ${newCheckedState}" (LocalGameSettings)`);
-        localGameStore.updateSettings({ blockModeEnabled: newCheckedState });
+        gameState.updateSettings({ blockModeEnabled: newCheckedState });
       }}
     />
 
@@ -60,7 +60,7 @@
       on:toggle={() => {
         const newCheckedState = !settings.autoHideBoard;
         logService.action(`Click: "Автоматично приховувати дошку: ${newCheckedState}" (LocalGameSettings)`);
-        localGameStore.updateSettings({ autoHideBoard: newCheckedState });
+        gameState.updateSettings({ autoHideBoard: newCheckedState });
       }}
     />
 
@@ -71,7 +71,7 @@
       on:toggle={() => {
         const newCheckedState = !settings.lockSettings;
         logService.action(`Click: "Заборонити змінювати правила: ${newCheckedState}" (LocalGameSettings)`);
-        localGameStore.updateSettings({ lockSettings: newCheckedState });
+        gameState.updateSettings({ lockSettings: newCheckedState });
       }}
     />
   </div>

@@ -1,6 +1,7 @@
 // src/lib/stores/animationStore.ts
 import { writable, get, type Writable } from 'svelte/store';
 import { isLocalGame } from './derivedState';
+import { gameState } from './gameState';
 
 // ВАЖЛИВО! Цей store працює ЛИШЕ з візуальним станом для анімації.
 // Заборонено напряму змінювати moveQueue або board логічного стану гри з animationStore!
@@ -68,7 +69,6 @@ function createAnimationService() {
 
   let lastProcessedMoveIndex = 0;
   let isInitialized = false;
-  let gameState: GameStateStore | null = null; // Відкладаємо імпорт
 
   // === ФУНКЦІЇ ДЛЯ КЕРУВАННЯ ЧЕРГОЮ АНІМАЦІЙ ===
 
@@ -146,30 +146,7 @@ function createAnimationService() {
   function initializeSubscription(): void {
     if (isInitialized) return;
     
-    // Відкладаємо імпорт gameState до моменту використання
-    if (!gameState) {
-      try {
-        // Використовуємо динамічний імпорт
-        import('./gameState.js').then((module: any) => {
-          gameState = module.gameState;
-          initializeSubscription(); // Рекурсивно викликаємо після імпорту
-        }).catch((err: Error) => {
-          console.error('AnimationStore: Не вдалося імпортувати gameState:', err);
-        });
-        return;
-      } catch (error) {
-        console.error('AnimationStore: Помилка імпорту gameState:', error);
-        return;
-      }
-    }
-    
-    // Захист від undefined gameState
-    if (!gameState || typeof gameState.subscribe !== 'function') {
-      console.error('AnimationStore: gameState is not properly initialized');
-      return;
-    }
-
-    const initialGameState = get(gameState);
+    const initialGameState = get(gameState) as GameState;
     lastProcessedMoveIndex = initialGameState?.moveQueue?.length || 0;
 
     gameState.subscribe((currentState: GameState) => {

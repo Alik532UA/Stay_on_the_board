@@ -1,41 +1,23 @@
 <script lang="ts">
-  import { localGameStore } from '$lib/stores/localGameStore.js';
+  import { gameState } from '$lib/stores/gameState';
   import { _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
-  import { resetGame } from '$lib/services/gameLogicService';
-  import type { PlayerType } from '$lib/stores/gameState';
   import { navigationService } from '$lib/services/navigationService.js';
   import ColorPicker from './ColorPicker.svelte';
   import { logService } from '$lib/services/logService.js';
   
   function startGame() {
     logService.action('Click: "Почати гру" (PlayerManager)');
-    const { players, settings } = get(localGameStore);
+    const state = get(gameState);
     
-    // Конвертуємо гравців з localGameStore в формат gameState
-    const gamePlayers = players.map(player => ({
-      id: player.id,
-      name: player.name,
-      type: player.isComputer ? 'computer' : 'human',
-      score: player.score
-    } as const));
-    
-    // Ініціалізуємо стан гри з поточними налаштуваннями
-    resetGame(
-      {
-        newSize: settings.boardSize,
-        players: gamePlayers,
-        settings: {
-          blockModeEnabled: settings.blockModeEnabled,
-          autoHideBoard: settings.autoHideBoard,
-          lockSettings: settings.lockSettings
-        }
-      },
-      get(localGameStore)
-    );
+    // Ініціалізуємо стан гри з поточними гравцями та налаштуваннями
+    gameState.reset({
+      size: state.settings.boardSize,
+      players: state.players,
+    });
 
     // Робимо знімок початкових (нульових) рахунків перед стартом
-    localGameStore.snapshotScores();
+    gameState.snapshotScores();
 
     // Переходимо на сторінку локальної гри
     navigationService.goTo('/game/local');
@@ -46,38 +28,36 @@
   <h2>{$_('localGame.playerManagerTitle')}</h2>
 
   <div class="player-list">
-    {#each $localGameStore.players as player (player.id)}
+    {#each $gameState.players as player (player.id)}
       <div class="player-row">
         <ColorPicker
           value={player.color}
           on:change={(e) => {
-            console.log('PlayerManager: ColorPicker change event received', e.detail);
-            console.log('PlayerManager: Updating player', player.id, 'color to', e.detail.value);
-            localGameStore.updatePlayer(player.id, { color: e.detail.value });
+            gameState.updatePlayer(player.id, { color: e.detail.value });
           }}
         />
         <button
           class="player-type-btn"
           title={$_('localGame.togglePlayerType')}
-          on:click={() => localGameStore.updatePlayer(player.id, { isComputer: !player.isComputer })}
+          on:click={() => gameState.updatePlayer(player.id, { type: player.type === 'human' ? 'computer' : 'human' })}
         >
-          {player.isComputer ? '🤖' : '👤'}
+          {player.type === 'computer' ? '🤖' : '👤'}
         </button>
         <input
           type="text"
           class="player-name-input"
           placeholder="Ім'я гравця"
           bind:value={player.name}
-          on:input={(e) => localGameStore.updatePlayer(player.id, { name: e.currentTarget.value })}
+          on:input={(e) => gameState.updatePlayer(player.id, { name: e.currentTarget.value })}
         />
         <button
           class="remove-player-btn"
           title={$_('localGame.removePlayer')}
           on:click={() => {
             logService.action(`Click: "Видалити гравця: ${player.name}" (PlayerManager)`);
-            localGameStore.removePlayer(player.id);
+            gameState.removePlayer(player.id);
           }}
-          disabled={$localGameStore.players.length <= 2}
+          disabled={$gameState.players.length <= 2}
         >
           ×
         </button>
@@ -86,13 +66,13 @@
   </div>
 
   <div class="manager-actions">
-    <button 
-      class="add-player-btn" 
+    <button
+      class="add-player-btn"
       on:click={() => {
         logService.action('Click: "Додати гравця" (PlayerManager)');
-        localGameStore.addPlayer();
+        gameState.addPlayer();
       }}
-      disabled={$localGameStore.players.length >= 8}
+      disabled={$gameState.players.length >= 8}
     >
       {$_('localGame.addPlayer')}
     </button>

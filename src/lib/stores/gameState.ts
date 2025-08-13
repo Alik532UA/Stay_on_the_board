@@ -6,12 +6,38 @@ import { writable } from 'svelte/store';
 import { createEmptyBoard, getRandomCell, getAvailableMoves } from '$lib/utils/boardUtils.ts';
 
 // Імпортуємо типи з gameLogicService
-import type { Direction, Move } from '$lib/services/gameLogicService';
+import type { Direction, Move } from '$lib/utils/gameUtils';
+import { logService } from '../services/logService.js';
 
 const initialBoardSize = 4;
 
 export type PlayerType = 'human' | 'ai' | 'remote' | 'computer';
-export interface Player { id: number; type: PlayerType; name: string; score: number; }
+
+export interface BonusEntry {
+  points: number;
+  reason: string;
+  timestamp: number;
+}
+
+export interface Player {
+  id: number;
+  type: PlayerType;
+  name: string;
+  score: number;
+  color: string;
+  isComputer: boolean;
+  penaltyPoints: number;
+  bonusPoints: number;
+  bonusHistory: BonusEntry[];
+}
+
+export interface GameSettings {
+  boardSize: number;
+  blockModeEnabled: boolean;
+  autoHideBoard: boolean;
+  lockSettings: boolean;
+}
+
 export type CellVisitCounts = Record<string, number>;
 export interface MoveHistoryEntry { pos: {row: number, col: number}, blocked: {row: number, col: number}[], visits?: CellVisitCounts, blockModeEnabled?: boolean }
 export interface GameState {
@@ -77,6 +103,10 @@ export interface GameState {
   isFirstMove: boolean;
   /** Чи гра була продовжена після паузи. */
   wasResumed: boolean;
+  /** Налаштування гри, раніше в localGameStore */
+  settings: GameSettings;
+  /** Рахунки на початок раунду для локальної гри */
+  scoresAtRoundStart: number[];
 }
 
 export interface GameStateConfig {
@@ -88,11 +118,36 @@ export interface GameStateConfig {
 import { get } from 'svelte/store';
 import { testModeStore } from './testModeStore';
 
+// --- Player and Color Helpers (from localGameStore) ---
+const generateId = () => Date.now() + Math.random();
+
+const availableColors = [
+  '#e63946', '#457b9d', '#2a9d8f', '#f4a261',
+  '#e76f51', '#9b5de5', '#f15bb5', '#00bbf9'
+];
+
+const getRandomColor = () => availableColors[Math.floor(Math.random() * availableColors.length)];
+
+const getRandomUnusedColor = (usedColors: string[]) => {
+  const unused = availableColors.filter(c => !usedColors.includes(c));
+  if (unused.length === 0) return getRandomColor();
+  return unused[Math.floor(Math.random() * unused.length)];
+};
+
+const availableNames = ['Alik', 'Noah', 'Jack', 'Mateo', 'Lucas', 'Sofia', 'Olivia', 'Nora', 'Lucia', 'Emilia'];
+
+const getRandomUnusedName = (usedNames: string[]) => {
+  const unused = availableNames.filter(name => !usedNames.includes(name));
+  if (unused.length === 0) return `Player ${usedNames.length + 1}`;
+  return unused[Math.floor(Math.random() * unused.length)];
+};
+
+
 export function createInitialState(config: GameStateConfig = {}): GameState {
   const size = config.size ?? initialBoardSize;
   const players = config.players ?? [
-    { id: 1, type: 'human', name: 'Гравець', score: 0 },
-    { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0 }
+    { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#e63946', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
+    { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#457b9d', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
   ];
   
   const testModeState = get(testModeStore);
@@ -111,7 +166,7 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
     board,
     playerRow: initialRow,
     playerCol: initialCol,
-    availableMoves: [], // Ініціалізуємо як порожній, оскільки він буде обчислений в derived store
+    availableMoves: [],
     players,
     currentPlayerIndex: 0,
     isGameOver: false,
@@ -130,7 +185,143 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
     distanceBonus: 0,
     isFirstMove: true,
     wasResumed: false,
+    settings: {
+      boardSize: 4,
+      blockModeEnabled: false,
+      autoHideBoard: false,
+      lockSettings: false
+    },
+    scoresAtRoundStart: players.map(p => p.score),
   };
 }
 
-export const gameState = writable<GameState>(createInitialState()); 
+function createGameStateStore() {
+  const { subscribe, update, set } = writable<GameState>(createInitialState());
+
+  return {
+    subscribe,
+    set,
+    update,
+
+    // --- Player Management ---
+    addPlayer: () => {
+      update(state => {
+        if (state.players.length >= 8) return state;
+        const usedColors = state.players.map(p => p.color);
+        const usedNames = state.players.map(p => p.name);
+        const newPlayer: Player = {
+          id: generateId(),
+          name: getRandomUnusedName(usedNames),
+          color: getRandomUnusedColor(usedColors),
+          score: 0,
+          isComputer: false,
+          type: 'human',
+          penaltyPoints: 0,
+          bonusPoints: 0,
+          bonusHistory: []
+        };
+        return { ...state, players: [...state.players, newPlayer] };
+      });
+    },
+
+    removePlayer: (playerId: number) => {
+      update(state => {
+        if (state.players.length <= 2) return state;
+        return { ...state, players: state.players.filter(p => p.id !== playerId) };
+      });
+    },
+
+    updatePlayer: (playerId: number, updatedData: Partial<Player>) => {
+      update(state => {
+        return {
+          ...state,
+          players: state.players.map(p =>
+            p.id === playerId ? { ...p, ...updatedData } : p
+          )
+        };
+      });
+    },
+
+    // --- Settings Management ---
+    updateSettings: (newSettings: Partial<GameSettings>) => {
+      update(state => ({
+        ...state,
+        settings: { ...state.settings, ...newSettings }
+      }));
+    },
+
+    // --- Score Management ---
+    snapshotScores: () => {
+      update(state => {
+        const scores = state.players.map(p => p.bonusPoints - p.penaltyPoints);
+        return { ...state, scoresAtRoundStart: scores };
+      });
+    },
+    
+    resetScores: () => {
+      update(state => ({
+        ...state,
+        players: state.players.map(p => ({ ...p, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as BonusEntry[] }))
+      }));
+    },
+
+    addPlayerPenaltyPoints: (playerId: number, penaltyPointsToAdd: number) => {
+      update(state => ({
+        ...state,
+        players: state.players.map(p =>
+          p.id === playerId ? { ...p, penaltyPoints: p.penaltyPoints + penaltyPointsToAdd } : p
+        )
+      }));
+    },
+    
+    addPlayerBonusPoints: (playerId: number, bonusPointsToAdd: number, reason: string = '') => {
+      update(state => ({
+        ...state,
+        players: state.players.map(p =>
+          p.id === playerId ? {
+            ...p,
+            bonusPoints: p.bonusPoints + bonusPointsToAdd,
+            bonusHistory: [...p.bonusHistory, {
+              points: bonusPointsToAdd,
+              reason: reason,
+              timestamp: Date.now()
+            }]
+          } : p
+        )
+      }));
+    },
+
+    addPlayerBonus: (playerId: number, bonusPointsToAdd: number, reason: string = '') => {
+      update(state => ({
+        ...state,
+        players: state.players.map(p =>
+          p.id === playerId ? {
+            ...p,
+            bonusPoints: p.bonusPoints + bonusPointsToAdd,
+            bonusHistory: [...p.bonusHistory, {
+              points: bonusPointsToAdd,
+              reason: reason,
+              timestamp: Date.now()
+            }]
+          } : p
+        )
+      }));
+    },
+
+    addPlayerPenalty: (playerId: number, penaltyPointsToAdd: number) => {
+      update(state => ({
+        ...state,
+        players: state.players.map(p =>
+          p.id === playerId ? { ...p, penaltyPoints: p.penaltyPoints + penaltyPointsToAdd } : p
+        )
+      }));
+    },
+
+    // --- General ---
+    reset: (config?: GameStateConfig) => {
+      set(createInitialState(config));
+    }
+  };
+}
+
+export const gameState = createGameStateStore();
