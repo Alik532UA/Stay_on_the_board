@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { _ } from 'svelte-i18n';
-import { BaseGameMode } from './BaseGameMode';
+import { BaseGameMode } from './index';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService';
 import { playerInputStore } from '$lib/stores/playerInputStore';
@@ -98,31 +98,6 @@ export class LocalGameMode extends BaseGameMode {
     return get(gameState).players;
   }
 
-  public determineWinner(state: GameState, reasonKey: string) {
-    const scores = state.scoresAtRoundStart;
-
-    const isNoMovesSurrender = reasonKey === 'modal.gameOverReasonNoMovesLeft';
-    const losingPlayerIndex = isNoMovesSurrender ? -1 : state.currentPlayerIndex;
-
-    let maxScore = -Infinity;
-    for (let i = 0; i < scores.length; i++) {
-      if (i !== losingPlayerIndex) {
-        if (scores[i] > maxScore) {
-          maxScore = scores[i];
-        }
-      }
-    }
-
-    const winners: number[] = [];
-    for (let i = 0; i < scores.length; i++) {
-      if (i !== losingPlayerIndex && scores[i] === maxScore) {
-        winners.push(i);
-      }
-    }
-    
-    const winningPlayerIndex = winners.length > 0 ? winners[0] : -1;
-    return { winners, winningPlayerIndex };
-  }
 
 
   protected async advanceToNextPlayer(): Promise<SideEffect[]> {

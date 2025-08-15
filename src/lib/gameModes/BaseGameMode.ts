@@ -3,7 +3,7 @@ import { _ } from 'svelte-i18n';
 import type { IGameMode } from './gameMode.interface';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService';
-import { calculateFinalScore } from '$lib/services/scoreService';
+import { calculateFinalScore, determineWinner } from '$lib/services/scoreService';
 import { playerInputStore } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
@@ -19,7 +19,6 @@ export abstract class BaseGameMode implements IGameMode {
   abstract claimNoMoves(): Promise<SideEffect[]>;
   abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]>;
   abstract getPlayersConfiguration(): Player[];
-  public abstract determineWinner(state: GameState, reasonKey: string): { winners: number[], winningPlayerIndex: number };
   protected abstract advanceToNextPlayer(): Promise<SideEffect[]>;
   protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
 
@@ -94,7 +93,7 @@ export abstract class BaseGameMode implements IGameMode {
     };
     await stateManager.applyChanges('END_GAME', endGameChanges, `Game ended: ${reasonKey}`);
 
-    const { winners } = this.determineWinner(state, reasonKey);
+    const { winners } = determineWinner(state, reasonKey);
     gameOverStore.setGameOver({
       scores: state.players.map(p => ({ playerId: p.id, score: p.score })),
       winners: winners,
