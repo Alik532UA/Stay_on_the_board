@@ -8,7 +8,7 @@ test.describe('Модальне вікно "Суперник у пастці"', 
     await setBoardSize(page, 2);
   });
 
-  test('Повинно відображатися, коли режим блокування УВІМКНЕНО', { tag: '@bug' }, async ({ page }) => {
+  test('Повинно відображатися, коли режим блокування УВІМКНЕНО', { tag: ['@done', '@OTM-1'] }, async ({ page }) => {
     // Вмикаємо режим блокування клітинок
     await setBlockMode(page, BlockModeState.On);
 
@@ -22,7 +22,7 @@ test.describe('Модальне вікно "Суперник у пастці"', 
     await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.computerNoMovesTitle');
   });
 
-  test('НЕ повинно відображатися, коли режим блокування ВИМКНЕНО', { tag: '@done' }, async ({ page }) => {
+  test('НЕ повинно відображатися, коли режим блокування ВИМКНЕНО', { tag: ['@done', '@OTM-2'] }, async ({ page }) => {
     // Переконуємося, що режим блокування клітинок вимкнений
     await setBlockMode(page, BlockModeState.Off);
 

@@ -8,7 +8,7 @@ test.describe('Модальне вікно "Блискучий аналіз"', (
     await setBoardSize(page, 3);
   });
 
-  test('Повинно відображатися, коли режим блокування УВІМКНЕНО', { tag: '@done' }, async ({ page }) => {
+  test('Повинно відображатися, коли режим блокування УВІМКНЕНО', { tag: ['@done', '@PNMM-1'] }, async ({ page }) => {
     await setBlockMode(page, BlockModeState.On);
 
     await makeMove(page, 'down', 1);
@@ -42,7 +42,7 @@ test.describe('Модальне вікно "Блискучий аналіз"', (
     await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.playerNoMovesTitle');
   });
 
-  test('Повинно з\'являтися вікно "Game Over", коли режим блокування ВИМКНЕНО', { tag: '@done' }, async ({ page }) => {
+  test('Повинно з`являтися вікно "Game Over", коли режим блокування ВИМКНЕНО', { tag: ['@done', '@PNMM-2'] }, async ({ page }) => {
     await setBlockMode(page, BlockModeState.On);
     await setBlockMode(page, BlockModeState.Off);
 
