@@ -77,6 +77,7 @@ export const userActionService = {
   },
 
   async finishWithBonus(reasonKey: string): Promise<void> {
+    logService.logic('[userActionService] finishWithBonus called with reason:', reasonKey);
     await stateManager.applyChanges(
       'SET_FINISH_FLAG',
       { finishedByFinishButton: true },

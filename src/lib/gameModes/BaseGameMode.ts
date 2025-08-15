@@ -81,6 +81,7 @@ export abstract class BaseGameMode implements IGameMode {
   }
 
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<SideEffect[]> {
+    logService.GAME_MODE(`[${this.constructor.name}] endGame called with reason:`, reasonKey);
     const state = get(gameState);
     const humanPlayersCount = get(gameState).players.filter(p => p.type === 'human').length;
     const gameType = humanPlayersCount > 1 ? 'local' : 'vs-computer';

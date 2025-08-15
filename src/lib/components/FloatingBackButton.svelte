@@ -4,6 +4,7 @@
   import { gameOrchestrator } from '$lib/gameOrchestrator.ts';
   import { _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
+  import { userActionService } from '$lib/services/userActionService';
   import { gameState } from '$lib/stores/gameState.js';
   import { logService } from '$lib/services/logService.js';
   import { gameOverStore } from '$lib/stores/gameOverStore.js';
@@ -30,9 +31,9 @@
           case 'continueAfterNoMoves':
             newBtn.onClick = () => gameOrchestrator.continueAfterNoMoves();
             break;
-          case 'finalizeGameWithBonus':
-            newBtn.onClick = () => gameModeService.endGame('modal.gameOverReasonBonus');
-            break;
+        case 'finishWithBonus':
+          newBtn.onClick = () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonBonus' });
+          break;
           case 'startReplay':
             newBtn.onClick = () => replayService.loadReplayData();
             break;
