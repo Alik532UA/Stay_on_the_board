@@ -13,6 +13,7 @@
   import { playerInputStore } from '$lib/stores/playerInputStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { gameState } from '$lib/stores/gameState.js';
+  import { userActionService } from '$lib/services/userActionService';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { logService } from '$lib/services/logService.js';
@@ -23,7 +24,7 @@
     const currentSize = get(gameState).boardSize;
     const newSize = currentSize + increment;
     if (newSize >= 2 && newSize <= 9) {
-      gameState.update(s => ({...s, boardSize: newSize}));
+      userActionService.changeBoardSize(newSize);
     }
   }
 
