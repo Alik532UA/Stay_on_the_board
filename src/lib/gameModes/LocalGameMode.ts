@@ -61,16 +61,19 @@ export class LocalGameMode extends BaseGameMode {
               textKey: 'modal.continueGame',
               onClick: () => userActionService.handleModalAction('continueAfterNoMoves'),
               primary: true,
-              isHot: true
+              isHot: true,
+              dataTestId: 'continue-game-btn'
             },
             {
               textKey: 'modal.endGame',
-              onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonNoMovesLeft' })
+              onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonNoMovesLeft' }),
+              dataTestId: 'end-game-btn'
             },
             {
               textKey: 'modal.reviewRecord',
               customClass: 'blue-btn',
-              onClick: () => userActionService.handleModalAction('requestReplay')
+              onClick: () => userActionService.handleModalAction('requestReplay'),
+              dataTestId: 'review-record-btn'
             }
           ]
         }

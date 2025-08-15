@@ -252,7 +252,7 @@
                 }
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
-              data-testid={`modal-btn-${btn.textKey || btn.text}`}
+              data-testid={btn.dataTestId || `modal-btn-${btn.textKey || btn.text}`}
             >
               {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
             </button>
@@ -276,7 +276,7 @@
                 }
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
-              data-testid={`modal-btn-${btn.textKey || btn.text}`}
+              data-testid={btn.dataTestId || `modal-btn-${btn.textKey || btn.text}`}
             >
               {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
             </button>

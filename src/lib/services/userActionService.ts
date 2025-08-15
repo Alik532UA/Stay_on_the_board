@@ -17,6 +17,7 @@ import { settingsStore } from '$lib/stores/settingsStore';
 import { getAvailableMoves } from '$lib/utils/boardUtils.ts';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { animationStore } from '$lib/stores/animationStore';
+import { base } from '$app/paths';
 
 export const userActionService = {
   async confirmMove(): Promise<void> {
@@ -72,7 +73,7 @@ export const userActionService = {
     const gameType = gameModeService._determineGameType();
     const modalContext = modalService.getCurrentModalContext();
     replayService.saveReplayData(gameType, modalContext);
-    this.executeSideEffects([{ type: 'navigation/goto', payload: { path: '/replay' } }]);
+    this.executeSideEffects([{ type: 'navigation/goto', payload: { path: `${base}/replay` } }]);
   },
 
   async finishWithBonus(reasonKey: string): Promise<void> {
