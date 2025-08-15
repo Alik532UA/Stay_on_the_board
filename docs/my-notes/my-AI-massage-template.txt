@@ -18,6 +18,7 @@ npm test -- tests/ssr-initialization.test.ts
 npx playwright test tests/game-page-startup.test.ts
 =======================================================================================
 npx playwright test
+npx playwright test --grep "@BRM-3"
 npx playwright test tests/game-mode-modal.spec.ts
 npx playwright test tests/game-flow.spec.ts --headed
 =======================================================================================
