@@ -75,7 +75,7 @@ export class VsComputerGameMode extends BaseGameMode {
       const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex, state, settings);
 
       if (!moveResult.success) {
-        return this.handleNoMoves('computer');
+        sideEffects = await this.handleNoMoves('computer');
       } else {
         const settings = get(settingsStore);
         if (settings.speechEnabled) {
@@ -104,9 +104,10 @@ export class VsComputerGameMode extends BaseGameMode {
         sideEffects = [...sideEffects, ...(await this.advanceToNextPlayer())];
       }
     } else {
-      return this.handleNoMoves('computer');
+      sideEffects = await this.handleNoMoves('computer');
     }
     await stateManager.applyChanges('SET_PLAYER_TURN', { isComputerMoveInProgress: false }, 'Computer move completed');
+    sideEffects.forEach(effect => sideEffectService.execute(effect));
     return sideEffects;
   }
 
