@@ -26,7 +26,7 @@ export async function enableTestMode(page: Page) {
     (window as any).settingsStore.updateSettings({ testMode: true });
   });
   // Додаємо очікування, поки testMode в сторі не стане true
-  await page.waitForFunction(() => (window as any).settingsStore.testMode === true);
+  await page.waitForFunction(() => localStorage.getItem('testMode') === 'true');
   await expect(page.getByTestId('test-mode-widget-container')).toBeVisible();
 }
 

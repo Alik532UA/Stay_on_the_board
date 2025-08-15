@@ -29,17 +29,8 @@ test.describe('Модальне вікно "Суперник у пастці"', 
     await makeMove(page, 'right', 1);
 
     // Задаємо параметри ходу комп'ютера, щоб він заблокував себе
-    await page.evaluate(() => {
-      const testModeStore = (window as any).testModeStore;
-      if (testModeStore) {
-        // @ts-ignore
-        testModeStore.update(state => ({
-          ...state,
-          computerMoveMode: 'manual',
-          manualComputerMove: { direction: 'right', distance: 1 }
-        }));
-      }
-    });
+    await page.getByTestId('test-mode-dir-btn-right').click();
+    // await page.getByTestId('test-mode-move-dist-input').fill('1');
 
     await makeMove(page, 'left', 1, false);
     
