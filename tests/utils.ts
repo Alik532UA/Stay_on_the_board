@@ -20,17 +20,19 @@ export enum GameMode {
   Pro = 'pro-mode-btn',
 }
 
+export async function enableTestMode(page: Page) {
+  await page.waitForFunction(() => (window as any).settingsStore);
+  await page.evaluate(() => {
+    (window as any).settingsStore.updateSettings({ testMode: true });
+  });
+  // Додаємо очікування, поки testMode в сторі не стане true
+  await page.waitForFunction(() => (window as any).settingsStore.testMode === true);
+  await expect(page.getByTestId('test-mode-widget-container')).toBeVisible();
+}
+
 export async function startNewGame(page: Page, mode: GameMode = GameMode.Beginner) {
   await page.goto('/');
-  // Вмикаємо тестовий режим програмно, оскільки кнопка доступна тільки в DEV-режимі
-  await page.evaluate(() => {
-    const settingsStore = (window as any).settingsStore;
-    if (settingsStore) {
-      settingsStore.updateSettings({ testMode: true });
-    } else {
-      console.error('settingsStore not found on window object');
-    }
-  });
+  await enableTestMode(page);
   await page.getByTestId('vs-computer-btn').click();
 
   await page.getByTestId(mode).click();

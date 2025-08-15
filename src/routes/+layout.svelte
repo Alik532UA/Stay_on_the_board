@@ -87,6 +87,10 @@
 			event.preventDefault();
 			showUpdateNotice = !showUpdateNotice;
 		}
+		if (event.ctrlKey && event.altKey && event.code === 'KeyT') {
+			event.preventDefault();
+			settingsStore.toggleTestMode();
+		}
 	}
 
 	// Видалено гарячу клавішу для переходу на /dev-dnd-columns
@@ -147,7 +151,7 @@
 <PlayerColorProvider />
 
 {#if $settingsStore.testMode}
-	<div class="test-mode-container">
+	<div class="test-mode-container" data-testid="test-mode-widget-container">
 		<TestModeWidget />
 	</div>
 {/if}
