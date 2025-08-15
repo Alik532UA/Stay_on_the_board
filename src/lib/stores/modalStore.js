@@ -14,6 +14,7 @@ import { writable } from 'svelte/store';
  * @typedef {Object} ModalContent
  * @property {string} [reason]
  * @property {number} [score]
+ * @property {string} [reasonKey]
  * @property {unknown} [scoreDetails]
  * @property {boolean} [isFaq]
  */

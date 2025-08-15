@@ -146,7 +146,7 @@
       </div>
       <div class="modal-content" class:is-faq={typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq} bind:this={modalContent}>
         {#if typeof $modalState.content === 'object' && $modalState.content && 'reason' in $modalState.content}
-          <p class="reason">{$modalState.content.reason}</p>
+          <p class="reason" data-testid="modal-content-reason" data-i18n-key={($modalState.content as any).reasonKey}>{$modalState.content.reason}</p>
         {/if}
         {#if $modalState.component}
           <svelte:component this={$modalState.component as any} />
@@ -191,39 +191,39 @@
              </div>
            {:else}
              <!-- Показуємо деталі рахунку тільки для гри проти комп'ютера -->
-             <div class="score-details-container">
-               <div class="score-detail-row">{$_('modal.scoreDetails.baseScore')} <span>{($modalState.content as any)?.scoreDetails?.baseScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span></div>
+             <div class="score-details-container" data-testid="score-details-container">
+               <div class="score-detail-row" data-testid="base-score">{$_('modal.scoreDetails.baseScore')} <span data-testid="base-score-value">{($modalState.content as any)?.scoreDetails?.baseScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span></div>
                {#if (($modalState.content as any)?.scoreDetails?.sizeBonus ?? $gameState.sizeBonus ?? 0) > 0}
-                 <div class="score-detail-row">{$_('modal.scoreDetails.sizeBonus')} <span>+{($modalState.content as any)?.scoreDetails?.sizeBonus ?? $gameState.sizeBonus ?? 0}</span></div>
+                 <div class="score-detail-row" data-testid="size-bonus">{$_('modal.scoreDetails.sizeBonus')} <span data-testid="size-bonus-value">+{($modalState.content as any)?.scoreDetails?.sizeBonus ?? $gameState.sizeBonus ?? 0}</span></div>
                {/if}
                {#if (($modalState.content as any)?.scoreDetails?.blockModeBonus ?? $gameState.blockModeBonus ?? 0) > 0}
-                 <div class="score-detail-row">{$_('modal.scoreDetails.blockModeBonus')} <span>+{($modalState.content as any)?.scoreDetails?.blockModeBonus ?? $gameState.blockModeBonus ?? 0}</span></div>
+                 <div class="score-detail-row" data-testid="block-mode-bonus">{$_('modal.scoreDetails.blockModeBonus')} <span data-testid="block-mode-bonus-value">+{($modalState.content as any)?.scoreDetails?.blockModeBonus ?? $gameState.blockModeBonus ?? 0}</span></div>
                {/if}
                {#if (($modalState.content as any)?.scoreDetails?.jumpBonus ?? $gameState.jumpBonus ?? 0) > 0}
-                 <div class="score-detail-row">{$_('modal.scoreDetails.jumpBonus')} <span>+{($modalState.content as any)?.scoreDetails?.jumpBonus ?? $gameState.jumpBonus ?? 0}</span></div>
+                 <div class="score-detail-row" data-testid="jump-bonus">{$_('modal.scoreDetails.jumpBonus')} <span data-testid="jump-bonus-value">+{($modalState.content as any)?.scoreDetails?.jumpBonus ?? $gameState.jumpBonus ?? 0}</span></div>
                {/if}
                {#if (($modalState.content as any)?.scoreDetails?.noMovesBonus ?? $gameState.noMovesBonus ?? 0) > 0}
-                 <div class="score-detail-row">{$_('modal.scoreDetails.noMovesBonus')} <span>+{($modalState.content as any)?.scoreDetails?.noMovesBonus ?? $gameState.noMovesBonus ?? 0}</span></div>
+                 <div class="score-detail-row" data-testid="no-moves-bonus">{$_('modal.scoreDetails.noMovesBonus')} <span data-testid="no-moves-bonus-value">+{($modalState.content as any)?.scoreDetails?.noMovesBonus ?? $gameState.noMovesBonus ?? 0}</span></div>
                {/if}
                {#if (($modalState.content as any)?.scoreDetails?.distanceBonus ?? $gameState.distanceBonus ?? 0) > 0}
-                 <div class="score-detail-row">{$_('modal.scoreDetails.distanceBonus')} <span>+{($modalState.content as any)?.scoreDetails?.distanceBonus ?? $gameState.distanceBonus ?? 0}</span></div>
+                 <div class="score-detail-row" data-testid="distance-bonus">{$_('modal.scoreDetails.distanceBonus')} <span data-testid="distance-bonus-value">+{($modalState.content as any)?.scoreDetails?.distanceBonus ?? $gameState.distanceBonus ?? 0}</span></div>
                {/if}
                {#if ($modalState.titleKey === 'modal.gameOverTitle' && (($modalState.content as any)?.scoreDetails?.finishBonus ?? $gameState.finishBonus ?? 0) > 0)}
-                 <div class="score-detail-row">{$_('modal.scoreDetails.finishBonus')} <span>+{($modalState.content as any)?.scoreDetails?.finishBonus ?? $gameState.finishBonus ?? 0}</span></div>
+                 <div class="score-detail-row" data-testid="finish-bonus">{$_('modal.scoreDetails.finishBonus')} <span data-testid="finish-bonus-value">+{($modalState.content as any)?.scoreDetails?.finishBonus ?? $gameState.finishBonus ?? 0}</span></div>
                {/if}
                {#if (($modalState.content as any)?.scoreDetails?.totalPenalty ?? $gameState.totalPenalty ?? 0) > 0}
-                 <div class="score-detail-row penalty">{$_('modal.scoreDetails.penalty')} <span>-{($modalState.content as any)?.scoreDetails?.totalPenalty ?? $gameState.totalPenalty ?? 0}</span></div>
+                 <div class="score-detail-row penalty" data-testid="total-penalty">{$_('modal.scoreDetails.penalty')} <span data-testid="total-penalty-value">-{(($modalState.content as any)?.scoreDetails?.totalPenalty ?? $gameState.totalPenalty ?? 0)}</span></div>
                {/if}
              </div>
              <div class="final-score-container" class:compact={isCompactScoreMode}>
                {#if isCompactScoreMode}
                  <div class="final-score-compact">
                    <span class="final-score-label-inline">{$_('modal.scoreDetails.finalScore')}</span>
-                   <span class="final-score-value-inline">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span>
+                   <span class="final-score-value-inline" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span>
                  </div>
                {:else}
                  <div class="final-score-label">{$_('modal.scoreDetails.finalScore')}</div>
-                 <div class="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</div>
+                 <div class="final-score-value" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</div>
                {/if}
              </div>
            {/if}

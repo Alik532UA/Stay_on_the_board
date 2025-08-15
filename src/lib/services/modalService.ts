@@ -54,6 +54,7 @@ export const modalService = {
       const modalReason = t(reasonKey, reasonValues ? { values: reasonValues } : undefined);
       content = {
         reason: modalReason,
+        reasonKey: reasonKey,
         scoreDetails: finalScoreDetails
       };
     }
