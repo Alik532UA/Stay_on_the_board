@@ -176,7 +176,7 @@
       aria-label="Ігрове поле"
       transition:scaleAndSlide={{ duration: 600, easing: quintOut }}
     >
-      <div class="game-board" style="--board-size: {$boardSize}" role="grid">
+      <div class="game-board" style="--board-size: {$boardSize}" role="grid" data-testid="game-board">
         {#each Array($boardSize) as _, rowIdx (rowIdx)}
           {#each Array($boardSize) as _, colIdx (colIdx)}
             {@const moveInfo = getMoveInfo(rowIdx, colIdx)}

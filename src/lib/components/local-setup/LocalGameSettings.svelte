@@ -21,7 +21,7 @@
 </script>
 
 <div class="settings-card">
-  <h2>{$_('localGame.settingsTitle')}</h2>
+  <h2 data-testid="local-game-settings-title">{$_('localGame.settingsTitle')}</h2>
 
   <div class="settings-list">
     <!-- Керування розміром дошки -->

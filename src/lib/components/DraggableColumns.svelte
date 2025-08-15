@@ -174,7 +174,7 @@
   }
 </style>
 
-<div class="dnd-columns-container {class_name}" style="margin-top: {isHorizontalLayout ? '7vh' : '0'};">
+<div class="dnd-columns-container {class_name}" style="margin-top: {isHorizontalLayout ? '7vh' : '0'};" data-testid="game-widgets-container">
   {#each columns as col, i}
     <ul
       bind:this={colRefs[i]}

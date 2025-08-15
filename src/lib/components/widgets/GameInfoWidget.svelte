@@ -450,6 +450,7 @@
          class:pause={$isPauseBetweenMoves}
          class:compact={$settingsStore.showGameInfoWidget === 'compact'}
          transition:scaleAndSlide={{ duration: 400, easing: quintOut }}
+         data-testid="game-info-panel"
     >
       <div class="game-info-content" class:fade-out={isAnimating}>
         {@html displayMessage}

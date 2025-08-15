@@ -148,7 +148,7 @@
   }
 </script>
 
-<main class="main-menu">
+<main class="main-menu" data-testid="main-menu-container">
   {#if $isLoading}
     <div class="main-menu-loading">Завантаження перекладу...</div>
   {:else}
@@ -242,8 +242,8 @@
       </div>
     {/if}
 
-    <div class="main-menu-title">{$_('mainMenu.title')}</div>
-    <div class="main-menu-subtitle">
+    <div class="main-menu-title" data-testid="main-menu-title">{$_('mainMenu.title')}</div>
+    <div class="main-menu-subtitle" data-testid="main-menu-subtitle">
       {$_('mainMenu.menu')}
       {#if isDev}
         <span class="dev-version" role="button" tabindex="0" onclick={handleDevMenu} onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleDevMenu()}>
@@ -252,12 +252,12 @@
       {/if}
     </div>
     <div id="main-menu-buttons">
-      <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="play-vs-computer-btn">{$_('mainMenu.playVsComputer')}</button>
-      <button class="modal-button secondary" onclick={handleLocalGame}>{$_('mainMenu.localGame')}</button>
-      <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice}>{$_('mainMenu.playOnline')}</button>
-      <!-- <button class="modal-button secondary" on:click={() => navigateTo('/settings')}>{$_('mainMenu.settings')}</button> -->
-      <button class="modal-button secondary" onclick={handleControls}>{$_('mainMenu.controls')}</button>
-      <button class="modal-button secondary" onclick={handleRules}>{$_('mainMenu.rules')}</button>
+      <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="vs-computer-btn">{$_('mainMenu.playVsComputer')}</button>
+      <button class="modal-button secondary" onclick={handleLocalGame} data-testid="local-game-btn">{$_('mainMenu.localGame')}</button>
+      <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice} data-testid="online-game-btn">{$_('mainMenu.playOnline')}</button>
+      <!-- <button class="modal-button secondary" on:click={() => navigateTo('/settings')} data-testid="settings-btn">{$_('mainMenu.settings')}</button> -->
+      <button class="modal-button secondary" onclick={handleControls} data-testid="controls-btn">{$_('mainMenu.controls')}</button>
+      <button class="modal-button secondary" onclick={handleRules} data-testid="rules-btn">{$_('mainMenu.rules')}</button>
       <button class="modal-button secondary" onclick={handleSupporters}>{$_('mainMenu.supporters')}</button>
       <button class="modal-button danger" onclick={showClearCacheModal}>{$_('mainMenu.clearCache')}</button>
     </div>

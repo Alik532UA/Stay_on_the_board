@@ -11,7 +11,7 @@
 <div class="page-container">
   <div class="header-container">
     <FloatingBackButton />
-    <h1>{$_('localGame.title')}</h1>
+    <h1 data-testid="local-setup-title">{$_('localGame.title')}</h1>
   </div>
 
   <div class="setup-grid">
