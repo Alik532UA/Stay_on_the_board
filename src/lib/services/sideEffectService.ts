@@ -2,6 +2,7 @@ import { modalStore } from '$lib/stores/modalStore';
 import { speakText as speak, loadAndGetVoices } from '$lib/services/speechService';
 import { logService } from '$lib/services/logService';
 import { goto } from '$app/navigation';
+import { modalService } from './modalService';
 
 export type SideEffect =
   | { type: 'audio/speak'; payload: SpeakEffect }
@@ -49,7 +50,7 @@ class SideEffectService {
         this.showModal(effect.payload);
         break;
       case 'ui/showGameOverModal':
-        // This is handled by modalService now
+        modalService.showGameOverModal(effect.payload);
         break;
       case 'ui/closeModal':
         this.closeModal();

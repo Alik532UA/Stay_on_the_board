@@ -73,8 +73,6 @@ export abstract class BaseGameMode implements IGameMode {
       'Queueing final losing move for animation'
     );
 
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
     if (reason === 'out_of_bounds') {
       return this.endGame('modal.gameOverReasonOut');
     } else if (reason === 'blocked_cell') {
@@ -85,7 +83,8 @@ export abstract class BaseGameMode implements IGameMode {
 
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<SideEffect[]> {
     const state = get(gameState);
-    const gameType = get(gameState).players.length > 1 ? 'local' : 'vs-computer';
+    const humanPlayersCount = get(gameState).players.filter(p => p.type === 'human').length;
+    const gameType = humanPlayersCount > 1 ? 'local' : 'vs-computer';
     const finalScoreDetails = calculateFinalScore(state as any, gameType);
 
     const endGameChanges = {
