@@ -145,12 +145,13 @@ export class VsComputerGameMode extends BaseGameMode {
             scoreDetails: potentialScoreDetails
           },
           buttons: [
-            { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: () => userActionService.handleModalAction('continueAfterNoMoves') },
+            { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: () => userActionService.handleModalAction('continueAfterNoMoves'), dataTestId: 'continue-game-no-moves-btn' },
             {
               text: get(_)('modal.finishGameWithBonus', { values: { bonus: updatedState.boardSize } }),
-              onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonBonus' })
+              onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonBonus' }),
+              dataTestId: 'finish-game-with-bonus-btn'
             },
-            { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay') }
+            { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: 'watch-replay-no-moves-btn' }
           ],
           closable: false,
           dataTestId: playerType === 'human' ? 'player-no-moves-modal' : 'opponent-trapped-modal',

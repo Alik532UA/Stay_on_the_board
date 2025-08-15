@@ -65,8 +65,8 @@ export const modalService = {
       dataTestId: 'game-over-modal',
       titleDataTestId: 'game-over-modal-title',
       buttons: [
-        { textKey: 'modal.playAgain', primary: true, onClick: () => userActionService.handleModalAction('restartGame'), isHot: true },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay') }
+        { textKey: 'modal.playAgain', primary: true, onClick: () => userActionService.handleModalAction('restartGame'), isHot: true, dataTestId: 'play-again-btn' },
+        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: 'watch-replay-btn' }
       ]
     });
   },
@@ -85,9 +85,10 @@ export const modalService = {
           textKey: 'modal.resetScoreConfirm',
           customClass: 'green-btn',
           isHot: true,
-          onClick: () => userActionService.handleModalAction('resetGame', { newSize })
+          onClick: () => userActionService.handleModalAction('resetGame', { newSize }),
+          dataTestId: 'reset-score-confirm-btn'
         },
-        { textKey: 'modal.resetScoreCancel', onClick: () => userActionService.handleModalAction('closeModal') }
+        { textKey: 'modal.resetScoreCancel', onClick: () => userActionService.handleModalAction('closeModal'), dataTestId: 'reset-score-cancel-btn' }
       ]
     });
   },

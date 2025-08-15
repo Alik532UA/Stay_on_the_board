@@ -9,6 +9,7 @@ import { writable } from 'svelte/store';
  * @property {string} [customClass]
  * @property {boolean} [isHot]
  * @property {string} [hotKey]
+ * @property {string} [dataTestId]
  */
 /**
  * @typedef {Object} ModalContent
