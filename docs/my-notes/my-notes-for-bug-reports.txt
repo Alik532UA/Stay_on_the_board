@@ -3553,8 +3553,10 @@ P.S. але інші елементи, кнопки та тексти відоб
 2. натинути data-testid="modal-btn-modal.watchReplay"
 3. повернутися з /replay до /game/vs-computer
 4. натиснути data-testid="finish-game-with-bonus-btn"
-Актуальний результат: 
-Очікуваний результат: 
+Актуальний результат: сторінка гри без модального вікна data-testid="game-over-modal"
+Очікуваний результат: модальне вікно data-testid="game-over-modal"
+
+додаткова інформація: якщо не заходити на сторінку /replay, тоді працює так як очікувано, тобто після натискання data-testid="finish-game-with-bonus-btn" відкривається вікно data-testid="game-over-modal"
 =======================================================================================
 модальне вікно gameOverTitle
 1. 

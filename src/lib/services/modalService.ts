@@ -9,9 +9,11 @@ import { _, locale } from 'svelte-i18n';
 import type { FinalScoreDetails } from '$lib/models/score';
 import type { GameState } from '$lib/stores/gameState';
 import { determineWinner } from './scoreService';
+import { logService } from './logService.js';
 
 export const modalService = {
   showGameOverModal(payload: { reasonKey: string, reasonValues: any, finalScoreDetails: FinalScoreDetails, gameType: string, state: GameState }): void {
+    logService.ui('[modalService] showGameOverModal called with payload:', payload);
     const { reasonKey, reasonValues, finalScoreDetails, gameType, state } = payload;
     const t = get(_);
     
@@ -113,7 +115,7 @@ export const modalService = {
       if (btn.onClick) {
         const onClickString = btn.onClick.toString();
         if (onClickString.includes('continueAfterNoMoves')) action = 'continueAfterNoMoves';
-        else if (onClickString.includes('finalizeGameWithBonus')) action = 'finalizeGameWithBonus';
+        else if (onClickString.includes('finishWithBonus')) action = 'finishWithBonus';
         else if (onClickString.includes('startReplay')) action = 'startReplay';
         else if (onClickString.includes('restartGame')) action = 'playAgain';
       }
