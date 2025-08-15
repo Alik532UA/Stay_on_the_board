@@ -89,8 +89,8 @@
   <div class="test-mode-control-group">
     <h4 class="test-mode-group-title">Start Position</h4>
     <div class="test-mode-btn-group">
-      <button class="test-mode-row-btn" on:click={() => setStartPositionMode('random')} class:active={$testModeStore.startPositionMode === 'random'}>Random</button>
-      <button class="test-mode-row-btn" on:click={() => setStartPositionMode('manual')} class:active={$testModeStore.startPositionMode === 'manual'}>Manual</button>
+      <button class="test-mode-row-btn" on:click={() => setStartPositionMode('random')} class:active={$testModeStore.startPositionMode === 'random'} data-testid="test-mode-start-pos-random-btn">Random</button>
+      <button class="test-mode-row-btn" on:click={() => setStartPositionMode('manual')} class:active={$testModeStore.startPositionMode === 'manual'} data-testid="test-mode-start-pos-manual-btn">Manual</button>
     </div>
     {#if $testModeStore.startPositionMode === 'manual'}
       <div class="test-mode-manual-coords">
@@ -112,7 +112,7 @@
   <div class="test-mode-control-group">
     <h4 class="test-mode-group-title">Computer's Move</h4>
     <div class="test-mode-btn-group">
-        <button class="test-mode-row-btn" on:click={() => setComputerMoveMode('random')} class:active={$testModeStore.computerMoveMode === 'random'}>Random</button>
+        <button class="test-mode-row-btn" on:click={() => setComputerMoveMode('random')} class:active={$testModeStore.computerMoveMode === 'random'} data-testid="test-mode-computer-move-random-btn">Random</button>
     </div>
     <div class="test-mode-directions-3x3">
       <button class="test-mode-dir-btn" class:active={manualDirection === 'up-left'} on:click={() => handleDirection('up-left')} data-testid="test-mode-dir-btn-up-left">↖</button>

@@ -70,6 +70,7 @@
 			(window as any).gameOrchestrator = gameOrchestrator; // Залишаємо для зворотної сумісності, поки всі тести не переведено
 			(window as any).userActionService = userActionService;
 			(window as any).gameModeService = gameModeService;
+			(window as any).settingsStore = settingsStore; // Додаємо settingsStore для доступу в тестах
 		}
 	});
 
