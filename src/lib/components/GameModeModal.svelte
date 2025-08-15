@@ -46,6 +46,8 @@
         setTimeout(() => {
           modalStore.showModal({
             titleKey: 'faq.title',
+            dataTestId: 'faq-modal',
+            titleDataTestId: 'modal-title',
             content: { isFaq: true },
             buttons: [
               { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },

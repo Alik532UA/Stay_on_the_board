@@ -113,6 +113,8 @@
     if (settings.showGameModeModal) {
       modalStore.showModal({
         titleKey: 'mainMenu.gameModeModal.title',
+        dataTestId: 'game-mode-modal',
+        titleDataTestId: 'game-mode-modal-title',
         component: GameModeModal,
         buttons: [
           { textKey: 'modal.close', onClick: () => modalStore.closeModal() }

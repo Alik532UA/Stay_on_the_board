@@ -16,7 +16,17 @@ test.describe('Модальне вікно "Блискучий аналіз"', (
     await makeMove(page, 'up-left', 1);
 
     // Задаємо параметри ходу комп'ютера, щоб він заблокував себе
-    await page.getByTestId('test-mode-dir-btn-right').click();
+    await page.evaluate(() => {
+      const testModeStore = (window as any).testModeStore;
+      if (testModeStore) {
+        // @ts-ignore
+        testModeStore.update(state => ({
+          ...state,
+          computerMoveMode: 'manual',
+          manualComputerMove: { direction: 'right', distance: 1 }
+        }));
+      }
+    });
 
     await makeMove(page, 'down', 1);
 
@@ -41,7 +51,17 @@ test.describe('Модальне вікно "Блискучий аналіз"', (
     await makeMove(page, 'up-left', 1);
 
     // Задаємо параметри ходу комп'ютера, щоб він заблокував себе
-    await page.getByTestId('test-mode-dir-btn-right').click();
+    await page.evaluate(() => {
+      const testModeStore = (window as any).testModeStore;
+      if (testModeStore) {
+        // @ts-ignore
+        testModeStore.update(state => ({
+          ...state,
+          computerMoveMode: 'manual',
+          manualComputerMove: { direction: 'right', distance: 1 }
+        }));
+      }
+    });
 
     await makeMove(page, 'down', 1);
 
