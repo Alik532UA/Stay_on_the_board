@@ -305,15 +305,17 @@
           role="button"
           tabindex="0"
           title={$_('modal.scoreInfoTitle')}
+          data-testid="score-value"
         >{$gameState.players[0]?.score || 0}</span>
         {#if $gameState.penaltyPoints > 0}
           <span 
-            class="penalty-display" 
+            class="penalty-display"
             on:click={showPenaltyInfo}
             on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
             title={$_('gameBoard.penaltyHint')}
             role="button"
             tabindex="0"
+            data-testid="penalty-display"
           >-{$gameState.penaltyPoints}</span>
         {/if}
       </div>
