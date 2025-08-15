@@ -341,7 +341,14 @@ function createSettingsStore() {
       methods.updateSettings(settingsToApply);
       modal.closeModal();
       return showFaq;
-    }
+    },
+    toggleTestMode: () => {
+      update(state => {
+        const newState = !state.testMode;
+        if (isBrowser) localStorage.setItem('testMode', String(newState));
+        return { ...state, testMode: newState };
+      });
+    },
   };
   return { subscribe, ...methods };
 }
