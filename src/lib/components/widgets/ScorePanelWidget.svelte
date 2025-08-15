@@ -237,7 +237,7 @@
 </style>
 
 {#if !$replayStore.isReplayMode}
-  <div class="score-panel game-content-block">
+  <div class="score-panel game-content-block" data-testid="score-panel">
     {#if isMultiplayer}
       <!-- Локальна гра - показуємо рахунок всіх гравців -->
       <div class="score-display-multiplayer">
@@ -318,7 +318,7 @@
         {/if}
       </div>
     {/if}
-    <button class="cash-out-btn" on:click={cashOutAndEndGame} title={isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}>
+    <button class="cash-out-btn" on:click={cashOutAndEndGame} title={isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')} data-testid="cash-out-btn">
       {@html isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}
     </button>
   </div>

@@ -25,7 +25,7 @@
 </script>
 
 <div class="player-manager-card">
-  <h2>{$_('localGame.playerManagerTitle')}</h2>
+  <h2 data-testid="player-manager-title">{$_('localGame.playerManagerTitle')}</h2>
 
   <div class="player-list">
     {#each $gameState.players as player (player.id)}
@@ -49,6 +49,7 @@
           placeholder="Ім'я гравця"
           bind:value={player.name}
           on:input={(e) => gameState.updatePlayer(player.id, { name: e.currentTarget.value })}
+          data-testid="player-name-input-{player.id}"
         />
         <button
           class="remove-player-btn"
@@ -58,6 +59,7 @@
             gameState.removePlayer(player.id);
           }}
           disabled={$gameState.players.length <= 2}
+          data-testid="remove-player-btn-{player.id}"
         >
           ×
         </button>
@@ -73,10 +75,11 @@
         gameState.addPlayer();
       }}
       disabled={$gameState.players.length >= 8}
+      data-testid="add-player-btn"
     >
       {$_('localGame.addPlayer')}
     </button>
-    <button class="start-game-btn" on:click={startGame}>
+    <button class="start-game-btn" on:click={startGame} data-testid="start-game-btn">
       {$_('localGame.startGame')}
     </button>
   </div>

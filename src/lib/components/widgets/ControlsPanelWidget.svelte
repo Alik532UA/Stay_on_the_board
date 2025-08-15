@@ -94,7 +94,7 @@
   }
 </style>
 
-<div class="game-controls-panel">
+<div class="game-controls-panel" data-testid="controls-panel">
   <div class="select-direction-label">{$_('gameControls.selectDirectionAndDistance')}</div>
   <DirectionControls
     {selectedDirection}
