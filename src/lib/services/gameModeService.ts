@@ -5,6 +5,7 @@
  */
 import { get } from 'svelte/store';
 import { page } from '$app/stores';
+import { browser } from '$app/environment';
 import { gameState } from '$lib/stores/gameState';
 import { gameStore } from '$lib/stores/gameStore';
 import { logService } from '$lib/services/logService.js';
@@ -61,6 +62,9 @@ export const gameModeService = {
   },
 
   _determineGameType(): string {
+    if (!browser) {
+      return 'vs-computer'; // Default for SSR context
+    }
     const currentPath = get(page).url.pathname;
     
     if (currentPath.includes('/game/local')) {

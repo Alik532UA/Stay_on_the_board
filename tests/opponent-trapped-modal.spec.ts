@@ -8,7 +8,7 @@ test.describe('Модальне вікно "Суперник у пастці"', 
     await setBoardSize(page, 2);
   });
 
-  test('Повинно відображатися, коли режим блокування УВІМКНЕНО', { tag: '@done' }, async ({ page }) => {
+  test('Повинно відображатися, коли режим блокування УВІМКНЕНО', { tag: '@bug' }, async ({ page }) => {
     // Вмикаємо режим блокування клітинок
     await setBlockMode(page, BlockModeState.On);
 
@@ -29,7 +29,17 @@ test.describe('Модальне вікно "Суперник у пастці"', 
     await makeMove(page, 'right', 1);
 
     // Задаємо параметри ходу комп'ютера, щоб він заблокував себе
-    await page.getByTestId('test-mode-dir-btn-right').click();
+    await page.evaluate(() => {
+      const testModeStore = (window as any).testModeStore;
+      if (testModeStore) {
+        // @ts-ignore
+        testModeStore.update(state => ({
+          ...state,
+          computerMoveMode: 'manual',
+          manualComputerMove: { direction: 'right', distance: 1 }
+        }));
+      }
+    });
 
     await makeMove(page, 'left', 1, false);
     

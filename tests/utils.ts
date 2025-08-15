@@ -22,8 +22,16 @@ export enum GameMode {
 
 export async function startNewGame(page: Page, mode: GameMode = GameMode.Beginner) {
   await page.goto('/');
-  await page.getByTestId('test-mode-btn').click();
-  await page.getByTestId('play-vs-computer-btn').click();
+  // Вмикаємо тестовий режим програмно, оскільки кнопка доступна тільки в DEV-режимі
+  await page.evaluate(() => {
+    const settingsStore = (window as any).settingsStore;
+    if (settingsStore) {
+      settingsStore.updateSettings({ testMode: true });
+    } else {
+      console.error('settingsStore not found on window object');
+    }
+  });
+  await page.getByTestId('vs-computer-btn').click();
 
   await page.getByTestId(mode).click();
 

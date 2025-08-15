@@ -102,7 +102,7 @@
     if (!$modalState.closable) return;
     onOverlayClick(e);
   }} onkeydown={onModalKeydown}>
-    <div class="modal-window" data-testid="modal-container">
+    <div class="modal-window" data-testid={$modalState.dataTestId}>
       <div class="modal-header">
         {#if $modalState.titleKey === 'modal.expertModeTitle'}
           <!-- Контейнер для повзунка, якому ми передаємо CSS-змінну -->
@@ -127,7 +127,7 @@
           {#if $modalState.titleKey === 'modal.gameOverTitle'}
             <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
           {/if}
-          <h2 class="modal-title" data-testid="modal-title" data-i18n-key={$modalState.titleKey}>
+          <h2 class="modal-title" data-testid={$modalState.titleDataTestId} data-i18n-key={$modalState.titleKey}>
             {#if $i18nReady && $modalState.titleKey}
               {@html $_($modalState.titleKey, {
                 values: $modalState.content as any
@@ -144,7 +144,7 @@
           {/if}
         {/if}
       </div>
-      <div class="modal-content" class:is-faq={typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq} bind:this={modalContent} data-testid="modal-content">
+      <div class="modal-content" class:is-faq={typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq} bind:this={modalContent}>
         {#if typeof $modalState.content === 'object' && $modalState.content && 'reason' in $modalState.content}
           <p class="reason">{$modalState.content.reason}</p>
         {/if}
