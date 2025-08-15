@@ -118,7 +118,7 @@ function createAnimationService() {
     const isPlayerMove = move.player === 1;
     const animationDuration = 500;
     
-    const pauseAfterMove = isPlayerMove ? 1000 : 100;
+    const pauseAfterMove = isPlayerMove ? 101 : 100;
 
     setTimeout(() => {
       if (!isPlayerMove) {
