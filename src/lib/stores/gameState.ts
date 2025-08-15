@@ -150,11 +150,12 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
     { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#457b9d', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
   ];
   
+  const testModeActive = config.testMode ?? false;
   const testModeState = get(testModeStore);
   const { row: initialRow, col: initialCol } =
-    testModeState.startPositionMode === 'manual' && testModeState.manualStartPosition
+    testModeActive && testModeState.startPositionMode === 'manual' && testModeState.manualStartPosition
     ? { row: testModeState.manualStartPosition.y, col: testModeState.manualStartPosition.x }
-    : testModeState.startPositionMode === 'predictable'
+    : testModeActive && testModeState.startPositionMode === 'predictable'
     ? { row: 0, col: 0 }
     : getRandomCell(size);
   const board = createEmptyBoard(size);
