@@ -8,7 +8,7 @@ import { userActionService } from './userActionService';
 import { _, locale } from 'svelte-i18n';
 import type { FinalScoreDetails } from '$lib/models/score';
 import type { GameState } from '$lib/stores/gameState';
-import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
+import { determineWinner } from './scoreService';
 
 export const modalService = {
   showGameOverModal(payload: { reasonKey: string, reasonValues: any, finalScoreDetails: FinalScoreDetails, gameType: string, state: GameState }): void {
@@ -19,7 +19,7 @@ export const modalService = {
     let content;
 
     if (gameType === 'local') {
-      const { winners, winningPlayerIndex } = new LocalGameMode().determineWinner(state, reasonKey);
+      const { winners, winningPlayerIndex } = determineWinner(state, reasonKey);
       const losingPlayerName = state.players[state.currentPlayerIndex].name;
       const modalReason = t(reasonKey, { values: { playerName: losingPlayerName } });
       

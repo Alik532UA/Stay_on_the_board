@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { _, locale } from 'svelte-i18n';
-import { BaseGameMode } from './BaseGameMode';
+import { BaseGameMode } from './index';
 import { moveDirections } from '$lib/utils/translations';
 import { lastComputerMove, availableMoves as derivedAvailableMoves } from '$lib/stores/derivedState';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';

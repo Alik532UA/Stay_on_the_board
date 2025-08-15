@@ -197,3 +197,28 @@ export function validateScoreUpdate(changes: any, currentState: any): { errors: 
 
   return { errors, warnings };
 }
+export function determineWinner(state: GameState, reasonKey: string): { winners: number[], winningPlayerIndex: number } {
+  const scores = state.scoresAtRoundStart;
+
+  const isNoMovesSurrender = reasonKey === 'modal.gameOverReasonNoMovesLeft';
+  const losingPlayerIndex = isNoMovesSurrender ? -1 : state.currentPlayerIndex;
+
+  let maxScore = -Infinity;
+  for (let i = 0; i < scores.length; i++) {
+    if (i !== losingPlayerIndex) {
+      if (scores[i] > maxScore) {
+        maxScore = scores[i];
+      }
+    }
+  }
+
+  const winners: number[] = [];
+  for (let i = 0; i < scores.length; i++) {
+    if (i !== losingPlayerIndex && scores[i] === maxScore) {
+      winners.push(i);
+    }
+  }
+  
+  const winningPlayerIndex = winners.length > 0 ? winners[0] : -1;
+  return { winners, winningPlayerIndex };
+}
