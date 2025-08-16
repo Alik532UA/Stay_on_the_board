@@ -18,7 +18,7 @@
     
     // 2. Конфігурація
     const defaultConfig = {
-      [LOG_GROUPS.STATE]: true,
+      [LOG_GROUPS.STATE]: false,
       [LOG_GROUPS.LOGIC]: false,
       [LOG_GROUPS.SCORE]: false,
       [LOG_GROUPS.UI]: true,

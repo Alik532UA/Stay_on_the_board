@@ -1,5 +1,4 @@
 import { writable } from 'svelte/store';
-import { logService } from '$lib/services/logService.js';
 
 /**
  * @typedef {Object} ModalButton
@@ -66,29 +65,29 @@ export const modalState = { subscribe };
   update(currentState => {
     if (currentState.isOpen) {
       modalStack.push(currentState);
-      logService.state('[modalStore] Pushed modal to stack. Stack size:', modalStack.length, modalStack);
     }
-    const newState = { isOpen: true, title, titleKey, content, contentKey, buttons: buttons || [], component, props, closable, closeOnOverlayClick, dataTestId, titleDataTestId };
-    logService.state('[modalStore] Showing new modal:', newState);
-    return newState;
+    return { isOpen: true, title, titleKey, content, contentKey, buttons: buttons || [], component, props, closable, closeOnOverlayClick, dataTestId, titleDataTestId };
   });
  }
 export function closeModal() {
   if (modalStack.length > 0) {
     const previousState = modalStack.pop();
-    logService.state('[modalStore] Popped modal from stack. Stack size:', modalStack.length, modalStack);
     if (previousState) {
-      logService.state('[modalStore] Restoring previous modal:', previousState);
       set(previousState);
     }
   } else {
-    logService.state('[modalStore] Closing final modal, resetting to initial state.');
     set({ ...initialState });
   }
+}
+
+export function closeAllModals() {
+  modalStack.length = 0; // Clear the stack
+  set({ ...initialState });
 }
 
 export const modalStore = {
   subscribe,
   showModal,
-  closeModal
+  closeModal,
+  closeAllModals
 };
