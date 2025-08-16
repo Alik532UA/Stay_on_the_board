@@ -6,6 +6,7 @@
   import { modalStore } from '$lib/stores/modalStore.js';
   import { replayStore } from '$lib/stores/replayStore.js';
   import { _ } from 'svelte-i18n';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
 
   // Реактивні змінні для визначення поточного гравця та режиму гри
   $: currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
@@ -250,7 +251,7 @@
               <span
                 class="score-value-clickable"
                 on:click={() => showPlayerBonusInfo(player)}
-                on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
+                on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
                 role="button"
                 tabindex="0"
                 title="Натисніть для перегляду деталей балів"
@@ -260,7 +261,7 @@
               <span
                 class="bonus-display"
                 on:click={() => showPlayerBonusInfo(player)}
-                on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
+                on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
                 title="Натисніть для перегляду деталей бонусних балів"
                 role="button"
                 tabindex="0"
@@ -270,7 +271,7 @@
               <span
                 class="penalty-display"
                 on:click={showPenaltyInfo}
-                on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+                on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
                 title={$_('gameBoard.penaltyHint')}
                 role="button"
                 tabindex="0"
@@ -283,7 +284,7 @@
             <span 
               class="penalty-display" 
               on:click={showPenaltyInfo}
-              on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+              on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
               title={$_('gameBoard.penaltyHint')}
               role="button"
               tabindex="0"
@@ -301,18 +302,18 @@
           class="score-value-clickable"
           class:positive-score={$gameState.players[0]?.score > 0}
           on:click={showScoreInfo}
-          on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
+          on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
           role="button"
           tabindex="0"
-          title={$_('modal.scoreInfoTitle')}
+          use:customTooltip={$_('modal.scoreInfoTitle')}
           data-testid="score-value"
         >{$gameState.players[0]?.score || 0}</span>
         {#if $gameState.penaltyPoints > 0}
           <span 
             class="penalty-display"
             on:click={showPenaltyInfo}
-            on:keydown={e => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
-            title={$_('gameBoard.penaltyHint')}
+            on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+            use:customTooltip={$_('gameBoard.penaltyHint')}
             role="button"
             tabindex="0"
             data-testid="penalty-display"
