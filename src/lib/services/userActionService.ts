@@ -67,6 +67,7 @@ export const userActionService = {
   },
 
   async requestRestart(): Promise<void> {
+    modalStore.closeAllModals();
     const sideEffects = await gameModeService.restartGame();
     this.executeSideEffects(sideEffects);
   },
