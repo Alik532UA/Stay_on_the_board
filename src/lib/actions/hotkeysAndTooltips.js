@@ -1,4 +1,5 @@
 import { tooltipStore } from '$lib/stores/tooltipStore.js';
+import { logService } from '$lib/services/logService.js';
 
 /**
  * A Svelte action to dynamically assign numeric hotkeys (1-9) and custom tooltips to buttons within a container.
@@ -11,13 +12,12 @@ export function hotkeysAndTooltips(node) {
     btn.title = ''; // Remove native title to prevent interference
 
     const tooltipContent = `HotKey <span class="hotkey-kbd">${index + 1}</span>`;
-    /** @type {ReturnType<typeof setTimeout>} */
-    let showTimeout;
 
     const mouseOver = (/** @type {MouseEvent} */ event) => {
-      showTimeout = setTimeout(() => {
-        tooltipStore.show(tooltipContent, event.pageX + 10, event.pageY + 10);
-      }, 1000);
+      // Only schedule if the button is still in the DOM
+      if (!btn.isConnected) return;
+      
+      tooltipStore.scheduleShow(tooltipContent, event.pageX + 10, event.pageY + 10, 1000);
     };
 
     const mouseMove = (/** @type {MouseEvent} */ event) => {
@@ -25,7 +25,6 @@ export function hotkeysAndTooltips(node) {
     };
 
     const mouseLeave = () => {
-      clearTimeout(showTimeout);
       tooltipStore.hide();
     };
 
@@ -56,6 +55,7 @@ export function hotkeysAndTooltips(node) {
   return {
     destroy() {
       window.removeEventListener('keydown', handleKeydown);
+      // No need to unregister, as the store now manages its own state.
       // Button-specific listeners are not removed here, as they will be garbage collected
       // when the node (and its buttons) are destroyed.
     }
