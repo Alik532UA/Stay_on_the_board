@@ -13,8 +13,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
+    min-width: 20px;
     height: 20px;
+    padding: 0 6px;
     border: 1px solid var(--border-color, #444);
     border-radius: 4px;
     background: var(--bg-primary, #1e1e1e);
