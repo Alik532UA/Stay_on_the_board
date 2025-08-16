@@ -326,10 +326,6 @@
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 } 
 
-.game-board-piece {
-    /* Правила позиціонування та розміру шрифту видалено */
-}
-
 .game-board-piece.crown {
     filter: drop-shadow(0 2px 6px #fff8);
 }
