@@ -8,6 +8,7 @@
   import { get } from 'svelte/store';
   import { gameState } from '$lib/stores/gameState';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
+  import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
 
   /**
    * @param {'beginner' | 'experienced' | 'pro'} mode
@@ -73,7 +74,7 @@
   }
 </script>
 
-<div class="game-mode-buttons">
+<div class="game-mode-buttons" use:hotkeysAndTooltips>
   <button class="modal-btn-generic green-btn" on:click={() => selectMode('beginner')} data-testid="beginner-mode-btn">
     {$_('gameModes.beginner')}
   </button>

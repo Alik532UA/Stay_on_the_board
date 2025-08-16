@@ -9,6 +9,18 @@
 </div>
 
 <style>
+  :global(.hotkey-kbd) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--border-color, #444);
+    border-radius: 4px;
+    background: var(--bg-primary, #1e1e1e);
+    font-weight: bold;
+    margin-left: 8px;
+  }
   .tooltip {
     position: fixed;
     padding: 8px 12px;
