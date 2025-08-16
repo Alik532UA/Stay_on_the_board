@@ -69,8 +69,8 @@ export const modalService = {
       titleDataTestId: 'game-over-modal-title',
       buttons: [
         { textKey: 'modal.playAgain', primary: true, onClick: () => userActionService.handleModalAction('restartGame'), isHot: true, dataTestId: 'play-again-btn' },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: 'watch-replay-btn' },
-        { textKey: 'gameBoard.mainMenu', onClick: () => navigationService.goToMainMenu(), dataTestId: 'main-menu-btn' }
+        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: 'game-over-watch-replay-btn' },
+        { textKey: 'gameBoard.mainMenu', onClick: () => navigationService.goToMainMenu(), dataTestId: 'game-over-main-menu-btn' }
       ]
     });
   },

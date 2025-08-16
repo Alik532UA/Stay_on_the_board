@@ -51,7 +51,7 @@
 </style>
 
 <div class="game-board-top-row">
-  <button class="main-menu-btn" use:hotkeyTooltip={{ key: 'ESC' }} on:click={handleMainMenuClick} data-testid="main-menu-btn">
+  <button class="main-menu-btn" use:hotkeyTooltip={{ key: 'ESC' }} on:click={handleMainMenuClick} data-testid="top-row-main-menu-btn">
     <SvgIcons name="home" />
   </button>
   {#if $page.route.id?.includes('/game/local')}

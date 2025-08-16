@@ -151,7 +151,7 @@ export class VsComputerGameMode extends BaseGameMode {
               onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonBonus' }),
               dataTestId: 'finish-game-with-bonus-btn'
             },
-            { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: 'watch-replay-no-moves-btn' }
+            { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: `watch-replay-${playerType}-no-moves-btn` }
           ],
           closable: false,
           dataTestId: playerType === 'human' ? 'player-no-moves-modal' : 'opponent-trapped-modal',
