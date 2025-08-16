@@ -34,14 +34,14 @@ const defaultStyle = import.meta.env.DEV ? 'gray' : 'purple';
 
 /** @type {Record<KeybindingAction, string[]>} */
 export const defaultKeybindings = {
-  'up-left': ['Numpad7', 'KeyQ'],
-  'up': ['Numpad8', 'KeyW'],
-  'up-right': ['Numpad9', 'KeyE'],
-  'left': ['Numpad4', 'KeyA'],
-  'right': ['Numpad6', 'KeyD'],
-  'down-left': ['Numpad1', 'KeyZ'],
-  'down': ['Numpad2', 'KeyS', 'KeyX'],
-  'down-right': ['Numpad3', 'KeyC'],
+  'up-left': ['KeyQ', 'Numpad7'],
+  'up': ['KeyW', 'Numpad8'],
+  'up-right': ['KeyE', 'Numpad9'],
+  'left': ['KeyA', 'Numpad4'],
+  'right': ['KeyD', 'Numpad6'],
+  'down-left': ['KeyZ', 'Numpad1'],
+  'down': ['KeyS', 'KeyX', 'Numpad2'],
+  'down-right': ['KeyC', 'Numpad3'],
   'confirm': ['NumpadEnter', 'Enter', 'Space', 'Numpad5', 'KeyS'],
   'no-moves': ['NumpadDecimal', 'Backspace', 'KeyN'],
   'toggle-block-mode': ['NumpadMultiply'],

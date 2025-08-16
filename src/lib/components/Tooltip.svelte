@@ -9,18 +9,32 @@
 </div>
 
 <style>
+  :global(.hotkey-title) {
+    font-weight: bold;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  :global(.hotkey-item) {
+    display: flex;
+    justify-content: center;
+  }
+  :global(.hotkey-item:not(:last-child)) {
+    margin-bottom: 4px;
+  }
   :global(.hotkey-kbd) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 20px;
     height: 20px;
     padding: 0 6px;
     border: 1px solid var(--border-color, #444);
     border-radius: 4px;
     background: var(--bg-primary, #1e1e1e);
     font-weight: bold;
-    margin-left: 8px;
+  }
+  :global(.hotkey-kbd.single-char) {
+    width: 20px;
+    padding: 0;
   }
   .tooltip {
     position: fixed;

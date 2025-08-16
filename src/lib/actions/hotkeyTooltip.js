@@ -8,8 +8,19 @@ import { get } from 'svelte/store';
  */
 function formatHotkeys(keys) {
   if (!keys || keys.length === 0) return '';
-  const formattedKeys = keys.map(key => `<span class="hotkey-kbd">${key.replace(/^(Key|Digit|Numpad)/, '')}</span>`).join(' ');
-  return `HotKey ${formattedKeys}`;
+  const keyElements = keys.map(key => {
+    let keyText = key;
+    if (key.startsWith('Key')) {
+      keyText = key.substring(3);
+    } else if (key.startsWith('Numpad')) {
+      keyText = `NumPad ${key.substring(6)}`;
+    } else if (key.startsWith('Digit')) {
+      keyText = key.substring(5);
+    }
+    const className = keyText.length === 1 ? 'hotkey-kbd single-char' : 'hotkey-kbd';
+    return `<div class="hotkey-item"><span class="${className}">${keyText}</span></div>`;
+  }).join('');
+  return `<div class="hotkey-title">HotKey</div>${keyElements}`;
 }
 
 /**
@@ -19,6 +30,8 @@ function formatHotkeys(keys) {
  */
 export function hotkeyTooltip(node, actionName) {
   let tooltipContent = '';
+  const originalTitle = node.title;
+  node.title = '';
 
   const unsubscribe = settingsStore.subscribe(settings => {
     const keys = settings.keybindings[actionName];
@@ -60,6 +73,7 @@ export function hotkeyTooltip(node, actionName) {
       node.removeEventListener('mousemove', mouseMove);
       node.removeEventListener('mouseleave', mouseLeave);
       unsubscribe();
+      node.title = originalTitle;
     }
   };
 }
