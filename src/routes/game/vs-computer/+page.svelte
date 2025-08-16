@@ -86,13 +86,5 @@
   }
 </script>
 
-{#if $replayStore.isReplayMode}
-  <ReplayViewer
-    moveHistory={$replayStore.moveHistory}
-    boardSize={$replayStore.boardSize}
-    autoPlayForward={true}
-  />
-{:else}
   <DraggableColumns {columns} itemContent={itemContent} on:drop={handleDrop} />
   <DevClearCacheButton />
-{/if}

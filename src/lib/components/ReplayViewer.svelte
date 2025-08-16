@@ -14,6 +14,7 @@
   import { onMount } from 'svelte';
   import { replayAutoPlayStore } from '$lib/stores/replayAutoPlayStore.js';
   import { replayStore } from '$lib/stores/replayStore.js'; // Corrected import
+  import { modalStore } from '$lib/stores/modalStore.js';
   import { _ } from 'svelte-i18n'; // Added import for i18n
 
   let { moveHistory, boardSize, autoPlayForward = false } = $props<{ moveHistory: any[]; boardSize: number; autoPlayForward?: boolean }>();
@@ -56,7 +57,7 @@
 </script>
 
 <div class="replay-viewer">
-  <button class="close-replay-btn" onclick={replayStore.stopReplay}>
+  <button class="close-replay-btn" onclick={() => { replayStore.stopReplay(); modalStore.closeModal(); }}>
     {$_('replay.close')}
   </button>
   <div class="board-bg-wrapper game-content-block" style="--board-size: {boardSize}">

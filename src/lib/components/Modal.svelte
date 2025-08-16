@@ -149,7 +149,7 @@
           <p class="reason" data-testid="modal-content-reason" data-i18n-key={($modalState.content as any).reasonKey}>{$modalState.content.reason}</p>
         {/if}
         {#if $modalState.component}
-          <svelte:component this={$modalState.component as any} />
+          <svelte:component this={$modalState.component as any} {...$modalState.props} />
         {:else if typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq}
           <FAQModal />
         {:else if typeof $modalState.content === 'object' && $modalState.content && 'key' in $modalState.content && 'actions' in $modalState.content}
