@@ -3,6 +3,7 @@
   import { modalStore } from '$lib/stores/modalStore.js';
   import { gameOrchestrator } from '$lib/gameOrchestrator.ts';
   import { _ } from 'svelte-i18n';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
   import { get } from 'svelte/store';
   import { userActionService } from '$lib/services/userActionService';
   import { gameState } from '$lib/stores/gameState.js';
@@ -23,7 +24,7 @@
 <button
   class="floating-back-btn"
   aria-label={$_('ui.goBack') || 'Повернутися назад'}
-  title={$_('ui.goBack') || 'Повернутися назад'}
+  use:customTooltip={$_('ui.goBack') || 'Повернутися назад'}
   onclick={handleBackClick}
 >
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

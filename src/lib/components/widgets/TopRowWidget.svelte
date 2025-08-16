@@ -3,6 +3,7 @@
   import { _ } from 'svelte-i18n';
   import SvgIcons from '../SvgIcons.svelte';
   import { showGameModeSelector, showGameInfoModal } from '$lib/utils/uiHelpers.js';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
   import { page } from '$app/stores';
 
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
@@ -30,19 +31,19 @@
 </style>
 
 <div class="game-board-top-row">
-  <button class="main-menu-btn" title={$_('gameBoard.mainMenu')} on:click={handleMainMenuClick}>
+  <button class="main-menu-btn" use:customTooltip={$_('gameBoard.mainMenu')} on:click={handleMainMenuClick} data-testid="main-menu-btn">
     <SvgIcons name="home" />
   </button>
   {#if $page.route.id?.includes('/game/local')}
-    <button class="main-menu-btn" title={$_('tooltips.localGameSettings')} on:click={handleLocalSetupClick}>
+    <button class="main-menu-btn" use:customTooltip={$_('tooltips.localGameSettings')} on:click={handleLocalSetupClick} data-testid="local-game-settings-btn">
       <SvgIcons name="hamburger-menu" />
     </button>
   {/if}
-  <button class="main-menu-btn" title={$_('gameBoard.info')} on:click={showGameInfoModal}>
+  <button class="main-menu-btn" use:customTooltip={$_('gameBoard.info')} on:click={showGameInfoModal} data-testid="game-info-btn">
     <SvgIcons name="info" />
   </button>
   {#if false}
-    <button class="main-menu-btn" title={$columnStyleMode === 'editing' ? 'Switch to Fixed' : 'Switch to Editing'} on:click={() => columnStyleMode.update(v => v === 'fixed' ? 'editing' : 'fixed')} style="display: flex; align-items: center; justify-content: center;">
+    <button class="main-menu-btn" use:customTooltip={$columnStyleMode === 'editing' ? 'Switch to Fixed' : 'Switch to Editing'} on:click={() => columnStyleMode.update(v => v === 'fixed' ? 'editing' : 'fixed')} style="display: flex; align-items: center; justify-content: center;" data-testid="column-style-mode-btn">
       <SvgIcons name="palette" />
       {#if $columnStyleMode === 'editing'}
         <span style="display: flex; align-items: center; justify-content: center; margin-left: 4px;"><SvgIcons name="editing" /></span>

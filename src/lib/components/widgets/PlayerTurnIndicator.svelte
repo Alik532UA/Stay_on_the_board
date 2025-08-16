@@ -1,5 +1,6 @@
 <script>
   import { gameState } from '$lib/stores/gameState';
+  import { customTooltip } from '$lib/actions/customTooltip';
 
   $: players = $gameState.players;
   $: currentPlayerIndex = $gameState.currentPlayerIndex;
@@ -26,7 +27,7 @@
     <div 
       class="player-bar"
       style="background-color: {player.color}; opacity: {i === currentPlayerIndex ? 1 : 0.2};"
-      title="{player.name}"
+      use:customTooltip={player.name}
     ></div>
   {/each}
 </div>

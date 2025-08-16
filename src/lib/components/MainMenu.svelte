@@ -20,6 +20,7 @@
   import { get } from 'svelte/store';
   import GameModeModal from '$lib/components/GameModeModal.svelte';
   import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
 
   let showLangDropdown = false;
   let showThemeDropdown = false;
@@ -142,12 +143,12 @@
     <div class="main-menu-loading">Завантаження перекладу...</div>
   {:else}
     <div class="main-menu-top-icons">
-      <button class="main-menu-icon" title={$_('mainMenu.theme')} aria-label={$_('mainMenu.theme')} onclick={() => showThemeDropdown = !showThemeDropdown}>
+      <button class="main-menu-icon" use:customTooltip={$_('mainMenu.theme')} aria-label={$_('mainMenu.theme')} onclick={() => showThemeDropdown = !showThemeDropdown} data-testid="theme-btn">
         <span class="main-menu-icon-inner">
           <SvgIcons name="theme" />
         </span>
       </button>
-      <button class="main-menu-icon" title={$_('mainMenu.language')} aria-label={$_('mainMenu.language')} onclick={toggleLangDropdown}>
+      <button class="main-menu-icon" use:customTooltip={$_('mainMenu.language')} aria-label={$_('mainMenu.language')} onclick={toggleLangDropdown} data-testid="lang-btn">
         <span class="main-menu-icon-inner">
           {@html $currentLanguageFlagSvg}
         </span>
@@ -155,13 +156,13 @@
       {#if showLangDropdown}
         <div class="lang-dropdown main-menu-lang-dropdown" role="dialog" aria-modal="true" tabindex="0" onclick={(e) => { e.stopPropagation(); }} onkeydown={(e) => (e.key === 'Escape') && (showLangDropdown = false)}>
           {#each languages as lang (lang.code)}
-            <button class="lang-option" onclick={() => selectLang(lang.code)} aria-label={lang.code}>
+            <button class="lang-option" onclick={() => selectLang(lang.code)} aria-label={lang.code} data-testid={`lang-option-${lang.code}`}>
               {@html lang.svg}
             </button>
           {/each}
         </div>
       {/if}
-      <button class="main-menu-icon" title={$_('mainMenu.donate')} aria-label={$_('mainMenu.donate')} onclick={() => navigateTo('/supporters')}>
+      <button class="main-menu-icon" use:customTooltip={$_('mainMenu.donate')} aria-label={$_('mainMenu.donate')} onclick={() => navigateTo('/supporters')} data-testid="donate-btn">
         <span class="main-menu-icon-inner">
           <SvgIcons name="donate" />
         </span>
@@ -176,7 +177,7 @@
     {#if showDevMenu}
       <div class="dev-menu" role="dialog" tabindex="0" onclick={(e) => { e.stopPropagation(); }} onkeydown={(e) => (e.key === 'Escape') && (showDevMenu = false)}>
         <h3>dev</h3>
-        <button class="modal-button secondary" onclick={handleDevMenuBtn}>
+        <button class="modal-button secondary" onclick={handleDevMenuBtn} data-testid="dev-menu-dnd-btn">
           {$_('mainMenu.dragAndDropTest')}
         </button>
         <!-- Сюди можна додавати нові dev-кнопки -->
@@ -186,10 +187,10 @@
     {#if showWipNotice}
       <div class="wip-notice-overlay" role="dialog" tabindex="0" onclick={(e) => { e.stopPropagation(); }} onkeydown={(e) => (e.key === 'Escape') && closeDropdowns()}>
         <div class="wip-notice-content">
-          <button class="wip-close-btn" onclick={closeDropdowns}>×</button>
+          <button class="wip-close-btn" onclick={closeDropdowns} data-testid="wip-close-btn">×</button>
           <h3>{$_('mainMenu.wipNotice.title')}</h3>
           <p>{$_('mainMenu.wipNotice.description')}</p>
-          <button class="wip-donate-btn" onclick={handleDonate}>
+          <button class="wip-donate-btn" onclick={handleDonate} data-testid="wip-donate-btn">
             {$_('mainMenu.donate')}
           </button>
         </div>
@@ -199,34 +200,34 @@
     {#if showThemeDropdown}
       <div class="theme-dropdown" role="dialog" tabindex="0" aria-modal="true" aria-label={$_('mainMenu.themeDropdown')} onclick={(e) => { e.stopPropagation(); }} onkeydown={(e) => (e.key === 'Escape') && closeDropdowns()}>
         <div class="theme-style-row" data-style="purple">
-          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('purple', 'light')}>☀️</button>
+          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('purple', 'light')} data-testid="theme-purple-light-btn">☀️</button>
           <span class="theme-name">{$_('mainMenu.themeName.purple')}</span>
-          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('purple', 'dark')}>🌙</button>
+          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('purple', 'dark')} data-testid="theme-purple-dark-btn">🌙</button>
         </div>
         <div class="theme-style-row" data-style="green">
-          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('green', 'light')}>☀️</button>
+          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('green', 'light')} data-testid="theme-green-light-btn">☀️</button>
           <span class="theme-name">{$_('mainMenu.themeName.green')}</span>
-          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('green', 'dark')}>🌙</button>
+          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('green', 'dark')} data-testid="theme-green-dark-btn">🌙</button>
         </div>
         <div class="theme-style-row" data-style="blue">
-          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('blue', 'light')}>☀️</button>
+          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('blue', 'light')} data-testid="theme-blue-light-btn">☀️</button>
           <span class="theme-name">{$_('mainMenu.themeName.blue')}</span>
-          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('blue', 'dark')}>🌙</button>
+          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('blue', 'dark')} data-testid="theme-blue-dark-btn">🌙</button>
         </div>
         <div class="theme-style-row" data-style="gray">
-          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('gray', 'light')}>☀️</button>
+          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('gray', 'light')} data-testid="theme-gray-light-btn">☀️</button>
           <span class="theme-name">{$_('mainMenu.themeName.gray')}</span>
-          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('gray', 'dark')}>🌙</button>
+          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('gray', 'dark')} data-testid="theme-gray-dark-btn">🌙</button>
         </div>
         <div class="theme-style-row" data-style="orange">
-          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('orange', 'light')}>☀️</button>
+          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('orange', 'light')} data-testid="theme-orange-light-btn">☀️</button>
           <span class="theme-name">{$_('mainMenu.themeName.orange')}</span>
-          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('orange', 'dark')}>🌙</button>
+          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('orange', 'dark')} data-testid="theme-orange-dark-btn">🌙</button>
         </div>
         <div class="theme-style-row" data-style="wood">
-          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('wood', 'light')}>☀️</button>
+          <button class="theme-btn" data-theme="light" onclick={() => selectTheme('wood', 'light')} data-testid="theme-wood-light-btn">☀️</button>
           <span class="theme-name">{$_('mainMenu.themeName.wood')}</span>
-          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('wood', 'dark')}>🌙</button>
+          <button class="theme-btn" data-theme="dark" onclick={() => selectTheme('wood', 'dark')} data-testid="theme-wood-dark-btn">🌙</button>
         </div>
       </div>
     {/if}
@@ -247,8 +248,8 @@
       <!-- <button class="modal-button secondary" on:click={() => navigateTo('/settings')} data-testid="settings-btn">{$_('mainMenu.settings')}</button> -->
       <button class="modal-button secondary" onclick={handleControls} data-testid="controls-btn">{$_('mainMenu.controls')}</button>
       <button class="modal-button secondary" onclick={handleRules} data-testid="rules-btn">{$_('mainMenu.rules')}</button>
-      <button class="modal-button secondary" onclick={handleSupporters}>{$_('mainMenu.supporters')}</button>
-      <button class="modal-button danger" onclick={showClearCacheModal}>{$_('mainMenu.clearCache')}</button>
+      <button class="modal-button secondary" onclick={handleSupporters} data-testid="supporters-btn">{$_('mainMenu.supporters')}</button>
+      <button class="modal-button danger" onclick={showClearCacheModal} data-testid="clear-cache-btn">{$_('mainMenu.clearCache')}</button>
     </div>
   {/if}
 </main>

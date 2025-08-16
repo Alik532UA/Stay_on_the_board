@@ -5,6 +5,7 @@
   import { getCenterInfoState } from '$lib/utils/centerInfoUtil';
   import { logService } from '$lib/services/logService.js';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
 
   export let selectedDirection: string | null = null;
   export let selectedDistance: number | null = null;
@@ -66,6 +67,7 @@
       tabindex="0"
       disabled={!centerInfoProps.clickable}
       style={centerInfoProps.backgroundColor ? `background-color: ${centerInfoProps.backgroundColor} !important` : ''}
+      data-testid="center-info-btn"
     >
       {centerInfoProps.content}
     </button>
@@ -86,12 +88,12 @@
     </div>
   </div>
   <div class="action-btns">
-    <button class="confirm-btn {confirmButtonBlocked ? 'disabled' : ''}" use:hotkeyTooltip={'confirm'} on:click={handleConfirm} title={$_('gameControls.confirm')} data-testid="confirm-move-btn">
+    <button class="confirm-btn {confirmButtonBlocked ? 'disabled' : ''}" use:hotkeyTooltip={'confirm'} on:click={handleConfirm} use:customTooltip={$_('gameControls.confirm')} data-testid="confirm-move-btn">
       <SvgIcons name="confirm" />
       {$_('gameControls.confirm')}
     </button>
     {#if blockModeEnabled}
-      <button class="no-moves-btn" use:hotkeyTooltip={'no-moves'} on:click={handleNoMoves} title={$_('gameControls.noMovesTitle')} data-testid="no-moves-btn">
+      <button class="no-moves-btn" use:hotkeyTooltip={'no-moves'} on:click={handleNoMoves} use:customTooltip={$_('gameControls.noMovesTitle')} data-testid="no-moves-btn">
         <SvgIcons name="no-moves" />
         {$_('gameControls.noMovesTitle')}
       </button>

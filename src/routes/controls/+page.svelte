@@ -3,6 +3,7 @@
   import { _ } from 'svelte-i18n';
   import { settingsStore } from '$lib/stores/settingsStore.ts';
   import { onMount } from 'svelte';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
 
   /** @type {{ action: import('$lib/stores/settingsStore.ts').KeybindingAction, index: number } | null} */
   let listeningFor = null;
@@ -124,7 +125,7 @@
                     ? $_('controlsPage.pressKey')
                     : (key ? key.replace(/^Key|^Digit/, '') : 'N/A')}
                 </button>
-                <button class="remove-key-btn" title={$_('controlsPage.removeKey')} on:click={() => removeKey(/** @type {import('$lib/stores/settingsStore').KeybindingAction} */(action), i)}>×</button>
+                <button class="remove-key-btn" use:customTooltip={$_('controlsPage.removeKey')} on:click={() => removeKey(/** @type {import('$lib/stores/settingsStore').KeybindingAction} */(action), i)}>×</button>
               </div>
             {/each}
             {#if (keybindings[action]?.length || 0) < 8}
