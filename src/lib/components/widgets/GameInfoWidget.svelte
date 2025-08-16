@@ -125,6 +125,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
   }
 
   :global(.message-line-1) {
@@ -156,7 +157,7 @@
        transition:scaleAndSlide={{ duration: 400, easing: quintOut }}
        data-testid="game-info-panel"
   >
-    <div class="game-info-content">
+    <div class="game-info-content" data-testid="game-info-content">
       {@html $displayMessage}
     </div>
   </div>
