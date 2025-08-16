@@ -60,7 +60,7 @@
   }
 
   .available .move-dot {
-    opacity: 1;
+    opacity: 0.5;
     transform: translate(-50%, -50%) scale(1);
   }
 
