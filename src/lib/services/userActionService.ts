@@ -15,6 +15,7 @@ import { logService } from './logService.js';
 import { stateManager } from './stateManager';
 import { gameState } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService.js';
+import { navigationService } from './navigationService';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { getAvailableMoves } from '$lib/utils/boardUtils.ts';
 import { gameOverStore } from '$lib/stores/gameOverStore';
@@ -174,6 +175,10 @@ export const userActionService = {
         break;
       case 'closeModal':
         sideEffects = [{ type: 'ui/closeModal' }];
+        break;
+      case 'resetGameAndGoToMainMenu':
+        gameLogicService.resetGame({}, get(gameState));
+        navigationService.goToMainMenu();
         break;
       default:
         logService.logic(`[userActionService.handleModalAction] Unknown action: ${action}`);
