@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('Game page loads and renders correctly on direct navigation', { tag: '@GPS-1' }, async ({ page }) => {
+test('Game page loads and renders correctly on direct navigation', { tag: ['@done', '@GPS-1'] } , async ({ page }) => {
   // Переходимо напряму на сторінку гри
   const response = await page.goto('/Stay_on_the_board/game/vs-computer');
 
