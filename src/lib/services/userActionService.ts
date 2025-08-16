@@ -75,10 +75,19 @@ export const userActionService = {
     modalStore.closeModal();
     const { moveHistory, boardSize } = get(gameState);
     if (moveHistory && moveHistory.length > 0) {
-      logService.logic('[userActionService] Starting replay mode');
-      replayStore.startReplay(moveHistory, boardSize);
+      logService.logic('[userActionService] Opening replay in modal');
+      const ReplayViewer = (await import('$lib/components/ReplayViewer.svelte')).default;
+      modalStore.showModal({
+        component: ReplayViewer,
+        props: {
+          moveHistory,
+          boardSize,
+          autoPlayForward: true
+        },
+        closable: true,
+      });
     } else {
-      logService.logic('[userActionService] No move history to replay.');
+      logService.logic('[userAction-service] No move history to replay.');
     }
   },
 
