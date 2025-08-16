@@ -40,10 +40,12 @@ export interface Animation {
 /**
  * Інтерфейс для gameState
  */
+import type { MoveHistoryEntry } from './gameState';
+
 export interface GameState {
   gameId: number;
   moveQueue: any[];
-  moveHistory: any[];
+  moveHistory: MoveHistoryEntry[];
   [key: string]: any;
 }
 
