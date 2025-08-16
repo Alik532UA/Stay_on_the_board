@@ -166,7 +166,7 @@
           </p>
         {/if}
 
-                 {#if $gameState.isGameOver || ($modalState.content && typeof $modalState.content === 'object' && 'scoreDetails' in $modalState.content)}
+                 {#if ($gameState.isGameOver || ($modalState.content && typeof $modalState.content === 'object' && 'scoreDetails' in $modalState.content)) && !$modalState.component}
            <!-- Показуємо рахунки гравців для локальної гри -->
            {#if ($modalState.content as any)?.playerScores && ($modalState.content as any).playerScores.length > 0}
              <div class="player-scores-container">

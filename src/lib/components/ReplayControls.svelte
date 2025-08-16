@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { _ } from 'svelte-i18n';
+  import ToggleButton from './ToggleButton.svelte';
 
   export let limitReplayPath: boolean;
   export let currentStep: number;
@@ -11,25 +12,25 @@
 </script>
 
 <div class="replay-ui-container">
-  <label class="limit-path-toggle">
-    <input 
-      type="checkbox" 
-      checked={limitReplayPath} 
-      on:change={() => dispatch('toggleLimitPath')} 
+  <div class="limit-path-container">
+    <ToggleButton
+      label={$_('replay.limitPath')}
+      checked={limitReplayPath}
+      on:toggle={() => dispatch('toggleLimitPath')}
+      dataTestId="limit-path-toggle"
     />
-    <span>{$_('replay.limitPath')}</span>
-  </label>
+  </div>
 
   <div class="replay-controls">
-    <button class="control-btn" on:click={() => dispatch('goToStep', currentStep - 1)} disabled={currentStep === 0} title={$_('replay.prev')}>«</button>
-    <button class="control-btn play-pause" class:active={autoPlayDirection === 'backward'} on:click={() => dispatch('toggleAutoPlay', 'backward')} title={autoPlayDirection === 'backward' ? $_('replay.pause') : $_('replay.playBackward')}>
+    <button class="control-btn" data-testid="replay-prev-step-btn" on:click={() => dispatch('goToStep', currentStep - 1)} disabled={currentStep === 0} title={$_('replay.prev')}>«</button>
+    <button class="control-btn play-pause" data-testid="replay-play-backward-btn" class:active={autoPlayDirection === 'backward'} on:click={() => dispatch('toggleAutoPlay', 'backward')} title={autoPlayDirection === 'backward' ? $_('replay.pause') : $_('replay.playBackward')}>
       {#if autoPlayDirection === 'backward'}❚❚{:else}◀{/if}
     </button>
-    <button class="control-btn play-pause" class:active={autoPlayDirection === 'forward'} on:click={() => dispatch('toggleAutoPlay', 'forward')} title={autoPlayDirection === 'forward' ? $_('replay.pause') : $_('replay.play')}>
+    <button class="control-btn play-pause" data-testid="replay-play-forward-btn" class:active={autoPlayDirection === 'forward'} on:click={() => dispatch('toggleAutoPlay', 'forward')} title={autoPlayDirection === 'forward' ? $_('replay.pause') : $_('replay.play')}>
       {#if autoPlayDirection === 'forward'}❚❚{:else}▶{/if}
     </button>
-    <button class="control-btn" on:click={() => dispatch('goToStep', currentStep + 1)} disabled={currentStep >= totalSteps - 1} title={$_('replay.next')}>»</button>
-    <div class="step-counter">
+    <button class="control-btn" data-testid="replay-next-step-btn" on:click={() => dispatch('goToStep', currentStep + 1)} disabled={currentStep >= totalSteps - 1} title={$_('replay.next')}>»</button>
+    <div class="step-counter" data-testid="replay-step-counter">
       {$_('replay.step', { values: { current: currentStep + 1, total: totalSteps } })}
     </div>
   </div>
@@ -42,25 +43,13 @@
   align-items: center;
   gap: 12px;
   margin-top: 16px;
+  width: 100%;
 }
 
-.limit-path-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9em;
-  cursor: pointer;
-  color: var(--text-secondary);
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.1);
-  transition: background 0.2s;
-}
-.limit-path-toggle:hover {
-  background: rgba(0,0,0,0.2);
-}
-.limit-path-toggle input {
-  accent-color: var(--text-accent, #ff9800);
+.limit-path-container {
+  width: 100%;
+  max-width: 250px; /* Or adjust as needed */
+  --button-height: 40px; /* Example height */
 }
 
 .replay-controls {
