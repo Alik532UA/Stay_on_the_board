@@ -16,12 +16,17 @@
   import { clearCache } from '$lib/utils/cacheManager.js';
   import { requestGameModeModal } from '$lib/stores/uiStore.js';
   import ClearCacheOptions from './ClearCacheOptions.svelte';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { get } from 'svelte/store';
   import GameModeModal from '$lib/components/GameModeModal.svelte';
+  import Tooltip from './Tooltip.svelte';
 
   let showLangDropdown = false;
   let showThemeDropdown = false;
+  let isTooltipVisible = false;
+  let tooltipContent = '';
+  let tooltipX = 0;
+  let tooltipY = 0;
   let showWipNotice = false;
   let showDevMenu = false;
   /** @param {string} lang */
@@ -79,23 +84,63 @@
 
   let isDev = false;
   
-  function handleKeydown(/** @type {KeyboardEvent} */ event) {
-    // L або Д (українська Д) для переходу в local-setup (тільки в DEV)
-    if ((event.key === 'l' || event.key === 'д' || event.key === 'L' || event.key === 'Д') && import.meta.env.DEV) {
-      event.preventDefault();
-      navigateTo('/local-setup');
-    }
-  }
-  
-  onMount(() => {
-    settingsStore.init(); // Ініціалізуємо налаштування тут
-    isDev = !!import.meta.env.DEV;
+  /** @param {HTMLElement} node */
+  function hotkeysAndTooltips(node) {
+    const menuButtons = Array.from(node.querySelectorAll('button'));
+
+    /** @param {KeyboardEvent} event */
+    const handleKeydown = (event) => {
+      if ((event.key === 'l' || event.key === 'д' || event.key === 'L' || event.key === 'Д') && import.meta.env.DEV) {
+        event.preventDefault();
+        navigateTo('/local-setup');
+        return;
+      }
+      const keyNumber = parseInt(event.key, 10);
+      if (!isNaN(keyNumber) && keyNumber >= 1 && keyNumber <= 9) {
+        const buttonIndex = keyNumber - 1;
+        if (menuButtons[buttonIndex]) {
+          event.preventDefault();
+          menuButtons[buttonIndex].click();
+        }
+      }
+    };
+
     document.addEventListener('keydown', handleKeydown);
-  });
-  
-  import { onDestroy } from 'svelte';
-  onDestroy(() => {
-    document.removeEventListener('keydown', handleKeydown);
+
+    menuButtons.forEach((btn, index) => {
+      btn.title = ''; // Remove native title
+      const content = `${btn.textContent?.trim()}<br><small style="color: var(--text-secondary);">HotKey ${index + 1}</small>`;
+
+      const mouseOver = (/** @type {MouseEvent} */ event) => {
+        isTooltipVisible = true;
+        tooltipContent = content;
+        tooltipX = event.pageX + 10;
+        tooltipY = event.pageY + 10;
+      };
+      const mouseMove = (/** @type {MouseEvent} */ event) => {
+        tooltipX = event.pageX + 10;
+        tooltipY = event.pageY + 10;
+      };
+      const mouseLeave = () => {
+        isTooltipVisible = false;
+      };
+
+      btn.addEventListener('mouseover', mouseOver);
+      btn.addEventListener('mousemove', mouseMove);
+      btn.addEventListener('mouseleave', mouseLeave);
+    });
+
+    return {
+      destroy() {
+        document.removeEventListener('keydown', handleKeydown);
+        // Button listeners are not removed as they are destroyed with the component
+      }
+    };
+  }
+
+  onMount(() => {
+    settingsStore.init();
+    isDev = !!import.meta.env.DEV;
   });
 
   function handleDevMenu() {
@@ -151,6 +196,9 @@
 </script>
 
 <main class="main-menu" data-testid="main-menu-container">
+  {#if isTooltipVisible}
+    <Tooltip content={tooltipContent} x={tooltipX} y={tooltipY} />
+  {/if}
   {#if $isLoading}
     <div class="main-menu-loading">Завантаження перекладу...</div>
   {:else}
@@ -253,7 +301,7 @@
         </span>
       {/if}
     </div>
-    <div id="main-menu-buttons">
+    <div id="main-menu-buttons" use:hotkeysAndTooltips>
       <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="vs-computer-btn">{$_('mainMenu.playVsComputer')}</button>
       <button class="modal-button secondary" onclick={handleLocalGame} data-testid="local-game-btn">{$_('mainMenu.localGame')}</button>
       <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice} data-testid="online-game-btn">{$_('mainMenu.playOnline')}</button>
@@ -267,6 +315,22 @@
 </main>
 
 <style>
+  .wip-close-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.2);
+    color: white;
+    border: none;
+    font-size: 1.5em;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
   .dev-version {
     font-size: 0.7em;
     opacity: 0.7;

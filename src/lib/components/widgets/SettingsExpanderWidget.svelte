@@ -115,7 +115,8 @@
         buttons: [
           { textKey: 'modal.expertModeConfirm', primary: true, isHot: true, onClick: () => { settingsStore.updateSettings({ blockOnVisitCount: count }); modalStore.closeModal(); } },
           { textKey: 'modal.expertModeCancel', onClick: modalStore.closeModal }
-        ]
+        ],
+        closeOnOverlayClick: true
       });
     } else {
       settingsStore.updateSettings({ blockOnVisitCount: count });
