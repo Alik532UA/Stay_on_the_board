@@ -1,6 +1,10 @@
 <script lang="ts">
   import { settingsStore } from '$lib/stores/settingsStore.ts';
   import { _ } from 'svelte-i18n';
+  import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
+  import { logService } from '$lib/services/logService.js';
+  import { onMount } from 'svelte';
+  import { focusManager } from '$lib/stores/focusManager.js';
   let dontShowAgain = false;
   $: dontShowAgain = !$settingsStore.showGameModeModal;
 
@@ -10,16 +14,47 @@
       settingsStore.updateSettings({ showGameModeModal: !input.checked });
     }
   }
+
+  /** @param {KeyboardEvent} e */
+  function handleKeydown(e: KeyboardEvent) {
+    logService.action('Keydown event on DontShowAgainCheckbox', { key: e.key, code: e.code });
+    if (e.code === 'KeyX') {
+      e.preventDefault();
+      logService.action('Toggling dontShowAgain via hotkey X');
+      if (inputEl) {
+        inputEl.click();
+      }
+    }
+  }
+
+  let wrapperEl: HTMLDivElement | null = null;
+  let inputEl: HTMLInputElement | null = null;
+
+  onMount(() => {
+    if (wrapperEl) {
+      focusManager.focusWithDelay(wrapperEl, 150);
+    }
+  });
 </script>
 
 <div class="dont-show-again-checkbox">
   <label class="ios-switch-label">
-    <div class="switch-content-wrapper">
+    <div
+      class="switch-content-wrapper"
+      use:hotkeyTooltip={{ key: 'X' }}
+      data-testid="dont-show-again-switch"
+      on:keydown={handleKeydown}
+      on:focus={() => logService.ui('DontShowAgainCheckbox focused')}
+      tabindex="0"
+      role="button"
+      bind:this={wrapperEl}
+    >
       <div class="ios-switch">
-        <input 
+        <input
           type="checkbox"
           bind:checked={dontShowAgain}
           on:change={handleCheckboxChange}
+          bind:this={inputEl}
         />
         <span class="slider"></span>
       </div>

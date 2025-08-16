@@ -105,7 +105,12 @@
         titleDataTestId: 'game-mode-modal-title',
         component: GameModeModal,
         buttons: [
-          { textKey: 'modal.close', onClick: () => modalStore.closeModal() }
+          {
+            textKey: 'modal.close',
+            onClick: () => modalStore.closeModal(),
+            dataTestId: 'modal-btn-modal.close',
+            hotKey: 'ESC'
+          }
         ]
       });
     } else {
