@@ -40,6 +40,8 @@
 	import { gameOrchestrator } from '$lib/gameOrchestrator';
 	import { userActionService } from '$lib/services/userActionService';
 	import { gameModeService } from '$lib/services/gameModeService';
+	import { tooltipStore } from '$lib/stores/tooltipStore.js';
+	import Tooltip from '$lib/components/Tooltip.svelte';
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
@@ -148,6 +150,9 @@
 	{/if}
 </div>
 
+{#if $tooltipStore.isVisible}
+	<Tooltip content={$tooltipStore.content} x={$tooltipStore.x} y={$tooltipStore.y} />
+{/if}
 <Modal />
 <PlayerColorProvider />
 

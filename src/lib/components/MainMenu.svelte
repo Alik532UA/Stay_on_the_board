@@ -19,14 +19,10 @@
   import { onMount, tick } from 'svelte';
   import { get } from 'svelte/store';
   import GameModeModal from '$lib/components/GameModeModal.svelte';
-  import Tooltip from './Tooltip.svelte';
+  import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
 
   let showLangDropdown = false;
   let showThemeDropdown = false;
-  let isTooltipVisible = false;
-  let tooltipContent = '';
-  let tooltipX = 0;
-  let tooltipY = 0;
   let showWipNotice = false;
   let showDevMenu = false;
   /** @param {string} lang */
@@ -85,64 +81,10 @@
   let isDev = false;
   
   /** @param {HTMLElement} node */
-  function hotkeysAndTooltips(node) {
-    const menuButtons = Array.from(node.querySelectorAll('button'));
-
-    /** @param {KeyboardEvent} event */
-    const handleKeydown = (event) => {
-      if ((event.key === 'l' || event.key === 'д' || event.key === 'L' || event.key === 'Д') && import.meta.env.DEV) {
-        event.preventDefault();
-        navigateTo('/local-setup');
-        return;
-      }
-      const keyNumber = parseInt(event.key, 10);
-      if (!isNaN(keyNumber) && keyNumber >= 1 && keyNumber <= 9) {
-        const buttonIndex = keyNumber - 1;
-        if (menuButtons[buttonIndex]) {
-          event.preventDefault();
-          menuButtons[buttonIndex].click();
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeydown);
-
-    menuButtons.forEach((btn, index) => {
-      btn.title = ''; // Remove native title
-      const content = `${btn.textContent?.trim()}<br><small style="color: var(--text-secondary);">HotKey ${index + 1}</small>`;
-
-      const mouseOver = (/** @type {MouseEvent} */ event) => {
-        isTooltipVisible = true;
-        tooltipContent = content;
-        tooltipX = event.pageX + 10;
-        tooltipY = event.pageY + 10;
-      };
-      const mouseMove = (/** @type {MouseEvent} */ event) => {
-        tooltipX = event.pageX + 10;
-        tooltipY = event.pageY + 10;
-      };
-      const mouseLeave = () => {
-        isTooltipVisible = false;
-      };
-
-      btn.addEventListener('mouseover', mouseOver);
-      btn.addEventListener('mousemove', mouseMove);
-      btn.addEventListener('mouseleave', mouseLeave);
-    });
-
-    return {
-      destroy() {
-        document.removeEventListener('keydown', handleKeydown);
-        // Button listeners are not removed as they are destroyed with the component
-      }
-    };
-  }
-
   onMount(() => {
     settingsStore.init();
     isDev = !!import.meta.env.DEV;
   });
-
   function handleDevMenu() {
     logService.action('Click: "dev version" (MainMenu)');
     showDevMenu = !showDevMenu;
@@ -196,9 +138,6 @@
 </script>
 
 <main class="main-menu" data-testid="main-menu-container">
-  {#if isTooltipVisible}
-    <Tooltip content={tooltipContent} x={tooltipX} y={tooltipY} />
-  {/if}
   {#if $isLoading}
     <div class="main-menu-loading">Завантаження перекладу...</div>
   {:else}
