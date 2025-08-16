@@ -33,8 +33,11 @@
   onMount(() => {
     // Ініціалізуємо гру, тільки якщо це не відновлення зі сторінки replay
     const isRestoring = sessionStorage.getItem('isRestoringReplay') === 'true';
-    if (!isRestoring) {
-      resetGame({}, get(gameState));
+    const state = get(gameState);
+    const isGameInProgress = !state.isGameOver && state.moveHistory.length > 1;
+
+    if (!isRestoring && !isGameInProgress) {
+      resetGame({}, state);
     }
     gameModeService.setCurrentGameMode('vs-computer');
     animationStore.initialize();

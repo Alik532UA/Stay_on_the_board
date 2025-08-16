@@ -3,6 +3,7 @@
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { gameState } from '$lib/stores/gameState.js';
   import { navigateToGame } from '$lib/services/uiService';
+  import { navigationService } from '$lib/services/navigationService';
   import { logService } from '$lib/services/logService.js';
   
   import { goto } from '$app/navigation';
@@ -97,24 +98,29 @@
   }
   function handlePlayVsComputer() {
     logService.action(`Click: "Гра проти комп'ютера" (MainMenu)`);
-    const settings = get(settingsStore);
-    if (settings.showGameModeModal) {
-      modalStore.showModal({
-        titleKey: 'mainMenu.gameModeModal.title',
-        dataTestId: 'game-mode-modal',
-        titleDataTestId: 'game-mode-modal-title',
-        component: GameModeModal,
-        buttons: [
-          {
-            textKey: 'modal.close',
-            onClick: () => modalStore.closeModal(),
-            dataTestId: 'modal-btn-modal.close',
-            hotKey: 'ESC'
-          }
-        ]
-      });
+    const state = get(gameState);
+    if (!state.isGameOver && state.moveHistory.length > 1) {
+      navigationService.resumeGame('/game/vs-computer');
     } else {
-      navigateToGame();
+      const settings = get(settingsStore);
+      if (settings.showGameModeModal) {
+        modalStore.showModal({
+          titleKey: 'mainMenu.gameModeModal.title',
+          dataTestId: 'game-mode-modal',
+          titleDataTestId: 'game-mode-modal-title',
+          component: GameModeModal,
+          buttons: [
+            {
+              textKey: 'modal.close',
+              onClick: () => modalStore.closeModal(),
+              dataTestId: 'modal-btn-modal.close',
+              hotKey: 'ESC'
+            }
+          ]
+        });
+      } else {
+        navigateToGame();
+      }
     }
   }
   function handleLocalGame() {
