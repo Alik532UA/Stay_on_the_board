@@ -2,6 +2,7 @@
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
 import { logService } from './logService.js';
+import { modalStore } from '$lib/stores/modalStore';
 
 export const navigationService = {
   /**
@@ -23,6 +24,7 @@ export const navigationService = {
   goToMainMenu() {
     try {
       logService.ui('NavigationService: Going to main menu');
+      modalStore.closeAllModals();
       this.goTo('/');
     } catch (error) {
       logService.ui('NavigationService: Error going to main menu', error);
