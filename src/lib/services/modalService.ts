@@ -70,7 +70,7 @@ export const modalService = {
       buttons: [
         { textKey: 'modal.playAgain', primary: true, onClick: () => userActionService.handleModalAction('restartGame'), isHot: true, dataTestId: 'play-again-btn' },
         { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: 'game-over-watch-replay-btn' },
-        { textKey: 'gameBoard.mainMenu', onClick: () => navigationService.goToMainMenu(), dataTestId: 'game-over-main-menu-btn' }
+        { textKey: 'gameBoard.mainMenu', onClick: () => userActionService.handleModalAction('resetGameAndGoToMainMenu'), dataTestId: 'game-over-main-menu-btn' }
       ]
     });
   },
