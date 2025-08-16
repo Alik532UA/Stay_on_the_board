@@ -10,6 +10,7 @@ import type { FinalScoreDetails } from '$lib/models/score';
 import type { GameState } from '$lib/stores/gameState';
 import { determineWinner } from './scoreService';
 import { logService } from './logService.js';
+import { navigationService } from './navigationService.js';
 
 export const modalService = {
   showGameOverModal(payload: { reasonKey: string, reasonValues: any, finalScoreDetails: FinalScoreDetails, gameType: string, state: GameState }): void {
@@ -68,7 +69,8 @@ export const modalService = {
       titleDataTestId: 'game-over-modal-title',
       buttons: [
         { textKey: 'modal.playAgain', primary: true, onClick: () => userActionService.handleModalAction('restartGame'), isHot: true, dataTestId: 'play-again-btn' },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: 'watch-replay-btn' }
+        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: 'watch-replay-btn' },
+        { textKey: 'gameBoard.mainMenu', onClick: () => navigationService.goToMainMenu(), dataTestId: 'main-menu-btn' }
       ]
     });
   },
