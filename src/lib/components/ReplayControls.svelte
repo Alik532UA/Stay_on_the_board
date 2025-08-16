@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import { _ } from 'svelte-i18n';
   import ToggleButton from './ToggleButton.svelte';
+  import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
 
   export let limitReplayPath: boolean;
   export let currentStep: number;
@@ -21,15 +22,15 @@
     />
   </div>
 
-  <div class="replay-controls">
-    <button class="control-btn" data-testid="replay-prev-step-btn" on:click={() => dispatch('goToStep', currentStep - 1)} disabled={currentStep === 0} title={$_('replay.prev')}>«</button>
-    <button class="control-btn play-pause" data-testid="replay-play-backward-btn" class:active={autoPlayDirection === 'backward'} on:click={() => dispatch('toggleAutoPlay', 'backward')} title={autoPlayDirection === 'backward' ? $_('replay.pause') : $_('replay.playBackward')}>
+  <div class="replay-controls" use:hotkeysAndTooltips>
+    <button class="control-btn" data-testid="replay-prev-step-btn" on:click={() => dispatch('goToStep', currentStep - 1)} disabled={currentStep === 0}>«</button>
+    <button class="control-btn play-pause" data-testid="replay-play-backward-btn" class:active={autoPlayDirection === 'backward'} on:click={() => dispatch('toggleAutoPlay', 'backward')}>
       {#if autoPlayDirection === 'backward'}❚❚{:else}◀{/if}
     </button>
-    <button class="control-btn play-pause" data-testid="replay-play-forward-btn" class:active={autoPlayDirection === 'forward'} on:click={() => dispatch('toggleAutoPlay', 'forward')} title={autoPlayDirection === 'forward' ? $_('replay.pause') : $_('replay.play')}>
+    <button class="control-btn play-pause" data-testid="replay-play-forward-btn" class:active={autoPlayDirection === 'forward'} on:click={() => dispatch('toggleAutoPlay', 'forward')}>
       {#if autoPlayDirection === 'forward'}❚❚{:else}▶{/if}
     </button>
-    <button class="control-btn" data-testid="replay-next-step-btn" on:click={() => dispatch('goToStep', currentStep + 1)} disabled={currentStep >= totalSteps - 1} title={$_('replay.next')}>»</button>
+    <button class="control-btn" data-testid="replay-next-step-btn" on:click={() => dispatch('goToStep', currentStep + 1)} disabled={currentStep >= totalSteps - 1}>»</button>
     <div class="step-counter" data-testid="replay-step-counter">
       {$_('replay.step', { values: { current: currentStep + 1, total: totalSteps } })}
     </div>

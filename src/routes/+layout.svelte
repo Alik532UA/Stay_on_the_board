@@ -119,6 +119,8 @@
 			return;
 		}
 		modalStore.closeModal();
+		logService.ui('[layout] afterNavigate: hiding tooltip');
+		tooltipStore.hide();
 	});
 </script>
 
