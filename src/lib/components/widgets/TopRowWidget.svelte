@@ -3,8 +3,10 @@
   import { _ } from 'svelte-i18n';
   import SvgIcons from '../SvgIcons.svelte';
   import { showGameModeSelector, showGameInfoModal } from '$lib/utils/uiHelpers.js';
+  import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
   import { page } from '$app/stores';
+  import { onMount } from 'svelte';
 
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
   import { logService } from '$lib/services/logService.js';
@@ -22,6 +24,24 @@
   function handleLocalSetupClick() {
     navigationService.goTo('/local-setup');
   }
+
+  /** @param {KeyboardEvent} e */
+  function handleKeydown(e) {
+    if (e.code === 'KeyI') {
+      e.preventDefault();
+      showGameInfoModal();
+    } else if (e.code === 'Escape') {
+      e.preventDefault();
+      handleMainMenuClick();
+    }
+  }
+
+  onMount(() => {
+    window.addEventListener('keydown', handleKeydown);
+    return () => {
+      window.removeEventListener('keydown', handleKeydown);
+    };
+  });
 </script>
 
 <style>
@@ -31,7 +51,7 @@
 </style>
 
 <div class="game-board-top-row">
-  <button class="main-menu-btn" use:customTooltip={$_('gameBoard.mainMenu')} on:click={handleMainMenuClick} data-testid="main-menu-btn">
+  <button class="main-menu-btn" use:hotkeyTooltip={{ key: 'ESC' }} on:click={handleMainMenuClick} data-testid="main-menu-btn">
     <SvgIcons name="home" />
   </button>
   {#if $page.route.id?.includes('/game/local')}
@@ -39,7 +59,7 @@
       <SvgIcons name="hamburger-menu" />
     </button>
   {/if}
-  <button class="main-menu-btn" use:customTooltip={$_('gameBoard.info')} on:click={showGameInfoModal} data-testid="game-info-btn">
+  <button class="main-menu-btn" use:hotkeyTooltip={{ key: 'I' }} on:click={showGameInfoModal} data-testid="game-info-btn">
     <SvgIcons name="info" />
   </button>
   {#if false}

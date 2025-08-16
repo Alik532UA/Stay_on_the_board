@@ -4,7 +4,6 @@
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { logService } from '$lib/services/logService.js';
   import { onMount } from 'svelte';
-  import { focusManager } from '$lib/stores/focusManager.js';
   let dontShowAgain = false;
   $: dontShowAgain = !$settingsStore.showGameModeModal;
 
@@ -27,13 +26,13 @@
     }
   }
 
-  let wrapperEl: HTMLDivElement | null = null;
   let inputEl: HTMLInputElement | null = null;
 
   onMount(() => {
-    if (wrapperEl) {
-      focusManager.focusWithDelay(wrapperEl, 150);
-    }
+    window.addEventListener('keydown', handleKeydown);
+    return () => {
+      window.removeEventListener('keydown', handleKeydown);
+    };
   });
 </script>
 
@@ -43,11 +42,6 @@
       class="switch-content-wrapper"
       use:hotkeyTooltip={{ key: 'X' }}
       data-testid="dont-show-again-switch"
-      on:keydown={handleKeydown}
-      on:focus={() => logService.ui('DontShowAgainCheckbox focused')}
-      tabindex="0"
-      role="button"
-      bind:this={wrapperEl}
     >
       <div class="ios-switch">
         <input
