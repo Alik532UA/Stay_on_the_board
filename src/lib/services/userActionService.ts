@@ -72,7 +72,6 @@ export const userActionService = {
   },
 
   async requestReplay(): Promise<void> {
-    modalStore.closeModal();
     const { moveHistory, boardSize } = get(gameState);
     if (moveHistory && moveHistory.length > 0) {
       logService.logic('[userActionService] Opening replay in modal');

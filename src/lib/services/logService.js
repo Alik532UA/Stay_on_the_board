@@ -7,6 +7,7 @@
       LOGIC: 'logic',       // Для gameLogicService, gameOrchestrator
       SCORE: 'score',       // Для всього, що пов'язано з нарахуванням балів
       UI: 'ui',             // Для Svelte компонентів та їх життєвого циклу
+      TOOLTIP: 'tooltip',   // Для логів тултіпів
       ANIMATION: 'animation', // Для animationStore та візуальних ефектів
       INIT: 'init',         // Для ініціалізації сторів та сервісів
       ACTION: 'action',     // Для дій користувача (кліки, хоткеї)
@@ -17,10 +18,11 @@
     
     // 2. Конфігурація
     const defaultConfig = {
-      [LOG_GROUPS.STATE]: false,
+      [LOG_GROUPS.STATE]: true,
       [LOG_GROUPS.LOGIC]: false,
       [LOG_GROUPS.SCORE]: false,
       [LOG_GROUPS.UI]: true,
+      [LOG_GROUPS.TOOLTIP]: false,
       [LOG_GROUPS.ANIMATION]: false,
       [LOG_GROUPS.INIT]: false,
       [LOG_GROUPS.ACTION]: true,
@@ -68,6 +70,7 @@
       [LOG_GROUPS.LOGIC]: 'color: #03A9F4; font-weight: bold;', // Blue
       [LOG_GROUPS.SCORE]: 'color: #4CAF50; font-weight: bold;', // Green
       [LOG_GROUPS.UI]: 'color: #FF9800; font-weight: bold;',    // Orange
+      [LOG_GROUPS.TOOLTIP]: 'color: #6c757d; font-weight: bold;', // Gray
       [LOG_GROUPS.ANIMATION]: 'color: #E91E63; font-weight: bold;', // Pink
       [LOG_GROUPS.INIT]: 'color: #00BCD4; font-weight: bold;',     // Cyan
       [LOG_GROUPS.GAME_MODE]: 'color: #FF5722; font-weight: bold;', // Deep Orange
@@ -99,6 +102,7 @@
       logic: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC, message, ...data),
       score: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.SCORE, message, ...data),
       ui: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.UI, message, ...data),
+      tooltip: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.TOOLTIP, message, ...data),
       animation: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.ANIMATION, message, ...data),
       init: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.INIT, message, ...data),
       action: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.ACTION, message, ...data),

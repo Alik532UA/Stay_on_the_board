@@ -25,7 +25,7 @@ function cancelScheduledShow() {
   update(state => {
     if (state.timeoutId) {
       clearTimeout(state.timeoutId);
-      logService.ui('[tooltipStore] Canceled scheduled show');
+      logService.tooltip('[tooltipStore] Canceled scheduled show');
     }
     return { ...state, timeoutId: null };
   });
@@ -42,12 +42,12 @@ export const tooltipStore = {
   scheduleShow: (content, x, y, delay) => {
     cancelScheduledShow(); // Cancel any pending tooltip
     const timeoutId = setTimeout(() => {
-      logService.ui('[tooltipStore] setTimeout callback: showing tooltip');
+      logService.tooltip('[tooltipStore] setTimeout callback: showing tooltip');
       update(state => ({ ...state, isVisible: true, content, x, y, timeoutId: null }));
     }, delay);
     
     update(state => ({ ...state, timeoutId }));
-    logService.ui('[tooltipStore] show scheduled', { content, x, y, delay });
+    logService.tooltip('[tooltipStore] show scheduled', { content, x, y, delay });
   },
   
   /**
@@ -57,7 +57,7 @@ export const tooltipStore = {
   move: (x, y) => update(state => ({ ...state, x, y })),
 
   hide: () => {
-    logService.ui('[tooltipStore] hide called, canceling scheduled show and hiding');
+    logService.tooltip('[tooltipStore] hide called, canceling scheduled show and hiding');
     cancelScheduledShow();
     set(initialState);
   },
