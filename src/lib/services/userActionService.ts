@@ -84,7 +84,18 @@ export const userActionService = {
           boardSize,
           autoPlayForward: true
         },
-        closable: true,
+        buttons: [
+          {
+            textKey: 'replay.close',
+            onClick: () => {
+              replayStore.stopReplay();
+              modalStore.closeModal();
+            },
+            dataTestId: 'close-replay-btn',
+            primary: true
+          }
+        ],
+        closable: false,
       });
     } else {
       logService.logic('[userAction-service] No move history to replay.');

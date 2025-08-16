@@ -56,10 +56,7 @@
   }
 </script>
 
-<div class="replay-viewer">
-  <button class="close-replay-btn" onclick={() => { replayStore.stopReplay(); modalStore.closeModal(); }}>
-    {$_('replay.close')}
-  </button>
+<div class="replay-viewer-content" data-testid="replay-viewer-modal">
   <div class="board-bg-wrapper game-content-block" style="--board-size: {boardSize}">
     <div class="game-board" style="--board-size: {boardSize}">
       {#each Array(boardSize) as _, rowIdx}
@@ -105,17 +102,19 @@
 </div>
 
 <style>
-  .replay-viewer {
+  .replay-viewer-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
     width: 100%;
-    max-width: 500px;
   }
 
   .board-bg-wrapper {
     overflow: visible;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
   }
 
   .player-piece {
