@@ -14,65 +14,9 @@
   function handleBackClick() {
     logService.ui('FloatingBackButton: handleBackClick called');
     // Встановлюємо прапорець, щоб повідомити root layout, що не потрібно закривати модальне вікно
-    sessionStorage.setItem('isRestoringReplay', 'true');
-    
-    const replayData = replayService.loadReplayData();
-
-    if (replayData && replayData.modalContext) {
-      logService.ui('FloatingBackButton: Modal context found, restoring modal', replayData.modalContext);
-      const modalContext = replayData.modalContext;
-
-      // Re-create buttons with direct calls to the orchestrator
-      const buttons = modalContext.buttons.map((btn: any) => {
-        const newBtn: any = { ...btn };
-        delete newBtn.action; // Remove the action string
-
-        switch (btn.action) {
-          case 'continueAfterNoMoves':
-            newBtn.onClick = () => gameOrchestrator.continueAfterNoMoves();
-            break;
-        case 'finishWithBonus':
-          newBtn.onClick = () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonBonus' });
-          break;
-          case 'startReplay':
-            newBtn.onClick = () => replayService.loadReplayData();
-            break;
-          case 'playAgain':
-            newBtn.onClick = () => {
-              modalStore.closeModal(); // Спочатку закриваємо модальне вікно
-              gameModeService.restartGame();
-            };
-            break;
-          default:
-            // Для кнопок типу "Завершити гру", які мають складнішу логіку
-            if (btn.textKey === 'modal.endGame') {
-                 newBtn.onClick = () => gameModeService.endGame('modal.gameOverReasonNoMovesLeft');
-            } else if (btn.action === 'startReplay') {
-                 newBtn.onClick = () => replayService.loadReplayData();
-            }
-            else {
-                 newBtn.onClick = () => modalStore.closeModal();
-            }
-            break;
-        }
-        return newBtn;
-      });
-
-      modalStore.showModal({
-        titleKey: modalContext.titleKey,
-        content: modalContext.content,
-        buttons: buttons,
-        closable: modalContext.closable
-      });
-
-      // Navigate back to the correct game page
-      const gameType = replayData.gameType || 'vs-computer';
-      navigationService.goTo(`/game/${gameType}`);
-
-    } else {
-      logService.ui('FloatingBackButton: No modal context found, using goBack()');
-      navigationService.goBack();
-    }
+    // No longer needed as replay is handled by replayStore
+    logService.ui('FloatingBackButton: handleBackClick called, no longer restoring replay from sessionStorage.');
+    navigationService.goBack();
   }
 </script>
 

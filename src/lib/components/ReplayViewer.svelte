@@ -2,17 +2,19 @@
   import { writable, derived } from 'svelte/store';
   import SvgIcons from './SvgIcons.svelte';
   import ReplayControls from './ReplayControls.svelte';
-  import { 
-    replayPosition as calculateReplayPosition, 
-    replayCellVisitCounts as calculateReplayCellVisitCounts, 
+  import {
+    replayPosition as calculateReplayPosition,
+    replayCellVisitCounts as calculateReplayCellVisitCounts,
     replaySegments as calculateReplaySegments,
-    replayBlockModeEnabled as calculateReplayBlockModeEnabled 
+    replayBlockModeEnabled as calculateReplayBlockModeEnabled
   } from '$lib/utils/replay.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
   import { replayAutoPlayStore } from '$lib/stores/replayAutoPlayStore.js';
+  import { replayStore } from '$lib/stores/replayStore.js'; // Corrected import
+  import { _ } from 'svelte-i18n'; // Added import for i18n
 
   let { moveHistory, boardSize, autoPlayForward = false } = $props<{ moveHistory: any[]; boardSize: number; autoPlayForward?: boolean }>();
 
@@ -54,6 +56,9 @@
 </script>
 
 <div class="replay-viewer">
+  <button class="close-replay-btn" onclick={replayStore.stopReplay}>
+    {$_('replay.close')}
+  </button>
   <div class="board-bg-wrapper game-content-block" style="--board-size: {boardSize}">
     <div class="game-board" style="--board-size: {boardSize}">
       {#each Array(boardSize) as _, rowIdx}
@@ -78,7 +83,7 @@
       </svg>
 
       {#if $replayPosition}
-        <div 
+        <div
           class="player-piece"
           style="top: {$replayPosition.row * (100 / boardSize)}%; left: {$replayPosition.col * (100 / boardSize)}%; z-index: 10;">
           <div class="piece-container"><SvgIcons name="queen" /></div>
@@ -87,7 +92,7 @@
     </div>
   </div>
 
-  <ReplayControls 
+  <ReplayControls
     limitReplayPath={$replayState.limitReplayPath}
     on:toggleLimitPath={toggleLimitPath}
     on:goToStep={(e) => goToStep(e.detail)}

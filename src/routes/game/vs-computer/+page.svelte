@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { replayStore } from '$lib/stores/replayStore.js';
+  import ReplayViewer from '$lib/components/ReplayViewer.svelte';
   // НАВІЩО: Ця сторінка тепер відповідає ТІЛЬКИ за відображення ігрових віджетів
   // у потрібному порядку для режиму "гра проти комп'ютера".
   // Вся спільна логіка (модальні вікна, гарячі клавіші) винесена в layout.
@@ -84,5 +86,13 @@
   }
 </script>
 
-<DraggableColumns {columns} itemContent={itemContent} on:drop={handleDrop} />
-<DevClearCacheButton /> 
+{#if $replayStore.isReplayMode}
+  <ReplayViewer
+    moveHistory={$replayStore.moveHistory}
+    boardSize={$replayStore.boardSize}
+    autoPlayForward={true}
+  />
+{:else}
+  <DraggableColumns {columns} itemContent={itemContent} on:drop={handleDrop} />
+  <DevClearCacheButton />
+{/if}

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { replayStore } from '$lib/stores/replayStore.js';
+  import ReplayViewer from '$lib/components/ReplayViewer.svelte';
   // НАВІЩО: Ця сторінка буде відповідати за відображення локальної гри.
   // Зараз вона використовує ті ж віджети, що й гра проти AI, але в майбутньому
   // її вміст може бути змінено (наприклад, інша панель керування).
@@ -32,7 +34,7 @@
   
   // Примітка: onMount та ініціалізація гри тут не потрібні,
   // оскільки вони відбуваються на сторінці /local-setup
-
+ 
   /**
    * Показує модальне вікно завершення гри, якщо це необхідно.
    */
@@ -107,5 +109,13 @@
   }
 </script>
 
-<DraggableColumns {columns} itemContent={itemContent} on:drop={handleDrop} class_name="game-layout" />
-<DevClearCacheButton /> 
+{#if $replayStore.isReplayMode}
+  <ReplayViewer
+    moveHistory={$replayStore.moveHistory}
+    boardSize={$replayStore.boardSize}
+    autoPlayForward={true}
+  />
+{:else}
+  <DraggableColumns {columns} itemContent={itemContent} on:drop={handleDrop} class_name="game-layout" />
+  <DevClearCacheButton />
+{/if}

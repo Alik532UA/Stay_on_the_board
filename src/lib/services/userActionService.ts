@@ -3,6 +3,8 @@
  * It orchestrates the flow of user intentions to the appropriate services.
  */
 import { get } from 'svelte/store';
+import { replayStore } from '$lib/stores/replayStore.js';
+import { modalStore } from '$lib/stores/modalStore';
 import { playerInputStore } from '$lib/stores/playerInputStore';
 import { gameStore } from '$lib/stores/gameStore';
 import { modalService } from './modalService';
@@ -70,10 +72,14 @@ export const userActionService = {
   },
 
   async requestReplay(): Promise<void> {
-    const gameType = gameModeService._determineGameType();
-    const modalContext = modalService.getCurrentModalContext();
-    replayService.saveReplayData(gameType, modalContext);
-    this.executeSideEffects([{ type: 'navigation/goto', payload: { path: `${base}/replay` } }]);
+    modalStore.closeModal();
+    const { moveHistory, boardSize } = get(gameState);
+    if (moveHistory && moveHistory.length > 0) {
+      logService.logic('[userActionService] Starting replay mode');
+      replayStore.startReplay(moveHistory, boardSize);
+    } else {
+      logService.logic('[userActionService] No move history to replay.');
+    }
   },
 
   async finishWithBonus(reasonKey: string): Promise<void> {

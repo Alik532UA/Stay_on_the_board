@@ -3,54 +3,22 @@ import { gameState } from '$lib/stores/gameState';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { logService } from './logService';
 
+interface ReplayData {
+  moveHistory: any[];
+  boardSize: number;
+  gameType: string;
+  modalContext: any | null;
+}
+
 export const replayService = {
   saveReplayData(gameType: string, modalContext: any = null) {
-    const state = get(gameState);
-    if (state.moveHistory && state.moveHistory.length > 0) {
-      const replayData = {
-        moveHistory: state.moveHistory,
-        boardSize: state.boardSize,
-        gameType: gameType,
-        modalContext: modalContext
-      };
-
-      try {
-        sessionStorage.setItem('replayGameState', JSON.stringify(state));
-        sessionStorage.setItem('replayGameOverState', JSON.stringify(get(gameOverStore)));
-        sessionStorage.setItem('replayData', JSON.stringify(replayData));
-      } catch (error) {
-        logService.ui("Failed to save replay data:", error);
-      }
-    } else {
-      logService.ui("saveReplayData called with no move history.");
-    }
+    // This function is no longer needed as replay data is managed by replayStore
+    logService.ui("saveReplayData is deprecated and should not be called.");
   },
 
-  loadReplayData() {
-    const replayDataJSON = sessionStorage.getItem('replayData');
-    if (replayDataJSON) {
-      try {
-        const replayData = JSON.parse(replayDataJSON);
-        const replayGameStateJSON = sessionStorage.getItem('replayGameState');
-        if (replayGameStateJSON) {
-          gameState.set(JSON.parse(replayGameStateJSON));
-          sessionStorage.removeItem('replayGameState');
-        }
-
-
-        const replayGameOverStateJSON = sessionStorage.getItem('replayGameOverState');
-        if (replayGameOverStateJSON) {
-          gameOverStore.restoreState(JSON.parse(replayGameOverStateJSON));
-          sessionStorage.removeItem('replayGameOverState');
-        }
-
-        sessionStorage.removeItem('replayData');
-        return replayData;
-      } catch (error) {
-        logService.ui("Failed to load replay data:", error);
-        return null;
-      }
-    }
+  loadReplayData(): ReplayData | null {
+    // This function is no longer needed as replay data is managed by replayStore
+    logService.ui("loadReplayData is deprecated and should not be called.");
     return null;
   }
 };
