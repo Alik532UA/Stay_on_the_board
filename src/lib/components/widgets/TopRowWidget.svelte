@@ -7,17 +7,19 @@
   import { customTooltip } from '$lib/actions/customTooltip.js';
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
+  import { gameState } from '$lib/stores/gameState';
+  import { modalService } from '$lib/services/modalService';
 
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
   import { logService } from '$lib/services/logService.js';
 
   function handleMainMenuClick() {
-    try {
+    const state = get(gameState);
+    if (state.isGameOver) {
       navigationService.goToMainMenu();
-    } catch (error) {
-      logService.ui('Error navigating to main menu:', error);
-      // Fallback: direct navigation
-      window.location.href = '/';
+    } else {
+      modalService.showExitConfirmation();
     }
   }
 

@@ -19,6 +19,13 @@ export const navigationService = {
   },
 
   /**
+   * @param {string} route
+   */
+  resumeGame(route) {
+    this.goTo(route);
+  },
+
+  /**
    * Переходить на головне меню.
    */
   goToMainMenu() {

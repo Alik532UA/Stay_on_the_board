@@ -16,6 +16,14 @@ import { BaseGameMode } from '$lib/gameModes/BaseGameMode';
 
 export const gameModeService = {
   setCurrentGameMode(mode: 'local' | 'vs-computer') {
+    const currentMode = get(gameStore).mode;
+    const isSameMode = (currentMode instanceof LocalGameMode && mode === 'local') || (currentMode instanceof VsComputerGameMode && mode === 'vs-computer');
+
+    if (isSameMode) {
+      logService.GAME_MODE(`Game mode is already set to: ${mode}. No changes needed.`);
+      return;
+    }
+
     logService.GAME_MODE(`Setting game mode to: ${mode}`);
     let gameMode: BaseGameMode;
     if (mode === 'local') {
