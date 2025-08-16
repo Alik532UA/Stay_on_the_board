@@ -57,24 +57,6 @@
   .dev-clear-cache-button:active {
     transform: translateY(0);
   }
-
-
-
-  .dev-clear-cache-button[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    right: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--bg-secondary, rgba(0, 0, 0, 0.8));
-    color: var(--text-primary, white);
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    margin-right: 8px;
-    z-index: 1001;
-  }
 </style>
 
 {#if import.meta.env.DEV}

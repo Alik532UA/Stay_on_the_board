@@ -11,6 +11,7 @@
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
   import { focusManager } from '$lib/stores/focusManager.js';
   import { logService } from '$lib/services/logService.js';
+  import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
 
   let hotBtn: HTMLButtonElement | null = null;
   let modalContent: HTMLDivElement | null = null;
@@ -21,6 +22,14 @@
 
   onMount(() => {
     expertVolume = audioService.loadVolume();
+
+    /** @param {KeyboardEvent} e */
+    const handleKeydown = (e: KeyboardEvent) => {
+      if ($modalState.isOpen && e.key === 'Escape') {
+        logService.ui('Escape key pressed, closing modal');
+        modalStore.closeModal();
+      }
+    };
     
     // Додаємо обробник resize для перевірки компактного режиму
     const handleResize = () => {
@@ -30,10 +39,12 @@
     };
     
     window.addEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleKeydown);
     
     return () => {
       audioService.pause();
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeydown);
     };
   });
 
@@ -138,7 +149,7 @@
 
         {#if !(($modalState.buttons && $modalState.buttons.length === 2 && $modalState.buttons.every(btn => typeof btn.onClick === 'function')) || $modalState.titleKey === 'modal.gameOverTitle' || ($modalState.buttons && $modalState.buttons.length === 1))}
           {#if $modalState.closable}
-            <button class="modal-close" onclick={() => { logService.ui('Закриття модального вікна (X)'); modalStore.closeModal(); }} data-testid="modal-close-btn">×</button>
+            <button class="modal-close" use:hotkeyTooltip={{ key: 'ESC' }} onclick={() => { logService.ui('Закриття модального вікна (X)'); modalStore.closeModal(); }} data-testid="modal-btn-modal.close">×</button>
           {/if}
         {/if}
       </div>
@@ -230,6 +241,7 @@
       </div>
       <div class="modal-action-buttons">
         {#each $modalState.buttons as btn, i (i)}
+          {@const useTooltip = btn.hotKey ? hotkeyTooltip : () => {}}
           {#if btn.isHot && !$modalState.buttons.slice(0, i).some(b => b.isHot)}
             <button
               class="modal-btn-generic"
@@ -238,7 +250,8 @@
               class:green-btn={btn.customClass === 'green-btn'}
               class:danger-btn={btn.customClass === 'danger-btn'}
               bind:this={hotBtn}
-              onclick={() => { 
+              use:useTooltip={{ key: btn.hotKey }}
+              onclick={() => {
                 logService.action(`Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`);
                 logService.ui(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`);
                 logService.ui('Modal button clicked (hot):', { textKey: btn.textKey, text: btn.text, onClick: btn.onClick });
@@ -262,6 +275,7 @@
               class:blue-btn={btn.customClass === 'blue-btn'}
               class:green-btn={btn.customClass === 'green-btn'}
               class:danger-btn={btn.customClass === 'danger-btn'}
+              use:useTooltip={{ key: btn.hotKey }}
               onclick={() => {
                 logService.action(`Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`);
                 logService.ui(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`);

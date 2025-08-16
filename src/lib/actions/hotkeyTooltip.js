@@ -24,18 +24,36 @@ function formatHotkeys(keys) {
 }
 
 /**
- * A Svelte action to show a tooltip with the assigned hotkeys for a specific game action.
+ * A Svelte action to show a tooltip with assigned hotkeys.
+ * Can take a game action name to look up in settings, or a static key.
  * @param {HTMLElement} node The element to attach the tooltip to.
- * @param {import('$lib/stores/settingsStore.ts').KeybindingAction} actionName The name of the game action.
+ * @param {import('$lib/stores/settingsStore.ts').KeybindingAction | {key: string}} param
  */
-export function hotkeyTooltip(node, actionName) {
+export function hotkeyTooltip(node, param) {
   let tooltipContent = '';
   const originalTitle = node.title;
   node.title = '';
 
+  /** @param {import('$lib/stores/settingsStore.ts').KeybindingAction | {key: string}} newParam */
+  function updateTooltipContent(newParam) {
+    if (typeof newParam === 'string') {
+      const settings = get(settingsStore);
+      const keys = settings.keybindings[/** @type {import('$lib/stores/settingsStore.ts').KeybindingAction} */ (newParam)];
+      tooltipContent = formatHotkeys(keys);
+    } else if (typeof newParam === 'object' && newParam.key) {
+      tooltipContent = formatHotkeys([newParam.key]);
+    } else {
+      tooltipContent = '';
+    }
+  }
+
+  updateTooltipContent(param);
+
   const unsubscribe = settingsStore.subscribe(settings => {
-    const keys = settings.keybindings[actionName];
-    tooltipContent = formatHotkeys(keys);
+    if (typeof param === 'string') {
+      const keys = settings.keybindings[/** @type {import('$lib/stores/settingsStore.ts').KeybindingAction} */ (param)];
+      tooltipContent = formatHotkeys(keys);
+    }
   });
 
   /** @param {MouseEvent} event */
@@ -60,13 +78,11 @@ export function hotkeyTooltip(node, actionName) {
 
   return {
     /**
-     * @param {import('$lib/stores/settingsStore.ts').KeybindingAction} newActionName
+     * @param {import('$lib/stores/settingsStore.ts').KeybindingAction | {key: string}} newParam
      */
-    update(newActionName) {
-      actionName = newActionName;
-      const settings = get(settingsStore);
-      const keys = settings.keybindings[actionName];
-      tooltipContent = formatHotkeys(keys);
+    update(newParam) {
+      param = newParam;
+      updateTooltipContent(newParam);
     },
     destroy() {
       node.removeEventListener('mouseover', mouseOver);
