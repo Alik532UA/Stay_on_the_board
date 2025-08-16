@@ -15,6 +15,7 @@
   import { logService } from '$lib/services/logService.js';
   import ToggleButton from '../ToggleButton.svelte';
   import { blurOnClick } from '$lib/utils/actions';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
 
   let expanderRef: HTMLDetailsElement;
   let summaryRef: HTMLElement;
@@ -469,7 +470,7 @@
         checked={speechEnabled}
         on:toggle={() => settingsStore.toggleSpeech(undefined)}
       />
-      <button class="settings-expander__square-btn" use:blurOnClick title={$_('gameControls.voiceSettingsTitle')} on:click|stopPropagation={openVoiceSettingsModal}>
+      <button class="settings-expander__square-btn" use:blurOnClick use:customTooltip={$_('gameControls.voiceSettingsTitle')} on:click|stopPropagation={openVoiceSettingsModal}>
         <SvgIcons name="voice-settings" />
       </button>
     </div>
@@ -498,7 +499,7 @@
           class="settings-expander__square-btn"
           use:blurOnClick
           aria-label="Скинути положення меню"
-          title={$_('ui.resetMenuLayout') || 'Скинути положення елементів меню'}
+          use:customTooltip={$_('ui.resetMenuLayout') || 'Скинути положення елементів меню'}
           on:click={() => layoutStore.resetLayout()}
         >
           <span style="width:50%;height:50%;display:flex;align-items:center;justify-content:center;">

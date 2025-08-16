@@ -138,7 +138,7 @@
 
         {#if !(($modalState.buttons && $modalState.buttons.length === 2 && $modalState.buttons.every(btn => typeof btn.onClick === 'function')) || $modalState.titleKey === 'modal.gameOverTitle' || ($modalState.buttons && $modalState.buttons.length === 1))}
           {#if $modalState.closable}
-            <button class="modal-close" onclick={() => { logService.ui('Закриття модального вікна (X)'); modalStore.closeModal(); }}>×</button>
+            <button class="modal-close" onclick={() => { logService.ui('Закриття модального вікна (X)'); modalStore.closeModal(); }} data-testid="modal-close-btn">×</button>
           {/if}
         {/if}
       </div>

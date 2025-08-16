@@ -3,6 +3,7 @@
   import { _ } from 'svelte-i18n';
   import SvgIcons from '../SvgIcons.svelte';
   import { clearCache } from '$lib/utils/cacheManager.js';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
 
   let isVisible = false;
 
@@ -79,7 +80,7 @@
 {#if import.meta.env.DEV}
   <button 
     class="dev-clear-cache-button" 
-    title="{$_('gameBoard.clearCache')} (R/К)"
+    use:customTooltip={`${$_('gameBoard.clearCache')} (R/К)`}
     on:click={handleClearCache}
   >
     <SvgIcons name="clear-cache" />

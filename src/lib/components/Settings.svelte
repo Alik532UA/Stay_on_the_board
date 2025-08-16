@@ -3,6 +3,7 @@
   import { _ } from 'svelte-i18n';
   import LanguageSwitcher from './LanguageSwitcher.svelte';
   import SvgIcons from './SvgIcons.svelte';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
   $: settings = $settingsStore;
 
   /** @param {Event} e */
@@ -24,7 +25,7 @@
     <LanguageSwitcher />
   </div>
   <div class="settings-group">
-    <label class="custom-checkbox" title="{$_('settings.showMovesHint')}">
+    <label class="custom-checkbox" use:customTooltip={$_('settings.showMovesHint')}>
       <input type="checkbox" name="showMoves" checked={settings.showMoves} onchange={onChange} />
       <span class="checkmark"></span>
       {$_('settings.showMoves')}
@@ -49,7 +50,7 @@
     </select>
   </div>
   <div class="settings-actions">
-    <button class="reset-btn" onclick={resetSettings} aria-label="{$_('settings.reset')}" title="{$_('settings.resetHint')}">
+    <button class="reset-btn" onclick={resetSettings} aria-label="{$_('settings.reset')}" use:customTooltip={$_('settings.resetHint')}>
       <SvgIcons name="reset" />
       {$_('settings.reset')}
     </button>

@@ -32,12 +32,14 @@
           class="adjust-btn"
           on:click={() => changeBoardSize(-1)}
           disabled={settings.boardSize <= 2}
+          data-testid="board-size-decrement-btn"
         >-</button>
         <span class="current-size">{settings.boardSize}x{settings.boardSize}</span>
         <button
           class="adjust-btn"
           on:click={() => changeBoardSize(1)}
           disabled={settings.boardSize >= 9}
+          data-testid="board-size-increment-btn"
         >+</button>
       </div>
     </div>

@@ -1,12 +1,13 @@
 <script>
   import { navigationService } from '$lib/services/navigationService.js';
   import { _ } from 'svelte-i18n';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
 </script>
 
 <button 
   class="floating-close-btn" 
   aria-label={$_('ui.closeAndReturnToMenu') || 'Закрити і повернутися в меню'}
-  title={$_('ui.closeAndReturnToMenu') || 'Закрити і повернутися в меню'}
+  use:customTooltip={$_('ui.closeAndReturnToMenu') || 'Закрити і повернутися в меню'}
   onclick={navigationService.goBack}
 >
   &times;

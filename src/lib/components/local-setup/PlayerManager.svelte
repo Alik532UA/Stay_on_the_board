@@ -5,6 +5,7 @@
   import { navigationService } from '$lib/services/navigationService.js';
   import ColorPicker from './ColorPicker.svelte';
   import { logService } from '$lib/services/logService.js';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
   
   function startGame() {
     logService.action('Click: "Почати гру" (PlayerManager)');
@@ -38,7 +39,7 @@
         />
         <button
           class="player-type-btn"
-          title={$_('localGame.togglePlayerType')}
+          use:customTooltip={$_('localGame.togglePlayerType')}
           on:click={() => gameState.updatePlayer(player.id, { type: player.type === 'human' ? 'computer' : 'human' })}
         >
           {player.type === 'computer' ? '🤖' : '👤'}
@@ -53,7 +54,7 @@
         />
         <button
           class="remove-player-btn"
-          title={$_('localGame.removePlayer')}
+          use:customTooltip={$_('localGame.removePlayer')}
           on:click={() => {
             logService.action(`Click: "Видалити гравця: ${player.name}" (PlayerManager)`);
             gameState.removePlayer(player.id);

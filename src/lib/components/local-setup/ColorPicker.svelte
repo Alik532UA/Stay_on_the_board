@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import SvgIcons from '$lib/components/SvgIcons.svelte';
   import { logService } from '$lib/services/logService.js';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
   
   const dispatch = createEventDispatcher();
   
@@ -79,7 +80,7 @@
     class="color-preview"
     style="background-color: {currentValue}"
     on:click={toggleDropdown}
-    title="Обрати колір"
+    use:customTooltip={"Обрати колір"}
     aria-label="Обрати колір гравця"
   ></button>
   
@@ -91,14 +92,14 @@
             class="color-option"
             style="background-color: {color}"
             on:click={() => selectColor(color)}
-            title="Обрати {color}"
+            use:customTooltip={`Обрати ${color}`}
             aria-label="Обрати колір {color}"
           ></button>
         {/each}
         <button 
           class="color-option palette-button"
           on:click={openColorPicker}
-          title="Відкрити палітру кольорів"
+          use:customTooltip={"Відкрити палітру кольорів"}
         >
           <SvgIcons name="theme" />
         </button>
@@ -107,7 +108,7 @@
             class="color-option"
             style="background-color: {color}"
             on:click={() => selectColor(color)}
-            title="Обрати {color}"
+            use:customTooltip={`Обрати ${color}`}
             aria-label="Обрати колір {color}"
           ></button>
         {/each}

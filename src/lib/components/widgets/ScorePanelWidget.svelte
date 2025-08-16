@@ -254,7 +254,7 @@
                 on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
                 role="button"
                 tabindex="0"
-                title="Натисніть для перегляду деталей балів"
+                use:customTooltip={"Натисніть для перегляду деталей балів"}
               >0</span>
             {/if}
             {#if player.bonusPoints > 0}
@@ -262,7 +262,7 @@
                 class="bonus-display"
                 on:click={() => showPlayerBonusInfo(player)}
                 on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
-                title="Натисніть для перегляду деталей бонусних балів"
+                use:customTooltip={"Натисніть для перегляду деталей бонусних балів"}
                 role="button"
                 tabindex="0"
               >+{player.bonusPoints}</span>
@@ -272,7 +272,7 @@
                 class="penalty-display"
                 on:click={showPenaltyInfo}
                 on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
-                title={$_('gameBoard.penaltyHint')}
+                use:customTooltip={$_('gameBoard.penaltyHint')}
                 role="button"
                 tabindex="0"
               >-{player.penaltyPoints}</span>
@@ -285,7 +285,7 @@
               class="penalty-display" 
               on:click={showPenaltyInfo}
               on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
-              title={$_('gameBoard.penaltyHint')}
+              use:customTooltip={$_('gameBoard.penaltyHint')}
               role="button"
               tabindex="0"
             >Штраф: -{$gameState.penaltyPoints}</span>
@@ -321,7 +321,7 @@
         {/if}
       </div>
     {/if}
-    <button class="cash-out-btn" on:click={cashOutAndEndGame} title={isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')} data-testid="cash-out-btn">
+    <button class="cash-out-btn" on:click={cashOutAndEndGame} use:customTooltip={isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')} data-testid="cash-out-btn">
       {@html isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}
     </button>
   </div>
