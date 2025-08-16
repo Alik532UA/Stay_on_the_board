@@ -88,7 +88,7 @@
   }
 
   function onOverlayClick(e: MouseEvent) {
-    if (!$modalState.closable) return;
+    if (!$modalState.closeOnOverlayClick) return;
     const target = e.target as HTMLElement;
     if (target && target.classList.contains('modal-overlay')) {
       logService.ui('Закриття модального вікна (overlay)');
@@ -98,11 +98,9 @@
 </script>
 
 {#if $modalState.isOpen}
-  <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.ok')} onclick={e => {
-    if (!$modalState.closable) return;
-    onOverlayClick(e);
-  }} onkeydown={onModalKeydown}>
+  <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.ok')} onclick={onOverlayClick} onkeydown={onModalKeydown}>
     <div class="modal-window" data-testid={$modalState.dataTestId}>
+      {#if $modalState.titleKey || $modalState.title}
       <div class="modal-header">
         {#if $modalState.titleKey === 'modal.expertModeTitle'}
           <!-- Контейнер для повзунка, якому ми передаємо CSS-змінну -->
@@ -144,6 +142,7 @@
           {/if}
         {/if}
       </div>
+      {/if}
       <div class="modal-content" class:is-faq={typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq} bind:this={modalContent}>
         {#if typeof $modalState.content === 'object' && $modalState.content && 'reason' in $modalState.content}
           <p class="reason" data-testid="modal-content-reason" data-i18n-key={($modalState.content as any).reasonKey}>{$modalState.content.reason}</p>
@@ -294,9 +293,9 @@
 <style>
 /* ... (попередні стилі залишаються, але стилі для повзунка повністю замінені) ... */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
+  /* position: fixed; */
+  /* inset: 0; */
+  /* z-index: 1000; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -318,7 +317,6 @@
   width: 100%;
   max-width: 400px;
   max-height: 85vh;
-  min-height: 200px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -339,9 +337,9 @@
   background: transparent;
   border: 2px solid rgba(255, 255, 255, 0.2) !important;
   overflow-y: auto;
-  max-height: 60vh;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  border-radius: 24px;
 }
 
 .modal-content.is-faq {
