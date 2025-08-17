@@ -321,7 +321,7 @@
         {/if}
       </div>
     {/if}
-    <button class="cash-out-btn" on:click={cashOutAndEndGame} use:customTooltip={isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')} data-testid="cash-out-btn">
+    <button class="cash-out-btn" on:click={cashOutAndEndGame} use:customTooltip={isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOutTooltip')} data-testid="cash-out-btn">
       {@html isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}
     </button>
   </div>

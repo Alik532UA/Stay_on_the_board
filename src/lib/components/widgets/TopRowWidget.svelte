@@ -19,7 +19,8 @@
     if (state.isGameOver) {
       navigationService.goToMainMenu();
     } else {
-      modalService.showExitConfirmation();
+      // modalService.showExitConfirmation();
+      navigationService.goToMainMenu();
     }
   }
 
