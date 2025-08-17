@@ -2,6 +2,8 @@ export default {
   title: "Sozlamalar",
   showMoves: "Mümkün areketlerni köster",
   language: "Til",
+  showGameModeModal: "\"Oyun rejimini sayla\" köster",
+  showDifficultyWarningModal: "\"Oyun zorluq tenbiyesi\" köster",
   lang: {
     uk: "Ukrain tili",
     en: "İnglizce",

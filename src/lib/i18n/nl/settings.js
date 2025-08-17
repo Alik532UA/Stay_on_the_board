@@ -2,6 +2,8 @@ export default {
   title: "Instellingen",
   showMoves: "Toon mogelijke zetten",
   language: "Taal",
+  showGameModeModal: "Toon \"Selecteer Spelmodus\"",
+  showDifficultyWarningModal: "Toon \"Spelmoeilijkheid Waarschuwing\"",
   lang: {
     uk: "Oekraïens",
     en: "Engels",
