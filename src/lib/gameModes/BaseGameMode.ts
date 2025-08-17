@@ -122,4 +122,8 @@ export abstract class BaseGameMode implements IGameMode {
     gameLogicService.resetGame({}, get(gameState));
     return [{ type: 'ui/closeModal' }];
   }
+  
+  cleanup(): void {
+    logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
+  }
 }
