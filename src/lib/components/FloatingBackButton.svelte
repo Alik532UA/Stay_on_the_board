@@ -12,12 +12,11 @@
   import { replayService } from '$lib/services/replayService';
   import { gameModeService } from '$lib/services/gameModeService';
 
+  import { modalService } from '$lib/services/modalService';
+
   function handleBackClick() {
     logService.ui('FloatingBackButton: handleBackClick called');
-    // Встановлюємо прапорець, щоб повідомити root layout, що не потрібно закривати модальне вікно
-    // No longer needed as replay is handled by replayStore
-    logService.ui('FloatingBackButton: handleBackClick called, no longer restoring replay from sessionStorage.');
-    navigationService.goBack();
+    navigationService.goToMainMenu();
   }
 </script>
 

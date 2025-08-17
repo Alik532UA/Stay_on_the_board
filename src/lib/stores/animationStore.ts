@@ -150,7 +150,22 @@ function createAnimationService() {
     const initialGameState = get(gameState) as GameState;
     lastProcessedMoveIndex = initialGameState?.moveQueue?.length || 0;
 
-    gameState.subscribe((currentState: GameState) => {
+    gameState.subscribe((currentState: GameState | null) => {
+      if (!currentState) {
+        // Гра завершена, скидаємо стан анімації
+        set({
+          isAnimating: false,
+          gameId: 0,
+          currentAnimation: null,
+          visualMoveQueue: [],
+          animationQueue: [],
+          isPlayingAnimation: false,
+          isComputerMoveCompleted: true,
+        });
+        lastProcessedMoveIndex = 0;
+        return;
+      }
+
       const animationState = get({ subscribe });
 
       if (currentState.gameId !== animationState.gameId) {

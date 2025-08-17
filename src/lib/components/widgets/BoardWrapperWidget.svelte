@@ -26,14 +26,14 @@
   import PlayerPiece from './PlayerPiece.svelte';
   import { logService } from '$lib/services/logService.js';
 
-  const boardSize = derived(gameState, $gameState => Number($gameState.boardSize));
+  const boardSize = derived(gameState, $gameState => $gameState ? Number($gameState.boardSize) : 0);
   
   // Слідкуємо, чи був зроблений хід гравця (moveQueue останній елемент - player: 1)
   const shouldHideBoard = derived([
     settingsStore,
     gameState
   ], ([$settingsStore, $gameState]) => {
-    if (!$settingsStore.autoHideBoard) return false;
+    if (!$gameState || !$settingsStore.autoHideBoard) return false;
     const lastMove = $gameState.moveQueue?.[$gameState.moveQueue.length - 1];
     return lastMove && lastMove.player === 1;
   });
@@ -51,30 +51,27 @@
   }
 
   onMount(() => {
-    // НАВІЩО: Зберігаємо попередню позицію гравця для коректного визначення зміни стану та автоприховування дошки.
-    let lastRow = $gameState.playerRow;
-    let lastCol = $gameState.playerCol;
-    
-    // Вмикаємо чекбокси при старті нової гри
-    if ($gameState.moveHistory.length === 1) {
-      enableAllGameCheckboxesIfNeeded();
-    }
-    
     const unsubscribe = gameState.subscribe(($gameState) => {
+      if (!$gameState) return;
+
+      // НАВІЩО: Зберігаємо попередню позицію гравця для коректного визначення зміни стану та автоприховування дошки.
+      let lastRow = $gameState.playerRow;
+      let lastCol = $gameState.playerCol;
+
+      // Вмикаємо чекбокси при старті нової гри
+      if ($gameState.moveHistory.length === 1) {
+        enableAllGameCheckboxesIfNeeded();
+      }
+
       // НАВІЩО: Реакція на зміну позиції гравця для автоприховування дошки та повторного вмикання чекбоксів після скидання гри.
       if (
         get(settingsStore).autoHideBoard &&
         get(settingsStore).showBoard &&
         ($gameState.playerRow !== lastRow || $gameState.playerCol !== lastCol) &&
-        $gameState.moveHistory.length > 1 // <-- ДОДАЙ ЦЕЙ РЯДОК
+        $gameState.moveHistory.length > 1
       ) {
         lastRow = $gameState.playerRow;
         lastCol = $gameState.playerCol;
-        // setTimeout(() => {
-        //   if (get(settingsStore).showBoard) {
-        //     settingsStore.toggleShowBoard(false);
-        //   }
-        // }, 0);
         uiEffectsStore.autoHideBoard(0);
       } else {
         lastRow = $gameState.playerRow;
@@ -93,6 +90,10 @@
   // Видаляємо prevMoveQueueLength, оскільки анімація тепер керується через animationStore
   // НАВІЩО: Відстежуємо зміну gameId для скидання стану при новій грі.
   gameState.subscribe(($gameState) => {
+    if (!$gameState) {
+      prevGameId = null;
+      return;
+    }
     // Якщо нова гра — скидаємо лічильник
     if ($gameState.gameId !== prevGameId) {
       prevGameId = $gameState.gameId;
@@ -142,7 +143,7 @@
 
   function onCellRightClick(event: MouseEvent, row: number, col: number): void {
     event.preventDefault();
-    if ($settingsStore.blockModeEnabled && !(row === $gameState.playerRow && col === $gameState.playerCol)) {
+    if ($gameState && $settingsStore.blockModeEnabled && !(row === $gameState.playerRow && col === $gameState.playerCol)) {
       const visualCounts = get(visualCellVisitCounts);
       const blocked = isCellBlocked(row, col, visualCounts, $settingsStore);
       logService.ui(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`);
@@ -164,48 +165,50 @@
   }
 </script>
 
-{#key $gameState.gameId}
-  {#if $settingsStore.showBoard}
-    <div 
-      class="board-bg-wrapper game-content-block{ $shouldHideBoard ? ' hidden' : '' }"
-      style="--board-size: {$boardSize}"
-      onclick={showBoardClickHint} 
-      onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
-      role="button"
-      tabindex="0"
-      aria-label="Ігрове поле"
-      transition:scaleAndSlide={{ duration: 600, easing: quintOut }}
-    >
-      <div class="game-board" style="--board-size: {$boardSize}" role="grid" data-testid="game-board">
-        {#each Array($boardSize) as _, rowIdx (rowIdx)}
-          {#each Array($boardSize) as _, colIdx (colIdx)}
-            {@const moveInfo = getMoveInfo(rowIdx, colIdx)}
-            <BoardCell
-              {rowIdx}
-              {colIdx}
-              visualCellVisitCounts={$visualCellVisitCounts}
-              settingsStore={$settingsStore}
-              isAvailable={moveInfo.isAvailable}
-              isPenalty={moveInfo.isPenalty}
-              visualPosition={$visualPosition}
-              boardState={$visualBoardState}
-              gameState={$gameState}
-              on:cellRightClick={(e) => onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
-            />
+{#if $gameState}
+  {#key $gameState.gameId}
+    {#if $settingsStore.showBoard}
+      <div
+        class="board-bg-wrapper game-content-block{ $shouldHideBoard ? ' hidden' : '' }"
+        style="--board-size: {$boardSize}"
+        onclick={showBoardClickHint}
+        onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
+        role="button"
+        tabindex="0"
+        aria-label="Ігрове поле"
+        transition:scaleAndSlide={{ duration: 600, easing: quintOut }}
+      >
+        <div class="game-board" style="--board-size: {$boardSize}" role="grid" data-testid="game-board">
+          {#each Array($boardSize) as _, rowIdx (rowIdx)}
+            {#each Array($boardSize) as _, colIdx (colIdx)}
+              {@const moveInfo = getMoveInfo(rowIdx, colIdx)}
+              <BoardCell
+                {rowIdx}
+                {colIdx}
+                visualCellVisitCounts={$visualCellVisitCounts}
+                settingsStore={$settingsStore}
+                isAvailable={moveInfo.isAvailable}
+                isPenalty={moveInfo.isPenalty}
+                visualPosition={$visualPosition}
+                boardState={$visualBoardState}
+                gameState={$gameState}
+                on:cellRightClick={(e) => onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
+              />
+            {/each}
           {/each}
-        {/each}
-        
-        {#if $settingsStore.showPiece && $visualPosition.row !== null && $visualPosition.col !== null}
-          <PlayerPiece
-            row={$visualPosition.row}
-            col={$visualPosition.col}
-            boardSize={$boardSize}
-          />
-        {/if}
+          
+          {#if $settingsStore.showPiece && $visualPosition.row !== null && $visualPosition.col !== null}
+            <PlayerPiece
+              row={$visualPosition.row}
+              col={$visualPosition.col}
+              boardSize={$boardSize}
+            />
+          {/if}
+        </div>
       </div>
-    </div>
-  {/if}
-{/key}
+    {/if}
+  {/key}
+{/if}
 
 <style>
 

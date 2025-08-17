@@ -364,6 +364,7 @@
   }
 </style>
 
+{#if $gameState}
 <div class="settings-expander {isOpen ? 'open' : ''}" class:disabled={$settingsStore.lockSettings}>
   <div
     class="settings-expander__summary"
@@ -511,3 +512,4 @@
     {/if}
   </div>
 </div>
+{/if}

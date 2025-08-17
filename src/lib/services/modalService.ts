@@ -97,23 +97,6 @@ export const modalService = {
     });
   },
 
-  showExitConfirmation(): void {
-    modalStore.showModal({
-      titleKey: 'modal.exitConfirmationTitle',
-      contentKey: 'modal.exitConfirmationContent',
-      dataTestId: 'exit-confirm-modal',
-      buttons: [
-        {
-          textKey: 'modal.confirmExit',
-          customClass: 'danger-btn',
-          isHot: true,
-          onClick: () => navigationService.goToMainMenu(),
-          dataTestId: 'exit-confirm-btn'
-        },
-        { textKey: 'modal.cancel', onClick: () => modalStore.closeModal(), dataTestId: 'exit-cancel-btn' }
-      ]
-    });
-  },
 
   /**
    * Closes the currently active modal.

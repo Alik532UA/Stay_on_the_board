@@ -19,7 +19,6 @@
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { onMount } from 'svelte';
   import { afterNavigate } from '$app/navigation';
-  import { resetGame } from '$lib/services/gameLogicService.js';
   import { calculateFinalScore } from '$lib/services/scoreService.js';
   import { animationStore } from '$lib/stores/animationStore.js';
   import { gameState } from '$lib/stores/gameState.js';
@@ -31,14 +30,6 @@
   import { gameStore } from '$lib/stores/gameStore';
 
   onMount(() => {
-    // Ініціалізуємо гру, тільки якщо це не відновлення зі сторінки replay
-    const isRestoring = sessionStorage.getItem('isRestoringReplay') === 'true';
-    const state = get(gameState);
-    const isGameInProgress = !state.isGameOver && state.moveHistory.length > 1;
-
-    if (!isRestoring && !isGameInProgress) {
-      resetGame({}, state);
-    }
     gameModeService.setCurrentGameMode('vs-computer');
     animationStore.initialize();
   });

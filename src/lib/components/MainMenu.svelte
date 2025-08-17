@@ -20,7 +20,6 @@
   import ClearCacheOptions from './ClearCacheOptions.svelte';
   import { onMount, tick } from 'svelte';
   import { get } from 'svelte/store';
-  import GameModeModal from '$lib/components/GameModeModal.svelte';
   import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
 
@@ -101,24 +100,27 @@
   function handlePlayVsComputer() {
     logService.action(`Click: "Гра проти комп'ютера" (MainMenu)`);
     const state = get(gameState);
-    if (!state.isGameOver && state.moveHistory.length > 1) {
+    if (state && !state.isGameOver && state.moveHistory.length > 1) {
       navigationService.resumeGame('/game/vs-computer');
     } else {
       const settings = get(settingsStore);
       if (settings.showGameModeModal) {
-        modalStore.showModal({
-          titleKey: 'mainMenu.gameModeModal.title',
-          dataTestId: 'game-mode-modal',
-          titleDataTestId: 'game-mode-modal-title',
-          component: GameModeModal,
-          buttons: [
-            {
-              textKey: 'modal.close',
-              onClick: () => modalStore.closeModal(),
-              dataTestId: 'modal-btn-modal.close',
-              hotKey: 'ESC'
-            }
-          ]
+        import('./GameModeModal.svelte').then(module => {
+          const GameModeModal = module.default;
+          modalStore.showModal({
+            titleKey: 'mainMenu.gameModeModal.title',
+            dataTestId: 'game-mode-modal',
+            titleDataTestId: 'game-mode-modal-title',
+            component: GameModeModal,
+            buttons: [
+              {
+                textKey: 'modal.close',
+                onClick: () => modalStore.closeModal(),
+                dataTestId: 'modal-btn-modal.close',
+                hotKey: 'ESC'
+              }
+            ]
+          });
         });
       } else {
         navigateToGame();

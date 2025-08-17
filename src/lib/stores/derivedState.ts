@@ -36,6 +36,7 @@ export const isLocalGame = derived(page, $page =>
 export const lastComputerMove = derived(
   [gameState, isLocalGame],
   ([$gameState, $isLocalGame]) => {
+    if (!$gameState) return null;
     if ($isLocalGame) {
       // В локальній грі немає комп'ютера, тому lastComputerMove завжди null
       return null;
@@ -57,7 +58,7 @@ export const lastComputerMove = derived(
  * @type {import('svelte/store').Readable<ComputerMove | null>}
  */
 export const lastPlayerMove = derived(gameState, $gameState => {
-  if ($gameState.moveQueue.length === 0) return null;
+  if (!$gameState || $gameState.moveQueue.length === 0) return null;
   const lastMove = $gameState.moveQueue[$gameState.moveQueue.length - 1];
   return {
     direction: lastMove.direction as Direction,
@@ -73,6 +74,7 @@ export const lastPlayerMove = derived(gameState, $gameState => {
 export const isPauseBetweenMoves = derived(
   [gameState, isLocalGame],
   ([$gameState, $isLocalGame]) => {
+    if (!$gameState) return false;
     if ($isLocalGame) {
       return false;
     }
@@ -133,6 +135,7 @@ const directionArrows: Record<Direction, string> = {
 export const centerInfo = derived(
   [gameState, playerInputStore, lastComputerMove],
   ([$gameState, $playerInputStore, $lastComputerMove]) => {
+    if (!$gameState) return { class: '', content: '•', clickable: false, aria: 'Порожньо' };
     const { selectedDirection, selectedDistance } = $playerInputStore;
     const isPlayerTurn = $gameState.players[$gameState.currentPlayerIndex]?.type === 'human';
     let info;
@@ -179,6 +182,7 @@ export const centerInfo = derived(
 export const isConfirmButtonDisabled = derived(
   [gameState, playerInputStore],
   ([$gameState, $playerInputStore]) => {
+    if (!$gameState) return true;
     const isPlayerTurn = $gameState.players[$gameState.currentPlayerIndex]?.type === 'human';
     const { selectedDirection, selectedDistance, isMoveInProgress } = $playerInputStore;
 
@@ -195,7 +199,7 @@ export const isConfirmButtonDisabled = derived(
  * @type {import('svelte/store').Readable<boolean>}
  */
 export const isPlayerTurn = derived(gameState, $gameState =>
-  $gameState.players[$gameState.currentPlayerIndex]?.type === 'human'
+  $gameState ? $gameState.players[$gameState.currentPlayerIndex]?.type === 'human' : false
 );
 
 
@@ -206,6 +210,7 @@ export const isPlayerTurn = derived(gameState, $gameState =>
 export const availableMoves = derived(
   [gameState, settingsStore, lastPlayerMove, isLocalGame, lastComputerMove],
   ([$gameState, $settingsStore, $lastPlayerMove, $isLocalGame, $lastComputerMove]) => {
+    if (!$gameState) return [];
     const {
       playerRow,
       playerCol,
@@ -241,7 +246,7 @@ export const availableMoves = derived(
 export const previousPlayerColor = derived(
   [gameState, isLocalGame],
   ([$gameState, $isLocalGame]) => {
-    if (!$isLocalGame) return null;
+    if (!$gameState || !$isLocalGame) return null;
 
     const currentPlayerIndex = $gameState.currentPlayerIndex;
     const playersCount = $gameState.players.length;
@@ -254,8 +259,8 @@ export const previousPlayerColor = derived(
   }
 );
 
-export const availableDistances = derived(gameState, $gameState => 
-  Array.from({ length: $gameState.boardSize - 1 }, (_, i) => i + 1)
+export const availableDistances = derived(gameState, $gameState =>
+  $gameState ? Array.from({ length: $gameState.boardSize - 1 }, (_, i) => i + 1) : []
 );
 
 /**
@@ -303,7 +308,7 @@ export const currentLanguageFlagSvg = derived(
 export const shouldHideBoard = derived(
   [settingsStore, gameState],
   ([$settingsStore, $gameState]) => {
-    if (!$settingsStore.autoHideBoard) return false;
+    if (!$gameState || !$settingsStore.autoHideBoard) return false;
     const lastMove = $gameState.moveQueue?.[$gameState.moveQueue.length - 1];
     return lastMove?.player === 1;
   }
@@ -321,6 +326,7 @@ export const shouldHideBoard = derived(
 export const visualPosition = derived(
   [gameState, animationStore],
   ([$gameState, $animationStore]) => {
+    if (!$gameState) return { row: null, col: null };
     if ($animationStore.visualMoveQueue && $animationStore.visualMoveQueue.length > 0) {
       const lastAnimatedMove = $animationStore.visualMoveQueue[$animationStore.visualMoveQueue.length - 1];
       return {
@@ -343,6 +349,7 @@ export const visualPosition = derived(
 export const visualCellVisitCounts = derived(
   [visualPosition, gameState, animationStore],
   ([$visualPosition, $gameState, $animationStore]) => {
+    if (!$gameState) return {};
     // Якщо гра не анімується, візуальний стан ПОВИНЕН відповідати логічному.
     // Це виправляє баг, коли cellVisitCounts скидається, але візуалізація не оновлюється.
     if (!$animationStore.isAnimating) {
@@ -373,24 +380,38 @@ export const visualCellVisitCounts = derived(
  */
 export const visualBoardState = derived(
   [gameState, animationStore],
-  ([$gameState, $animationStore]) => ({
-    // Логічні дані з gameState
-    position: { 
-      row: $gameState.playerRow, 
-      col: $gameState.playerCol 
-    },
-    cellVisitCounts: $gameState.cellVisitCounts,
-    availableMoves: $gameState.availableMoves,
-    board: $gameState.board,
-    boardSize: $gameState.boardSize,
-    
-    // Візуальні прапорці з animationStore
-    isAnimating: $animationStore.isAnimating,
-    
-    // Додаткові візуальні властивості
-    isGameOver: $gameState.isGameOver,
-    currentPlayerIndex: $gameState.currentPlayerIndex
-  })
+  ([$gameState, $animationStore]) => {
+    if (!$gameState) {
+      return {
+        position: { row: null, col: null },
+        cellVisitCounts: {},
+        availableMoves: [],
+        board: [],
+        boardSize: 0,
+        isAnimating: false,
+        isGameOver: false,
+        currentPlayerIndex: 0
+      };
+    }
+    return {
+      // Логічні дані з gameState
+      position: {
+        row: $gameState.playerRow,
+        col: $gameState.playerCol
+      },
+      cellVisitCounts: $gameState.cellVisitCounts,
+      availableMoves: $gameState.availableMoves,
+      board: $gameState.board,
+      boardSize: $gameState.boardSize,
+      
+      // Візуальні прапорці з animationStore
+      isAnimating: $animationStore.isAnimating,
+      
+      // Додаткові візуальні властивості
+      isGameOver: $gameState.isGameOver,
+      currentPlayerIndex: $gameState.currentPlayerIndex
+    };
+  }
 );
 
 /**
@@ -400,7 +421,7 @@ export const visualBoardState = derived(
  */
 export const visualCurrentPlayerIndex = derived(
   gameState,
-  ($gameState) => $gameState.currentPlayerIndex
+  ($gameState) => $gameState ? $gameState.currentPlayerIndex : 0
 );
 
 /**
@@ -410,6 +431,7 @@ export const visualCurrentPlayerIndex = derived(
 export const currentPlayer = derived(
   [gameState, visualCurrentPlayerIndex],
   ([$gameState, $visualCurrentPlayerIndex]) => {
+    if (!$gameState) return null;
     return $gameState.players[$visualCurrentPlayerIndex];
   }
 );
@@ -422,7 +444,7 @@ export const currentPlayer = derived(
 export const currentPlayerColor = derived(
   [gameState, isLocalGame],
   ([$gameState, $isLocalGame]) => {
-    if (!$isLocalGame) return null;
+    if (!$gameState || !$isLocalGame) return null;
 
     const currentPlayerIndex = $gameState.currentPlayerIndex;
     const currentPlayer = $gameState.players[currentPlayerIndex];

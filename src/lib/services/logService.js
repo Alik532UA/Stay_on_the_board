@@ -18,18 +18,18 @@
     
     // 2. Конфігурація
     const defaultConfig = {
-      [LOG_GROUPS.STATE]: false,
-      [LOG_GROUPS.LOGIC]: false,
-      [LOG_GROUPS.SCORE]: false,
-      [LOG_GROUPS.UI]: true,
-      [LOG_GROUPS.TOOLTIP]: false,
-      [LOG_GROUPS.ANIMATION]: false,
-      [LOG_GROUPS.INIT]: false,
-      [LOG_GROUPS.ACTION]: true,
-      [LOG_GROUPS.GAME_MODE]: false,
-      [LOG_GROUPS.SPEECH]: false,
-      [LOG_GROUPS.TEST_MODE]: false,
-    };
+          [LOG_GROUPS.STATE]: true,
+          [LOG_GROUPS.LOGIC]: false,
+          [LOG_GROUPS.SCORE]: false,
+          [LOG_GROUPS.UI]: true,
+          [LOG_GROUPS.TOOLTIP]: false,
+          [LOG_GROUPS.ANIMATION]: false,
+          [LOG_GROUPS.INIT]: true,
+          [LOG_GROUPS.ACTION]: false,
+          [LOG_GROUPS.GAME_MODE]: true,
+          [LOG_GROUPS.SPEECH]: false,
+          [LOG_GROUPS.TEST_MODE]: false,
+        };
     
     const STORAGE_KEY = 'logConfig';
     

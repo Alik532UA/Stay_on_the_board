@@ -176,10 +176,6 @@ export const userActionService = {
       case 'closeModal':
         sideEffects = [{ type: 'ui/closeModal' }];
         break;
-      case 'resetGameAndGoToMainMenu':
-        gameLogicService.resetGame({}, get(gameState));
-        navigationService.goToMainMenu();
-        break;
       default:
         logService.logic(`[userActionService.handleModalAction] Unknown action: ${action}`);
         break;
