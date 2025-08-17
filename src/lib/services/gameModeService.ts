@@ -82,5 +82,14 @@ export const gameModeService = {
     }
     
     return 'vs-computer';
+  },
+  
+  cleanupCurrentGameMode() {
+    const activeGameMode = get(gameStore).mode;
+    if (activeGameMode) {
+      activeGameMode.cleanup();
+      gameStore.setMode(null);
+      logService.GAME_MODE('Game mode cleaned up and reset.');
+    }
   }
 };

@@ -5,6 +5,7 @@
   import { navigateToGame } from '$lib/services/uiService';
   import { navigationService } from '$lib/services/navigationService';
   import { logService } from '$lib/services/logService.js';
+  import { gameModeService } from '$lib/services/gameModeService';
   
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
@@ -84,6 +85,7 @@
   
   /** @param {HTMLElement} node */
   onMount(() => {
+    gameModeService.cleanupCurrentGameMode();
     settingsStore.init();
     isDev = !!import.meta.env.DEV;
   });
