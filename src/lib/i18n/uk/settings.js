@@ -2,6 +2,8 @@ export default {
   title: "Налаштування",
   showMoves: "Показувати доступні ходи",
   language: "Мова",
+  showGameModeModal: "Показувати \"Вибір режиму гри\"",
+  showDifficultyWarningModal: "Показувати \"попередження ускладнення гри\"",
   lang: {
     uk: "Українська",
     en: "English",

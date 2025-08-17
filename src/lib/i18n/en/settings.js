@@ -2,6 +2,8 @@ export default {
   title: "Settings",
   showMoves: "Show available moves",
   language: "Language",
+  showGameModeModal: "Show \"Select Game Mode\"",
+  showDifficultyWarningModal: "Show \"Game Difficulty Warning\"",
   lang: {
     uk: "Ukrainian",
     en: "English",

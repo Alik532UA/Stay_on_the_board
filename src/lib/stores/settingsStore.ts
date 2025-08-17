@@ -24,6 +24,7 @@ export interface SettingsState {
   autoHideBoard: boolean;
   gameMode: 'beginner' | 'experienced' | 'pro' | null;
   showGameModeModal: boolean;
+  showDifficultyWarningModal: boolean;
   showGameInfoWidget: 'hidden' | 'shown' | 'compact';
   lockSettings: boolean;
   testMode: boolean;
@@ -75,6 +76,7 @@ const defaultSettings: SettingsState = {
   keyConflictResolution: {},
   gameMode: null,
   showGameModeModal: true,
+  showDifficultyWarningModal: true,
   showGameInfoWidget: 'shown',
   lockSettings: false,
   testMode: false,
@@ -135,6 +137,7 @@ function loadSettings(): SettingsState {
     keyConflictResolution: safeJsonParse(localStorage.getItem('keyConflictResolution'), {}),
     gameMode: localStorage.getItem('gameMode') as 'beginner' | 'experienced' | 'pro' | null,
     showGameModeModal: localStorage.getItem('showGameModeModal') !== 'false',
+    showDifficultyWarningModal: localStorage.getItem('showDifficultyWarningModal') !== 'false',
     showGameInfoWidget: (localStorage.getItem('showGameInfoWidget') as 'hidden' | 'shown' | 'compact') || 'shown',
     lockSettings: localStorage.getItem('lockSettings') === 'true',
     testMode: localStorage.getItem('testMode') === 'true',
