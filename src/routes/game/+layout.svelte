@@ -17,6 +17,23 @@
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { logService } from '$lib/services/logService.js';
+  import { onMount, onDestroy } from 'svelte';
+  import { gameOrchestrator } from '$lib/gameOrchestrator';
+  import PlayerColorProvider from '$lib/components/PlayerColorProvider.svelte';
+
+  onDestroy(() => {
+    logService.GAME_MODE('Game layout is being destroyed, cleaning up game mode.');
+    gameModeService.cleanupCurrentGameMode();
+  });
+ 
+  onMount(() => {
+    if (import.meta.env.DEV || get(settingsStore).testMode) {
+  	(window as any).gameOrchestrator = gameOrchestrator;
+  	(window as any).userActionService = userActionService;
+  	(window as any).gameModeService = gameModeService;
+  	(window as any).settingsStore = settingsStore;
+  }
+  });
 
   // НАВІЩО: Гарячі клавіші є глобальними для будь-якого ігрового режиму,
   // тому їх логіка знаходиться тут, а не на сторінках конкретних режимів.
@@ -122,6 +139,7 @@
 {/if}
 
 <svelte:window on:keydown={handleHotkey} />
+<PlayerColorProvider />
 
 <style>
   .game-layout-container {

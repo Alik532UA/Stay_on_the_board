@@ -5,7 +5,7 @@
   import ToggleButton from '$lib/components/ToggleButton.svelte';
 
   // Створюємо локальні змінні для зручності доступу до налаштувань
-  $: settings = $gameState.settings;
+  $: settings = $gameState ? $gameState.settings : null;
 
   /**
    * Оновлює налаштування розміру дошки в store
@@ -20,6 +20,7 @@
   }
 </script>
 
+{#if $gameState}
 <div class="settings-card">
   <h2 data-testid="local-game-settings-title">{$_('localGame.settingsTitle')}</h2>
 
@@ -78,6 +79,7 @@
     />
   </div>
 </div>
+{/if}
 
 <style>
   .setting-item {

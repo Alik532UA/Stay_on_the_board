@@ -9,9 +9,9 @@
   import { customTooltip } from '$lib/actions/customTooltip.js';
 
   // Реактивні змінні для визначення поточного гравця та режиму гри
-  $: currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
-  $: isMultiplayer = $gameState.players.filter(p => p.type === 'human').length > 1;
-  $: players = $gameState.players;
+  $: currentPlayer = $gameState ? $gameState.players[$gameState.currentPlayerIndex] : null;
+  $: isMultiplayer = $gameState ? $gameState.players.filter(p => p.type === 'human').length > 1 : false;
+  $: players = $gameState ? $gameState.players : [];
 
   /**
    * Функція для отримання кольору гравця
@@ -237,7 +237,7 @@
   }
 </style>
 
-{#if !$replayStore.isReplayMode}
+{#if !$replayStore.isReplayMode && $gameState}
   <div class="score-panel game-content-block" data-testid="score-panel">
     {#if isMultiplayer}
       <!-- Локальна гра - показуємо рахунок всіх гравців -->
@@ -281,8 +281,8 @@
         {/each}
         {#if $gameState.penaltyPoints > 0}
           <div class="score-row">
-            <span 
-              class="penalty-display" 
+            <span
+              class="penalty-display"
               on:click={showPenaltyInfo}
               on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
               use:customTooltip={$_('gameBoard.penaltyHint')}
@@ -309,7 +309,7 @@
           data-testid="score-value"
         >{$gameState.players[0]?.score || 0}</span>
         {#if $gameState.penaltyPoints > 0}
-          <span 
+          <span
             class="penalty-display"
             on:click={showPenaltyInfo}
             on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
@@ -325,4 +325,4 @@
       {@html isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}
     </button>
   </div>
-{/if} 
+{/if}

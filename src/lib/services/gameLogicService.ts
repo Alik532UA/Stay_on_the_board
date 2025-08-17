@@ -21,7 +21,7 @@ import type { Direction } from '$lib/utils/gameUtils';
  */
 
 export function resetGame(options: { newSize?: number; players?: Player[]; settings?: any } = {}, currentState: any) {
-  const newSize = options.newSize ?? currentState.boardSize;
+  const newSize = options.newSize ?? currentState?.boardSize ?? 4;
   const { testMode } = get(settingsStore);
   
   const newState = createInitialState({

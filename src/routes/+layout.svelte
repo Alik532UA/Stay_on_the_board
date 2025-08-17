@@ -35,11 +35,7 @@
 	import DontShowAgainCheckbox from '$lib/components/DontShowAgainCheckbox.svelte';
 	import { modalState } from '$lib/stores/modalStore.js';
 	import { logService } from '$lib/services/logService.js';
-	import PlayerColorProvider from '$lib/components/PlayerColorProvider.svelte';
 	import TestModeWidget from '$lib/components/widgets/TestModeWidget.svelte';
-	import { gameOrchestrator } from '$lib/gameOrchestrator';
-	import { userActionService } from '$lib/services/userActionService';
-	import { gameModeService } from '$lib/services/gameModeService';
 	import { tooltipStore } from '$lib/stores/tooltipStore.js';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 
@@ -69,9 +65,6 @@
 		}
 
 		if (import.meta.env.DEV || get(settingsStore).testMode) {
-			(window as any).gameOrchestrator = gameOrchestrator; // Залишаємо для зворотної сумісності, поки всі тести не переведено
-			(window as any).userActionService = userActionService;
-			(window as any).gameModeService = gameModeService;
 			(window as any).settingsStore = settingsStore; // Додаємо settingsStore для доступу в тестах
 		}
 	});
@@ -156,7 +149,6 @@
 	<Tooltip content={$tooltipStore.content} x={$tooltipStore.x} y={$tooltipStore.y} />
 {/if}
 <Modal />
-<PlayerColorProvider />
 
 {#if $settingsStore.testMode}
 	<div class="test-mode-container" data-testid="test-mode-widget-container">

@@ -197,7 +197,7 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
 }
 
 function createGameStateStore() {
-  const { subscribe, update, set } = writable<GameState>(createInitialState());
+  const { subscribe, update, set } = writable<GameState | null>(null);
 
   return {
     subscribe,
@@ -321,6 +321,10 @@ function createGameStateStore() {
     // --- General ---
     reset: (config?: GameStateConfig) => {
       set(createInitialState(config));
+    },
+
+    destroy: () => {
+      set(null);
     }
   };
 }

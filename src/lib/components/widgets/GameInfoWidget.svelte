@@ -39,6 +39,8 @@
   const displayMessage = derived(
     [gameState, lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves, _],
     ([$gameState, $lastComputerMove, $lastPlayerMove, $isPlayerTurn, $isPauseBetweenMoves, $_]) => {
+      if (!$gameState) return '';
+
       const humanPlayersCount = $gameState.players.filter(p => p.type === 'human').length;
       const isLocalGame = humanPlayersCount > 1;
 
@@ -151,7 +153,7 @@
  }
 </style>
 
-{#if $i18nReady && $settingsStore.showGameInfoWidget !== 'hidden'}
+{#if $i18nReady && $settingsStore.showGameInfoWidget !== 'hidden' && $gameState}
   <div class="game-info-widget"
        class:compact={$settingsStore.showGameInfoWidget === 'compact'}
        transition:scaleAndSlide={{ duration: 400, easing: quintOut }}

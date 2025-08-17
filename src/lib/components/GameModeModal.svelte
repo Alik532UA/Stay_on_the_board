@@ -15,32 +15,7 @@
    */
   function selectMode(mode) {
     const shouldShowFaq = settingsStore.applyGameModePreset(mode);
-    const { penaltyPoints, boardSize, players } = get(gameState);
-    const score = players[0]?.score ?? 0;
-    if (score === 0 && penaltyPoints === 0 && boardSize !== 4) {
-      gameState.updateSettings({ boardSize: 4 });
-      gotoAfterFaq();
-    } else if (boardSize !== 4) {
-      modalStore.showModal({
-        titleKey: 'modal.resetScoreTitle',
-        contentKey: 'modal.resetScoreContent',
-        buttons: [
-          {
-            textKey: 'modal.resetScoreConfirm',
-            customClass: 'green-btn',
-            isHot: true,
-            onClick: () => {
-              gameState.updateSettings({ boardSize: 4 });
-              modalStore.closeModal();
-              gotoAfterFaq();
-            }
-          },
-          { textKey: 'modal.resetScoreCancel', onClick: modalStore.closeModal }
-        ]
-      });
-    } else {
-      gotoAfterFaq();
-    }
+    gotoAfterFaq();
 
     function gotoAfterFaq() {
       if (shouldShowFaq) {

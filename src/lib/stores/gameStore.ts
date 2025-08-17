@@ -3,7 +3,7 @@ import type { BaseGameMode } from '$lib/gameModes/BaseGameMode';
 import { gameState, type GameState } from './gameState';
 export interface Game {
   mode: BaseGameMode | null;
-  state: GameState;
+  state: GameState | null;
 }
 
 const createGameStore = () => {
@@ -12,8 +12,8 @@ const createGameStore = () => {
     state: get(gameState)
   });
 
-  gameState.subscribe(state => {
-    update(game => ({ ...game, state }));
+  gameState.subscribe(newState => {
+    update(game => ({ ...game, state: newState }));
   });
 
   return {

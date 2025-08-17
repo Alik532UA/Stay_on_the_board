@@ -5,7 +5,6 @@
   import { i18nReady } from '$lib/i18n/init.js';
   import SvgIcons from './SvgIcons.svelte';
   import FAQModal from './FAQModal.svelte';
-  import { gameState } from '$lib/stores/gameState.js';
   import { onMount } from 'svelte';
   import { audioService } from '$lib/services/audioService.js';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
@@ -176,68 +175,68 @@
           </p>
         {/if}
 
-                 {#if ($gameState.isGameOver || ($modalState.content && typeof $modalState.content === 'object' && 'scoreDetails' in $modalState.content)) && !$modalState.component}
-           <!-- Показуємо рахунки гравців для локальної гри -->
-           {#if ($modalState.content as any)?.playerScores && ($modalState.content as any).playerScores.length > 0}
-             <div class="player-scores-container">
-               <h3>Рахунки гравців:</h3>
-               {#each ($modalState.content as any).playerScores as playerScore}
-                 <div class="player-score-row" class:winner={playerScore.isWinner} class:loser={playerScore.isLoser}>
-                   <span class="player-name">
-                     {#if playerScore.isWinner}
-                       <span class="winner-badge">🏆</span>
-                     {:else if playerScore.isLoser}
-                       <span class="loser-badge">🐚</span>
-                     {/if}
-                     {$_('modal.scoreDetails.playerScore', {
-                       values: {
-                         playerName: playerScore.playerName,
-                         score: playerScore.score
-                       }
-                     })}
-                   </span>
-                 </div>
-               {/each}
-             </div>
-           {:else}
-             <!-- Показуємо деталі рахунку тільки для гри проти комп'ютера -->
-             <div class="score-details-container" data-testid="score-details-container">
-               <div class="score-detail-row" data-testid="base-score">{$_('modal.scoreDetails.baseScore')} <span data-testid="base-score-value">{($modalState.content as any)?.scoreDetails?.baseScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span></div>
-               {#if (($modalState.content as any)?.scoreDetails?.sizeBonus ?? $gameState.sizeBonus ?? 0) > 0}
-                 <div class="score-detail-row" data-testid="size-bonus">{$_('modal.scoreDetails.sizeBonus')} <span data-testid="size-bonus-value">+{($modalState.content as any)?.scoreDetails?.sizeBonus ?? $gameState.sizeBonus ?? 0}</span></div>
-               {/if}
-               {#if (($modalState.content as any)?.scoreDetails?.blockModeBonus ?? $gameState.blockModeBonus ?? 0) > 0}
-                 <div class="score-detail-row" data-testid="block-mode-bonus">{$_('modal.scoreDetails.blockModeBonus')} <span data-testid="block-mode-bonus-value">+{($modalState.content as any)?.scoreDetails?.blockModeBonus ?? $gameState.blockModeBonus ?? 0}</span></div>
-               {/if}
-               {#if (($modalState.content as any)?.scoreDetails?.jumpBonus ?? $gameState.jumpBonus ?? 0) > 0}
-                 <div class="score-detail-row" data-testid="jump-bonus">{$_('modal.scoreDetails.jumpBonus')} <span data-testid="jump-bonus-value">+{($modalState.content as any)?.scoreDetails?.jumpBonus ?? $gameState.jumpBonus ?? 0}</span></div>
-               {/if}
-               {#if (($modalState.content as any)?.scoreDetails?.noMovesBonus ?? $gameState.noMovesBonus ?? 0) > 0}
-                 <div class="score-detail-row" data-testid="no-moves-bonus">{$_('modal.scoreDetails.noMovesBonus')} <span data-testid="no-moves-bonus-value">+{($modalState.content as any)?.scoreDetails?.noMovesBonus ?? $gameState.noMovesBonus ?? 0}</span></div>
-               {/if}
-               {#if (($modalState.content as any)?.scoreDetails?.distanceBonus ?? $gameState.distanceBonus ?? 0) > 0}
-                 <div class="score-detail-row" data-testid="distance-bonus">{$_('modal.scoreDetails.distanceBonus')} <span data-testid="distance-bonus-value">+{($modalState.content as any)?.scoreDetails?.distanceBonus ?? $gameState.distanceBonus ?? 0}</span></div>
-               {/if}
-               {#if ($modalState.titleKey === 'modal.gameOverTitle' && (($modalState.content as any)?.scoreDetails?.finishBonus ?? $gameState.finishBonus ?? 0) > 0)}
-                 <div class="score-detail-row" data-testid="finish-bonus">{$_('modal.scoreDetails.finishBonus')} <span data-testid="finish-bonus-value">+{($modalState.content as any)?.scoreDetails?.finishBonus ?? $gameState.finishBonus ?? 0}</span></div>
-               {/if}
-               {#if (($modalState.content as any)?.scoreDetails?.totalPenalty ?? $gameState.totalPenalty ?? 0) > 0}
-                 <div class="score-detail-row penalty" data-testid="total-penalty">{$_('modal.scoreDetails.penalty')} <span data-testid="total-penalty-value">-{(($modalState.content as any)?.scoreDetails?.totalPenalty ?? $gameState.totalPenalty ?? 0)}</span></div>
-               {/if}
-             </div>
-             <div class="final-score-container" class:compact={isCompactScoreMode}>
-               {#if isCompactScoreMode}
-                 <div class="final-score-compact">
-                   <span class="final-score-label-inline">{$_('modal.scoreDetails.finalScore')}</span>
-                   <span class="final-score-value-inline" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span>
-                 </div>
-               {:else}
-                 <div class="final-score-label">{$_('modal.scoreDetails.finalScore')}</div>
-                 <div class="final-score-value" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</div>
-               {/if}
-             </div>
-           {/if}
-         {/if}
+                  {#if ($modalState.content && typeof $modalState.content === 'object' && 'scoreDetails' in $modalState.content) && !$modalState.component}
+            <!-- Показуємо рахунки гравців для локальної гри -->
+            {#if ($modalState.content as any)?.playerScores && ($modalState.content as any).playerScores.length > 0}
+              <div class="player-scores-container">
+                <h3>Рахунки гравців:</h3>
+                {#each ($modalState.content as any).playerScores as playerScore}
+                  <div class="player-score-row" class:winner={playerScore.isWinner} class:loser={playerScore.isLoser}>
+                    <span class="player-name">
+                      {#if playerScore.isWinner}
+                        <span class="winner-badge">🏆</span>
+                      {:else if playerScore.isLoser}
+                        <span class="loser-badge">🐚</span>
+                      {/if}
+                      {$_('modal.scoreDetails.playerScore', {
+                        values: {
+                          playerName: playerScore.playerName,
+                          score: playerScore.score
+                        }
+                      })}
+                    </span>
+                  </div>
+                {/each}
+              </div>
+            {:else}
+              <!-- Показуємо деталі рахунку тільки для гри проти комп'ютера -->
+              <div class="score-details-container" data-testid="score-details-container">
+                <div class="score-detail-row" data-testid="base-score">{$_('modal.scoreDetails.baseScore')} <span data-testid="base-score-value">{($modalState.content as any)?.scoreDetails?.baseScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span></div>
+                {#if ($modalState.content as any)?.scoreDetails?.sizeBonus > 0}
+                  <div class="score-detail-row" data-testid="size-bonus">{$_('modal.scoreDetails.sizeBonus')} <span data-testid="size-bonus-value">+{($modalState.content as any)?.scoreDetails?.sizeBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.blockModeBonus > 0}
+                  <div class="score-detail-row" data-testid="block-mode-bonus">{$_('modal.scoreDetails.blockModeBonus')} <span data-testid="block-mode-bonus-value">+{($modalState.content as any)?.scoreDetails?.blockModeBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.jumpBonus > 0}
+                  <div class="score-detail-row" data-testid="jump-bonus">{$_('modal.scoreDetails.jumpBonus')} <span data-testid="jump-bonus-value">+{($modalState.content as any)?.scoreDetails?.jumpBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.noMovesBonus > 0}
+                  <div class="score-detail-row" data-testid="no-moves-bonus">{$_('modal.scoreDetails.noMovesBonus')} <span data-testid="no-moves-bonus-value">+{($modalState.content as any)?.scoreDetails?.noMovesBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.distanceBonus > 0}
+                  <div class="score-detail-row" data-testid="distance-bonus">{$_('modal.scoreDetails.distanceBonus')} <span data-testid="distance-bonus-value">+{($modalState.content as any)?.scoreDetails?.distanceBonus}</span></div>
+                {/if}
+                {#if ($modalState.titleKey === 'modal.gameOverTitle' && ($modalState.content as any)?.scoreDetails?.finishBonus > 0)}
+                  <div class="score-detail-row" data-testid="finish-bonus">{$_('modal.scoreDetails.finishBonus')} <span data-testid="finish-bonus-value">+{($modalState.content as any)?.scoreDetails?.finishBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.totalPenalty > 0}
+                  <div class="score-detail-row penalty" data-testid="total-penalty">{$_('modal.scoreDetails.penalty')} <span data-testid="total-penalty-value">-{(($modalState.content as any)?.scoreDetails?.totalPenalty)}</span></div>
+                {/if}
+              </div>
+              <div class="final-score-container" class:compact={isCompactScoreMode}>
+                {#if isCompactScoreMode}
+                  <div class="final-score-compact">
+                    <span class="final-score-label-inline">{$_('modal.scoreDetails.finalScore')}</span>
+                    <span class="final-score-value-inline" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span>
+                  </div>
+                {:else}
+                  <div class="final-score-label">{$_('modal.scoreDetails.finalScore')}</div>
+                  <div class="final-score-value" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</div>
+                {/if}
+              </div>
+            {/if}
+          {/if}
       </div>
       <div class="modal-action-buttons">
         {#each $modalState.buttons as btn, i (i)}

@@ -4,6 +4,15 @@
   import LocalGameSettings from '$lib/components/local-setup/LocalGameSettings.svelte';
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
   import { _ } from 'svelte-i18n';
+  import { onMount } from 'svelte';
+  import { gameState } from '$lib/stores/gameState.js';
+  import { get } from 'svelte/store';
+
+  onMount(() => {
+    if (!get(gameState)) {
+      gameState.reset();
+    }
+  });
 </script>
 
 <DevClearCacheButton />

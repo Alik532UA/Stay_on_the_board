@@ -94,6 +94,7 @@
   }
 </style>
 
+{#if $gameState}
 <div class="game-controls-panel" data-testid="controls-panel">
   <div class="select-direction-label">{$_('gameControls.selectDirectionAndDistance')}</div>
   <DirectionControls
@@ -116,4 +117,5 @@
     on:confirm={handleConfirm}
     on:noMoves={handleNoMoves}
   />
-</div> 
+</div>
+{/if}

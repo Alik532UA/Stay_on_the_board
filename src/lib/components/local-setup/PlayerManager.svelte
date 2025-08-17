@@ -11,20 +11,23 @@
     logService.action('Click: "Почати гру" (PlayerManager)');
     const state = get(gameState);
     
-    // Ініціалізуємо стан гри з поточними гравцями та налаштуваннями
-    gameState.reset({
-      size: state.settings.boardSize,
-      players: state.players,
-    });
+    if (state) {
+      // Ініціалізуємо стан гри з поточними гравцями та налаштуваннями
+      gameState.reset({
+        size: state.settings.boardSize,
+        players: state.players,
+      });
 
-    // Робимо знімок початкових (нульових) рахунків перед стартом
-    gameState.snapshotScores();
+      // Робимо знімок початкових (нульових) рахунків перед стартом
+      gameState.snapshotScores();
 
-    // Переходимо на сторінку локальної гри
-    navigationService.goTo('/game/local');
+      // Переходимо на сторінку локальної гри
+      navigationService.goTo('/game/local');
+    }
   }
 </script>
 
+{#if $gameState}
 <div class="player-manager-card">
   <h2 data-testid="player-manager-title">{$_('localGame.playerManagerTitle')}</h2>
 
@@ -48,7 +51,7 @@
           type="text"
           class="player-name-input"
           placeholder="Ім'я гравця"
-          bind:value={player.name}
+          value={player.name}
           on:input={(e) => gameState.updatePlayer(player.id, { name: e.currentTarget.value })}
           data-testid="player-name-input-{player.id}"
         />
@@ -85,6 +88,7 @@
     </button>
   </div>
 </div>
+{/if}
 
 <style>
   .player-manager-card {
