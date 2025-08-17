@@ -256,7 +256,7 @@
       <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="vs-computer-btn">{$_('mainMenu.playVsComputer')}</button>
       <button class="modal-button secondary" onclick={handleLocalGame} data-testid="local-game-btn">{$_('mainMenu.localGame')}</button>
       <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice} data-testid="online-game-btn">{$_('mainMenu.playOnline')}</button>
-      <!-- <button class="modal-button secondary" on:click={() => navigateTo('/settings')} data-testid="settings-btn">{$_('mainMenu.settings')}</button> -->
+      <button class="modal-button secondary" onclick={() => navigateTo('/settings')} data-testid="settings-btn">{$_('mainMenu.settings')}</button>
       <button class="modal-button secondary" onclick={handleControls} data-testid="controls-btn">{$_('mainMenu.controls')}</button>
       <button class="modal-button secondary" onclick={handleRules} data-testid="rules-btn">{$_('mainMenu.rules')}</button>
       <button class="modal-button secondary" onclick={handleSupporters} data-testid="supporters-btn">{$_('mainMenu.supporters')}</button>
