@@ -70,6 +70,11 @@ export const gameModeService = {
     return activeGameMode.claimNoMoves();
   },
 
+  async continueAfterNoMoves(): Promise<SideEffect[]> {
+    const activeGameMode = this._ensureGameMode();
+    return activeGameMode.continueAfterNoMoves();
+  },
+
   _determineGameType(): string {
     if (!browser) {
       return 'vs-computer'; // Default for SSR context

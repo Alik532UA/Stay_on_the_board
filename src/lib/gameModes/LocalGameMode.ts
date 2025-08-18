@@ -13,6 +13,7 @@ import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { logService } from '$lib/services/logService';
 import { lastPlayerMove } from '$lib/stores/derivedState';
+import { animationStore } from '$lib/stores/animationStore';
 
 export class LocalGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
@@ -80,8 +81,9 @@ export class LocalGameMode extends BaseGameMode {
     ];
   }
 
-  private async _continueLocalGameAfterNoMoves(): Promise<SideEffect[]> {
+  async continueAfterNoMoves(): Promise<SideEffect[]> {
     gameState.update(state => ({...state, cellVisitCounts: {}}));
+    animationStore.reset();
     this.advanceToNextPlayer();
     return [{ type: 'ui/closeModal' }];
   }

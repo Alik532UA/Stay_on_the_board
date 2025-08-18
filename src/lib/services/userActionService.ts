@@ -94,43 +94,8 @@ export const userActionService = {
   },
 
   async continueAfterNoMoves(): Promise<void> {
-    const state = get(gameState);
-    const settings = get(settingsStore);
-    const bonus = state.boardSize;
-
-    const continueChanges = {
-      noMovesBonus: state.noMovesBonus + bonus,
-      cellVisitCounts: {},
-      moveHistory: [{ 
-        pos: { row: state.playerRow, col: state.playerCol }, 
-        blocked: [] as {row: number, col: number}[], 
-        visits: {},
-        blockModeEnabled: settings.blockModeEnabled
-      }],
-      moveQueue: [] as any[],
-      availableMoves: getAvailableMoves(
-        state.playerRow,
-        state.playerCol,
-        state.boardSize,
-        {},
-        settings.blockOnVisitCount,
-        state.board,
-        settings.blockModeEnabled,
-        null
-      ),
-      noMovesClaimed: false,
-      isComputerMoveInProgress: false,
-      wasResumed: true,
-      isGameOver: false,
-      gameOverReasonKey: null as string | null,
-      gameOverReasonValues: null as Record<string, any> | null
-    };
-
-    gameState.update(state => ({...state, ...continueChanges}));
-    
-    gameOverStore.resetGameOverState();
-    animationStore.reset();
-    this.executeSideEffects([{ type: 'ui/closeModal' }]);
+    const sideEffects = await gameModeService.continueAfterNoMoves();
+    this.executeSideEffects(sideEffects);
   },
 
   async handleModalAction(action: string, payload?: any): Promise<void> {
