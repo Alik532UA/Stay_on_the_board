@@ -20,10 +20,7 @@ test.describe('Модальне вікно "Блискучий аналіз"', (
 
     await makeMove(page, 'down', 1);
 
-    // await page.waitForTimeout(17000);
-
     // Натискаємо на кнопку "Ходів немає"
-    await page.waitForTimeout(5000);
     await page.getByTestId('no-moves-btn').click();
     
     // Перевіряємо, що модальне вікно з'явилося

@@ -18,6 +18,7 @@ export abstract class BaseGameMode implements IGameMode {
   abstract claimNoMoves(): Promise<SideEffect[]>;
   abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]>;
   abstract getPlayersConfiguration(): Player[];
+  abstract continueAfterNoMoves(): Promise<SideEffect[]>;
   protected abstract advanceToNextPlayer(): Promise<SideEffect[]>;
   protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
 

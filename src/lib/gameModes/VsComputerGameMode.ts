@@ -15,6 +15,7 @@ import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { getAvailableMoves } from '$lib/utils/boardUtils';
 import { logService } from '$lib/services/logService';
 import { calculateFinalScore } from '$lib/services/scoreService';
+import { animationStore } from '$lib/stores/animationStore';
 
 export class VsComputerGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
@@ -118,6 +119,49 @@ export class VsComputerGameMode extends BaseGameMode {
     // У режимі гри з комп'ютером, всі очки (бонуси та штрафи) додаються до загального рахунку,
     // а не до конкретного гравця. `performMove` вже оновив загальний стан,
     // тому тут нічого робити не потрібно.
+  }
+
+  async continueAfterNoMoves(): Promise<SideEffect[]> {
+    const state = get(gameState);
+    const settings = get(settingsStore);
+    const bonus = state.boardSize;
+
+    const continueChanges = {
+      noMovesBonus: state.noMovesBonus + bonus,
+      cellVisitCounts: {},
+      moveHistory: [{
+        pos: { row: state.playerRow, col: state.playerCol },
+        blocked: [] as {row: number, col: number}[],
+        visits: {},
+        blockModeEnabled: settings.blockModeEnabled
+      }],
+      moveQueue: [] as any[],
+      availableMoves: getAvailableMoves(
+        state.playerRow,
+        state.playerCol,
+        state.boardSize,
+        {},
+        settings.blockOnVisitCount,
+        state.board,
+        settings.blockModeEnabled,
+        null
+      ),
+      noMovesClaimed: false,
+      isComputerMoveInProgress: false,
+      wasResumed: true,
+      isGameOver: false,
+      gameOverReasonKey: null as string | null,
+      gameOverReasonValues: null as Record<string, any> | null
+    };
+
+    gameState.update(state => ({...state, ...continueChanges}));
+    
+    gameOverStore.resetGameOverState();
+    animationStore.reset();
+    
+    const nextPlayerEffects = await this.advanceToNextPlayer();
+    
+    return [{ type: 'ui/closeModal' }, ...nextPlayerEffects];
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]> {
