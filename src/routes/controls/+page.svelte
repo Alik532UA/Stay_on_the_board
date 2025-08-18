@@ -98,6 +98,19 @@
       window.removeEventListener('keydown', handleKeydown);
     };
   });
+  /** @param {string} code */
+  function formatKeyCode(code) {
+    if (!code) return 'N/A';
+    return code
+      .replace(/^Key/, '')
+      .replace(/^Digit/, '')
+      .replace(/^Numpad/, 'NumPad ')
+      .replace('Decimal', '.')
+      .replace('Multiply', '*')
+      .replace('Divide', '/')
+      .replace('Add', '+')
+      .replace('Subtract', '-');
+  }
 </script>
 
 <div class="controls-container">
@@ -123,7 +136,7 @@
                 >
                   {listeningFor?.action === action && listeningFor?.index === i
                     ? $_('controlsPage.pressKey')
-                    : (key ? key.replace(/^Key|^Digit/, '') : 'N/A')}
+                    : formatKeyCode(key)}
                 </button>
                 <button class="remove-key-btn" use:customTooltip={$_('controlsPage.removeKey')} on:click={() => removeKey(/** @type {import('$lib/stores/settingsStore').KeybindingAction} */(action), i)}>×</button>
               </div>

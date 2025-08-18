@@ -31,7 +31,7 @@ export const navigationService = {
   goToMainMenu() {
     try {
       logService.ui('NavigationService: Going to main menu');
-      modalStore.closeAllModals();
+      modalStore.closeModal();
       this.goTo('/');
     } catch (error) {
       logService.ui('NavigationService: Error going to main menu', error);

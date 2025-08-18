@@ -8,59 +8,12 @@ import { logService } from '../services/logService.js';
 
 export type KeybindingAction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right'|'confirm'|'no-moves'|'toggle-block-mode'|'toggle-board'|'increase-board'|'decrease-board'|'toggle-speech'|'distance-1'|'distance-2'|'distance-3'|'distance-4'|'distance-5'|'distance-6'|'distance-7'|'distance-8';
 
-export interface SettingsState {
-  showMoves: boolean;
-  showBoard: boolean;
-  language: string;
-  theme: string;
-  style: string;
-  speechEnabled: boolean;
-  selectedVoiceURI: string | null;
-  blockModeEnabled: boolean;
-  showPiece: boolean;
-  blockOnVisitCount: number;
-  keybindings: Record<KeybindingAction, string[]>;
-  keyConflictResolution: Record<string, KeybindingAction>;
-  autoHideBoard: boolean;
-  gameMode: 'beginner' | 'experienced' | 'pro' | null;
-  showGameModeModal: boolean;
-  showDifficultyWarningModal: boolean;
-  showGameInfoWidget: 'hidden' | 'shown' | 'compact';
-  lockSettings: boolean;
-  testMode: boolean;
-}
-
 const isBrowser = typeof window !== 'undefined';
 const defaultStyle = import.meta.env.DEV ? 'gray' : 'purple';
+const SETTINGS_VERSION = 2;
 
-/** @type {Record<KeybindingAction, string[]>} */
-export const defaultKeybindings = {
-  'up-left': ['KeyQ', 'Numpad7'],
-  'up': ['KeyW', 'Numpad8'],
-  'up-right': ['KeyE', 'Numpad9'],
-  'left': ['KeyA', 'Numpad4'],
-  'right': ['KeyD', 'Numpad6'],
-  'down-left': ['KeyZ', 'Numpad1'],
-  'down': ['KeyS', 'KeyX', 'Numpad2'],
-  'down-right': ['KeyC', 'Numpad3'],
-  'confirm': ['NumpadEnter', 'Enter', 'Space', 'Numpad5', 'KeyS'],
-  'no-moves': ['NumpadDecimal', 'Backspace', 'KeyN'],
-  'toggle-block-mode': ['NumpadMultiply'],
-  'toggle-board': ['NumpadDivide'],
-  'increase-board': ['NumpadAdd', 'Equal'],
-  'decrease-board': ['NumpadSubtract', 'Minus'],
-  'toggle-speech': ['KeyV'],
-  'distance-1': ['Digit1'],
-  'distance-2': ['Digit2'],
-  'distance-3': ['Digit3'],
-  'distance-4': ['Digit4'],
-  'distance-5': ['Digit5'],
-  'distance-6': ['Digit6'],
-  'distance-7': ['Digit7'],
-  'distance-8': ['Digit8'],
-};
-
-const defaultSettings: SettingsState = {
+const defaultSettings: any = {
+  version: SETTINGS_VERSION,
   showMoves: true,
   showBoard: true,
   language: 'uk',
@@ -72,7 +25,31 @@ const defaultSettings: SettingsState = {
   showPiece: true,
   blockOnVisitCount: 0,
   autoHideBoard: false,
-  keybindings: defaultKeybindings,
+  keybindings: {
+    'up-left': ['Numpad7', 'KeyQ'],
+    'up': ['Numpad8', 'KeyW'],
+    'up-right': ['Numpad9', 'KeyE'],
+    'left': ['Numpad4', 'KeyA'],
+    'right': ['Numpad6', 'KeyD'],
+    'down-left': ['Numpad1', 'KeyZ'],
+    'down': ['Numpad2', 'KeyX'],
+    'down-right': ['Numpad3', 'KeyC'],
+    'confirm': ['Numpad5', 'Enter', 'Space'],
+    'no-moves': ['NumpadDecimal', 'Backspace'],
+    'distance-1': ['Digit1'],
+    'distance-2': ['Digit2'],
+    'distance-3': ['Digit3'],
+    'distance-4': ['Digit4'],
+    'distance-5': ['Digit5'],
+    'distance-6': ['Digit6'],
+    'distance-7': ['Digit7'],
+    'distance-8': ['Digit8'],
+    'toggle-block-mode': ['NumpadMultiply', 'KeyB'],
+    'toggle-board': ['NumpadDivide', 'KeyH'],
+    'increase-board': ['NumpadAdd', 'Equal'],
+    'decrease-board': ['NumpadSubtract', 'Minus'],
+    'toggle-speech': ['KeyS'],
+  },
   keyConflictResolution: {},
   gameMode: null,
   showGameModeModal: true,
@@ -108,45 +85,129 @@ const convertStyle = (style: string | null): string | null => {
   return conversions[style] || style;
 };
 
-function loadSettings(): SettingsState {
+function loadSettings(): any {
   if (!isBrowser) return defaultSettings;
-  
+
   try {
-    const storedKeybindingsRaw = localStorage.getItem('keybindings');
-    let storedKeybindings = safeJsonParse<Record<string, string[]>>(storedKeybindingsRaw, {});
-    Object.keys(storedKeybindings).forEach(action => {
-      const key = action as keyof typeof storedKeybindings;
-      if (typeof storedKeybindings[key] === 'string') {
+    const storedSettingsRaw = localStorage.getItem('settings');
+    const storedSettings: { version?: number; keybindings?: Record<string, string[]> } = safeJsonParse(storedSettingsRaw, {});
+    const settingsVersion = storedSettings.version || 0;
+
+    let mergedSettings = { ...defaultSettings, ...storedSettings };
+
+    if (settingsVersion < SETTINGS_VERSION) {
+      const defaultKeybindings = defaultSettings.keybindings;
+      const storedKeybindings = storedSettings.keybindings || {};
+      
+      const mergedKeybindings = { ...defaultKeybindings };
+
+      for (const action in defaultKeybindings) {
+        if (storedKeybindings[action]) {
+          const uniqueKeys = [...new Set([...defaultKeybindings[action], ...storedKeybindings[action]])];
+          mergedKeybindings[action] = uniqueKeys;
+        }
+      }
+       for (const action in storedKeybindings) {
+        if (!mergedKeybindings[action]) {
+          mergedKeybindings[action] = storedKeybindings[action];
+        }
+      }
+
+      mergedSettings.keybindings = mergedKeybindings;
+      mergedSettings.version = SETTINGS_VERSION;
+    }
+    
+    const legacyKeybindingsRaw = localStorage.getItem('keybindings');
+    if (legacyKeybindingsRaw) {
+        const legacyKeybindings: Record<string, string[]> = safeJsonParse(legacyKeybindingsRaw, {});
+        for (const action in legacyKeybindings) {
+            if (mergedSettings.keybindings[action]) {
+                const uniqueKeys = [...new Set([...mergedSettings.keybindings[action], ...legacyKeybindings[action]])];
+                mergedSettings.keybindings[action] = uniqueKeys;
+            } else {
+                mergedSettings.keybindings[action] = legacyKeybindings[action];
+            }
+        }
+        localStorage.removeItem('keybindings');
+    }
+
+    // Ensure all keybindings are arrays
+    Object.keys(mergedSettings.keybindings).forEach(action => {
+      const key = action as keyof typeof mergedSettings.keybindings;
+      if (typeof mergedSettings.keybindings[key] === 'string') {
         // @ts-ignore
-        storedKeybindings[key] = [storedKeybindings[key]];
+        mergedSettings.keybindings[key] = [mergedSettings.keybindings[key]];
       }
     });
-  const loadedSettings = {
-    showMoves: localStorage.getItem('showMoves') !== 'false',
-    showBoard: localStorage.getItem('showBoard') !== 'false',
-    language: localStorage.getItem('lang') || defaultSettings.language,
-    theme: localStorage.getItem('theme') || defaultSettings.theme,
-    style: convertStyle(localStorage.getItem('style')) || defaultSettings.style,
-    speechEnabled: localStorage.getItem('speechEnabled') === 'true',
-    selectedVoiceURI: localStorage.getItem('selectedVoiceURI') || null,
-    blockModeEnabled: localStorage.getItem('blockModeEnabled') === 'true',
-    showPiece: localStorage.getItem('showPiece') !== 'false',
-    blockOnVisitCount: Number(localStorage.getItem('blockOnVisitCount')) || 0,
-    autoHideBoard: localStorage.getItem('autoHideBoard') === 'true',
-    keybindings: { ...defaultKeybindings, ...storedKeybindings },
-    keyConflictResolution: safeJsonParse(localStorage.getItem('keyConflictResolution'), {}),
-    gameMode: localStorage.getItem('gameMode') as 'beginner' | 'experienced' | 'pro' | null,
-    showGameModeModal: localStorage.getItem('showGameModeModal') !== 'false',
-    showDifficultyWarningModal: localStorage.getItem('showDifficultyWarningModal') !== 'false',
-    showGameInfoWidget: (localStorage.getItem('showGameInfoWidget') as 'hidden' | 'shown' | 'compact') || 'shown',
-    lockSettings: localStorage.getItem('lockSettings') === 'true',
-    testMode: localStorage.getItem('testMode') === 'true',
-  };
-  const gameMode = loadedSettings.gameMode;
-  return {
-      ...loadedSettings,
-      gameMode: gameMode === 'beginner' || gameMode === 'experienced' || gameMode === 'pro' ? gameMode : null
-  };
+
+    const gameMode = mergedSettings.gameMode;
+    mergedSettings.gameMode = ['beginner', 'experienced', 'pro'].includes(gameMode) ? gameMode : null;
+    
+    // Migrate individual settings from localStorage to the new 'settings' object
+    const individualSettingsMap = {
+      showMoves: 'showMoves',
+      showBoard: 'showBoard',
+      lang: 'language',
+      theme: 'theme',
+      style: 'style',
+      speechEnabled: 'speechEnabled',
+      selectedVoiceURI: 'selectedVoiceURI',
+      blockModeEnabled: 'blockModeEnabled',
+      showPiece: 'showPiece',
+      blockOnVisitCount: 'blockOnVisitCount',
+      autoHideBoard: 'autoHideBoard',
+      keyConflictResolution: 'keyConflictResolution',
+      gameMode: 'gameMode',
+      showGameModeModal: 'showGameModeModal',
+      showDifficultyWarningModal: 'showDifficultyWarningModal',
+      showGameInfoWidget: 'showGameInfoWidget',
+      lockSettings: 'lockSettings',
+      testMode: 'testMode'
+    };
+
+    let hasMigrated = false;
+    for (const [storageKey, settingsKey] of Object.entries(individualSettingsMap)) {
+      const storedValue = localStorage.getItem(storageKey);
+      if (storedValue !== null) {
+        hasMigrated = true;
+        switch (settingsKey) {
+          case 'showMoves':
+          case 'showBoard':
+          case 'speechEnabled':
+          case 'blockModeEnabled':
+          case 'showPiece':
+          case 'autoHideBoard':
+          case 'showGameModeModal':
+          case 'showDifficultyWarningModal':
+          case 'lockSettings':
+          case 'testMode':
+            // @ts-ignore
+            mergedSettings[settingsKey] = storedValue === 'true';
+            break;
+          case 'blockOnVisitCount':
+            // @ts-ignore
+            mergedSettings[settingsKey] = Number(storedValue);
+            break;
+          case 'style':
+            mergedSettings.style = convertStyle(storedValue) || defaultSettings.style;
+            break;
+          case 'keyConflictResolution':
+            mergedSettings.keyConflictResolution = safeJsonParse(storedValue, {});
+            break;
+          default:
+            // @ts-ignore
+            mergedSettings[settingsKey] = storedValue;
+        }
+        localStorage.removeItem(storageKey);
+      }
+    }
+
+    if (hasMigrated) {
+      localStorage.setItem('settings', JSON.stringify(mergedSettings));
+    }
+
+    return mergedSettings;
+
   } catch (error) {
     logService.init('Помилка завантаження налаштувань:', error);
     return defaultSettings;
@@ -154,7 +215,7 @@ function loadSettings(): SettingsState {
 }
 
 function createSettingsStore() {
-  const { subscribe, set, update } = writable<SettingsState>(loadSettings());
+  const { subscribe, set, update } = writable<any>(loadSettings());
 
   const methods = {
     init: () => {
@@ -173,26 +234,17 @@ function createSettingsStore() {
         set(defaultSettings);
       }
     },
-    updateSettings: (newSettings: Partial<SettingsState>) => {
-      update((state: SettingsState) => {
+    updateSettings: (newSettings: Partial<any>) => {
+      update((state: any) => {
         const merged = { ...state, ...newSettings };
         if (isBrowser) {
-          Object.entries(newSettings).forEach(([key, value]) => {
-            const storageKey = key === 'language' ? 'lang' : key;
-            if (typeof value === 'object' && value !== null) {
-              localStorage.setItem(storageKey, JSON.stringify(value));
-            } else if (value !== null && value !== undefined) {
-              localStorage.setItem(storageKey, String(value));
-            } else {
-              localStorage.removeItem(storageKey);
-            }
-          });
+          localStorage.setItem('settings', JSON.stringify(merged));
         }
         return merged;
       });
     },
     setVisibilityLevel: (level: number) => {
-      let newSettings: Partial<SettingsState> = {};
+      let newSettings: Partial<any> = {};
       switch (level) {
         case 1: newSettings = { showBoard: false, showPiece: false, showMoves: false }; break;
         case 2: newSettings = { showBoard: true, showPiece: false, showMoves: false }; break;
@@ -203,12 +255,13 @@ function createSettingsStore() {
     },
     resetSettings: () => {
       if (isBrowser) {
-        Object.keys(defaultSettings).forEach(key => localStorage.removeItem(key));
-        localStorage.setItem('keybindings', JSON.stringify(defaultKeybindings));
+        localStorage.removeItem('settings');
       }
-      set({ ...defaultSettings });
+      set(defaultSettings);
     },
-    resetKeybindings: () => methods.updateSettings({ keybindings: defaultKeybindings }),
+    resetKeybindings: () => {
+      methods.updateSettings({ keybindings: defaultSettings.keybindings });
+    },
     /**
      * @param {string} key
      * @param {KeybindingAction} action
@@ -218,7 +271,7 @@ function createSettingsStore() {
      * @param {KeybindingAction} action
      */
     resolveKeyConflict: (key: string, action: KeybindingAction) => {
-      update((state: SettingsState) => {
+      update((state: any) => {
         const newResolution = { ...state.keyConflictResolution, [key]: action };
         if (isBrowser) {
           localStorage.setItem('keyConflictResolution', JSON.stringify(newResolution));
@@ -227,7 +280,7 @@ function createSettingsStore() {
       });
     },
     toggleShowBoard: (forceState: boolean | undefined) => {
-      update((state: SettingsState) => {
+      update((state: any) => {
         const newState = typeof forceState === 'boolean' ? forceState : !state.showBoard;
         const newSettings = { ...state, showBoard: newState };
         if (isBrowser) {
@@ -267,13 +320,13 @@ function createSettingsStore() {
       });
     },
     setGameInfoWidgetState: (newState: 'hidden' | 'shown' | 'compact') => {
-      update((state: SettingsState) => {
+      update((state: any) => {
         if (isBrowser) localStorage.setItem('showGameInfoWidget', newState);
         return { ...state, showGameInfoWidget: newState };
       });
     },
     toggleBlockMode: () => {
-      update((state: SettingsState) => {
+      update((state: any) => {
         const newState = !state.blockModeEnabled;
         if (isBrowser) localStorage.setItem('blockModeEnabled', String(newState));
         if (newState) {
@@ -327,7 +380,7 @@ function createSettingsStore() {
      * @returns {boolean}
      */
     applyGameModePreset: (mode: 'beginner' | 'experienced' | 'pro', modal = modalStore) => {
-      let settingsToApply: Partial<SettingsState> = {};
+      let settingsToApply: Partial<any> = {};
       let showFaq = false;
       switch (mode) {
         case 'beginner':

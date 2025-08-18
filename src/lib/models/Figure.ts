@@ -14,21 +14,6 @@ export const MoveDirection = {
 
 export type MoveDirectionType = typeof MoveDirection[keyof typeof MoveDirection];
 
-export interface Position {
-  row: number;
-  col: number;
-}
-
-export interface MoveResult {
-  success: boolean;
-  newPosition?: Position;
-  error?: string;
-}
-
-export interface AvailableMove {
-  direction: MoveDirectionType;
-  distance: number;
-}
 
 /**
  * Клас фігури, що представляє гравця на дошці
@@ -47,7 +32,7 @@ export class Figure {
   /**
    * Отримати поточну позицію
    */
-  getPosition(): Position {
+  getPosition(): any {
     return { row: this.row, col: this.col };
   }
 
@@ -74,7 +59,7 @@ export class Figure {
   /**
    * Обчислити нову позицію на основі напрямку та відстані
    */
-  calculateNewPosition(direction: MoveDirectionType, distance: number): Position {
+  calculateNewPosition(direction: MoveDirectionType, distance: number): any {
     const newRow = this.row;
     const newCol = this.col;
 
@@ -103,7 +88,7 @@ export class Figure {
   /**
    * Виконати рух у вказаному напрямку на вказану відстань
    */
-  move(direction: MoveDirectionType, distance: number): MoveResult {
+  move(direction: MoveDirectionType, distance: number): any {
     const newPosition = this.calculateNewPosition(direction, distance);
     
     if (this.isValidPosition(newPosition.row, newPosition.col)) {
@@ -126,8 +111,8 @@ export class Figure {
   /**
    * Отримати список доступних ходів
    */
-  getAvailableMoves(): AvailableMove[] {
-    const moves: AvailableMove[] = [];
+  getAvailableMoves(): any[] {
+    const moves: any[] = [];
     const directions = Object.values(MoveDirection);
     
     for (const direction of directions) {

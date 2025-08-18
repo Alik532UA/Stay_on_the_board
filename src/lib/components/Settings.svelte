@@ -94,21 +94,21 @@
   <div class="settings-option">
     <label class="settings-checkbox" use:customTooltip={$_('settings.showMovesHint')} data-testid="settings-page-show-moves-checkbox">
       <input type="checkbox" name="showMoves" checked={settings.showMoves} on:change={onChange} />
-      <span class="checkmark" />
+      <span class="checkmark"></span>
       <span>{$_('settings.showMoves')}</span>
     </label>
   </div>
   <div class="settings-option">
     <label class="settings-checkbox" data-testid="settings-page-show-game-mode-modal-checkbox">
       <input type="checkbox" name="showGameModeModal" checked={settings.showGameModeModal} on:change={onChange} />
-      <span class="checkmark" />
+      <span class="checkmark"></span>
       <span>{$_('settings.showGameModeModal')}</span>
     </label>
   </div>
   <div class="settings-option">
     <label class="settings-checkbox" data-testid="settings-page-show-difficulty-warning-modal-checkbox">
       <input type="checkbox" name="showDifficultyWarningModal" checked={settings.showDifficultyWarningModal} on:change={onChange} />
-      <span class="checkmark" />
+      <span class="checkmark"></span>
       <span>{$_('settings.showDifficultyWarningModal')}</span>
     </label>
   </div>

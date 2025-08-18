@@ -13,7 +13,7 @@
 
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from '../SvgIcons.svelte';
-  import { slide, scale } from 'svelte/transition';
+  import { safeScale } from '$lib/utils/transitions.ts';
   import { quintOut } from 'svelte/easing';
   import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
   import { animationStore } from '$lib/stores/animationStore.js';
@@ -150,19 +150,6 @@
     }
   }
 
-  function scaleAndSlide(node: HTMLElement, params: any) {
-      const slideTrans = slide(node, params);
-      const scaleTrans = scale(node, params);
-
-      return {
-          duration: params.duration,
-          easing: params.easing,
-          css: (t: number, u: number) => `
-              ${slideTrans.css ? slideTrans.css(t, u) : ''}
-              ${scaleTrans.css ? scaleTrans.css(t, u) : ''}
-          `
-      };
-  }
 </script>
 
 {#if $gameState}
@@ -176,7 +163,7 @@
         role="button"
         tabindex="0"
         aria-label="Ігрове поле"
-        transition:scaleAndSlide={{ duration: 600, easing: quintOut }}
+        transition:safeScale={{ duration: 600, easing: quintOut }}
       >
         <div class="game-board" style="--board-size: {$boardSize}" role="grid" data-testid="game-board">
           {#each Array($boardSize) as _, rowIdx (rowIdx)}

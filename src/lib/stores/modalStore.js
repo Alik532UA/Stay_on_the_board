@@ -59,19 +59,23 @@ const modalStack = [];
 export const modalState = { subscribe };
 
 /**
- /**
-  * @param {{ title?: string, titleKey?: string, content?: string|ModalContent|any, contentKey?: string, buttons?: ModalButton[], component?: any, props?: object, closable?: boolean, closeOnOverlayClick?: boolean, dataTestId?: string, titleDataTestId?: string }} param0
-  */
- export function showModal({ title, titleKey, content, contentKey, buttons, component, props = {}, closable = true, closeOnOverlayClick = false, dataTestId, titleDataTestId }) {
-  logService.ui(`[ModalStore] showModal called for '${dataTestId || titleKey}'. Pushing to stack if modal is open.`);
+ * @param {Partial<ModalState>} modalDetails
+ */
+export function showModal(modalDetails) {
   update(currentState => {
     if (currentState.isOpen) {
       modalStack.push(currentState);
-      logService.ui(`[ModalStore] Pushed '${currentState.dataTestId || currentState.titleKey}' to stack. Stack size: ${modalStack.length}`);
     }
-    return { isOpen: true, title, titleKey, content, contentKey, buttons: buttons || [], component, props, closable, closeOnOverlayClick, dataTestId, titleDataTestId };
+    const newState = {
+      ...initialState,
+      ...modalDetails,
+      isOpen: true,
+    };
+    logService.ui(`[ModalStore] showModal called. New modal: '${newState.dataTestId || newState.titleKey}'. Stack size: ${modalStack.length}`);
+    return newState;
   });
- }
+}
+
 export function closeModal() {
   logService.ui(`[ModalStore] closeModal called. Stack size: ${modalStack.length}`);
   if (modalStack.length > 0) {
@@ -86,14 +90,8 @@ export function closeModal() {
   }
 }
 
-export function closeAllModals() {
-  modalStack.length = 0; // Clear the stack
-  set({ ...initialState });
-}
-
 export const modalStore = {
   subscribe,
-  showModal,
   closeModal,
-  closeAllModals
+  showModal,
 };

@@ -17,7 +17,3 @@ export function closeVoiceSettingsModal() {
 export function requestGameModeModal() {
   uiState.update(state => ({ ...state, shouldShowGameModeModalOnLoad: true }));
 }
-
-export function clearGameModeModalRequest() {
-  uiState.update(state => ({ ...state, shouldShowGameModeModalOnLoad: false }));
-} 
