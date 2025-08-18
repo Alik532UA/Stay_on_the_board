@@ -13,6 +13,7 @@ import { sideEffectService, type SideEffect } from './sideEffectService';
 import { replayService } from './replayService';
 import { logService } from './logService.js';
 import { gameState } from '$lib/stores/gameState';
+import ReplayViewer from '$lib/components/ReplayViewer.svelte';
 import * as gameLogicService from '$lib/services/gameLogicService.js';
 import { navigationService } from './navigationService';
 import { settingsStore } from '$lib/stores/settingsStore';
@@ -72,6 +73,18 @@ export const userActionService = {
     this.executeSideEffects(sideEffects);
   },
 
+  async requestReplay(): Promise<void> {
+    const { moveHistory, boardSize } = get(gameState);
+    modalStore.showModal({
+      component: ReplayViewer,
+      props: {
+        moveHistory,
+        boardSize,
+      },
+      titleKey: 'replay.title',
+      buttons: [{ textKey: 'modal.close', onClick: () => modalStore.closeModal() }],
+    });
+  },
 
   async finishWithBonus(reasonKey: string): Promise<void> {
     logService.logic('[userActionService] finishWithBonus called with reason:', reasonKey);
@@ -124,6 +137,9 @@ export const userActionService = {
     let sideEffects: SideEffect[] = [];
     switch (action) {
       case 'restartGame':
+        await this.requestRestart();
+        break;
+      case 'playAgain':
         await this.requestRestart();
         break;
       case 'requestReplay':

@@ -1,47 +1,66 @@
-import { get, type Writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 
-export const replayAutoPlayStore = (() => {
-  let autoPlayInterval: ReturnType<typeof setInterval> | null = null;
+const { subscribe, update } = writable({
+  direction: 'paused' as 'paused' | 'forward' | 'backward',
+  intervalId: null as ReturnType<typeof setInterval> | null,
+});
 
-  function toggleAutoPlay(
+function stepForward() {
+  // Логіка буде реалізована в ReplayViewer
+}
+
+function stepBackward() {
+  // Логіка буде реалізована в ReplayViewer
+}
+
+function togglePlayPause() {
+  // Логіка буде реалізована в ReplayViewer
+}
+
+export const replayAutoPlayStore = {
+  subscribe,
+  stepForward,
+  stepBackward,
+  togglePlayPause,
+  // Залишаємо toggleAutoPlay для сумісності з ReplayViewer
+  toggleAutoPlay: (
     direction: 'forward' | 'backward',
-    replayState: Writable<any>,
+    replayState: import('svelte/store').Writable<{
+      replayCurrentStep: number;
+      moveHistory: any[];
+      autoPlayDirection: 'paused' | 'forward' | 'backward';
+    }>,
     goToStep: (step: number) => void
-  ) {
-    if (autoPlayInterval) {
-      clearInterval(autoPlayInterval);
-      autoPlayInterval = null;
-    }
-
-    const currentState = get(replayState);
-    const currentDirection = currentState.autoPlayDirection;
-
-    if (currentDirection === direction && currentDirection !== 'paused') {
-      replayState.update((s: any) => ({ ...s, autoPlayDirection: 'paused' }));
-      return;
-    }
-
-    if (direction === 'forward' && currentState.replayCurrentStep >= currentState.moveHistory.length - 1) {
-      goToStep(0);
-    }
-
-    replayState.update((s: any) => ({ ...s, autoPlayDirection: direction }));
-
-    autoPlayInterval = setInterval(() => {
-      const s = get(replayState); // <-- Ключове виправлення: отримуємо актуальний стан
-      const nextStep = s.replayCurrentStep + (direction === 'forward' ? 1 : -1);
-
-      if (nextStep >= 0 && nextStep < s.moveHistory.length) {
-        goToStep(nextStep);
-      } else {
-        if (autoPlayInterval) clearInterval(autoPlayInterval);
-        autoPlayInterval = null;
-        replayState.update((st: any) => ({ ...st, autoPlayDirection: 'paused' }));
+  ) => {
+    update(store => {
+      if (store.intervalId) {
+        clearInterval(store.intervalId);
       }
-    }, 1000);
-  }
 
-  return {
-    toggleAutoPlay
-  };
-})(); 
+      const currentState = get(replayState);
+      if (store.direction === direction) {
+        replayState.update((s: any) => ({ ...s, autoPlayDirection: 'paused' }));
+        return { direction: 'paused', intervalId: null };
+      }
+
+      if (direction === 'forward' && currentState.replayCurrentStep >= currentState.moveHistory.length - 1) {
+        goToStep(0);
+      }
+      
+      const newIntervalId = setInterval(() => {
+        const s = get(replayState);
+        const nextStep = s.replayCurrentStep + (direction === 'forward' ? 1 : -1);
+
+        if (nextStep >= 0 && nextStep < s.moveHistory.length) {
+          goToStep(nextStep);
+        } else {
+          if (newIntervalId) clearInterval(newIntervalId);
+          replayState.update((st: any) => ({ ...st, autoPlayDirection: 'paused' }));
+        }
+      }, 1000);
+
+      replayState.update((s: any) => ({ ...s, autoPlayDirection: direction }));
+      return { direction, intervalId: newIntervalId };
+    });
+  }
+};

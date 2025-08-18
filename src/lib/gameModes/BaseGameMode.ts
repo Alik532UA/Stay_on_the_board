@@ -45,7 +45,12 @@ export abstract class BaseGameMode implements IGameMode {
 
     playerInputStore.set(initialState);
 
-    return this.advanceToNextPlayer();
+    const nextPlayerEffects = await this.advanceToNextPlayer();
+    
+    // Перевіряємо, чи є у moveResult побічні ефекти (наприклад, модальне вікно)
+    const moveResultEffects = moveResult.sideEffects || [];
+
+    return [...moveResultEffects, ...nextPlayerEffects];
   }
 
   protected async onPlayerMoveFailure(reason: string | undefined, direction: MoveDirectionType, distance: number): Promise<SideEffect[]> {

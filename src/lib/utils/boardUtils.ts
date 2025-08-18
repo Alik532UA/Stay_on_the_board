@@ -1,5 +1,6 @@
 // src/lib/utils/boardUtils.ts
 
+import { logService } from '$lib/services/logService';
 import type { Direction, Move } from '$lib/utils/gameUtils';
 
 /**
@@ -44,8 +45,18 @@ export function getAvailableMoves(
   blockModeEnabled: boolean, // <-- Новий параметр
   lastPlayerMove: { direction: string, distance: number } | null
 ): Move[] {
-  if (row === null || col === null) return [];
-  
+  if (row === null || col === null) {
+    logService.logic('getAvailableMoves: Початкові координати не задані, ходів немає.');
+    return [];
+  }
+
+  logService.logic(`getAvailableMoves: Початок розрахунку для позиції (${row}, ${col})`, {
+    size,
+    cellVisitCounts,
+    blockModeEnabled,
+    blockOnVisitCount
+  });
+
   const moves: Move[] = [];
   const directions: { dr: number; dc: number; direction: Direction }[] = [
     { dr: -1, dc: 0, direction: 'up' },
@@ -68,18 +79,26 @@ export function getAvailableMoves(
       const nr = row + dr * dist;
       const nc = col + dc * dist;
       if (nr < 0 || nc < 0 || nr >= size || nc >= size) {
+        logService.logic(`  [${direction}]: Вихід за межі дошки на відстані ${dist}.`);
         break;
       }
-      // Використовуємо isCellBlocked з урахуванням blockModeEnabled
-      if (!isCellBlocked(nr, nc, cellVisitCounts, { blockModeEnabled, blockOnVisitCount }) && !isOccupied(nr, nc)) {
+
+      const blocked = isCellBlocked(nr, nc, cellVisitCounts, { blockModeEnabled, blockOnVisitCount });
+      
+      if (!blocked) {
         let isPenalty = false;
         if (lastPlayerMove && !blockModeEnabled) {
           isPenalty = isMirrorMove(direction, dist, lastPlayerMove.direction, lastPlayerMove.distance);
         }
+        logService.logic(`  [${direction}]: Знайдено доступний хід на (${nr}, ${nc}), відстань ${dist}.`);
         moves.push({ row: nr, col: nc, direction, distance: dist, isPenalty });
+      } else {
+        logService.logic(`  [${direction}]: Клітинка (${nr}, ${nc}) заблокована. Зупинка пошуку в цьому напрямку.`);
+        break;
       }
     }
   }
+  logService.logic(`getAvailableMoves: Розрахунок завершено. Знайдено ходів: ${moves.length}`, moves);
   return moves;
 }
 

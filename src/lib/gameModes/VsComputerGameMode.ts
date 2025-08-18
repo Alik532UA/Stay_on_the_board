@@ -46,32 +46,40 @@ export class VsComputerGameMode extends BaseGameMode {
 
 
   protected async advanceToNextPlayer(): Promise<SideEffect[]> {
+    logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
     const currentState = get(gameState);
     const nextPlayerIndex = (currentState.currentPlayerIndex + 1) % currentState.players.length;
 
     gameState.update(state => ({...state, currentPlayerIndex: nextPlayerIndex}));
 
     const nextPlayer = get(gameState).players[nextPlayerIndex];
+    logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer.type}.`);
     if (nextPlayer.type === 'ai' && !get(gameState).isComputerMoveInProgress) {
+      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера.');
       return this.triggerComputerMove();
     }
     return [];
   }
 
   private async triggerComputerMove(): Promise<SideEffect[]> {
+    logService.GAME_MODE('triggerComputerMove: Початок ходу комп\'ютера.');
     const state = get(gameState);
     gameState.update(state => ({...state, isComputerMoveInProgress: true}));
 
     const computerMove = gameLogicService.getComputerMove();
+    logService.GAME_MODE('triggerComputerMove: Результат getComputerMove:', computerMove);
     let sideEffects: SideEffect[] = [];
 
     if (computerMove) {
+      logService.GAME_MODE('triggerComputerMove: Комп\'ютер має хід, виконуємо...');
       const { direction, distance } = computerMove;
       const settings = get(settingsStore);
       const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex, state, settings);
 
       if (!moveResult.success) {
+        logService.GAME_MODE('triggerComputerMove: Хід комп\'ютера не вдався, обробка "немає ходів".');
         sideEffects = await this.handleNoMoves('computer');
+        sideEffects.forEach(effect => sideEffectService.execute(effect));
       } else {
         sideEffects = await this.onPlayerMoveSuccess(moveResult);
         const settings = get(settingsStore);
@@ -97,7 +105,9 @@ export class VsComputerGameMode extends BaseGameMode {
         // sideEffects = [...sideEffects, ...(await this.advanceToNextPlayer())];
       }
     } else {
+      logService.GAME_MODE('triggerComputerMove: У комп\'ютера немає ходів, викликаємо handleNoMoves.');
       sideEffects = await this.handleNoMoves('computer');
+      sideEffects.forEach(effect => sideEffectService.execute(effect));
     }
     gameState.update(state => ({...state, isComputerMoveInProgress: false}));
     playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
@@ -111,6 +121,7 @@ export class VsComputerGameMode extends BaseGameMode {
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]> {
+    logService.GAME_MODE(`handleNoMoves: Обробка ситуації "немає ходів" для гравця типу: ${playerType}.`);
     const state = get(gameState);
     gameOverStore.resetGameOverState();
 
