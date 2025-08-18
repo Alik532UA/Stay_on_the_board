@@ -8,7 +8,6 @@ import * as gameLogicService from '$lib/services/gameLogicService';
 import { playerInputStore } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
-import { stateManager } from '$lib/services/stateManager';
 import { userActionService } from '$lib/services/userActionService';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import type { FinalScoreDetails } from '$lib/models/score';
@@ -19,7 +18,8 @@ import { calculateFinalScore } from '$lib/services/scoreService';
 
 export class VsComputerGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
-    // У цьому режимі ініціалізація відбувається через стандартний resetGame
+    const settings = get(settingsStore);
+    gameLogicService.resetGame({ players: this.getPlayersConfiguration(), settings }, get(gameState));
   }
 
   async claimNoMoves(): Promise<SideEffect[]> {
@@ -49,14 +49,10 @@ export class VsComputerGameMode extends BaseGameMode {
     const currentState = get(gameState);
     const nextPlayerIndex = (currentState.currentPlayerIndex + 1) % currentState.players.length;
 
-    await stateManager.applyChanges(
-      'ADVANCE_TURN',
-      { currentPlayerIndex: nextPlayerIndex },
-      `Turn advanced to player ${nextPlayerIndex}`
-    );
+    gameState.update(state => ({...state, currentPlayerIndex: nextPlayerIndex}));
 
     const nextPlayer = get(gameState).players[nextPlayerIndex];
-    if (nextPlayer.type === 'ai') {
+    if (nextPlayer.type === 'ai' && !get(gameState).isComputerMoveInProgress) {
       return this.triggerComputerMove();
     }
     return [];
@@ -64,7 +60,7 @@ export class VsComputerGameMode extends BaseGameMode {
 
   private async triggerComputerMove(): Promise<SideEffect[]> {
     const state = get(gameState);
-    await stateManager.applyChanges('SET_COMPUTER_TURN', { isComputerMoveInProgress: true }, 'Starting computer move');
+    gameState.update(state => ({...state, isComputerMoveInProgress: true}));
 
     const computerMove = gameLogicService.getComputerMove();
     let sideEffects: SideEffect[] = [];
@@ -77,6 +73,7 @@ export class VsComputerGameMode extends BaseGameMode {
       if (!moveResult.success) {
         sideEffects = await this.handleNoMoves('computer');
       } else {
+        sideEffects = await this.onPlayerMoveSuccess(moveResult);
         const settings = get(settingsStore);
         if (settings.speechEnabled) {
           const lastMove = get(lastComputerMove);
@@ -95,19 +92,15 @@ export class VsComputerGameMode extends BaseGameMode {
         
         const currentState = get(gameState);
         if (currentState.wasResumed) {
-          await stateManager.applyChanges(
-            'RESET_WAS_RESUMED_AFTER_COMPUTER_MOVE',
-            { wasResumed: false },
-            'Resetting wasResumed after successful computer move'
-          );
+          gameState.update(state => ({...state, wasResumed: false}));
         }
-        sideEffects = [...sideEffects, ...(await this.advanceToNextPlayer())];
+        // sideEffects = [...sideEffects, ...(await this.advanceToNextPlayer())];
       }
     } else {
       sideEffects = await this.handleNoMoves('computer');
     }
-    await stateManager.applyChanges('SET_PLAYER_TURN', { isComputerMoveInProgress: false }, 'Computer move completed');
-    sideEffects.forEach(effect => sideEffectService.execute(effect));
+    gameState.update(state => ({...state, isComputerMoveInProgress: false}));
+    playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
     return sideEffects;
   }
 
@@ -121,14 +114,11 @@ export class VsComputerGameMode extends BaseGameMode {
     const state = get(gameState);
     gameOverStore.resetGameOverState();
 
-    await stateManager.applyChanges(
-      'SUCCESSFUL_NO_MOVES_CLAIM',
-      {
+    gameState.update(state => ({
+        ...state,
         noMovesClaimed: true,
         noMovesBonus: (state.noMovesBonus || 0) + state.boardSize
-      },
-      `${playerType} has no moves and bonus is awarded`
-    );
+    }));
 
     const updatedState = get(gameState);
     const potentialScoreDetails = calculateFinalScore(updatedState as any, 'vs-computer');

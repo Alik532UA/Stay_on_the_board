@@ -12,7 +12,6 @@ import { gameModeService } from './gameModeService';
 import { sideEffectService, type SideEffect } from './sideEffectService';
 import { replayService } from './replayService';
 import { logService } from './logService.js';
-import { stateManager } from './stateManager';
 import { gameState } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService.js';
 import { navigationService } from './navigationService';
@@ -38,7 +37,7 @@ export const userActionService = {
 
     const sideEffects = await activeGameMode.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
     logService.logic('[userActionService.confirmMove] Side effects from handlePlayerMove:', sideEffects);
-    sideEffects.forEach(effect => sideEffectService.execute(effect));
+    sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
   },
 
   async claimNoMoves(): Promise<void> {
@@ -52,7 +51,7 @@ export const userActionService = {
       }
     }
     const sideEffects = await activeGameMode.claimNoMoves();
-    sideEffects.forEach(effect => sideEffectService.execute(effect));
+    sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
   },
 
   async changeBoardSize(newSize: number): Promise<void> {
@@ -63,53 +62,20 @@ export const userActionService = {
     if (score === 0 && penaltyPoints === 0) {
       gameLogicService.resetGame({ newSize }, get(gameState));
     } else {
-      modalService.showResetScoreConfirmation(newSize);
+      modalService.showBoardResizeModal(newSize);
     }
   },
 
   async requestRestart(): Promise<void> {
-    modalStore.closeAllModals();
+    modalStore.closeModal();
     const sideEffects = await gameModeService.restartGame();
     this.executeSideEffects(sideEffects);
   },
 
-  async requestReplay(): Promise<void> {
-    const { moveHistory, boardSize } = get(gameState);
-    if (moveHistory && moveHistory.length > 0) {
-      logService.logic('[userActionService] Opening replay in modal');
-      const ReplayViewer = (await import('$lib/components/ReplayViewer.svelte')).default;
-      modalStore.showModal({
-        component: ReplayViewer,
-        props: {
-          moveHistory,
-          boardSize,
-          autoPlayForward: true
-        },
-        buttons: [
-          {
-            textKey: 'replay.close',
-            onClick: () => {
-              replayStore.stopReplay();
-              modalStore.closeModal();
-            },
-            dataTestId: 'close-replay-btn',
-            primary: true
-          }
-        ],
-        closable: false,
-      });
-    } else {
-      logService.logic('[userAction-service] No move history to replay.');
-    }
-  },
 
   async finishWithBonus(reasonKey: string): Promise<void> {
     logService.logic('[userActionService] finishWithBonus called with reason:', reasonKey);
-    await stateManager.applyChanges(
-      'SET_FINISH_FLAG',
-      { finishedByFinishButton: true },
-      'Player chose to finish with a bonus'
-    );
+    gameState.update(state => ({...state, finishedByFinishButton: true}));
     const sideEffects = await gameModeService.endGame(reasonKey);
     this.executeSideEffects(sideEffects);
   },
@@ -147,7 +113,7 @@ export const userActionService = {
       gameOverReasonValues: null as Record<string, any> | null
     };
 
-    await stateManager.applyChanges('CONTINUE_AFTER_NO_MOVES_CLAIM', continueChanges, 'Player continues after successful no-moves claim');
+    gameState.update(state => ({...state, ...continueChanges}));
     
     gameOverStore.resetGameOverState();
     animationStore.reset();

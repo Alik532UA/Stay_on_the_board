@@ -8,6 +8,7 @@
   import { i18nReady } from '$lib/i18n/init.js';
   import { slide, scale } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
+  import { safeScale } from '$lib/utils/transitions';
 
   // Функція для комбінованої анімації
   function scaleAndSlide(node: HTMLElement, params: any) {
@@ -156,7 +157,7 @@
 {#if $i18nReady && $settingsStore.showGameInfoWidget !== 'hidden' && $gameState}
   <div class="game-info-widget"
        class:compact={$settingsStore.showGameInfoWidget === 'compact'}
-       transition:scaleAndSlide={{ duration: 400, easing: quintOut }}
+       transition:safeScale={{ duration: 400, easing: quintOut }}
        data-testid="game-info-panel"
   >
     <div class="game-info-content" data-testid="game-info-content">

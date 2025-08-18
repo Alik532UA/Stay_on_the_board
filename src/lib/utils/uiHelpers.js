@@ -7,6 +7,7 @@ import { goto } from '$app/navigation';
 import { base } from '$app/paths';
 import GameModeModal from '$lib/components/GameModeModal.svelte';
 
+
 export function showGameModeSelector() {
   modalStore.showModal({
     titleKey: 'gameModes.title',
@@ -54,4 +55,4 @@ export function showClearCacheModal() {
       { textKey: 'modal.cancel', onClick: modalStore.closeModal },
     ],
   });
-} 
+}

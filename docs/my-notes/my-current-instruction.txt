@@ -1,0 +1,99 @@
+Зрозумів. Переходимо від аналізу до дій. На основі наданого звіту `knip` я підготував чіткий та безпечний план для AI-асистента, щоб усунути весь виявлений "мертвий код".
+
+Стратегія полягає в тому, щоб діяти від найменш ризикованих операцій до більш точкових, забезпечуючи чистоту та стабільність кодової бази.
+
+---
+
+# План дій для AI-асистента
+
+## 1. Інструкції для асистента
+
+**Команда до виконання:**
+Я, твій AI-архітектор, підготував для тебе цей план. Твоя задача — діяти автономно та ефективно, дотримуючись наступних правил:
+
+1.  **Автономне виконання:** Не веди діалог у чаті, не став уточнюючих питань і не запитуй дозволу. Одразу починай виконувати наданий нижче покроковий план, вносячи зміни безпосередньо у відповідні файли проєкту.
+
+2.  **Обов'язкова звітність:** Після завершення всіх кроків, **обов'язково** створи звіт у форматі Markdown. Використовуй для цього шаблон, який я надав у секції 3 цього документа. Це невід'ємна частина виконаного завдання.
+
+---
+
+## 2. Покроковий план дій
+
+### **Фаза 1: Очищення залежностей проєкту**
+
+*   **Крок 1: Видалення невикористовуваних dev-залежностей**
+    *   **Дія:** Виконати в терміналі проєкту одну команду для видалення всіх невикористовуваних пакетів.
+        ```bash
+        npm uninstall @fontsource/fira-mono @sveltejs/adapter-auto @testing-library/svelte eslint prettier svelte-preprocess
+        ```
+    *   **Обґрунтування:** Очищення файлу `package.json` від зайвих залежностей. Це зменшує розмір проєкту, прискорює `npm install` та спрощує управління залежностями, дотримуючись принципу **KISS**.
+
+### **Фаза 2: Видалення невикористовуваних файлів**
+
+*   **Крок 2: Видалення невикористовуваних компонентів, сторінок та модулів**
+    *   **Дія:** Повністю видалити наступні 10 файлів та їх директорії, якщо вони стануть порожніми:
+        1.  `src/components/GameControls.svelte`
+        2.  `src/routes/Counter.svelte`
+        3.  `src/lib/components/DynamicLayout.svelte`
+        4.  `src/lib/components/FloatingCloseButton.svelte`
+        5.  `src/lib/components/Header.svelte`
+        6.  `src/lib/components/SettingsExpanderWidget.svelte`
+        7.  `src/lib/components/TestDndActions.svelte`
+        8.  `src/lib/i18n/index.js`
+        9.  `src/lib/stores/boardStore.ts`
+        10. `src/lib/stores/playersStore.ts`
+    *   **Обґрунтування:** Радикальне зменшення кодової бази шляхом видалення цілих файлів, які не імпортуються і не використовуються в застосунку. Це найефективніший крок для усунення "мертвого коду" та дотримання принципу **YAGNI (You Ain't Gonna Need It)**.
+
+### **Фаза 3: Видалення невикористовуваних експортів з робочих файлів**
+
+*   **Крок 3: Очищення тестових утиліт (`tests/utils.ts`)**
+    *   **Дія:** У файлі `tests/utils.ts` видалити повні визначення функцій `enableTestMode`, `getScoreByTestId`, `expectScoreToBePositive`. Також видалити члени `Experienced` та `Pro` з переліку (enum) `GameMode`.
+    *   **Обґрунтування:** Видалення невикористовуваних допоміжних функцій та конфігурацій з тестового коду.
+
+*   **Крок 4: Очищення сторів та сервісів**
+    *   **Дія:** Послідовно відредагувати наступні файли, видаливши вказані експорти (функції, змінні, типи, інтерфейси):
+        *   `src/lib/stores/settingsStore.ts`: видалити змінну `defaultKeybindings` та інтерфейс `SettingsState`.
+        *   `src/lib/stores/modalStore.js`: видалити функції `showModal` та `closeAllModals`.
+        *   `src/lib/services/gameLogicService.ts`: видалити функції `getAvailableMovesForFigure` та `isValidMove`.
+        *   `src/lib/stores/uiStore.js`: видалити функцію `clearGameModeModalRequest`.
+        *   `src/lib/services/stateManager.ts`: видалити клас `StateManager` та інтерфейси `StateChange`, `ValidationResult`, `GameStateChanges`.
+        *   `src/lib/stores/animationStore.ts`: видалити змінну `playerMoveAnimationDone`, функцію `animateLastMove` та інтерфейси/типи `AnimationState`, `Animation`, `GameState`, `GameStateStore`.
+        *   `src/lib/services/scoreService.ts`: видалити функцію `countJumpedCells`.
+        *   `src/lib/services/speechService.js`: видалити експорти `voices` та `langMap`.
+        *   `src/lib/stores/versionStore.js`: видалити функцію `loadVersion`.
+        *   `src/lib/stores/derivedState.ts`: видалити експорти `isLocalGame`, `centerInfo`, `shouldHideBoard`, `visualCurrentPlayerIndex` та інтерфейс `VisualBoardState`.
+        *   `src/lib/utils/gameUtils.ts`: видалити експорти `dirMap`, `numToDir`, `oppositeDirections`.
+        *   `src/lib/utils/uiHelpers.js`: видалити функцію `showClearCacheModal`.
+        *   `src/lib/stores/gameState.ts`: видалити типи/інтерфейси `PlayerType`, `BonusEntry`, `GameSettings`, `CellVisitCounts`, `GameStateConfig`.
+        *   `src/lib/stores/gameOverStore.ts`: видалити інтерфейси `GameResult`, `GameOverState`.
+        *   `src/lib/stores/gameStore.ts`: видалити інтерфейс `Game`.
+        *   `src/lib/services/sideEffectService.ts`: видалити інтерфейси `SpeakEffect`, `ModalEffect`.
+        *   `src/lib/models/Figure.ts`: видалити інтерфейси `Position`, `MoveResult`, `AvailableMove`.
+        *   `src/lib/utils/centerInfoUtil.ts`: видалити тип `DirectionKey` та інтерфейс `CenterInfoProps`.
+    *   **Обґрунтування:** Точкове видалення невикористовуваного коду з активних файлів. Це робить код чистішим, зменшує публічний API модулів та полегшує їх розуміння та підтримку.
+
+---
+
+## 3. Шаблон звіту для асистента
+
+**Після виконання всіх кроків, заповни та надай цей звіт:**
+
+```markdown
+# Звіт про виконання завдання
+
+## 1. Виконана робота
+
+### Фаза 1: Очищення залежностей
+- Видалено 6 невикористовуваних dev-залежностей з `package.json` (`@fontsource/fira-mono`, `@sveltejs/adapter-auto`, `@testing-library/svelte`, `eslint`, `prettier`, `svelte-preprocess`).
+
+### Фаза 2: Видалення невикористовуваних файлів
+- Повністю видалено 10 невикористовуваних файлів, включаючи застарілі компоненти, сторінки та стори.
+
+### Фаза 3: Видалення невикористовуваних експортів
+- Проведено точкову чистку коду в 19 файлах проєкту.
+- Видалено загалом 24 невикористовувані функції/змінні, 24 невикористовувані типи/інтерфейси та 2 члени enum.
+- Кодова база проєкту була значно спрощена, а публічні API модулів скорочені до реально використовуваних частин.
+
+## 2. Проблеми та перешкоди (якщо були)
+- Проблем під час виконання не виявлено. Всі операції базувалися на статичному аналізі та були виконані згідно з планом.
+```

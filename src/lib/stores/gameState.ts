@@ -11,35 +11,20 @@ import { logService } from '../services/logService.js';
 
 const initialBoardSize = 4;
 
-export type PlayerType = 'human' | 'ai' | 'remote' | 'computer';
-
-export interface BonusEntry {
-  points: number;
-  reason: string;
-  timestamp: number;
-}
 
 export interface Player {
   id: number;
-  type: PlayerType;
+  type: any;
   name: string;
   score: number;
   color: string;
   isComputer: boolean;
   penaltyPoints: number;
   bonusPoints: number;
-  bonusHistory: BonusEntry[];
+  bonusHistory: any[];
 }
 
-export interface GameSettings {
-  boardSize: number;
-  blockModeEnabled: boolean;
-  autoHideBoard: boolean;
-  lockSettings: boolean;
-}
-
-export type CellVisitCounts = Record<string, number>;
-export interface MoveHistoryEntry { pos: {row: number, col: number}, blocked: {row: number, col: number}[], visits?: CellVisitCounts, blockModeEnabled?: boolean }
+export interface MoveHistoryEntry { pos: {row: number, col: number}, blocked: {row: number, col: number}[], visits?: any, blockModeEnabled?: boolean }
 export interface GameState {
   /** Унікальний ідентифікатор поточної гри, змінюється при кожному перезапуску. */
   gameId: number;
@@ -68,7 +53,7 @@ export interface GameState {
   /** Чи гру завершено кнопкою "Завершити". */
   finishedByFinishButton: boolean;
   /** Лічильник відвідувань кожної клітини (для block mode). */
-  cellVisitCounts: CellVisitCounts;
+  cellVisitCounts: any;
   /** Історія ходів (для повторів, анімацій, undo). */
   moveHistory: MoveHistoryEntry[];
   /** Черга ходів для анімації. */
@@ -104,16 +89,13 @@ export interface GameState {
   /** Чи гра була продовжена після паузи. */
   wasResumed: boolean;
   /** Налаштування гри, раніше в localGameStore */
-  settings: GameSettings;
+  settings: any;
   /** Рахунки на початок раунду для локальної гри */
   scoresAtRoundStart: number[];
+  /** Чи триває хід комп'ютера. */
+  isComputerMoveInProgress: boolean;
 }
 
-export interface GameStateConfig {
-  size?: number;
-  players?: Player[];
-  testMode?: boolean;
-}
 
 import { get } from 'svelte/store';
 import { testModeStore } from './testModeStore';
@@ -143,7 +125,7 @@ const getRandomUnusedName = (usedNames: string[]) => {
 };
 
 
-export function createInitialState(config: GameStateConfig = {}): GameState {
+export function createInitialState(config: any = {}): GameState {
   const size = config.size ?? initialBoardSize;
   const players = config.players ?? [
     { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#e63946', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
@@ -192,7 +174,8 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
       autoHideBoard: false,
       lockSettings: false
     },
-    scoresAtRoundStart: players.map(p => p.score),
+    scoresAtRoundStart: players.map((p: any) => p.score),
+    isComputerMoveInProgress: false,
   };
 }
 
@@ -244,7 +227,7 @@ function createGameStateStore() {
     },
 
     // --- Settings Management ---
-    updateSettings: (newSettings: Partial<GameSettings>) => {
+    updateSettings: (newSettings: Partial<any>) => {
       update(state => ({
         ...state,
         settings: { ...state.settings, ...newSettings }
@@ -262,7 +245,7 @@ function createGameStateStore() {
     resetScores: () => {
       update(state => ({
         ...state,
-        players: state.players.map(p => ({ ...p, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as BonusEntry[] }))
+        players: state.players.map(p => ({ ...p, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as any[] }))
       }));
     },
 
@@ -319,7 +302,7 @@ function createGameStateStore() {
     },
 
     // --- General ---
-    reset: (config?: GameStateConfig) => {
+    reset: (config?: any) => {
       set(createInitialState(config));
     },
 

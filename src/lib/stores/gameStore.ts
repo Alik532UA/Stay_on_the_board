@@ -1,13 +1,9 @@
 import { writable, get } from 'svelte/store';
 import type { BaseGameMode } from '$lib/gameModes/BaseGameMode';
 import { gameState, type GameState } from './gameState';
-export interface Game {
-  mode: BaseGameMode | null;
-  state: GameState | null;
-}
 
 const createGameStore = () => {
-  const { subscribe, update } = writable<Game>({
+  const { subscribe, update } = writable<any>({
     mode: null,
     state: get(gameState)
   });

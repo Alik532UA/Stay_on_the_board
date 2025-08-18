@@ -7,7 +7,6 @@ import { gameState, createInitialState, type Player } from '../stores/gameState'
 import { getAvailableMoves, isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
 import { lastPlayerMove } from '$lib/stores/derivedState';
 import { settingsStore } from '../stores/settingsStore';
-import { stateManager } from './stateManager';
 import { logService } from './logService.js';
 import { testModeStore } from '$lib/stores/testModeStore';
 import { calculateMoveScore } from './scoreService';
@@ -27,7 +26,7 @@ export function resetGame(options: { newSize?: number; players?: Player[]; setti
   const newState = createInitialState({
     size: newSize,
     players: options.players,
-    testMode
+    testMode: options.settings?.testMode ?? testMode
   });
 
   // Якщо гравці передані, використовуємо їх
@@ -120,6 +119,7 @@ export async function performMove(
   currentState: any,
   settings: any
 ) {
+
   logService.logic('performMove: початок з параметрами:', { direction, distance, playerIndex });
   
   const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
@@ -189,7 +189,7 @@ export async function performMove(
     isFirstMove: false
   };
 
-  await stateManager.applyChanges('PERFORM_MOVE', changes, `Move: ${direction}${distance}`);
+  gameState.update(state => ({...state, ...changes}));
   
   // Логіка для "дзеркального" ходу та бонусів тепер обробляється в LocalGameMode та VsComputerGameMode,
   // які отримують `scoreChanges` і вирішують, як їх застосувати.
@@ -204,23 +204,6 @@ export async function performMove(
   };
 }
 
-/**
- * Отримати доступні ходи для поточної позиції використовуючи клас Figure
- */
-export function getAvailableMovesForFigure() {
-  const currentState = get(gameState);
-  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
-  return figure.getAvailableMoves();
-}
-
-/**
- * Перевірити чи валідний хід використовуючи клас Figure
- */
-export function isValidMove(direction: MoveDirectionType, distance: number) {
-  const currentState = get(gameState);
-  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
-  return figure.canMove(direction, distance);
-}
 
 export function getComputerMove(): { direction: MoveDirectionType; distance: number } | null {
   const testModeState = get(testModeStore);

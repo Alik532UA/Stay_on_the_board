@@ -18,8 +18,6 @@ export async function setBoardSize(page: Page, size: number) {
 // Перелік режимів гри
 export enum GameMode {
   Beginner = 'beginner-mode-btn',
-  Experienced = 'experienced-mode-btn',
-  Pro = 'pro-mode-btn',
 }
 
 // Вмикає тестовий режим

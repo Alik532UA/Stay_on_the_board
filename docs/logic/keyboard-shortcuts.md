@@ -1,109 +1,122 @@
-# Keyboard Shortcuts
+# Гарячі клавіші
 
-## Game Controls
+## Керування в грі
 
-### Direction Selection (NumPad)
-- **7** (↖): Select up-left direction
-- **8** (↑): Select up direction  
-- **9** (↗): Select up-right direction
-- **4** (←): Select left direction
-- **6** (→): Select right direction
-- **1** (↙): Select down-left direction
-- **2** (↓): Select down direction
-- **3** (↘): Select down-right direction
+### Основне керування рухом
+- **Вгору-вліво ↖**: [NumPad7], [Q]
+- **Вгору ↑**: [NumPad8], [W]
+- **Вгору-вправо ↗**: [NumPad9], [E]
+- **Вліво ←**: [NumPad4], [A]
+- **Вправо →**: [NumPad6], [D]
+- **Вниз-вліво ↙**: [NumPad1], [Z]
+- **Вниз ↓**: [NumPad2], [X]
+- **Вниз-вправо ↘**: [NumPad3], [C]
 
-**Behavior:**
-- **First press**: Selects direction and automatically selects distance 1
-- **Same direction again**: Increments distance by 1 (up to boardSize - 1)
-- **At maximum distance**: Resets distance to 1 on next press
-- **Different direction**: Selects new direction and resets distance to 1 only if not manually selected
+### Дії в грі
+- **Підтвердити хід**: [NumPad5], [Enter], [Пробіл]
+- **Заявити "немає ходів"**: [NumPad .], [Backspace]
 
-**Distance Limits:**
-- **3x3 board**: Maximum distance = 2 (cycles: 1 → 2 → 1)
-- **4x4 board**: Maximum distance = 3 (cycles: 1 → 2 → 3 → 1)
-- **5x5 board**: Maximum distance = 4 (cycles: 1 → 2 → 3 → 4 → 1)
+### Керування налаштуваннями гри
+- **Режим блокування**: [NumPad *], [B]
+- **Видимість дошки**: [NumPad /], [H]
+- **Збільшити дошку**: [NumPad +], [=]
+- **Зменшити дошку**: [NumPad -], [-]
+- **Озвучування ходів**: [S]
 
-### Distance Selection
-- **1-9**: Select specific distance (limited by boardSize - 1)
-- **Space**: Confirm move (when both direction and distance are selected)
-- **Enter**: Confirm move (alternative to Space)
+## Поведінка клавіш
 
-**Manual Distance Behavior:**
-- **Preservation**: Manually selected distances are preserved when changing direction
-- **Automatic Reset**: Only automatically selected distances are reset when changing direction
+**Поведінка:**
+- **Перше натискання**: Вибирає напрямок і автоматично вибирає відстань 1
+- **Повторне натискання того ж напрямку**: Збільшує відстань на 1 (до boardSize - 1)
+- **При максимальній відстані**: Скидає відстань до 1 при наступному натисканні
+- **Інший напрямок**: Вибирає новий напрямок і скидає відстань до 1, тільки якщо вона не була обрана вручну
 
-### Move Confirmation
-- **Space**: Confirm the selected move
-- **Enter**: Confirm the selected move
-- **NumPad 5**: Confirm the selected move (center button)
-- **Click on center-info**: Confirm the selected move (when both direction and distance are selected)
+**Обмеження відстані:**
+- **Дошка 3x3**: Максимальна відстань = 2 (цикли: 1 → 2 → 1)
+- **Дошка 4x4**: Максимальна відстань = 3 (цикли: 1 → 2 → 3 → 1)
+- **Дошка 5x5**: Максимальна відстань = 4 (цикли: 1 → 2 → 3 → 4 → 1)
 
-### Center Info Element
-The center-info element provides visual feedback about the current game state:
+### Вибір відстані
+- **[1-9]**: Вибрати конкретну відстань (обмежено boardSize - 1)
+- **[Пробіл]**: Підтвердити хід (коли обрано і напрямок, і відстань)
+- **[Enter]**: Підтвердити хід (альтернатива Пробілу)
 
-#### Visual States
-1. **Empty State**: No content, no border, transparent background - when no direction or distance is selected
-2. **Computer Move Display**: Shows last computer move (e.g., "→2") with orange background, no border
-3. **Direction Only**: Shows only direction arrow (e.g., "→", "↑") with no border
-4. **Distance Only**: Shows only distance number (e.g., "2", "3") with no border  
-5. **Confirmable Move**: Shows direction + distance (e.g., "→2") with border and clickable
+**Поведінка при ручному виборі відстані:**
+- **Збереження**: Відстані, обрані вручну, зберігаються при зміні напрямку
+- **Автоматичне скидання**: Тільки автоматично обрані відстані скидаються при зміні напрямку
 
-#### Interaction
-- **Clickable**: Only when both direction and distance are selected (confirmable state)
-- **Visual Feedback**: Border and animation indicate when move can be confirmed
-- **Computer Move**: Displays last computer move until player starts selecting their move
+### Підтвердження ходу
+- **[Пробіл]**: Підтвердити обраний хід
+- **[Enter]**: Підтвердити обраний хід
+- **[NumPad 5]**: Підтвердити обраний хід (центральна кнопка)
+- **Клік по центральному інфо-елементу**: Підтвердити обраний хід (коли обрано і напрямок, і відстань)
 
-### Game Actions
-- **Backspace**: Declare "no moves available"
-- **Escape**: Cancel current selection
-- **H**: Show help/information
+### Центральний інфо-елемент
+Центральний інфо-елемент надає візуальний зворотний зв'язок про поточний стан гри:
 
-## Navigation
+#### Візуальні стани
+1. **Порожній стан**: Немає вмісту, немає рамки, прозорий фон - коли не обрано напрямок або відстань
+2. **Відображення ходу комп'ютера**: Показує останній хід комп'ютера (наприклад, "→2") з помаранчевим фоном, без рамки
+3. **Тільки напрямок**: Показує тільки стрілку напрямку (наприклад, "→", "↑") без рамки
+4. **Тільки відстань**: Показує тільки число відстані (наприклад, "2", "3") без рамки
+5. **Хід, що можна підтвердити**: Показує напрямок + відстань (наприклад, "→2") з рамкою і можливістю кліку
 
-### Menu Navigation
-- **Escape**: Return to main menu
-- **Tab**: Navigate between menu items
-- **Enter**: Select menu item
+#### Взаємодія
+- **Клікабельний**: Тільки коли обрано і напрямок, і відстань (стан, що можна підтвердити)
+- **Візуальний зворотний зв'язок**: Рамка та анімація вказують, коли хід можна підтвердити
+- **Хід комп'ютера**: Відображає останній хід комп'ютера, доки гравець не почне вибирати свій хід
 
-### Settings
-- **T**: Toggle theme (light/dark)
-- **L**: Toggle language
-- **S**: Open settings
+### Дії в грі
+- **[Backspace]**: Заявити "немає ходів"
+- **[Escape]**: Скасувати поточний вибір
+- **[H]**: Показати допомогу/інформацію
 
-## Accessibility
+## Навігація
 
-### Screen Reader Support
-- All interactive elements have proper ARIA labels
-- Keyboard navigation is fully supported
-- Focus indicators are clearly visible
+### Навігація по меню
+- **[Escape]**: Повернутися до головного меню
+- **[Tab]**: Переміщатися між пунктами меню
+- **[Enter]**: Вибрати пункт меню
 
-### Visual Feedback
-- Selected elements are highlighted
-- Hover effects provide visual feedback
-- Disabled elements are visually distinct
+### Налаштування
+- **[T]**: Переключити тему (світла/темна)
+- **[L]**: Переключити мову
+- **[S]**: Відкрити налаштування
 
-## Mobile Support
+## Доступність
 
-### Touch Controls
-- Tap direction buttons to select
-- Tap distance buttons to select
-- Tap center button to confirm move
-- Swipe gestures are not currently supported
+### Підтримка екранних читачів
+- Всі інтерактивні елементи мають належні ARIA-мітки
+- Повністю підтримується навігація з клавіатури
+- Індикатори фокусу чітко видно
 
-### Responsive Design
-- Controls adapt to screen size
-- Touch targets are appropriately sized
-- Layout adjusts for different orientations
+### Візуальний зворотний зв'язок
+- Вибрані елементи підсвічуються
+- Ефекти при наведенні надають візуальний зворотний зв'язок
+- Вимкнені елементи візуально відрізняються
 
-## Tips
+## Підтримка мобільних пристроїв
 
-1. **Quick Moves**: Use the same direction key multiple times to quickly cycle through distances
-2. **Visual Feedback**: Watch the center button to see your current selection
-3. **Keyboard Efficiency**: Use NumPad for faster direction selection
-4. **Confirmation**: Always confirm your move with Space/Enter after selecting both direction and distance
-5. **Distance Cycling**: On 3x3 boards, pressing the same direction 3 times cycles: 1 → 2 → 1
-6. **Manual Distance**: If you manually select a distance, it will be preserved when changing direction
-7. **Automatic Distance**: Automatically selected distances reset to 1 when changing direction 
+### Сенсорне керування
+- Торкніться кнопок напрямку для вибору
+- Торкніться кнопок відстані для вибору
+- Торкніться центральної кнопки для підтвердження ходу
+- Жести свайпу наразі не підтримуються
+
+### Адаптивний дизайн
+- Елементи керування адаптуються до розміру екрана
+- Сенсорні цілі мають відповідний розмір
+- Макет підлаштовується під різні орієнтації
+
+## Поради
+
+1. **Швидкі ходи**: Використовуйте одну й ту ж клавішу напрямку кілька разів, щоб швидко перебирати відстані
+2. **Візуальний зворотний зв'язок**: Слідкуйте за центральною кнопкою, щоб бачити ваш поточний вибір
+3. **Ефективність клавіатури**: Використовуйте NumPad для швидшого вибору напрямку
+4. **Підтвердження**: Завжди підтверджуйте свій хід Пробілом/Enter після вибору і напрямку, і відстані
+5. **Циклічність відстані**: На дошках 3x3, натискання того ж напрямку 3 рази перемикає: 1 → 2 → 1
+6. **Ручна відстань**: Якщо ви вручну вибрали відстань, вона буде збережена при зміні напрямку
+7. **Автоматична відстань**: Автоматично обрані відстані скидаються до 1 при зміні напрямку
 
 ---
 
@@ -114,4 +127,4 @@ The center-info element provides visual feedback about the current game state:
 - Це критично для зрозумілого UX і уникнення конфліктів гарячих клавіш.
 - Не змінюйте цю логіку під час рефакторингу без повного тестування!
 
-Деталі див. у handleHotkey (GameBoard.svelte). 
+Деталі див. у handleHotkey (GameBoard.svelte).

@@ -6,9 +6,16 @@
   import { logService } from '$lib/services/logService.js';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
-
-  export let selectedDirection: string | null = null;
-  export let selectedDistance: number | null = null;
+  import { playerInputStore } from '$lib/stores/playerInputStore.js';
+  
+  let selectedDirection: string | null = null;
+  let selectedDistance: number | null = null;
+  
+  playerInputStore.subscribe(value => {
+    selectedDirection = value.selectedDirection;
+    selectedDistance = value.selectedDistance;
+  });
+  
   export const availableDirections: string[] = [
     'up-left', 'up', 'up-right',
     'left', null, 'right',
@@ -18,10 +25,11 @@
   export const isPlayerTurn: boolean = false;
   export const isMoveInProgress: boolean = false;
   export let blockModeEnabled: boolean = false;
-  export let confirmButtonBlocked: boolean = false;
   export let centerInfoProps: any = {};
-
+  
   const dispatch = createEventDispatcher();
+  
+  $: confirmButtonBlocked = !selectedDirection || !selectedDistance;
 
   /**
    * @param {number} dist

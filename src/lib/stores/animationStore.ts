@@ -1,6 +1,7 @@
 // src/lib/stores/animationStore.ts
 import { writable, get, type Writable } from 'svelte/store';
 import { gameState } from './gameState';
+import { logService } from '../services/logService';
 
 // ВАЖЛИВО! Цей store працює ЛИШЕ з візуальним станом для анімації.
 // Заборонено напряму змінювати moveQueue або board логічного стану гри з animationStore!
@@ -16,48 +17,9 @@ if (typeof global !== 'undefined' && !global.requestAnimationFrame) {
 /**
  * Інтерфейс для стану анімації
  */
-export interface AnimationState {
-  isAnimating: boolean;
-  gameId: number;
-  currentAnimation: any | null;
-  // Черга для візуалізації (тільки анімовані ходи)
-  visualMoveQueue: any[];
-  // Окрема черга для анімацій
-  animationQueue: any[];
-  isPlayingAnimation: boolean;
-  isComputerMoveCompleted: boolean; // <-- НОВИЙ ПРАПОРЕЦЬ
-}
-
-/**
- * Інтерфейс для анімації
- */
-export interface Animation {
-  type: string;
-  duration: number;
-  data?: any;
-}
-
-/**
- * Інтерфейс для gameState
- */
-import type { MoveHistoryEntry } from './gameState';
-
-export interface GameState {
-  gameId: number;
-  moveQueue: any[];
-  moveHistory: MoveHistoryEntry[];
-  [key: string]: any;
-}
-
-/**
- * Тип для gameState store
- */
-export type GameStateStore = Writable<GameState>;
-
-export const playerMoveAnimationDone = writable(false);
 
 function createAnimationService() {
-  const { subscribe, set, update } = writable<AnimationState>({
+  const { subscribe, set, update } = writable<any>({
     // Тільки візуальні прапорці та анімаційні дані
     isAnimating: false,
     gameId: Date.now(),
@@ -77,10 +39,10 @@ function createAnimationService() {
    * Додає хід в чергу анімацій
    */
   function addToAnimationQueue(move: any) {
-    console.log('[animationStore] addToAnimationQueue викликано з move:', move);
+    logService.animation('[animationStore] addToAnimationQueue called with move:', move);
     update(state => {
       const newQueue = [...state.animationQueue, move];
-      console.log('[animationStore] addToAnimationQueue: нова черга:', newQueue);
+      logService.animation('[animationStore] addToAnimationQueue: new queue:', newQueue);
       if (!state.isPlayingAnimation) {
         // Якщо ми починаємо нову послідовність, очищаємо стару візуальну чергу
         state.visualMoveQueue = [];
@@ -134,8 +96,7 @@ function createAnimationService() {
       }));
       
       if (isPlayerMove) {
-        console.log('[animationStore] playNextAnimation: хід гравця завершено, сигналізуємо playerMoveAnimationDone');
-        playerMoveAnimationDone.set(true);
+        logService.animation('[animationStore] playNextAnimation: player move animation done, signaling playerMoveAnimationDone');
       }
 
       playNextAnimation(false);
@@ -147,10 +108,10 @@ function createAnimationService() {
   function initializeSubscription(): void {
     if (isInitialized) return;
     
-    const initialGameState = get(gameState) as GameState;
+    const initialGameState = get(gameState) as any;
     lastProcessedMoveIndex = initialGameState?.moveQueue?.length || 0;
 
-    gameState.subscribe((currentState: GameState | null) => {
+    gameState.subscribe((currentState: any | null) => {
       if (!currentState) {
         // Гра завершена, скидаємо стан анімації
         set({
@@ -169,7 +130,7 @@ function createAnimationService() {
       const animationState = get({ subscribe });
 
       if (currentState.gameId !== animationState.gameId) {
-        console.log('AnimationStore: Нова гра, gameId змінився з', animationState.gameId, 'на', currentState.gameId);
+        logService.animation('AnimationStore: New game, gameId changed from', animationState.gameId, 'to', currentState.gameId);
         lastProcessedMoveIndex = 0;
 
         // КРОК 1: Миттєво скидаємо стан для нової гри
@@ -182,7 +143,7 @@ function createAnimationService() {
           isPlayingAnimation: false,
           isComputerMoveCompleted: true, // <-- Додано сюди
         });
-        console.log('AnimationStore: Очищено animationQueue при зміні gameId');
+        logService.animation('AnimationStore: Cleared animationQueue on gameId change');
 
         return;
       }
@@ -190,7 +151,7 @@ function createAnimationService() {
       // Обробляємо нові ходи в moveQueue
       const newMoves = currentState.moveQueue.slice(lastProcessedMoveIndex);
       if (newMoves.length > 0) {
-        newMoves.forEach(move => addToAnimationQueue(move));
+        newMoves.forEach((move: any) => addToAnimationQueue(move));
         lastProcessedMoveIndex = currentState.moveQueue.length;
       }
     });
@@ -205,7 +166,7 @@ function createAnimationService() {
     initialize: initializeSubscription,
     reset: () => {
       lastProcessedMoveIndex = 0;
-      console.log('AnimationStore: reset() - очищаємо animationQueue');
+      logService.animation('AnimationStore: reset() - clearing animationQueue');
       set({
         isAnimating: false,
         gameId: Date.now(),
@@ -217,8 +178,8 @@ function createAnimationService() {
       });
     },
     // Залишаємо тільки необхідні публічні методи
-    startAnimation: () => update((state: AnimationState) => ({ ...state, isAnimating: true })),
-    stopAnimation: () => update((state: AnimationState) => ({ ...state, isAnimating: false })),
+    startAnimation: () => update((state: any) => ({ ...state, isAnimating: true })),
+    stopAnimation: () => update((state: any) => ({ ...state, isAnimating: false })),
   };
 }
 
@@ -226,9 +187,3 @@ function createAnimationService() {
 export const animationStore = createAnimationService();
 
 // === Оновлюємо функцію для анімації тільки останнього ходу ===
-export function animateLastMove(move: any) {
-  if (!move) return;
-  // Додаємо хід в чергу анімацій через внутрішню логіку
-  // Ця функція тепер не потрібна, оскільки анімація керується автоматично через підписку на gameState
-  console.log('[animateLastMove] Функція застаріла, анімація керується автоматично');
-} 

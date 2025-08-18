@@ -13,90 +13,29 @@ import { logService } from './logService.js';
 import { navigationService } from './navigationService.js';
 
 export const modalService = {
-  showGameOverModal(payload: { reasonKey: string, reasonValues: any, finalScoreDetails: FinalScoreDetails, gameType: string, state: GameState }): void {
-    logService.ui('[modalService] showGameOverModal called with payload:', payload);
-    const { reasonKey, reasonValues, finalScoreDetails, gameType, state } = payload;
-    const t = get(_);
-    
-    let titleKey = 'modal.gameOverTitle';
-    let content;
 
-    if (gameType === 'local') {
-      const { winners, winningPlayerIndex } = determineWinner(state, reasonKey);
-      const losingPlayerName = state.players[state.currentPlayerIndex].name;
-      const modalReason = t(reasonKey, { values: { playerName: losingPlayerName } });
-      
-      const playerScores = state.players.map((player, index) => ({
-        playerNumber: index + 1,
-        playerName: player.name,
-        score: state.scoresAtRoundStart[index],
-        isWinner: winners.includes(index),
-        isLoser: index === state.currentPlayerIndex
-      }));
 
-      let winnerName = '';
-      let winnerNumbers = '';
-
-      if (winners.length === 1) {
-        titleKey = 'modal.winnerTitle';
-        winnerName = state.players[winningPlayerIndex].name;
-      } else if (winners.length > 1) {
-        titleKey = 'modal.winnersTitle';
-        winnerNumbers = winners.map((i: number) => state.players[i].name).join(', ');
-      }
-      
-      content = {
-        reason: modalReason,
-        playerScores,
-        winnerName,
-        winnerNumbers,
-        scoreDetails: finalScoreDetails
-      };
-
-    } else { // vs-computer
-      const modalReason = t(reasonKey, reasonValues ? { values: reasonValues } : undefined);
-      content = {
-        reason: modalReason,
-        reasonKey: reasonKey,
-        scoreDetails: finalScoreDetails
-      };
-    }
-
-    modalStore.showModal({
-      titleKey,
-      content,
-      dataTestId: 'game-over-modal',
-      titleDataTestId: 'game-over-modal-title',
-      buttons: [
-        { textKey: 'modal.playAgain', primary: true, onClick: () => userActionService.handleModalAction('restartGame'), isHot: true, dataTestId: 'play-again-btn' },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: 'game-over-watch-replay-btn' },
-        { textKey: 'gameBoard.mainMenu', onClick: () => userActionService.handleModalAction('resetGameAndGoToMainMenu'), dataTestId: 'game-over-main-menu-btn' }
-      ]
-    });
-  },
-  /**
-   * Shows a confirmation modal for resetting the score when changing board size.
-   * @param newSize - The new board size.
-   */
-  showResetScoreConfirmation(newSize: number): void {
+  showBoardResizeModal(newSize: number): void {
     modalStore.showModal({
       titleKey: 'modal.resetScoreTitle',
       contentKey: 'modal.resetScoreContent',
-      dataTestId: 'board-resize-confirm-modal',
-      titleDataTestId: 'modal-window-title',
       buttons: [
         {
-          textKey: 'modal.resetScoreConfirm',
-          customClass: 'green-btn',
-          isHot: true,
+          textKey: 'modal.confirm',
           onClick: () => userActionService.handleModalAction('resetGame', { newSize }),
-          dataTestId: 'reset-score-confirm-btn'
+          customClass: 'danger-btn',
+          isHot: true,
         },
-        { textKey: 'modal.resetScoreCancel', onClick: () => userActionService.handleModalAction('closeModal'), dataTestId: 'reset-score-cancel-btn' }
-      ]
+        {
+          textKey: 'modal.cancel',
+          onClick: () => userActionService.handleModalAction('closeModal'),
+        },
+      ],
+      closable: true,
+      closeOnOverlayClick: true,
+      dataTestId: 'board-resize-confirm-modal',
     });
   },
-
 
   /**
    * Closes the currently active modal.

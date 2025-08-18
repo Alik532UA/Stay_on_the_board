@@ -109,7 +109,7 @@
     }
 
     const matchingActions = Object.entries(keybindings)
-      .filter(([, keys]) => keys.includes(key))
+      .filter(([, keys]) => (keys as string[]).includes(key))
       .map(([action]) => action);
 
     if (matchingActions.length === 0) return;

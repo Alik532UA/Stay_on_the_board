@@ -7,7 +7,6 @@ import { playerInputStore } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { getAvailableMoves } from '$lib/utils/boardUtils';
 import { gameOverStore } from '$lib/stores/gameOverStore';
-import { stateManager } from '$lib/services/stateManager';
 import { userActionService } from '$lib/services/userActionService';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import type { FinalScoreDetails } from '$lib/models/score';
@@ -82,11 +81,7 @@ export class LocalGameMode extends BaseGameMode {
   }
 
   private async _continueLocalGameAfterNoMoves(): Promise<SideEffect[]> {
-    await stateManager.applyChanges(
-      'CONTINUE_LOCAL_GAME',
-      { cellVisitCounts: {} },
-      'Clearing blocked cells and continuing local game'
-    );
+    gameState.update(state => ({...state, cellVisitCounts: {}}));
     this.advanceToNextPlayer();
     return [{ type: 'ui/closeModal' }];
   }
@@ -111,11 +106,7 @@ export class LocalGameMode extends BaseGameMode {
       gameState.snapshotScores();
     }
 
-    await stateManager.applyChanges(
-      'ADVANCE_TURN',
-      { currentPlayerIndex: nextPlayerIndex },
-      `Turn advanced to player ${nextPlayerIndex}`
-    );
+    gameState.update(state => ({...state, currentPlayerIndex: nextPlayerIndex}));
 
     return this.checkComputerTurn();
   }

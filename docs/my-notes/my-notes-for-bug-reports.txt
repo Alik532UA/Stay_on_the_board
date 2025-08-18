@@ -3954,6 +3954,9 @@ data-testid="settings-page-game-mode-button-group"
 видалити логіку та модальне вікно:
 <div class="modal-window s-CbKqU8tqPnSX" data-testid="exit-confirm-modal"><div class="modal-header s-CbKqU8tqPnSX"><!----> <div class="modal-title-wrapper s-CbKqU8tqPnSX"><!----> <h2 class="modal-title s-CbKqU8tqPnSX" data-i18n-key="modal.exitConfirmationTitle"><!---->Вийти з гри?<!----></h2></div> <!----></div><!----> <div class="modal-content s-CbKqU8tqPnSX"><!----> <!----><!----><!----><p class="reason s-CbKqU8tqPnSX">Ваш прогрес буде збережено, і ви зможете продовжити гру пізніше. Ви впевнені, що хочете вийти в головне меню?<!----></p><!----> <!----></div> <div class="modal-action-buttons s-CbKqU8tqPnSX"><!----><button class="modal-btn-generic s-CbKqU8tqPnSX danger-btn" aria-label="Так, вийти" data-testid="exit-confirm-btn">Так, вийти</button><!----><button class="modal-btn-generic s-CbKqU8tqPnSX" aria-label="Скасувати" data-testid="exit-cancel-btn">Скасувати</button><!----> <!----> <!----></div></div>
 =======================================================================================
+/controls сторінка
+Актуальний результат: відсутні виставленні гарячі клавіши
+Очікуваний результат: присутні виставленні гарячі клавіши (як в документації)
 =======================================================================================
 =======================================================================================
 =======================================================================================

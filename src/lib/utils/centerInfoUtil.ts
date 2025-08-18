@@ -1,14 +1,5 @@
-export type DirectionKey = 'up-left' | 'up' | 'up-right' | 'left' | 'right' | 'down-left' | 'down' | 'down-right';
 
-export interface CenterInfoProps {
-  class: string;
-  content: string;
-  clickable: boolean;
-  aria: string;
-  backgroundColor?: string; // Додаємо опціональний колір фону
-}
-
-const directionArrows: Record<DirectionKey, string> = {
+const directionArrows: Record<any, string> = {
   'up-left': '↖',
   'up': '↑',
   'up-right': '↗',
@@ -28,14 +19,14 @@ export function getCenterInfoState({
   isPauseBetweenMoves = false,
   previousPlayerColor = null
 }: {
-  selectedDirection: DirectionKey | null;
+  selectedDirection: any | null;
   selectedDistance: number | null;
-  lastComputerMove?: { direction?: DirectionKey; distance?: number } | null;
-  lastPlayerMove?: { direction?: DirectionKey; distance?: number } | null;
+  lastComputerMove?: { direction?: any; distance?: number } | null;
+  lastPlayerMove?: { direction?: any; distance?: number } | null;
   isPlayerTurn: boolean;
   isPauseBetweenMoves?: boolean;
   previousPlayerColor?: string | null;
-}): CenterInfoProps {
+}): any {
   // Якщо є вибраний хід - показуємо його
   if (selectedDirection && selectedDistance) {
     let dir = '';
