@@ -16,7 +16,7 @@ test.describe('Модальне вікно підтвердження зміни
     await makeFirstMove(page);
     await page.getByTestId('increase-board-size-btn').click();
     await expect(page.getByTestId('board-resize-confirm-modal')).toBeVisible();
-    await expect(page.getByTestId('modal-window-title')).toHaveAttribute('data-i18n-key', 'modal.resetScoreTitle');
+    await expect(page.getByTestId('board-resize-confirm-modal-title')).toHaveAttribute('data-i18n-key', 'modal.resetScoreTitle');
   });
 
   test('3. Спочатку не з`являється (рахунок 0), потім з`являється (рахунок не 0)', { tag: ['@done', '@BRM-3'] }, async ({ page }) => {
@@ -31,6 +31,6 @@ test.describe('Модальне вікно підтвердження зміни
     // Stage 3: Score is not 0
     await page.getByTestId('increase-board-size-btn').click();
     await expect(page.getByTestId('board-resize-confirm-modal')).toBeVisible();
-    await expect(page.getByTestId('modal-window-title')).toHaveAttribute('data-i18n-key', 'modal.resetScoreTitle');
+    await expect(page.getByTestId('board-resize-confirm-modal-title')).toHaveAttribute('data-i18n-key', 'modal.resetScoreTitle');
   });
 });

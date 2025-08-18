@@ -23,13 +23,14 @@ test.describe('Модальне вікно "Блискучий аналіз"', (
     // await page.waitForTimeout(17000);
 
     // Натискаємо на кнопку "Ходів немає"
+    await page.waitForTimeout(5000);
     await page.getByTestId('no-moves-btn').click();
     
     // Перевіряємо, що модальне вікно з'явилося
     await expect(page.getByTestId('player-no-moves-modal')).toBeVisible();
 
     // Перевіряємо заголовок модального вікна за ключем локалізації
-    await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.playerNoMovesTitle');
+    await expect(page.getByTestId('player-no-moves-modal-title')).toHaveAttribute('data-i18n-key', 'modal.playerNoMovesTitle');
   });
 
   test('Повинно з`являтися вікно "Game Over", коли режим блокування ВИМКНЕНО', { tag: ['@done', '@PNMM-2'] }, async ({ page }) => {
