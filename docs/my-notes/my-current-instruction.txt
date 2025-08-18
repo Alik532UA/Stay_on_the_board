@@ -1,99 +1,49 @@
-Зрозумів. Переходимо від аналізу до дій. На основі наданого звіту `knip` я підготував чіткий та безпечний план для AI-асистента, щоб усунути весь виявлений "мертвий код".
+**Правила**: Ознайомся та дотримуйся правил з @/docs/my-notes/AI_AGENT_RULES.md 
+**Мова**: мова роздумів та відповіді в чаті лише українська. Англійською не пиши, а заощаджуй токени.
+**Опис дії**: Перейди на стислий режим: мінімум пояснень (приблизно до 200 символів, але бажано 30-70 символів), максимум дій.
 
-Стратегія полягає в тому, щоб діяти від найменш ризикованих операцій до більш точкових, забезпечуючи чистоту та стабільність кодової бази.
-
----
-
-# План дій для AI-асистента
-
-## 1. Інструкції для асистента
-
-**Команда до виконання:**
-Я, твій AI-архітектор, підготував для тебе цей план. Твоя задача — діяти автономно та ефективно, дотримуючись наступних правил:
-
-1.  **Автономне виконання:** Не веди діалог у чаті, не став уточнюючих питань і не запитуй дозволу. Одразу починай виконувати наданий нижче покроковий план, вносячи зміни безпосередньо у відповідні файли проєкту.
-
-2.  **Обов'язкова звітність:** Після завершення всіх кроків, **обов'язково** створи звіт у форматі Markdown. Використовуй для цього шаблон, який я надав у секції 3 цього документа. Це невід'ємна частина виконаного завдання.
+Поточнє завдання:
+виправити баг:
 
 ---
 
-## 2. Покроковий план дій
-
-### **Фаза 1: Очищення залежностей проєкту**
-
-*   **Крок 1: Видалення невикористовуваних dev-залежностей**
-    *   **Дія:** Виконати в терміналі проєкту одну команду для видалення всіх невикористовуваних пакетів.
-        ```bash
-        npm uninstall @fontsource/fira-mono @sveltejs/adapter-auto @testing-library/svelte eslint prettier svelte-preprocess
-        ```
-    *   **Обґрунтування:** Очищення файлу `package.json` від зайвих залежностей. Це зменшує розмір проєкту, прискорює `npm install` та спрощує управління залежностями, дотримуючись принципу **KISS**.
-
-### **Фаза 2: Видалення невикористовуваних файлів**
-
-*   **Крок 2: Видалення невикористовуваних компонентів, сторінок та модулів**
-    *   **Дія:** Повністю видалити наступні 10 файлів та їх директорії, якщо вони стануть порожніми:
-        1.  `src/components/GameControls.svelte`
-        2.  `src/routes/Counter.svelte`
-        3.  `src/lib/components/DynamicLayout.svelte`
-        4.  `src/lib/components/FloatingCloseButton.svelte`
-        5.  `src/lib/components/Header.svelte`
-        6.  `src/lib/components/SettingsExpanderWidget.svelte`
-        7.  `src/lib/components/TestDndActions.svelte`
-        8.  `src/lib/i18n/index.js`
-        9.  `src/lib/stores/boardStore.ts`
-        10. `src/lib/stores/playersStore.ts`
-    *   **Обґрунтування:** Радикальне зменшення кодової бази шляхом видалення цілих файлів, які не імпортуються і не використовуються в застосунку. Це найефективніший крок для усунення "мертвого коду" та дотримання принципу **YAGNI (You Ain't Gonna Need It)**.
-
-### **Фаза 3: Видалення невикористовуваних експортів з робочих файлів**
-
-*   **Крок 3: Очищення тестових утиліт (`tests/utils.ts`)**
-    *   **Дія:** У файлі `tests/utils.ts` видалити повні визначення функцій `enableTestMode`, `getScoreByTestId`, `expectScoreToBePositive`. Також видалити члени `Experienced` та `Pro` з переліку (enum) `GameMode`.
-    *   **Обґрунтування:** Видалення невикористовуваних допоміжних функцій та конфігурацій з тестового коду.
-
-*   **Крок 4: Очищення сторів та сервісів**
-    *   **Дія:** Послідовно відредагувати наступні файли, видаливши вказані експорти (функції, змінні, типи, інтерфейси):
-        *   `src/lib/stores/settingsStore.ts`: видалити змінну `defaultKeybindings` та інтерфейс `SettingsState`.
-        *   `src/lib/stores/modalStore.js`: видалити функції `showModal` та `closeAllModals`.
-        *   `src/lib/services/gameLogicService.ts`: видалити функції `getAvailableMovesForFigure` та `isValidMove`.
-        *   `src/lib/stores/uiStore.js`: видалити функцію `clearGameModeModalRequest`.
-        *   `src/lib/services/stateManager.ts`: видалити клас `StateManager` та інтерфейси `StateChange`, `ValidationResult`, `GameStateChanges`.
-        *   `src/lib/stores/animationStore.ts`: видалити змінну `playerMoveAnimationDone`, функцію `animateLastMove` та інтерфейси/типи `AnimationState`, `Animation`, `GameState`, `GameStateStore`.
-        *   `src/lib/services/scoreService.ts`: видалити функцію `countJumpedCells`.
-        *   `src/lib/services/speechService.js`: видалити експорти `voices` та `langMap`.
-        *   `src/lib/stores/versionStore.js`: видалити функцію `loadVersion`.
-        *   `src/lib/stores/derivedState.ts`: видалити експорти `isLocalGame`, `centerInfo`, `shouldHideBoard`, `visualCurrentPlayerIndex` та інтерфейс `VisualBoardState`.
-        *   `src/lib/utils/gameUtils.ts`: видалити експорти `dirMap`, `numToDir`, `oppositeDirections`.
-        *   `src/lib/utils/uiHelpers.js`: видалити функцію `showClearCacheModal`.
-        *   `src/lib/stores/gameState.ts`: видалити типи/інтерфейси `PlayerType`, `BonusEntry`, `GameSettings`, `CellVisitCounts`, `GameStateConfig`.
-        *   `src/lib/stores/gameOverStore.ts`: видалити інтерфейси `GameResult`, `GameOverState`.
-        *   `src/lib/stores/gameStore.ts`: видалити інтерфейс `Game`.
-        *   `src/lib/services/sideEffectService.ts`: видалити інтерфейси `SpeakEffect`, `ModalEffect`.
-        *   `src/lib/models/Figure.ts`: видалити інтерфейси `Position`, `MoveResult`, `AvailableMove`.
-        *   `src/lib/utils/centerInfoUtil.ts`: видалити тип `DirectionKey` та інтерфейс `CenterInfoProps`.
-    *   **Обґрунтування:** Точкове видалення невикористовуваного коду з активних файлів. Це робить код чистішим, зменшує публічний API модулів та полегшує їх розуміння та підтримку.
+data-testid="opponent-trapped-modal"
+натиснути data-testid="finish-game-with-bonus-btn"
+Актуальний результат: залишилось вікно data-testid="opponent-trapped-modal"
+Очікуваний результат: відкривається модальне вікно завершення гри
 
 ---
 
-## 3. Шаблон звіту для асистента
+**Ключова вимога:** Твоє рішення має бути комплексним. Не роби поверхневих виправлень ("латок" чи "костилів").
+**Реалізуй системне виправлення**, яке усуває корінь проблеми та відповідає цільовій архітектурі проєкту.
+при виправленні використовуй принципи:
+1.  **SSoT (Single Source of Truth):** Чи є єдине джерело правди для кожного елемента стану?
+2.  **UDF (Unidirectional Data Flow):** Чи є потік даних односпрямованим та передбачуваним?
+3.  **SoC (Separation of Concerns):** Наскільки добре розділені відповідальності (стан, логіка, UI)?
+4.  **Композиція:** Чи ефективно використовуються компоненти для побудови UI?
+5.  **Чистота та Побічні ефекти:** Наскільки добре ізольовані "нечисті" операції (API, DOM, таймери)?
+6.  **DRY (Don't Repeat Yourself):** Чи є дублювання коду, яке можна усунути?
+7.  **Простота та Читабельність (KISS):** Чи є надмірно складні рішення? Наскільки код зрозумілий (якість іменування)?
+8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
+9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
 
-**Після виконання всіх кроків, заповни та надай цей звіт:**
+---
 
-```markdown
-# Звіт про виконання завдання
+**Відладка (Дебагінг):**
+    *   **Використовуй `logService`:** Замість `console.log` завжди використовуй централізований `logService`.
+    *   **Доповнюй логи для аналізу:** Якщо поточний рівень логування не дозволяє діагностувати описану проблему, додай нові виклики logService у відповідних місцях коду. Мета — забезпечити, щоб майбутні логи містили всю інформацію, яка дозволить мені самостійно проаналізувати, чи вирішено проблему, і що саме потребує виправлення.
+    *   **Фокусуйся на проблемі:** Під час виправлення багу, **тимчасово відредагуй файл `src/lib/services/logService.js`**. Зміни булеві прапорці в об'єкті `logConfig`, щоб увімкнути лише ті групи логів, які стосуються проблеми (наприклад, `score`), а решту вимкнути. Це допоможе усунути інформаційний шум.
+    *   **Незмінність логів:** Параметри логування не змінюй, доки я (людина) не підтвердить, що баг виправлено. При порушені цього правила AI буде вимкнено та видалено.
+**Верифікація:** Переконайся, що проблема вирішена і не з'явилися нові баги в суміжних частинах системи.
 
-## 1. Виконана робота
+---
 
-### Фаза 1: Очищення залежностей
-- Видалено 6 невикористовуваних dev-залежностей з `package.json` (`@fontsource/fira-mono`, `@sveltejs/adapter-auto`, `@testing-library/svelte`, `eslint`, `prettier`, `svelte-preprocess`).
-
-### Фаза 2: Видалення невикористовуваних файлів
-- Повністю видалено 10 невикористовуваних файлів, включаючи застарілі компоненти, сторінки та стори.
-
-### Фаза 3: Видалення невикористовуваних експортів
-- Проведено точкову чистку коду в 19 файлах проєкту.
-- Видалено загалом 24 невикористовувані функції/змінні, 24 невикористовувані типи/інтерфейси та 2 члени enum.
-- Кодова база проєкту була значно спрощена, а публічні API модулів скорочені до реально використовуваних частин.
-
-## 2. Проблеми та перешкоди (якщо були)
-- Проблем під час виконання не виявлено. Всі операції базувалися на статичному аналізі та були виконані згідно з планом.
-```
+logService.js:92 [LOGIC] getAvailableMoves: Розрахунок завершено. Знайдено ходів: 0 Array(0)
+logService.js:92 [GAME_MODE] triggerComputerMove: Результат getComputerMove: null
+logService.js:94 [GAME_MODE] triggerComputerMove: У комп'ютера немає ходів, викликаємо handleNoMoves.
+logService.js:94 [GAME_MODE] handleNoMoves: Обробка ситуації "немає ходів" для гравця типу: computer.
+logService.js:92 [LOGIC] Executing side effect: ui/showModal Object
+manifest.json:1   Failed to load resource: the server responded with a status of 404 (Not Found)
+logService.js:92 [LOGIC] [userActionService] finishWithBonus called with reason: modal.gameOverReasonBonus
+logService.js:92 [GAME_MODE] [VsComputerGameMode] endGame called with reason: modal.gameOverReasonBonus
+logService.js:92 [LOGIC] Executing side effect: ui/showGameOverModal {reasonKey: 'modal.gameOverReasonBonus', reasonValues: null, finalScoreDetails: {…}, gameType: 'vs-computer', state: {…}}

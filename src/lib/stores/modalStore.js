@@ -34,6 +34,7 @@ import { logService } from '$lib/services/logService';
  * @property {boolean} [closeOnOverlayClick]
  * @property {string} [dataTestId]
  * @property {string} [titleDataTestId]
+ * @property {object} [titleValues]
  */
 
 /** @type {ModalState} */
@@ -76,6 +77,19 @@ export function showModal(modalDetails) {
   });
 }
 
+/**
+ * @param {Partial<ModalState>} modalDetails
+ */
+export function showModalAsReplacement(modalDetails) {
+  logService.ui(`[ModalStore] showModalAsReplacement called. Clearing stack and showing new modal: '${modalDetails.dataTestId || modalDetails.titleKey}'.`);
+  modalStack.length = 0; // Очищуємо стек
+  set({
+    ...initialState,
+    ...modalDetails,
+    isOpen: true,
+  });
+}
+
 export function closeModal() {
   logService.ui(`[ModalStore] closeModal called. Stack size: ${modalStack.length}`);
   if (modalStack.length > 0) {
@@ -94,4 +108,5 @@ export const modalStore = {
   subscribe,
   closeModal,
   showModal,
+  showModalAsReplacement
 };

@@ -44,6 +44,61 @@ export const modalService = {
     modalStore.closeModal();
   },
 
+  showGameOverModal(payload: {
+    reasonKey: string;
+    reasonValues: any;
+    finalScoreDetails: FinalScoreDetails;
+    gameType: 'vs-computer' | 'local';
+    state: GameState;
+  }): void {
+    const { reasonKey, reasonValues, finalScoreDetails, gameType, state } = payload;
+    const t = get(_);
+    const { winners } = determineWinner(state, reasonKey);
+
+    let titleKey = 'modal.gameOverTitle';
+    if (winners.length === 1) {
+      const winner = state.players.find(p => p.id === winners[0]);
+      if (winner) {
+        titleKey = gameType === 'local' ? 'modal.winnerTitle' : 'modal.gameOverTitle';
+      }
+    } else if (winners.length > 1) {
+      titleKey = 'modal.drawTitle';
+    }
+
+    modalStore.showModalAsReplacement({
+      titleKey,
+      titleValues: {
+        winnerName: state.players.find(p => p.id === winners[0])?.name || ''
+      },
+      content: {
+        reason: t(reasonKey, { values: reasonValues }),
+        scoreDetails: finalScoreDetails,
+      },
+      buttons: [
+        {
+          textKey: 'modal.playAgain',
+          onClick: () => userActionService.handleModalAction('playAgain'),
+          isHot: true,
+          customClass: 'green-btn',
+          dataTestId: 'play-again-btn',
+        },
+        {
+          textKey: 'modal.watchReplay',
+          onClick: () => userActionService.handleModalAction('requestReplay'),
+          customClass: 'blue-btn',
+          dataTestId: 'watch-replay-btn',
+        },
+        {
+          textKey: 'modal.mainMenu',
+          onClick: () => navigationService.goToMainMenu(),
+          dataTestId: 'game-over-main-menu-btn',
+        },
+      ],
+      closable: false,
+      dataTestId: 'game-over-modal',
+    });
+  },
+
   /**
    * Gets the current context of the modal for serialization.
    * @returns The serializable modal context or null if the modal is not open.

@@ -33,6 +33,7 @@ class SideEffectService {
         this.showModal(effect.payload);
         break;
       case 'ui/showGameOverModal':
+        this.showGameOverModal(effect.payload);
         break;
       case 'ui/closeModal':
         this.closeModal();
@@ -52,6 +53,12 @@ class SideEffectService {
 
   private showModal(payload: any): void {
     logService.ui('Showing modal:', payload);
+    modalStore.showModal(payload);
+  }
+
+  private showGameOverModal(payload: any): void {
+    logService.ui('Showing game over modal:', payload);
+    modalService.showGameOverModal(payload);
   }
 
   private closeModal(): void {
