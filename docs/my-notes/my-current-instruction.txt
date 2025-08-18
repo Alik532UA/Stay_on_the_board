@@ -4,13 +4,12 @@
 
 Поточнє завдання:
 виправити баг:
+1. зіграти першу гру 
+2. data-testid="continue-game-no-moves-btn"
+3. користувач робить хід
+Актуальний результат: комп'ютер не відповідає своїм ходом
+Очікуваний результат: комп'ютер відповідає своїм ходом
 
----
-
-data-testid="opponent-trapped-modal"
-натиснути data-testid="finish-game-with-bonus-btn"
-Актуальний результат: залишилось вікно data-testid="opponent-trapped-modal"
-Очікуваний результат: відкривається модальне вікно завершення гри
 
 ---
 
@@ -38,12 +37,8 @@ data-testid="opponent-trapped-modal"
 
 ---
 
-logService.js:92 [LOGIC] getAvailableMoves: Розрахунок завершено. Знайдено ходів: 0 Array(0)
-logService.js:92 [GAME_MODE] triggerComputerMove: Результат getComputerMove: null
-logService.js:94 [GAME_MODE] triggerComputerMove: У комп'ютера немає ходів, викликаємо handleNoMoves.
-logService.js:94 [GAME_MODE] handleNoMoves: Обробка ситуації "немає ходів" для гравця типу: computer.
-logService.js:92 [LOGIC] Executing side effect: ui/showModal Object
-manifest.json:1   Failed to load resource: the server responded with a status of 404 (Not Found)
-logService.js:92 [LOGIC] [userActionService] finishWithBonus called with reason: modal.gameOverReasonBonus
-logService.js:92 [GAME_MODE] [VsComputerGameMode] endGame called with reason: modal.gameOverReasonBonus
-logService.js:92 [LOGIC] Executing side effect: ui/showGameOverModal {reasonKey: 'modal.gameOverReasonBonus', reasonValues: null, finalScoreDetails: {…}, gameType: 'vs-computer', state: {…}}
+**Візуалізація дошки (`game-board`) НІКОЛИ не повинна впливати на `center-info` та логіку гри.**
+*   Логіка гри та `center-info` НІЧОГО не знають про існування візуальної дошки.
+*   Додавання або видалення пауз та анімацій стосується **тільки** візуального шару і не повинно жодним чином затримувати чи змінювати логіку гри та оновлення `center-info`.
+
+---
