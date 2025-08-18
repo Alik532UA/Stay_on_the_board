@@ -135,7 +135,7 @@
           {#if $modalState.titleKey === 'modal.gameOverTitle'}
             <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
           {/if}
-          <h2 class="modal-title" data-testid={$modalState.titleDataTestId} data-i18n-key={$modalState.titleKey}>
+          <h2 class="modal-title" data-testid={$modalState.dataTestId ? `${$modalState.dataTestId}-title` : ''} data-i18n-key={$modalState.titleKey}>
             {#if $i18nReady && $modalState.titleKey}
               {@html $_($modalState.titleKey, {
                 values: $modalState.content as any
