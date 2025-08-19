@@ -65,8 +65,19 @@ export const modalState = { subscribe };
  */
 export function showModal(modalDetails) {
   update(currentState => {
+    // НАВІЩО: Ця перевірка запобігає "нашаруванню" однакових модалок.
+    // Якщо нова модалка має той самий dataTestId (для тестів) або titleKey (якщо ID немає),
+    // вона вважається ідентичною до поточної, і поточна не додається до стеку.
+    // Це захист від помилок, коли showModal викликається кілька разів для однієї події.
     if (currentState.isOpen) {
-      modalStack.push(currentState);
+      const sameIdentity =
+        (modalDetails?.dataTestId && currentState.dataTestId === modalDetails.dataTestId) ||
+        (!modalDetails?.dataTestId && modalDetails?.titleKey && currentState.titleKey === modalDetails.titleKey);
+      if (!sameIdentity) {
+        modalStack.push(currentState);
+      } else {
+        logService.ui(`[ModalStore] showModal: Prevented stacking identical modal '${modalDetails.dataTestId || modalDetails.titleKey}'.`);
+      }
     }
     const newState = {
       ...initialState,
