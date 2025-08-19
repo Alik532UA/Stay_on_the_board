@@ -93,8 +93,8 @@ export function getAvailableMoves(
         logService.logic(`  [${direction}]: Знайдено доступний хід на (${nr}, ${nc}), відстань ${dist}.`);
         moves.push({ row: nr, col: nc, direction, distance: dist, isPenalty });
       } else {
-        logService.logic(`  [${direction}]: Клітинка (${nr}, ${nc}) заблокована. Зупинка пошуку в цьому напрямку.`);
-        break;
+        logService.logic(`  [${direction}]: Клітинка (${nr}, ${nc}) заблокована. Продовжуємо пошук в цьому напрямку.`);
+        // Не перериваємо цикл, а продовжуємо шукати доступні клітинки далі
       }
     }
   }
