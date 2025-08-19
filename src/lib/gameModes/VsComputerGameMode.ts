@@ -6,11 +6,10 @@ import { moveDirections } from '$lib/utils/translations';
 import { lastComputerMove, availableMoves as derivedAvailableMoves } from '$lib/stores/derivedState';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService';
-import { playerInputStore } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { userActionService } from '$lib/services/userActionService';
-import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
+import type { SideEffect } from '$lib/services/sideEffectService';
 import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { getAvailableMoves } from '$lib/utils/boardUtils';
@@ -111,8 +110,10 @@ export class VsComputerGameMode extends BaseGameMode {
       sideEffects = await this.handleNoMoves('computer');
     }
     gameState.update(state => ({...state, isComputerMoveInProgress: false}));
-    playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
-    sideEffects.forEach(effect => sideEffectService.execute(effect));
+    // ЧОМУ ЦЕ ВАЖЛИВО: GameMode НЕ МАЄ напряму виконувати сайд-ефекти або змінювати стан вводу.
+    // Він лише повертає список сайд-ефектів. Єдиним виконавцем є userActionService,
+    // що гарантує єдине джерело істини (SSoT) і запобігає подвійному виконанню,
+    // як-от у випадку з модалкою "opponent-trapped-modal".
     return sideEffects;
   }
 
