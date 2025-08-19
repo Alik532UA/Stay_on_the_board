@@ -83,6 +83,7 @@ export const userActionService = {
       },
       titleKey: 'replay.title',
       buttons: [{ textKey: 'modal.close', onClick: () => modalStore.closeModal() }],
+      dataTestId: 'replay-modal',
     });
   },
 

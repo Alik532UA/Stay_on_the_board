@@ -80,7 +80,6 @@ export class VsComputerGameMode extends BaseGameMode {
       if (!moveResult.success) {
         logService.GAME_MODE('triggerComputerMove: Хід комп\'ютера не вдався, обробка "немає ходів".');
         sideEffects = await this.handleNoMoves('computer');
-        sideEffects.forEach(effect => sideEffectService.execute(effect));
       } else {
         sideEffects = await this.onPlayerMoveSuccess(moveResult);
         const settings = get(settingsStore);
@@ -108,7 +107,6 @@ export class VsComputerGameMode extends BaseGameMode {
     } else {
       logService.GAME_MODE('triggerComputerMove: У комп\'ютера немає ходів, викликаємо handleNoMoves.');
       sideEffects = await this.handleNoMoves('computer');
-      sideEffects.forEach(effect => sideEffectService.execute(effect));
     }
     gameState.update(state => ({...state, isComputerMoveInProgress: false}));
     playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
@@ -151,17 +149,16 @@ export class VsComputerGameMode extends BaseGameMode {
       wasResumed: true,
       isGameOver: false,
       gameOverReasonKey: null as string | null,
-      gameOverReasonValues: null as Record<string, any> | null
+      gameOverReasonValues: null as Record<string, any> | null,
+      currentPlayerIndex: 0 // Повертаємо хід гравцю-людині
     };
 
     gameState.update(state => ({...state, ...continueChanges}));
     
     gameOverStore.resetGameOverState();
     animationStore.reset();
-    
-    const nextPlayerEffects = await this.advanceToNextPlayer();
-    
-    return [{ type: 'ui/closeModal' }, ...nextPlayerEffects];
+        
+    return [{ type: 'ui/closeModal' }];
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]> {
