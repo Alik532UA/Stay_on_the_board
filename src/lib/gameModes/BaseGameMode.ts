@@ -100,7 +100,7 @@ export abstract class BaseGameMode implements IGameMode {
       gameType: gameType,
     });
 
-    sideEffectService.execute({
+    return [{
       type: 'ui/showGameOverModal',
       payload: {
         reasonKey,
@@ -109,9 +109,7 @@ export abstract class BaseGameMode implements IGameMode {
         gameType,
         state
       }
-    });
-
-    return [];
+    }];
   }
 
   async restartGame(): Promise<SideEffect[]> {
