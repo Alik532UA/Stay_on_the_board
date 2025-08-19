@@ -33,7 +33,7 @@ test.describe('Модальне вікно "Суперник у пастці"', 
     await makeMove(page, 'left', 1);
 
     // Задаємо параметри ходу комп'ютера, щоб ходив рандомно
-    await page.getByTestId('test-mode-start-pos-random-btn').click();
+    await page.getByTestId('test-mode-computer-move-random-btn').click(); // 
     
     await makeMove(page, 'right', 1, false);
 

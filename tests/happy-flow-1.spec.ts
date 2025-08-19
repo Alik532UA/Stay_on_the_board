@@ -20,12 +20,14 @@ test.describe('хепі флоу', () => {
     await makeMove(page, 'left', 1);
 
     // Задаємо параметри ходу комп'ютера, щоб ходив рандомно
-    await page.getByTestId('test-mode-start-pos-random-btn').click();
+    await page.getByTestId('test-mode-computer-move-random-btn').click();
     
     await makeMove(page, 'right', 1, false);
 
     // Перевіряємо, що модальне вікно "Суперник у пастці!"/"Opponent is Trapped!" з'явилося
     await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
+
+    await page.waitForTimeout(777777);
 
     // Перевіряємо заголовок модального вікна за ключем локалізації
     await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.computerNoMovesTitle');
