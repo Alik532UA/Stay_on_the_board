@@ -9,6 +9,7 @@ test.describe('хепі флоу', () => {
   });
 
   test('хепі флоу 1', { tag: ['@inProgress', '@HF-1'] }, async ({ page }) => {
+    test.setTimeout(1000 * 60 * 15); // 15 minutes
     // Вмикаємо режим блокування клітинок
     await startNewGame(page);
     await setBoardSize(page, 3);
@@ -27,7 +28,7 @@ test.describe('хепі флоу', () => {
     // Перевіряємо, що модальне вікно "Суперник у пастці!"/"Opponent is Trapped!" з'явилося
     await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
 
-    await page.waitForTimeout(777777);
+    // await page.waitForTimeout(7777777);
 
     // Перевіряємо заголовок модального вікна за ключем локалізації
     await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.computerNoMovesTitle');
@@ -44,8 +45,14 @@ test.describe('хепі флоу', () => {
     // Перевіряємо, що модальне вікно "Суперник у пастці!"/"Opponent is Trapped!" з'явилося
     await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
 
+    // await page.waitForTimeout(7777);
+
+    await page.waitForTimeout(7777777);
+
     // Натискаємо на кнопку "Продовжити"
     await page.getByTestId('continue-game-no-moves-btn').click();
+    
+    await page.waitForTimeout(7777777);
 
     // Перевіряємо, що модальне вікно "Суперник у пастці!"/"Opponent is Trapped!" НЕ з'явилося
     await expect(page.getByTestId('opponent-trapped-modal')).not.toBeVisible();

@@ -110,6 +110,7 @@ export class VsComputerGameMode extends BaseGameMode {
     }
     gameState.update(state => ({...state, isComputerMoveInProgress: false}));
     playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+    sideEffects.forEach(effect => sideEffectService.execute(effect));
     return sideEffects;
   }
 
