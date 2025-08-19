@@ -7,6 +7,7 @@ import { logService } from '$lib/services/logService';
  * @property {string} [textKey]
  * @property {boolean} [primary]
  * @property {() => void} [onClick]
+ * @property {boolean} [disabled]
  * @property {string} [customClass]
  * @property {boolean} [isHot]
  * @property {string} [hotKey]

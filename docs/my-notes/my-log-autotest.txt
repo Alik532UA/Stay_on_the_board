@@ -76,16 +76,5 @@ logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgres
 logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
 logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
 logService.js:100 [GAME_MODE] [VsComputerGameMode] continueAfterNoMoves called
-logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
-logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
-logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
-logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
-logService.js:98 [LOGIC_AI] getComputerMove: обрано хід з бонусом Object
-logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
-logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
-logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
-logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
-logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
-logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
 logService.js:98 [LOGIC_MOVE] Executing side effect: ui/closeModal 
 logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false

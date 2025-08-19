@@ -1,6 +1,8 @@
 ﻿<script lang="ts">
   import { modalState, modalStore } from '$lib/stores/modalStore.js';
+  import { playerInputStore } from '$lib/stores/playerInputStore.js';
 
+  import { get } from 'svelte/store';
   import { _, init } from 'svelte-i18n';
   import { i18nReady } from '$lib/i18n/init.js';
   import SvgIcons from './SvgIcons.svelte';
@@ -18,6 +20,11 @@
   let expertVolume = 0.3;
   let volumePercentage = 30;
   let isCompactScoreMode = false;
+  let processingButtons: boolean[] = [];
+
+  $: if ($modalState.buttons) {
+    processingButtons = Array($modalState.buttons.length).fill(false);
+  }
 
   onMount(() => {
     expertVolume = audioService.loadVolume();
@@ -240,7 +247,6 @@
       </div>
       <div class="modal-action-buttons">
         {#each $modalState.buttons as btn, i (i)}
-          {@const useTooltip = btn.hotKey ? hotkeyTooltip : () => {}}
           {#if btn.isHot && !$modalState.buttons.slice(0, i).some(b => b.isHot)}
             <button
               class="modal-btn-generic"
@@ -249,22 +255,25 @@
               class:green-btn={btn.customClass === 'green-btn'}
               class:danger-btn={btn.customClass === 'danger-btn'}
               bind:this={hotBtn}
-              use:useTooltip={{ key: btn.hotKey }}
-              onclick={() => {
+              use:hotkeyTooltip={{ key: btn.hotKey }}
+              onclick={async () => {
+                if (processingButtons[i] || get(playerInputStore).isMoveInProgress) return;
+                processingButtons[i] = true;
+
                 logService.action(`Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`);
-                logService.ui(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`);
-                logService.ui('Modal button clicked (hot):', { textKey: btn.textKey, text: btn.text, onClick: btn.onClick });
                 if (btn.onClick) {
-                  logService.ui('Executing onClick handler...');
-                  btn.onClick();
+                  await btn.onClick();
                 } else {
-                  logService.ui('No onClick handler, closing modal');
                   modalStore.closeModal();
                 }
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
               data-testid={btn.dataTestId || `modal-btn-${btn.textKey || btn.text}`}
+              disabled={btn.disabled || $playerInputStore.isMoveInProgress || processingButtons[i]}
             >
+              <!-- НАВІЩО: Додано `$playerInputStore.isMoveInProgress` для глобального блокування кнопок.
+                   Це запобігає подвійним клікам під час виконання асинхронних операцій
+                   і вирішує проблему стану гонитви (race condition) в автотестах. -->
               {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
             </button>
           {:else}
@@ -274,22 +283,25 @@
               class:blue-btn={btn.customClass === 'blue-btn'}
               class:green-btn={btn.customClass === 'green-btn'}
               class:danger-btn={btn.customClass === 'danger-btn'}
-              use:useTooltip={{ key: btn.hotKey }}
-              onclick={() => {
+              use:hotkeyTooltip={{ key: btn.hotKey }}
+              onclick={async () => {
+                if (processingButtons[i] || get(playerInputStore).isMoveInProgress) return;
+                processingButtons[i] = true;
+
                 logService.action(`Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`);
-                logService.ui(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`);
-                logService.ui('Modal button clicked (regular):', { textKey: btn.textKey, text: btn.text, onClick: btn.onClick });
                 if (btn.onClick) {
-                  logService.ui('Executing onClick handler...');
-                  btn.onClick();
+                  await btn.onClick();
                 } else {
-                  logService.ui('No onClick handler, closing modal');
                   modalStore.closeModal();
                 }
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
               data-testid={btn.dataTestId || `modal-btn-${btn.textKey || btn.text}`}
+              disabled={btn.disabled || $playerInputStore.isMoveInProgress || processingButtons[i]}
             >
+              <!-- НАВІЩО: Додано `$playerInputStore.isMoveInProgress` для глобального блокування кнопок.
+                   Це запобігає подвійним клікам під час виконання асинхронних операцій
+                   і вирішує проблему стану гонитви (race condition) в автотестах. -->
               {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
             </button>
           {/if}

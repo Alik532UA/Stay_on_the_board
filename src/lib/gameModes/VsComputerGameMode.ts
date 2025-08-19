@@ -1,3 +1,4 @@
+import { tick } from 'svelte';
 import { get } from 'svelte/store';
 import { _, locale } from 'svelte-i18n';
 import { BaseGameMode } from './index';
@@ -66,6 +67,7 @@ export class VsComputerGameMode extends BaseGameMode {
     logService.GAME_MODE('triggerComputerMove: Початок ходу комп\'ютера.');
     const state = get(gameState);
     gameState.update(state => ({...state, isComputerMoveInProgress: true}));
+
 
     const computerMove = gameLogicService.getComputerMove();
     logService.GAME_MODE('triggerComputerMove: Результат getComputerMove:', computerMove);
@@ -152,16 +154,19 @@ export class VsComputerGameMode extends BaseGameMode {
       isGameOver: false,
       gameOverReasonKey: null as string | null,
       gameOverReasonValues: null as Record<string, any> | null,
-      currentPlayerIndex: 0 // Повертаємо хід гравцю-людині
+      // Згідно з правилами, хід залишається у гравця-людини (індекс 0).
+      // Тому currentPlayerIndex тут явно встановлюється в 0.
+      currentPlayerIndex: 0
     };
 
     gameState.update(state => ({...state, ...continueChanges}));
     
     gameOverStore.resetGameOverState();
     animationStore.reset();
-    
-    this.advanceToNextPlayer();
-        
+
+    // У цьому режимі хід не передається комп'ютеру після очищення дошки.
+    // Гравець-людина продовжує свій хід з чистої дошки.
+    // Тому this.advanceToNextPlayer() тут не викликається.
     return [{ type: 'ui/closeModal' }];
   }
 

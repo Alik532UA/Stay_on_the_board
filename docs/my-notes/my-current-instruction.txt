@@ -1,3 +1,31 @@
+
+**Роль:** Ти — провідний AI-архітектор та старший розробник. Твоя головна сила — глибокий аналіз коду, виявлення першопричин проблем та розробка елегантних, надійних і ефективних рішень. Ти не тільки виправляєш баги та впроваджуєш нову логіку, а й покращуєш архітектуру коду та проєкту.
+
+**Принципи:**
+Коли ти працюєш з кодом, він має відповідати наступним критеріям:
+1.  **SSoT (Single Source of Truth):** Чи є єдине джерело правди для кожного елемента стану?
+2.  **UDF (Unidirectional Data Flow):** Чи є потік даних односпрямованим та передбачуваним?
+3.  **SoC (Separation of Concerns):** Наскільки добре розділені відповідальності (стан, логіка, UI)?
+4.  **Композиція:** Чи ефективно використовуються компоненти для побудови UI?
+5.  **Чистота та Побічні ефекти:** Наскільки добре ізольовані "нечисті" операції (API, DOM, таймери)?
+6.  **DRY (Don't Repeat Yourself):** Чи є дублювання коду, яке можна усунути?
+7.  **Простота та Читабельність (KISS):** Чи є надмірно складні рішення? Наскільки код зрозумілий (якість іменування)?
+8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
+9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
+
+**Контекст:** Я доручаю тобі проаналізувати завдання у контексті мого проєкту. Твоя задача — створити чіткий, покроковий та детальний план дій для AI-асистента Gemini в доповненні RooCode в VS Code. Агент потребує точного і продуманого керівництва від тебе.
+
+**Якість понад усе:** Це завдання — змагання на якість аналізу та стратегічного мислення з іншими моделями AI. Надавай не просто правильні, а найбільш продумані, обґрунтовані та чіткі інструкції. Не треба змагатися у швидкості, тому що чим довше ти будеш думати для якісної інструкції, тим краще.
+
+---
+
+### **Формат твого фінального виводу: План для AI-асистента (RooCode)**
+
+Твій кінцевий результат — це не просто аналіз, а готовий до виконання, детальний план для AI-асистента Gemini (RooCode). Цей план має бути єдиним джерелом інструкцій для асистента.
+
+Твоя відповідь **завжди** повинна мати наступну структуру у форматі Markdown:
+
+````markdown
 # План дій для AI-асистента
 
 ## 1. Інструкції для асистента
@@ -13,59 +41,19 @@
 
 ## 2. Покроковий план дій
 
-### **Аналіз проблеми**
+Тут ти, як AI-архітектор, на основі свого аналізу надаєш детальний, покроковий план.
 
-Аналіз наданих скріншотів та логів виявив, що попередній план був реалізований **не повністю**. Хоча логіка блокування (`isMoveInProgress`) була додана на сервісному рівні, на UI-рівні (`DirectionControls.svelte`) вона була застосована лише до кнопок напрямку (`dir-btn`), але **не до кнопок відстані (`dist-btn`) та кнопки "Ходів немає" (`no-moves-btn`)**.
+*   **(Приклад) Крок 1: Рефакторинг файлу `src/components/UserProfile.tsx`**
+    *   **Дія:** Винести логіку стану користувача у новий хук `useUserData`.
+    *   **Обґрунтування:** Дотримання принципу SoC, покращення читабельності та перевикористання логіки.
 
-Це залишило "вікно" для виникнення **стану гонитви (race condition)**, яке надійно відтворюється швидким автотестом, але не завжди проявляється при ручному тестуванні. Автотест встигає ініціювати нову дію до того, як попередня повністю завершилася, що призводить до пошкодження стану та "зависання" модального вікна.
+*   **(Приклад) Крок 2: Створення файлу `src/hooks/useUserData.ts`**
+    *   **Дія:** Створити новий файл та реалізувати в ньому хук `useUserData`, який буде інкапсулювати `useState` та `useEffect` для отримання даних користувача.
+    *   **Обґрунтування:** Ізоляція побічних ефектів (API-запити) та створення єдиного джерела правди (SSoT) для даних користувача.
 
-### **Стратегія вирішення**
-
-Ми завершимо попередній план, реалізувавши **повне та надійне блокування всього ігрового вводу** на час обробки ходу. Це забезпечить атомарність кожної дії користувача та повну стійкість до стану гонитви. Додатково, ми покращимо систему логування для спрощення майбутньої діагностики, як було запропоновано.
-
----
-
-*   **Крок 1: Деталізація системи логування**
-    *   **Файл:** `src/lib/services/logService.js`
-    *   **Дія:**
-        1.  Розділити існуючу групу `LOGIC` на більш гранулярні підгрупи. Заміни `LOGIC: 'logic'` у `LOG_GROUPS` на:
-            ```javascript
-            LOGIC_MOVE: 'logic_move',       // Для performMove та розрахунку ходів
-            LOGIC_AI: 'logic_ai',         // Для логіки вибору ходу комп'ютером
-            LOGIC_AVAILABILITY: 'logic_availability', // Для getAvailableMoves
-            ```
-        2.  Оновити об'єкт `defaultConfig`, вимкнувши стару групу `LOGIC` (якщо вона ще є) та увімкнувши нові:
-            ```javascript
-            [LOG_GROUPS.LOGIC_MOVE]: true,
-            [LOG_GROUPS.LOGIC_AI]: true,
-            [LOG_GROUPS.LOGIC_AVAILABILITY]: false, // Вимкнемо за замовчуванням, щоб зменшити шум
-            ```
-        3.  Додати відповідні стилі для нових груп в об'єкт `styles`.
-        4.  Додати нові методи до `logService` для кожної нової групи: `logicMove`, `logicAI`, `logicAvailability`.
-    *   **Обґрунтування:** Дотримання принципу **SoC** навіть у логуванні. Це дозволить більш гнучко керувати виводом логів та фокусуватися на конкретних аспектах логіки під час відладки.
-
-*   **Крок 2: Оновлення викликів логування в коді**
-    *   **Файл:** `src/lib/services/gameLogicService.ts`
-    *   **Дія:** Замінити всі виклики `logService.logic()` на більш специфічні:
-        *   У функції `performMove` використовувати `logService.logicMove()`.
-        *   У функції `getComputerMove` використовувати `logService.logicAI()`.
-        *   У функції `getAvailableMoves` використовувати `logService.logicAvailability()`.
-    *   **Обґрунтування:** Впровадження нової, більш деталізованої системи логування.
-
-*   **Крок 3: Завершення повного блокування UI**
-    *   **Файл:** `src/lib/components/widgets/DirectionControls.svelte`
-    *   **Дія:**
-        1.  Переконайся, що існує реактивна змінна `$: isMoveInProgress = $playerInputStore.isMoveInProgress;`.
-        2.  Додай атрибут `disabled={isMoveInProgress}` до **кожної** кнопки відстані (`dist-btn`) та до кнопки "Ходів немає" (`no-moves-btn`).
-    *   **Обґрунтування:** Це **критичне виправлення**, яке повністю закриває можливість стану гонитви з боку UI. Блокування **всіх** елементів вводу гарантує, що жодна нова дія не може бути ініційована до завершення поточної.
-
-*   **Крок 4: Додавання діагностичного логування в `userActionService`**
-    *   **Файл:** `src/lib/services/userActionService.ts`
-    *   **Дія:** Додати виклики `logService` для чіткого відстеження стану блокування:
-        *   Всередині блоку `try` (після встановлення прапорця в `true`) додай: `logService.logic('[userActionService] Input locked: isMoveInProgress=true');`
-        *   Всередині блоку `finally` (перед встановленням прапорця в `false`) додай: `logService.logic('[userActionService] Input unlocked: isMoveInProgress=false');`
-        *   Зроби це для обох методів: `confirmMove` та `handleModalAction`.
-    *   **Обґрунтування:** Покращення **простоти та читабельності** потоку даних. Ці логи дозволять легко верифікувати, що механізм блокування працює коректно, і значно спростять відладку в майбутньому.
+*   **(Приклад) Крок 3: Оновлення файлу `src/api/client.ts`**
+    *   **Дія:** Додати нову функцію `fetchUserProfile(userId)`.
+    *   **Обґрунтування:** Усунення дублювання коду (DRY) шляхом централізації API-запитів.
 
 ---
 
@@ -77,11 +65,1531 @@
 # Звіт про виконання завдання
 
 ## 1. Виконана робота
-- Модифіковано `src/lib/services/logService.js`: деталізовано групу логування `LOGIC` на `LOGIC_MOVE`, `LOGIC_AI`, `LOGIC_AVAILABILITY` для більш гнучкої відладки.
-- Оновлено `src/lib/services/gameLogicService.ts`: замінено виклики `logService.logic()` на нові, більш специфічні методи.
-- Виправлено `src/lib/components/widgets/DirectionControls.svelte`: реалізовано **повне** блокування всіх кнопок керування (напрямки, відстані, "Ходів немає") за допомогою прапорця `isMoveInProgress`.
-- Додано діагностичне логування в `src/lib/services/userActionService.ts` для чіткого відстеження стану блокування вводу користувача.
+- (Приклад) Рефакторинг компонента `UserProfile.tsx`: виніс стан в хук `useUserData`.
+- (Приклад) Створення файлу `src/hooks/useUserData.ts` та реалізація хука.
+- (Приклад) Оновлення файлу `src/api/client.ts`: додано функцію `fetchUserProfile`.
 
 ## 2. Проблеми та перешкоди (якщо були)
-- Проблем під час виконання не виявлено.
+- Опис будь-яких труднощів, непередбачених ситуацій або обмежень.
+- Якщо проблем не виникло, напиши: "Проблем під час виконання не виявлено."
 ```
+````
+
+
+---
+
+@/tests/happy-flow-1.spec.ts 
+
+коли автотест доходить до натискання кнопки "continue-game-no-moves-btn", і далі або автотест, або користувач мануально натискає на кнопку "continue-game-no-moves-btn", гра запускається заново
+Актуальний результат: data-testid="opponent-trapped-modal" не зникає
+Очікуваний результат: data-testid="opponent-trapped-modal" зникає
+
+Коли ті самі кроки я роблю вручну з самого початку, то такої проблеми немає. тобто до цього моменту, якась функція працює не правильно. Але я думаю що сама кнопка "continue-game-no-moves-btn" працює правильно, бо в незалежності від того хто її натискає, чи користувач мануально, чи автотест, то результат однаковий натискає на кнопку 
+
+---
+"C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\src\lib\components\Modal.svelte"
+<script lang="ts">
+  import { modalState, modalStore } from '$lib/stores/modalStore.js';
+  import { playerInputStore } from '$lib/stores/playerInputStore.js';
+
+  import { get } from 'svelte/store';
+  import { _, init } from 'svelte-i18n';
+  import { i18nReady } from '$lib/i18n/init.js';
+  import SvgIcons from './SvgIcons.svelte';
+  import FAQModal from './FAQModal.svelte';
+  import { onMount } from 'svelte';
+  import { audioService } from '$lib/services/audioService.js';
+  import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
+  import { focusManager } from '$lib/stores/focusManager.js';
+  import { logService } from '$lib/services/logService.js';
+  import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
+
+  let hotBtn: HTMLButtonElement | null = null;
+  let modalContent: HTMLDivElement | null = null;
+
+  let expertVolume = 0.3;
+  let volumePercentage = 30;
+  let isCompactScoreMode = false;
+  let processingButtons: boolean[] = [];
+
+  $: if ($modalState.buttons) {
+    processingButtons = Array($modalState.buttons.length).fill(false);
+  }
+
+  onMount(() => {
+    expertVolume = audioService.loadVolume();
+
+    /** @param {KeyboardEvent} e */
+    const handleKeydown = (e: KeyboardEvent) => {
+      if ($modalState.isOpen && e.key === 'Escape') {
+        logService.ui('Escape key pressed, closing modal');
+        modalStore.closeModal();
+      }
+    };
+    
+    // Додаємо обробник resize для перевірки компактного режиму
+    const handleResize = () => {
+      if ($modalState.isOpen) {
+        checkCompactMode();
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleKeydown);
+    
+    return () => {
+      audioService.pause();
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeydown);
+    };
+  });
+
+  // Реактивний блок для керування логікою
+  $: {
+    const isTestEnvironment = import.meta.env.CI === 'true' || import.meta.env.MODE === 'test';
+    const shouldPlay = $modalState.isOpen && $modalState.titleKey === 'modal.expertModeTitle' && !isTestEnvironment;
+
+    // Оновлюємо гучність, зберігаємо її та оновлюємо CSS-змінну для стилізації
+    audioService.setVolume(expertVolume);
+    audioService.saveVolume(expertVolume);
+    volumePercentage = expertVolume * 100;
+
+    if (shouldPlay) {
+      audioService.play();
+    } else {
+      audioService.pause();
+    }
+  }
+
+  $: if ($modalState.isOpen && hotBtn) {
+    focusManager.focusWithDelay(hotBtn, 50);
+  }
+
+  // Функція для перевірки, чи потрібен компактний режим
+  function checkCompactMode() {
+    if (modalContent) {
+      const hasScroll = modalContent.scrollHeight > modalContent.clientHeight;
+      isCompactScoreMode = hasScroll;
+    }
+  }
+
+  // Перевіряємо компактний режим при зміні стану модального вікна
+  $: if ($modalState.isOpen && modalContent) {
+    // Невелика затримка для забезпечення рендерингу
+    setTimeout(checkCompactMode, 100);
+  }
+
+  function onModalKeydown(e: KeyboardEvent) {
+    if (!$modalState.isOpen || !$modalState.buttons) return;
+    const idx = $modalState.buttons.findIndex(b => b.isHot);
+    if (idx !== -1 && (e.key === 'Enter' || e.key === ' ' || e.code === 'Numpad5')) {
+      e.preventDefault();
+      e.stopPropagation();
+      const button = $modalState.buttons[idx];
+      if (button && typeof button.onClick === 'function') {
+        button.onClick();
+      } else {
+        modalStore.closeModal();
+      }
+    }
+  }
+
+  function onOverlayClick(e: MouseEvent) {
+    if (!$modalState.closeOnOverlayClick) return;
+    const target = e.target as HTMLElement;
+    if (target && target.classList.contains('modal-overlay')) {
+      logService.ui('Закриття модального вікна (overlay)');
+      modalStore.closeModal();
+    }
+  }
+</script>
+
+{#if $modalState.isOpen}
+  <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.ok')} onclick={onOverlayClick} onkeydown={onModalKeydown}>
+    <div class="modal-window" data-testid={$modalState.dataTestId}>
+      {#if $modalState.titleKey || $modalState.title}
+      <div class="modal-header">
+        {#if $modalState.titleKey === 'modal.expertModeTitle'}
+          <!-- Контейнер для повзунка, якому ми передаємо CSS-змінну -->
+          <div class="volume-control-container" style="--volume-percentage: {volumePercentage}%; position: relative;">
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              bind:value={expertVolume}
+              class="volume-slider"
+              aria-label={$_('voiceSettings.volume')}
+            />
+            <span class="volume-thumb-svg" style="left: calc((100% - 32px) * {expertVolume});">
+              <SvgIcons name="boxing-glove-pictogram-1" />
+            </span>
+            <span class="volume-label">{$_('voiceSettings.volumeLabel')}: {volumePercentage.toFixed(0)}%</span>
+          </div>
+        {/if}
+
+        <div class="modal-title-wrapper">
+          {#if $modalState.titleKey === 'modal.gameOverTitle'}
+            <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
+          {/if}
+          <h2 class="modal-title" data-testid={$modalState.dataTestId ? `${$modalState.dataTestId}-title` : ''} data-i18n-key={$modalState.titleKey}>
+            {#if $i18nReady && $modalState.titleKey}
+              {@html $_($modalState.titleKey, {
+                values: $modalState.content as any
+              })}
+            {:else}
+              {$modalState.title}
+            {/if}
+          </h2>
+        </div>
+
+        {#if !(($modalState.buttons && $modalState.buttons.length === 2 && $modalState.buttons.every(btn => typeof btn.onClick === 'function')) || $modalState.titleKey === 'modal.gameOverTitle' || ($modalState.buttons && $modalState.buttons.length === 1))}
+          {#if $modalState.closable}
+            <button class="modal-close" use:hotkeyTooltip={{ key: 'ESC' }} onclick={() => { logService.ui('Закриття модального вікна (X)'); modalStore.closeModal(); }} data-testid="modal-btn-modal.close">×</button>
+          {/if}
+        {/if}
+      </div>
+      {/if}
+      <div class="modal-content" class:is-faq={typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq} bind:this={modalContent}>
+        {#if typeof $modalState.content === 'object' && $modalState.content && 'reason' in $modalState.content}
+          <p class="reason" data-testid="modal-content-reason" data-i18n-key={($modalState.content as any).reasonKey}>{$modalState.content.reason}</p>
+        {/if}
+        {#if $modalState.component}
+          <svelte:component this={$modalState.component as any} {...$modalState.props} />
+        {:else if typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq}
+          <FAQModal />
+        {:else if typeof $modalState.content === 'object' && $modalState.content && 'key' in $modalState.content && 'actions' in $modalState.content}
+          <p class="reason">{$_('modal.keyConflictContent', { values: { key: $modalState.content.key as string } })}</p>
+        {:else if $modalState.contentKey}
+          <p class="reason">
+            {@html $_($modalState.contentKey, {
+              values: $modalState.content as any
+            })}
+          </p>
+        {:else if typeof $modalState.content === 'string' && $modalState.content}
+          <p class="reason">
+            {@html $modalState.content}
+          </p>
+        {/if}
+
+                  {#if ($modalState.content && typeof $modalState.content === 'object' && 'scoreDetails' in $modalState.content) && !$modalState.component}
+            <!-- Показуємо рахунки гравців для локальної гри -->
+            {#if ($modalState.content as any)?.playerScores && ($modalState.content as any).playerScores.length > 0}
+              <div class="player-scores-container">
+                <h3>Рахунки гравців:</h3>
+                {#each ($modalState.content as any).playerScores as playerScore}
+                  <div class="player-score-row" class:winner={playerScore.isWinner} class:loser={playerScore.isLoser}>
+                    <span class="player-name">
+                      {#if playerScore.isWinner}
+                        <span class="winner-badge">🏆</span>
+                      {:else if playerScore.isLoser}
+                        <span class="loser-badge">🐚</span>
+                      {/if}
+                      {$_('modal.scoreDetails.playerScore', {
+                        values: {
+                          playerName: playerScore.playerName,
+                          score: playerScore.score
+                        }
+                      })}
+                    </span>
+                  </div>
+                {/each}
+              </div>
+            {:else}
+              <!-- Показуємо деталі рахунку тільки для гри проти комп'ютера -->
+              <div class="score-details-container" data-testid="score-details-container">
+                <div class="score-detail-row" data-testid="base-score">{$_('modal.scoreDetails.baseScore')} <span data-testid="base-score-value">{($modalState.content as any)?.scoreDetails?.baseScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span></div>
+                {#if ($modalState.content as any)?.scoreDetails?.sizeBonus > 0}
+                  <div class="score-detail-row" data-testid="size-bonus">{$_('modal.scoreDetails.sizeBonus')} <span data-testid="size-bonus-value">+{($modalState.content as any)?.scoreDetails?.sizeBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.blockModeBonus > 0}
+                  <div class="score-detail-row" data-testid="block-mode-bonus">{$_('modal.scoreDetails.blockModeBonus')} <span data-testid="block-mode-bonus-value">+{($modalState.content as any)?.scoreDetails?.blockModeBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.jumpBonus > 0}
+                  <div class="score-detail-row" data-testid="jump-bonus">{$_('modal.scoreDetails.jumpBonus')} <span data-testid="jump-bonus-value">+{($modalState.content as any)?.scoreDetails?.jumpBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.noMovesBonus > 0}
+                  <div class="score-detail-row" data-testid="no-moves-bonus">{$_('modal.scoreDetails.noMovesBonus')} <span data-testid="no-moves-bonus-value">+{($modalState.content as any)?.scoreDetails?.noMovesBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.distanceBonus > 0}
+                  <div class="score-detail-row" data-testid="distance-bonus">{$_('modal.scoreDetails.distanceBonus')} <span data-testid="distance-bonus-value">+{($modalState.content as any)?.scoreDetails?.distanceBonus}</span></div>
+                {/if}
+                {#if ($modalState.titleKey === 'modal.gameOverTitle' && ($modalState.content as any)?.scoreDetails?.finishBonus > 0)}
+                  <div class="score-detail-row" data-testid="finish-bonus">{$_('modal.scoreDetails.finishBonus')} <span data-testid="finish-bonus-value">+{($modalState.content as any)?.scoreDetails?.finishBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.totalPenalty > 0}
+                  <div class="score-detail-row penalty" data-testid="total-penalty">{$_('modal.scoreDetails.penalty')} <span data-testid="total-penalty-value">-{(($modalState.content as any)?.scoreDetails?.totalPenalty)}</span></div>
+                {/if}
+              </div>
+              <div class="final-score-container" class:compact={isCompactScoreMode}>
+                {#if isCompactScoreMode}
+                  <div class="final-score-compact">
+                    <span class="final-score-label-inline">{$_('modal.scoreDetails.finalScore')}</span>
+                    <span class="final-score-value-inline" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span>
+                  </div>
+                {:else}
+                  <div class="final-score-label">{$_('modal.scoreDetails.finalScore')}</div>
+                  <div class="final-score-value" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</div>
+                {/if}
+              </div>
+            {/if}
+          {/if}
+      </div>
+      <div class="modal-action-buttons">
+        {#each $modalState.buttons as btn, i (i)}
+          {#if btn.isHot && !$modalState.buttons.slice(0, i).some(b => b.isHot)}
+            <button
+              class="modal-btn-generic"
+              class:primary={btn.primary && !btn.customClass}
+              class:blue-btn={btn.customClass === 'blue-btn'}
+              class:green-btn={btn.customClass === 'green-btn'}
+              class:danger-btn={btn.customClass === 'danger-btn'}
+              bind:this={hotBtn}
+              use:hotkeyTooltip={{ key: btn.hotKey }}
+              onclick={async () => {
+                if (processingButtons[i] || get(playerInputStore).isMoveInProgress) return;
+                processingButtons[i] = true;
+
+                logService.action(`Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`);
+                if (btn.onClick) {
+                  await btn.onClick();
+                } else {
+                  modalStore.closeModal();
+                }
+              }}
+              aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
+              data-testid={btn.dataTestId || `modal-btn-${btn.textKey || btn.text}`}
+              disabled={btn.disabled || $playerInputStore.isMoveInProgress || processingButtons[i]}
+            >
+              <!-- НАВІЩО: Додано `$playerInputStore.isMoveInProgress` для глобального блокування кнопок.
+                   Це запобігає подвійним клікам під час виконання асинхронних операцій
+                   і вирішує проблему стану гонитви (race condition) в автотестах. -->
+              {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
+            </button>
+          {:else}
+            <button
+              class="modal-btn-generic"
+              class:primary={btn.primary && !btn.customClass}
+              class:blue-btn={btn.customClass === 'blue-btn'}
+              class:green-btn={btn.customClass === 'green-btn'}
+              class:danger-btn={btn.customClass === 'danger-btn'}
+              use:hotkeyTooltip={{ key: btn.hotKey }}
+              onclick={async () => {
+                if (processingButtons[i] || get(playerInputStore).isMoveInProgress) return;
+                processingButtons[i] = true;
+
+                logService.action(`Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`);
+                if (btn.onClick) {
+                  await btn.onClick();
+                } else {
+                  modalStore.closeModal();
+                }
+              }}
+              aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
+              data-testid={btn.dataTestId || `modal-btn-${btn.textKey || btn.text}`}
+              disabled={btn.disabled || $playerInputStore.isMoveInProgress || processingButtons[i]}
+            >
+              <!-- НАВІЩО: Додано `$playerInputStore.isMoveInProgress` для глобального блокування кнопок.
+                   Це запобігає подвійним клікам під час виконання асинхронних операцій
+                   і вирішує проблему стану гонитви (race condition) в автотестах. -->
+              {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
+            </button>
+          {/if}
+        {/each}
+        {#if $modalState.titleKey === 'gameModes.title' || $modalState.titleKey === 'modal.expertModeTitle'}
+          <DontShowAgainCheckbox />
+        {/if}
+        <slot />
+      </div>
+    </div>
+  </div>
+{/if}
+
+<style>
+/* ... (попередні стилі залишаються, але стилі для повзунка повністю замінені) ... */
+.modal-overlay {
+  /* position: fixed; */
+  /* inset: 0; */
+  /* z-index: 1000; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal-victory-icon {
+  font-size: 1.5em;
+  margin-right: 8px;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 8px #ffeb3b88);
+}
+.modal-window {
+  background: var(--bg-secondary);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 400px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(0.95);
+  opacity: 0;
+  animation: modalFadeIn 0.3s ease-out forwards;
+}
+@keyframes modalFadeIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.modal-content {
+  flex: 1;
+  padding: 20px 24px;
+  color: var(--text-primary, #fff);
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  border-radius: 24px;
+}
+
+.modal-content.is-faq {
+  text-align: left;
+  padding-right: 10px;
+}
+
+.modal-content.is-faq::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content.is-faq::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.modal-content.is-faq::-webkit-scrollbar-thumb {
+  background-color: var(--text-accent, #ff9800);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.modal-content.is-faq::-webkit-scrollbar-thumb:hover {
+  background-color: #fff;
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+.modal-header {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  background: transparent;
+  position: relative;
+}
+.modal-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-title {
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #fffde7;
+  text-align: center;
+  flex: 1;
+}
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  background: none;
+  border: none;
+  font-size: 2em;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  z-index: 1;
+}
+.modal-close:hover {
+  color: #fff;
+}
+
+/* --- НОВІ, ПОКРАЩЕНІ СТИЛІ ДЛЯ ПОВЗУНКА ГУЧНОСТІ --- */
+.volume-control-container {
+  width: 85%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+.volume-label {
+  font-size: 0.9em;
+  color: #aaa;
+  font-weight: 500;
+}
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  border-radius: 15px;
+  height: 20px; /* Висота для клікабельної зони */
+  background: transparent; /* Фон самого інпута прозорий */
+}
+
+/* --- Трек (доріжка) повзунка для Webkit (Chrome, Safari) --- */
+.volume-slider::-webkit-slider-runnable-track {
+  height: 14px;
+  background: linear-gradient(to right, var(--confirm-action-bg) var(--volume-percentage), #3a3f44 var(--volume-percentage));
+  border-radius: 7px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* --- Бігунок (thumb) для Webkit --- */
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -4px;
+  height: 32px;
+  width: 32px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  transition: transform 0.1s ease;
+}
+.volume-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+
+/* --- Трек (доріжка) повзунка для Firefox --- */
+.volume-slider::-moz-range-track {
+  height: 14px;
+  background: linear-gradient(to right, var(--confirm-action-bg) var(--volume-percentage), #3a3f44 var(--volume-percentage));
+  border-radius: 7px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* --- Бігунок (thumb) для Firefox --- */
+.volume-slider::-moz-range-thumb {
+  height: 32px;
+  width: 32px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+.volume-slider:hover::-moz-range-thumb {
+  transform: scale(1.1);
+}
+
+.volume-thumb-svg {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(calc(-50% - 16px)) rotate(130deg);
+  pointer-events: none;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  /* transition: left 0.2s; */
+  filter: drop-shadow(0 0 0.8px #4caf50) drop-shadow(0 0 0.8px #4caf50) drop-shadow(0 0 0.8px #4caf50) drop-shadow(0 0 0.8px #4caf50);
+}
+/* --- Кінець стилів для повзунка --- */
+
+.score-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 1em;
+  color: var(--text-secondary);
+}
+.score-detail-row:last-of-type {
+  border-bottom: none;
+}
+.score-detail-row span {
+  font-weight: bold;
+  color: var(--text-primary);
+}
+.modal-btn-generic {
+    margin: 0;
+    padding: 12px 26px;
+    font-size: 1.1em;
+    border-radius: 12px;
+    border: none;
+    background: #fff;
+    color: #222;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
+    font-weight: 700;
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+    outline: none;
+    width: 100%;
+    text-align: center;
+}
+.modal-btn-generic:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px 0 rgba(0,0,0,0.12);
+}
+.modal-btn-generic.primary, .modal-btn-generic.green-btn {
+    background: var(--confirm-action-bg);
+    color: var(--confirm-action-text);
+    box-shadow: 0 2px 12px 0 var(--shadow-color);
+}
+.modal-btn-generic.blue-btn {
+    background: var(--info-action-bg);
+    color: var(--info-action-text);
+    box-shadow: 0 2px 12px 0 var(--shadow-color);
+}
+.modal-btn-generic.danger-btn {
+    background: var(--error-color);
+    color: #fff;
+    box-shadow: 0 2px 12px 0 var(--shadow-color);
+}
+.reason {
+  font-size: 1.1em;
+  color: var(--text-secondary, #ccc);
+  margin-bottom: 24px;
+  margin-top: 0;
+  text-align: center;
+  white-space: pre-line;
+}
+.score-details-container {
+  background: rgba(0,0,0,0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+.score-detail-row.penalty span {
+  color: var(--error-color);
+}
+.final-score-container {
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+.final-score-label {
+  font-size: 1em;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.final-score-value {
+  font-size: 2.8em;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+/* Компактний режим для фінального рахунку */
+.final-score-container.compact {
+  padding: 12px;
+}
+
+.final-score-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.final-score-label-inline {
+  font-size: 1em;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.final-score-value-inline {
+  font-size: 2.2em;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+/* Адаптивні стилі для компактного відображення */
+@media (max-width: 480px) {
+  .modal-window {
+    max-height: 80vh;
+    margin: 8px;
+  }
+  
+  .modal-header {
+    padding: 20px 16px 12px;
+  }
+  .modal-title {
+    font-size: 1.6em;
+  }
+  .modal-content {
+    padding: 16px;
+    max-height: 50vh;
+  }
+  
+  /* Компактний режим для фінального рахунку */
+  .final-score-container {
+    padding: 12px;
+  }
+  
+  .final-score-container.compact {
+    padding: 10px;
+  }
+  
+  .final-score-label {
+    font-size: 0.9em;
+    margin-bottom: 4px;
+  }
+  
+  .final-score-value {
+    font-size: 2.2em;
+  }
+  
+  .final-score-label-inline {
+    font-size: 0.9em;
+  }
+  
+  .final-score-value-inline {
+    font-size: 1.8em;
+  }
+  
+  /* Компактний режим для деталей рахунку */
+  .score-details-container {
+    padding: 10px 12px;
+    margin-bottom: 16px;
+  }
+  
+  .score-detail-row {
+    padding: 6px 0;
+    font-size: 0.9em;
+  }
+  
+  .reason {
+    font-size: 1em;
+    margin-bottom: 20px;
+  }
+  
+  /* Стилі для рахунків гравців */
+  .player-scores-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border-radius: var(--unified-border-radius);
+    border: var(--unified-border);
+  }
+  
+  .player-scores-container h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+    color: var(--text-primary);
+  }
+  
+  .player-score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .player-score-row:last-child {
+    border-bottom: none;
+  }
+  
+  .player-score-row.winner {
+    font-weight: bold;
+    color: var(--accent-color);
+  }
+  
+  .player-name {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .winner-badge, .loser-badge {
+    margin-right: 10px;
+    font-size: 1.2em;
+  }
+
+  .player-score-row.loser {
+    color: var(--text-secondary);
+  }
+}
+
+/* Дуже компактний режим для дуже маленьких екранів */
+@media (max-width: 360px) {
+  .modal-window {
+    max-height: 75vh;
+    margin: 4px;
+  }
+  
+  .modal-content {
+    max-height: 45vh;
+    padding: 12px;
+  }
+  
+  .final-score-container {
+    padding: 8px;
+  }
+  
+  .final-score-container.compact {
+    padding: 6px;
+  }
+  
+  .final-score-label {
+    font-size: 0.8em;
+    margin-bottom: 2px;
+  }
+  
+  .final-score-value {
+    font-size: 1.8em;
+  }
+  
+  .final-score-label-inline {
+    font-size: 0.8em;
+  }
+  
+  .final-score-value-inline {
+    font-size: 1.5em;
+  }
+  
+  .score-details-container {
+    padding: 8px 10px;
+    margin-bottom: 12px;
+  }
+  
+  .score-detail-row {
+    padding: 4px 0;
+    font-size: 0.85em;
+  }
+  
+  .reason {
+    font-size: 0.9em;
+    margin-bottom: 16px;
+  }
+}
+
+.modal-action-buttons {
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  background: transparent;
+}
+
+
+</style>
+
+---
+"C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\src\lib\gameModes\VsComputerGameMode.ts"
+import { tick } from 'svelte';
+import { get } from 'svelte/store';
+import { _, locale } from 'svelte-i18n';
+import { BaseGameMode } from './index';
+import { moveDirections } from '$lib/utils/translations';
+import { lastComputerMove, availableMoves as derivedAvailableMoves } from '$lib/stores/derivedState';
+import { gameState, type GameState, type Player } from '$lib/stores/gameState';
+import * as gameLogicService from '$lib/services/gameLogicService';
+import { playerInputStore } from '$lib/stores/playerInputStore';
+import { settingsStore } from '$lib/stores/settingsStore';
+import { gameOverStore } from '$lib/stores/gameOverStore';
+import { userActionService } from '$lib/services/userActionService';
+import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
+import type { FinalScoreDetails } from '$lib/models/score';
+import { Figure, type MoveDirectionType } from '$lib/models/Figure';
+import { getAvailableMoves } from '$lib/utils/boardUtils';
+import { logService } from '$lib/services/logService';
+import { calculateFinalScore } from '$lib/services/scoreService';
+import { animationStore } from '$lib/stores/animationStore';
+
+export class VsComputerGameMode extends BaseGameMode {
+  initialize(initialState: GameState): void {
+    const settings = get(settingsStore);
+    gameLogicService.resetGame({ players: this.getPlayersConfiguration(), settings }, get(gameState));
+  }
+
+  async claimNoMoves(): Promise<SideEffect[]> {
+    const currentAvailableMoves = get(derivedAvailableMoves);
+
+    if (currentAvailableMoves.length > 0) {
+      return this.endGame('modal.errorContent', { count: currentAvailableMoves.length });
+    } else {
+      return this.handleNoMoves('human');
+    }
+  }
+
+  getPlayersConfiguration(): Player[] {
+    return [
+      { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#e63946', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
+      { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#457b9d', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
+    ];
+  }
+
+  public determineWinner(state: GameState, reasonKey: string) {
+    // У грі проти комп'ютера немає концепції переможця, лише рахунок
+    return { winners: [] as number[], winningPlayerIndex: -1 };
+  }
+
+
+  protected async advanceToNextPlayer(): Promise<SideEffect[]> {
+    logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
+    const currentState = get(gameState);
+    const nextPlayerIndex = (currentState.currentPlayerIndex + 1) % currentState.players.length;
+
+    gameState.update(state => ({...state, currentPlayerIndex: nextPlayerIndex}));
+
+    const nextPlayer = get(gameState).players[nextPlayerIndex];
+    logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer.type}.`);
+    if (nextPlayer.type === 'ai' && !get(gameState).isComputerMoveInProgress) {
+      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера.');
+      return this.triggerComputerMove();
+    }
+    return [];
+  }
+
+  private async triggerComputerMove(): Promise<SideEffect[]> {
+    logService.GAME_MODE('triggerComputerMove: Початок ходу комп\'ютера.');
+    const state = get(gameState);
+    gameState.update(state => ({...state, isComputerMoveInProgress: true}));
+
+
+    const computerMove = gameLogicService.getComputerMove();
+    logService.GAME_MODE('triggerComputerMove: Результат getComputerMove:', computerMove);
+    let sideEffects: SideEffect[] = [];
+
+    if (computerMove) {
+      logService.GAME_MODE('triggerComputerMove: Комп\'ютер має хід, виконуємо...');
+      const { direction, distance } = computerMove;
+      const settings = get(settingsStore);
+      const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex, state, settings);
+
+      if (!moveResult.success) {
+        logService.GAME_MODE('triggerComputerMove: Хід комп\'ютера не вдався, обробка "немає ходів".');
+        sideEffects = await this.handleNoMoves('computer');
+      } else {
+        sideEffects = await this.onPlayerMoveSuccess(moveResult);
+        const settings = get(settingsStore);
+        if (settings.speechEnabled) {
+          const lastMove = get(lastComputerMove);
+          if (lastMove) {
+            const allVoices = window.speechSynthesis.getVoices();
+            const selectedVoice = allVoices.find(v => v.voiceURI === settings.selectedVoiceURI);
+            const speechLang = selectedVoice ? selectedVoice.lang.split('-')[0] : (get(locale) || 'uk');
+
+            const directionKey = lastMove.direction.replace(/-(\w)/g, (_: string, c: string) => c.toUpperCase());
+            // @ts-ignore
+            const moveDirection = moveDirections[speechLang][directionKey];
+            const textToSpeak = `${moveDirection} ${lastMove.distance}`;
+            sideEffects.push({ type: 'audio/speak', payload: { text: textToSpeak, lang: speechLang, voiceURI: settings.selectedVoiceURI } });
+          }
+        }
+        
+        const currentState = get(gameState);
+        if (currentState.wasResumed) {
+          gameState.update(state => ({...state, wasResumed: false}));
+        }
+        // sideEffects = [...sideEffects, ...(await this.advanceToNextPlayer())];
+      }
+    } else {
+      logService.GAME_MODE('triggerComputerMove: У комп\'ютера немає ходів, викликаємо handleNoMoves.');
+      sideEffects = await this.handleNoMoves('computer');
+    }
+    gameState.update(state => ({...state, isComputerMoveInProgress: false}));
+    playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+    sideEffects.forEach(effect => sideEffectService.execute(effect));
+    return sideEffects;
+  }
+
+  protected async applyScoreChanges(scoreChanges: any): Promise<void> {
+    // У режимі гри з комп'ютером, всі очки (бонуси та штрафи) додаються до загального рахунку,
+    // а не до конкретного гравця. `performMove` вже оновив загальний стан,
+    // тому тут нічого робити не потрібно.
+  }
+
+  async continueAfterNoMoves(): Promise<SideEffect[]> {
+    logService.GAME_MODE('[VsComputerGameMode] continueAfterNoMoves called');
+    const state = get(gameState);
+    const settings = get(settingsStore);
+    const bonus = state.boardSize;
+
+    const continueChanges = {
+      noMovesBonus: state.noMovesBonus + bonus,
+      cellVisitCounts: {},
+      moveHistory: [{
+        pos: { row: state.playerRow, col: state.playerCol },
+        blocked: [] as {row: number, col: number}[],
+        visits: {},
+        blockModeEnabled: settings.blockModeEnabled
+      }],
+      moveQueue: [] as any[],
+      availableMoves: getAvailableMoves(
+        state.playerRow,
+        state.playerCol,
+        state.boardSize,
+        {},
+        settings.blockOnVisitCount,
+        state.board,
+        settings.blockModeEnabled,
+        null
+      ),
+      noMovesClaimed: false,
+      isComputerMoveInProgress: false,
+      wasResumed: true,
+      isGameOver: false,
+      gameOverReasonKey: null as string | null,
+      gameOverReasonValues: null as Record<string, any> | null,
+      // Згідно з правилами, хід залишається у гравця-людини (індекс 0).
+      // Тому currentPlayerIndex тут явно встановлюється в 0.
+      currentPlayerIndex: 0
+    };
+
+    gameState.update(state => ({...state, ...continueChanges}));
+    
+    gameOverStore.resetGameOverState();
+    animationStore.reset();
+
+    // У цьому режимі хід не передається комп'ютеру після очищення дошки.
+    // Гравець-людина продовжує свій хід з чистої дошки.
+    // Тому this.advanceToNextPlayer() тут не викликається.
+    return [{ type: 'ui/closeModal' }];
+  }
+
+  async handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]> {
+    logService.GAME_MODE(`handleNoMoves: Обробка ситуації "немає ходів" для гравця типу: ${playerType}.`);
+    const state = get(gameState);
+    gameOverStore.resetGameOverState();
+
+    gameState.update(state => ({
+        ...state,
+        noMovesClaimed: true,
+        noMovesBonus: (state.noMovesBonus || 0) + state.boardSize
+    }));
+
+    const updatedState = get(gameState);
+    const potentialScoreDetails = calculateFinalScore(updatedState as any, 'vs-computer');
+    const titleKey = playerType === 'human' ? 'modal.playerNoMovesTitle' : 'modal.computerNoMovesTitle';
+    const contentKey = playerType === 'human' ? 'modal.playerNoMovesContent' : 'modal.computerNoMovesContent';
+
+    return [
+      {
+        type: 'ui/showModal',
+        payload: {
+          titleKey,
+          content: {
+            reason: get(_)(contentKey),
+            scoreDetails: potentialScoreDetails
+          },
+          buttons: [
+            { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: () => userActionService.handleModalAction('continueAfterNoMoves'), dataTestId: 'continue-game-no-moves-btn' },
+            {
+              text: get(_)('modal.finishGameWithBonus', { values: { bonus: updatedState.boardSize } }),
+              onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonBonus' }),
+              dataTestId: 'finish-game-with-bonus-btn'
+            },
+            { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: `watch-replay-${playerType}-no-moves-btn` }
+          ],
+          closable: false,
+          dataTestId: playerType === 'human' ? 'player-no-moves-modal' : 'opponent-trapped-modal',
+          titleDataTestId: 'opponent-trapped-modal-title'
+        }
+      }
+    ];
+  }
+}
+
+---
+"C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\src\lib\services\userActionService.ts"
+/**
+ * @file This service is the single entry point for all user-initiated actions.
+ * It orchestrates the flow of user intentions to the appropriate services.
+ */
+import { get } from 'svelte/store';
+import { tick } from 'svelte';
+import { replayStore } from '$lib/stores/replayStore.js';
+import { modalStore } from '$lib/stores/modalStore';
+import { playerInputStore } from '$lib/stores/playerInputStore';
+import { gameStore } from '$lib/stores/gameStore';
+import { modalService } from './modalService';
+import { gameModeService } from './gameModeService';
+import { sideEffectService, type SideEffect } from './sideEffectService';
+import { replayService } from './replayService';
+import { logService } from './logService.js';
+import { gameState } from '$lib/stores/gameState';
+import ReplayViewer from '$lib/components/ReplayViewer.svelte';
+import * as gameLogicService from '$lib/services/gameLogicService.js';
+import { navigationService } from './navigationService';
+import { settingsStore } from '$lib/stores/settingsStore';
+import { getAvailableMoves } from '$lib/utils/boardUtils.ts';
+import { gameOverStore } from '$lib/stores/gameOverStore';
+import { animationStore } from '$lib/stores/animationStore';
+import { base } from '$app/paths';
+
+export const userActionService = {
+  async confirmMove(): Promise<void> {
+    if (get(playerInputStore).isMoveInProgress) {
+      return;
+    }
+   playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+   try {
+     logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+     let activeGameMode = get(gameStore).mode;
+     if (!activeGameMode) {
+       gameModeService.initializeGameMode();
+       activeGameMode = get(gameStore).mode;
+       if (!activeGameMode) {
+         logService.logicMove('[userActionService.confirmMove] No active game mode found after initialization.');
+         return;
+       }
+     }
+     const playerInput = get(playerInputStore);
+     if (!playerInput.selectedDirection || !playerInput.selectedDistance) return;
+
+     const sideEffects = await activeGameMode.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
+     logService.logicMove('[userActionService.confirmMove] Side effects from handlePlayerMove:', sideEffects);
+     sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
+   } finally {
+     // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
+     // завершаться перед тим, як розблокувати ввід для наступних дій.
+     // Це усуває стан гонитви (race condition).
+     await tick();
+     logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
+     playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+   }
+  },
+
+  async claimNoMoves(): Promise<void> {
+    if (get(playerInputStore).isMoveInProgress) {
+      return;
+    }
+    playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+    try {
+      logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+      let activeGameMode = get(gameStore).mode;
+      if (!activeGameMode) {
+        gameModeService.initializeGameMode();
+        activeGameMode = get(gameStore).mode;
+        if (!activeGameMode) {
+          logService.logicMove('[userActionService.claimNoMoves] No active game mode found after initialization.');
+          return;
+        }
+      }
+      const sideEffects = await activeGameMode.claimNoMoves();
+      sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
+    } finally {
+      // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
+      // завершаться перед тим, як розблокувати ввід для наступних дій.
+      // Це усуває стан гонитви (race condition).
+      await tick();
+      logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
+      playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+    }
+  },
+
+  async changeBoardSize(newSize: number): Promise<void> {
+    const { players, penaltyPoints, boardSize } = get(gameState);
+    const score = players.reduce((acc, p) => acc + p.score, 0);
+    if (newSize === boardSize) return;
+
+    if (score === 0 && penaltyPoints === 0) {
+      gameLogicService.resetGame({ newSize }, get(gameState));
+    } else {
+      modalService.showBoardResizeModal(newSize);
+    }
+  },
+
+  async requestRestart(): Promise<void> {
+    modalStore.closeModal();
+    const sideEffects = await gameModeService.restartGame();
+    this.executeSideEffects(sideEffects);
+  },
+
+  async requestReplay(): Promise<void> {
+    const { moveHistory, boardSize } = get(gameState);
+    modalStore.showModal({
+      component: ReplayViewer,
+      props: {
+        moveHistory,
+        boardSize,
+      },
+      titleKey: 'replay.title',
+      buttons: [{ textKey: 'modal.close', onClick: () => modalStore.closeModal() }],
+      dataTestId: 'replay-modal',
+    });
+  },
+
+  async finishWithBonus(reasonKey: string): Promise<void> {
+    logService.logicMove('[userActionService] finishWithBonus called with reason:', reasonKey);
+    gameState.update(state => ({...state, finishedByFinishButton: true}));
+    const sideEffects = await gameModeService.endGame(reasonKey);
+    this.executeSideEffects(sideEffects);
+  },
+
+  async continueAfterNoMoves(): Promise<void> {
+    const sideEffects = await gameModeService.continueAfterNoMoves();
+    this.executeSideEffects(sideEffects);
+  },
+
+  async handleModalAction(action: string, payload?: any): Promise<void> {
+    if (get(playerInputStore).isMoveInProgress) {
+      return;
+    }
+    playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+    try {
+      logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+      let sideEffects: SideEffect[] = [];
+      switch (action) {
+        case 'restartGame':
+          await this.requestRestart();
+          break;
+        case 'playAgain':
+          await this.requestRestart();
+          break;
+        case 'requestReplay':
+          await this.requestReplay();
+          break;
+        case 'finishWithBonus':
+          await this.finishWithBonus(payload.reasonKey);
+          break;
+        case 'continueAfterNoMoves':
+          await this.continueAfterNoMoves();
+          break;
+        case 'resetGame':
+          gameLogicService.resetGame({ newSize: payload.newSize }, get(gameState));
+          sideEffects = [{ type: 'ui/closeModal' }];
+          break;
+        case 'closeModal':
+          sideEffects = [{ type: 'ui/closeModal' }];
+          break;
+        default:
+          logService.logicMove(`[userActionService.handleModalAction] Unknown action: ${action}`);
+          break;
+      }
+      this.executeSideEffects(sideEffects);
+    } finally {
+      // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
+      // завершаться перед тим, як розблокувати ввід для наступних дій.
+      // Це усуває стан гонитви (race condition).
+      await tick();
+      logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
+      playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+    }
+  },
+
+  executeSideEffects(sideEffects: SideEffect[]) {
+    sideEffects.forEach(effect => sideEffectService.execute(effect));
+  }
+};
+
+---
+
+"C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\src\lib\stores\modalStore.js"
+import { writable } from 'svelte/store';
+import { logService } from '$lib/services/logService';
+
+/**
+ * @typedef {Object} ModalButton
+ * @property {string} [text]
+ * @property {string} [textKey]
+ * @property {boolean} [primary]
+ * @property {() => void} [onClick]
+ * @property {boolean} [disabled]
+ * @property {string} [customClass]
+ * @property {boolean} [isHot]
+ * @property {string} [hotKey]
+ * @property {string} [dataTestId]
+ */
+/**
+ * @typedef {Object} ModalContent
+ * @property {string} [reason]
+ * @property {number} [score]
+ * @property {string} [reasonKey]
+ * @property {unknown} [scoreDetails]
+ * @property {boolean} [isFaq]
+ */
+/**
+ * @typedef {Object} ModalState
+ * @property {boolean} isOpen
+ * @property {string} [title]
+ * @property {string} [titleKey]
+ * @property {string|ModalContent|unknown} [content]
+ * @property {string} [contentKey]
+ * @property {ModalButton[]} buttons
+ * @property {unknown} [component]
+ * @property {object} [props]
+ * @property {boolean} [closable]
+ * @property {boolean} [closeOnOverlayClick]
+ * @property {string} [dataTestId]
+ * @property {string} [titleDataTestId]
+ * @property {object} [titleValues]
+ */
+
+/** @type {ModalState} */
+const initialState = {
+  isOpen: false,
+  title: '',
+  content: '',
+  buttons: [],
+  component: null,
+  props: {},
+  closable: true,
+  closeOnOverlayClick: false,
+  dataTestId: undefined,
+  titleDataTestId: undefined
+};
+
+const store = writable(initialState);
+const { subscribe, set, update } = store;
+
+/** @type {ModalState[]} */
+const modalStack = [];
+
+export const modalState = { subscribe };
+
+/**
+ * @param {Partial<ModalState>} modalDetails
+ */
+export function showModal(modalDetails) {
+  update(currentState => {
+    if (currentState.isOpen) {
+      modalStack.push(currentState);
+    }
+    const newState = {
+      ...initialState,
+      ...modalDetails,
+      isOpen: true,
+    };
+    logService.ui(`[ModalStore] showModal called. New modal: '${newState.dataTestId || newState.titleKey}'. Stack size: ${modalStack.length}`);
+    return newState;
+  });
+}
+
+/**
+ * @param {Partial<ModalState>} modalDetails
+ */
+export function showModalAsReplacement(modalDetails) {
+  logService.ui(`[ModalStore] showModalAsReplacement called. Clearing stack and showing new modal: '${modalDetails.dataTestId || modalDetails.titleKey}'.`);
+  modalStack.length = 0; // Очищуємо стек
+  set({
+    ...initialState,
+    ...modalDetails,
+    isOpen: true,
+  });
+}
+
+export function closeModal() {
+  logService.ui(`[ModalStore] closeModal called. Stack size: ${modalStack.length}`);
+  if (modalStack.length > 0) {
+    const previousState = modalStack.pop();
+    if (previousState) {
+      logService.ui(`[ModalStore] Popped '${previousState.dataTestId || previousState.titleKey}' from stack. Restoring previous state.`);
+      set(previousState);
+    }
+  } else {
+    logService.ui('[ModalStore] Stack is empty. Resetting to initial state.');
+    set({ ...initialState });
+  }
+}
+
+export const modalStore = {
+  subscribe,
+  closeModal,
+  showModal,
+  showModalAsReplacement
+};
+
+---
+"C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\happy-flow-1.spec.ts"
+import { test, expect } from '@playwright/test';
+import { setBoardSize, startNewGame, setBlockMode, BlockModeState, makeMove } from './utils';
+
+test.describe('хепі флоу', () => {
+  
+  test.beforeEach(async ({ page }) => {
+    // await startNewGame(page);
+    // await setBoardSize(page, 2);
+  });
+
+  test('хепі флоу 1', { tag: ['@inProgress', '@HF-1'] }, async ({ page }) => {
+    test.setTimeout(1000 * 60 * 15); // 15 minutes
+    // Вмикаємо режим блокування клітинок
+    await startNewGame(page);
+
+    await page.waitForTimeout(2222);    
+    await setBoardSize(page, 3);
+    await page.waitForTimeout(2222);
+    
+    await setBlockMode(page, BlockModeState.On);
+    await page.waitForTimeout(2222);
+    await makeMove(page, 'down', 1);
+    await page.waitForTimeout(2222);
+    await makeMove(page, 'up-right', 2);
+    await page.waitForTimeout(2222);
+    await makeMove(page, 'left', 1);
+
+    // Задаємо параметри ходу комп'ютера, щоб ходив рандомно
+    await page.waitForTimeout(2222);
+
+    await page.getByTestId('test-mode-computer-move-random-btn').click();
+
+    await page.waitForTimeout(2222);
+    
+    await makeMove(page, 'right', 1, false);
+    await page.waitForTimeout(2222);
+
+    // Перевіряємо, що модальне вікно "Суперник у пастці!"/"Opponent is Trapped!" з'явилося
+    await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
+    await page.waitForTimeout(2222);
+
+    // await page.waitForTimeout(7777777);
+
+    // Перевіряємо заголовок модального вікна за ключем локалізації
+    await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.computerNoMovesTitle');
+    await page.waitForTimeout(2222);
+
+    // Натискаємо на кнопку "Переглянути запис"
+    await page.getByTestId('watch-replay-computer-no-moves-btn').click();
+    await page.waitForTimeout(2222);
+
+    // Перевіряємо, що модальне вікно "replay.title" з'явилося
+    await expect(page.getByTestId('replay-modal')).toBeVisible();
+    await page.waitForTimeout(2222);
+
+    // Закриваємо модальне вікно "replay.title"
+    await page.getByTestId('modal-btn-modal.close').click();
+    await page.waitForTimeout(2222);
+
+    // Перевіряємо, що модальне вікно "Суперник у пастці!"/"Opponent is Trapped!" з'явилося
+    await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
+    await page.waitForTimeout(2222);
+
+    // await page.waitForTimeout(7777);
+
+    await page.waitForTimeout(7777777);
+
+    // Натискаємо на кнопку "Продовжити"
+    await page.getByTestId('continue-game-no-moves-btn').click();
+    
+    await page.waitForTimeout(7777777);
+
+    // Перевіряємо, що модальне вікно "Суперник у пастці!"/"Opponent is Trapped!" НЕ з'явилося
+    await expect(page.getByTestId('opponent-trapped-modal')).not.toBeVisible();
+
+
+  });
+});
+
+---
+
+log:
+logService.js:129 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+init.js:31 ✅ i18n ініціалізовано успішно
+logService.js:100 [GAME_MODE] Setting game mode to: vs-computer
+logService.js:98 [LOGIC_MOVE] setDirection: встановлено напрямок Object
+logService.js:98 [LOGIC_MOVE] setDistance: встановлено відстань Object
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(0)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:98 [LOGIC_MOVE] setDirection: встановлено напрямок Object
+logService.js:98 [LOGIC_MOVE] setDistance: встановлено відстань Object
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(0)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:98 [LOGIC_MOVE] setDirection: встановлено напрямок Object
+logService.js:98 [LOGIC_MOVE] setDistance: встановлено відстань Object
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(0)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:98 [LOGIC_MOVE] setDirection: встановлено напрямок Object
+logService.js:98 [LOGIC_MOVE] setDistance: встановлено відстань Object
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: null
+logService.js:100 [GAME_MODE] triggerComputerMove: У комп'ютера немає ходів, викликаємо handleNoMoves.
+logService.js:100 [GAME_MODE] handleNoMoves: Обробка ситуації "немає ходів" для гравця типу: computer.
+logService.js:98 [LOGIC_MOVE] Executing side effect: ui/showModal Object
+logService.js:98 [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(1)
+logService.js:98 [LOGIC_MOVE] Executing side effect: ui/showModal Object
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:100 [GAME_MODE] [VsComputerGameMode] continueAfterNoMoves called
+logService.js:98 [LOGIC_MOVE] Executing side effect: ui/closeModal 
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
