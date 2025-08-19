@@ -121,6 +121,7 @@ export class VsComputerGameMode extends BaseGameMode {
   }
 
   async continueAfterNoMoves(): Promise<SideEffect[]> {
+    logService.GAME_MODE('[VsComputerGameMode] continueAfterNoMoves called');
     const state = get(gameState);
     const settings = get(settingsStore);
     const bonus = state.boardSize;
@@ -158,6 +159,8 @@ export class VsComputerGameMode extends BaseGameMode {
     
     gameOverStore.resetGameOverState();
     animationStore.reset();
+    
+    this.advanceToNextPlayer();
         
     return [{ type: 'ui/closeModal' }];
   }

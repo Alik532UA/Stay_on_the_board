@@ -24,35 +24,55 @@ import { base } from '$app/paths';
 
 export const userActionService = {
   async confirmMove(): Promise<void> {
-    let activeGameMode = get(gameStore).mode;
-    if (!activeGameMode) {
-      gameModeService.initializeGameMode();
-      activeGameMode = get(gameStore).mode;
-      if (!activeGameMode) {
-        logService.logic('[userActionService.confirmMove] No active game mode found after initialization.');
-        return;
-      }
+    if (get(playerInputStore).isMoveInProgress) {
+      return;
     }
-    const playerInput = get(playerInputStore);
-    if (!playerInput.selectedDirection || !playerInput.selectedDistance) return;
+   playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+   try {
+     logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+     let activeGameMode = get(gameStore).mode;
+     if (!activeGameMode) {
+       gameModeService.initializeGameMode();
+       activeGameMode = get(gameStore).mode;
+       if (!activeGameMode) {
+         logService.logicMove('[userActionService.confirmMove] No active game mode found after initialization.');
+         return;
+       }
+     }
+     const playerInput = get(playerInputStore);
+     if (!playerInput.selectedDirection || !playerInput.selectedDistance) return;
 
-    const sideEffects = await activeGameMode.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
-    logService.logic('[userActionService.confirmMove] Side effects from handlePlayerMove:', sideEffects);
-    sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
+     const sideEffects = await activeGameMode.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
+     logService.logicMove('[userActionService.confirmMove] Side effects from handlePlayerMove:', sideEffects);
+     sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
+   } finally {
+     logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
+     playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+   }
   },
 
   async claimNoMoves(): Promise<void> {
-    let activeGameMode = get(gameStore).mode;
-    if (!activeGameMode) {
-      gameModeService.initializeGameMode();
-      activeGameMode = get(gameStore).mode;
-      if (!activeGameMode) {
-        logService.logic('[userActionService.claimNoMoves] No active game mode found after initialization.');
-        return;
-      }
+    if (get(playerInputStore).isMoveInProgress) {
+      return;
     }
-    const sideEffects = await activeGameMode.claimNoMoves();
-    sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
+    playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+    try {
+      logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+      let activeGameMode = get(gameStore).mode;
+      if (!activeGameMode) {
+        gameModeService.initializeGameMode();
+        activeGameMode = get(gameStore).mode;
+        if (!activeGameMode) {
+          logService.logicMove('[userActionService.claimNoMoves] No active game mode found after initialization.');
+          return;
+        }
+      }
+      const sideEffects = await activeGameMode.claimNoMoves();
+      sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
+    } finally {
+      logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
+      playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+    }
   },
 
   async changeBoardSize(newSize: number): Promise<void> {
@@ -88,7 +108,7 @@ export const userActionService = {
   },
 
   async finishWithBonus(reasonKey: string): Promise<void> {
-    logService.logic('[userActionService] finishWithBonus called with reason:', reasonKey);
+    logService.logicMove('[userActionService] finishWithBonus called with reason:', reasonKey);
     gameState.update(state => ({...state, finishedByFinishButton: true}));
     const sideEffects = await gameModeService.endGame(reasonKey);
     this.executeSideEffects(sideEffects);
@@ -100,35 +120,45 @@ export const userActionService = {
   },
 
   async handleModalAction(action: string, payload?: any): Promise<void> {
-    let sideEffects: SideEffect[] = [];
-    switch (action) {
-      case 'restartGame':
-        await this.requestRestart();
-        break;
-      case 'playAgain':
-        await this.requestRestart();
-        break;
-      case 'requestReplay':
-        await this.requestReplay();
-        break;
-      case 'finishWithBonus':
-        await this.finishWithBonus(payload.reasonKey);
-        break;
-      case 'continueAfterNoMoves':
-        await this.continueAfterNoMoves();
-        break;
-      case 'resetGame':
-        gameLogicService.resetGame({ newSize: payload.newSize }, get(gameState));
-        sideEffects = [{ type: 'ui/closeModal' }];
-        break;
-      case 'closeModal':
-        sideEffects = [{ type: 'ui/closeModal' }];
-        break;
-      default:
-        logService.logic(`[userActionService.handleModalAction] Unknown action: ${action}`);
-        break;
+    if (get(playerInputStore).isMoveInProgress) {
+      return;
     }
-    this.executeSideEffects(sideEffects);
+    playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+    try {
+      logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+      let sideEffects: SideEffect[] = [];
+      switch (action) {
+        case 'restartGame':
+          await this.requestRestart();
+          break;
+        case 'playAgain':
+          await this.requestRestart();
+          break;
+        case 'requestReplay':
+          await this.requestReplay();
+          break;
+        case 'finishWithBonus':
+          await this.finishWithBonus(payload.reasonKey);
+          break;
+        case 'continueAfterNoMoves':
+          await this.continueAfterNoMoves();
+          break;
+        case 'resetGame':
+          gameLogicService.resetGame({ newSize: payload.newSize }, get(gameState));
+          sideEffects = [{ type: 'ui/closeModal' }];
+          break;
+        case 'closeModal':
+          sideEffects = [{ type: 'ui/closeModal' }];
+          break;
+        default:
+          logService.logicMove(`[userActionService.handleModalAction] Unknown action: ${action}`);
+          break;
+      }
+      this.executeSideEffects(sideEffects);
+    } finally {
+      logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
+      playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+    }
   },
 
   executeSideEffects(sideEffects: SideEffect[]) {

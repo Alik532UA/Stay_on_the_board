@@ -92,7 +92,7 @@ export function setDirection(dir: Direction) {
     distanceManuallySelected: newManuallySelected
   }));
   
-  logService.logic('setDirection: встановлено напрямок', { dir, newDistance, newManuallySelected });
+  logService.logicMove('setDirection: встановлено напрямок', { dir, newDistance, newManuallySelected });
 }
 
 export function setDistance(dist: number) {
@@ -103,7 +103,7 @@ export function setDistance(dist: number) {
     distanceManuallySelected: true
   }));
   
-  logService.logic('setDistance: встановлено відстань', { dist });
+  logService.logicMove('setDistance: встановлено відстань', { dist });
 }
 
 /**
@@ -120,7 +120,7 @@ export async function performMove(
   settings: any
 ) {
 
-  logService.logic('performMove: початок з параметрами:', { direction, distance, playerIndex });
+  logService.logicMove('performMove: початок з параметрами:', { direction, distance, playerIndex });
   
   const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
 
@@ -128,13 +128,13 @@ export async function performMove(
 
   // 1. Перевірка виходу за межі дошки
   if (!figure.isValidPosition(newPosition.row, newPosition.col)) {
-    logService.logic('performMove: вихід за межі дошки');
+    logService.logicMove('performMove: вихід за межі дошки');
     return { success: false, reason: 'out_of_bounds' };
   }
 
   // 2. Перевірка ходу на заблоковану клітинку
   if (isCellBlocked(newPosition.row, newPosition.col, currentState.cellVisitCounts, settings)) {
-    logService.logic('performMove: хід на заблоковану клітинку');
+    logService.logicMove('performMove: хід на заблоковану клітинку');
     return { success: false, reason: 'blocked_cell' };
   }
 
@@ -195,7 +195,7 @@ export async function performMove(
   // які отримують `scoreChanges` і вирішують, як їх застосувати.
   // Це робить `performMove` більш чистою функцією, що відповідає лише за сам хід.
   
-  logService.logic('performMove: завершено успішно');
+  logService.logicMove('performMove: завершено успішно');
   return {
     success: true,
     newPosition,
@@ -248,7 +248,7 @@ export function getComputerMove(): { direction: MoveDirectionType; distance: num
     const bestMove = movesWithBonuses.reduce((best, current) => {
       return getMoveBonus(current) > getMoveBonus(best) ? current : best;
     });
-    logService.logic('getComputerMove: обрано хід з бонусом', bestMove);
+    logService.logicAI('getComputerMove: обрано хід з бонусом', bestMove);
     return bestMove;
   }
 
@@ -264,12 +264,12 @@ export function getComputerMove(): { direction: MoveDirectionType; distance: num
 
   if (longestMoves.length > 0) {
     const randomLongestMove = longestMoves[Math.floor(Math.random() * longestMoves.length)];
-    logService.logic('getComputerMove: обрано найдовший хід', randomLongestMove);
+    logService.logicAI('getComputerMove: обрано найдовший хід', randomLongestMove);
     return randomLongestMove;
   }
 
   const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-  logService.logic('getComputerMove: обрано випадковий хід', randomMove);
+  logService.logicAI('getComputerMove: обрано випадковий хід', randomMove);
   return randomMove;
 }
 

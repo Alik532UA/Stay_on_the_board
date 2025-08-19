@@ -82,6 +82,7 @@ export class LocalGameMode extends BaseGameMode {
   }
 
   async continueAfterNoMoves(): Promise<SideEffect[]> {
+    logService.GAME_MODE('[LocalGameMode] continueAfterNoMoves called');
     gameState.update(state => ({...state, cellVisitCounts: {}}));
     animationStore.reset();
     this.advanceToNextPlayer();
@@ -89,7 +90,7 @@ export class LocalGameMode extends BaseGameMode {
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]> {
-    logService.logic('handleNoMoves is not applicable in LocalGameMode');
+    logService.GAME_MODE('handleNoMoves is not applicable in LocalGameMode');
     return [];
   }
 

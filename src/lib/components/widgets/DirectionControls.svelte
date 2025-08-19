@@ -8,13 +8,9 @@
   import { customTooltip } from '$lib/actions/customTooltip.js';
   import { playerInputStore } from '$lib/stores/playerInputStore.js';
   
-  let selectedDirection: string | null = null;
-  let selectedDistance: number | null = null;
-  
-  playerInputStore.subscribe(value => {
-    selectedDirection = value.selectedDirection;
-    selectedDistance = value.selectedDistance;
-  });
+  $: isMoveInProgress = $playerInputStore.isMoveInProgress;
+  $: selectedDirection = $playerInputStore.selectedDirection;
+  $: selectedDistance = $playerInputStore.selectedDistance;
   
   export const availableDirections: string[] = [
     'up-left', 'up', 'up-right',
@@ -23,7 +19,6 @@
   ];
   export let distanceRows: number[][] = [];
   export const isPlayerTurn: boolean = false;
-  export const isMoveInProgress: boolean = false;
   export let blockModeEnabled: boolean = false;
   export let centerInfoProps: any = {};
   
@@ -63,10 +58,10 @@
 
 <div class="direction-controls-panel">
   <div class="directions-3x3">
-    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" use:hotkeyTooltip={'up-left'} on:click={() => handleDirection('up-left')} data-testid="dir-btn-up-left">↖</button>
-    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" use:hotkeyTooltip={'up'} on:click={() => handleDirection('up')} data-testid="dir-btn-up">↑</button>
-    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" use:hotkeyTooltip={'up-right'} on:click={() => handleDirection('up-right')} data-testid="dir-btn-up-right">↗</button>
-    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" use:hotkeyTooltip={'left'} on:click={() => handleDirection('left')} data-testid="dir-btn-left">←</button>
+    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" use:hotkeyTooltip={'up-left'} on:click={() => handleDirection('up-left')} data-testid="dir-btn-up-left" disabled={isMoveInProgress}>↖</button>
+    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" use:hotkeyTooltip={'up'} on:click={() => handleDirection('up')} data-testid="dir-btn-up" disabled={isMoveInProgress}>↑</button>
+    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" use:hotkeyTooltip={'up-right'} on:click={() => handleDirection('up-right')} data-testid="dir-btn-up-right" disabled={isMoveInProgress}>↗</button>
+    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" use:hotkeyTooltip={'left'} on:click={() => handleDirection('left')} data-testid="dir-btn-left" disabled={isMoveInProgress}>←</button>
     <button id="center-info"
       class="control-btn center-info {centerInfoProps.class}"
       type="button"
@@ -79,29 +74,29 @@
     >
       {centerInfoProps.content}
     </button>
-    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" use:hotkeyTooltip={'right'} on:click={() => handleDirection('right')} data-testid="dir-btn-right">→</button>
-    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" use:hotkeyTooltip={'down-left'} on:click={() => handleDirection('down-left')} data-testid="dir-btn-down-left">↙</button>
-    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" use:hotkeyTooltip={'down'} on:click={() => handleDirection('down')} data-testid="dir-btn-down">↓</button>
-    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" use:hotkeyTooltip={'down-right'} on:click={() => handleDirection('down-right')} data-testid="dir-btn-down-right">↘</button>
+    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" use:hotkeyTooltip={'right'} on:click={() => handleDirection('right')} data-testid="dir-btn-right" disabled={isMoveInProgress}>→</button>
+    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" use:hotkeyTooltip={'down-left'} on:click={() => handleDirection('down-left')} data-testid="dir-btn-down-left" disabled={isMoveInProgress}>↙</button>
+    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" use:hotkeyTooltip={'down'} on:click={() => handleDirection('down')} data-testid="dir-btn-down" disabled={isMoveInProgress}>↓</button>
+    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" use:hotkeyTooltip={'down-right'} on:click={() => handleDirection('down-right')} data-testid="dir-btn-down-right" disabled={isMoveInProgress}>↘</button>
   </div>
   <div class="distance-select">
     <div class="distance-btns">
       {#each distanceRows as row}
         <div class="distance-row">
           {#each row as dist}
-            <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" use:hotkeyTooltip={getActionForDistance(dist)} on:click={() => handleDistance(dist)} data-testid={`dist-btn-${dist}`}>{dist}</button>
+            <button class="dist-btn {selectedDistance === dist ? 'active' : ''}" use:hotkeyTooltip={getActionForDistance(dist)} on:click={() => handleDistance(dist)} data-testid={`dist-btn-${dist}`} disabled={isMoveInProgress}>{dist}</button>
           {/each}
         </div>
       {/each}
     </div>
   </div>
   <div class="action-btns">
-    <button class="confirm-btn {confirmButtonBlocked ? 'disabled' : ''}" use:hotkeyTooltip={'confirm'} on:click={handleConfirm} use:customTooltip={$_('gameControls.confirm')} data-testid="confirm-move-btn">
+    <button class="confirm-btn {confirmButtonBlocked ? 'disabled' : ''}" use:hotkeyTooltip={'confirm'} on:click={handleConfirm} use:customTooltip={$_('gameControls.confirm')} data-testid="confirm-move-btn" disabled={isMoveInProgress}>
       <SvgIcons name="confirm" />
       {$_('gameControls.confirm')}
     </button>
     {#if blockModeEnabled}
-      <button class="no-moves-btn" use:hotkeyTooltip={'no-moves'} on:click={handleNoMoves} use:customTooltip={$_('gameControls.noMovesTitle')} data-testid="no-moves-btn">
+      <button class="no-moves-btn" use:hotkeyTooltip={'no-moves'} on:click={handleNoMoves} use:customTooltip={$_('gameControls.noMovesTitle')} data-testid="no-moves-btn" disabled={isMoveInProgress}>
         <SvgIcons name="no-moves" />
         {$_('gameControls.noMovesTitle')}
       </button>
