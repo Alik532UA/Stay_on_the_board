@@ -75,7 +75,8 @@
   aria-label={$_('voiceSettings.close')}
 >
   <div 
-    class="modal-window" 
+    class="modal-window"
+    data-testid="voice-settings-modal"
     tabindex="0"
     onclick={(e) => e.stopPropagation()}
     onkeydown={(e) => { if (e.key === 'Escape') close(); }}

@@ -21,7 +21,7 @@
           [LOG_GROUPS.STATE]: false,
           [LOG_GROUPS.LOGIC]: true,
           [LOG_GROUPS.SCORE]: false,
-          [LOG_GROUPS.UI]: true,
+          [LOG_GROUPS.UI]: false,
           [LOG_GROUPS.TOOLTIP]: false,
           [LOG_GROUPS.ANIMATION]: false,
           [LOG_GROUPS.INIT]: false,
