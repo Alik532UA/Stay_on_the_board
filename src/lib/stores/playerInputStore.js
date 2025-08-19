@@ -16,7 +16,7 @@ import { logService } from '$lib/services/logService.js';
  * @property {Direction | null} selectedDirection
  * @property {number | null} selectedDistance
  * @property {boolean} distanceManuallySelected
- * @property {boolean} isMoveInProgress // Додаємо прапорець для блокування введення
+ * @property {boolean} isMoveInProgress
  */
 
 /** @type {PlayerInputState} */
@@ -24,7 +24,7 @@ export const initialState = {
   selectedDirection: null,
   selectedDistance: null,
   distanceManuallySelected: false,
-  isMoveInProgress: false, // Додаємо прапорець
+  isMoveInProgress: false,
 };
 
 const { subscribe, set, update } = writable(initialState);

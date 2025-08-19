@@ -24,7 +24,7 @@ class SideEffectService {
   }
 
   public execute(effect: SideEffect): void {
-    logService.logic('Executing side effect:', effect.type, 'payload' in effect ? effect.payload : '');
+    logService.logicMove('Executing side effect:', effect.type, 'payload' in effect ? effect.payload : '');
     switch (effect.type) {
       case 'audio/speak':
         this.speakText(effect.payload);

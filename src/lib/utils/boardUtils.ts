@@ -46,11 +46,11 @@ export function getAvailableMoves(
   lastPlayerMove: { direction: string, distance: number } | null
 ): Move[] {
   if (row === null || col === null) {
-    logService.logic('getAvailableMoves: Початкові координати не задані, ходів немає.');
+    logService.logicAvailability('getAvailableMoves: Початкові координати не задані, ходів немає.');
     return [];
   }
 
-  logService.logic(`getAvailableMoves: Початок розрахунку для позиції (${row}, ${col})`, {
+  logService.logicAvailability(`getAvailableMoves: Початок розрахунку для позиції (${row}, ${col})`, {
     size,
     cellVisitCounts,
     blockModeEnabled,
@@ -79,7 +79,7 @@ export function getAvailableMoves(
       const nr = row + dr * dist;
       const nc = col + dc * dist;
       if (nr < 0 || nc < 0 || nr >= size || nc >= size) {
-        logService.logic(`  [${direction}]: Вихід за межі дошки на відстані ${dist}.`);
+        logService.logicAvailability(`  [${direction}]: Вихід за межі дошки на відстані ${dist}.`);
         break;
       }
 
@@ -90,15 +90,15 @@ export function getAvailableMoves(
         if (lastPlayerMove && !blockModeEnabled) {
           isPenalty = isMirrorMove(direction, dist, lastPlayerMove.direction, lastPlayerMove.distance);
         }
-        logService.logic(`  [${direction}]: Знайдено доступний хід на (${nr}, ${nc}), відстань ${dist}.`);
+        logService.logicAvailability(`  [${direction}]: Знайдено доступний хід на (${nr}, ${nc}), відстань ${dist}.`);
         moves.push({ row: nr, col: nc, direction, distance: dist, isPenalty });
       } else {
-        logService.logic(`  [${direction}]: Клітинка (${nr}, ${nc}) заблокована. Продовжуємо пошук в цьому напрямку.`);
+        logService.logicAvailability(`  [${direction}]: Клітинка (${nr}, ${nc}) заблокована. Продовжуємо пошук в цьому напрямку.`);
         // Не перериваємо цикл, а продовжуємо шукати доступні клітинки далі
       }
     }
   }
-  logService.logic(`getAvailableMoves: Розрахунок завершено. Знайдено ходів: ${moves.length}`, moves);
+  logService.logicAvailability(`getAvailableMoves: Розрахунок завершено. Знайдено ходів: ${moves.length}`, moves);
   return moves;
 }
 

@@ -55,7 +55,7 @@ function _calculateMirrorMovePenalty(currentState: any, direction: string, dista
 
   if (direction && lastComputerMove && lastComputerMove.player !== 0 && !settings.blockModeEnabled) {
     const isMirror = isMirrorMove(direction, distance, lastComputerMove.direction, lastComputerMove.distance);
-    logService.logic(`_calculateMirrorMovePenalty: перевіряємо "дзеркальний" хід:`, {
+    logService.logicMove(`_calculateMirrorMovePenalty: перевіряємо "дзеркальний" хід:`, {
       currentMove: { direction, distance },
       computerMove: { direction: lastComputerMove.direction, distance: lastComputerMove.distance },
       isMirrorMove: isMirror
@@ -71,7 +71,7 @@ function _calculateMirrorMovePenalty(currentState: any, direction: string, dista
       }
     }
   } else {
-    logService.logic(`_calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.`);
+    logService.logicMove(`_calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.`);
   }
 
   return { penaltyPoints, penaltyPointsForMove };
