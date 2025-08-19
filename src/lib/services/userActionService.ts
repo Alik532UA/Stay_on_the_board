@@ -3,6 +3,7 @@
  * It orchestrates the flow of user intentions to the appropriate services.
  */
 import { get } from 'svelte/store';
+import { tick } from 'svelte';
 import { replayStore } from '$lib/stores/replayStore.js';
 import { modalStore } from '$lib/stores/modalStore';
 import { playerInputStore } from '$lib/stores/playerInputStore';
@@ -46,6 +47,10 @@ export const userActionService = {
      logService.logicMove('[userActionService.confirmMove] Side effects from handlePlayerMove:', sideEffects);
      sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
    } finally {
+     // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
+     // завершаться перед тим, як розблокувати ввід для наступних дій.
+     // Це усуває стан гонитви (race condition).
+     await tick();
      logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
      playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
    }
@@ -70,6 +75,10 @@ export const userActionService = {
       const sideEffects = await activeGameMode.claimNoMoves();
       sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
     } finally {
+      // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
+      // завершаться перед тим, як розблокувати ввід для наступних дій.
+      // Це усуває стан гонитви (race condition).
+      await tick();
       logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
       playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
     }
@@ -156,6 +165,10 @@ export const userActionService = {
       }
       this.executeSideEffects(sideEffects);
     } finally {
+      // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
+      // завершаться перед тим, як розблокувати ввід для наступних дій.
+      // Це усуває стан гонитви (race condition).
+      await tick();
       logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
       playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
     }
