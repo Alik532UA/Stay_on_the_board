@@ -31,9 +31,12 @@ test.describe('хепі флоу', () => {
     await page.getByTestId('test-mode-computer-move-random-btn').click();
 
     //await page.waitForTimeout(2222);
-    
+    await page.waitForTimeout(7777777);
+
     await makeMove(page, 'right', 1, false);
     //await page.waitForTimeout(2222);
+
+    await page.waitForTimeout(7777777);
 
     // Перевіряємо, що модальне вікно "Суперник у пастці!"/"Opponent is Trapped!" з'явилося
     await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();

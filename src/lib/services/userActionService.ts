@@ -45,7 +45,7 @@ export const userActionService = {
 
      const sideEffects = await activeGameMode.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
      logService.logicMove('[userActionService.confirmMove] Side effects from handlePlayerMove:', sideEffects);
-     sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
+     this.executeSideEffects(sideEffects);
    } finally {
      // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
      // завершаться перед тим, як розблокувати ввід для наступних дій.

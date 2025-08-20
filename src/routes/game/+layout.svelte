@@ -70,8 +70,8 @@
       case 'down-left': setDirection('down-left'); break;
       case 'down': setDirection('down'); break;
       case 'down-right': setDirection('down-right'); break;
-      case 'confirm': gameModeService.handlePlayerMove(get(playerInputStore).selectedDirection, get(playerInputStore).selectedDistance); break;
-      case 'no-moves': gameModeService.claimNoMoves(); break;
+      case 'confirm': userActionService.confirmMove(); break;
+      case 'no-moves': userActionService.claimNoMoves(); break;
       case 'distance-1': setDistance(1); break;
       case 'distance-2': setDistance(2); break;
       case 'distance-3': setDistance(3); break;
