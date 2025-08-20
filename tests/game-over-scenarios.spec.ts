@@ -9,25 +9,23 @@ test.describe('Сценарії завершення гри', () => {
   });
 
   test('Повинно з\'являтися вікно "Game Over", коли гравець виходить за межі дошки', { tag: ['@done', '@GOS-1'] }, async ({ page }) => {
-    // Робимо хід, який гарантовано виходить за межі дошки 2x2
-    // Стартова позиція зазвичай в центрі, тому будь-який хід на 2 клітинки буде за межами
-    await makeMove(page, 'up', 2, false);
+    await test.step('Гравець робить хід за межі дошки', async () => {
+      // Робимо хід, який гарантовано виходить за межі дошки 4x4
+      // Стартова позиція зазвичай в центрі, тому будь-який хід на 2 клітинки буде за межами
+      await makeMove(page, 'up', 2, false);
+    });
 
-    // Перевіряємо, що модальне вікно "Гру завершено!"/"Game Over!" з'явилося
-    await expect(page.getByTestId('game-over-modal')).toBeVisible();
+    await test.step('Перевірка модального вікна "Гру завершено!"', async () => {
+      await expect(page.getByTestId('game-over-modal')).toBeVisible();
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+      // TODO: Перевірити повідомлення про вихід за межі дошки, коли воно буде додано
+      // const message = page.getByTestId('modal-content-reason');
+      // await expect(message).toHaveAttribute('data-i18n-key', 'gameOverReasonOut');
+    });
 
-    // Перевіряємо заголовок модального вікна
-    await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
-
-    // Перевіряємо повідомлення про вихід за межі дошки
-    await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
-    // const message = page.getByTestId('modal-content-reason');
-    // await expect(message).toHaveAttribute('data-i18n-key', 'gameOverReasonOut');
-
-    // Перевіряємо, що базовий рахунок менший або дорівнює 0
-    await expectScoreToBeZeroOrNegative(page, 'base-score-value');
-
-    // Перевіряємо, що фінальний рахунок менший або дорівнює 0
-    await expectScoreToBeZeroOrNegative(page, 'final-score-value');
+    await test.step('Перевірка, що рахунки нульові або від\'ємні', async () => {
+      await expectScoreToBeZeroOrNegative(page, 'base-score-value');
+      await expectScoreToBeZeroOrNegative(page, 'final-score-value');
+    });
   });
 });
