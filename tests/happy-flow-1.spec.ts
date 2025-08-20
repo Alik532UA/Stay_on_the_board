@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setBoardSize, startNewGame, setBlockMode, BlockModeState, makeMove } from './utils';
+import { setBoardSize, startNewGame, setBlockMode, BlockModeState, makeMove, getScoreByTestId, expectScoreToBeZeroOrNegative } from './utils';
 
 test.describe('хепі флоу', () => {
   
@@ -9,7 +9,7 @@ test.describe('хепі флоу', () => {
   });
 
   test('хепі флоу 1', { tag: ['@inProgress', '@HF-1'] }, async ({ page }) => {
-    // test.setTimeout(1000 * 60 * 120); // 120 minutes
+    test.setTimeout(1000 * 60 * 120); // 120 minutes
     await test.step('Початок гри та налаштування дошки', async () => {
       await startNewGame(page);
       await setBoardSize(page, 3);
@@ -70,16 +70,18 @@ test.describe('хепі флоу', () => {
       await page.getByTestId('modal-btn-modal.close').click();
     });
 
+    let scoreBeforeBonus: number;
     await test.step('Повернення до модального вікна "Блискучий аналіз!" та завершення гри з бонусом', async () => {
       await expect(page.getByTestId('player-no-moves-modal')).toBeVisible();
-      // TODO: тут треба запам'ятати зміну яка в data-testid="final-score-value"
+      scoreBeforeBonus = await getScoreByTestId(page, 'final-score-value');
       await page.getByTestId('finish-game-with-bonus-btn').click();
     });
 
     await test.step('Перевірка модального вікна "Гру завершено!"', async () => {
       await expect(page.getByTestId('game-over-modal')).toBeVisible();
       await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
-      // TODO: тут треба перевірити що значення data-testid="final-score-value" більше ніж ми запам'ятали
+      const scoreAfterBonus = await getScoreByTestId(page, 'final-score-value');
+      expect(scoreAfterBonus).toBeGreaterThan(scoreBeforeBonus);
     });
 
     await test.step('Перегляд фінального запису гри та початок нової гри', async () => {
@@ -88,6 +90,102 @@ test.describe('хепі флоу', () => {
       await expect(page.getByTestId('limit-path-toggle')).toBeVisible();
       await page.getByTestId('modal-btn-modal.close').click();
       await page.getByTestId('play-again-btn').click();
+      await expectScoreToBeZeroOrNegative(page, 'score-value');
     });
+
+    await test.step('Гравець змінює розмір дошки та робить хід на велику відстань', async () => {
+      await setBoardSize(page, 6);
+      await page.getByTestId('test-mode-dir-btn-up-left').click();
+      await page.getByTestId('test-mode-move-dist-input').fill('4');
+      await page.getByTestId('test-mode-set-move-dist-btn').click();
+      await makeMove(page, 'down-right', 5);
+      await page.getByTestId('test-mode-computer-move-random-btn').click();
+      await makeMove(page, 'right', 2);
+    });
+
+    await test.step('Помилково заявити про відсутність ходів, отримати вікно завершення гри та натискання кнопки "Грати ще раз"', async () => {
+      await page.getByTestId('no-moves-btn').click();
+      await expect(page.getByTestId('game-over-modal')).toBeVisible();
+      await expect(page.getByTestId('modal-content-reason')).toBeVisible();
+      await page.getByTestId('play-again-btn').click();
+      await expectScoreToBeZeroOrNegative(page, 'score-value');
+    });
+
+    
+    await test.step('Гравець змінює розмір дошки та робить хід на заблоковану клітинку', async () => {
+      await setBoardSize(page, 5);
+      await page.getByTestId('test-mode-dir-btn-up-right').click();
+      await page.getByTestId('test-mode-move-dist-input').fill('3');
+      await page.getByTestId('test-mode-set-move-dist-btn').click();
+      await makeMove(page, 'down', 3);
+      await page.getByTestId('test-mode-computer-move-random-btn').click();
+      await makeMove(page, 'left', 3, false);
+    });
+
+    // await page.waitForTimeout(7777777); // пауза
+    await test.step('Завершення гри та натискання кнопки "Грати ще раз"', async () => {
+      await expect(page.getByTestId('game-over-modal')).toBeVisible();
+      await expect(page.getByTestId('modal-content-reason')).toBeVisible();
+      await page.getByTestId('watch-replay-btn').click();
+      await expect(page.getByTestId('replay-modal')).toBeVisible();
+      await expect(page.getByTestId('limit-path-toggle')).toBeVisible();
+      await expect(page.getByTestId('replay-next-step-btn')).toBeVisible();
+      await expect(page.getByTestId('limit-path-toggle')).toBeVisible();
+      await expect(page.getByTestId('replay-next-step-btn')).toBeVisible();
+      await page.getByTestId('modal-btn-modal.close').click();
+      await page.getByTestId('play-again-btn').click();
+      await expectScoreToBeZeroOrNegative(page, 'score-value');
+    });
+
+    await test.step('Гравець змінює розмір дошки та робить хід на заблоковану клітинку', async () => {
+      await setBoardSize(page, 4);
+      await page.getByTestId('test-mode-dir-btn-up-right').click();
+      await page.getByTestId('test-mode-move-dist-input').fill('3');
+      await page.getByTestId('test-mode-set-move-dist-btn').click();
+      await makeMove(page, 'down', 3);
+      await page.getByTestId('test-mode-computer-move-random-btn').click();
+      await makeMove(page, 'left', 3, false);
+    });
+
+    await test.step('Перевірка модального вікна "Гру завершено!" та вихід в головне меню', async () => {
+      await expect(page.getByTestId('game-over-modal')).toBeVisible();
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+      await page.getByTestId('play-again-btn').click();
+      await expectScoreToBeZeroOrNegative(page, 'score-value');
+    });
+
+    await test.step('Гравець робить хід за межі дошки', async () => {
+      await setBoardSize(page, 4);
+      await page.getByTestId('test-mode-dir-btn-right').click();
+      await page.getByTestId('test-mode-move-dist-input').fill('2');
+      await page.getByTestId('test-mode-set-move-dist-btn').click();
+      await makeMove(page, 'down-right', 1);
+      await page.getByTestId('test-mode-computer-move-random-btn').click();
+      await makeMove(page, 'right', 1, false);
+    });
+
+    await test.step('Перевірка модального вікна "Гру завершено!" та вихід в головне меню', async () => {
+      await expect(page.getByTestId('game-over-modal')).toBeVisible();
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+      await page.getByTestId('game-over-main-menu-btn').click();
+    });
+
+    await test.step('Початок гри та налаштування дошки', async () => {
+      await startNewGame(page);
+      await setBoardSize(page, 3);
+      await setBlockMode(page, BlockModeState.On);
+    });
+
+    await test.step('Гравець натискає "Забрати бали / Почати нову гру"', async () => {
+      await setBoardSize(page, 4);
+      await page.getByTestId('test-mode-dir-btn-right').click();
+      await page.getByTestId('test-mode-move-dist-input').fill('2');
+      await page.getByTestId('test-mode-set-move-dist-btn').click();
+      await makeMove(page, 'down-right', 1);
+      await page.getByTestId('test-mode-computer-move-random-btn').click();
+      await page.getByTestId('cash-out-btn').click();
+    });
+
+    await page.waitForTimeout(7777777); // пауза
   });
 });
