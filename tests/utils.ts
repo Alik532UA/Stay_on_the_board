@@ -1,5 +1,5 @@
-    // Додаємо паузу 7 секунд
-    // await page.waitForTimeout(7000);
+// test.setTimeout(1000 * 60 * 120); // 120 minutes
+// await page.waitForTimeout(7777777); // Додаємо паузу
 
 import { test, expect, type Page } from '@playwright/test';
 
