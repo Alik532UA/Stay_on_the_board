@@ -53,6 +53,7 @@
     --toggle-off-bg: #23272f;
     --confirm-btn-text: #fff;
     --no-moves-btn-text: #fff;
+    --button-text-color: #23272f;
 
     /* === Уніфіковані стилі для основних елементів інтерфейсу === */
     --button-height: 44px;
@@ -113,4 +114,5 @@
     --disabled-bg: #cccccc;
     --disabled-text: #666666;
     --toggle-off-bg: #ccc;
+    --button-text-color: #fff;
 }

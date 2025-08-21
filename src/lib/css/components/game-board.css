@@ -149,6 +149,7 @@
 
 .main-menu-btn.active {
   background: var(--control-selected, #ff9800);
+  color: var(--control-selected-text);
   color: #fff;
   box-shadow: 0 0 12px var(--control-selected, #ff9800);
   transform: scale(1.05);

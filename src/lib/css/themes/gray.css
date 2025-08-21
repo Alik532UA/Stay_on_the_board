@@ -97,6 +97,7 @@
 [data-style="gray"] .dir-btn.active,
 [data-style="gray"] .dist-btn.active,
 [data-style="gray"] .control-btn.selected {
+   color: var(--control-selected-text);
     background: var(--control-selected);
     color: #fff;
     border-color: var(--control-selected);

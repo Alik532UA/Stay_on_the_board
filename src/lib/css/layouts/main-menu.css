@@ -148,6 +148,7 @@
 
 #theme-toggle button.active {
     background: var(--control-selected);
+    color: var(--control-selected-text);
     color: white;
 }
 

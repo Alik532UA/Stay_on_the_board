@@ -95,6 +95,7 @@
 [data-style="orange"] .dir-btn.active,
 [data-style="orange"] .dist-btn.active {
     background-color: var(--control-selected);
+    color: var(--control-selected-text);
     color: var(--bg-secondary);
 }
 
