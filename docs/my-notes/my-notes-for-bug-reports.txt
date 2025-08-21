@@ -3877,8 +3877,10 @@ class="settings-option s-Twm6pjhj-ond"
 видали data-testid="settings-page-show-moves-checkbox"
 =======================================================================================
 /settings page
-видали <div class="settings-option s-Twm6pjhj-ond"><label class="settings-checkbox s-Twm6pjhj-ond" title=""><input type="checkbox" name="showMoves" class="s-Twm6pjhj-ond"> <span class="checkmark s-Twm6pjhj-ond"></span> <span class="s-Twm6pjhj-ond">Показувати доступні ходи</span></label></div>
+видали 
+<div class="settings-option s-Twm6pjhj-ond"><label class="settings-checkbox s-Twm6pjhj-ond" data-testid="settings-page-show-moves-checkbox" title=""><input type="checkbox" name="showMoves" class="s-Twm6pjhj-ond"> <span class="checkmark s-Twm6pjhj-ond"></span> <span class="s-Twm6pjhj-ond">Показувати доступні ходи</span></label></div>
 =======================================================================================
+class="settings-option"
 Актуальний результат: це паломаний чекбокс
 Очікуваний результат: це чекбокс-кнопка, по прикладу <button class="settings-expander__toggle-btn s-D-5lNYez-F-W">Автоматично приховувати дошку</button>
 =======================================================================================
@@ -3918,7 +3920,7 @@ P.S. баг іноді відтворюється, а іноді ні
 <div class="settings-option s-Twm6pjhj-ond"><button class="settings-expander__toggle-btn s-D-5lNYez-F-W active" data-testid="settings-page-show-moves-toggle">Показувати доступні ходи</button><!----></div>
 =======================================================================================
 /settings page
-<div class="settings-option s-Twm6pjhj-ond"><button class="settings-expander__toggle-btn s-D-5lNYez-F-W active" data-testid="settings-page-show-game-mode-modal-toggle">Показувати "Вибір режиму гри"</button><!----></div>
+<button data-testid="settings-page-show-game-mode-modal-toggle" class="settings-toggle-button s-Twm6pjhj-ond active">Показувати "Вибір режиму гри"</button>
 замінити на групу чекбоксів по прикладу:
 <div class="settings-expander__button-group s-7Vnx0XQsxohu"><button class="settings-expander__row-btn s-7Vnx0XQsxohu" style="font-size: 11.9px;"><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----> сховати</button><button class="settings-expander__row-btn s-7Vnx0XQsxohu active" style="font-size: 11.9px;"><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----> показати</button><button class="settings-expander__row-btn s-7Vnx0XQsxohu active" style="font-size: 11.9px;"><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----> з фігурою</button><button class="settings-expander__row-btn s-7Vnx0XQsxohu active" style="font-size: 11.9px;"><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----> з ходами</button></div>
 
@@ -4061,7 +4063,7 @@ npx playwright test --grep "@GOS-3"
 Актуальний результат: нічого не відбувається
 Очікуваний результат: модальне вікно завершення гри з тестом gameOverReasonCashOut
 =======================================================================================
-
+зроби припущення яка очукється логіка зв'язку data-testid="settings-page-game-mode-section" та data-testid="game-mode-modal" (data-testid="dont-show-again-switch")
 =======================================================================================
 =======================================================================================
 =======================================================================================
