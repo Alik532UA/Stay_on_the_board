@@ -60,7 +60,7 @@
     {$_('gameModes.pro')}
   </button>
 </div>
-<DontShowAgainCheckbox />
+<DontShowAgainCheckbox dataTestId="modal-dont-show-again-switch" />
 
 <style>
   .game-mode-buttons {

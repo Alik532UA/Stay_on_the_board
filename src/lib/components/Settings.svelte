@@ -90,15 +90,20 @@
     <div class="settings-button-group" data-testid="settings-page-game-mode-group">
       <button
         class="settings-group-button"
-        class:active={settings.gameMode === null}
-        on:click={() => settingsStore.updateSettings({ gameMode: null })}
+        class:active={!settings.rememberGameMode}
+        on:click={() => {
+          settingsStore.updateSettings({ gameMode: null, showGameModeModal: true, rememberGameMode: false });
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('gameMode');
+          }
+        }}
         data-testid="settings-page-game-mode-null"
       >
         Вибирати
       </button>
       <button
         class="settings-group-button"
-        class:active={settings.gameMode === 'beginner'}
+        class:active={settings.rememberGameMode && settings.gameMode === 'beginner'}
         on:click={() => settingsStore.applyGameModePreset('beginner')}
         data-testid="settings-page-game-mode-beginner"
       >
@@ -106,7 +111,7 @@
       </button>
       <button
         class="settings-group-button"
-        class:active={settings.gameMode === 'experienced'}
+        class:active={settings.rememberGameMode && settings.gameMode === 'experienced'}
         on:click={() => settingsStore.applyGameModePreset('experienced')}
         data-testid="settings-page-game-mode-experienced"
       >
@@ -114,7 +119,7 @@
       </button>
       <button
         class="settings-group-button"
-        class:active={settings.gameMode === 'pro'}
+        class:active={settings.rememberGameMode && settings.gameMode === 'pro'}
         on:click={() => settingsStore.applyGameModePreset('pro')}
         data-testid="settings-page-game-mode-pro"
       >

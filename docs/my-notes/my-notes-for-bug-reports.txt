@@ -4065,14 +4065,54 @@ npx playwright test --grep "@GOS-3"
 =======================================================================================
 зроби припущення яка очукється логіка зв'язку data-testid="settings-page-game-mode-section" та data-testid="game-mode-modal" (data-testid="dont-show-again-switch")
 =======================================================================================
+якщо вибрано data-testid="settings-page-game-mode-null" тоді showGameModeModal == true
+якщо вибрано data-testid="settings-page-game-mode-beginner" чи data-testid="settings-page-game-mode-experienced" чи data-testid="settings-page-game-mode-pro" тоді showGameModeModal == false
 =======================================================================================
+<div class="game-mode-buttons s-7ixHSxZNgfWi"><button class="modal-btn-generic green-btn s-7ixHSxZNgfWi" data-testid="beginner-mode-btn" title="">Новачок</button> <button class="modal-btn-generic blue-btn s-7ixHSxZNgfWi" data-testid="experienced-mode-btn" title="">Розбійник</button> <button class="modal-btn-generic danger-btn s-7ixHSxZNgfWi" data-testid="pro-mode-btn" title="">Потужний</button></div>
+запам'ятовувати вибір та відображати в data-testid="settings-page-game-mode-group" тільки якщо увімкнений data-testid="dont-show-again-switch"
+а якщо вимкнутий data-testid="dont-show-again-switch", то вважати це одноразовим вибором, і залишати позицію в /settings сторінці: data-testid="settings-page-game-mode-null"
 =======================================================================================
+кроки:
+1. data-testid="dont-show-again-switch" увімкнути чекбокс
+2. вибрати режим
+3. зайти в /settings
+Актуальний результат: вибраний data-testid="settings-page-game-mode-null"
+Очікуваний результат: data-testid="settings-page-game-mode-null" не вибраний, а вибраний режим в data-testid="settings-page-game-mode-group"
 =======================================================================================
+data-testid="dont-show-again-switch" та data-testid="settings-page-game-mode-null" треба об'єднати логіку в одну кнопку і залишати data-testid="settings-page-game-mode-null"
 =======================================================================================
+data-testid="settings-page-game-mode-null" перейменуй в data-testid="dont-show-again-switch"
 =======================================================================================
+в налаштуваннях сторінка /settings та в мадальному вінкі data-testid="game-mode-modal"
+Актуальний результат: однаковий data-testid="dont-show-again-switch"
+Очікуваний результат: унікальний data-testid
 =======================================================================================
+за замовчуванням:
+data-testid="settings-page-game-mode-null" == вибраний
+data-testid="dont-show-again-switch" == вимкнений
 =======================================================================================
+за замовчуванням:
+data-testid="settings-page-game-mode-null" == вибраний
+
+це означає що data-testid="dont-show-again-switch" == вимкнений
+
+бо ці два елемента дублюють один одного завжди, вони залежать від одної і тої самої зміної і міняють одну і ту саму зміну. а не різні
 =======================================================================================
+
+кроки:
+1. data-testid="dont-show-again-switch" увімкнути чекбокс
+2. вибрати режим
+3. зайти в /settings
+Актуальний результат: вибраний data-testid="settings-page-game-mode-null"
+Очікуваний результат: data-testid="settings-page-game-mode-null" не вибраний, а вибраний правильний режим в data-testid="settings-page-game-mode-group"
+=======================================================================================
+сторінка settings
+data-testid="settings-page-game-mode-beginner"
+data-testid="settings-page-game-mode-experienced"
+data-testid="settings-page-game-mode-pro"
+можуть бути вибрані тільки якщо вимкнений data-testid="settings-page-game-mode-null"
+
+не може бути вибрані одразу кілька варіантів
 =======================================================================================
 =======================================================================================
 =======================================================================================

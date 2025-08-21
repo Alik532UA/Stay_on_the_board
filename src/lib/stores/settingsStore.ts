@@ -52,6 +52,7 @@ const defaultSettings: any = {
   },
   keyConflictResolution: {},
   gameMode: null,
+  rememberGameMode: false,
   showGameModeModal: true,
   showDifficultyWarningModal: true,
   showGameInfoWidget: 'shown',
@@ -90,7 +91,10 @@ function loadSettings(): any {
 
   try {
     const storedSettingsRaw = localStorage.getItem('settings');
+    const sessionGameMode = isBrowser ? sessionStorage.getItem('gameMode') : null;
+    logService.init('Завантажено raw налаштування з localStorage:', storedSettingsRaw);
     const storedSettings: { version?: number; keybindings?: Record<string, string[]> } = safeJsonParse(storedSettingsRaw, {});
+    logService.init('Розпарсені налаштування:', storedSettings);
     const settingsVersion = storedSettings.version || 0;
 
     let mergedSettings = { ...defaultSettings, ...storedSettings };
@@ -141,7 +145,7 @@ function loadSettings(): any {
     });
 
     const gameMode = mergedSettings.gameMode;
-    mergedSettings.gameMode = ['beginner', 'experienced', 'pro'].includes(gameMode) ? gameMode : null;
+    mergedSettings.gameMode = ['beginner', 'experienced', 'pro'].includes(gameMode) ? gameMode : sessionGameMode;
     
     // Migrate individual settings from localStorage to the new 'settings' object
     const individualSettingsMap = {
@@ -158,6 +162,7 @@ function loadSettings(): any {
       autoHideBoard: 'autoHideBoard',
       keyConflictResolution: 'keyConflictResolution',
       gameMode: 'gameMode',
+      rememberGameMode: 'rememberGameMode',
       showGameModeModal: 'showGameModeModal',
       showDifficultyWarningModal: 'showDifficultyWarningModal',
       showGameInfoWidget: 'showGameInfoWidget',
@@ -178,6 +183,7 @@ function loadSettings(): any {
           case 'showPiece':
           case 'autoHideBoard':
           case 'showGameModeModal':
+          case 'rememberGameMode':
           case 'showDifficultyWarningModal':
           case 'lockSettings':
           case 'testMode':
@@ -236,12 +242,30 @@ function createSettingsStore() {
     },
     updateSettings: (newSettings: Partial<any>) => {
       update((state: any) => {
-        const merged = { ...state, ...newSettings };
-        if (isBrowser) {
-          localStorage.setItem('settings', JSON.stringify(merged));
-        }
-        return merged;
-      });
+          const merged = { ...state, ...newSettings };
+          logService.state('Оновлення налаштувань. Поточний стан:', state);
+          logService.state('Нові налаштування:', newSettings);
+          logService.state('Об\'єднані налаштування:', merged);
+          if (isBrowser) {
+            const persistentState = { ...merged };
+            
+            if (merged.rememberGameMode) {
+              persistentState.gameMode = merged.gameMode;
+            } else {
+              persistentState.gameMode = null;
+            }
+  
+            if (isBrowser && merged.gameMode) {
+              sessionStorage.setItem('gameMode', merged.gameMode);
+            } else if (isBrowser) {
+              sessionStorage.removeItem('gameMode');
+            }
+  
+            logService.state('Стан для збереження в localStorage:', persistentState);
+            localStorage.setItem('settings', JSON.stringify(persistentState));
+          }
+          return merged;
+        });
     },
     setVisibilityLevel: (level: number) => {
       let newSettings: Partial<any> = {};
@@ -384,15 +408,21 @@ function createSettingsStore() {
       let showFaq = false;
       switch (mode) {
         case 'beginner':
-          settingsToApply = { gameMode: mode, showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: false, speechEnabled: false, autoHideBoard: false };
+          settingsToApply = { showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: false, speechEnabled: false, autoHideBoard: false };
           showFaq = true;
           break;
         case 'experienced':
-          settingsToApply = { gameMode: mode, showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
+          settingsToApply = { showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
           break;
         case 'pro':
-          settingsToApply = { gameMode: mode, showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
+          settingsToApply = { showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
           break;
+      }
+      settingsToApply.gameMode = mode;
+      if (modal === modalStore) {
+        settingsToApply.rememberGameMode = get(settingsStore).showGameModeModal ? false : true;
+      } else {
+        settingsToApply.rememberGameMode = true;
       }
       methods.updateSettings(settingsToApply);
       modal.closeModal();

@@ -4,6 +4,7 @@
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { logService } from '$lib/services/logService.js';
   import { onMount } from 'svelte';
+  export let dataTestId = 'dont-show-again-switch';
   let dontShowAgain = false;
   $: dontShowAgain = !$settingsStore.showGameModeModal;
 
@@ -41,7 +42,7 @@
     <div
       class="switch-content-wrapper"
       use:hotkeyTooltip={{ key: 'X' }}
-      data-testid="dont-show-again-switch"
+      data-testid={dataTestId}
     >
       <div class="ios-switch">
         <input
