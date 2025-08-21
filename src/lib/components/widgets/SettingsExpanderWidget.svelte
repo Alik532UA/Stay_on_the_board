@@ -109,7 +109,7 @@
 
   function selectBlockCount(count: number) {
     logService.action(`Click: "Вибір кількості блоків: ${count}" (SettingsExpanderWidget)`);
-    if (count > 0 && $settingsStore.showGameModeModal) {
+    if (count > 0) {
       modalStore.showModal({
         titleKey: 'modal.expertModeTitle',
         contentKey: 'modal.expertModeContent',
