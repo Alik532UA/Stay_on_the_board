@@ -186,6 +186,6 @@ test.describe('хепі флоу', () => {
       await page.getByTestId('cash-out-btn').click();
     });
 
-    await page.waitForTimeout(7777777); // пауза
+    // await page.waitForTimeout(7777777); // пауза
   });
 });
