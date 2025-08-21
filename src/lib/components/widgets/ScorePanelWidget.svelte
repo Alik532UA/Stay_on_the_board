@@ -7,6 +7,7 @@
   import { replayStore } from '$lib/stores/replayStore.js';
   import { _ } from 'svelte-i18n';
   import { customTooltip } from '$lib/actions/customTooltip.js';
+  import { sideEffectService } from '$lib/services/sideEffectService.js';
 
   // Реактивні змінні для визначення поточного гравця та режиму гри
   $: currentPlayer = $gameState ? $gameState.players[$gameState.currentPlayerIndex] : null;
@@ -112,8 +113,9 @@
     });
   }
 
-  function cashOutAndEndGame() {
-      gameModeService.endGame('modal.gameOverReasonCashOut');
+  async function cashOutAndEndGame() {
+    const sideEffects = await gameModeService.endGame('modal.gameOverReasonCashOut');
+    sideEffectService.executeMany(sideEffects);
   }
 </script>
 

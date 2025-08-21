@@ -47,6 +47,10 @@ class SideEffectService {
     }
   }
 
+  public executeMany(effects: SideEffect[]): void {
+    effects.forEach(effect => this.execute(effect));
+  }
+ 
   private speakText(payload: any): void {
     speak(payload.text, payload.lang, payload.voiceURI);
   }
