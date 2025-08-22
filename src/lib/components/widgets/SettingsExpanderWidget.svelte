@@ -109,7 +109,7 @@
 
   function selectBlockCount(count: number) {
     logService.action(`Click: "Вибір кількості блоків: ${count}" (SettingsExpanderWidget)`);
-    if (count > 0) {
+    if (count > 0 && get(settingsStore).showExpertModeWarningModal) {
       modalStore.showModal({
         titleKey: 'modal.expertModeTitle',
         dataTestId: 'expert-mode-modal',
@@ -118,7 +118,11 @@
           { textKey: 'modal.expertModeConfirm', primary: true, isHot: true, onClick: () => { settingsStore.updateSettings({ blockOnVisitCount: count }); modalStore.closeModal(); } },
           { textKey: 'modal.expertModeCancel', onClick: modalStore.closeModal }
         ],
-        closeOnOverlayClick: true
+        closeOnOverlayClick: true,
+        props: {
+          showDontShowAgain: true,
+          dontShowAgainBinding: () => settingsStore.updateSettings({ showExpertModeWarningModal: false })
+        }
       });
     } else {
       settingsStore.updateSettings({ blockOnVisitCount: count });
