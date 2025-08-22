@@ -1,21 +1,3 @@
-1. скачати ollama
-2. встановити модель, в командний рядок написати: ollama pull nomic-embed-text
-
-3. скачати docker-desktop
-4. в командний рядок написати: docker run -p 6333:6333 qdrant/qdrant
-
-5. в Roo Code увімкнути Codebase Indexing
-6. Embedder Provider: Ollama
-7. Ollama Base URL: http://localhost:11434
-8. Model: nomic-embed-text
-9. Qdrant URL: http://localhost:6333
-10. Qdrant API Key: (порожне поле)
-
-11. в Roo Code зайти в налаштування Provider
-12. Активувати Use custom base URL, заповнити поле: http://127.0.0.1:5000
-
----
-
 ## Інструкція з налаштування Roo Code для першого запуску
 
 Ця інструкція допоможе налаштувати необхідні інструменти для роботи Roo Code з локальною моделлю та векторною базою даних.
