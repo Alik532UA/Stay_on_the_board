@@ -175,18 +175,6 @@
     font-weight: 600;
     color: var(--text-secondary);
   }
-  select {
-    background: var(--control-bg);
-    color: var(--text-primary);
-    border: 1.5px solid var(--border-color);
-    border-radius: 8px;
-    padding: 8px 12px;
-    transition: all 0.2s;
-  }
-  select:hover, select:focus {
-    border-color: var(--control-selected);
-    outline: none;
-  }
   .settings-divider {
     border: none;
     border-top: 1.5px solid var(--border-color);
