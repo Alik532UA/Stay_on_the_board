@@ -137,7 +137,8 @@
     modalStore.showModal({
       titleKey: 'modal.boardClickTitle',
       contentKey: 'modal.boardClickContent',
-      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+      dataTestId: 'board-click-modal'
     });
   }
 
