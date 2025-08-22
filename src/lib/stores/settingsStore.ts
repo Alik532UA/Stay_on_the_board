@@ -55,6 +55,7 @@ const defaultSettings: any = {
   rememberGameMode: false,
   showGameModeModal: true,
   showDifficultyWarningModal: true,
+  showExpertModeWarningModal: true,
   showGameInfoWidget: 'shown',
   lockSettings: false,
   testMode: false,
@@ -165,6 +166,7 @@ function loadSettings(): any {
       rememberGameMode: 'rememberGameMode',
       showGameModeModal: 'showGameModeModal',
       showDifficultyWarningModal: 'showDifficultyWarningModal',
+      showExpertModeWarningModal: 'showExpertModeWarningModal',
       showGameInfoWidget: 'showGameInfoWidget',
       lockSettings: 'lockSettings',
       testMode: 'testMode'
@@ -185,6 +187,7 @@ function loadSettings(): any {
           case 'showGameModeModal':
           case 'rememberGameMode':
           case 'showDifficultyWarningModal':
+          case 'showExpertModeWarningModal':
           case 'lockSettings':
           case 'testMode':
             // @ts-ignore

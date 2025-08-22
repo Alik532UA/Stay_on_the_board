@@ -5,13 +5,25 @@
   import { logService } from '$lib/services/logService.js';
   import { onMount } from 'svelte';
   export let dataTestId = '';
+  export let modalType: 'gameMode' | 'expertMode' = 'gameMode';
   let dontShowAgain = false;
-  $: dontShowAgain = !$settingsStore.showGameModeModal;
+
+  $: {
+    if (modalType === 'gameMode') {
+      dontShowAgain = !$settingsStore.showGameModeModal;
+    } else if (modalType === 'expertMode') {
+      dontShowAgain = !$settingsStore.showExpertModeWarningModal;
+    }
+  }
 
   function handleCheckboxChange(event: Event) {
     const input = event.currentTarget as HTMLInputElement;
     if (input && typeof input.checked === 'boolean') {
-      settingsStore.updateSettings({ showGameModeModal: !input.checked });
+      if (modalType === 'gameMode') {
+        settingsStore.updateSettings({ showGameModeModal: !input.checked });
+      } else if (modalType === 'expertMode') {
+        settingsStore.updateSettings({ showExpertModeWarningModal: !input.checked });
+      }
     }
   }
 

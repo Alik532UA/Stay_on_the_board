@@ -1,0 +1,61 @@
+**Правила**: Ознайомся та дотримуйся правил з @/docs/my-notes/AI_AGENT_RULES.md 
+**Мова**: мова роздумів та відповіді в чаті лише українська. Англійською не пиши, а заощаджуй токени.
+**Опис дії**: Перейди на стислий режим: мінімум пояснень (приблизно до 200 символів, але бажано 30-70 символів), максимум дій.
+
+Поточнє завдання:
+виправити баг:
+
+1. в settings-expander__content вибрати 1 чи 2 чи 3
+Актуальний та очікуваний результат: модальне вікно expert-mode-modal з попередженням з'явилось
+2. вибрати чекбокс expert-mode-modal-dont-show-again-switch
+3. в settings-expander__content вибрати повторно вибрати 1 чи 2 чи 3
+Актуальний результат: модальне вікно expert-mode-modal з попередженням з'явилось
+Очікуваний результат: модальне вікно expert-mode-modal з попередженням НЕ з'явилось
+
+
+---
+
+**Ключова вимога:** Твоє рішення має бути комплексним. Не роби поверхневих виправлень ("латок" чи "костилів").
+**Реалізуй системне виправлення**, яке усуває корінь проблеми та відповідає цільовій архітектурі проєкту.
+при виправленні використовуй принципи:
+1.  **SSoT (Single Source of Truth):** Чи є єдине джерело правди для кожного елемента стану?
+2.  **UDF (Unidirectional Data Flow):** Чи є потік даних односпрямованим та передбачуваним?
+3.  **SoC (Separation of Concerns):** Наскільки добре розділені відповідальності (стан, логіка, UI)?
+4.  **Композиція:** Чи ефективно використовуються компоненти для побудови UI?
+5.  **Чистота та Побічні ефекти:** Наскільки добре ізольовані "нечисті" операції (API, DOM, таймери)?
+6.  **DRY (Don't Repeat Yourself):** Чи є дублювання коду, яке можна усунути?
+7.  **Простота та Читабельність (KISS):** Чи є надмірно складні рішення? Наскільки код зрозумілий (якість іменування)?
+8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
+9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
+
+---
+
+client:733 [vite] connecting...
+client:827 [vite] connected.
+logService.js:129 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+init.js:31 ✅ i18n ініціалізовано успішно
+logService.js:100 [GAME_MODE] Setting game mode to: vs-computer
+logService.js:98 [STATE] Оновлення налаштувань. Поточний стан: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
+logService.js:98 [STATE] Нові налаштування: {blockModeEnabled: false, autoHideBoard: false, lockSettings: false, showBoard: true, showPiece: true, …}
+logService.js:98 [STATE] Об'єднані налаштування: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
+logService.js:98 [STATE] Стан для збереження в localStorage: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
+logService.js:98 [STATE] Оновлення налаштувань. Поточний стан: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
+logService.js:98 [STATE] Нові налаштування: {showGameModeModal: false}
+logService.js:98 [STATE] Об'єднані налаштування: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
+logService.js:98 [STATE] Стан для збереження в localStorage: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
+logService.js:98 [STATE] Оновлення налаштувань. Поточний стан: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
+logService.js:98 [STATE] Нові налаштування: {blockOnVisitCount: 1}
+logService.js:98 [STATE] Об'єднані налаштування: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
+logService.js:98 [STATE] Стан для збереження в localStorage: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
+
+
+---
+
+**Відладка (Дебагінг):**
+    *   **Використовуй `logService`:** Замість `console.log` завжди використовуй централізований `logService`.
+    *   **Доповнюй логи для аналізу:** Якщо поточний рівень логування не дозволяє діагностувати описану проблему, додай нові виклики logService у відповідних місцях коду. Мета — забезпечити, щоб майбутні логи містили всю інформацію, яка дозволить мені самостійно проаналізувати, чи вирішено проблему, і що саме потребує виправлення.
+    *   **Фокусуйся на проблемі:** Під час виправлення багу, **тимчасово відредагуй файл `src/lib/services/logService.js`**. Зміни булеві прапорці в об'єкті `logConfig`, щоб увімкнути лише ті групи логів, які стосуються проблеми (наприклад, `score`), а решту вимкнути. Це допоможе усунути інформаційний шум.
+    *   **Незмінність логів:** Параметри логування не змінюй, доки я (людина) не підтвердить, що баг виправлено. При порушені цього правила AI буде вимкнено та видалено.
+**Верифікація:** Переконайся, що проблема вирішена і не з'явилися нові баги в суміжних частинах системи.
+
+---

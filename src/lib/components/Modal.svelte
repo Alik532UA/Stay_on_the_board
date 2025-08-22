@@ -307,8 +307,10 @@
             </button>
           {/if}
         {/each}
-        {#if $modalState.titleKey === 'gameModes.title' || $modalState.titleKey === 'modal.expertModeTitle'}
-          <DontShowAgainCheckbox dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} />
+        {#if $modalState.titleKey === 'gameModes.title'}
+          <DontShowAgainCheckbox modalType="gameMode" dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} />
+        {:else if $modalState.titleKey === 'modal.expertModeTitle'}
+          <DontShowAgainCheckbox modalType="expertMode" dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} />
         {/if}
         <slot />
       </div>
