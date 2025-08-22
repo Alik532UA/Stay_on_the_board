@@ -23,7 +23,6 @@
           modalStore.showModal({
             titleKey: 'faq.title',
             dataTestId: 'faq-modal',
-            titleDataTestId: 'modal-title',
             content: { isFaq: true },
             buttons: [
               { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },
@@ -60,7 +59,7 @@
     {$_('gameModes.pro')}
   </button>
 </div>
-<DontShowAgainCheckbox dataTestId="modal-dont-show-again-switch" />
+<DontShowAgainCheckbox dataTestId="game-mode-modal-dont-show-again-switch" />
 
 <style>
   .game-mode-buttons {

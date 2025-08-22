@@ -19,7 +19,7 @@ test.describe('Модальне вікно вибору режиму гри', ()
       await page.getByTestId('beginner-mode-btn').click();
       await expect(page.getByTestId('faq-modal')).toBeVisible();
       await expect(page.getByTestId('faq-modal-title')).toHaveAttribute('data-i18n-key', 'faq.title');
-      await page.getByTestId('modal-btn-modal.ok').click();
+      await page.getByTestId('faq-modal-modal.ok-btn').click();
       await page.waitForURL('**/game/vs-computer');
       await expect(page.locator('.direction-controls-panel')).toBeVisible();
     });

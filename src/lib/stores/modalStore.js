@@ -34,7 +34,6 @@ import { logService } from '$lib/services/logService';
  * @property {boolean} [closable]
  * @property {boolean} [closeOnOverlayClick]
  * @property {string} [dataTestId]
- * @property {string} [titleDataTestId]
  * @property {object} [titleValues]
  */
 
@@ -48,8 +47,7 @@ const initialState = {
   props: {},
   closable: true,
   closeOnOverlayClick: false,
-  dataTestId: undefined,
-  titleDataTestId: undefined
+  dataTestId: undefined
 };
 
 const store = writable(initialState);
@@ -61,9 +59,9 @@ const modalStack = [];
 export const modalState = { subscribe };
 
 /**
- * @param {Partial<ModalState>} modalDetails
+ * @param {Partial<ModalState> & { dataTestId: string }} modalDetails
  */
-export function showModal(modalDetails) {
+export function showModal({ dataTestId, ...modalDetails }) {
   update(currentState => {
     // НАВІЩО: Ця перевірка запобігає "нашаруванню" однакових модалок.
     // Якщо нова модалка має той самий dataTestId (для тестів) або titleKey (якщо ID немає),
@@ -71,17 +69,18 @@ export function showModal(modalDetails) {
     // Це захист від помилок, коли showModal викликається кілька разів для однієї події.
     if (currentState.isOpen) {
       const sameIdentity =
-        (modalDetails?.dataTestId && currentState.dataTestId === modalDetails.dataTestId) ||
-        (!modalDetails?.dataTestId && modalDetails?.titleKey && currentState.titleKey === modalDetails.titleKey);
+        (dataTestId && currentState.dataTestId === dataTestId) ||
+        (!dataTestId && modalDetails?.titleKey && currentState.titleKey === modalDetails.titleKey);
       if (!sameIdentity) {
         modalStack.push(currentState);
       } else {
-        logService.ui(`[ModalStore] showModal: Prevented stacking identical modal '${modalDetails.dataTestId || modalDetails.titleKey}'.`);
+        logService.ui(`[ModalStore] showModal: Prevented stacking identical modal '${dataTestId || modalDetails.titleKey}'.`);
       }
     }
     const newState = {
       ...initialState,
       ...modalDetails,
+      dataTestId,
       isOpen: true,
     };
     logService.ui(`[ModalStore] showModal called. New modal: '${newState.dataTestId || newState.titleKey}'. Stack size: ${modalStack.length}`);

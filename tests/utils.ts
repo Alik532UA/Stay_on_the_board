@@ -44,7 +44,7 @@ export async function startNewGame(page: Page, mode: GameMode = GameMode.Beginne
   await page.getByTestId(mode).click();
 
   if (mode === GameMode.Beginner) {
-    await page.getByTestId('modal-btn-modal.ok').click();
+    await page.getByTestId('faq-modal-modal.ok-btn').click();
   }
 
   await page.waitForURL('**/game/vs-computer');

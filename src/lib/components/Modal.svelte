@@ -115,13 +115,13 @@
 </script>
 
 {#if $modalState.isOpen}
-  <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.ok')} onclick={onOverlayClick} onkeydown={onModalKeydown}>
+  <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.ok')} onclick={onOverlayClick} onkeydown={onModalKeydown} data-testid="modal-overlay">
     <div class="modal-window" data-testid={$modalState.dataTestId}>
       {#if $modalState.titleKey || $modalState.title}
-      <div class="modal-header">
+      <div class="modal-header" data-testid={`${$modalState.dataTestId}-header`}>
         {#if $modalState.titleKey === 'modal.expertModeTitle'}
           <!-- Контейнер для повзунка, якому ми передаємо CSS-змінну -->
-          <div class="volume-control-container" style="--volume-percentage: {volumePercentage}%; position: relative;">
+          <div class="volume-control-container" style="--volume-percentage: {volumePercentage}%; position: relative;" data-testid="expert-mode-volume-container">
             <input
               type="range"
               min="0"
@@ -130,11 +130,12 @@
               bind:value={expertVolume}
               class="volume-slider"
               aria-label={$_('voiceSettings.volume')}
+              data-testid="expert-mode-volume-slider"
             />
-            <span class="volume-thumb-svg" style="left: calc((100% - 32px) * {expertVolume});">
+            <span class="volume-thumb-svg" style="left: calc((100% - 32px) * {expertVolume});" data-testid="expert-mode-volume-thumb">
               <SvgIcons name="boxing-glove-pictogram-1" />
             </span>
-            <span class="volume-label">{$_('voiceSettings.volumeLabel')}: {volumePercentage.toFixed(0)}%</span>
+            <span class="volume-label" data-testid="expert-mode-volume-label">{$_('voiceSettings.volumeLabel')}: {volumePercentage.toFixed(0)}%</span>
           </div>
         {/if}
 
@@ -142,7 +143,7 @@
           {#if $modalState.titleKey === 'modal.gameOverTitle'}
             <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
           {/if}
-          <h2 class="modal-title" data-testid={$modalState.dataTestId ? `${$modalState.dataTestId}-title` : ''} data-i18n-key={$modalState.titleKey}>
+          <h2 class="modal-title" data-testid={`${$modalState.dataTestId}-title`} data-i18n-key={$modalState.titleKey}>
             {#if $i18nReady && $modalState.titleKey}
               {@html $_($modalState.titleKey, {
                 values: $modalState.content as any
@@ -155,14 +156,14 @@
 
         {#if !(($modalState.buttons && $modalState.buttons.length === 2 && $modalState.buttons.every(btn => typeof btn.onClick === 'function')) || $modalState.titleKey === 'modal.gameOverTitle' || ($modalState.buttons && $modalState.buttons.length === 1))}
           {#if $modalState.closable}
-            <button class="modal-close" use:hotkeyTooltip={{ key: 'ESC' }} onclick={() => { logService.ui('Закриття модального вікна (X)'); modalStore.closeModal(); }} data-testid="modal-btn-modal.close">×</button>
+            <button class="modal-close" use:hotkeyTooltip={{ key: 'ESC' }} onclick={() => { logService.ui('Закриття модального вікна (X)'); modalStore.closeModal(); }} data-testid={`${$modalState.dataTestId}-close-btn`}>×</button>
           {/if}
         {/if}
       </div>
       {/if}
-      <div class="modal-content" class:is-faq={typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq} bind:this={modalContent}>
+      <div class="modal-content" class:is-faq={typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq} bind:this={modalContent} data-testid={`${$modalState.dataTestId}-content`}>
         {#if typeof $modalState.content === 'object' && $modalState.content && 'reason' in $modalState.content}
-          <p class="reason" data-testid="modal-content-reason" data-i18n-key={($modalState.content as any).reasonKey}>{$modalState.content.reason}</p>
+          <p class="reason" data-testid={`${$modalState.dataTestId}-content-reason`} data-i18n-key={($modalState.content as any).reasonKey}>{$modalState.content.reason}</p>
         {/if}
         {#if $modalState.component}
           <svelte:component this={$modalState.component as any} {...$modalState.props} />
@@ -268,7 +269,7 @@
                 }
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
-              data-testid={btn.dataTestId || `modal-btn-${btn.textKey || btn.text}`}
+              data-testid={btn.dataTestId || `${$modalState.dataTestId}-${btn.textKey || btn.text}-btn`}
               disabled={btn.disabled || $playerInputStore.isMoveInProgress || processingButtons[i]}
             >
               <!-- НАВІЩО: Додано `$playerInputStore.isMoveInProgress` для глобального блокування кнопок.
@@ -296,7 +297,7 @@
                 }
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
-              data-testid={btn.dataTestId || `modal-btn-${btn.textKey || btn.text}`}
+              data-testid={btn.dataTestId || `${$modalState.dataTestId}-${btn.textKey || btn.text}-btn`}
               disabled={btn.disabled || $playerInputStore.isMoveInProgress || processingButtons[i]}
             >
               <!-- НАВІЩО: Додано `$playerInputStore.isMoveInProgress` для глобального блокування кнопок.
@@ -307,7 +308,7 @@
           {/if}
         {/each}
         {#if $modalState.titleKey === 'gameModes.title' || $modalState.titleKey === 'modal.expertModeTitle'}
-          <DontShowAgainCheckbox />
+          <DontShowAgainCheckbox dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} />
         {/if}
         <slot />
       </div>
