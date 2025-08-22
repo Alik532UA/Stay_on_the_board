@@ -453,6 +453,7 @@
       label={$_('gameModes.autoHideBoard')}
       checked={$settingsStore.autoHideBoard}
       on:toggle={handleToggleAutoHideBoard}
+      dataTestId="auto-hide-board-toggle"
     />
     <ToggleButton
       label={$_('gameControls.blockMode')}
