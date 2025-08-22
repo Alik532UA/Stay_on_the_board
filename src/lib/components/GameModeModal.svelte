@@ -9,12 +9,15 @@
   import { gameState } from '$lib/stores/gameState';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
   import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
+  import { enableAllGameCheckboxesIfNeeded } from '$lib/utils/uiUtils.js';
 
   /**
    * @param {'beginner' | 'experienced' | 'pro'} mode
    */
   function selectMode(mode) {
     const shouldShowFaq = settingsStore.applyGameModePreset(mode);
+    // Ініціалізуємо чекбокси після вибору режиму, забезпечуючи видимість на старті незалежно від autoHideBoard
+    enableAllGameCheckboxesIfNeeded();
     gotoAfterFaq();
 
     function gotoAfterFaq() {
