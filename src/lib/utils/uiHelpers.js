@@ -7,9 +7,11 @@ import { goto } from '$app/navigation';
 import { base } from '$app/paths';
 import GameModeModal from '$lib/components/GameModeModal.svelte';
 
+
 export function showGameModeSelector() {
   modalStore.showModal({
     titleKey: 'gameModes.title',
+    dataTestId: 'game-mode-selector-modal',
     component: GameModeModal,
     buttons: [{ textKey: 'modal.cancel', onClick: modalStore.closeModal }],
     closable: false,
@@ -19,6 +21,7 @@ export function showGameModeSelector() {
 export function showGameInfoModal() {
   modalStore.showModal({
     titleKey: 'faq.title',
+    dataTestId: 'game-info-modal',
     content: { isFaq: true },
     buttons: [
       { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },
@@ -30,6 +33,7 @@ export function showGameInfoModal() {
 export function showClearCacheModal() {
   modalStore.showModal({
     titleKey: 'mainMenu.clearCacheModal.title',
+    dataTestId: 'clear-cache-modal',
     contentKey: 'mainMenu.clearCacheModal.content',
     buttons: [
       {
@@ -54,4 +58,4 @@ export function showClearCacheModal() {
       { textKey: 'modal.cancel', onClick: modalStore.closeModal },
     ],
   });
-} 
+}

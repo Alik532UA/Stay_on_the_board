@@ -4,10 +4,9 @@ import type { IGameMode } from './gameMode.interface';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';
 import * as gameLogicService from '$lib/services/gameLogicService';
 import { calculateFinalScore, determineWinner } from '$lib/services/scoreService';
-import { playerInputStore } from '$lib/stores/playerInputStore';
+import { playerInputStore, initialState } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
-import { stateManager } from '$lib/services/stateManager';
 import { userActionService } from '$lib/services/userActionService';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import type { FinalScoreDetails } from '$lib/models/score';
@@ -19,6 +18,7 @@ export abstract class BaseGameMode implements IGameMode {
   abstract claimNoMoves(): Promise<SideEffect[]>;
   abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]>;
   abstract getPlayersConfiguration(): Player[];
+  abstract continueAfterNoMoves(): Promise<SideEffect[]>;
   protected abstract advanceToNextPlayer(): Promise<SideEffect[]>;
   protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
 
@@ -38,20 +38,20 @@ export abstract class BaseGameMode implements IGameMode {
   protected async onPlayerMoveSuccess(moveResult: any): Promise<SideEffect[]> {
     const currentState = get(gameState);
     if (currentState.isFirstMove) {
-      await stateManager.applyChanges('FIRST_MOVE_COMPLETED', { isFirstMove: false }, 'First move completed');
+      gameState.update(state => ({...state, isFirstMove: false}));
     }
     if (currentState.wasResumed) {
-      await stateManager.applyChanges('RESET_WAS_RESUMED', { wasResumed: false }, 'Resetting wasResumed after successful player move');
+      gameState.update(state => ({...state, wasResumed: false}));
     }
 
-    playerInputStore.set({
-      selectedDirection: null,
-      selectedDistance: null,
-      distanceManuallySelected: false,
-      isMoveInProgress: false
-    });
+    playerInputStore.set(initialState);
 
-    return this.advanceToNextPlayer();
+    const nextPlayerEffects = await this.advanceToNextPlayer();
+    
+    // Перевіряємо, чи є у moveResult побічні ефекти (наприклад, модальне вікно)
+    const moveResultEffects = moveResult.sideEffects || [];
+
+    return [...moveResultEffects, ...nextPlayerEffects];
   }
 
   protected async onPlayerMoveFailure(reason: string | undefined, direction: MoveDirectionType, distance: number): Promise<SideEffect[]> {
@@ -66,11 +66,7 @@ export abstract class BaseGameMode implements IGameMode {
       to: finalInvalidPosition
     };
 
-    await stateManager.applyChanges(
-      'QUEUE_FINAL_MOVE',
-      { moveQueue: [...state.moveQueue, finalMoveForAnimation] },
-      'Queueing final losing move for animation'
-    );
+    gameState.update(state => ({...state, moveQueue: [...state.moveQueue, finalMoveForAnimation]}));
 
     if (reason === 'out_of_bounds') {
       return this.endGame('modal.gameOverReasonOut');
@@ -92,7 +88,7 @@ export abstract class BaseGameMode implements IGameMode {
       gameOverReasonKey: reasonKey,
       gameOverReasonValues: reasonValues,
     };
-    await stateManager.applyChanges('END_GAME', endGameChanges, `Game ended: ${reasonKey}`);
+    gameState.update(state => ({...state, ...endGameChanges}));
 
     const { winners } = determineWinner(state, reasonKey);
     gameOverStore.setGameOver({
@@ -104,7 +100,7 @@ export abstract class BaseGameMode implements IGameMode {
       gameType: gameType,
     });
 
-    sideEffectService.execute({
+    return [{
       type: 'ui/showGameOverModal',
       payload: {
         reasonKey,
@@ -113,13 +109,15 @@ export abstract class BaseGameMode implements IGameMode {
         gameType,
         state
       }
-    });
-
-    return [];
+    }];
   }
 
   async restartGame(): Promise<SideEffect[]> {
     gameLogicService.resetGame({}, get(gameState));
     return [{ type: 'ui/closeModal' }];
+  }
+  
+  cleanup(): void {
+    logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
   }
 }

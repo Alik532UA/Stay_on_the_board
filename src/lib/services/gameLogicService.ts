@@ -7,7 +7,6 @@ import { gameState, createInitialState, type Player } from '../stores/gameState'
 import { getAvailableMoves, isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
 import { lastPlayerMove } from '$lib/stores/derivedState';
 import { settingsStore } from '../stores/settingsStore';
-import { stateManager } from './stateManager';
 import { logService } from './logService.js';
 import { testModeStore } from '$lib/stores/testModeStore';
 import { calculateMoveScore } from './scoreService';
@@ -21,13 +20,13 @@ import type { Direction } from '$lib/utils/gameUtils';
  */
 
 export function resetGame(options: { newSize?: number; players?: Player[]; settings?: any } = {}, currentState: any) {
-  const newSize = options.newSize ?? currentState.boardSize;
+  const newSize = options.newSize ?? currentState?.boardSize ?? 4;
   const { testMode } = get(settingsStore);
   
   const newState = createInitialState({
     size: newSize,
     players: options.players,
-    testMode
+    testMode: options.settings?.testMode ?? testMode
   });
 
   // Якщо гравці передані, використовуємо їх
@@ -93,7 +92,7 @@ export function setDirection(dir: Direction) {
     distanceManuallySelected: newManuallySelected
   }));
   
-  logService.logic('setDirection: встановлено напрямок', { dir, newDistance, newManuallySelected });
+  logService.logicMove('setDirection: встановлено напрямок', { dir, newDistance, newManuallySelected });
 }
 
 export function setDistance(dist: number) {
@@ -104,7 +103,7 @@ export function setDistance(dist: number) {
     distanceManuallySelected: true
   }));
   
-  logService.logic('setDistance: встановлено відстань', { dist });
+  logService.logicMove('setDistance: встановлено відстань', { dist });
 }
 
 /**
@@ -120,7 +119,8 @@ export async function performMove(
   currentState: any,
   settings: any
 ) {
-  logService.logic('performMove: початок з параметрами:', { direction, distance, playerIndex });
+
+  logService.logicMove('performMove: початок з параметрами:', { direction, distance, playerIndex });
   
   const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
 
@@ -128,13 +128,13 @@ export async function performMove(
 
   // 1. Перевірка виходу за межі дошки
   if (!figure.isValidPosition(newPosition.row, newPosition.col)) {
-    logService.logic('performMove: вихід за межі дошки');
+    logService.logicMove('performMove: вихід за межі дошки');
     return { success: false, reason: 'out_of_bounds' };
   }
 
   // 2. Перевірка ходу на заблоковану клітинку
   if (isCellBlocked(newPosition.row, newPosition.col, currentState.cellVisitCounts, settings)) {
-    logService.logic('performMove: хід на заблоковану клітинку');
+    logService.logicMove('performMove: хід на заблоковану клітинку');
     return { success: false, reason: 'blocked_cell' };
   }
 
@@ -189,13 +189,13 @@ export async function performMove(
     isFirstMove: false
   };
 
-  await stateManager.applyChanges('PERFORM_MOVE', changes, `Move: ${direction}${distance}`);
+  gameState.update(state => ({...state, ...changes}));
   
   // Логіка для "дзеркального" ходу та бонусів тепер обробляється в LocalGameMode та VsComputerGameMode,
   // які отримують `scoreChanges` і вирішують, як їх застосувати.
   // Це робить `performMove` більш чистою функцією, що відповідає лише за сам хід.
   
-  logService.logic('performMove: завершено успішно');
+  logService.logicMove('performMove: завершено успішно');
   return {
     success: true,
     newPosition,
@@ -204,23 +204,6 @@ export async function performMove(
   };
 }
 
-/**
- * Отримати доступні ходи для поточної позиції використовуючи клас Figure
- */
-export function getAvailableMovesForFigure() {
-  const currentState = get(gameState);
-  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
-  return figure.getAvailableMoves();
-}
-
-/**
- * Перевірити чи валідний хід використовуючи клас Figure
- */
-export function isValidMove(direction: MoveDirectionType, distance: number) {
-  const currentState = get(gameState);
-  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
-  return figure.canMove(direction, distance);
-}
 
 export function getComputerMove(): { direction: MoveDirectionType; distance: number } | null {
   const testModeState = get(testModeStore);
@@ -252,11 +235,42 @@ export function getComputerMove(): { direction: MoveDirectionType; distance: num
     return null;
   }
   
-  const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-  return {
-    direction: randomMove.direction,
-    distance: randomMove.distance
+  const getMoveBonus = (move: { direction: MoveDirectionType; distance: number }): number => {
+    const figure = new Figure(state.playerRow, state.playerCol, state.boardSize);
+    const newPosition = figure.calculateNewPosition(move.direction, move.distance);
+    const scoreChanges = calculateMoveScore(state, newPosition, 1, settings, move.distance, move.direction);
+    return scoreChanges.bonusPoints;
   };
+
+  const movesWithBonuses = availableMoves.filter(move => getMoveBonus(move) > 0);
+
+  if (movesWithBonuses.length > 0) {
+    const bestMove = movesWithBonuses.reduce((best, current) => {
+      return getMoveBonus(current) > getMoveBonus(best) ? current : best;
+    });
+    logService.logicAI('getComputerMove: обрано хід з бонусом', bestMove);
+    return bestMove;
+  }
+
+  const longestMoves = availableMoves.reduce((bestMoves, move) => {
+    if (bestMoves.length === 0 || move.distance > bestMoves[0].distance) {
+      return [move];
+    }
+    if (move.distance === bestMoves[0].distance) {
+      bestMoves.push(move);
+    }
+    return bestMoves;
+  }, [] as { direction: MoveDirectionType; distance: number }[]);
+
+  if (longestMoves.length > 0) {
+    const randomLongestMove = longestMoves[Math.floor(Math.random() * longestMoves.length)];
+    logService.logicAI('getComputerMove: обрано найдовший хід', randomLongestMove);
+    return randomLongestMove;
+  }
+
+  const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+  logService.logicAI('getComputerMove: обрано випадковий хід', randomMove);
+  return randomMove;
 }
 
 export function validatePlayerMove(changes: any, currentState: any): { errors: string[], warnings: string[] } {

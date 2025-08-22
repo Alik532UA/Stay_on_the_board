@@ -16,9 +16,6 @@ import { getAvailableMoves } from '$lib/utils/boardUtils';
  * Визначає, чи є поточна гра локальною (грають кілька людей).
  * @type {import('svelte/store').Readable<boolean>}
  */
-export const isLocalGame = derived(page, $page =>
-  $page.url.pathname.includes('/game/local')
-);
 
 /**
  * @typedef {object} ComputerMove
@@ -34,12 +31,9 @@ export const isLocalGame = derived(page, $page =>
 // ГАРАНТІЯ: lastComputerMove derived ТІЛЬКИ з gameState.moveQueue. НЕ МОЖНА додавати залежність від animationStore, BoardWrapperWidget чи будь-якої візуалізації!
 // Це гарантує, що center-info/control-btn завжди оновлюється одразу після зміни стану гри, незалежно від анімації.
 export const lastComputerMove = derived(
-  [gameState, isLocalGame],
-  ([$gameState, $isLocalGame]) => {
-    if ($isLocalGame) {
-      // В локальній грі немає комп'ютера, тому lastComputerMove завжди null
-      return null;
-    }
+  [gameState],
+  ([$gameState]) => {
+    if (!$gameState) return null;
     
     for (let i = $gameState.moveQueue.length - 1; i >= 0; i--) {
       const move = $gameState.moveQueue[i];
@@ -57,7 +51,7 @@ export const lastComputerMove = derived(
  * @type {import('svelte/store').Readable<ComputerMove | null>}
  */
 export const lastPlayerMove = derived(gameState, $gameState => {
-  if ($gameState.moveQueue.length === 0) return null;
+  if (!$gameState || $gameState.moveQueue.length === 0) return null;
   const lastMove = $gameState.moveQueue[$gameState.moveQueue.length - 1];
   return {
     direction: lastMove.direction as Direction,
@@ -71,11 +65,9 @@ export const lastPlayerMove = derived(gameState, $gameState => {
  * @type {import('svelte/store').Readable<boolean>}
  */
 export const isPauseBetweenMoves = derived(
-  [gameState, isLocalGame],
-  ([$gameState, $isLocalGame]) => {
-    if ($isLocalGame) {
-      return false;
-    }
+  [gameState],
+  ([$gameState]) => {
+    if (!$gameState) return false;
 
     const lastMove = $gameState.moveQueue[$gameState.moveQueue.length - 1];
     if (!lastMove) {
@@ -130,47 +122,6 @@ const directionArrows: Record<Direction, string> = {
  */
 // ВАЖЛИВО: center-info derived не залежить від анімації чи паузи (animationStore, BoardWrapperWidget), а оновлюється миттєво після зміни стану гри. Це гарантує SoC, SSoT, UDF.
 // Це гарантує, що center-info/control-btn завжди оновлюється одразу після зміни стану гри, незалежно від анімації.
-export const centerInfo = derived(
-  [gameState, playerInputStore, lastComputerMove],
-  ([$gameState, $playerInputStore, $lastComputerMove]) => {
-    const { selectedDirection, selectedDistance } = $playerInputStore;
-    const isPlayerTurn = $gameState.players[$gameState.currentPlayerIndex]?.type === 'human';
-    let info;
-    if (selectedDirection && selectedDistance) {
-      const dir = directionArrows[selectedDirection] || '';
-      info = {
-        class: 'confirm-btn-active',
-        content: `${dir}${selectedDistance}`,
-        clickable: isPlayerTurn,
-        aria: `Підтвердити хід: ${dir}${selectedDistance}`
-      };
-      return info;
-    }
-    if (selectedDirection) {
-      const dir = directionArrows[selectedDirection] || '';
-      info = {
-        class: 'direction-distance-state',
-        content: dir,
-        clickable: false,
-        aria: `Вибрано напрямок: ${dir}`
-      };
-      return info;
-    }
-    if ($lastComputerMove) {
-      const dir = directionArrows[$lastComputerMove.direction] || '';
-      const dist = $lastComputerMove.distance || '';
-      info = {
-        class: 'computer-move-display',
-        content: `${dir}${dist}`,
-        clickable: false,
-        aria: `Хід комп'ютера: ${dir}${dist}`
-      };
-      return info;
-    }
-    info = { class: '', content: '•', clickable: false, aria: 'Порожньо' };
-    return info;
-  }
-); 
 
 /**
  * Derived стор, що визначає, чи заблокована кнопка підтвердження ходу.
@@ -179,6 +130,7 @@ export const centerInfo = derived(
 export const isConfirmButtonDisabled = derived(
   [gameState, playerInputStore],
   ([$gameState, $playerInputStore]) => {
+    if (!$gameState) return true;
     const isPlayerTurn = $gameState.players[$gameState.currentPlayerIndex]?.type === 'human';
     const { selectedDirection, selectedDistance, isMoveInProgress } = $playerInputStore;
 
@@ -195,7 +147,7 @@ export const isConfirmButtonDisabled = derived(
  * @type {import('svelte/store').Readable<boolean>}
  */
 export const isPlayerTurn = derived(gameState, $gameState =>
-  $gameState.players[$gameState.currentPlayerIndex]?.type === 'human'
+  $gameState ? $gameState.players[$gameState.currentPlayerIndex]?.type === 'human' : false
 );
 
 
@@ -204,8 +156,9 @@ export const isPlayerTurn = derived(gameState, $gameState =>
  * @type {import('svelte/store').Readable<import('$lib/services/gameLogicService').Move[]>}
  */
 export const availableMoves = derived(
-  [gameState, settingsStore, lastPlayerMove, isLocalGame, lastComputerMove],
-  ([$gameState, $settingsStore, $lastPlayerMove, $isLocalGame, $lastComputerMove]) => {
+  [gameState, settingsStore, lastPlayerMove, lastComputerMove],
+  ([$gameState, $settingsStore, $lastPlayerMove, $lastComputerMove]) => {
+    if (!$gameState) return [];
     const {
       playerRow,
       playerCol,
@@ -219,7 +172,7 @@ export const availableMoves = derived(
     // Для перевірки штрафних ходів нам потрібен останній хід *супротивника*.
     // У локальній грі це lastPlayerMove (хід попереднього гравця).
     // У грі проти ШІ це lastComputerMove.
-    const moveForPenaltyCheck = $isLocalGame ? $lastPlayerMove : $lastComputerMove;
+    const moveForPenaltyCheck = $lastComputerMove;
 
     return getAvailableMoves(
       playerRow,
@@ -239,9 +192,9 @@ export const availableMoves = derived(
  * @type {import('svelte/store').Readable<string | null>}
  */
 export const previousPlayerColor = derived(
-  [gameState, isLocalGame],
-  ([$gameState, $isLocalGame]) => {
-    if (!$isLocalGame) return null;
+  [gameState],
+  ([$gameState]) => {
+    if (!$gameState) return null;
 
     const currentPlayerIndex = $gameState.currentPlayerIndex;
     const playersCount = $gameState.players.length;
@@ -254,8 +207,8 @@ export const previousPlayerColor = derived(
   }
 );
 
-export const availableDistances = derived(gameState, $gameState => 
-  Array.from({ length: $gameState.boardSize - 1 }, (_, i) => i + 1)
+export const availableDistances = derived(gameState, $gameState =>
+  $gameState ? Array.from({ length: $gameState.boardSize - 1 }, (_, i) => i + 1) : []
 );
 
 /**
@@ -300,14 +253,6 @@ export const currentLanguageFlagSvg = derived(
  * Визначає, чи потрібно приховати дошку після ходу гравця.
  * @type {import('svelte/store').Readable<boolean>}
  */
-export const shouldHideBoard = derived(
-  [settingsStore, gameState],
-  ([$settingsStore, $gameState]) => {
-    if (!$settingsStore.autoHideBoard) return false;
-    const lastMove = $gameState.moveQueue?.[$gameState.moveQueue.length - 1];
-    return lastMove?.player === 1;
-  }
-); 
 
 // ===== НОВІ DERIVED STORES ДЛЯ ВІЗУАЛЬНИХ ДАНИХ =====
 
@@ -321,6 +266,7 @@ export const shouldHideBoard = derived(
 export const visualPosition = derived(
   [gameState, animationStore],
   ([$gameState, $animationStore]) => {
+    if (!$gameState) return { row: null, col: null };
     if ($animationStore.visualMoveQueue && $animationStore.visualMoveQueue.length > 0) {
       const lastAnimatedMove = $animationStore.visualMoveQueue[$animationStore.visualMoveQueue.length - 1];
       return {
@@ -343,6 +289,7 @@ export const visualPosition = derived(
 export const visualCellVisitCounts = derived(
   [visualPosition, gameState, animationStore],
   ([$visualPosition, $gameState, $animationStore]) => {
+    if (!$gameState) return {};
     // Якщо гра не анімується, візуальний стан ПОВИНЕН відповідати логічному.
     // Це виправляє баг, коли cellVisitCounts скидається, але візуалізація не оновлюється.
     if (!$animationStore.isAnimating) {
@@ -373,24 +320,38 @@ export const visualCellVisitCounts = derived(
  */
 export const visualBoardState = derived(
   [gameState, animationStore],
-  ([$gameState, $animationStore]) => ({
-    // Логічні дані з gameState
-    position: { 
-      row: $gameState.playerRow, 
-      col: $gameState.playerCol 
-    },
-    cellVisitCounts: $gameState.cellVisitCounts,
-    availableMoves: $gameState.availableMoves,
-    board: $gameState.board,
-    boardSize: $gameState.boardSize,
-    
-    // Візуальні прапорці з animationStore
-    isAnimating: $animationStore.isAnimating,
-    
-    // Додаткові візуальні властивості
-    isGameOver: $gameState.isGameOver,
-    currentPlayerIndex: $gameState.currentPlayerIndex
-  })
+  ([$gameState, $animationStore]) => {
+    if (!$gameState) {
+      return {
+        position: { row: null, col: null },
+        cellVisitCounts: {},
+        availableMoves: [],
+        board: [],
+        boardSize: 0,
+        isAnimating: false,
+        isGameOver: false,
+        currentPlayerIndex: 0
+      };
+    }
+    return {
+      // Логічні дані з gameState
+      position: {
+        row: $gameState.playerRow,
+        col: $gameState.playerCol
+      },
+      cellVisitCounts: $gameState.cellVisitCounts,
+      availableMoves: $gameState.availableMoves,
+      board: $gameState.board,
+      boardSize: $gameState.boardSize,
+      
+      // Візуальні прапорці з animationStore
+      isAnimating: $animationStore.isAnimating,
+      
+      // Додаткові візуальні властивості
+      isGameOver: $gameState.isGameOver,
+      currentPlayerIndex: $gameState.currentPlayerIndex
+    };
+  }
 );
 
 /**
@@ -398,19 +359,16 @@ export const visualBoardState = derived(
  * Це дозволяє UI реагувати на те, що бачить користувач, а не на миттєвий логічний стан.
  * @type {import('svelte/store').Readable<number>}
  */
-export const visualCurrentPlayerIndex = derived(
-  gameState,
-  ($gameState) => $gameState.currentPlayerIndex
-);
 
 /**
  * Derived store, що містить дані поточного гравця.
  * @type {import('svelte/store').Readable<{id: number|string, type: 'human'|'ai', name: string}>}
  */
 export const currentPlayer = derived(
-  [gameState, visualCurrentPlayerIndex],
-  ([$gameState, $visualCurrentPlayerIndex]) => {
-    return $gameState.players[$visualCurrentPlayerIndex];
+  [gameState],
+  ([$gameState]) => {
+    if (!$gameState) return null;
+    return $gameState.players[$gameState.currentPlayerIndex];
   }
 );
 
@@ -420,9 +378,9 @@ export const currentPlayer = derived(
  * @type {import('svelte/store').Readable<string | null>}
  */
 export const currentPlayerColor = derived(
-  [gameState, isLocalGame],
-  ([$gameState, $isLocalGame]) => {
-    if (!$isLocalGame) return null;
+  [gameState],
+  ([$gameState]) => {
+    if (!$gameState) return null;
 
     const currentPlayerIndex = $gameState.currentPlayerIndex;
     const currentPlayer = $gameState.players[currentPlayerIndex];
@@ -434,13 +392,3 @@ export const currentPlayerColor = derived(
 /**
  * Типи для візуального стану дошки
  */
-export interface VisualBoardState {
-  position: { row: number|null; col: number|null };
-  cellVisitCounts: Record<string, number>;
-  availableMoves: any[];
-  board: number[][];
-  boardSize: number;
-  isAnimating: boolean;
-  isGameOver: boolean;
-  currentPlayerIndex: number;
-}

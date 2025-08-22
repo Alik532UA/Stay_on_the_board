@@ -31,7 +31,8 @@ export const gameModeService = {
     } else {
       gameMode = new VsComputerGameMode();
     }
-    gameMode.initialize(get(gameState));
+    gameState.reset();
+    gameMode.initialize(get(gameState)!);
     gameStore.setMode(gameMode);
   },
 
@@ -42,7 +43,7 @@ export const gameModeService = {
 
   _ensureGameMode(): BaseGameMode {
     let activeGameMode = get(gameStore).mode;
-    if (!activeGameMode) {
+    if (!activeGameMode || !get(gameState)) {
       this.initializeGameMode();
       activeGameMode = get(gameStore).mode;
     }
@@ -69,6 +70,11 @@ export const gameModeService = {
     return activeGameMode.claimNoMoves();
   },
 
+  async continueAfterNoMoves(): Promise<SideEffect[]> {
+    const activeGameMode = this._ensureGameMode();
+    return activeGameMode.continueAfterNoMoves();
+  },
+
   _determineGameType(): string {
     if (!browser) {
       return 'vs-computer'; // Default for SSR context
@@ -82,5 +88,15 @@ export const gameModeService = {
     }
     
     return 'vs-computer';
+  },
+  
+  cleanupCurrentGameMode() {
+    const activeGameMode = get(gameStore).mode;
+    if (activeGameMode) {
+      activeGameMode.cleanup();
+      gameStore.setMode(null);
+      gameState.destroy();
+      logService.GAME_MODE('Game mode cleaned up and state destroyed.');
+    }
   }
 };

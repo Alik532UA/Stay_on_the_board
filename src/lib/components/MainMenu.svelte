@@ -5,6 +5,7 @@
   import { navigateToGame } from '$lib/services/uiService';
   import { navigationService } from '$lib/services/navigationService';
   import { logService } from '$lib/services/logService.js';
+  import { gameModeService } from '$lib/services/gameModeService';
   
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
@@ -19,7 +20,6 @@
   import ClearCacheOptions from './ClearCacheOptions.svelte';
   import { onMount, tick } from 'svelte';
   import { get } from 'svelte/store';
-  import GameModeModal from '$lib/components/GameModeModal.svelte';
   import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
 
@@ -57,6 +57,7 @@
     logService.action('Click: "Очистити кеш" (MainMenu)');
     modalStore.showModal({
       titleKey: 'mainMenu.clearCacheModal.title',
+      dataTestId: 'clear-cache-modal',
       component: ClearCacheOptions,
       buttons: [
         { textKey: 'modal.cancel', onClick: () => modalStore.closeModal() }
@@ -84,6 +85,7 @@
   
   /** @param {HTMLElement} node */
   onMount(() => {
+    gameModeService.cleanupCurrentGameMode();
     settingsStore.init();
     isDev = !!import.meta.env.DEV;
   });
@@ -99,24 +101,26 @@
   function handlePlayVsComputer() {
     logService.action(`Click: "Гра проти комп'ютера" (MainMenu)`);
     const state = get(gameState);
-    if (!state.isGameOver && state.moveHistory.length > 1) {
+    if (state && !state.isGameOver && state.moveHistory.length > 1) {
       navigationService.resumeGame('/game/vs-computer');
     } else {
       const settings = get(settingsStore);
       if (settings.showGameModeModal) {
-        modalStore.showModal({
-          titleKey: 'mainMenu.gameModeModal.title',
-          dataTestId: 'game-mode-modal',
-          titleDataTestId: 'game-mode-modal-title',
-          component: GameModeModal,
-          buttons: [
-            {
-              textKey: 'modal.close',
-              onClick: () => modalStore.closeModal(),
-              dataTestId: 'modal-btn-modal.close',
-              hotKey: 'ESC'
-            }
-          ]
+        import('./GameModeModal.svelte').then(module => {
+          const GameModeModal = module.default;
+          modalStore.showModal({
+            titleKey: 'mainMenu.gameModeModal.title',
+            dataTestId: 'game-mode-modal',
+            component: GameModeModal,
+            buttons: [
+              {
+                textKey: 'modal.close',
+                onClick: () => modalStore.closeModal(),
+                dataTestId: 'modal-btn-modal.close',
+                hotKey: 'ESC'
+              }
+            ]
+          });
         });
       } else {
         navigateToGame();

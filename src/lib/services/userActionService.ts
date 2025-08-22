@@ -3,6 +3,7 @@
  * It orchestrates the flow of user intentions to the appropriate services.
  */
 import { get } from 'svelte/store';
+import { tick } from 'svelte';
 import { replayStore } from '$lib/stores/replayStore.js';
 import { modalStore } from '$lib/stores/modalStore';
 import { playerInputStore } from '$lib/stores/playerInputStore';
@@ -12,8 +13,8 @@ import { gameModeService } from './gameModeService';
 import { sideEffectService, type SideEffect } from './sideEffectService';
 import { replayService } from './replayService';
 import { logService } from './logService.js';
-import { stateManager } from './stateManager';
 import { gameState } from '$lib/stores/gameState';
+import ReplayViewer from '$lib/components/ReplayViewer.svelte';
 import * as gameLogicService from '$lib/services/gameLogicService.js';
 import { navigationService } from './navigationService';
 import { settingsStore } from '$lib/stores/settingsStore';
@@ -24,35 +25,63 @@ import { base } from '$app/paths';
 
 export const userActionService = {
   async confirmMove(): Promise<void> {
-    let activeGameMode = get(gameStore).mode;
-    if (!activeGameMode) {
-      gameModeService.initializeGameMode();
-      activeGameMode = get(gameStore).mode;
-      if (!activeGameMode) {
-        logService.logic('[userActionService.confirmMove] No active game mode found after initialization.');
-        return;
-      }
+    if (get(playerInputStore).isMoveInProgress) {
+      return;
     }
-    const playerInput = get(playerInputStore);
-    if (!playerInput.selectedDirection || !playerInput.selectedDistance) return;
+   playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+   try {
+     logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+     let activeGameMode = get(gameStore).mode;
+     if (!activeGameMode) {
+       gameModeService.initializeGameMode();
+       activeGameMode = get(gameStore).mode;
+       if (!activeGameMode) {
+         logService.logicMove('[userActionService.confirmMove] No active game mode found after initialization.');
+         return;
+       }
+     }
+     const playerInput = get(playerInputStore);
+     if (!playerInput.selectedDirection || !playerInput.selectedDistance) return;
 
-    const sideEffects = await activeGameMode.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
-    logService.logic('[userActionService.confirmMove] Side effects from handlePlayerMove:', sideEffects);
-    sideEffects.forEach(effect => sideEffectService.execute(effect));
+     const sideEffects = await activeGameMode.handlePlayerMove(playerInput.selectedDirection, playerInput.selectedDistance);
+     logService.logicMove('[userActionService.confirmMove] Side effects from handlePlayerMove:', sideEffects);
+     this.executeSideEffects(sideEffects);
+   } finally {
+     // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
+     // завершаться перед тим, як розблокувати ввід для наступних дій.
+     // Це усуває стан гонитви (race condition).
+     await tick();
+     logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
+     playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+   }
   },
 
   async claimNoMoves(): Promise<void> {
-    let activeGameMode = get(gameStore).mode;
-    if (!activeGameMode) {
-      gameModeService.initializeGameMode();
-      activeGameMode = get(gameStore).mode;
-      if (!activeGameMode) {
-        logService.logic('[userActionService.claimNoMoves] No active game mode found after initialization.');
-        return;
-      }
+    if (get(playerInputStore).isMoveInProgress) {
+      return;
     }
-    const sideEffects = await activeGameMode.claimNoMoves();
-    sideEffects.forEach(effect => sideEffectService.execute(effect));
+    playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+    try {
+      logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+      let activeGameMode = get(gameStore).mode;
+      if (!activeGameMode) {
+        gameModeService.initializeGameMode();
+        activeGameMode = get(gameStore).mode;
+        if (!activeGameMode) {
+          logService.logicMove('[userActionService.claimNoMoves] No active game mode found after initialization.');
+          return;
+        }
+      }
+      const sideEffects = await activeGameMode.claimNoMoves();
+      sideEffects.forEach((effect: any) => sideEffectService.execute(effect));
+    } finally {
+      // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
+      // завершаться перед тим, як розблокувати ввід для наступних дій.
+      // Це усуває стан гонитви (race condition).
+      await tick();
+      logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
+      playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+    }
   },
 
   async changeBoardSize(newSize: number): Promise<void> {
@@ -63,128 +92,86 @@ export const userActionService = {
     if (score === 0 && penaltyPoints === 0) {
       gameLogicService.resetGame({ newSize }, get(gameState));
     } else {
-      modalService.showResetScoreConfirmation(newSize);
+      modalService.showBoardResizeModal(newSize);
     }
   },
 
   async requestRestart(): Promise<void> {
-    modalStore.closeAllModals();
+    modalStore.closeModal();
     const sideEffects = await gameModeService.restartGame();
     this.executeSideEffects(sideEffects);
   },
 
   async requestReplay(): Promise<void> {
     const { moveHistory, boardSize } = get(gameState);
-    if (moveHistory && moveHistory.length > 0) {
-      logService.logic('[userActionService] Opening replay in modal');
-      const ReplayViewer = (await import('$lib/components/ReplayViewer.svelte')).default;
-      modalStore.showModal({
-        component: ReplayViewer,
-        props: {
-          moveHistory,
-          boardSize,
-          autoPlayForward: true
-        },
-        buttons: [
-          {
-            textKey: 'replay.close',
-            onClick: () => {
-              replayStore.stopReplay();
-              modalStore.closeModal();
-            },
-            dataTestId: 'close-replay-btn',
-            primary: true
-          }
-        ],
-        closable: false,
-      });
-    } else {
-      logService.logic('[userAction-service] No move history to replay.');
-    }
+    modalStore.showModal({
+      component: ReplayViewer,
+      props: {
+        moveHistory,
+        boardSize,
+      },
+      titleKey: 'replay.title',
+      buttons: [{ textKey: 'modal.close', onClick: () => modalStore.closeModal() }],
+      dataTestId: 'replay-modal',
+    });
   },
 
   async finishWithBonus(reasonKey: string): Promise<void> {
-    logService.logic('[userActionService] finishWithBonus called with reason:', reasonKey);
-    await stateManager.applyChanges(
-      'SET_FINISH_FLAG',
-      { finishedByFinishButton: true },
-      'Player chose to finish with a bonus'
-    );
+    logService.logicMove('[userActionService] finishWithBonus called with reason:', reasonKey);
+    gameState.update(state => ({...state, finishedByFinishButton: true}));
     const sideEffects = await gameModeService.endGame(reasonKey);
     this.executeSideEffects(sideEffects);
   },
 
   async continueAfterNoMoves(): Promise<void> {
-    const state = get(gameState);
-    const settings = get(settingsStore);
-    const bonus = state.boardSize;
-
-    const continueChanges = {
-      noMovesBonus: state.noMovesBonus + bonus,
-      cellVisitCounts: {},
-      moveHistory: [{ 
-        pos: { row: state.playerRow, col: state.playerCol }, 
-        blocked: [] as {row: number, col: number}[], 
-        visits: {},
-        blockModeEnabled: settings.blockModeEnabled
-      }],
-      moveQueue: [] as any[],
-      availableMoves: getAvailableMoves(
-        state.playerRow,
-        state.playerCol,
-        state.boardSize,
-        {},
-        settings.blockOnVisitCount,
-        state.board,
-        settings.blockModeEnabled,
-        null
-      ),
-      noMovesClaimed: false,
-      isComputerMoveInProgress: false,
-      wasResumed: true,
-      isGameOver: false,
-      gameOverReasonKey: null as string | null,
-      gameOverReasonValues: null as Record<string, any> | null
-    };
-
-    await stateManager.applyChanges('CONTINUE_AFTER_NO_MOVES_CLAIM', continueChanges, 'Player continues after successful no-moves claim');
-    
-    gameOverStore.resetGameOverState();
-    animationStore.reset();
-    this.executeSideEffects([{ type: 'ui/closeModal' }]);
+    const sideEffects = await gameModeService.continueAfterNoMoves();
+    this.executeSideEffects(sideEffects);
   },
 
   async handleModalAction(action: string, payload?: any): Promise<void> {
-    let sideEffects: SideEffect[] = [];
-    switch (action) {
-      case 'restartGame':
-        await this.requestRestart();
-        break;
-      case 'requestReplay':
-        await this.requestReplay();
-        break;
-      case 'finishWithBonus':
-        await this.finishWithBonus(payload.reasonKey);
-        break;
-      case 'continueAfterNoMoves':
-        await this.continueAfterNoMoves();
-        break;
-      case 'resetGame':
-        gameLogicService.resetGame({ newSize: payload.newSize }, get(gameState));
-        sideEffects = [{ type: 'ui/closeModal' }];
-        break;
-      case 'closeModal':
-        sideEffects = [{ type: 'ui/closeModal' }];
-        break;
-      case 'resetGameAndGoToMainMenu':
-        gameLogicService.resetGame({}, get(gameState));
-        navigationService.goToMainMenu();
-        break;
-      default:
-        logService.logic(`[userActionService.handleModalAction] Unknown action: ${action}`);
-        break;
+    if (get(playerInputStore).isMoveInProgress) {
+      return;
     }
-    this.executeSideEffects(sideEffects);
+    playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+    try {
+      logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+      let sideEffects: SideEffect[] = [];
+      switch (action) {
+        case 'restartGame':
+          await this.requestRestart();
+          break;
+        case 'playAgain':
+          await this.requestRestart();
+          break;
+        case 'requestReplay':
+          await this.requestReplay();
+          break;
+        case 'finishWithBonus':
+          await this.finishWithBonus(payload.reasonKey);
+          break;
+        case 'continueAfterNoMoves':
+          await this.continueAfterNoMoves();
+          break;
+        case 'resetGame':
+          gameLogicService.resetGame({ newSize: payload.newSize }, get(gameState));
+          sideEffects = [{ type: 'ui/closeModal' }];
+          break;
+        case 'closeModal':
+          sideEffects = [{ type: 'ui/closeModal' }];
+          break;
+        default:
+          logService.logicMove(`[userActionService.handleModalAction] Unknown action: ${action}`);
+          break;
+      }
+      this.executeSideEffects(sideEffects);
+    } finally {
+      // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
+      // завершаться перед тим, як розблокувати ввід для наступних дій.
+      // Це усуває стан гонитви (race condition).
+      await tick();
+      logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
+      playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+    }
   },
 
   executeSideEffects(sideEffects: SideEffect[]) {

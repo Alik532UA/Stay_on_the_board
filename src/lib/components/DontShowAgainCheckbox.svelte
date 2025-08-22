@@ -4,13 +4,26 @@
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { logService } from '$lib/services/logService.js';
   import { onMount } from 'svelte';
+  export let dataTestId = '';
+  export let modalType: 'gameMode' | 'expertMode' = 'gameMode';
   let dontShowAgain = false;
-  $: dontShowAgain = !$settingsStore.showGameModeModal;
+
+  $: {
+    if (modalType === 'gameMode') {
+      dontShowAgain = !$settingsStore.showGameModeModal;
+    } else if (modalType === 'expertMode') {
+      dontShowAgain = !$settingsStore.showDifficultyWarningModal;
+    }
+  }
 
   function handleCheckboxChange(event: Event) {
     const input = event.currentTarget as HTMLInputElement;
     if (input && typeof input.checked === 'boolean') {
-      settingsStore.updateSettings({ showGameModeModal: !input.checked });
+      if (modalType === 'gameMode') {
+        settingsStore.updateSettings({ showGameModeModal: !input.checked });
+      } else if (modalType === 'expertMode') {
+        settingsStore.updateSettings({ showDifficultyWarningModal: !input.checked });
+      }
     }
   }
 
@@ -41,7 +54,7 @@
     <div
       class="switch-content-wrapper"
       use:hotkeyTooltip={{ key: 'X' }}
-      data-testid="dont-show-again-switch"
+      data-testid={dataTestId}
     >
       <div class="ios-switch">
         <input

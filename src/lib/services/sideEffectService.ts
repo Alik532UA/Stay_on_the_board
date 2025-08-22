@@ -5,29 +5,12 @@ import { goto } from '$app/navigation';
 import { modalService } from './modalService';
 
 export type SideEffect =
-  | { type: 'audio/speak'; payload: SpeakEffect }
-  | { type: 'ui/showModal'; payload: ModalEffect }
+  | { type: 'audio/speak'; payload: any }
+  | { type: 'ui/showModal'; payload: any }
   | { type: 'ui/showGameOverModal'; payload: any }
   | { type: 'ui/closeModal' }
   | { type: 'navigation/goto'; payload: { path: string } };
 
-export interface SpeakEffect {
-  text: string;
-  lang: string;
-  voiceURI: string | null;
-}
-
-export interface ModalEffect {
-  title?: string;
-  titleKey?: string;
-  content?: any;
-  contentKey?: string;
-  buttons?: any[];
-  component?: any;
-  closable?: boolean;
-  dataTestId?: string;
-  titleDataTestId?: string;
-}
 
 class SideEffectService {
   constructor() {
@@ -41,7 +24,7 @@ class SideEffectService {
   }
 
   public execute(effect: SideEffect): void {
-    logService.logic('Executing side effect:', effect.type, 'payload' in effect ? effect.payload : '');
+    logService.logicMove('Executing side effect:', effect.type, 'payload' in effect ? effect.payload : '');
     switch (effect.type) {
       case 'audio/speak':
         this.speakText(effect.payload);
@@ -50,7 +33,7 @@ class SideEffectService {
         this.showModal(effect.payload);
         break;
       case 'ui/showGameOverModal':
-        modalService.showGameOverModal(effect.payload);
+        this.showGameOverModal(effect.payload);
         break;
       case 'ui/closeModal':
         this.closeModal();
@@ -64,13 +47,22 @@ class SideEffectService {
     }
   }
 
-  private speakText(payload: SpeakEffect): void {
+  public executeMany(effects: SideEffect[]): void {
+    effects.forEach(effect => this.execute(effect));
+  }
+ 
+  private speakText(payload: any): void {
     speak(payload.text, payload.lang, payload.voiceURI);
   }
 
-  private showModal(payload: ModalEffect): void {
+  private showModal(payload: any): void {
     logService.ui('Showing modal:', payload);
     modalStore.showModal(payload);
+  }
+
+  private showGameOverModal(payload: any): void {
+    logService.ui('Showing game over modal:', payload);
+    modalService.showGameOverModal(payload);
   }
 
   private closeModal(): void {

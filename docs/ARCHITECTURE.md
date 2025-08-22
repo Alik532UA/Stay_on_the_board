@@ -1,4 +1,12 @@
 ---
+last-reviewed: 2025-08-22
+---
+
+**Пов'язані документи:**
+- [Onboarding для розробників](ONBOARDING.md)
+- [Архітектура ігрового циклу та потоку даних](architecture/game-logic-and-data-flow.md)
+- [Патерни асинхронної візуалізації стану](architecture/patterns-asynchronous-state-visualization.md)
+---
 last-reviewed: 2025-08-07
 ---
 

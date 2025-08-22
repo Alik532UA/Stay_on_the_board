@@ -17,6 +17,23 @@
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { logService } from '$lib/services/logService.js';
+  import { onMount, onDestroy } from 'svelte';
+  import { gameOrchestrator } from '$lib/gameOrchestrator';
+  import PlayerColorProvider from '$lib/components/PlayerColorProvider.svelte';
+
+  onDestroy(() => {
+    logService.GAME_MODE('Game layout is being destroyed, cleaning up game mode.');
+    gameModeService.cleanupCurrentGameMode();
+  });
+ 
+  onMount(() => {
+    if (import.meta.env.DEV || get(settingsStore).testMode) {
+  	(window as any).gameOrchestrator = gameOrchestrator;
+  	(window as any).userActionService = userActionService;
+  	(window as any).gameModeService = gameModeService;
+  	(window as any).settingsStore = settingsStore;
+  }
+  });
 
   // НАВІЩО: Гарячі клавіші є глобальними для будь-якого ігрового режиму,
   // тому їх логіка знаходиться тут, а не на сторінках конкретних режимів.
@@ -53,8 +70,8 @@
       case 'down-left': setDirection('down-left'); break;
       case 'down': setDirection('down'); break;
       case 'down-right': setDirection('down-right'); break;
-      case 'confirm': gameModeService.handlePlayerMove(get(playerInputStore).selectedDirection, get(playerInputStore).selectedDistance); break;
-      case 'no-moves': gameModeService.claimNoMoves(); break;
+      case 'confirm': userActionService.confirmMove(); break;
+      case 'no-moves': userActionService.claimNoMoves(); break;
       case 'distance-1': setDistance(1); break;
       case 'distance-2': setDistance(2); break;
       case 'distance-3': setDistance(3); break;
@@ -92,7 +109,7 @@
     }
 
     const matchingActions = Object.entries(keybindings)
-      .filter(([, keys]) => keys.includes(key))
+      .filter(([, keys]) => (keys as string[]).includes(key))
       .map(([action]) => action);
 
     if (matchingActions.length === 0) return;
@@ -122,6 +139,7 @@
 {/if}
 
 <svelte:window on:keydown={handleHotkey} />
+<PlayerColorProvider />
 
 <style>
   .game-layout-container {

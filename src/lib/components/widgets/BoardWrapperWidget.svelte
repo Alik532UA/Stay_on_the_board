@@ -13,7 +13,7 @@
 
   import { modalStore } from '$lib/stores/modalStore.js';
   import SvgIcons from '../SvgIcons.svelte';
-  import { slide, scale } from 'svelte/transition';
+  import { safeScale } from '$lib/utils/transitions.ts';
   import { quintOut } from 'svelte/easing';
   import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
   import { animationStore } from '$lib/stores/animationStore.js';
@@ -25,64 +25,50 @@
   import BoardCell from './BoardCell.svelte';
   import PlayerPiece from './PlayerPiece.svelte';
   import { logService } from '$lib/services/logService.js';
+  import { enableAllGameCheckboxesIfNeeded } from '$lib/utils/uiUtils.ts';
 
-  const boardSize = derived(gameState, $gameState => Number($gameState.boardSize));
-  
-  // Слідкуємо, чи був зроблений хід гравця (moveQueue останній елемент - player: 1)
-  const shouldHideBoard = derived([
-    settingsStore,
-    gameState
-  ], ([$settingsStore, $gameState]) => {
-    if (!$settingsStore.autoHideBoard) return false;
-    const lastMove = $gameState.moveQueue?.[$gameState.moveQueue.length - 1];
-    return lastMove && lastMove.player === 1;
-  });
-
-  // --- Додаємо автозапуск чекбоксів перед першим ходом користувача ---
-  // НАВІЩО: Гарантуємо, що всі візуальні опції (showBoard, showPiece, showMoves) будуть активовані для коректного UX при старті нової гри.
-  function enableAllGameCheckboxesIfNeeded() {
-    const s = get(settingsStore);
-    let changed = false;
-    if (!s.showBoard) { settingsStore.toggleShowBoard(true); changed = true; }
-    if (!s.showPiece) { settingsStore.toggleShowPiece(); changed = true; }
-    if (!s.showMoves) { settingsStore.toggleShowMoves(); changed = true; }
-    // Якщо showPiece був вимкнений, showMoves міг автоматично вимкнутись, тому ще раз вмикаємо
-    if (!get(settingsStore).showMoves) { settingsStore.toggleShowMoves(); }
-  }
+  const boardSize = derived(gameState, $gameState => $gameState ? Number($gameState.boardSize) : 0);
 
   onMount(() => {
-    // НАВІЩО: Зберігаємо попередню позицію гравця для коректного визначення зміни стану та автоприховування дошки.
-    let lastRow = $gameState.playerRow;
-    let lastCol = $gameState.playerCol;
-    
-    // Вмикаємо чекбокси при старті нової гри
-    if ($gameState.moveHistory.length === 1) {
-      enableAllGameCheckboxesIfNeeded();
-    }
-    
+    // Зберігаємо попередню позицію для виявлення змін після ходу гравця (SSoT в gameState)
+    let lastRow: number | null = null;
+    let lastCol: number | null = null;
+
     const unsubscribe = gameState.subscribe(($gameState) => {
-      // НАВІЩО: Реакція на зміну позиції гравця для автоприховування дошки та повторного вмикання чекбоксів після скидання гри.
+      if (!$gameState) return;
+
+      // Ініціалізація та пропуск на першому ході
+      if ($gameState.isFirstMove) {
+        lastRow = $gameState.playerRow;
+        lastCol = $gameState.playerCol;
+        return;
+      }
+
+      // Вмикаємо чекбокси при старті нової гри
+      if ($gameState.moveHistory.length === 1) {
+        enableAllGameCheckboxesIfNeeded();
+      }
+
+      // НАВІЩО: Реакція на зміну позиції гравця для автоприховування дошки.
       if (
         get(settingsStore).autoHideBoard &&
         get(settingsStore).showBoard &&
         ($gameState.playerRow !== lastRow || $gameState.playerCol !== lastCol) &&
-        $gameState.moveHistory.length > 1 // <-- ДОДАЙ ЦЕЙ РЯДОК
+        $gameState.moveHistory.length > 1
       ) {
-        lastRow = $gameState.playerRow;
-        lastCol = $gameState.playerCol;
-        // setTimeout(() => {
-        //   if (get(settingsStore).showBoard) {
-        //     settingsStore.toggleShowBoard(false);
-        //   }
-        // }, 0);
         uiEffectsStore.autoHideBoard(0);
-      } else {
         lastRow = $gameState.playerRow;
         lastCol = $gameState.playerCol;
       }
+
       // --- Після автоприховування дошки ---
-      // Вмикаємо чекбокси тільки після початку гри (є ходи в історії), а не при ініціалізації
-      if ($gameState.moveQueue && $gameState.moveQueue.length === 0 && $gameState.moveHistory.length > 1) {
+      // Показуємо дошку після очищення moveQueue, але не під час ходу комп'ютера
+      if (
+        $gameState.moveQueue &&
+        $gameState.moveQueue.length === 0 &&
+        $gameState.moveHistory.length > 1 &&
+        !$gameState.isComputerMoveInProgress
+      ) {
         enableAllGameCheckboxesIfNeeded();
       }
     });
@@ -93,6 +79,10 @@
   // Видаляємо prevMoveQueueLength, оскільки анімація тепер керується через animationStore
   // НАВІЩО: Відстежуємо зміну gameId для скидання стану при новій грі.
   gameState.subscribe(($gameState) => {
+    if (!$gameState) {
+      prevGameId = null;
+      return;
+    }
     // Якщо нова гра — скидаємо лічильник
     if ($gameState.gameId !== prevGameId) {
       prevGameId = $gameState.gameId;
@@ -136,76 +126,66 @@
     modalStore.showModal({
       titleKey: 'modal.boardClickTitle',
       contentKey: 'modal.boardClickContent',
-      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+      dataTestId: 'board-click-modal'
     });
   }
 
   function onCellRightClick(event: MouseEvent, row: number, col: number): void {
     event.preventDefault();
-    if ($settingsStore.blockModeEnabled && !(row === $gameState.playerRow && col === $gameState.playerCol)) {
+    if ($gameState && $settingsStore.blockModeEnabled && !(row === $gameState.playerRow && col === $gameState.playerCol)) {
       const visualCounts = get(visualCellVisitCounts);
       const blocked = isCellBlocked(row, col, visualCounts, $settingsStore);
       logService.ui(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`);
     }
   }
 
-  function scaleAndSlide(node: HTMLElement, params: any) {
-      const slideTrans = slide(node, params);
-      const scaleTrans = scale(node, params);
-
-      return {
-          duration: params.duration,
-          easing: params.easing,
-          css: (t: number, u: number) => `
-              ${slideTrans.css ? slideTrans.css(t, u) : ''}
-              ${scaleTrans.css ? scaleTrans.css(t, u) : ''}
-          `
-      };
-  }
 </script>
 
-{#key $gameState.gameId}
-  {#if $settingsStore.showBoard}
-    <div 
-      class="board-bg-wrapper game-content-block{ $shouldHideBoard ? ' hidden' : '' }"
-      style="--board-size: {$boardSize}"
-      onclick={showBoardClickHint} 
-      onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
-      role="button"
-      tabindex="0"
-      aria-label="Ігрове поле"
-      transition:scaleAndSlide={{ duration: 600, easing: quintOut }}
-    >
-      <div class="game-board" style="--board-size: {$boardSize}" role="grid" data-testid="game-board">
-        {#each Array($boardSize) as _, rowIdx (rowIdx)}
-          {#each Array($boardSize) as _, colIdx (colIdx)}
-            {@const moveInfo = getMoveInfo(rowIdx, colIdx)}
-            <BoardCell
-              {rowIdx}
-              {colIdx}
-              visualCellVisitCounts={$visualCellVisitCounts}
-              settingsStore={$settingsStore}
-              isAvailable={moveInfo.isAvailable}
-              isPenalty={moveInfo.isPenalty}
-              visualPosition={$visualPosition}
-              boardState={$visualBoardState}
-              gameState={$gameState}
-              on:cellRightClick={(e) => onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
-            />
+{#if $gameState}
+  {#key $gameState.gameId}
+    {#if $settingsStore.showBoard}
+      <div
+        class="board-bg-wrapper game-content-block"
+        style="--board-size: {$boardSize}"
+        onclick={showBoardClickHint}
+        onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
+        role="button"
+        tabindex="0"
+        aria-label="Ігрове поле"
+        transition:safeScale={{ duration: 600, easing: quintOut }}
+      >
+        <div class="game-board" style="--board-size: {$boardSize}" role="grid" data-testid="game-board">
+          {#each Array($boardSize) as _, rowIdx (rowIdx)}
+            {#each Array($boardSize) as _, colIdx (colIdx)}
+              {@const moveInfo = getMoveInfo(rowIdx, colIdx)}
+              <BoardCell
+                {rowIdx}
+                {colIdx}
+                visualCellVisitCounts={$visualCellVisitCounts}
+                settingsStore={$settingsStore}
+                isAvailable={moveInfo.isAvailable}
+                isPenalty={moveInfo.isPenalty}
+                visualPosition={$visualPosition}
+                boardState={$visualBoardState}
+                gameState={$gameState}
+                on:cellRightClick={(e) => onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
+              />
+            {/each}
           {/each}
-        {/each}
-        
-        {#if $settingsStore.showPiece && $visualPosition.row !== null && $visualPosition.col !== null}
-          <PlayerPiece
-            row={$visualPosition.row}
-            col={$visualPosition.col}
-            boardSize={$boardSize}
-          />
-        {/if}
+          
+          {#if $settingsStore.showPiece && $visualPosition.row !== null && $visualPosition.col !== null}
+            <PlayerPiece
+              row={$visualPosition.row}
+              col={$visualPosition.col}
+              boardSize={$boardSize}
+            />
+          {/if}
+        </div>
       </div>
-    </div>
-  {/if}
-{/key}
+    {/if}
+  {/key}
+{/if}
 
 <style>
 

@@ -1,1 +1,0 @@
-npx playwright test --grep "@GF-1"

@@ -3,7 +3,7 @@ import { writable, get } from 'svelte/store';
 import { logService } from '$lib/services/logService.js';
 
 /** @type {import('svelte/store').Writable<SpeechSynthesisVoice[]>} */
-export const voices = writable([]);
+const voices = writable([]);
 /** @type {Promise<SpeechSynthesisVoice[]> | null} */
 let voicesPromise = null;
 
@@ -107,11 +107,5 @@ export function speakText(textToSpeak, lang, voiceURI) {
   }, 50);
 }
 
-export const langMap = {
-  uk: 'uk-UA',
-  en: 'en-US',
-  crh: 'crh-UA',
-  nl: 'nl-NL'
-};
 
 // TODO: Додати мок-версію для тестування 

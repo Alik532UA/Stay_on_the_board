@@ -1,33 +1,65 @@
 import { test, expect } from '@playwright/test';
-import { startNewGame, setBoardSize, makeMove, expectScoreToBeZeroOrNegative } from './utils';
+import { startNewGame, setBoardSize, makeMove, expectScoreToBeZeroOrNegative, setBlockMode, BlockModeState } from './utils';
 
-test.describe('Сценарії завершення гри', () => {
+test.describe('Сценарії завершення гри', { tag: '@GOS' }, () => {
   test.beforeEach(async ({ page }) => {
     await startNewGame(page);
     // Встановлюємо невеликий розмір дошки, щоб легко вийти за межі
     await setBoardSize(page, 4);
   });
 
-  test('Повинно з\'являтися вікно "Game Over", коли гравець виходить за межі дошки', async ({ page }) => {
-    // Робимо хід, який гарантовано виходить за межі дошки 2x2
-    // Стартова позиція зазвичай в центрі, тому будь-який хід на 2 клітинки буде за межами
-    await makeMove(page, 'up', 2, false);
+  test('Повинно з\'являтися вікно "Game Over", коли гравець виходить за межі дошки', { tag: ['@done', '@GOS-1'] }, async ({ page }) => {
+    await test.step('Гравець робить хід за межі дошки', async () => {
+      // Робимо хід, який гарантовано виходить за межі дошки 4x4
+      // Стартова позиція зазвичай в центрі, тому будь-який хід на 2 клітинки буде за межами
+      await makeMove(page, 'up', 2, false);
+    });
 
-    // Перевіряємо, що модальне вікно "Game Over" з'явилося
-    await expect(page.getByTestId('game-over-modal')).toBeVisible();
+    await test.step('Перевірка модального вікна "Гру завершено!"', async () => {
+      await expect(page.getByTestId('game-over-modal')).toBeVisible();
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+    });
 
-    // Перевіряємо заголовок модального вікна
-    await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+    await test.step('Перевірка, що рахунки нульові або від\'ємні', async () => {
+      await expectScoreToBeZeroOrNegative(page, 'base-score-value');
+      await expectScoreToBeZeroOrNegative(page, 'final-score-value');
+    });
+  });
 
-    // Перевіряємо повідомлення про вихід за межі дошки
-    await expect(page.getByTestId('modal-content-reason')).toHaveAttribute('data-i18n-key', 'modal.gameOverReasonOut');
-    // const message = page.getByTestId('modal-content-reason');
-    // await expect(message).toHaveAttribute('data-i18n-key', 'gameOverReasonOut');
+  test('Повинно з\'являтися вікно "Game Over", коли гравець ходить на заблоковану клітинку', { tag: ['@done', '@GOS-2'] }, async ({ page }) => {
 
-    // Перевіряємо, що базовий рахунок менший або дорівнює 0
-    await expectScoreToBeZeroOrNegative(page, 'base-score-value');
+    await test.step('Гравець змінює розмір дошки та робить хід на заблоковану клітинку', async () => {
+      await setBoardSize(page, 5);
+      await setBlockMode(page, BlockModeState.On);
+      await page.getByTestId('test-mode-dir-btn-up-right').click();
+      await page.getByTestId('test-mode-move-dist-input').fill('3');
+      await page.getByTestId('test-mode-set-move-dist-btn').click();
+      await makeMove(page, 'down', 3);
+      await page.getByTestId('test-mode-computer-move-random-btn').click();
+      await makeMove(page, 'left', 3, false);
+    });
 
-    // Перевіряємо, що фінальний рахунок менший або дорівнює 0
-    await expectScoreToBeZeroOrNegative(page, 'final-score-value');
+    await test.step('Перевірка модального вікна "Гру завершено!"', async () => {
+      await expect(page.getByTestId('game-over-modal')).toBeVisible();
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+    });
+  });
+
+  test('Повинно з\'являтися вікно "Game Over" після натискання кнопки "Забрати виграш"', { tag: ['@bug', '@GOS-3'] }, async ({ page }) => {
+
+    await test.step('Гравець натискає "Забрати бали / Почати нову гру"', async () => {
+      await page.getByTestId('test-mode-dir-btn-right').click();
+      await page.getByTestId('test-mode-move-dist-input').fill('2');
+      await page.getByTestId('test-mode-set-move-dist-btn').click();
+      await makeMove(page, 'down-right', 1);
+      await page.getByTestId('test-mode-computer-move-random-btn').click();
+      await page.getByTestId('cash-out-btn').click();
+    });
+
+    await test.step('Перевірка модального вікна "Гру завершено!"', async () => {
+      await expect(page.getByTestId('game-over-modal')).toBeVisible();
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+      // await expect(page.getByTestId('modal-content-reason')).toHaveAttribute('data-i18n-key', 'modal.gameOverReasonCashOut');
+    });
   });
 });

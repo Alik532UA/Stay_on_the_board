@@ -1,0 +1,299 @@
+ Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+ [UI] [Speech] 'voiceschanged' event fired. Loaded 0 voices.
+ [UI] [ModalStore] closeModal called. Stack size: 0
+ [UI] [ModalStore] Stack is empty. Resetting to initial state.
+ [UI] [layout] afterNavigate: hiding tooltip
+ [UI] [Speech] 'voiceschanged' event fired. Loaded 3 voices.
+ ✅ i18n ініціалізовано успішно
+ [ACTION] Click: "Гра проти комп'ютера" (MainMenu)
+ [UI] [ModalStore] showModal called. New modal: 'game-mode-modal'. Stack size: 0
+ [UI] [ModalStore] closeModal called. Stack size: 0
+ [UI] [ModalStore] Stack is empty. Resetting to initial state.
+ [UI] [ModalStore] showModal called. New modal: 'faq-modal'. Stack size: 0
+ [UI] [Speech] Fallback check loaded 3 voices.
+ [ACTION] Click: "OK" (Modal)
+ [UI] [ModalStore] closeModal called. Stack size: 0
+ [UI] [ModalStore] Stack is empty. Resetting to initial state.
+ [GAME_MODE] Setting game mode to: vs-computer
+ [UI] [BoardWrapperWidget] Нова гра, скидаємо стан
+ [UI] [ModalStore] closeModal called. Stack size: 0
+ [UI] [ModalStore] Stack is empty. Resetting to initial state.
+ [UI] [layout] afterNavigate: hiding tooltip
+ [UI] [BoardWrapperWidget] Нова гра, скидаємо стан
+ [ACTION] Click: "Напрямок: down" (DirectionControls)
+ [ACTION] Click: "Напрямок: down" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDirection: встановлено напрямок Object
+ [ACTION] Click: "Відстань: 1" (DirectionControls)
+ [ACTION] Click: "Відстань: 1" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDistance: встановлено відстань Object
+ [ACTION] Click: "Підтвердити хід" (DirectionControls)
+ [ACTION] Click: "Підтвердити хід" (ControlsPanelWidget)
+ [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+ [LOGIC_MOVE] performMove: завершено успішно
+ [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+ [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+ [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+ [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] performMove: завершено успішно
+ [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+ [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+ [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(0)
+ [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+ [ACTION] Click: "Напрямок: up-right" (DirectionControls)
+ [ACTION] Click: "Напрямок: up-right" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDirection: встановлено напрямок Object
+ [ACTION] Click: "Відстань: 2" (DirectionControls)
+ [ACTION] Click: "Відстань: 2" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDistance: встановлено відстань Object
+ [ACTION] Click: "Підтвердити хід" (DirectionControls)
+ [ACTION] Click: "Підтвердити хід" (ControlsPanelWidget)
+ [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+ [SCORE] _calculateDistanceBonus: додаємо 1 бонусний бал за хід на відстань 2
+ [LOGIC_MOVE] performMove: завершено успішно
+ [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+ [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+ [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+ [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] performMove: завершено успішно
+ [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+ [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+ [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(0)
+ [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+ [ACTION] Click: "Напрямок: left" (DirectionControls)
+ [ACTION] Click: "Напрямок: left" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDirection: встановлено напрямок Object
+ [ACTION] Click: "Відстань: 1" (DirectionControls)
+ [ACTION] Click: "Відстань: 1" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDistance: встановлено відстань Object
+ [ACTION] Click: "Підтвердити хід" (DirectionControls)
+ [ACTION] Click: "Підтвердити хід" (ControlsPanelWidget)
+ [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+ [LOGIC_MOVE] performMove: завершено успішно
+ [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+ [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+ [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+ [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] performMove: завершено успішно
+ [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+ [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+ [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(0)
+ [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+ [ACTION] Click: "Напрямок: right" (DirectionControls)
+ [ACTION] Click: "Напрямок: right" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDirection: встановлено напрямок Object
+ [ACTION] Click: "Відстань: 1" (DirectionControls)
+ [ACTION] Click: "Відстань: 1" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDistance: встановлено відстань Object
+ [ACTION] Click: "Підтвердити хід" (DirectionControls)
+ [ACTION] Click: "Підтвердити хід" (ControlsPanelWidget)
+ [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+ [LOGIC_MOVE] performMove: завершено успішно
+ [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+ [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+ [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Результат getComputerMove: null
+ [GAME_MODE] triggerComputerMove: У комп'ютера немає ходів, викликаємо handleNoMoves.
+ [GAME_MODE] handleNoMoves: Обробка ситуації "немає ходів" для гравця типу: computer.
+ [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(1)
+ [LOGIC_MOVE] Executing side effect: ui/showModal Object
+ [UI] Showing modal: Object
+ [UI] [ModalStore] showModal called. New modal: 'opponent-trapped-modal'. Stack size: 0
+ [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+ [ACTION] Click: "Переглянути запис" (Modal)
+ [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+ [UI] [ModalStore] showModal called. New modal: 'replay-modal'. Stack size: 1
+ [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+ [ACTION] Click: "Закрити" (Modal)
+ [UI] [ModalStore] closeModal called. Stack size: 1
+ [UI] [ModalStore] Popped 'opponent-trapped-modal' from stack. Restoring previous state.
+ [ACTION] Click: "Продовжити" (Modal)
+ [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+ [GAME_MODE] [VsComputerGameMode] continueAfterNoMoves called
+ [LOGIC_MOVE] Executing side effect: ui/closeModal 
+ [UI] [ModalStore] closeModal called. Stack size: 0
+ [UI] [ModalStore] Stack is empty. Resetting to initial state.
+ [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+ [ACTION] Click: "Напрямок: up" (DirectionControls)
+ [ACTION] Click: "Напрямок: up" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDirection: встановлено напрямок Object
+ [ACTION] Click: "Відстань: 1" (DirectionControls)
+ [ACTION] Click: "Відстань: 1" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDistance: встановлено відстань Object
+ [ACTION] Click: "Підтвердити хід" (DirectionControls)
+ [ACTION] Click: "Підтвердити хід" (ControlsPanelWidget)
+ [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+ [LOGIC_MOVE] performMove: завершено успішно
+ [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+ [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+ [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+ [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] performMove: завершено успішно
+ [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+ [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+ [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(0)
+ [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+ [ACTION] Click: "Напрямок: left" (DirectionControls)
+ [ACTION] Click: "Напрямок: left" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDirection: встановлено напрямок Object
+ [ACTION] Click: "Відстань: 1" (DirectionControls)
+ [ACTION] Click: "Відстань: 1" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDistance: встановлено відстань Object
+ [ACTION] Click: "Підтвердити хід" (DirectionControls)
+ [ACTION] Click: "Підтвердити хід" (ControlsPanelWidget)
+ [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+ [LOGIC_MOVE] performMove: завершено успішно
+ [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+ [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+ [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+ [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+ [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] performMove: завершено успішно
+ [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+ [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+ [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(0)
+ [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+ [ACTION] Click: "Напрямок: up" (DirectionControls)
+ [ACTION] Click: "Напрямок: up" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDirection: встановлено напрямок Object
+ [ACTION] Click: "Відстань: 2" (DirectionControls)
+ [ACTION] Click: "Відстань: 2" (ControlsPanelWidget)
+ [LOGIC_MOVE] setDistance: встановлено відстань Object
+ [ACTION] Click: "Підтвердити хід" (DirectionControls)
+ [ACTION] Click: "Підтвердити хід" (ControlsPanelWidget)
+ [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+ [LOGIC_MOVE] performMove: початок з параметрами: Object
+ [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+logService.js:100 [SCORE] _calculateDistanceBonus: додаємо 1 бонусний бал за хід на відстань 2
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(0)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:100 [ACTION] Click: "Напрямок: left" (DirectionControls)
+logService.js:100 [ACTION] Click: "Напрямок: left" (ControlsPanelWidget)
+logService.js:98 [LOGIC_MOVE] setDirection: встановлено напрямок Object
+logService.js:100 [ACTION] Click: "Відстань: 2" (DirectionControls)
+logService.js:100 [ACTION] Click: "Відстань: 2" (ControlsPanelWidget)
+logService.js:98 [LOGIC_MOVE] setDistance: встановлено відстань Object
+logService.js:100 [ACTION] Click: "Підтвердити хід" (DirectionControls)
+logService.js:100 [ACTION] Click: "Підтвердити хід" (ControlsPanelWidget)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+logService.js:100 [SCORE] _calculateDistanceBonus: додаємо 1 бонусний бал за хід на відстань 2
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:100 [SCORE] _calculateDistanceBonus: додаємо 1 бонусний бал за хід на відстань 2
+logService.js:98 [LOGIC_AI] getComputerMove: обрано хід з бонусом Object
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [SCORE] _calculateDistanceBonus: додаємо 1 бонусний бал за хід на відстань 2
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(0)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:100 [ACTION] Click: "Ходів немає" (DirectionControls)
+logService.js:100 [ACTION] Click: "Ходів немає" (ControlsPanelWidget)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:100 [GAME_MODE] handleNoMoves: Обробка ситуації "немає ходів" для гравця типу: human.
+logService.js:98 [LOGIC_MOVE] Executing side effect: ui/showModal Object
+logService.js:98 [UI] Showing modal: Object
+logService.js:100 [UI] [ModalStore] showModal called. New modal: 'player-no-moves-modal'. Stack size: 0
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:100 [ACTION] Click: "Переглянути запис" (Modal)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:100 [UI] [ModalStore] showModal called. New modal: 'replay-modal'. Stack size: 1
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:100 [ACTION] Click: "Закрити" (Modal)
+logService.js:100 [UI] [ModalStore] closeModal called. Stack size: 1
+logService.js:100 [UI] [ModalStore] Popped 'player-no-moves-modal' from stack. Restoring previous state.
+logService.js:100 [ACTION] Click: "Завершити (+3 балів)" (Modal)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:98 [LOGIC_MOVE] [userActionService] finishWithBonus called with reason: modal.gameOverReasonBonus
+logService.js:98 [GAME_MODE] [VsComputerGameMode] endGame called with reason: modal.gameOverReasonBonus
+logService.js:98 [LOGIC_MOVE] Executing side effect: ui/showGameOverModal Object
+logService.js:98 [UI] Showing game over modal: Object
+logService.js:100 [UI] [ModalStore] showModalAsReplacement called. Clearing stack and showing new modal: 'game-over-modal'.
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:100 [ACTION] Click: "Переглянути запис" (Modal)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:100 [UI] [ModalStore] showModal called. New modal: 'replay-modal'. Stack size: 1
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:100 [ACTION] Click: "Закрити" (Modal)
+logService.js:100 [UI] [ModalStore] closeModal called. Stack size: 1
+logService.js:100 [UI] [ModalStore] Popped 'game-over-modal' from stack. Restoring previous state.
+logService.js:100 [ACTION] Click: "Грати ще раз" (Modal)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:100 [UI] [ModalStore] closeModal called. Stack size: 0
+logService.js:100 [UI] [ModalStore] Stack is empty. Resetting to initial state.
+logService.js:100 [UI] [BoardWrapperWidget] Нова гра, скидаємо стан
+logService.js:98 [LOGIC_MOVE] Executing side effect: ui/closeModal 
+logService.js:100 [UI] [ModalStore] closeModal called. Stack size: 0
+logService.js:100 [UI] [ModalStore] Stack is empty. Resetting to initial state.
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:100 [UI] [BoardWrapperWidget] Нова гра, скидаємо стан
+logService.js:100 [ACTION] Click: "Напрямок: down-right" (DirectionControls)
+logService.js:100 [ACTION] Click: "Напрямок: down-right" (ControlsPanelWidget)
+logService.js:98 [LOGIC_MOVE] setDirection: встановлено напрямок Object
+logService.js:100 [ACTION] Click: "Відстань: 5" (DirectionControls)
+logService.js:100 [ACTION] Click: "Відстань: 5" (ControlsPanelWidget)
+logService.js:98 [LOGIC_MOVE] setDistance: встановлено відстань Object
+logService.js:100 [ACTION] Click: "Підтвердити хід" (DirectionControls)
+logService.js:100 [ACTION] Click: "Підтвердити хід" (ControlsPanelWidget)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input locked: isMoveInProgress=true
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [LOGIC_MOVE] _calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.
+logService.js:100 [SCORE] _calculateDistanceBonus: додаємо 1 бонусний бал за хід на відстань 5
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [LOGIC_MOVE] performMove: початок з параметрами: Object
+logService.js:100 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [LOGIC_MOVE] [userActionService.confirmMove] Side effects from handlePlayerMove: Array(0)
+logService.js:100 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false

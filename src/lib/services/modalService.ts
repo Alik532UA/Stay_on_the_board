@@ -13,105 +13,27 @@ import { logService } from './logService.js';
 import { navigationService } from './navigationService.js';
 
 export const modalService = {
-  showGameOverModal(payload: { reasonKey: string, reasonValues: any, finalScoreDetails: FinalScoreDetails, gameType: string, state: GameState }): void {
-    logService.ui('[modalService] showGameOverModal called with payload:', payload);
-    const { reasonKey, reasonValues, finalScoreDetails, gameType, state } = payload;
-    const t = get(_);
-    
-    let titleKey = 'modal.gameOverTitle';
-    let content;
 
-    if (gameType === 'local') {
-      const { winners, winningPlayerIndex } = determineWinner(state, reasonKey);
-      const losingPlayerName = state.players[state.currentPlayerIndex].name;
-      const modalReason = t(reasonKey, { values: { playerName: losingPlayerName } });
-      
-      const playerScores = state.players.map((player, index) => ({
-        playerNumber: index + 1,
-        playerName: player.name,
-        score: state.scoresAtRoundStart[index],
-        isWinner: winners.includes(index),
-        isLoser: index === state.currentPlayerIndex
-      }));
 
-      let winnerName = '';
-      let winnerNumbers = '';
-
-      if (winners.length === 1) {
-        titleKey = 'modal.winnerTitle';
-        winnerName = state.players[winningPlayerIndex].name;
-      } else if (winners.length > 1) {
-        titleKey = 'modal.winnersTitle';
-        winnerNumbers = winners.map((i: number) => state.players[i].name).join(', ');
-      }
-      
-      content = {
-        reason: modalReason,
-        playerScores,
-        winnerName,
-        winnerNumbers,
-        scoreDetails: finalScoreDetails
-      };
-
-    } else { // vs-computer
-      const modalReason = t(reasonKey, reasonValues ? { values: reasonValues } : undefined);
-      content = {
-        reason: modalReason,
-        reasonKey: reasonKey,
-        scoreDetails: finalScoreDetails
-      };
-    }
-
-    modalStore.showModal({
-      titleKey,
-      content,
-      dataTestId: 'game-over-modal',
-      titleDataTestId: 'game-over-modal-title',
-      buttons: [
-        { textKey: 'modal.playAgain', primary: true, onClick: () => userActionService.handleModalAction('restartGame'), isHot: true, dataTestId: 'play-again-btn' },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: 'game-over-watch-replay-btn' },
-        { textKey: 'gameBoard.mainMenu', onClick: () => userActionService.handleModalAction('resetGameAndGoToMainMenu'), dataTestId: 'game-over-main-menu-btn' }
-      ]
-    });
-  },
-  /**
-   * Shows a confirmation modal for resetting the score when changing board size.
-   * @param newSize - The new board size.
-   */
-  showResetScoreConfirmation(newSize: number): void {
+  showBoardResizeModal(newSize: number): void {
     modalStore.showModal({
       titleKey: 'modal.resetScoreTitle',
       contentKey: 'modal.resetScoreContent',
-      dataTestId: 'board-resize-confirm-modal',
-      titleDataTestId: 'modal-window-title',
       buttons: [
         {
-          textKey: 'modal.resetScoreConfirm',
-          customClass: 'green-btn',
-          isHot: true,
+          textKey: 'modal.confirm',
           onClick: () => userActionService.handleModalAction('resetGame', { newSize }),
-          dataTestId: 'reset-score-confirm-btn'
-        },
-        { textKey: 'modal.resetScoreCancel', onClick: () => userActionService.handleModalAction('closeModal'), dataTestId: 'reset-score-cancel-btn' }
-      ]
-    });
-  },
-
-  showExitConfirmation(): void {
-    modalStore.showModal({
-      titleKey: 'modal.exitConfirmationTitle',
-      contentKey: 'modal.exitConfirmationContent',
-      dataTestId: 'exit-confirm-modal',
-      buttons: [
-        {
-          textKey: 'modal.confirmExit',
           customClass: 'danger-btn',
           isHot: true,
-          onClick: () => navigationService.goToMainMenu(),
-          dataTestId: 'exit-confirm-btn'
         },
-        { textKey: 'modal.cancel', onClick: () => modalStore.closeModal(), dataTestId: 'exit-cancel-btn' }
-      ]
+        {
+          textKey: 'modal.cancel',
+          onClick: () => userActionService.handleModalAction('closeModal'),
+        },
+      ],
+      closable: true,
+      closeOnOverlayClick: true,
+      dataTestId: 'board-resize-confirm-modal',
     });
   },
 
@@ -120,6 +42,61 @@ export const modalService = {
    */
   closeModal(): void {
     modalStore.closeModal();
+  },
+
+  showGameOverModal(payload: {
+    reasonKey: string;
+    reasonValues: any;
+    finalScoreDetails: FinalScoreDetails;
+    gameType: 'vs-computer' | 'local';
+    state: GameState;
+  }): void {
+    const { reasonKey, reasonValues, finalScoreDetails, gameType, state } = payload;
+    const t = get(_);
+    const { winners } = determineWinner(state, reasonKey);
+
+    let titleKey = 'modal.gameOverTitle';
+    if (winners.length === 1) {
+      const winner = state.players.find(p => p.id === winners[0]);
+      if (winner) {
+        titleKey = gameType === 'local' ? 'modal.winnerTitle' : 'modal.gameOverTitle';
+      }
+    } else if (winners.length > 1) {
+      titleKey = 'modal.drawTitle';
+    }
+
+    modalStore.showModalAsReplacement({
+      titleKey,
+      titleValues: {
+        winnerName: state.players.find(p => p.id === winners[0])?.name || ''
+      },
+      content: {
+        reason: t(reasonKey, { values: reasonValues }),
+        scoreDetails: finalScoreDetails,
+      },
+      buttons: [
+        {
+          textKey: 'modal.playAgain',
+          onClick: () => userActionService.handleModalAction('playAgain'),
+          isHot: true,
+          customClass: 'green-btn',
+          dataTestId: 'play-again-btn',
+        },
+        {
+          textKey: 'modal.watchReplay',
+          onClick: () => userActionService.handleModalAction('requestReplay'),
+          customClass: 'blue-btn',
+          dataTestId: 'watch-replay-btn',
+        },
+        {
+          textKey: 'modal.mainMenu',
+          onClick: () => navigationService.goToMainMenu(),
+          dataTestId: 'game-over-main-menu-btn',
+        },
+      ],
+      closable: false,
+      dataTestId: 'game-over-modal',
+    });
   },
 
   /**

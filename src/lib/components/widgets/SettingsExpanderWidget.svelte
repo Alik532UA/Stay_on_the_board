@@ -109,15 +109,20 @@
 
   function selectBlockCount(count: number) {
     logService.action(`Click: "Вибір кількості блоків: ${count}" (SettingsExpanderWidget)`);
-    if (count > 0 && $settingsStore.showGameModeModal) {
+    if (count > 0 && get(settingsStore).showDifficultyWarningModal) {
       modalStore.showModal({
         titleKey: 'modal.expertModeTitle',
+        dataTestId: 'expert-mode-modal',
         contentKey: 'modal.expertModeContent',
         buttons: [
           { textKey: 'modal.expertModeConfirm', primary: true, isHot: true, onClick: () => { settingsStore.updateSettings({ blockOnVisitCount: count }); modalStore.closeModal(); } },
           { textKey: 'modal.expertModeCancel', onClick: modalStore.closeModal }
         ],
-        closeOnOverlayClick: true
+        closeOnOverlayClick: true,
+        props: {
+          showDontShowAgain: true,
+          dontShowAgainBinding: () => settingsStore.updateSettings({ showDifficultyWarningModal: false })
+        }
       });
     } else {
       settingsStore.updateSettings({ blockOnVisitCount: count });
@@ -364,6 +369,7 @@
   }
 </style>
 
+{#if $gameState}
 <div class="settings-expander {isOpen ? 'open' : ''}" class:disabled={$settingsStore.lockSettings}>
   <div
     class="settings-expander__summary"
@@ -447,6 +453,7 @@
       label={$_('gameModes.autoHideBoard')}
       checked={$settingsStore.autoHideBoard}
       on:toggle={handleToggleAutoHideBoard}
+      dataTestId="auto-hide-board-toggle"
     />
     <ToggleButton
       label={$_('gameControls.blockMode')}
@@ -511,3 +518,4 @@
     {/if}
   </div>
 </div>
+{/if}

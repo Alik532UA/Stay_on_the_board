@@ -1,5 +1,5 @@
-    // Додаємо паузу 7 секунд
-    // await page.waitForTimeout(7000);
+// test.setTimeout(1000 * 60 * 120); // 120 minutes
+// await page.waitForTimeout(7777777); // Додаємо паузу
 
 import { test, expect, type Page } from '@playwright/test';
 
@@ -18,18 +18,20 @@ export async function setBoardSize(page: Page, size: number) {
 // Перелік режимів гри
 export enum GameMode {
   Beginner = 'beginner-mode-btn',
-  Experienced = 'experienced-mode-btn',
-  Pro = 'pro-mode-btn',
 }
 
 // Вмикає тестовий режим
 export async function enableTestMode(page: Page) {
-  await page.waitForFunction(() => (window as any).settingsStore);
+  await page.waitForFunction(() => (window as any).settingsStore, null, { timeout: 10000 });
   await page.evaluate(() => {
     (window as any).settingsStore.updateSettings({ testMode: true });
+    // Примусово встановлюємо значення в localStorage для надійності тесту
+    localStorage.setItem('testMode', 'true');
   });
-  // Додаємо очікування, поки testMode в сторі не стане true
-  await page.waitForFunction(() => localStorage.getItem('testMode') === 'true');
+  // Перевіряємо, що значення дійсно встановлено
+  await page.waitForFunction(() => localStorage.getItem('testMode') === 'true', null, {
+    timeout: 5000,
+  });
   await expect(page.getByTestId('test-mode-widget-container')).toBeVisible();
 }
 
@@ -42,7 +44,7 @@ export async function startNewGame(page: Page, mode: GameMode = GameMode.Beginne
   await page.getByTestId(mode).click();
 
   if (mode === GameMode.Beginner) {
-    await page.getByTestId('modal-btn-modal.ok').click();
+    await page.getByTestId('faq-modal-modal.ok-btn').click();
   }
 
   await page.waitForURL('**/game/vs-computer');

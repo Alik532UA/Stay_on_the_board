@@ -33,33 +33,6 @@ export function calculateFinalScore(state: GameState, gameMode: 'local' | 'vs-co
   };
 }
 
-export function countJumpedCells(
-  startRow: number,
-  startCol: number,
-  endRow: number,
-  endCol: number,
-  cellVisitCounts: Record<string, number>,
-  blockOnVisitCount: number,
-  blockModeEnabled: boolean = false
-): number {
-  if (!blockModeEnabled) {
-    return 0;
-  }
-  
-  let jumpedCount = 0;
-  const dr = Math.sign(endRow - startRow);
-  const dc = Math.sign(endCol - startCol);
-  const distance = Math.max(Math.abs(endRow - startRow), Math.abs(endCol - startCol));
-  for (let i = 1; i < distance; i++) {
-    const currentRow = startRow + i * dr;
-    const currentCol = startCol + i * dc;
-    const visitCount = cellVisitCounts[`${currentRow}-${currentCol}`] || 0;
-    if (visitCount > blockOnVisitCount) {
-      jumpedCount++;
-    }
-  }
-  return jumpedCount;
-}
 
 function _calculateBaseScore(player: Player, settings: any): number {
   if (player?.type !== 'human') {
@@ -82,7 +55,7 @@ function _calculateMirrorMovePenalty(currentState: any, direction: string, dista
 
   if (direction && lastComputerMove && lastComputerMove.player !== 0 && !settings.blockModeEnabled) {
     const isMirror = isMirrorMove(direction, distance, lastComputerMove.direction, lastComputerMove.distance);
-    logService.logic(`_calculateMirrorMovePenalty: перевіряємо "дзеркальний" хід:`, {
+    logService.logicMove(`_calculateMirrorMovePenalty: перевіряємо "дзеркальний" хід:`, {
       currentMove: { direction, distance },
       computerMove: { direction: lastComputerMove.direction, distance: lastComputerMove.distance },
       isMirrorMove: isMirror
@@ -98,7 +71,7 @@ function _calculateMirrorMovePenalty(currentState: any, direction: string, dista
       }
     }
   } else {
-    logService.logic(`_calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.`);
+    logService.logicMove(`_calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.`);
   }
 
   return { penaltyPoints, penaltyPointsForMove };
@@ -150,15 +123,7 @@ export function calculateMoveScore(
     penaltyResult = _calculateMirrorMovePenalty(currentState, direction!, distance, settings);
   }
   
-  const jumpedCount = countJumpedCells(
-    currentState.playerRow,
-    currentState.playerCol,
-    newPosition.row,
-    newPosition.col,
-    currentState.cellVisitCounts,
-    settings.blockOnVisitCount,
-    settings.blockModeEnabled
-  );
+  const jumpedCount = 0;
 
   const distanceBonusResult = _calculateDistanceBonus(distance);
   const jumpBonus = _calculateJumpBonus(jumpedCount, settings);

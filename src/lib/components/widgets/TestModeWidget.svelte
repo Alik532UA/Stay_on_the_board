@@ -32,6 +32,12 @@
   }
 
 
+  function setManualMoveProperties() {
+    if (manualDirection) {
+      setManualComputerMove(manualDirection, manualDistance);
+    }
+  }
+
   function setManualComputerMove(direction: string, distance: number) {
     const newState: Partial<TestModeState> = {
       computerMoveMode: 'manual',
@@ -130,6 +136,7 @@
         <label for="manualDist">Dist</label>
         <input id="manualDist" class="test-mode-input" type="number" bind:value={manualDistance} min="1" max="7" data-testid="test-mode-move-dist-input">
       </div>
+      <button class="test-mode-square-btn" on:click={setManualMoveProperties} data-testid="test-mode-set-move-dist-btn">Set</button>
     </div>
   </div>
 </div>

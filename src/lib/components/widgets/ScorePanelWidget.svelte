@@ -7,11 +7,12 @@
   import { replayStore } from '$lib/stores/replayStore.js';
   import { _ } from 'svelte-i18n';
   import { customTooltip } from '$lib/actions/customTooltip.js';
+  import { sideEffectService } from '$lib/services/sideEffectService.js';
 
   // Реактивні змінні для визначення поточного гравця та режиму гри
-  $: currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
-  $: isMultiplayer = $gameState.players.filter(p => p.type === 'human').length > 1;
-  $: players = $gameState.players;
+  $: currentPlayer = $gameState ? $gameState.players[$gameState.currentPlayerIndex] : null;
+  $: isMultiplayer = $gameState ? $gameState.players.filter(p => p.type === 'human').length > 1 : false;
+  $: players = $gameState ? $gameState.players : [];
 
   /**
    * Функція для отримання кольору гравця
@@ -40,7 +41,8 @@
     modalStore.showModal({
       titleKey: 'gameBoard.penaltyInfoTitle',
       contentKey: 'gameBoard.penaltyHint',
-      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+      dataTestId: 'penalty-info-modal'
     });
   }
 
@@ -62,14 +64,16 @@
       modalStore.showModal({
         titleKey: 'gameBoard.bonusInfoTitle',
         content: bonusDetails,
-        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+        dataTestId: 'bonus-info-modal'
       });
     } else {
       // Якщо немає бонусних балів, показуємо загальну інформацію
       modalStore.showModal({
         titleKey: 'gameBoard.bonusInfoTitle',
         contentKey: 'gameBoard.bonusHint',
-        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+        dataTestId: 'bonus-info-modal'
       });
     }
   }
@@ -100,7 +104,8 @@
     modalStore.showModal({
       title: `Поточні бали ${player.name}`, // Динамічний заголовок
       content: scoreDetails,
-      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+      dataTestId: `player-score-details-modal-${player.name}`
     });
   }
 
@@ -108,12 +113,14 @@
     modalStore.showModal({
       titleKey: 'modal.scoreInfoTitle',
       contentKey: 'modal.scoreInfoContent',
-      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+      dataTestId: 'score-info-modal'
     });
   }
 
-  function cashOutAndEndGame() {
-      gameModeService.endGame('modal.gameOverReasonCashOut');
+  async function cashOutAndEndGame() {
+    const sideEffects = await gameModeService.endGame('modal.gameOverReasonCashOut');
+    sideEffectService.executeMany(sideEffects);
   }
 </script>
 
@@ -237,7 +244,7 @@
   }
 </style>
 
-{#if !$replayStore.isReplayMode}
+{#if !$replayStore.isReplayMode && $gameState}
   <div class="score-panel game-content-block" data-testid="score-panel">
     {#if isMultiplayer}
       <!-- Локальна гра - показуємо рахунок всіх гравців -->
@@ -281,8 +288,8 @@
         {/each}
         {#if $gameState.penaltyPoints > 0}
           <div class="score-row">
-            <span 
-              class="penalty-display" 
+            <span
+              class="penalty-display"
               on:click={showPenaltyInfo}
               on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
               use:customTooltip={$_('gameBoard.penaltyHint')}
@@ -309,7 +316,7 @@
           data-testid="score-value"
         >{$gameState.players[0]?.score || 0}</span>
         {#if $gameState.penaltyPoints > 0}
-          <span 
+          <span
             class="penalty-display"
             on:click={showPenaltyInfo}
             on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
@@ -325,4 +332,4 @@
       {@html isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}
     </button>
   </div>
-{/if} 
+{/if}

@@ -9,38 +9,16 @@
   import { gameState } from '$lib/stores/gameState';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
   import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
+  import { enableAllGameCheckboxesIfNeeded } from '$lib/utils/uiUtils.js';
 
   /**
    * @param {'beginner' | 'experienced' | 'pro'} mode
    */
   function selectMode(mode) {
     const shouldShowFaq = settingsStore.applyGameModePreset(mode);
-    const { penaltyPoints, boardSize, players } = get(gameState);
-    const score = players[0]?.score ?? 0;
-    if (score === 0 && penaltyPoints === 0 && boardSize !== 4) {
-      gameState.updateSettings({ boardSize: 4 });
-      gotoAfterFaq();
-    } else if (boardSize !== 4) {
-      modalStore.showModal({
-        titleKey: 'modal.resetScoreTitle',
-        contentKey: 'modal.resetScoreContent',
-        buttons: [
-          {
-            textKey: 'modal.resetScoreConfirm',
-            customClass: 'green-btn',
-            isHot: true,
-            onClick: () => {
-              gameState.updateSettings({ boardSize: 4 });
-              modalStore.closeModal();
-              gotoAfterFaq();
-            }
-          },
-          { textKey: 'modal.resetScoreCancel', onClick: modalStore.closeModal }
-        ]
-      });
-    } else {
-      gotoAfterFaq();
-    }
+    // Ініціалізуємо чекбокси після вибору режиму, забезпечуючи видимість на старті незалежно від autoHideBoard
+    enableAllGameCheckboxesIfNeeded();
+    gotoAfterFaq();
 
     function gotoAfterFaq() {
       if (shouldShowFaq) {
@@ -48,7 +26,6 @@
           modalStore.showModal({
             titleKey: 'faq.title',
             dataTestId: 'faq-modal',
-            titleDataTestId: 'modal-title',
             content: { isFaq: true },
             buttons: [
               { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },
@@ -85,7 +62,7 @@
     {$_('gameModes.pro')}
   </button>
 </div>
-<DontShowAgainCheckbox />
+<DontShowAgainCheckbox dataTestId="game-mode-modal-dont-show-again-switch" />
 
 <style>
   .game-mode-buttons {

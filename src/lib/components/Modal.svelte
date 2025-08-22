@@ -1,11 +1,12 @@
 ﻿<script lang="ts">
   import { modalState, modalStore } from '$lib/stores/modalStore.js';
+  import { playerInputStore } from '$lib/stores/playerInputStore.js';
 
+  import { get } from 'svelte/store';
   import { _, init } from 'svelte-i18n';
   import { i18nReady } from '$lib/i18n/init.js';
   import SvgIcons from './SvgIcons.svelte';
   import FAQModal from './FAQModal.svelte';
-  import { gameState } from '$lib/stores/gameState.js';
   import { onMount } from 'svelte';
   import { audioService } from '$lib/services/audioService.js';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
@@ -19,6 +20,11 @@
   let expertVolume = 0.3;
   let volumePercentage = 30;
   let isCompactScoreMode = false;
+  let processingButtons: boolean[] = [];
+
+  $: if ($modalState.buttons) {
+    processingButtons = Array($modalState.buttons.length).fill(false);
+  }
 
   onMount(() => {
     expertVolume = audioService.loadVolume();
@@ -109,13 +115,13 @@
 </script>
 
 {#if $modalState.isOpen}
-  <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.ok')} onclick={onOverlayClick} onkeydown={onModalKeydown}>
+  <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.ok')} onclick={onOverlayClick} onkeydown={onModalKeydown} data-testid="modal-overlay">
     <div class="modal-window" data-testid={$modalState.dataTestId}>
       {#if $modalState.titleKey || $modalState.title}
-      <div class="modal-header">
+      <div class="modal-header" data-testid={`${$modalState.dataTestId}-header`}>
         {#if $modalState.titleKey === 'modal.expertModeTitle'}
           <!-- Контейнер для повзунка, якому ми передаємо CSS-змінну -->
-          <div class="volume-control-container" style="--volume-percentage: {volumePercentage}%; position: relative;">
+          <div class="volume-control-container" style="--volume-percentage: {volumePercentage}%; position: relative;" data-testid="expert-mode-volume-container">
             <input
               type="range"
               min="0"
@@ -124,11 +130,12 @@
               bind:value={expertVolume}
               class="volume-slider"
               aria-label={$_('voiceSettings.volume')}
+              data-testid="expert-mode-volume-slider"
             />
-            <span class="volume-thumb-svg" style="left: calc((100% - 32px) * {expertVolume});">
+            <span class="volume-thumb-svg" style="left: calc((100% - 32px) * {expertVolume});" data-testid="expert-mode-volume-thumb">
               <SvgIcons name="boxing-glove-pictogram-1" />
             </span>
-            <span class="volume-label">{$_('voiceSettings.volumeLabel')}: {volumePercentage.toFixed(0)}%</span>
+            <span class="volume-label" data-testid="expert-mode-volume-label">{$_('voiceSettings.volumeLabel')}: {volumePercentage.toFixed(0)}%</span>
           </div>
         {/if}
 
@@ -136,7 +143,7 @@
           {#if $modalState.titleKey === 'modal.gameOverTitle'}
             <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
           {/if}
-          <h2 class="modal-title" data-testid={$modalState.titleDataTestId} data-i18n-key={$modalState.titleKey}>
+          <h2 class="modal-title" data-testid={`${$modalState.dataTestId}-title`} data-i18n-key={$modalState.titleKey}>
             {#if $i18nReady && $modalState.titleKey}
               {@html $_($modalState.titleKey, {
                 values: $modalState.content as any
@@ -149,14 +156,14 @@
 
         {#if !(($modalState.buttons && $modalState.buttons.length === 2 && $modalState.buttons.every(btn => typeof btn.onClick === 'function')) || $modalState.titleKey === 'modal.gameOverTitle' || ($modalState.buttons && $modalState.buttons.length === 1))}
           {#if $modalState.closable}
-            <button class="modal-close" use:hotkeyTooltip={{ key: 'ESC' }} onclick={() => { logService.ui('Закриття модального вікна (X)'); modalStore.closeModal(); }} data-testid="modal-btn-modal.close">×</button>
+            <button class="modal-close" use:hotkeyTooltip={{ key: 'ESC' }} onclick={() => { logService.ui('Закриття модального вікна (X)'); modalStore.closeModal(); }} data-testid={`${$modalState.dataTestId}-close-btn`}>×</button>
           {/if}
         {/if}
       </div>
       {/if}
-      <div class="modal-content" class:is-faq={typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq} bind:this={modalContent}>
+      <div class="modal-content" class:is-faq={typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq} bind:this={modalContent} data-testid={`${$modalState.dataTestId}-content`}>
         {#if typeof $modalState.content === 'object' && $modalState.content && 'reason' in $modalState.content}
-          <p class="reason" data-testid="modal-content-reason" data-i18n-key={($modalState.content as any).reasonKey}>{$modalState.content.reason}</p>
+          <p class="reason" data-testid={`${$modalState.dataTestId}-content-reason`} data-i18n-key={($modalState.content as any).reasonKey}>{$modalState.content.reason}</p>
         {/if}
         {#if $modalState.component}
           <svelte:component this={$modalState.component as any} {...$modalState.props} />
@@ -176,72 +183,71 @@
           </p>
         {/if}
 
-                 {#if ($gameState.isGameOver || ($modalState.content && typeof $modalState.content === 'object' && 'scoreDetails' in $modalState.content)) && !$modalState.component}
-           <!-- Показуємо рахунки гравців для локальної гри -->
-           {#if ($modalState.content as any)?.playerScores && ($modalState.content as any).playerScores.length > 0}
-             <div class="player-scores-container">
-               <h3>Рахунки гравців:</h3>
-               {#each ($modalState.content as any).playerScores as playerScore}
-                 <div class="player-score-row" class:winner={playerScore.isWinner} class:loser={playerScore.isLoser}>
-                   <span class="player-name">
-                     {#if playerScore.isWinner}
-                       <span class="winner-badge">🏆</span>
-                     {:else if playerScore.isLoser}
-                       <span class="loser-badge">🐚</span>
-                     {/if}
-                     {$_('modal.scoreDetails.playerScore', {
-                       values: {
-                         playerName: playerScore.playerName,
-                         score: playerScore.score
-                       }
-                     })}
-                   </span>
-                 </div>
-               {/each}
-             </div>
-           {:else}
-             <!-- Показуємо деталі рахунку тільки для гри проти комп'ютера -->
-             <div class="score-details-container" data-testid="score-details-container">
-               <div class="score-detail-row" data-testid="base-score">{$_('modal.scoreDetails.baseScore')} <span data-testid="base-score-value">{($modalState.content as any)?.scoreDetails?.baseScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span></div>
-               {#if (($modalState.content as any)?.scoreDetails?.sizeBonus ?? $gameState.sizeBonus ?? 0) > 0}
-                 <div class="score-detail-row" data-testid="size-bonus">{$_('modal.scoreDetails.sizeBonus')} <span data-testid="size-bonus-value">+{($modalState.content as any)?.scoreDetails?.sizeBonus ?? $gameState.sizeBonus ?? 0}</span></div>
-               {/if}
-               {#if (($modalState.content as any)?.scoreDetails?.blockModeBonus ?? $gameState.blockModeBonus ?? 0) > 0}
-                 <div class="score-detail-row" data-testid="block-mode-bonus">{$_('modal.scoreDetails.blockModeBonus')} <span data-testid="block-mode-bonus-value">+{($modalState.content as any)?.scoreDetails?.blockModeBonus ?? $gameState.blockModeBonus ?? 0}</span></div>
-               {/if}
-               {#if (($modalState.content as any)?.scoreDetails?.jumpBonus ?? $gameState.jumpBonus ?? 0) > 0}
-                 <div class="score-detail-row" data-testid="jump-bonus">{$_('modal.scoreDetails.jumpBonus')} <span data-testid="jump-bonus-value">+{($modalState.content as any)?.scoreDetails?.jumpBonus ?? $gameState.jumpBonus ?? 0}</span></div>
-               {/if}
-               {#if (($modalState.content as any)?.scoreDetails?.noMovesBonus ?? $gameState.noMovesBonus ?? 0) > 0}
-                 <div class="score-detail-row" data-testid="no-moves-bonus">{$_('modal.scoreDetails.noMovesBonus')} <span data-testid="no-moves-bonus-value">+{($modalState.content as any)?.scoreDetails?.noMovesBonus ?? $gameState.noMovesBonus ?? 0}</span></div>
-               {/if}
-               {#if (($modalState.content as any)?.scoreDetails?.distanceBonus ?? $gameState.distanceBonus ?? 0) > 0}
-                 <div class="score-detail-row" data-testid="distance-bonus">{$_('modal.scoreDetails.distanceBonus')} <span data-testid="distance-bonus-value">+{($modalState.content as any)?.scoreDetails?.distanceBonus ?? $gameState.distanceBonus ?? 0}</span></div>
-               {/if}
-               {#if ($modalState.titleKey === 'modal.gameOverTitle' && (($modalState.content as any)?.scoreDetails?.finishBonus ?? $gameState.finishBonus ?? 0) > 0)}
-                 <div class="score-detail-row" data-testid="finish-bonus">{$_('modal.scoreDetails.finishBonus')} <span data-testid="finish-bonus-value">+{($modalState.content as any)?.scoreDetails?.finishBonus ?? $gameState.finishBonus ?? 0}</span></div>
-               {/if}
-               {#if (($modalState.content as any)?.scoreDetails?.totalPenalty ?? $gameState.totalPenalty ?? 0) > 0}
-                 <div class="score-detail-row penalty" data-testid="total-penalty">{$_('modal.scoreDetails.penalty')} <span data-testid="total-penalty-value">-{(($modalState.content as any)?.scoreDetails?.totalPenalty ?? $gameState.totalPenalty ?? 0)}</span></div>
-               {/if}
-             </div>
-             <div class="final-score-container" class:compact={isCompactScoreMode}>
-               {#if isCompactScoreMode}
-                 <div class="final-score-compact">
-                   <span class="final-score-label-inline">{$_('modal.scoreDetails.finalScore')}</span>
-                   <span class="final-score-value-inline" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span>
-                 </div>
-               {:else}
-                 <div class="final-score-label">{$_('modal.scoreDetails.finalScore')}</div>
-                 <div class="final-score-value" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</div>
-               {/if}
-             </div>
-           {/if}
-         {/if}
+                  {#if ($modalState.content && typeof $modalState.content === 'object' && 'scoreDetails' in $modalState.content) && !$modalState.component}
+            <!-- Показуємо рахунки гравців для локальної гри -->
+            {#if ($modalState.content as any)?.playerScores && ($modalState.content as any).playerScores.length > 0}
+              <div class="player-scores-container">
+                <h3>Рахунки гравців:</h3>
+                {#each ($modalState.content as any).playerScores as playerScore}
+                  <div class="player-score-row" class:winner={playerScore.isWinner} class:loser={playerScore.isLoser}>
+                    <span class="player-name">
+                      {#if playerScore.isWinner}
+                        <span class="winner-badge">🏆</span>
+                      {:else if playerScore.isLoser}
+                        <span class="loser-badge">🐚</span>
+                      {/if}
+                      {$_('modal.scoreDetails.playerScore', {
+                        values: {
+                          playerName: playerScore.playerName,
+                          score: playerScore.score
+                        }
+                      })}
+                    </span>
+                  </div>
+                {/each}
+              </div>
+            {:else}
+              <!-- Показуємо деталі рахунку тільки для гри проти комп'ютера -->
+              <div class="score-details-container" data-testid="score-details-container">
+                <div class="score-detail-row" data-testid="base-score">{$_('modal.scoreDetails.baseScore')} <span data-testid="base-score-value">{($modalState.content as any)?.scoreDetails?.baseScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span></div>
+                {#if ($modalState.content as any)?.scoreDetails?.sizeBonus > 0}
+                  <div class="score-detail-row" data-testid="size-bonus">{$_('modal.scoreDetails.sizeBonus')} <span data-testid="size-bonus-value">+{($modalState.content as any)?.scoreDetails?.sizeBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.blockModeBonus > 0}
+                  <div class="score-detail-row" data-testid="block-mode-bonus">{$_('modal.scoreDetails.blockModeBonus')} <span data-testid="block-mode-bonus-value">+{($modalState.content as any)?.scoreDetails?.blockModeBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.jumpBonus > 0}
+                  <div class="score-detail-row" data-testid="jump-bonus">{$_('modal.scoreDetails.jumpBonus')} <span data-testid="jump-bonus-value">+{($modalState.content as any)?.scoreDetails?.jumpBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.noMovesBonus > 0}
+                  <div class="score-detail-row" data-testid="no-moves-bonus">{$_('modal.scoreDetails.noMovesBonus')} <span data-testid="no-moves-bonus-value">+{($modalState.content as any)?.scoreDetails?.noMovesBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.distanceBonus > 0}
+                  <div class="score-detail-row" data-testid="distance-bonus">{$_('modal.scoreDetails.distanceBonus')} <span data-testid="distance-bonus-value">+{($modalState.content as any)?.scoreDetails?.distanceBonus}</span></div>
+                {/if}
+                {#if ($modalState.titleKey === 'modal.gameOverTitle' && ($modalState.content as any)?.scoreDetails?.finishBonus > 0)}
+                  <div class="score-detail-row" data-testid="finish-bonus">{$_('modal.scoreDetails.finishBonus')} <span data-testid="finish-bonus-value">+{($modalState.content as any)?.scoreDetails?.finishBonus}</span></div>
+                {/if}
+                {#if ($modalState.content as any)?.scoreDetails?.totalPenalty > 0}
+                  <div class="score-detail-row penalty" data-testid="total-penalty">{$_('modal.scoreDetails.penalty')} <span data-testid="total-penalty-value">-{(($modalState.content as any)?.scoreDetails?.totalPenalty)}</span></div>
+                {/if}
+              </div>
+              <div class="final-score-container" class:compact={isCompactScoreMode}>
+                {#if isCompactScoreMode}
+                  <div class="final-score-compact">
+                    <span class="final-score-label-inline">{$_('modal.scoreDetails.finalScore')}</span>
+                    <span class="final-score-value-inline" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</span>
+                  </div>
+                {:else}
+                  <div class="final-score-label">{$_('modal.scoreDetails.finalScore')}</div>
+                  <div class="final-score-value" data-testid="final-score-value">{($modalState.content as any)?.scoreDetails?.totalScore ?? ($modalState.content as any)?.scoreDetails?.score ?? 0}</div>
+                {/if}
+              </div>
+            {/if}
+          {/if}
       </div>
       <div class="modal-action-buttons">
         {#each $modalState.buttons as btn, i (i)}
-          {@const useTooltip = btn.hotKey ? hotkeyTooltip : () => {}}
           {#if btn.isHot && !$modalState.buttons.slice(0, i).some(b => b.isHot)}
             <button
               class="modal-btn-generic"
@@ -250,22 +256,25 @@
               class:green-btn={btn.customClass === 'green-btn'}
               class:danger-btn={btn.customClass === 'danger-btn'}
               bind:this={hotBtn}
-              use:useTooltip={{ key: btn.hotKey }}
-              onclick={() => {
+              use:hotkeyTooltip={{ key: btn.hotKey }}
+              onclick={async () => {
+                if (processingButtons[i] || get(playerInputStore).isMoveInProgress) return;
+                processingButtons[i] = true;
+
                 logService.action(`Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`);
-                logService.ui(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`);
-                logService.ui('Modal button clicked (hot):', { textKey: btn.textKey, text: btn.text, onClick: btn.onClick });
                 if (btn.onClick) {
-                  logService.ui('Executing onClick handler...');
-                  btn.onClick();
+                  await btn.onClick();
                 } else {
-                  logService.ui('No onClick handler, closing modal');
                   modalStore.closeModal();
                 }
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
-              data-testid={btn.dataTestId || `modal-btn-${btn.textKey || btn.text}`}
+              data-testid={btn.dataTestId || `${$modalState.dataTestId}-${btn.textKey || btn.text}-btn`}
+              disabled={btn.disabled || $playerInputStore.isMoveInProgress || processingButtons[i]}
             >
+              <!-- НАВІЩО: Додано `$playerInputStore.isMoveInProgress` для глобального блокування кнопок.
+                   Це запобігає подвійним клікам під час виконання асинхронних операцій
+                   і вирішує проблему стану гонитви (race condition) в автотестах. -->
               {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
             </button>
           {:else}
@@ -275,28 +284,33 @@
               class:blue-btn={btn.customClass === 'blue-btn'}
               class:green-btn={btn.customClass === 'green-btn'}
               class:danger-btn={btn.customClass === 'danger-btn'}
-              use:useTooltip={{ key: btn.hotKey }}
-              onclick={() => {
+              use:hotkeyTooltip={{ key: btn.hotKey }}
+              onclick={async () => {
+                if (processingButtons[i] || get(playerInputStore).isMoveInProgress) return;
+                processingButtons[i] = true;
+
                 logService.action(`Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`);
-                logService.ui(`Клік по кнопці модалки: ${btn.textKey ? $_(btn.textKey) : btn.text}`);
-                logService.ui('Modal button clicked (regular):', { textKey: btn.textKey, text: btn.text, onClick: btn.onClick });
                 if (btn.onClick) {
-                  logService.ui('Executing onClick handler...');
-                  btn.onClick();
+                  await btn.onClick();
                 } else {
-                  logService.ui('No onClick handler, closing modal');
                   modalStore.closeModal();
                 }
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
-              data-testid={btn.dataTestId || `modal-btn-${btn.textKey || btn.text}`}
+              data-testid={btn.dataTestId || `${$modalState.dataTestId}-${btn.textKey || btn.text}-btn`}
+              disabled={btn.disabled || $playerInputStore.isMoveInProgress || processingButtons[i]}
             >
+              <!-- НАВІЩО: Додано `$playerInputStore.isMoveInProgress` для глобального блокування кнопок.
+                   Це запобігає подвійним клікам під час виконання асинхронних операцій
+                   і вирішує проблему стану гонитви (race condition) в автотестах. -->
               {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
             </button>
           {/if}
         {/each}
-        {#if $modalState.titleKey === 'gameModes.title' || $modalState.titleKey === 'modal.expertModeTitle'}
-          <DontShowAgainCheckbox />
+        {#if $modalState.titleKey === 'gameModes.title'}
+          <DontShowAgainCheckbox modalType="gameMode" dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} />
+        {:else if $modalState.titleKey === 'modal.expertModeTitle'}
+          <DontShowAgainCheckbox modalType="expertMode" dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} />
         {/if}
         <slot />
       </div>

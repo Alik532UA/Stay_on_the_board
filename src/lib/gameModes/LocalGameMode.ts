@@ -7,13 +7,13 @@ import { playerInputStore } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { getAvailableMoves } from '$lib/utils/boardUtils';
 import { gameOverStore } from '$lib/stores/gameOverStore';
-import { stateManager } from '$lib/services/stateManager';
 import { userActionService } from '$lib/services/userActionService';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { logService } from '$lib/services/logService';
 import { lastPlayerMove } from '$lib/stores/derivedState';
+import { animationStore } from '$lib/stores/animationStore';
 
 export class LocalGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
@@ -81,18 +81,16 @@ export class LocalGameMode extends BaseGameMode {
     ];
   }
 
-  private async _continueLocalGameAfterNoMoves(): Promise<SideEffect[]> {
-    await stateManager.applyChanges(
-      'CONTINUE_LOCAL_GAME',
-      { cellVisitCounts: {} },
-      'Clearing blocked cells and continuing local game'
-    );
+  async continueAfterNoMoves(): Promise<SideEffect[]> {
+    logService.GAME_MODE('[LocalGameMode] continueAfterNoMoves called');
+    gameState.update(state => ({...state, cellVisitCounts: {}}));
+    animationStore.reset();
     this.advanceToNextPlayer();
     return [{ type: 'ui/closeModal' }];
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]> {
-    logService.logic('handleNoMoves is not applicable in LocalGameMode');
+    logService.GAME_MODE('handleNoMoves is not applicable in LocalGameMode');
     return [];
   }
 
@@ -111,11 +109,7 @@ export class LocalGameMode extends BaseGameMode {
       gameState.snapshotScores();
     }
 
-    await stateManager.applyChanges(
-      'ADVANCE_TURN',
-      { currentPlayerIndex: nextPlayerIndex },
-      `Turn advanced to player ${nextPlayerIndex}`
-    );
+    gameState.update(state => ({...state, currentPlayerIndex: nextPlayerIndex}));
 
     return this.checkComputerTurn();
   }
