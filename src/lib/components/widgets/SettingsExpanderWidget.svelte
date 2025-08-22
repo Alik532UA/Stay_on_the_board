@@ -109,7 +109,7 @@
 
   function selectBlockCount(count: number) {
     logService.action(`Click: "Вибір кількості блоків: ${count}" (SettingsExpanderWidget)`);
-    if (count > 0 && get(settingsStore).showExpertModeWarningModal) {
+    if (count > 0 && get(settingsStore).showDifficultyWarningModal) {
       modalStore.showModal({
         titleKey: 'modal.expertModeTitle',
         dataTestId: 'expert-mode-modal',
@@ -121,7 +121,7 @@
         closeOnOverlayClick: true,
         props: {
           showDontShowAgain: true,
-          dontShowAgainBinding: () => settingsStore.updateSettings({ showExpertModeWarningModal: false })
+          dontShowAgainBinding: () => settingsStore.updateSettings({ showDifficultyWarningModal: false })
         }
       });
     } else {

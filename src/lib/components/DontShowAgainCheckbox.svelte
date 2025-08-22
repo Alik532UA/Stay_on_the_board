@@ -12,7 +12,7 @@
     if (modalType === 'gameMode') {
       dontShowAgain = !$settingsStore.showGameModeModal;
     } else if (modalType === 'expertMode') {
-      dontShowAgain = !$settingsStore.showExpertModeWarningModal;
+      dontShowAgain = !$settingsStore.showDifficultyWarningModal;
     }
   }
 
@@ -22,7 +22,7 @@
       if (modalType === 'gameMode') {
         settingsStore.updateSettings({ showGameModeModal: !input.checked });
       } else if (modalType === 'expertMode') {
-        settingsStore.updateSettings({ showExpertModeWarningModal: !input.checked });
+        settingsStore.updateSettings({ showDifficultyWarningModal: !input.checked });
       }
     }
   }
