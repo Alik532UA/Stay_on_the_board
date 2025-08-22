@@ -1,17 +1,13 @@
+
 **Правила**: Ознайомся та дотримуйся правил з @/docs/my-notes/AI_AGENT_RULES.md 
 **Мова**: мова роздумів та відповіді в чаті лише українська. Англійською не пиши, а заощаджуй токени.
 **Опис дії**: Перейди на стислий режим: мінімум пояснень (приблизно до 200 символів, але бажано 30-70 символів), максимум дій.
 
 Поточнє завдання:
-виправити баг:
-
-1. в settings-expander__content вибрати 1 чи 2 чи 3
-Актуальний та очікуваний результат: модальне вікно expert-mode-modal з попередженням з'явилось
-2. вибрати чекбокс expert-mode-modal-dont-show-again-switch
-3. в settings-expander__content вибрати повторно вибрати 1 чи 2 чи 3
-Актуальний результат: модальне вікно expert-mode-modal з попередженням з'явилось
-Очікуваний результат: модальне вікно expert-mode-modal з попередженням НЕ з'явилось
-
+Згідно з документацією, коли чекбокс "Автоматично приховувати дошку" увімкнений, очікується наступна поведінка:
+Після ходу гравця дошка автоматично приховується.
+але фактично на сайті це не працаює
+треба fix
 
 ---
 
@@ -27,26 +23,6 @@
 7.  **Простота та Читабельність (KISS):** Чи є надмірно складні рішення? Наскільки код зрозумілий (якість іменування)?
 8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
 9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
-
----
-
-client:733 [vite] connecting...
-client:827 [vite] connected.
-logService.js:129 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
-init.js:31 ✅ i18n ініціалізовано успішно
-logService.js:100 [GAME_MODE] Setting game mode to: vs-computer
-logService.js:98 [STATE] Оновлення налаштувань. Поточний стан: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
-logService.js:98 [STATE] Нові налаштування: {blockModeEnabled: false, autoHideBoard: false, lockSettings: false, showBoard: true, showPiece: true, …}
-logService.js:98 [STATE] Об'єднані налаштування: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
-logService.js:98 [STATE] Стан для збереження в localStorage: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
-logService.js:98 [STATE] Оновлення налаштувань. Поточний стан: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
-logService.js:98 [STATE] Нові налаштування: {showGameModeModal: false}
-logService.js:98 [STATE] Об'єднані налаштування: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
-logService.js:98 [STATE] Стан для збереження в localStorage: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
-logService.js:98 [STATE] Оновлення налаштувань. Поточний стан: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
-logService.js:98 [STATE] Нові налаштування: {blockOnVisitCount: 1}
-logService.js:98 [STATE] Об'єднані налаштування: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
-logService.js:98 [STATE] Стан для збереження в localStorage: {version: 2, showMoves: true, showBoard: true, language: 'uk', theme: 'dark', …}
 
 
 ---

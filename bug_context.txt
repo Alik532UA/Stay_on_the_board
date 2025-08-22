@@ -1,3 +1,4 @@
+==== START OF FILE: src/lib/stores/settingsStore.ts ====
 import { writable, get } from 'svelte/store';
 import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService.js';
 import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
@@ -339,7 +340,6 @@ function createSettingsStore() {
     toggleAutoHideBoard: () => {
       update(state => {
         const newState = !state.autoHideBoard;
-        logService.state('Автоматичне приховування дошки змінено на ' + newState);
         if (isBrowser) localStorage.setItem('autoHideBoard', String(newState));
         return { ...state, autoHideBoard: newState };
       });
@@ -413,7 +413,6 @@ function createSettingsStore() {
           showFaq = true;
           break;
         case 'experienced':
-          // autoHideBoard вмикається для experienced/pro для стимулювання гри по пам'яті, інтегруючись з gameState для виявлення ходів
           settingsToApply = { showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
           break;
         case 'pro':
@@ -442,3 +441,363 @@ function createSettingsStore() {
 }
 
 export const settingsStore = createSettingsStore();
+
+==== END OF FILE: src/lib/stores/settingsStore.ts ====
+
+
+==== START OF FILE: src/lib/stores/uiEffectsStore.ts ====
+import { writable, get } from 'svelte/store';
+import { settingsStore } from './settingsStore.js';
+
+/**
+ * Store для централізованого керування побічними ефектами UI (таймери, затримки, автоприховування тощо).
+ */
+
+function createUiEffectsStore() {
+  let autoHideTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  /**
+   * Автоматично приховати дошку після зміни позиції фігури.
+   * @param delayMs - затримка у мілісекундах (за замовчуванням 0)
+   */
+  function autoHideBoard(delayMs = 0) {
+    if (autoHideTimeout) clearTimeout(autoHideTimeout);
+    autoHideTimeout = setTimeout(() => {
+      if (get(settingsStore).showBoard) {
+        settingsStore.toggleShowBoard(false);
+      }
+    }, delayMs);
+  }
+
+  return {
+    autoHideBoard
+  };
+}
+
+export const uiEffectsStore = createUiEffectsStore(); 
+
+==== END OF FILE: src/lib/stores/uiEffectsStore.ts ====
+
+
+==== START OF FILE: src/lib/components/widgets/BoardWrapperWidget.svelte ====
+<!--
+ВАЖЛИВО! Архітектурний принцип: пауза (затримка) після ходу гравця реалізується лише у візуалізації дошки (animationStore),
+логіка гри та center-info оновлюються миттєво і не залежать від цієї паузи. Це гарантує SoC, SSoT, UDF.
+-->
+<script lang="ts">
+  // ВАЖЛИВО! Заборонено напряму змінювати moveQueue або board з UI-компонента!
+  // Компонент лише спостерігає за станом гри і ініціює анімацію через animationStore.
+  // Всі зміни логіки гри — лише через оркестратор/сервіси.
+  //
+  // IMPORTANT: Never mutate moveQueue or board directly from UI! This component only observes state and triggers animation.
+  import { gameState } from '$lib/stores/gameState.js';
+  import { settingsStore } from '$lib/stores/settingsStore.js';
+
+  import { modalStore } from '$lib/stores/modalStore.js';
+  import SvgIcons from '../SvgIcons.svelte';
+  import { safeScale } from '$lib/utils/transitions.ts';
+  import { quintOut } from 'svelte/easing';
+  import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
+  import { animationStore } from '$lib/stores/animationStore.js';
+  import { visualPosition, visualCellVisitCounts, visualBoardState, currentPlayer, availableMoves } from '$lib/stores/derivedState.ts';
+  import { derived } from 'svelte/store';
+  import { get } from 'svelte/store';
+  import { onMount } from 'svelte';
+  import { uiEffectsStore } from '$lib/stores/uiEffectsStore.js';
+  import BoardCell from './BoardCell.svelte';
+  import PlayerPiece from './PlayerPiece.svelte';
+  import { logService } from '$lib/services/logService.js';
+
+  const boardSize = derived(gameState, $gameState => $gameState ? Number($gameState.boardSize) : 0);
+  
+  // Слідкуємо, чи був зроблений хід гравця (moveQueue останній елемент - player: 1)
+  const shouldHideBoard = derived([
+    settingsStore,
+    gameState
+  ], ([$settingsStore, $gameState]) => {
+    if (!$gameState || !$settingsStore.autoHideBoard) return false;
+    const lastMove = $gameState.moveQueue?.[$gameState.moveQueue.length - 1];
+    return lastMove && lastMove.player === 1;
+  });
+
+  // --- Додаємо автозапуск чекбоксів перед першим ходом користувача ---
+  // НАВІЩО: Гарантуємо, що всі візуальні опції (showBoard, showPiece, showMoves) будуть активовані для коректного UX при старті нової гри.
+  function enableAllGameCheckboxesIfNeeded() {
+    const s = get(settingsStore);
+    let changed = false;
+    if (!s.showBoard) { settingsStore.toggleShowBoard(true); changed = true; }
+    if (!s.showPiece) { settingsStore.toggleShowPiece(); changed = true; }
+    if (!s.showMoves) { settingsStore.toggleShowMoves(); changed = true; }
+    // Якщо showPiece був вимкнений, showMoves міг автоматично вимкнутись, тому ще раз вмикаємо
+    if (!get(settingsStore).showMoves) { settingsStore.toggleShowMoves(); }
+  }
+
+  onMount(() => {
+    const unsubscribe = gameState.subscribe(($gameState) => {
+      if (!$gameState) return;
+
+      // НАВІЩО: Зберігаємо попередню позицію гравця для коректного визначення зміни стану та автоприховування дошки.
+      let lastRow = $gameState.playerRow;
+      let lastCol = $gameState.playerCol;
+
+      // Вмикаємо чекбокси при старті нової гри
+      if ($gameState.moveHistory.length === 1) {
+        enableAllGameCheckboxesIfNeeded();
+      }
+
+      // НАВІЩО: Реакція на зміну позиції гравця для автоприховування дошки та повторного вмикання чекбоксів після скидання гри.
+      if (
+        get(settingsStore).autoHideBoard &&
+        get(settingsStore).showBoard &&
+        ($gameState.playerRow !== lastRow || $gameState.playerCol !== lastCol) &&
+        $gameState.moveHistory.length > 1
+      ) {
+        lastRow = $gameState.playerRow;
+        lastCol = $gameState.playerCol;
+        uiEffectsStore.autoHideBoard(0);
+      } else {
+        lastRow = $gameState.playerRow;
+        lastCol = $gameState.playerCol;
+      }
+      // --- Після автоприховування дошки ---
+      // Вмикаємо чекбокси тільки після початку гри (є ходи в історії), а не при ініціалізації
+      if ($gameState.moveQueue && $gameState.moveQueue.length === 0 && $gameState.moveHistory.length > 1) {
+        enableAllGameCheckboxesIfNeeded();
+      }
+    });
+    return unsubscribe;
+  });
+
+  let prevGameId: number|null = null;
+  // Видаляємо prevMoveQueueLength, оскільки анімація тепер керується через animationStore
+  // НАВІЩО: Відстежуємо зміну gameId для скидання стану при новій грі.
+  gameState.subscribe(($gameState) => {
+    if (!$gameState) {
+      prevGameId = null;
+      return;
+    }
+    // Якщо нова гра — скидаємо лічильник
+    if ($gameState.gameId !== prevGameId) {
+      prevGameId = $gameState.gameId;
+      logService.ui('[BoardWrapperWidget] Нова гра, скидаємо стан');
+    }
+    // Анімація тепер керується через animationStore.visualMoveQueue
+    // Не потрібно викликати animateLastMove тут
+  });
+
+  const showAvailableMoves = derived(
+    [settingsStore, animationStore, currentPlayer],
+    ([$settingsStore, $animationStore, $currentPlayer]) => {
+      return (
+        $settingsStore.showMoves &&
+        !$animationStore.isAnimating &&
+        $currentPlayer?.type === 'human' &&
+        $animationStore.isComputerMoveCompleted
+      );
+    }
+  );
+
+  function getMoveInfo(row: number, col: number) {
+    if (!$showAvailableMoves) {
+      return { isAvailable: false, isPenalty: false };
+    }
+
+    const move = get(availableMoves).find(m => m.row === row && m.col === col);
+
+    if (move) {
+      return {
+        isAvailable: true,
+        isPenalty: move.isPenalty || false
+      };
+    }
+    
+    return { isAvailable: false, isPenalty: false };
+  }
+
+  function showBoardClickHint(e: Event) {
+    if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+    modalStore.showModal({
+      titleKey: 'modal.boardClickTitle',
+      contentKey: 'modal.boardClickContent',
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+      dataTestId: 'board-click-modal'
+    });
+  }
+
+  function onCellRightClick(event: MouseEvent, row: number, col: number): void {
+    event.preventDefault();
+    if ($gameState && $settingsStore.blockModeEnabled && !(row === $gameState.playerRow && col === $gameState.playerCol)) {
+      const visualCounts = get(visualCellVisitCounts);
+      const blocked = isCellBlocked(row, col, visualCounts, $settingsStore);
+      logService.ui(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`);
+    }
+  }
+
+</script>
+
+{#if $gameState}
+  {#key $gameState.gameId}
+    {#if $settingsStore.showBoard}
+      <div
+        class="board-bg-wrapper game-content-block{ $shouldHideBoard ? ' hidden' : '' }"
+        style="--board-size: {$boardSize}"
+        onclick={showBoardClickHint}
+        onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
+        role="button"
+        tabindex="0"
+        aria-label="Ігрове поле"
+        transition:safeScale={{ duration: 600, easing: quintOut }}
+      >
+        <div class="game-board" style="--board-size: {$boardSize}" role="grid" data-testid="game-board">
+          {#each Array($boardSize) as _, rowIdx (rowIdx)}
+            {#each Array($boardSize) as _, colIdx (colIdx)}
+              {@const moveInfo = getMoveInfo(rowIdx, colIdx)}
+              <BoardCell
+                {rowIdx}
+                {colIdx}
+                visualCellVisitCounts={$visualCellVisitCounts}
+                settingsStore={$settingsStore}
+                isAvailable={moveInfo.isAvailable}
+                isPenalty={moveInfo.isPenalty}
+                visualPosition={$visualPosition}
+                boardState={$visualBoardState}
+                gameState={$gameState}
+                on:cellRightClick={(e) => onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
+              />
+            {/each}
+          {/each}
+          
+          {#if $settingsStore.showPiece && $visualPosition.row !== null && $visualPosition.col !== null}
+            <PlayerPiece
+              row={$visualPosition.row}
+              col={$visualPosition.col}
+              boardSize={$boardSize}
+            />
+          {/if}
+        </div>
+      </div>
+    {/if}
+  {/key}
+{/if}
+
+<style>
+
+</style>
+
+==== END OF FILE: src/lib/components/widgets/BoardWrapperWidget.svelte ====
+
+
+==== START OF FILE: src/lib/components/GameModeModal.svelte ====
+<script>
+  import { _ } from 'svelte-i18n';
+  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
+  import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
+  import { gameOrchestrator } from '$lib/gameOrchestrator';
+  import { get } from 'svelte/store';
+  import { gameState } from '$lib/stores/gameState';
+  import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
+  import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
+
+  /**
+   * @param {'beginner' | 'experienced' | 'pro'} mode
+   */
+  function selectMode(mode) {
+    const shouldShowFaq = settingsStore.applyGameModePreset(mode);
+    gotoAfterFaq();
+
+    function gotoAfterFaq() {
+      if (shouldShowFaq) {
+        setTimeout(() => {
+          modalStore.showModal({
+            titleKey: 'faq.title',
+            dataTestId: 'faq-modal',
+            content: { isFaq: true },
+            buttons: [
+              { textKey: 'rulesPage.title', onClick: () => { goto(`${base}/rules`); modalStore.closeModal(); }, customClass: 'blue-btn' },
+              { textKey: 'modal.ok', primary: true, isHot: true, onClick: () => { modalStore.closeModal(); goto(`${base}/game/vs-computer`); } }
+            ]
+          });
+        }, 100);
+      } else {
+        goto(`${base}/game/vs-computer`);
+      }
+    }
+  }
+
+  let dontShowAgain = false;
+  $: dontShowAgain = !$settingsStore.showGameModeModal;
+
+  /** @param {Event} event */
+  function handleCheckboxChange(event) {
+    const input = /** @type {HTMLInputElement|null} */ (event.currentTarget);
+    if (input && typeof input.checked === 'boolean') {
+      settingsStore.updateSettings({ showGameModeModal: !input.checked });
+    }
+  }
+</script>
+
+<div class="game-mode-buttons" use:hotkeysAndTooltips>
+  <button class="modal-btn-generic green-btn" on:click={() => selectMode('beginner')} data-testid="beginner-mode-btn">
+    {$_('gameModes.beginner')}
+  </button>
+  <button class="modal-btn-generic blue-btn" on:click={() => selectMode('experienced')} data-testid="experienced-mode-btn">
+    {$_('gameModes.experienced')}
+  </button>
+  <button class="modal-btn-generic danger-btn" on:click={() => selectMode('pro')} data-testid="pro-mode-btn">
+    {$_('gameModes.pro')}
+  </button>
+</div>
+<DontShowAgainCheckbox dataTestId="game-mode-modal-dont-show-again-switch" />
+
+<style>
+  .game-mode-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 16px;
+  }
+</style> 
+
+==== END OF FILE: src/lib/components/GameModeModal.svelte ====
+
+
+==== START OF FILE: docs/elements/checkbox-auto-hide-board.md ====
+# Елемент: Чекбокс "Автоматично приховувати дошку"
+
+## Призначення (Purpose)
+
+Активує режим, в якому ігрова дошка автоматично приховується після ходу гравця, стимулюючи гру по пам'яті.
+
+## Джерело Правда (SSoT) та Залежності від Стану (State Dependencies)
+
+-   **`settingsStore.autoHideBoard`**: Основне джерело стану.
+
+## Поведінка (Behavior)
+
+-   Сам чекбокс лише встановлює прапорець `autoHideBoard` у `settingsStore`.
+-   **Побічний ефект** цієї дії обробляється в іншому місці (наприклад, у `BoardWrapperWidget.svelte` або централізованому `uiEffectsStore`).
+-   Слухач (`subscriber`) в `BoardWrapperWidget` відстежує зміни в `gameState.playerRow`/`playerCol`. Якщо позиція змінилася (тобто гравець зробив хід) і `$settingsStore.autoHideBoard` є `true`, він викликає `settingsStore.toggleShowBoard(false)` з невеликою затримкою.
+
+## Взаємодія з Користувачем (User Interaction)
+
+-   **Клік**: Викликає `settingsStore.toggleAutoHideBoard()`.
+
+## Архітектурні Нотатки та UI/UX
+
+-   **Відмінний приклад SoC**: Компонент чекбокса не містить складної логіки з таймерами чи підписками на стан гри. Він лише змінює налаштування. Окремий, більш високорівневий компонент (`BoardWrapperWidget`) відповідає за реалізацію *ефекту* цього налаштування. Це робить обидва компоненти простішими та більш сфокусованими.
+-   Затримка перед приховуванням важлива для UX, щоб гравець встиг побачити результат свого ходу перед тим, як дошка зникне.
+
+## Критерії Прийняття (Acceptance Criteria)
+
+-   [ ] Коли чекбокс увімкнений, після ходу гравця дошка автоматично приховується.
+-   [ ] Коли чекбокс вимкнений, дошка залишається видимою після ходу гравця.
+-   [ ] При старті нової гри дошка завжди видима, незалежно від цього налаштування.
+
+==== END OF FILE: docs/elements/checkbox-auto-hide-board.md ====
+
+
+==== FILE NOT FOUND: src/lib/stores/gameState.js ====
+
+
