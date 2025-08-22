@@ -60,7 +60,8 @@
       modalStore.showModal({
         titleKey: 'modal.confirmMoveHintTitle',
         contentKey: 'modal.confirmMoveHintContent',
-        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+        dataTestId: 'confirm-move-hint-modal'
       });
       return;
     }
@@ -98,8 +99,6 @@
 <div class="game-controls-panel" data-testid="controls-panel">
   <div class="select-direction-label">{$_('gameControls.selectDirectionAndDistance')}</div>
   <DirectionControls
-    {selectedDirection}
-    {selectedDistance}
     availableDirections={[
       'up-left', 'up', 'up-right',
       'left', null, 'right',
@@ -107,9 +106,8 @@
     ]}
     distanceRows={$distanceRows}
     isPlayerTurn={$isPlayerTurn}
-    isMoveInProgress={false}
     blockModeEnabled={$settingsStore.blockModeEnabled}
-    confirmButtonBlocked={$isConfirmButtonDisabled}
+    isConfirmDisabled={$isConfirmButtonDisabled}
     centerInfoProps={centerInfoProps}
     on:direction={handleDirection}
     on:distance={handleDistance}

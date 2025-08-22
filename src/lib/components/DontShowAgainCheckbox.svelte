@@ -4,7 +4,7 @@
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { logService } from '$lib/services/logService.js';
   import { onMount } from 'svelte';
-  export let dataTestId = 'dont-show-again-switch';
+  export let dataTestId = '';
   let dontShowAgain = false;
   $: dontShowAgain = !$settingsStore.showGameModeModal;
 

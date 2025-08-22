@@ -57,6 +57,7 @@
     logService.action('Click: "Очистити кеш" (MainMenu)');
     modalStore.showModal({
       titleKey: 'mainMenu.clearCacheModal.title',
+      dataTestId: 'clear-cache-modal',
       component: ClearCacheOptions,
       buttons: [
         { textKey: 'modal.cancel', onClick: () => modalStore.closeModal() }
@@ -110,7 +111,6 @@
           modalStore.showModal({
             titleKey: 'mainMenu.gameModeModal.title',
             dataTestId: 'game-mode-modal',
-            titleDataTestId: 'game-mode-modal-title',
             component: GameModeModal,
             buttons: [
               {

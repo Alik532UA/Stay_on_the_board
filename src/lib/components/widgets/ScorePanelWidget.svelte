@@ -41,7 +41,8 @@
     modalStore.showModal({
       titleKey: 'gameBoard.penaltyInfoTitle',
       contentKey: 'gameBoard.penaltyHint',
-      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+      dataTestId: 'penalty-info-modal'
     });
   }
 
@@ -63,14 +64,16 @@
       modalStore.showModal({
         titleKey: 'gameBoard.bonusInfoTitle',
         content: bonusDetails,
-        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+        dataTestId: 'bonus-info-modal'
       });
     } else {
       // Якщо немає бонусних балів, показуємо загальну інформацію
       modalStore.showModal({
         titleKey: 'gameBoard.bonusInfoTitle',
         contentKey: 'gameBoard.bonusHint',
-        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+        dataTestId: 'bonus-info-modal'
       });
     }
   }
@@ -101,7 +104,8 @@
     modalStore.showModal({
       title: `Поточні бали ${player.name}`, // Динамічний заголовок
       content: scoreDetails,
-      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+      dataTestId: `player-score-details-modal-${player.name}`
     });
   }
 
@@ -109,7 +113,8 @@
     modalStore.showModal({
       titleKey: 'modal.scoreInfoTitle',
       contentKey: 'modal.scoreInfoContent',
-      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }]
+      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+      dataTestId: 'score-info-modal'
     });
   }
 

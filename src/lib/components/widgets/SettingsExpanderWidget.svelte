@@ -112,6 +112,7 @@
     if (count > 0) {
       modalStore.showModal({
         titleKey: 'modal.expertModeTitle',
+        dataTestId: 'expert-mode-modal',
         contentKey: 'modal.expertModeContent',
         buttons: [
           { textKey: 'modal.expertModeConfirm', primary: true, isHot: true, onClick: () => { settingsStore.updateSettings({ blockOnVisitCount: count }); modalStore.closeModal(); } },

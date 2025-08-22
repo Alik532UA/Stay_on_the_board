@@ -21,10 +21,11 @@
   export const isPlayerTurn: boolean = false;
   export let blockModeEnabled: boolean = false;
   export let centerInfoProps: any = {};
+  export let isConfirmDisabled: boolean = false;
   
   const dispatch = createEventDispatcher();
   
-  $: confirmButtonBlocked = !selectedDirection || !selectedDistance;
+  $: confirmButtonBlocked = isConfirmDisabled || !selectedDirection || !selectedDistance;
 
   /**
    * @param {number} dist
