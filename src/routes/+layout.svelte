@@ -24,6 +24,7 @@
 	import { get } from 'svelte/store';
 	import { initializeI18n, i18nReady } from '$lib/i18n/init.js';
 	import { appVersion } from '$lib/stores/versionStore.js';
+	import { initializeStoreSync } from '$lib/services/storeSyncService';
 	import { assets } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { base } from '$app/paths';
@@ -62,6 +63,7 @@
 			}
 			settingsStore.init(); // <-- Ініціалізуємо налаштування на клієнті
 			initializeI18n(); // Ініціалізуємо локалізацію
+			initializeStoreSync(); // Ініціалізуємо синхронізацію сторів
 		} catch (error) {
 			logService.init('Failed to check for app update:', error);
 		}
