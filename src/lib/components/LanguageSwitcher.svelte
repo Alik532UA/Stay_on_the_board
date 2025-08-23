@@ -26,13 +26,13 @@ import { logService } from '$lib/services/logService.js';
 </script>
 
 <div class="language-switcher">
-  <button class="lang-dropdown-btn" aria-label="Вибір мови" on:click={toggleDropdown}>
+  <button data-testid="lang-dropdown-btn" class="lang-dropdown-btn" aria-label="Вибір мови" on:click={toggleDropdown}>
     🌐
   </button>
   {#if showDropdown}
     <div class="lang-dropdown" role="menu" on:blur={closeDropdown}>
       {#each languages as lang}
-        <button class="lang-option" on:click={() => selectLang(lang.code)} aria-label={lang.label}>
+        <button data-testid="lang-option-{lang.code}" class="lang-option" on:click={() => selectLang(lang.code)} aria-label={lang.label}>
           <span class="lang-flag">{lang.flag}</span> <span class="lang-label">{lang.label}</span>
         </button>
       {/each}
