@@ -1,11 +1,11 @@
 import { modalStore } from '$lib/stores/modalStore';
-import { speakText as speak, loadAndGetVoices } from '$lib/services/speechService';
+import { speakMove, loadAndGetVoices } from '$lib/services/speechService';
 import { logService } from '$lib/services/logService';
 import { goto } from '$app/navigation';
 import { modalService } from './modalService';
 
 export type SideEffect =
-  | { type: 'audio/speak'; payload: any }
+  | { type: 'audio/speak'; payload: { move: any; lang: string; voiceURI: string | null } }
   | { type: 'ui/showModal'; payload: any }
   | { type: 'ui/showGameOverModal'; payload: any }
   | { type: 'ui/closeModal' }
@@ -51,8 +51,8 @@ class SideEffectService {
     effects.forEach(effect => this.execute(effect));
   }
  
-  private speakText(payload: any): void {
-    speak(payload.text, payload.lang, payload.voiceURI);
+  private speakText(payload: { move: any; lang: string; voiceURI: string | null }): void {
+    speakMove(payload.move, payload.lang, payload.voiceURI);
   }
 
   private showModal(payload: any): void {
