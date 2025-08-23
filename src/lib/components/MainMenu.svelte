@@ -249,7 +249,11 @@
     {/if}
     <div id="main-menu-buttons" use:hotkeysAndTooltips>
       <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="vs-computer-btn">{$_('mainMenu.playVsComputer')}</button>
-      <button class="modal-button secondary" onclick={handleLocalGame} data-testid="local-game-btn">{$_('mainMenu.localGame')}</button>
+      <button
+        class="modal-button secondary"
+        class:pseudo-disabled={!import.meta.env.DEV}
+        onclick={import.meta.env.DEV ? handleLocalGame : openWipNotice}
+        data-testid="local-game-btn">{$_('mainMenu.localGame')}</button>
       <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice} data-testid="online-game-btn">{$_('mainMenu.playOnline')}</button>
       <button class="modal-button secondary" onclick={() => navigateTo('/settings')} data-testid="settings-btn">{$_('mainMenu.settings')}</button>
       <button class="modal-button secondary" onclick={handleControls} data-testid="controls-btn">{$_('mainMenu.controls')}</button>
