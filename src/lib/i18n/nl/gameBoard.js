@@ -26,7 +26,8 @@ export default {
     playerSelectedDistance: "Gekozen afstand: {distance}",
     playerSelectedMove: "Gekozen zet: {direction} met {distance}",
     computerMadeMove: "Computer verplaatste: {direction} met {distance}.\nNu jouw beurt om te zetten",
-    computerMadeMoveCompact: "Computer verplaatste: {move}.<br>Nu jouw beurt om te zetten",
+    computerMadeMovePart1: "Computer verplaatste:",
+    computerMadeMovePart2: "Nu jouw beurt om te zetten",
     pauseBetweenMoves: "Pauze tussen zetten...",
     gameOver: "Spel voorbij"
   },

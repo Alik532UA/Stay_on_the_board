@@ -26,7 +26,8 @@ export default {
     playerSelectedDistance: "Selected distance: {distance}",
     playerSelectedMove: "Selected move: {direction} by {distance}",
     computerMadeMove: "Computer moved: {direction} by {distance}.\nNow your turn to move",
-    computerMadeMoveCompact: "Computer moved: {move}.<br>Now your turn to move",
+    computerMadeMovePart1: "Computer moved:",
+    computerMadeMovePart2: "Now your turn to move",
     pauseBetweenMoves: "Pause between moves...",
     gameOver: "Game over"
   },

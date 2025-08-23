@@ -26,7 +26,8 @@ export default {
     playerSelectedDistance: "Вибрано відстань: {distance}",
     playerSelectedMove: "Вибрано хід: {direction} на {distance}",
     computerMadeMove: "Комп'ютер зробив хід: {direction} на {distance}.\nТепер ваша черга робити хід",
-    computerMadeMoveCompact: "Комп'ютер зробив хід: {move}.<br>Тепер ваша черга робити хід",
+    computerMadeMovePart1: "Комп'ютер зробив хід:",
+    computerMadeMovePart2: "Тепер ваша черга робити хід",
     pauseBetweenMoves: "Пауза між ходами...",
     gameOver: "Гра завершена"
   },

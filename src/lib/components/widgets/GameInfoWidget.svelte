@@ -73,8 +73,12 @@
 
         if (isCompact) {
           const arrow = directionArrows[$lastComputerMove.direction] || '?';
-          const moveDisplay = `<span class="compact-move-display">${arrow}${distance}</span>`;
-          return $_('gameBoard.gameInfo.computerMadeMoveCompact', { values: { move: moveDisplay } });
+          return {
+            isCompact: true,
+            part1: $_('gameBoard.gameInfo.computerMadeMovePart1'),
+            move: `${arrow}${distance}`,
+            part2: $_('gameBoard.gameInfo.computerMadeMovePart2')
+          };
         }
 
         return $_('gameBoard.gameInfo.computerMadeMove', { values: { direction, distance } });
@@ -174,6 +178,13 @@
     min-height: 28px;
     font-size: 1.1em;
   }
+  .compact-message-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap; /* Додаємо перенос для дуже вузьких екранів */
+  }
 </style>
 
 {#if $i18nReady && $settingsStore.showGameInfoWidget !== 'hidden' && $gameState}
@@ -183,7 +194,15 @@
        data-testid="game-info-panel"
   >
     <div class="game-info-content" data-testid="game-info-content">
-      {@html $displayMessage}
+      {#if typeof $displayMessage === 'object' && $displayMessage.isCompact}
+        <div class="compact-message-line">
+          <span>{$displayMessage.part1}</span>
+          <span class="compact-move-display">{$displayMessage.move}</span>
+        </div>
+        <span>{$displayMessage.part2}</span>
+      {:else}
+        {@html $displayMessage}
+      {/if}
     </div>
   </div>
 {/if}
