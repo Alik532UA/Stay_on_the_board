@@ -386,9 +386,9 @@
   </div>
   <div class="settings-expander__content" bind:this={contentRef} style="max-height: {contentHeight}px; opacity: {isOpen ? 1 : 0};">
     <div class="settings-expander__game-mode-row" use:fitTextAction={$_('gameModes.beginner')}>
-      <button class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => settingsStore.applyGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
-      <button class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => settingsStore.applyGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
-      <button class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'pro'} on:click={() => settingsStore.applyGameModePreset('pro')}>{$_('gameModes.pro')}</button>
+      <button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => settingsStore.applyGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
+      <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => settingsStore.applyGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
+      <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'pro'} on:click={() => settingsStore.applyGameModePreset('pro')}>{$_('gameModes.pro')}</button>
     </div>
     <hr class="settings-expander__divider" />
     <div class="settings-expander__setting-item">
@@ -414,6 +414,7 @@
     <div class="settings-expander__button-group" use:fitTextAction={$_('settings.visibility.hidden')}>
       {#each [$_('settings.visibility.hidden'), $_('settings.visibility.boardOnly'), $_('settings.visibility.withPiece'), $_('settings.visibility.withMoves')] as label, i}
         <button
+          data-testid="settings-expander-visibility-btn-{$_('settings.visibility.hidden') === label ? 'hidden' : $_('settings.visibility.boardOnly') === label ? 'boardOnly' : $_('settings.visibility.withPiece') === label ? 'withPiece' : 'withMoves'}"
           class="settings-expander__row-btn"
           class:active={getIsActive(i)}
           on:click={toggleFunctions[i]}
@@ -427,6 +428,7 @@
     <h3 class="settings-expander__section-title">{$_('settings.gameInfoWidget.title')}</h3>
     <div class="settings-expander__button-group settings-expander__button-group--three" use:fitTextAction={$_('settings.gameInfoWidget.hidden')}>
       <button
+        data-testid="settings-expander-game-info-widget-hidden-btn"
         class="settings-expander__row-btn"
         class:active={$settingsStore.showGameInfoWidget === 'hidden'}
         on:click={() => settingsStore.setGameInfoWidgetState('hidden')}
@@ -434,6 +436,7 @@
         {$_('settings.gameInfoWidget.hidden')}
       </button>
       <button
+        data-testid="settings-expander-game-info-widget-shown-btn"
         class="settings-expander__row-btn"
         class:active={$settingsStore.showGameInfoWidget === 'shown'}
         on:click={() => settingsStore.setGameInfoWidgetState('shown')}
@@ -441,6 +444,7 @@
         {$_('settings.gameInfoWidget.shown')}
       </button>
       <button
+        data-testid="settings-expander-game-info-widget-compact-btn"
         class="settings-expander__row-btn"
         class:active={$settingsStore.showGameInfoWidget === 'compact'}
         on:click={() => settingsStore.setGameInfoWidgetState('compact')}
@@ -477,7 +481,7 @@
         checked={speechEnabled}
         on:toggle={() => settingsStore.toggleSpeech(undefined)}
       />
-      <button class="settings-expander__square-btn" use:blurOnClick use:customTooltip={$_('gameControls.voiceSettingsTitle')} on:click|stopPropagation={openVoiceSettingsModal}>
+      <button data-testid="settings-expander-voice-settings-btn" class="settings-expander__square-btn" use:blurOnClick use:customTooltip={$_('gameControls.voiceSettingsTitle')} on:click|stopPropagation={openVoiceSettingsModal}>
         <SvgIcons name="voice-settings" />
       </button>
     </div>
@@ -487,6 +491,7 @@
       <span class="settings-expander__label">{$_('ui.moveMenuItems')}</span>
       <div style="display: flex; gap: 12px;">
         <button
+          data-testid="settings-expander-column-style-fixed-btn"
           class="settings-expander__square-btn"
           aria-label="Fixed mode"
           on:click={() => columnStyleMode.set('fixed')}
@@ -495,6 +500,7 @@
           <SvgIcons name="fixed" />
         </button>
         <button
+          data-testid="settings-expander-column-style-editing-btn"
           class="settings-expander__square-btn"
           aria-label="Editing mode"
           on:click={() => columnStyleMode.set('editing')}
@@ -503,6 +509,7 @@
           <SvgIcons name="editing" />
         </button>
         <button
+          data-testid="settings-expander-reset-layout-btn"
           class="settings-expander__square-btn"
           use:blurOnClick
           aria-label="Скинути положення меню"

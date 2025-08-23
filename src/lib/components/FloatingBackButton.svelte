@@ -21,6 +21,7 @@
 </script>
 
 <button
+  data-testid="floating-back-btn"
   class="floating-back-btn"
   aria-label={$_('ui.goBack') || 'Повернутися назад'}
   use:customTooltip={$_('ui.goBack') || 'Повернутися назад'}

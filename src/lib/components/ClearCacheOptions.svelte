@@ -20,10 +20,10 @@
 <div class="clear-cache-options">
   <p class="description">{$_('mainMenu.clearCacheModal.content')}</p>
   <div class="button-group">
-    <button class="modal-btn-generic danger-btn" on:click={handleClearAll}>
+    <button data-testid="clear-cache-full-clear-btn" class="modal-btn-generic danger-btn" on:click={handleClearAll}>
       {$_('mainMenu.clearCacheModal.fullClear')}
     </button>
-    <button class="modal-btn-generic primary" on:click={handleKeepAppearance}>
+    <button data-testid="clear-cache-keep-appearance-btn" class="modal-btn-generic primary" on:click={handleKeepAppearance}>
       {$_('mainMenu.clearCacheModal.keepAppearance')}
     </button>
   </div>
