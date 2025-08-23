@@ -366,23 +366,8 @@ function createSettingsStore() {
     toggleBlockMode: () => {
       update((state: any) => {
         const newState = !state.blockModeEnabled;
-        if (isBrowser) localStorage.setItem('blockModeEnabled', String(newState));
-        if (newState) {
-          gameState.update(gs => {
-            const resetHistoryEntry = {
-              pos: { row: gs.playerRow, col: gs.playerCol },
-              blocked: [] as {row: number, col: number}[],
-              visits: {},
-              blockModeEnabled: newState
-            };
-            return {
-              ...gs,
-              cellVisitCounts: {},
-              movesInBlockMode: 0,
-              moveHistory: [...gs.moveHistory, resetHistoryEntry]
-            };
-          });
-        }
+        // The logic for resetting game state is now handled reactively
+        // by the storeSyncService, ensuring a single source of truth.
         return { ...state, blockModeEnabled: newState };
       });
     },
@@ -451,7 +436,7 @@ function createSettingsStore() {
       });
     },
   };
-  return { subscribe, ...methods };
+  return { subscribe, get, ...methods };
 }
 
 export const settingsStore = createSettingsStore();

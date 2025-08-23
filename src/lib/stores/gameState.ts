@@ -306,6 +306,25 @@ function createGameStateStore() {
       set(createInitialState(config));
     },
 
+    resetBlockModeState: () => {
+      update(state => {
+        if (!state) return null;
+        logService.state('Скидання стану Block Mode');
+        const resetHistoryEntry = {
+          pos: { row: state.playerRow, col: state.playerCol },
+          blocked: [] as {row: number, col: number}[],
+          visits: {},
+          blockModeEnabled: true
+        };
+        return {
+          ...state,
+          cellVisitCounts: {},
+          movesInBlockMode: 0,
+          moveHistory: [...state.moveHistory, resetHistoryEntry]
+        };
+      });
+    },
+
     destroy: () => {
       set(null);
     }
