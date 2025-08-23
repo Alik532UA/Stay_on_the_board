@@ -37,10 +37,18 @@
     return color ? `background-color: ${color};` : '';
   }
 
+  const directionArrows: Record<string, string> = {
+    'up-left': '↖', 'up': '↑', 'up-right': '↗',
+    'left': '←', 'right': '→',
+    'down-left': '↙', 'down': '↓', 'down-right': '↘'
+  };
+
   const displayMessage = derived(
-    [gameState, lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves, _],
-    ([$gameState, $lastComputerMove, $lastPlayerMove, $isPlayerTurn, $isPauseBetweenMoves, $_]) => {
+    [gameState, lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves, _, settingsStore],
+    ([$gameState, $lastComputerMove, $lastPlayerMove, $isPlayerTurn, $isPauseBetweenMoves, $_, $settingsStore]) => {
       if (!$gameState) return '';
+
+      const isCompact = $settingsStore.showGameInfoWidget === 'compact';
 
       const humanPlayersCount = $gameState.players.filter(p => p.type === 'human').length;
       const isLocalGame = humanPlayersCount > 1;
@@ -60,12 +68,16 @@
         return $_('gameBoard.gameInfo.gameResumed');
       }
       if ($lastComputerMove && !$isPauseBetweenMoves) {
-        return $_('gameBoard.gameInfo.computerMadeMove', {
-          values: {
-            direction: $_(`gameBoard.directions.${$lastComputerMove.direction.replace('-', '')}`),
-            distance: $lastComputerMove.distance
-          }
-        });
+        const direction = $_(`gameBoard.directions.${$lastComputerMove.direction.replace('-', '')}`);
+        const distance = $lastComputerMove.distance;
+
+        if (isCompact) {
+          const arrow = directionArrows[$lastComputerMove.direction] || '?';
+          const moveDisplay = `<span class="compact-move-display">${arrow}${distance}</span>`;
+          return $_('gameBoard.gameInfo.computerMadeMoveCompact', { values: { move: moveDisplay } });
+        }
+
+        return $_('gameBoard.gameInfo.computerMadeMove', { values: { direction, distance } });
       }
       if ($lastPlayerMove && !$isPauseBetweenMoves && isLocalGame) {
         const currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
@@ -113,11 +125,6 @@
     overflow: hidden;
   }
 
-  .game-info-widget.compact {
-    padding: 8px 12px;
-    min-height: 40px;
-    font-size: 0.9em;
-  }
 
   .game-info-content {
     font-weight: 500;
@@ -152,6 +159,21 @@
    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
    transition: all 0.3s ease;
  }
+  :global(.compact-move-display) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: orange !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    border-radius: 12px;
+    padding: 2px 10px;
+    margin: 0 4px;
+    font-family: 'M PLUS Rounded 1c', sans-serif !important;
+    min-width: 40px;
+    min-height: 28px;
+    font-size: 1.1em;
+  }
 </style>
 
 {#if $i18nReady && $settingsStore.showGameInfoWidget !== 'hidden' && $gameState}
