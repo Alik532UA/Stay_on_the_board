@@ -3,6 +3,19 @@ import { writable, get } from 'svelte/store';
 import { logService } from '$lib/services/logService.js';
 import { _ } from 'svelte-i18n';
 
+// Прямий імпорт усіх необхідних перекладів
+import ukTranslations from '$lib/i18n/uk/speech.js';
+import enTranslations from '$lib/i18n/en/speech.js';
+import crhTranslations from '$lib/i18n/crh/speech.js';
+import nlTranslations from '$lib/i18n/nl/speech.js';
+
+const speechTranslations = {
+  uk: ukTranslations,
+  en: enTranslations,
+  crh: crhTranslations,
+  nl: nlTranslations
+};
+
 /** @type {import('svelte/store').Writable<SpeechSynthesisVoice[]>} */
 const voices = writable([]);
 /** @type {Promise<SpeechSynthesisVoice[]> | null} */
@@ -73,8 +86,8 @@ export function filterVoicesByLang(voiceList, langCode) {
 
 /**
  * Озвучує ігровий хід.
- * @param {{direction: string, distance: number}} move
- * @param {string} lang
+ * @param {{direction: import('../models/Figure').MoveDirectionType, distance: number}} move
+ * @param {string} lang - Мова інтерфейсу (для вибору голосу)
  * @param {string | null} voiceURI
  */
 export function speakMove(move, lang, voiceURI) {
@@ -89,45 +102,22 @@ export function speakMove(move, lang, voiceURI) {
 
   const selectedVoice = voiceURI ? allVoices.find(v => v.voiceURI === voiceURI) : null;
   const availableVoices = filterVoicesByLang(allVoices, lang);
-  /** @type {SpeechSynthesisVoice | null} */
-  let voiceToUse = null;
-  if (selectedVoice) {
-    voiceToUse = selectedVoice;
-  } else if (availableVoices.length > 0) {
-    voiceToUse = availableVoices[0];
-    logService.speech(`[Speech] No selected voice URI. Using first available for lang "${lang}":`, voiceToUse);
-  }
-  const voiceLang = voiceToUse ? voiceToUse.lang : 'en-US';
+  let voiceToUse = selectedVoice || availableVoices[0] || null;
   
-  const actualLangCode = voiceLang.split('-');
+  const voiceLang = voiceToUse ? voiceToUse.lang : 'en-US';
+  const actualLangCode = voiceLang.split('-')[0];
   logService.speech(`[Speech] Determined language for speech: ${actualLangCode} (based on voice lang: ${voiceLang})`);
 
-  let textToSpeak = '';
-  const $t = get(_);
-
-  /** @type {Object.<string, string>} */
-  const directionsEn = {
-    up: 'up',
-    down: 'down',
-    left: 'left',
-    right: 'right',
-    upLeft: 'up-left',
-    upRight: 'up-right',
-    downLeft: 'down-left',
-    downRight: 'down-right',
-  };
-
-  if (actualLangCode[0] === 'en') {
-    const directionKey = move.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-    const directionText = directionsEn[directionKey] || move.direction;
-    textToSpeak = `${directionText} ${move.distance}`;
-    logService.speech(`[Speech] Generating EN text: "${textToSpeak}"`);
-  } else {
-    const directionKey = move.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-    const directionText = $t(`gameBoard.directions.${directionKey}`) || move.direction;
-    textToSpeak = `${directionText} ${move.distance}`;
-    logService.speech(`[Speech] Generating text for "${actualLangCode}": "${textToSpeak}"`);
-  }
+  // Вибираємо правильний об'єкт перекладів, з фолбеком на англійську
+  // Вибираємо правильний об'єкт перекладів, з фолбеком на англійську
+const translations = actualLangCode in speechTranslations
+  ? speechTranslations[/** @type {keyof typeof speechTranslations} */ (actualLangCode)]
+  : speechTranslations['en'];
+  
+  const directionText = translations.directions[move.direction] || move.direction;
+  
+  const textToSpeak = `${directionText} ${move.distance}`;
+  logService.speech(`[Speech] Generating text for "${actualLangCode}": "${textToSpeak}"`);
 
   speakText(textToSpeak, voiceLang, voiceURI);
 }
@@ -168,6 +158,3 @@ export function speakText(textToSpeak, lang, voiceURI) {
     window.speechSynthesis.speak(utterance);
   }, 50);
 }
-
-
-// TODO: Додати мок-версію для тестування

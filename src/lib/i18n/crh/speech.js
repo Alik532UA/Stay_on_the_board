@@ -7,13 +7,13 @@ export default {
   cells: "hücreler",
   cells_many: "hücreler",
   directions: {
-    'up': 'yuxarı',
+    'up': 'yuqary',
     'down': 'aşağı',
     'left': 'solğa',
-    'right': 'oñğa',
-    'up-left': 'yuxarı-solğa',
-    'up-right': 'yuxarı-oñğa',
-    'down-left': 'aşağı-solğa',
-    'down-right': 'aşağı-oñğa'
+    'right': 'sağğa',
+    'up-left': 'diagonal yuqarı-solğa',
+    'up-right': 'diagonal yuqarı-sağğa',
+    'down-left': 'diagonal aşağı-solğa',
+    'down-right': 'diagonal aşağı-sağğa'
   }
-}; 
+};
