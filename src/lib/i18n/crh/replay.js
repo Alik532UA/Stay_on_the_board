@@ -1,4 +1,5 @@
 export default {
+  title: "Oyun Tekrarı",
   step: "Adım {current}/{total}",
   limitPath: "Yaxşılaşdırılğan yol körünüşi",
   close: "Replay'ni qapat",

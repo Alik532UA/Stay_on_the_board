@@ -1,4 +1,5 @@
 export default {
+  title: "Перегляд запису гри",
   step: "Крок {current}/{total}",
   limitPath: "Покращена видимість шляху",
   close: "Закрити реплей",

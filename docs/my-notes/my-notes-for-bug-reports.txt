@@ -4308,10 +4308,40 @@ class="settings-expander__button-group s-7Vnx0XQsxohu"
 1. сторінка гри
 2. чекбокс "Автоматично приховувати дошку" увімкнений
 3. гравець робить хід
-Актуальний результат: 
+Актуальний результат:
+1. дошка прихована
+2. кнопка-чекбокс data-testid="settings-expander-visibility-btn-hidden" стала активна
+3. кнопка-чекбокс data-testid="settings-expander-visibility-btn-boardOnly" стала не активна
+4. кнопка-чекбокс data-testid="settings-expander-visibility-btn-withPiece" не змінилась
+5. кнопка-чекбокс data-testid="settings-expander-visibility-btn-withMoves" не змінилась
 Очікуваний результат: 
+1. дошка прихована
+2. кнопка-чекбокс data-testid="settings-expander-visibility-btn-hidden" стала активна
+3. кнопка-чекбокс data-testid="settings-expander-visibility-btn-boardOnly" стала не активна
+4. кнопка-чекбокс data-testid="settings-expander-visibility-btn-withPiece" стала не активна
+5. кнопка-чекбокс data-testid="settings-expander-visibility-btn-withMoves" стала не активна
 
 =======================================================================================
+<button data-testid="settings-expander-game-info-widget-compact-btn" class="settings-expander__row-btn s-7Vnx0XQsxohu">скорочено</button>
+Актуальний результат: 
+1. pedding в data-testid="game-info-panel" стає меншим
+2. текст такий самий залишається таким самим як і при використанні data-testid="settings-expander-game-info-widget-shown-btn"
+Очікуваний результат: 
+1. pedding в data-testid="game-info-panel" не змінюється, розмір вікна не зміюється
+2. текст ходу стає схематичним а не таким самим як і при використанні data-testid="settings-expander-game-info-widget-shown-btn"
+
+Актуальний результат: 
+"
+Комп'ютер зробив хід: gameBoard.directions.upright на 1.
+Тепер ваша черга робити хід
+"
+Очікуваний результат: 
+"
+Комп'ютер зробив хід: [↗1]
+Тепер ваша черга робити хід
+"
+
+[]-квадратний дісплей по прикладу як class="control-btn center-info computer-move-display s-tL-WqGy3YDqs"
 =======================================================================================
 =======================================================================================
 =======================================================================================

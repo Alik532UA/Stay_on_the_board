@@ -1,4 +1,6 @@
 export default {
+  confirm: "Tasdiqla",
+  mainMenu: "Ana Menü",
   ok: "OK",
   resetScoreTitle: "Esapnı sıfırla?",
   resetScoreContent: "Tahta ölçüsini deñiştirmek, mevcut esabıñıznı ve ceza ballarıñıznı sıfırlaycaq. Devam etmek isteysiñizmi?",

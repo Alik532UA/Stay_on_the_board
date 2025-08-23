@@ -1,4 +1,6 @@
 export default {
+  confirm: "Confirm",
+  mainMenu: "Main Menu",
   ok: "OK",
   resetScoreTitle: "Reset score?",
   resetScoreContent: "Changing the board size will reset your current score and penalty points. Are you sure you want to continue?",
