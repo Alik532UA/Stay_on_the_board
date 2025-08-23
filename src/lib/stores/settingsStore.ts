@@ -9,7 +9,8 @@ import { logService } from '../services/logService.js';
 export type KeybindingAction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right'|'confirm'|'no-moves'|'toggle-block-mode'|'toggle-board'|'increase-board'|'decrease-board'|'toggle-speech'|'distance-1'|'distance-2'|'distance-3'|'distance-4'|'distance-5'|'distance-6'|'distance-7'|'distance-8';
 
 const isBrowser = typeof window !== 'undefined';
-const defaultStyle = import.meta.env.DEV ? 'gray' : 'purple';
+// const defaultStyle = import.meta.env.DEV ? 'gray' : 'purple';
+const defaultStyle = import.meta.env.DEV ? 'gray' : 'gray';
 const SETTINGS_VERSION = 2;
 
 const defaultSettings: any = {
