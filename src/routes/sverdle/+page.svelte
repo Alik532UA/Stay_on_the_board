@@ -153,7 +153,7 @@
 				<button data-key="enter" class:selected={submittable} disabled={!submittable}>enter</button>
 
 				<button
-					on:click={update}
+					onclick={update}
 					data-key="backspace"
 					formaction="?/update"
 					name="key"
@@ -166,7 +166,7 @@
 					<div class="row">
 						{#each row as letter, index (index)}
 							<button
-								on:click={update}
+								onclick={update}
 								data-key={letter}
 								class={classnames[letter]}
 								disabled={submittable}
