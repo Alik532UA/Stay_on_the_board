@@ -33,8 +33,8 @@ export default {
   clearCacheModal: {
     title: "Cache Wissen",
     content: "Kies een type wissen:",
-    fullClear: "Alles wissen (reset alle instellingen)",
-    keepAppearance: "Uiterlijk behouden (thema, taal)"
+    fullClear: "Cache volledig wissen",
+    keepAppearance: "Cache wissen, behalve thema en taal"
   },
   dragAndDropTest: "Drag & Drop Test"
 }; 

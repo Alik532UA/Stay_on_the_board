@@ -153,16 +153,13 @@
   <hr class="settings-divider" data-testid="settings-page-divider-4" />
   <div class="settings-actions" data-testid="settings-page-actions">
     <button class="settings-reset-button" on:click={resetSettings} use:customTooltip={$_('settings.resetHint')} data-testid="settings-page-reset-button">
-      <SvgIcons name="reset" />
       <span>{$_('settings.reset')}</span>
     </button>
-    <button data-testid="clear-cache-full-clear-btn" class="settings-reset-button danger" on:click={handleClearAll}>
-      <SvgIcons name="clear-cache" />
-      <span>{$_('mainMenu.clearCacheModal.fullClear')}</span>
-    </button>
     <button data-testid="clear-cache-keep-appearance-btn" class="settings-reset-button" on:click={handleKeepAppearance}>
-      <SvgIcons name="clear-cache" />
       <span>{$_('mainMenu.clearCacheModal.keepAppearance')}</span>
+    </button>
+    <button data-testid="clear-cache-full-clear-btn" class="settings-reset-button danger" on:click={handleClearAll}>
+      <span>{$_('mainMenu.clearCacheModal.fullClear')}</span>
     </button>
   </div>
 </div>
@@ -225,7 +222,7 @@
     color: var(--text-primary);
     border: 1.5px solid var(--border-color);
     border-radius: 8px;
-    padding: 10px 20px;
+    padding: 12px 20px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -234,6 +231,7 @@
     gap: 8px;
     transition: background 0.2s;
     width: 100%;
+    min-height: 50px;
   }
   .settings-reset-button:hover {
     border-color: var(--control-selected);

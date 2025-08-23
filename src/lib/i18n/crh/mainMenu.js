@@ -33,8 +33,8 @@ export default {
   clearCacheModal: {
     title: "Keşni Temizle",
     content: "Temizleme türüni saylañız:",
-    fullClear: "Episini temizle (bütün sozlamalarnı sıfırlar)",
-    keepAppearance: "Körünüşni saqla (tema, til)"
+    fullClear: "Keşni tolusınen temizle",
+    keepAppearance: "Keşni temizle, tema ve tilden ğayrı"
   },
   dragAndDropTest: "Süyrep Taşuv Testi"
 }; 
