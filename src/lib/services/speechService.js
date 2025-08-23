@@ -105,8 +105,21 @@ export function speakMove(move, lang, voiceURI) {
   let textToSpeak = '';
   const $t = get(_);
 
+  /** @type {Object.<string, string>} */
+  const directionsEn = {
+    up: 'up',
+    down: 'down',
+    left: 'left',
+    right: 'right',
+    upLeft: 'up-left',
+    upRight: 'up-right',
+    downLeft: 'down-left',
+    downRight: 'down-right',
+  };
+
   if (actualLangCode[0] === 'en') {
-    const directionText = $t(`gameBoard.directionsEn.${move.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase())}`) || move.direction;
+    const directionKey = move.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+    const directionText = directionsEn[directionKey] || move.direction;
     textToSpeak = `${directionText} ${move.distance}`;
     logService.speech(`[Speech] Generating EN text: "${textToSpeak}"`);
   } else {
