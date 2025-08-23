@@ -1,4 +1,6 @@
 export default {
+  confirm: "Bevestigen",
+  mainMenu: "Hoofdmenu",
   ok: "OK",
   resetScoreTitle: "Score resetten?",
   resetScoreContent: "Het wijzigen van de bordgrootte zal je huidige score en strafpunten resetten. Weet je zeker dat je wilt doorgaan?",

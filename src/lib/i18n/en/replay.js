@@ -1,4 +1,5 @@
 export default {
+  title: "Game Replay",
   step: "Step {current}/{total}",
   limitPath: "Improved path visibility",
   close: "Close replay",

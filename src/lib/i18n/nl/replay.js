@@ -1,4 +1,5 @@
 export default {
+  title: "Spel Herhaling",
   step: "Stap {current}/{total}",
   limitPath: "Verbeterde zichtbaarheid van het pad",
   close: "Replay sluiten",
