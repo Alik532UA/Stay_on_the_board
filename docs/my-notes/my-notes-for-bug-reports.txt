@@ -4490,7 +4490,16 @@ data-testid="local-game-btn"
 Актуальний результат: доступно в dev та в prod
 Очікуваний результат: доступно в dev, але в prod не доступно по прикладу data-testid="online-game-btn" 
 =======================================================================================
+data-testid="local-game-btn"
+Актуальний результат: доступно в dev, але в prod повністю прихований 
+Очікуваний результат: доступно в dev, але в prod не доступно по прикладу data-testid="online-game-btn" 
 =======================================================================================
+для game-mode-beginner зробити <button data-testid="settings-expander-game-info-widget-shown-btn" class="settings-expander__row-btn svelte-1t1jlmi">показати</button>
+
+для game-mode-experienced зробити <button data-testid="settings-expander-game-info-widget-compact-btn" class="settings-expander__row-btn svelte-1t1jlmi active">скорочено</button>
+
+для game-mode-pro зробити <button data-testid="settings-expander-game-info-widget-hidden-btn" class="settings-expander__row-btn svelte-1t1jlmi">сховати</button>
+
 =======================================================================================
 =======================================================================================
 =======================================================================================
