@@ -16,4 +16,4 @@ export default {
     'down-left': 'diagonally down-left',
     'down-right': 'diagonally down-right'
   }
-}; 
+};

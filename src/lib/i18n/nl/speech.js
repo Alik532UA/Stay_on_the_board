@@ -16,4 +16,4 @@ export default {
     'down-left': 'diagonaal omlaag-links',
     'down-right': 'diagonaal omlaag-rechts'
   }
-}; 
+};
