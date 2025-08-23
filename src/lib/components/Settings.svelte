@@ -8,7 +8,22 @@
   import '../css/layouts/main-menu.css';
   import { languages } from '$lib/constants.js';
   import { logService } from '$lib/services/logService.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
+  import ClearCacheOptions from './ClearCacheOptions.svelte';
+
   $: settings = $settingsStore;
+
+  function showClearCacheModal() {
+  logService.action('Click: "Очистити кеш" (Settings)');
+  modalStore.showModal({
+    titleKey: 'mainMenu.clearCacheModal.title',
+    dataTestId: 'clear-cache-modal',
+    component: ClearCacheOptions,
+    buttons: [
+      { textKey: 'modal.cancel', onClick: () => modalStore.closeModal() }
+    ]
+  });
+  }
 
   /** @param {string} lang */
   function selectLang(lang) {
@@ -138,11 +153,15 @@
     </button>
   </div>
   <div class="settings-actions" data-testid="settings-page-actions">
-    <button class="settings-reset-button" on:click={resetSettings} use:customTooltip={$_('settings.resetHint')} data-testid="settings-page-reset-button">
-      <SvgIcons name="reset" />
-      <span>{$_('settings.reset')}</span>
-    </button>
-  </div>
+  <button class="settings-reset-button" on:click={resetSettings} use:customTooltip={$_('settings.resetHint')} data-testid="settings-page-reset-button">
+    <SvgIcons name="reset" />
+    <span>{$_('settings.reset')}</span>
+  </button>
+  <button class="settings-reset-button danger" on:click={showClearCacheModal} data-testid="clear-cache-btn">
+    <SvgIcons name="clear-cache" />
+    <span>{$_('mainMenu.clearCache')}</span>
+  </button>
+</div>
 </div>
 
 <style>
@@ -190,6 +209,13 @@
     display: flex;
     justify-content: center;
   }
+  .settings-reset-button.danger {
+  background: var(--error-color);
+  color: #fff;
+}
+.settings-reset-button.danger:hover {
+  background: #a40e26; /* Темніший відтінок червоного для hover */
+}
   .settings-reset-button {
     background: var(--danger-bg);
     color: var(--danger-text);
