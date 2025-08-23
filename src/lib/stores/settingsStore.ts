@@ -305,10 +305,23 @@ function createSettingsStore() {
     },
     toggleShowBoard: (forceState: boolean | undefined) => {
       update((state: any) => {
-        const newState = typeof forceState === 'boolean' ? forceState : !state.showBoard;
-        const newSettings = { ...state, showBoard: newState };
+        const newShowBoardState = typeof forceState === 'boolean' ? forceState : !state.showBoard;
+        const newSettings = { ...state, showBoard: newShowBoardState };
+
+        // НАВІЩО: Забезпечуємо консистентність стану. Якщо дошка прихована,
+        // фігура та доступні ходи також не можуть бути видимими.
+        if (!newShowBoardState) {
+          newSettings.showPiece = false;
+          newSettings.showMoves = false;
+        }
+
         if (isBrowser) {
           localStorage.setItem('showBoard', String(newSettings.showBoard));
+          // Зберігаємо також залежні стани, щоб уникнути розсинхронізації при перезавантаженні.
+          if (!newShowBoardState) {
+            localStorage.setItem('showPiece', 'false');
+            localStorage.setItem('showMoves', 'false');
+          }
         }
         return newSettings;
       });
