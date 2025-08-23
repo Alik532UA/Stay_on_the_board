@@ -26,6 +26,7 @@ export default {
     playerSelectedDistance: "Saylanğan mesafe: {distance}",
     playerSelectedMove: "Saylanğan areket: {direction} {distance}",
     computerMadeMove: "Kompyuter areket yaptı: {direction} {distance}.\nEndi sıra sizde areket yapmaq",
+    computerMadeMoveCompact: "Kompyuter areket yaptı: {move}.<br>Endi sıra sizde areket yapmaq",
     pauseBetweenMoves: "Arekteler arası mola...",
     gameOver: "Oyun bitken"
   },
