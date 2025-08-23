@@ -30,13 +30,13 @@ export default {
     gameOver: "Game over"
   },
   directions: {
-    upLeft: "up-left",
+    upLeft: "diagonally up-left",
     up: "up",
-    upRight: "up-right",
+    upRight: "diagonally up-right",
     left: "left",
     right: "right",
-    downLeft: "down-left",
+    downLeft: "diagonally down-left",
     down: "down",
-    downRight: "down-right"
+    downRight: "diagonally down-right"
   }
 }; 

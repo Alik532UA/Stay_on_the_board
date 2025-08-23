@@ -30,13 +30,13 @@ export default {
     gameOver: "Oyun bitken"
   },
   directions: {
-    upLeft: "yukarı-sol",
-    up: "yukarı",
-    upRight: "yukarı-sağ",
-    left: "sol",
-    right: "sağ",
-    downLeft: "aşağı-sol",
+    upLeft: "diagonal yuqarı-solğa",
+    up: "yuqarı",
+    upRight: "diagonal yuqarı-sağğa",
+    left: "solğa",
+    right: "sağğa",
+    downLeft: "diagonal aşağı-solğa",
     down: "aşağı",
-    downRight: "aşağı-sağ"
+    downRight: "diagonal aşağı-sağğa"
   }
 }; 
