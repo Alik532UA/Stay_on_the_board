@@ -30,13 +30,13 @@ export default {
     gameOver: "Spel voorbij"
   },
   directions: {
-    upLeft: "boven-links",
+    upLeft: "diagonaal naar boven-links",
     up: "omhoog",
-    upRight: "boven-rechts",
+    upRight: "diagonaal naar boven-rechts",
     left: "links",
     right: "rechts",
-    downLeft: "beneden-links",
+    downLeft: "diagonaal naar beneden-links",
     down: "omlaag",
-    downRight: "beneden-rechts"
+    downRight: "diagonaal naar beneden-rechts"
   }
 }; 

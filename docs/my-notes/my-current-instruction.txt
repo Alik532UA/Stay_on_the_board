@@ -1,13 +1,12 @@
-
 **Правила**: Ознайомся та дотримуйся правил з @/docs/my-notes/AI_AGENT_RULES.md 
 **Мова**: мова роздумів та відповіді в чаті лише українська. Англійською не пиши, а заощаджуй токени.
 **Опис дії**: Перейди на стислий режим: мінімум пояснень (приблизно до 200 символів, але бажано 30-70 символів), максимум дій.
 
 Поточнє завдання:
-Згідно з документацією, коли чекбокс "Автоматично приховувати дошку" увімкнений, очікується наступна поведінка:
-Після ходу гравця дошка автоматично приховується.
-але фактично на сайті це не працаює
-треба fix
+виправити баг:
+Актуальний результат: комп'ютер ходить не викадковим чином а завжди однаково
+Очікуваний результат: комп'ютер ходить викадковим чином, алгоритм: 1. комп'ютер перевіряє та записує в масив (чи колекцію) всі доступні ходи, а потім вибирає випадковим чином один з доступних ходів
+
 
 ---
 
@@ -24,7 +23,6 @@
 8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
 9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
 
-
 ---
 
 **Відладка (Дебагінг):**
@@ -35,3 +33,125 @@
 **Верифікація:** Переконайся, що проблема вирішена і не з'явилися нові баги в суміжних частинах системи.
 
 ---
+
+client:733 [vite] connecting...
+client:827 [vite] connected.
+logService.js:129 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+logService.js:100 [UI] [Speech] 'voiceschanged' event fired. Loaded 322 voices.
+logService.js:100 [UI] [ModalStore] closeModal called. Stack size: 0
+logService.js:100 [UI] [ModalStore] Stack is empty. Resetting to initial state.
+logService.js:100 [UI] [layout] afterNavigate: hiding tooltip
+init.js:31 ✅ i18n ініціалізовано успішно
+logService.js:100 [GAME_MODE] Setting game mode to: vs-computer
+logService.js:100 [UI] [BoardWrapperWidget] Нова гра, скидаємо стан
+logService.js:100 [UI] [BoardWrapperWidget] Нова гра, скидаємо стан
+logService.js:98 [STATE] Оновлення налаштувань. Поточний стан: Object
+logService.js:98 [STATE] Нові налаштування: Object
+logService.js:98 [STATE] Об'єднані налаштування: Object
+logService.js:98 [STATE] Стан для збереження в localStorage: Object
+logService.js:100 [UI] [Speech] Fallback check loaded 322 voices.
+logService.js:100 [ACTION] Hotkey: "up" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "confirm" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "left" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "confirm" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "left" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "confirm" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "left" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "confirm" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "up-right" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "confirm" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "right" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "confirm" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "right" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [ACTION] Hotkey: "confirm" (GameLayout)
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:100 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:98 [GAME_MODE] triggerComputerMove: Результат getComputerMove: Object
+logService.js:100 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:98 [STATE] playerInputStore updated Object
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:100 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:98 [STATE] playerInputStore updated Object

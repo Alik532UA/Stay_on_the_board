@@ -232,44 +232,16 @@ export function getComputerMove(): { direction: MoveDirectionType; distance: num
   );
 
   if (availableMoves.length === 0) {
+    logService.logicAI('getComputerMove: немає доступних ходів');
     return null;
   }
+
+  const randomIndex = Math.floor(Math.random() * availableMoves.length);
+  const randomMove = availableMoves[randomIndex];
   
-  const getMoveBonus = (move: { direction: MoveDirectionType; distance: number }): number => {
-    const figure = new Figure(state.playerRow, state.playerCol, state.boardSize);
-    const newPosition = figure.calculateNewPosition(move.direction, move.distance);
-    const scoreChanges = calculateMoveScore(state, newPosition, 1, settings, move.distance, move.direction);
-    return scoreChanges.bonusPoints;
-  };
-
-  const movesWithBonuses = availableMoves.filter(move => getMoveBonus(move) > 0);
-
-  if (movesWithBonuses.length > 0) {
-    const bestMove = movesWithBonuses.reduce((best, current) => {
-      return getMoveBonus(current) > getMoveBonus(best) ? current : best;
-    });
-    logService.logicAI('getComputerMove: обрано хід з бонусом', bestMove);
-    return bestMove;
-  }
-
-  const longestMoves = availableMoves.reduce((bestMoves, move) => {
-    if (bestMoves.length === 0 || move.distance > bestMoves[0].distance) {
-      return [move];
-    }
-    if (move.distance === bestMoves[0].distance) {
-      bestMoves.push(move);
-    }
-    return bestMoves;
-  }, [] as { direction: MoveDirectionType; distance: number }[]);
-
-  if (longestMoves.length > 0) {
-    const randomLongestMove = longestMoves[Math.floor(Math.random() * longestMoves.length)];
-    logService.logicAI('getComputerMove: обрано найдовший хід', randomLongestMove);
-    return randomLongestMove;
-  }
-
-  const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+  logService.logicAI('getComputerMove: знайдено доступні ходи', availableMoves);
   logService.logicAI('getComputerMove: обрано випадковий хід', randomMove);
+  
   return randomMove;
 }
 
