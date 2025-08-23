@@ -1,14 +1,11 @@
-Це чудове і дуже важливе спостереження. Ти абсолютно правий, і твій аналіз логів вказує на тонку, але критичну помилку в моєму попередньому плані.
+Дякую за уточнення та скріншот. Ти вказав на важливу деталь UX — неправильні переноси рядків та зайві символи руйнують візуальну чистоту.
 
 **Аналіз першопричини:**
+1.  **Перенос рядка:** Використання тегу `<br>` у ключі локалізації `computerMadeMoveCompact` призводить до примусового переносу рядка.
+2.  **Зайва крапка:** Крапка з'являється через те, що вона є частиною рядка в перекладі, і після підстановки HTML-блоку з ходом вона залишається в кінці першого рядка.
 
-Твоя здогадка вірна. Проблема не в самому логуванні, а в тому, **як формується рядок для озвучення**.
-
-1.  **Змішування мов:** Мій попередній план некоректно змішував два джерела перекладів. Коли резервною мовою була англійська (`en-AU`), код брав префікс `"по діагоналі"` з українського файлу локалізації (бо це активна мова інтерфейсу), а сам напрямок (`"up-right"`) — з жорстко закодованого англійського об'єкта `directionsEn`. В результаті виходив неправильний, змішаний рядок: `"по діагоналі up-right 1"`.
-2.  **Чому озвучка працювала:** Браузерний рушій синтезу мовлення, отримавши команду озвучити текст мовою `en-AU`, ймовірно, просто ігнорував незрозумілу йому українську частину `"по діагоналі"` і коректно озвучував лише англійську — `"up-right one"`.
-3.  **Висновок:** Лог був точним — він показував саме той дефектний рядок, який генерував код. Проблема була в архітектурі коду, яка порушувала принцип **SSoT (Single Source of Truth)**, беручи переклади з різних місць.
-
-Я підготував новий, більш надійний план, який усуває цю архітектурну ваду.
+**Архітектурне рішення:**
+Ми виправимо це, змінивши підхід до локалізації. Замість того, щоб вставляти HTML в один рядок, ми створимо два окремі ключі для кожної частини повідомлення. Це дасть нам повний контроль над їхнім відображенням у компоненті за допомогою CSS (flexbox), що є більш гнучким та правильним рішенням з точки зору розділення логіки та представлення (SoC).
 
 ---
 
@@ -27,46 +24,93 @@
 
 ## 2. Покроковий план дій
 
-### **Архітектурне рішення**
+*   **Крок 1: Рефакторинг файлів локалізації `gameBoard.js`**
+    *   **Дія:** У файлах `gameBoard.js` для всіх мов замінити ключ `computerMadeMoveCompact` на два нових ключі: `computerMadeMovePart1` та `computerMadeMovePart2`.
+    *   **Файл:** `src/lib/i18n/uk/gameBoard.js`
+        *   **Замінити:** `computerMadeMoveCompact: "Комп'ютер зробив хід: {move}.<br>Тепер ваша черга робити хід",`
+        *   **На:**
+            ```javascript
+            computerMadeMovePart1: "Комп'ютер зробив хід:",
+            computerMadeMovePart2: "Тепер ваша черга робити хід",
+            ```
+    *   **Файл:** `src/lib/i18n/en/gameBoard.js`
+        *   **Замінити:** `computerMadeMoveCompact: "Computer moved: {move}.<br>Now your turn to move",`
+        *   **На:**
+            ```javascript
+            computerMadeMovePart1: "Computer moved:",
+            computerMadeMovePart2: "Now your turn to move",
+            ```
+    *   **Файл:** `src/lib/i18n/crh/gameBoard.js`
+        *   **Замінити:** `computerMadeMoveCompact: "Kompyuter areket yaptı: {move}.<br>Endi sıra sizde areket yapmaq",`
+        *   **На:**
+            ```javascript
+            computerMadeMovePart1: "Kompyuter areket yaptı:",
+            computerMadeMovePart2: "Endi sıra sizde areket yapmaq",
+            ```
+    *   **Файл:** `src/lib/i18n/nl/gameBoard.js`
+        *   **Замінити:** `computerMadeMoveCompact: "Computer verplaatste: {move}.<br>Nu jouw beurt om te zetten",`
+        *   **На:**
+            ```javascript
+            computerMadeMovePart1: "Computer verplaatste:",
+            computerMadeMovePart2: "Nu jouw beurt om te zetten",
+            ```
+    *   **Обґрунтування:** Розділення тексту на логічні частини дає нам гнучкість у верстці та усуває жорстко закодовані `<br>` (SoC).
 
-Ми повністю централізуємо логіку перекладів для озвучення. Усі текстові фрагменти, включаючи напрямки, будуть братися виключно з файлів локалізації `speech.js` для відповідної мови. Це забезпечить чистоту коду, усуне дублювання та гарантує, що рядок для озвучення завжди буде сформований однією мовою.
-
----
-
-*   **Крок 1: Оновлення файлу локалізації `src/lib/i18n/en/speech.js`**
-    *   **Дія:** Додати об'єкт `directions` з перекладами всіх напрямків англійською мовою. Це замінить жорстко закодований об'єкт `directionsEn` у `speechService.js`.
-    *   **Код для додавання:**
-        ```javascript
-        directions: {
-          'up': 'up',
-          'down': 'down',
-          'left': 'left',
-          'right': 'right',
-          'up-left': 'up-left',
-          'up-right': 'up-right',
-          'down-left': 'down-left',
-          'down-right': 'down-right'
+*   **Крок 2: Рефакторинг логіки та стилів у `src/lib/components/widgets/GameInfoWidget.svelte`**
+    *   **Дія 1 (Логіка):** Оновити `derived` стор `displayMessage`, щоб він повертав не рядок, а об'єкт з частинами повідомлення для компактного режиму.
+    *   **Знайти цей блок коду в `derived` сторі:**
+        ```typescript
+        if (isCompact) {
+          const arrow = directionArrows[$lastComputerMove.direction] || '?';
+          const moveDisplay = `<span class="compact-move-display">${arrow}${distance}</span>`;
+          return $_('gameBoard.gameInfo.computerMadeMoveCompact', { values: { move: moveDisplay } });
         }
         ```
-    *   **Обґрунтування:** Створення єдиного джерела правди (SSoT) для всіх текстів озвучення, що відповідає принципам чистого коду та інтернаціоналізації.
-
-*   **Крок 2: Рефакторинг логіки озвучення у файлі `src/lib/services/speechService.js`**
-    *   **Дія:** У функції `speakMove` повністю замінити існуючу логіку `if/else` для формування `textToSpeak` на новий, уніфікований підхід. Нова логіка буде визначати потрібну локаль і брати *всі* частини фрази (префікс "diagonally" та сам напрямок) з відповідного файлу `speech.js`.
-    *   **Код для повної заміни блоку `if (actualLangCode[0] === 'en') { ... } else { ... }`:**
-        ```javascript
-        const localeToUse = actualLangCode[0];
-        const $t = get(_);
-
-        const isDiagonal = move.direction.includes('-');
-        const diagonalPrefix = isDiagonal ? `${$t('speech.diagonally', { locale: localeToUse })} ` : '';
-        
-        const directionKey = move.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-        const directionText = $t(`speech.directions.${directionKey}`, { locale: localeToUse, fallback: move.direction });
-
-        textToSpeak = `${diagonalPrefix}${directionText} ${move.distance}`;
-        logService.speech(`[Speech] Generating text for "${localeToUse}": "${textToSpeak}"`);
+    *   **Замінити його на цей:**
+        ```typescript
+        if (isCompact) {
+          const arrow = directionArrows[$lastComputerMove.direction] || '?';
+          return {
+            isCompact: true,
+            part1: $_('gameBoard.gameInfo.computerMadeMovePart1'),
+            move: `${arrow}${distance}`,
+            part2: $_('gameBoard.gameInfo.computerMadeMovePart2')
+          };
+        }
         ```
-    *   **Обґрунтування:** Це рішення виправляє першопричину проблеми, гарантуючи, що рядок для озвучення завжди формується з одного джерела (`i18n`). Код стає простішим, чистішим (KISS) та більш надійним, а логування буде відображати коректну інформацію.
+    *   **Дія 2 (HTML):** Оновити розмітку, щоб вона обробляла як рядкові, так і об'єктні повідомлення.
+    *   **Знайти цей блок коду:**
+        ```html
+        <div class="game-info-content" data-testid="game-info-content">
+          {@html $displayMessage}
+        </div>
+        ```
+    *   **Замінити його на цей:**
+        ```html
+        <div class="game-info-content" data-testid="game-info-content">
+          {#if typeof $displayMessage === 'object' && $displayMessage.isCompact}
+            <div class="compact-message-line">
+              <span>{$displayMessage.part1}</span>
+              <span class="compact-move-display">{$displayMessage.move}</span>
+            </div>
+            <span>{$displayMessage.part2}</span>
+          {:else}
+            {@html $displayMessage}
+          {/if}
+        </div>
+        ```
+    *   **Дія 3 (CSS):** Додати стиль для нового контейнера `.compact-message-line`.
+    *   **Додати цей блок CSS:**
+        ```css
+        .compact-message-line {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          flex-wrap: wrap; /* Додаємо перенос для дуже вузьких екранів */
+        }
+        ```
+    *   **Обґрунтування:** Ми повністю розділили дані (з `i18n`) та їх представлення (HTML/CSS). `derived` стор тепер готує дані, а компонент вирішує, як їх відобразити. Використання `flexbox` для `.compact-message-line` забезпечує правильне розташування елементів в один рядок без зайвих символів та переносів.
 
 ---
 
@@ -78,8 +122,10 @@
 # Звіт про виконання завдання
 
 ## 1. Виконана робота
-- Оновлено файл `src/lib/i18n/en/speech.js`: додано об'єкт `directions` з англійськими перекладами напрямків.
-- Проведено рефакторинг функції `speakMove` у файлі `src/lib/services/speechService.js`: уніфіковано логіку генерації тексту для озвучення, яка тепер повністю покладається на файли локалізації. Це виправило помилку некоректного логування при використанні резервної мови.
+- **Локалізація:** Розділено ключ `computerMadeMoveCompact` на два окремі ключі (`computerMadeMovePart1`, `computerMadeMovePart2`) у всіх файлах локалізації для більшої гнучкості.
+- **Логіка:** Оновлено `derived` стор `displayMessage` у `GameInfoWidget.svelte`, щоб він повертав об'єкт з частинами повідомлення для компактного режиму.
+- **HTML/CSS:** Оновлено розмітку `GameInfoWidget.svelte` для обробки нового формату даних та додано CSS-стилі з використанням `flexbox` для коректного відображення елементів в один рядок.
+- **Результат:** Виправлено проблему з некоректними переносами рядків та зайвими крапками. Тепер повідомлення в компактному режимі відображається чисто та в один рядок, як і було заплановано.
 
 ## 2. Проблеми та перешкоди (якщо були)
 - Проблем під час виконання не виявлено.
