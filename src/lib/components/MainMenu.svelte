@@ -232,14 +232,21 @@
     {/if}
 
     <div class="main-menu-title" data-testid="main-menu-title">{$_('mainMenu.title')}</div>
-    <div class="main-menu-subtitle" data-testid="main-menu-subtitle">
-      {$_('mainMenu.menu')}
-      {#if import.meta.env.DEV}
-        <span class="dev-version" role="button" tabindex="0" onclick={handleDevMenu} onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleDevMenu()} data-testid="dev-version-span">
+    {#if import.meta.env.DEV}
+      <div class="main-menu-subtitle" data-testid="main-menu-subtitle">
+        {$_('mainMenu.menu')}
+        <span
+          class="dev-version"
+          role="button"
+          tabindex="0"
+          onclick={handleDevMenu}
+          onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleDevMenu()}
+          data-testid="dev-version-span"
+        >
           dev v.{$appVersion}
         </span>
-      {/if}
-    </div>
+      </div>
+    {/if}
     <div id="main-menu-buttons" use:hotkeysAndTooltips>
       <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="vs-computer-btn">{$_('mainMenu.playVsComputer')}</button>
       <button class="modal-button secondary" onclick={handleLocalGame} data-testid="local-game-btn">{$_('mainMenu.localGame')}</button>
