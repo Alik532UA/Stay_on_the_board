@@ -8,21 +8,18 @@
   import '../css/layouts/main-menu.css';
   import { languages } from '$lib/constants.js';
   import { logService } from '$lib/services/logService.js';
-  import { modalStore } from '$lib/stores/modalStore.js';
-  import ClearCacheOptions from './ClearCacheOptions.svelte';
+  import { clearCache } from '$lib/utils/cacheManager.js';
 
   $: settings = $settingsStore;
 
-  function showClearCacheModal() {
-  logService.action('Click: "Очистити кеш" (Settings)');
-  modalStore.showModal({
-    titleKey: 'mainMenu.clearCacheModal.title',
-    dataTestId: 'clear-cache-modal',
-    component: ClearCacheOptions,
-    buttons: [
-      { textKey: 'modal.cancel', onClick: () => modalStore.closeModal() }
-    ]
-  });
+  function handleClearAll() {
+    logService.action('Повне очищення кешу');
+    clearCache({ keepAppearance: false });
+  }
+
+  function handleKeepAppearance() {
+    logService.action('Очищення кешу зі збереженням вигляду');
+    clearCache({ keepAppearance: true });
   }
 
   /** @param {string} lang */
@@ -142,6 +139,7 @@
       </button>
     </div>
   </div>
+  <hr class="settings-divider" data-testid="settings-page-divider-3" />
   <div class="settings-option" data-testid="settings-page-difficulty-warning-option">
     <button
       class="settings-toggle-button"
@@ -152,16 +150,21 @@
       {$_('settings.showDifficultyWarningModal')}
     </button>
   </div>
+  <hr class="settings-divider" data-testid="settings-page-divider-4" />
   <div class="settings-actions" data-testid="settings-page-actions">
-  <button class="settings-reset-button" on:click={resetSettings} use:customTooltip={$_('settings.resetHint')} data-testid="settings-page-reset-button">
-    <SvgIcons name="reset" />
-    <span>{$_('settings.reset')}</span>
-  </button>
-  <button class="settings-reset-button danger" on:click={showClearCacheModal} data-testid="clear-cache-btn">
-    <SvgIcons name="clear-cache" />
-    <span>{$_('mainMenu.clearCache')}</span>
-  </button>
-</div>
+    <button class="settings-reset-button" on:click={resetSettings} use:customTooltip={$_('settings.resetHint')} data-testid="settings-page-reset-button">
+      <SvgIcons name="reset" />
+      <span>{$_('settings.reset')}</span>
+    </button>
+    <button data-testid="clear-cache-full-clear-btn" class="settings-reset-button danger" on:click={handleClearAll}>
+      <SvgIcons name="clear-cache" />
+      <span>{$_('mainMenu.clearCacheModal.fullClear')}</span>
+    </button>
+    <button data-testid="clear-cache-keep-appearance-btn" class="settings-reset-button" on:click={handleKeepAppearance}>
+      <SvgIcons name="clear-cache" />
+      <span>{$_('mainMenu.clearCacheModal.keepAppearance')}</span>
+    </button>
+  </div>
 </div>
 
 <style>
@@ -207,30 +210,33 @@
   .settings-actions {
     margin-top: 16px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
   }
   .settings-reset-button.danger {
-  background: var(--error-color);
-  color: #fff;
-}
-.settings-reset-button.danger:hover {
-  background: #a40e26; /* Темніший відтінок червоного для hover */
-}
+    background: var(--error-color);
+    color: #fff;
+  }
+  .settings-reset-button.danger:hover {
+    background: #a40e26; /* Темніший відтінок червоного для hover */
+  }
   .settings-reset-button {
-    background: var(--danger-bg);
-    color: var(--danger-text);
-    border: none;
+    background: var(--control-bg);
+    color: var(--text-primary);
+    border: 1.5px solid var(--border-color);
     border-radius: 8px;
     padding: 10px 20px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     transition: background 0.2s;
+    width: 100%;
   }
   .settings-reset-button:hover {
-    background: var(--danger-bg-hover);
+    border-color: var(--control-selected);
   }
   .language-selector {
     display: flex;
