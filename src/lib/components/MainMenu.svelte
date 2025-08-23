@@ -15,9 +15,7 @@
   import { currentLanguageFlagSvg } from '$lib/stores/derivedState.ts';
   import { languages } from '$lib/constants.js';
   import { modalStore } from '$lib/stores/modalStore.js';
-  import { clearCache } from '$lib/utils/cacheManager.js';
   import { requestGameModeModal } from '$lib/stores/uiStore.js';
-  import ClearCacheOptions from './ClearCacheOptions.svelte';
   import { onMount, tick } from 'svelte';
   import { get } from 'svelte/store';
   import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
@@ -53,18 +51,6 @@
     goto(`${base}${route}`);
   }
 
-  function showClearCacheModal() {
-    logService.action('Click: "Очистити кеш" (MainMenu)');
-    modalStore.showModal({
-      titleKey: 'mainMenu.clearCacheModal.title',
-      dataTestId: 'clear-cache-modal',
-      component: ClearCacheOptions,
-      buttons: [
-        { textKey: 'modal.cancel', onClick: () => modalStore.closeModal() }
-      ]
-    });
-  }
-
   /** @param {string} style @param {string} theme */
   function selectTheme(style, theme) {
     logService.action(`Click: "Тема: ${style} ${theme}" (MainMenu)`);
@@ -80,15 +66,13 @@
     showWipNotice = false;
     showDevMenu = false;
   }
-
-  let isDev = false;
   
   /** @param {HTMLElement} node */
   onMount(() => {
     gameModeService.cleanupCurrentGameMode();
     settingsStore.init();
-    isDev = !!import.meta.env.DEV;
   });
+
   function handleDevMenu() {
     logService.action('Click: "dev version" (MainMenu)');
     showDevMenu = !showDevMenu;
@@ -250,7 +234,7 @@
     <div class="main-menu-title" data-testid="main-menu-title">{$_('mainMenu.title')}</div>
     <div class="main-menu-subtitle" data-testid="main-menu-subtitle">
       {$_('mainMenu.menu')}
-      {#if isDev}
+      {#if import.meta.env.DEV}
         <span class="dev-version" role="button" tabindex="0" onclick={handleDevMenu} onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleDevMenu()} data-testid="dev-version-span">
           dev v.{$appVersion}
         </span>
@@ -264,7 +248,7 @@
       <button class="modal-button secondary" onclick={handleControls} data-testid="controls-btn">{$_('mainMenu.controls')}</button>
       <button class="modal-button secondary" onclick={handleRules} data-testid="rules-btn">{$_('mainMenu.rules')}</button>
       <button class="modal-button secondary" onclick={handleSupporters} data-testid="supporters-btn">{$_('mainMenu.supporters')}</button>
-      <button class="modal-button danger" onclick={showClearCacheModal} data-testid="clear-cache-btn">{$_('mainMenu.clearCache')}</button>
+      <!-- <button class="modal-button danger" onclick={showClearCacheModal} data-testid="clear-cache-btn">{$_('mainMenu.clearCache')}</button> -->
     </div>
   {/if}
 </main>

@@ -23,6 +23,7 @@
 	import { settingsStore } from '$lib/stores/settingsStore.ts';
 	import { get } from 'svelte/store';
 	import { initializeI18n, i18nReady } from '$lib/i18n/init.js';
+	import { appVersion } from '$lib/stores/versionStore.js';
 	import { assets } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { base } from '$app/paths';
@@ -51,6 +52,7 @@
 			const serverVersionData = await response.json();
 			const serverVersion = serverVersionData.version;
 			const localVersion = localStorage.getItem(APP_VERSION_KEY);
+			appVersion.set(serverVersion);
 
 			if (localVersion && localVersion !== serverVersion) {
 				showUpdateNotice = true;
