@@ -9,7 +9,7 @@
   import { gameState } from '$lib/stores/gameState.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
-  import { slide } from 'svelte/transition';
+  import { slide } from 'svelte/transition'; // <--- КРОК 1: Імпортуємо slide
   import { quintOut } from 'svelte/easing';
   import { animationStore } from '$lib/stores/animationStore.js';
   import { visualPosition, visualCellVisitCounts, visualBoardState, currentPlayer, availableMoves } from '$lib/stores/derivedState.ts';
@@ -20,8 +20,8 @@
   import PlayerPiece from './PlayerPiece.svelte';
   import { logService } from '$lib/services/logService.js';
   import { enableAllGameCheckboxesIfNeeded } from '$lib/utils/uiUtils.ts';
-  // КРОК 1: Імпортуємо isCellBlocked, щоб виправити помилку TypeScript
-  import { isCellBlocked } from '$lib/utils/boardUtils.ts';
+  // КРОК 2: Імпортуємо isCellBlocked та getDamageClass, щоб виправити помилку TypeScript
+  import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
 
   const boardSize = derived(gameState, $gameState => $gameState ? Number($gameState.boardSize) : 0);
 

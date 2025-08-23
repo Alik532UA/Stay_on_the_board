@@ -47,7 +47,6 @@
       if ($gameState.wasResumed) return $_('gameBoard.gameInfo.gameResumed');
 
       if ($lastComputerMove && !$isPauseBetweenMoves) {
-        // КРОК 3: Виправлення помилки локалізації
         const directionKey = $lastComputerMove.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
         const direction = $_(`gameBoard.directions.${directionKey}`);
         const distance = $lastComputerMove.distance;
@@ -106,7 +105,7 @@
     justify-content: center;
     backdrop-filter: var(--unified-backdrop-filter);
     border: var(--unified-border);
-    /* overflow: hidden; -- видалено для slide */
+    /* overflow: hidden; -- видаляємо, щоб slide працював коректно */
   }
 
   .game-info-content {
@@ -119,6 +118,22 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    position: relative; /* Батьківський елемент для абсолютно позиціонованої обгортки */
+    min-height: 50px; /* Задаємо мінімальну висоту, щоб уникнути стрибків розміру */
+  }
+
+  .fade-wrapper {
+    /* Робимо обгортку абсолютною, щоб стара і нова версії могли анімуватися одна над одною */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   :global(.message-line-1), :global(.message-line-2) {
