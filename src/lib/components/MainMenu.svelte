@@ -251,7 +251,7 @@
     <div class="main-menu-subtitle" data-testid="main-menu-subtitle">
       {$_('mainMenu.menu')}
       {#if isDev}
-        <span class="dev-version" role="button" tabindex="0" onclick={handleDevMenu} onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleDevMenu()}>
+        <span class="dev-version" role="button" tabindex="0" onclick={handleDevMenu} onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleDevMenu()} data-testid="dev-version-span">
           dev v.{$appVersion}
         </span>
       {/if}

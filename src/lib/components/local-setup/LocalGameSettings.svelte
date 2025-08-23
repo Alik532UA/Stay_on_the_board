@@ -54,6 +54,7 @@
         logService.action(`Click: "Режим заблокованих клітинок: ${newCheckedState}" (LocalGameSettings)`);
         gameState.updateSettings({ blockModeEnabled: newCheckedState });
       }}
+      dataTestId="block-mode-toggle"
     />
 
     <!-- ToggleButton: Автоматично приховувати дошку -->
@@ -65,6 +66,7 @@
         logService.action(`Click: "Автоматично приховувати дошку: ${newCheckedState}" (LocalGameSettings)`);
         gameState.updateSettings({ autoHideBoard: newCheckedState });
       }}
+      dataTestId="auto-hide-board-toggle"
     />
 
     <!-- ToggleButton: Заборонити змінювати правила -->
@@ -76,6 +78,7 @@
         logService.action(`Click: "Заборонити змінювати правила: ${newCheckedState}" (LocalGameSettings)`);
         gameState.updateSettings({ lockSettings: newCheckedState });
       }}
+      dataTestId="lock-settings-toggle"
     />
   </div>
 </div>

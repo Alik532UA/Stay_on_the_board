@@ -470,7 +470,7 @@
         <span class="settings-expander__label">{$_('gameControls.blockAfter')}</span>
         <div class="settings-expander__button-group" use:fitTextAction={$settingsStore.blockOnVisitCount}>
           {#each [0, 1, 2, 3] as count}
-            <button class="settings-expander__square-btn" class:active={$settingsStore.blockOnVisitCount === count} on:click={() => selectBlockCount(count)}>{count}</button>
+            <button data-testid="settings-expander-block-count-btn-{count}" class="settings-expander__square-btn" class:active={$settingsStore.blockOnVisitCount === count} on:click={() => selectBlockCount(count)}>{count}</button>
           {/each}
         </div>
       </div>
@@ -480,6 +480,7 @@
         label={$_('gameControls.speech')}
         checked={speechEnabled}
         on:toggle={() => settingsStore.toggleSpeech(undefined)}
+        dataTestId="speech-toggle"
       />
       <button data-testid="settings-expander-voice-settings-btn" class="settings-expander__square-btn" use:blurOnClick use:customTooltip={$_('gameControls.voiceSettingsTitle')} on:click|stopPropagation={openVoiceSettingsModal}>
         <SvgIcons name="voice-settings" />
