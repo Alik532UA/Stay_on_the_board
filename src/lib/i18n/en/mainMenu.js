@@ -33,8 +33,8 @@ export default {
   clearCacheModal: {
     title: "Clear Cache",
     content: "Choose a clearing type:",
-    fullClear: "Clear All (resets all settings)",
-    keepAppearance: "Keep Appearance (theme, language)"
+    fullClear: "Clear cache completely",
+    keepAppearance: "Clear cache, except theme and language"
   },
   gameModeModal: {
     title: "Select Game Mode"

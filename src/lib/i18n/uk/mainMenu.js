@@ -33,8 +33,8 @@ export default {
   clearCacheModal: {
     title: "Очищення кешу",
     content: "Виберіть тип очищення:",
-    fullClear: "Очистити все (скине всі налаштування)",
-    keepAppearance: "Зберегти вигляд (тема, мова)"
+    fullClear: "Очистити кеш повністю",
+    keepAppearance: "Очистити кеш, крім теми та мови"
   },
   gameModeModal: {
     title: "Вибір режиму гри"
