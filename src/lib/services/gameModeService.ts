@@ -12,12 +12,15 @@ import { logService } from '$lib/services/logService.js';
 import type { SideEffect } from './sideEffectService';
 import { VsComputerGameMode } from '$lib/gameModes/VsComputerGameMode';
 import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
+import { OnlineGameMode } from '$lib/gameModes/OnlineGameMode';
 import { BaseGameMode } from '$lib/gameModes/BaseGameMode';
 
 export const gameModeService = {
-  setCurrentGameMode(mode: 'local' | 'vs-computer') {
+  setCurrentGameMode(mode: 'local' | 'vs-computer' | 'online') {
     const currentMode = get(gameStore).mode;
-    const isSameMode = (currentMode instanceof LocalGameMode && mode === 'local') || (currentMode instanceof VsComputerGameMode && mode === 'vs-computer');
+    const isSameMode = (currentMode instanceof LocalGameMode && mode === 'local') ||
+                     (currentMode instanceof VsComputerGameMode && mode === 'vs-computer') ||
+                     (currentMode instanceof OnlineGameMode && mode === 'online');
 
     if (isSameMode) {
       logService.GAME_MODE(`Game mode is already set to: ${mode}. No changes needed.`);
@@ -28,6 +31,8 @@ export const gameModeService = {
     let gameMode: BaseGameMode;
     if (mode === 'local') {
       gameMode = new LocalGameMode();
+    } else if (mode === 'online') {
+      gameMode = new OnlineGameMode();
     } else {
       gameMode = new VsComputerGameMode();
     }
@@ -38,7 +43,7 @@ export const gameModeService = {
 
   initializeGameMode() {
     const gameType = this._determineGameType();
-    this.setCurrentGameMode(gameType as 'local' | 'vs-computer');
+    this.setCurrentGameMode(gameType as 'local' | 'vs-computer' | 'online');
   },
 
   _ensureGameMode(): BaseGameMode {
@@ -50,29 +55,29 @@ export const gameModeService = {
     return activeGameMode!;
   },
 
-  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<SideEffect[]> {
+  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
     const activeGameMode = this._ensureGameMode();
-    return activeGameMode.endGame(reasonKey, reasonValues);
+    await activeGameMode.endGame(reasonKey, reasonValues);
   },
 
-  async restartGame(): Promise<SideEffect[]> {
+  async restartGame(): Promise<void> {
     const activeGameMode = this._ensureGameMode();
-    return activeGameMode.restartGame();
+    await activeGameMode.restartGame();
   },
 
-  async handlePlayerMove(direction: any, distance: any): Promise<SideEffect[]> {
+  async handlePlayerMove(direction: any, distance: any): Promise<void> {
     const activeGameMode = this._ensureGameMode();
-    return activeGameMode.handlePlayerMove(direction, distance);
+    await activeGameMode.handlePlayerMove(direction, distance);
   },
 
-  async claimNoMoves(): Promise<SideEffect[]> {
+  async claimNoMoves(): Promise<void> {
     const activeGameMode = this._ensureGameMode();
-    return activeGameMode.claimNoMoves();
+    await activeGameMode.claimNoMoves();
   },
 
-  async continueAfterNoMoves(): Promise<SideEffect[]> {
+  async continueAfterNoMoves(): Promise<void> {
     const activeGameMode = this._ensureGameMode();
-    return activeGameMode.continueAfterNoMoves();
+    await activeGameMode.continueAfterNoMoves();
   },
 
   _determineGameType(): string {
@@ -85,6 +90,8 @@ export const gameModeService = {
       return 'local';
     } else if (currentPath.includes('/game/vs-computer')) {
       return 'vs-computer';
+    } else if (currentPath.includes('/game/online')) {
+      return 'online';
     }
     
     return 'vs-computer';

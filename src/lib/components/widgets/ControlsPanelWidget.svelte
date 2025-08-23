@@ -2,6 +2,7 @@
   import { gameState } from '$lib/stores/gameState.js';
   import { playerInputStore } from '$lib/stores/playerInputStore.js';
   import { setDirection, setDistance } from '$lib/services/gameLogicService.js';
+  import { localInputProvider } from '$lib/services/localInputProvider';
   import { userActionService } from '$lib/services/userActionService';
   import { _ } from 'svelte-i18n';
   import { settingsStore } from '$lib/stores/settingsStore.js';
@@ -65,7 +66,7 @@
       });
       return;
     }
-    userActionService.confirmMove();
+    localInputProvider.confirmMove();
   }
 </script>
 

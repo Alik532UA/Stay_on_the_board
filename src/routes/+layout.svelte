@@ -18,6 +18,7 @@
 </svelte:head>
 
 <script lang="ts">
+	import { commandService } from '$lib/services/commandService';
 	import Header from './Header.svelte';
 	import '../app.css';
 	import { settingsStore } from '$lib/stores/settingsStore.ts';

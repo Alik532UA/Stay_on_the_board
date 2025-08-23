@@ -21,19 +21,19 @@ export interface IGameMode {
    * @param distance - Відстань ходу.
    * @returns Promise, що вирішується масивом побічних ефектів.
    */
-  handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<SideEffect[]>;
+  handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void>;
 
   /**
    * Обробляє заявку гравця про відсутність ходів.
    * @returns Promise, що вирішується після обробки заявки.
    */
-  claimNoMoves(): Promise<SideEffect[]>;
+  claimNoMoves(): Promise<void>;
 
   /**
    * Обробляє ситуацію, коли у гравця або комп'ютера немає ходів.
    * @param playerType - Тип гравця ('human' або 'computer').
    */
-  handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]>;
+  handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
 
   /**
    * Повертає конфігурацію гравців для цього режиму.

@@ -5,10 +5,12 @@ import { BaseGameMode } from './index';
 import { moveDirections } from '$lib/utils/translations';
 import { lastComputerMove, availableMoves as derivedAvailableMoves } from '$lib/stores/derivedState';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';
+import { gameStateMutator } from '$lib/services/gameStateMutator';
 import * as gameLogicService from '$lib/services/gameLogicService';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { userActionService } from '$lib/services/userActionService';
+import { gameEventBus } from '$lib/services/gameEventBus';
 import type { SideEffect } from '$lib/services/sideEffectService';
 import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
@@ -23,13 +25,13 @@ export class VsComputerGameMode extends BaseGameMode {
     gameLogicService.resetGame({ players: this.getPlayersConfiguration(), settings }, get(gameState));
   }
 
-  async claimNoMoves(): Promise<SideEffect[]> {
+  async claimNoMoves(): Promise<void> {
     const currentAvailableMoves = get(derivedAvailableMoves);
 
     if (currentAvailableMoves.length > 0) {
-      return this.endGame('modal.errorContent', { count: currentAvailableMoves.length });
+      await this.endGame('modal.errorContent', { count: currentAvailableMoves.length });
     } else {
-      return this.handleNoMoves('human');
+      await this.handleNoMoves('human');
     }
   }
 
@@ -46,31 +48,28 @@ export class VsComputerGameMode extends BaseGameMode {
   }
 
 
-  protected async advanceToNextPlayer(): Promise<SideEffect[]> {
+  protected async advanceToNextPlayer(): Promise<void> {
     logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
     const currentState = get(gameState);
     const nextPlayerIndex = (currentState.currentPlayerIndex + 1) % currentState.players.length;
 
-    gameState.update(state => ({...state, currentPlayerIndex: nextPlayerIndex}));
+    gameStateMutator.setCurrentPlayer(nextPlayerIndex);
 
     const nextPlayer = get(gameState).players[nextPlayerIndex];
     logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer.type}.`);
     if (nextPlayer.type === 'ai' && !get(gameState).isComputerMoveInProgress) {
       logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера.');
-      return this.triggerComputerMove();
+      await this.triggerComputerMove();
     }
-    return [];
   }
 
-  private async triggerComputerMove(): Promise<SideEffect[]> {
+  private async triggerComputerMove(): Promise<void> {
     logService.GAME_MODE('triggerComputerMove: Початок ходу комп\'ютера.');
     const state = get(gameState);
-    gameState.update(state => ({...state, isComputerMoveInProgress: true}));
-
+    gameStateMutator.applyMove({ isComputerMoveInProgress: true });
 
     const computerMove = gameLogicService.getComputerMove();
     logService.GAME_MODE('triggerComputerMove: Результат getComputerMove:', computerMove);
-    let sideEffects: SideEffect[] = [];
 
     if (computerMove) {
       logService.GAME_MODE('triggerComputerMove: Комп\'ютер має хід, виконуємо...');
@@ -80,37 +79,31 @@ export class VsComputerGameMode extends BaseGameMode {
 
       if (!moveResult.success) {
         logService.GAME_MODE('triggerComputerMove: Хід комп\'ютера не вдався, обробка "немає ходів".');
-        sideEffects = await this.handleNoMoves('computer');
+        await this.handleNoMoves('computer');
       } else {
-        sideEffects = await this.onPlayerMoveSuccess(moveResult);
+        gameStateMutator.applyMove(moveResult.changes);
+        await this.onPlayerMoveSuccess(moveResult);
         const settings = get(settingsStore);
         if (settings.speechEnabled) {
           const lastMove = get(lastComputerMove);
           if (lastMove) {
             const allVoices = window.speechSynthesis.getVoices();
             const selectedVoice = allVoices.find(v => v.voiceURI === settings.selectedVoiceURI);
-            const speechLang = selectedVoice ? selectedVoice.lang.split('-')[0] : (get(locale) || 'uk');
-
-            sideEffects.push({ type: 'audio/speak', payload: { move: lastMove, lang: speechLang, voiceURI: settings.selectedVoiceURI } });
+            const speechLang = selectedVoice ? selectedVoice.lang.split('-') : (get(locale) || 'uk');
+            gameEventBus.dispatch('SpeakMove', { move: lastMove, lang: speechLang, voiceURI: settings.selectedVoiceURI });
           }
         }
         
         const currentState = get(gameState);
         if (currentState.wasResumed) {
-          gameState.update(state => ({...state, wasResumed: false}));
+          gameStateMutator.applyMove({ wasResumed: false });
         }
-        // sideEffects = [...sideEffects, ...(await this.advanceToNextPlayer())];
       }
     } else {
       logService.GAME_MODE('triggerComputerMove: У комп\'ютера немає ходів, викликаємо handleNoMoves.');
-      sideEffects = await this.handleNoMoves('computer');
+      await this.handleNoMoves('computer');
     }
-    gameState.update(state => ({...state, isComputerMoveInProgress: false}));
-    // ЧОМУ ЦЕ ВАЖЛИВО: GameMode НЕ МАЄ напряму виконувати сайд-ефекти або змінювати стан вводу.
-    // Він лише повертає список сайд-ефектів. Єдиним виконавцем є userActionService,
-    // що гарантує єдине джерело істини (SSoT) і запобігає подвійному виконанню,
-    // як-от у випадку з модалкою "opponent-trapped-modal".
-    return sideEffects;
+    gameStateMutator.applyMove({ isComputerMoveInProgress: false });
   }
 
   protected async applyScoreChanges(scoreChanges: any): Promise<void> {
@@ -119,7 +112,7 @@ export class VsComputerGameMode extends BaseGameMode {
     // тому тут нічого робити не потрібно.
   }
 
-  async continueAfterNoMoves(): Promise<SideEffect[]> {
+  async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE('[VsComputerGameMode] continueAfterNoMoves called');
     const state = get(gameState);
     const settings = get(settingsStore);
@@ -156,7 +149,7 @@ export class VsComputerGameMode extends BaseGameMode {
       currentPlayerIndex: 0
     };
 
-    gameState.update(state => ({...state, ...continueChanges}));
+    gameStateMutator.applyMove(continueChanges);
     
     gameOverStore.resetGameOverState();
     animationStore.reset();
@@ -164,48 +157,42 @@ export class VsComputerGameMode extends BaseGameMode {
     // У цьому режимі хід не передається комп'ютеру після очищення дошки.
     // Гравець-людина продовжує свій хід з чистої дошки.
     // Тому this.advanceToNextPlayer() тут не викликається.
-    return [{ type: 'ui/closeModal' }];
+    gameEventBus.dispatch('CloseModal');
   }
 
-  async handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]> {
+  async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
     logService.GAME_MODE(`handleNoMoves: Обробка ситуації "немає ходів" для гравця типу: ${playerType}.`);
     const state = get(gameState);
     gameOverStore.resetGameOverState();
 
-    gameState.update(state => ({
-        ...state,
-        noMovesClaimed: true,
-        noMovesBonus: (state.noMovesBonus || 0) + state.boardSize
-    }));
+    gameStateMutator.applyMove({
+      noMovesClaimed: true,
+      noMovesBonus: (state.noMovesBonus || 0) + state.boardSize
+    });
 
     const updatedState = get(gameState);
     const potentialScoreDetails = calculateFinalScore(updatedState as any, 'vs-computer');
     const titleKey = playerType === 'human' ? 'modal.playerNoMovesTitle' : 'modal.computerNoMovesTitle';
     const contentKey = playerType === 'human' ? 'modal.playerNoMovesContent' : 'modal.computerNoMovesContent';
 
-    return [
-      {
-        type: 'ui/showModal',
-        payload: {
-          titleKey,
-          content: {
-            reason: get(_)(contentKey),
-            scoreDetails: potentialScoreDetails
-          },
-          buttons: [
-            { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: () => userActionService.handleModalAction('continueAfterNoMoves'), dataTestId: 'continue-game-no-moves-btn' },
-            {
-              text: get(_)('modal.finishGameWithBonus', { values: { bonus: updatedState.boardSize } }),
-              onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonBonus' }),
-              dataTestId: 'finish-game-with-bonus-btn'
-            },
-            { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: `watch-replay-${playerType}-no-moves-btn` }
-          ],
-          closable: false,
-          dataTestId: playerType === 'human' ? 'player-no-moves-modal' : 'opponent-trapped-modal',
-          titleDataTestId: 'opponent-trapped-modal-title'
-        }
-      }
-    ];
+    gameEventBus.dispatch('ShowModal', {
+      titleKey,
+      content: {
+        reason: get(_)(contentKey),
+        scoreDetails: potentialScoreDetails
+      },
+      buttons: [
+        { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: () => userActionService.handleModalAction('continueAfterNoMoves'), dataTestId: 'continue-game-no-moves-btn' },
+        {
+          text: get(_)('modal.finishGameWithBonus', { values: { bonus: updatedState.boardSize } }),
+          onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonBonus' }),
+          dataTestId: 'finish-game-with-bonus-btn'
+        },
+        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: `watch-replay-${playerType}-no-moves-btn` }
+      ],
+      closable: false,
+      dataTestId: playerType === 'human' ? 'player-no-moves-modal' : 'opponent-trapped-modal',
+      titleDataTestId: 'opponent-trapped-modal-title'
+    });
   }
 }

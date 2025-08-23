@@ -3,7 +3,8 @@ import { Figure, MoveDirection } from '../models/Figure';
 import type { MoveDirectionType } from '../models/Figure';
 import { get } from 'svelte/store';
 import { playerInputStore } from '../stores/playerInputStore';
-import { gameState, createInitialState, type Player } from '../stores/gameState'; // Тепер цей імпорт безпечний
+import { gameState, createInitialState, type Player } from '../stores/gameState';
+import { gameStateMutator } from './gameStateMutator';
 import { getAvailableMoves, isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
 import { lastPlayerMove } from '$lib/stores/derivedState';
 import { settingsStore } from '../stores/settingsStore';
@@ -21,21 +22,9 @@ import type { Direction } from '$lib/utils/gameUtils';
 
 export function resetGame(options: { newSize?: number; players?: Player[]; settings?: any } = {}, currentState: any) {
   const newSize = options.newSize ?? currentState?.boardSize ?? 4;
-  const { testMode } = get(settingsStore);
   
-  const newState = createInitialState({
-    size: newSize,
-    players: options.players,
-    testMode: options.settings?.testMode ?? testMode
-  });
+  gameStateMutator.resetGame({ newSize, players: options.players });
 
-  // Якщо гравці передані, використовуємо їх
-  if (options.players) {
-    newState.players = options.players;
-  }
-  
-  gameState.set(newState);
-  
   // Застосовуємо налаштування з локальної гри, якщо вони передані
   if (options.settings) {
     settingsStore.updateSettings({
@@ -57,12 +46,11 @@ export function resetGame(options: { newSize?: number; players?: Player[]; setti
   }
   
   // Скидаємо рахунки гравців в локальній грі
+  const newState = get(gameState);
   const humanPlayersCount = newState.players.filter((p: Player) => p.type === 'human').length;
   if (humanPlayersCount > 1) {
-    gameState.resetScores();
+    gameState.resetScores(); // This is a method on the store, might need to be moved to mutator later
   }
-  
-  // animationStore автоматично скидається при зміні gameId
 }
 
 export function setDirection(dir: Direction) {
@@ -189,7 +177,7 @@ export async function performMove(
     isFirstMove: false
   };
 
-  gameState.update(state => ({...state, ...changes}));
+  // gameState.update(state => ({...state, ...changes}));
   
   // Логіка для "дзеркального" ходу та бонусів тепер обробляється в LocalGameMode та VsComputerGameMode,
   // які отримують `scoreChanges` і вирішують, як їх застосувати.
@@ -198,6 +186,7 @@ export async function performMove(
   logService.logicMove('performMove: завершено успішно');
   return {
     success: true,
+    changes,
     newPosition,
     bonusPoints: scoreChanges.bonusPoints,
     penaltyPoints: scoreChanges.penaltyPointsForMove

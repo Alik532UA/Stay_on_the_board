@@ -2,12 +2,14 @@ import { get } from 'svelte/store';
 import { _ } from 'svelte-i18n';
 import { BaseGameMode } from './index';
 import { gameState, type GameState, type Player } from '$lib/stores/gameState';
+import { gameStateMutator } from '$lib/services/gameStateMutator';
 import * as gameLogicService from '$lib/services/gameLogicService';
 import { playerInputStore } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { getAvailableMoves } from '$lib/utils/boardUtils';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { userActionService } from '$lib/services/userActionService';
+import { gameEventBus } from '$lib/services/gameEventBus';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
@@ -21,7 +23,7 @@ export class LocalGameMode extends BaseGameMode {
     this.checkComputerTurn();
   }
 
-  async claimNoMoves(): Promise<SideEffect[]> {
+  async claimNoMoves(): Promise<void> {
     const state = get(gameState);
     const settings = get(settingsStore);
     const availableMoves = getAvailableMoves(
@@ -38,60 +40,54 @@ export class LocalGameMode extends BaseGameMode {
     if (Object.keys(availableMoves).length > 0) {
       // If moves are available, the player loses.
       const currentPlayerName = state.players[state.currentPlayerIndex].name;
-      return this.endGame('modal.gameOverReasonPlayerLied', { playerName: currentPlayerName });
+      await this.endGame('modal.gameOverReasonPlayerLied', { playerName: currentPlayerName });
     } else {
       // If there are no moves, show the modal.
-      return this._handleLocalNoMoves();
+      this._handleLocalNoMoves();
     }
   }
 
-  private _handleLocalNoMoves(): SideEffect[] {
+  private _handleLocalNoMoves(): void {
     const state = get(gameState);
     const currentPlayerName = state.players[state.currentPlayerIndex].name;
 
-    return [
-      {
-        type: 'ui/showModal',
-        payload: {
-          titleKey: 'modal.playerNoMovesTitle',
-          contentKey: 'modal.noMovesLocalGameContent',
-          content: { playerName: currentPlayerName },
-          buttons: [
-            {
-              textKey: 'modal.continueGame',
-              onClick: () => userActionService.handleModalAction('continueAfterNoMoves'),
-              primary: true,
-              isHot: true,
-              dataTestId: 'continue-game-btn'
-            },
-            {
-              textKey: 'modal.endGame',
-              onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonNoMovesLeft' }),
-              dataTestId: 'end-game-btn'
-            },
-            {
-              textKey: 'modal.reviewRecord',
-              customClass: 'blue-btn',
-              onClick: () => userActionService.handleModalAction('requestReplay'),
-              dataTestId: 'review-record-btn'
-            }
-          ]
+    gameEventBus.dispatch('ShowModal', {
+      titleKey: 'modal.playerNoMovesTitle',
+      contentKey: 'modal.noMovesLocalGameContent',
+      content: { playerName: currentPlayerName },
+      buttons: [
+        {
+          textKey: 'modal.continueGame',
+          onClick: () => userActionService.handleModalAction('continueAfterNoMoves'),
+          primary: true,
+          isHot: true,
+          dataTestId: 'continue-game-btn'
+        },
+        {
+          textKey: 'modal.endGame',
+          onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonNoMovesLeft' }),
+          dataTestId: 'end-game-btn'
+        },
+        {
+          textKey: 'modal.reviewRecord',
+          customClass: 'blue-btn',
+          onClick: () => userActionService.handleModalAction('requestReplay'),
+          dataTestId: 'review-record-btn'
         }
-      }
-    ];
+      ]
+    });
   }
 
-  async continueAfterNoMoves(): Promise<SideEffect[]> {
+  async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE('[LocalGameMode] continueAfterNoMoves called');
-    gameState.update(state => ({...state, cellVisitCounts: {}}));
+    gameStateMutator.clearCellVisits();
     animationStore.reset();
-    this.advanceToNextPlayer();
-    return [{ type: 'ui/closeModal' }];
+    await this.advanceToNextPlayer();
+    gameEventBus.dispatch('CloseModal');
   }
 
-  async handleNoMoves(playerType: 'human' | 'computer'): Promise<SideEffect[]> {
+  async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
     logService.GAME_MODE('handleNoMoves is not applicable in LocalGameMode');
-    return [];
   }
 
   getPlayersConfiguration(): Player[] {
@@ -101,7 +97,7 @@ export class LocalGameMode extends BaseGameMode {
 
 
 
-  protected async advanceToNextPlayer(): Promise<SideEffect[]> {
+  protected async advanceToNextPlayer(): Promise<void> {
     const currentState = get(gameState);
     const nextPlayerIndex = (currentState.currentPlayerIndex + 1) % currentState.players.length;
 
@@ -109,9 +105,9 @@ export class LocalGameMode extends BaseGameMode {
       gameState.snapshotScores();
     }
 
-    gameState.update(state => ({...state, currentPlayerIndex: nextPlayerIndex}));
+    gameStateMutator.setCurrentPlayer(nextPlayerIndex);
 
-    return this.checkComputerTurn();
+    await this.checkComputerTurn();
   }
 
   protected async applyScoreChanges(scoreChanges: any): Promise<void> {
@@ -127,7 +123,7 @@ export class LocalGameMode extends BaseGameMode {
     }
   }
 
-  private async checkComputerTurn(): Promise<SideEffect[]> {
+  private async checkComputerTurn(): Promise<void> {
     const state = get(gameState);
     const currentPlayer = state.players[state.currentPlayerIndex];
 
@@ -137,12 +133,11 @@ export class LocalGameMode extends BaseGameMode {
 
       const move = gameLogicService.getComputerMove();
       if (move) {
-        return this.handlePlayerMove(move.direction, move.distance);
+        await this.handlePlayerMove(move.direction, move.distance);
       } else {
         // Якщо комп'ютер не може зробити хід, це означає кінець гри для нього
-        return this.endGame('modal.gameOverReasonPlayerBlocked');
+        await this.endGame('modal.gameOverReasonPlayerBlocked');
       }
     }
-    return [];
   }
 }

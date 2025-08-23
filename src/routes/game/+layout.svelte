@@ -13,6 +13,7 @@
   import { playerInputStore } from '$lib/stores/playerInputStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { gameState } from '$lib/stores/gameState.js';
+  import { localInputProvider } from '$lib/services/localInputProvider';
   import { userActionService } from '$lib/services/userActionService';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
@@ -70,7 +71,7 @@
       case 'down-left': setDirection('down-left'); break;
       case 'down': setDirection('down'); break;
       case 'down-right': setDirection('down-right'); break;
-      case 'confirm': userActionService.confirmMove(); break;
+      case 'confirm': localInputProvider.confirmMove(); break;
       case 'no-moves': userActionService.claimNoMoves(); break;
       case 'distance-1': setDistance(1); break;
       case 'distance-2': setDistance(2); break;
