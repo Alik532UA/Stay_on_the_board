@@ -11,14 +11,14 @@
   <p class="gratitude-text">{$_('supportersPage.gratitudeText')}</p>
   
   <div class="supporters-list">
-    <div class="supporter-item" role="button" tabindex="0" onclick={() => window.open('https://steamcommunity.com/profiles/76561198948943743/', '_blank', 'noopener,noreferrer')} onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && window.open('https://steamcommunity.com/profiles/76561198943743/', '_blank', 'noopener,noreferrer')}>den</div>
-    <div class="supporter-item" role="button" tabindex="0" onclick={() => window.open('https://steamcommunity.com/profiles/76561198055854871/', '_blank', 'noopener,noreferrer')} onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && window.open('https://steamcommunity.com/profiles/76561198055854871/', '_blank', 'noopener,noreferrer')}>Khaaaa</div>
+    <div class="supporter-item" role="button" tabindex="0" on:click={() => window.open('https://steamcommunity.com/profiles/76561198948943743/', '_blank', 'noopener,noreferrer')} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && window.open('https://steamcommunity.com/profiles/76561198943743/', '_blank', 'noopener,noreferrer')}>den</div>
+    <div class="supporter-item" role="button" tabindex="0" on:click={() => window.open('https://steamcommunity.com/profiles/76561198055854871/', '_blank', 'noopener,noreferrer')} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && window.open('https://steamcommunity.com/profiles/76561198055854871/', '_blank', 'noopener,noreferrer')}>Khaaaa</div>
     <div class="supporter-item">Destroyter94</div>
     <div class="supporter-item">MrGrom</div>
     <!-- Майбутні імена будуть додаватися сюди -->
   </div>
   <p class="call-to-action-text">{@html $_('supportersPage.callToAction')}</p>
-  <button class="support-btn" onclick={() => window.open('https://send.monobank.ua/jar/8TPmFKQTCK', '_blank', 'noopener,noreferrer')}>
+  <button class="support-btn" on:click={() => window.open('https://send.monobank.ua/jar/8TPmFKQTCK', '_blank', 'noopener,noreferrer')}>
     {$_('supportersPage.supportButton')}
   </button>
 </div>
