@@ -427,10 +427,10 @@ function createSettingsStore() {
           break;
         case 'experienced':
           // autoHideBoard вмикається для experienced/pro для стимулювання гри по пам'яті, інтегруючись з gameState для виявлення ходів
-          settingsToApply = { showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
+          settingsToApply = { showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'compact', blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
           break;
         case 'pro':
-          settingsToApply = { showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
+          settingsToApply = { showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'hidden', blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
           break;
       }
       settingsToApply.gameMode = mode;
