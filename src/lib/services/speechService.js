@@ -1,6 +1,7 @@
 // speechService: централізований сервіс для озвучення ходів, повідомлень тощо.
 import { writable, get } from 'svelte/store';
 import { logService } from '$lib/services/logService.js';
+import { _ } from 'svelte-i18n';
 
 /** @type {import('svelte/store').Writable<SpeechSynthesisVoice[]>} */
 const voices = writable([]);
@@ -72,6 +73,54 @@ export function filterVoicesByLang(voiceList, langCode) {
 
 /**
  * Озвучує ігровий хід.
+ * @param {{direction: string, distance: number}} move
+ * @param {string} lang
+ * @param {string | null} voiceURI
+ */
+export function speakMove(move, lang, voiceURI) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window) || !move) return;
+
+  const allVoices = speechSynthesis.getVoices();
+  if (allVoices.length === 0) {
+    logService.ui('[Speech] speakMove called, but no voices are available.');
+    loadAndGetVoices();
+    return;
+  }
+
+  const selectedVoice = voiceURI ? allVoices.find(v => v.voiceURI === voiceURI) : null;
+  const availableVoices = filterVoicesByLang(allVoices, lang);
+  /** @type {SpeechSynthesisVoice | null} */
+  let voiceToUse = null;
+  if (selectedVoice) {
+    voiceToUse = selectedVoice;
+  } else if (availableVoices.length > 0) {
+    voiceToUse = availableVoices[0];
+    logService.speech(`[Speech] No selected voice URI. Using first available for lang "${lang}":`, voiceToUse);
+  }
+  const voiceLang = voiceToUse ? voiceToUse.lang : 'en-US';
+  
+  const actualLangCode = voiceLang.split('-');
+  logService.speech(`[Speech] Determined language for speech: ${actualLangCode} (based on voice lang: ${voiceLang})`);
+
+  let textToSpeak = '';
+  const $t = get(_);
+
+  if (actualLangCode[0] === 'en') {
+    const directionText = $t(`gameBoard.directionsEn.${move.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase())}`) || move.direction;
+    textToSpeak = `${directionText} ${move.distance}`;
+    logService.speech(`[Speech] Generating EN text: "${textToSpeak}"`);
+  } else {
+    const directionKey = move.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+    const directionText = $t(`gameBoard.directions.${directionKey}`) || move.direction;
+    textToSpeak = `${directionText} ${move.distance}`;
+    logService.speech(`[Speech] Generating text for "${actualLangCode}": "${textToSpeak}"`);
+  }
+
+  speakText(textToSpeak, voiceLang, voiceURI);
+}
+
+/**
+ * Озвучує текст.
  * @param {string} textToSpeak
  * @param {string} lang
  * @param {string | null} voiceURI
@@ -108,4 +157,4 @@ export function speakText(textToSpeak, lang, voiceURI) {
 }
 
 
-// TODO: Додати мок-версію для тестування 
+// TODO: Додати мок-версію для тестування
