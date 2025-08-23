@@ -1,14 +1,3 @@
-Дякую за уточнення та скріншот. Ти вказав на важливу деталь UX — неправильні переноси рядків та зайві символи руйнують візуальну чистоту.
-
-**Аналіз першопричини:**
-1.  **Перенос рядка:** Використання тегу `<br>` у ключі локалізації `computerMadeMoveCompact` призводить до примусового переносу рядка.
-2.  **Зайва крапка:** Крапка з'являється через те, що вона є частиною рядка в перекладі, і після підстановки HTML-блоку з ходом вона залишається в кінці першого рядка.
-
-**Архітектурне рішення:**
-Ми виправимо це, змінивши підхід до локалізації. Замість того, щоб вставляти HTML в один рядок, ми створимо два окремі ключі для кожної частини повідомлення. Це дасть нам повний контроль над їхнім відображенням у компоненті за допомогою CSS (flexbox), що є більш гнучким та правильним рішенням з точки зору розділення логіки та представлення (SoC).
-
----
-
 # План дій для AI-асистента
 
 ## 1. Інструкції для асистента
@@ -24,93 +13,96 @@
 
 ## 2. Покроковий план дій
 
-*   **Крок 1: Рефакторинг файлів локалізації `gameBoard.js`**
-    *   **Дія:** У файлах `gameBoard.js` для всіх мов замінити ключ `computerMadeMoveCompact` на два нових ключі: `computerMadeMovePart1` та `computerMadeMovePart2`.
-    *   **Файл:** `src/lib/i18n/uk/gameBoard.js`
-        *   **Замінити:** `computerMadeMoveCompact: "Комп'ютер зробив хід: {move}.<br>Тепер ваша черга робити хід",`
-        *   **На:**
-            ```javascript
-            computerMadeMovePart1: "Комп'ютер зробив хід:",
-            computerMadeMovePart2: "Тепер ваша черга робити хід",
-            ```
-    *   **Файл:** `src/lib/i18n/en/gameBoard.js`
-        *   **Замінити:** `computerMadeMoveCompact: "Computer moved: {move}.<br>Now your turn to move",`
-        *   **На:**
-            ```javascript
-            computerMadeMovePart1: "Computer moved:",
-            computerMadeMovePart2: "Now your turn to move",
-            ```
-    *   **Файл:** `src/lib/i18n/crh/gameBoard.js`
-        *   **Замінити:** `computerMadeMoveCompact: "Kompyuter areket yaptı: {move}.<br>Endi sıra sizde areket yapmaq",`
-        *   **На:**
-            ```javascript
-            computerMadeMovePart1: "Kompyuter areket yaptı:",
-            computerMadeMovePart2: "Endi sıra sizde areket yapmaq",
-            ```
-    *   **Файл:** `src/lib/i18n/nl/gameBoard.js`
-        *   **Замінити:** `computerMadeMoveCompact: "Computer verplaatste: {move}.<br>Nu jouw beurt om te zetten",`
-        *   **На:**
-            ```javascript
-            computerMadeMovePart1: "Computer verplaatste:",
-            computerMadeMovePart2: "Nu jouw beurt om te zetten",
-            ```
-    *   **Обґрунтування:** Розділення тексту на логічні частини дає нам гнучкість у верстці та усуває жорстко закодовані `<br>` (SoC).
+### **Аналіз проблеми**
 
-*   **Крок 2: Рефакторинг логіки та стилів у `src/lib/components/widgets/GameInfoWidget.svelte`**
-    *   **Дія 1 (Логіка):** Оновити `derived` стор `displayMessage`, щоб він повертав не рядок, а об'єкт з частинами повідомлення для компактного режиму.
-    *   **Знайти цей блок коду в `derived` сторі:**
-        ```typescript
-        if (isCompact) {
-          const arrow = directionArrows[$lastComputerMove.direction] || '?';
-          const moveDisplay = `<span class="compact-move-display">${arrow}${distance}</span>`;
-          return $_('gameBoard.gameInfo.computerMadeMoveCompact', { values: { move: moveDisplay } });
-        }
-        ```
-    *   **Замінити його на цей:**
-        ```typescript
-        if (isCompact) {
-          const arrow = directionArrows[$lastComputerMove.direction] || '?';
-          return {
-            isCompact: true,
-            part1: $_('gameBoard.gameInfo.computerMadeMovePart1'),
-            move: `${arrow}${distance}`,
-            part2: $_('gameBoard.gameInfo.computerMadeMovePart2')
-          };
-        }
-        ```
-    *   **Дія 2 (HTML):** Оновити розмітку, щоб вона обробляла як рядкові, так і об'єктні повідомлення.
+Першопричина проблеми полягає у способі приховування віджета `GameInfoWidget`. Наразі він приховується за допомогою блоку `{#if ...}`, який повністю видаляє елемент з DOM. Це робить неможливим застосування CSS-анімацій переходу (`transition`), оскільки для анімації елемент повинен існувати в DOM як у початковому, так і в кінцевому стані. Поведінка дошки реалізована інакше — через додавання/видалення CSS-класу, що дозволяє анімації працювати.
+
+### **Архітектурне рішення**
+
+Ми реалізуємо системне виправлення, яке відповідає принципам чистоти коду та розділення відповідальності (SoC).
+
+1.  **Логіка (Svelte):** Ми змінимо компонент `GameInfoWidget.svelte`, щоб він не видалявся з DOM, а отримував динамічний CSS-клас (`.hidden`) на основі стану в `settingsStore`. Це дозволить CSS керувати його візуальним станом.
+2.  **Стилізація (CSS):** Ми додамо CSS-переходи (`transition`) до класу `.game-info-widget` для властивостей `max-height`, `opacity`, `padding`, `margin` та `transform`. Клас `.hidden` буде встановлювати цільові значення для цих властивостей (наприклад, `max-height: 0`), що і створить бажаний ефект плавного згортання та зникнення.
+
+Це рішення інкапсулює логіку анімації всередині компонента, роблячи його самодостатнім, і дотримується односпрямованого потоку даних (UDF): зміна в `settingsStore` призводить до візуальної зміни в компоненті.
+
+---
+
+*   **Крок 1: Рефакторинг логіки та розмітки у файлі `src/lib/components/widgets/GameInfoWidget.svelte`**
+    *   **Дія:** Замінити умовний рендеринг `{#if ...}` на динамічне додавання CSS-класу.
     *   **Знайти цей блок коду:**
         ```html
-        <div class="game-info-content" data-testid="game-info-content">
-          {@html $displayMessage}
-        </div>
+        {#if $i18nReady && $settingsStore.showGameInfoWidget !== 'hidden' && $gameState}
+          <div class="game-info-widget"
+               class:compact={$settingsStore.showGameInfoWidget === 'compact'}
+               transition:safeScale={{ duration: 400, easing: quintOut }}
+               data-testid="game-info-panel"
+          >
+            <!-- ...вміст... -->
+          </div>
+        {/if}
         ```
     *   **Замінити його на цей:**
         ```html
-        <div class="game-info-content" data-testid="game-info-content">
-          {#if typeof $displayMessage === 'object' && $displayMessage.isCompact}
-            <div class="compact-message-line">
-              <span>{$displayMessage.part1}</span>
-              <span class="compact-move-display">{$displayMessage.move}</span>
-            </div>
-            <span>{$displayMessage.part2}</span>
-          {:else}
-            {@html $displayMessage}
-          {/if}
-        </div>
+        {#if $i18nReady && $gameState}
+          <div class="game-info-widget"
+               class:hidden={$settingsStore.showGameInfoWidget === 'hidden'}
+               class:compact={$settingsStore.showGameInfoWidget === 'compact'}
+               data-testid="game-info-panel"
+          >
+            <!-- ...вміст... -->
+          </div>
+        {/if}
         ```
-    *   **Дія 3 (CSS):** Додати стиль для нового контейнера `.compact-message-line`.
-    *   **Додати цей блок CSS:**
+    *   **Обґрунтування:** Ця зміна гарантує, що DOM-елемент віджета завжди присутній на сторінці, що є необхідною умовою для роботи CSS-переходів. Видимість тепер буде керуватися виключно через CSS.
+
+*   **Крок 2: Рефакторинг стилів у файлі `src/lib/components/widgets/GameInfoWidget.svelte`**
+    *   **Дія:** Додати стилі для плавної анімації зникнення та появи віджета.
+    *   **Знайти цей CSS-клас:**
         ```css
-        .compact-message-line {
+        .game-info-widget {
+          /* ...існуючі стилі... */
+          transition: all 0.3s ease;
+          max-height: 200px;
+          overflow: hidden;
+        }
+        ```
+    *   **Замінити його на цей:**
+        ```css
+        .game-info-widget {
+          background: var(--bg-secondary);
+          padding: 20px 12px;
+          border-radius: var(--unified-border-radius);
+          box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
+          font-size: 1.1em;
+          color: var(--text-primary, #222);
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
-          flex-wrap: wrap; /* Додаємо перенос для дуже вузьких екранів */
+          backdrop-filter: var(--unified-backdrop-filter);
+          border: var(--unified-border);
+          overflow: hidden;
+          /* НАВІЩО: Додаємо плавні переходи для всіх необхідних властивостей */
+          transition: max-height 0.4s ease-out, opacity 0.3s ease-out, padding 0.4s ease-out, margin 0.4s ease-out, transform 0.3s ease-out;
+          max-height: 200px; /* Максимальна висота для анімації */
+          transform: scale(1);
         }
         ```
-    *   **Обґрунтування:** Ми повністю розділили дані (з `i18n`) та їх представлення (HTML/CSS). `derived` стор тепер готує дані, а компонент вирішує, як їх відобразити. Використання `flexbox` для `.compact-message-line` забезпечує правильне розташування елементів в один рядок без зайвих символів та переносів.
+    *   **Дія 2:** Додати новий CSS-клас `.hidden` для опису стану прихованого віджета.
+    *   **Додати цей блок CSS:**
+        ```css
+        .game-info-widget.hidden {
+          max-height: 0;
+          opacity: 0;
+          padding-top: 0;
+          padding-bottom: 0;
+          margin-top: 0;
+          margin-bottom: 0;
+          border-width: 0;
+          transform: scale(0.95);
+        }
+        ```
+    *   **Обґрунтування:** Ці стилі реалізують очікувану поведінку. При додаванні класу `.hidden` віджет плавно "згортається" до висоти 0, стає прозорим, а його відступи зникають, що дозволяє іншим елементам плавно зайняти його місце.
 
 ---
 
@@ -122,10 +114,11 @@
 # Звіт про виконання завдання
 
 ## 1. Виконана робота
-- **Локалізація:** Розділено ключ `computerMadeMoveCompact` на два окремі ключі (`computerMadeMovePart1`, `computerMadeMovePart2`) у всіх файлах локалізації для більшої гнучкості.
-- **Логіка:** Оновлено `derived` стор `displayMessage` у `GameInfoWidget.svelte`, щоб він повертав об'єкт з частинами повідомлення для компактного режиму.
-- **HTML/CSS:** Оновлено розмітку `GameInfoWidget.svelte` для обробки нового формату даних та додано CSS-стилі з використанням `flexbox` для коректного відображення елементів в один рядок.
-- **Результат:** Виправлено проблему з некоректними переносами рядків та зайвими крапками. Тепер повідомлення в компактному режимі відображається чисто та в один рядок, як і було заплановано.
+- **Рефакторинг `GameInfoWidget.svelte`:**
+  - Замінено умовний рендеринг `{#if ...}` на динамічне присвоєння CSS-класу `.hidden`, щоб елемент залишався в DOM.
+  - Додано CSS-переходи (`transition`) для властивостей `max-height`, `opacity`, `padding`, `margin` та `transform`.
+  - Створено клас `.hidden`, який анімує віджет до нульової висоти та повної прозорості.
+- **Результат:** Виправлено баг різкого зникнення/появи. Тепер `GameInfoWidget` плавно згортається та розгортається, аналогічно до поведінки ігрової дошки, забезпечуючи плавний зсув контенту.
 
 ## 2. Проблеми та перешкоди (якщо були)
 - Проблем під час виконання не виявлено.

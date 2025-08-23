@@ -1,37 +1,23 @@
 <script lang="ts">
   import { derived } from 'svelte/store';
   import { gameState } from '$lib/stores/gameState.js';
-  import { playerInputStore } from '$lib/stores/playerInputStore.js';
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { _ } from 'svelte-i18n';
   import { lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves } from '$lib/stores/derivedState.ts';
   import { i18nReady } from '$lib/i18n/init.js';
-  import { slide, scale } from 'svelte/transition';
-  import { quintOut } from 'svelte/easing';
-  import { safeScale } from '$lib/utils/transitions';
+  import { fade } from 'svelte/transition';
 
-  // Функція для комбінованої анімації
-  function scaleAndSlide(node: HTMLElement, params: any) {
-      const slideTrans = slide(node, params);
-      const scaleTrans = scale(node, params);
+  // --- Локальний стан для керування анімацією тексту ---
+  let displayContent: any = '';
+  let isFading = false;
+  let timeoutId: ReturnType<typeof setTimeout>;
 
-      return {
-          duration: params.duration,
-          easing: params.easing,
-          css: (t: number, u: number) => `
-              ${slideTrans.css ? slideTrans.css(t, u) : ''}
-              ${scaleTrans.css ? scaleTrans.css(t, u) : ''}
-          `
-      };
-  }
-
-  // Функція для отримання кольору гравця
+  // --- Допоміжні функції ---
   function getPlayerColor(players: any[], playerName: string): string | null {
     const player = players.find(p => p.name === playerName);
     return player ? player.color : null;
   }
 
-  // Функція для створення стилю з тінню кольору гравця
   function getPlayerNameStyle(players: any[], playerName: string): string {
     const color = getPlayerColor(players, playerName);
     return color ? `background-color: ${color};` : '';
@@ -43,13 +29,13 @@
     'down-left': '↙', 'down': '↓', 'down-right': '↘'
   };
 
+  // --- Derived стор для генерації повідомлень ---
   const displayMessage = derived(
     [gameState, lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves, _, settingsStore],
     ([$gameState, $lastComputerMove, $lastPlayerMove, $isPlayerTurn, $isPauseBetweenMoves, $_, $settingsStore]) => {
       if (!$gameState) return '';
 
       const isCompact = $settingsStore.showGameInfoWidget === 'compact';
-
       const humanPlayersCount = $gameState.players.filter(p => p.type === 'human').length;
       const isLocalGame = humanPlayersCount > 1;
 
@@ -68,7 +54,8 @@
         return $_('gameBoard.gameInfo.gameResumed');
       }
       if ($lastComputerMove && !$isPauseBetweenMoves) {
-        const direction = $_(`gameBoard.directions.${$lastComputerMove.direction.replace('-', '')}`);
+        const directionKey = $lastComputerMove.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+        const direction = $_(`gameBoard.directions.${directionKey}`);
         const distance = $lastComputerMove.distance;
 
         if (isCompact) {
@@ -89,7 +76,8 @@
         const previousPlayer = $gameState.players[previousPlayerIndex];
         const previousPlayerStyle = getPlayerNameStyle($gameState.players, previousPlayer.name);
         const currentPlayerStyle = getPlayerNameStyle($gameState.players, currentPlayer.name);
-        const direction = $_(`gameBoard.directions.${$lastPlayerMove.direction.replace('-', '')}`);
+        const directionKey = $lastPlayerMove.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+        const direction = $_(`gameBoard.directions.${directionKey}`);
         return `<div class="message-line-1"><span class="player-name-plate" style="${previousPlayerStyle}">${previousPlayer.name}</span> зробив хід: ${direction} на ${$lastPlayerMove.distance}.</div><div class="message-line-2"><span class="player-name-plate" style="${currentPlayerStyle}">${currentPlayer.name}</span> ваша черга робити хід!</div>`;
       }
       if ($isPauseBetweenMoves) {
@@ -109,6 +97,26 @@
       return $_('gameBoard.gameInfo.gameStarted');
     }
   );
+
+  // --- Реактивний блок для керування анімацією зміни тексту ---
+  $: {
+    const newMessage = $displayMessage;
+    // Ініціалізуємо displayContent першим значенням
+    if (displayContent === '') {
+      displayContent = newMessage;
+    }
+
+    // Порівнюємо об'єкти та рядки, щоб уникнути зайвих анімацій
+    if (JSON.stringify(displayContent) !== JSON.stringify(newMessage)) {
+      clearTimeout(timeoutId);
+      isFading = true;
+      timeoutId = setTimeout(() => {
+        displayContent = newMessage;
+        isFading = false;
+      }, 250); // Тривалість анімації зникнення
+    }
+  }
+
 </script>
 
 <style>
@@ -122,13 +130,25 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
     backdrop-filter: var(--unified-backdrop-filter);
     border: var(--unified-border);
-    max-height: 200px;
     overflow: hidden;
+    transition: max-height 0.4s ease-out, opacity 0.3s ease-out, padding 0.4s ease-out, margin 0.4s ease-out, transform 0.3s ease-out;
+    max-height: 200px;
+    transform: scale(1);
+    margin-bottom: 16px;
   }
 
+  .game-info-widget.hidden {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-width: 0;
+    transform: scale(0.95);
+  }
 
   .game-info-content {
     font-weight: 500;
@@ -140,6 +160,11 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    transition: opacity 0.25s ease-in-out;
+  }
+
+  .game-info-content.fading {
+    opacity: 0;
   }
 
   :global(.message-line-1) {
@@ -183,25 +208,25 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    flex-wrap: wrap; /* Додаємо перенос для дуже вузьких екранів */
+    flex-wrap: wrap;
   }
 </style>
 
-{#if $i18nReady && $settingsStore.showGameInfoWidget !== 'hidden' && $gameState}
+{#if $i18nReady && $gameState}
   <div class="game-info-widget"
+       class:hidden={$settingsStore.showGameInfoWidget === 'hidden'}
        class:compact={$settingsStore.showGameInfoWidget === 'compact'}
-       transition:safeScale={{ duration: 400, easing: quintOut }}
        data-testid="game-info-panel"
   >
-    <div class="game-info-content" data-testid="game-info-content">
-      {#if typeof $displayMessage === 'object' && $displayMessage.isCompact}
+    <div class="game-info-content" class:fading={isFading} data-testid="game-info-content">
+      {#if typeof displayContent === 'object' && displayContent.isCompact}
         <div class="compact-message-line">
-          <span>{$displayMessage.part1}</span>
-          <span class="compact-move-display">{$displayMessage.move}</span>
+          <span>{displayContent.part1}</span>
+          <span class="compact-move-display">{displayContent.move}</span>
         </div>
-        <span>{$displayMessage.part2}</span>
+        <span>{displayContent.part2}</span>
       {:else}
-        {@html $displayMessage}
+        {@html displayContent}
       {/if}
     </div>
   </div>
