@@ -56,6 +56,7 @@ export abstract class BaseGameMode implements IGameMode {
 
   protected async onPlayerMoveFailure(reason: string | undefined, direction: MoveDirectionType, distance: number): Promise<SideEffect[]> {
     const state = get(gameState);
+    const settings = get(settingsStore);
     const figure = new Figure(state.playerRow!, state.playerCol!, state.boardSize);
     const finalInvalidPosition = figure.calculateNewPosition(direction, distance);
 
@@ -65,8 +66,19 @@ export abstract class BaseGameMode implements IGameMode {
       distance: distance,
       to: finalInvalidPosition
     };
+    
+    const updatedMoveHistory = [...state.moveHistory, {
+      pos: { row: finalInvalidPosition.row, col: finalInvalidPosition.col },
+      blocked: [] as {row: number, col: number}[],
+      visits: { ...state.cellVisitCounts },
+      blockModeEnabled: settings.blockModeEnabled
+    }];
 
-    gameState.update(state => ({...state, moveQueue: [...state.moveQueue, finalMoveForAnimation]}));
+    gameState.update(state => ({
+      ...state,
+      moveQueue: [...state.moveQueue, finalMoveForAnimation],
+      moveHistory: updatedMoveHistory
+    }));
 
     if (reason === 'out_of_bounds') {
       return this.endGame('modal.gameOverReasonOut');
