@@ -8,12 +8,13 @@ import { generateId, getRandomUnusedColor, getRandomUnusedName } from '$lib/util
 
 class GameStateMutator {
   
-  public resetGame(options: { newSize?: number; players?: any[] } = {}) {
+  public resetGame(options: { newSize?: number; players?: any[], settings?: any } = {}) {
     logService.state('[GameStateMutator] Resetting game state', options);
     const newSize = options.newSize ?? get(gameState)?.boardSize ?? 4;
     
     // Отримуємо статус тестового режиму з налаштувань
-    const isTestMode = get(settingsStore).testMode;
+    const settings = options.settings ?? get(settingsStore);
+    const isTestMode = settings.testMode;
     logService.testMode(`[GameStateMutator] Test mode is ${isTestMode ? 'ON' : 'OFF'}`);
 
     const newState = createInitialState({
