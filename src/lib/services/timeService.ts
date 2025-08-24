@@ -9,6 +9,11 @@ let gameTimer: NodeJS.Timeout | null = null;
 let isGameTimerPaused = false;
 
 export const timeService = {
+  initializeTimers(gameDuration: number, turnDuration: number) {
+    gameTime.set(gameDuration);
+    turnTime.set(turnDuration);
+  },
+
   startTurnTimer(duration: number, onTimeUp: () => void) {
     this.stopTurnTimer();
     turnTime.set(duration);

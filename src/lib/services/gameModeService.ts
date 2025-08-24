@@ -10,6 +10,7 @@ import { gameState } from '$lib/stores/gameState';
 import { gameStateMutator } from './gameStateMutator';
 import { gameStore } from '$lib/stores/gameStore';
 import { logService } from '$lib/services/logService.js';
+import { timeService } from '$lib/services/timeService';
 import type { SideEffect } from './sideEffectService';
 import { TrainingGameMode } from '$lib/gameModes/TrainingGameMode';
 import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
@@ -48,6 +49,7 @@ export const gameModeService = {
     }
     gameStateMutator.resetGame();
     gameMode.initialize(get(gameState)!);
+    timeService.initializeTimers(gameMode.gameDuration, gameMode.turnDuration);
     gameStore.setMode(gameMode);
   },
 
