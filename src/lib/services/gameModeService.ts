@@ -7,6 +7,7 @@ import { get } from 'svelte/store';
 import { page } from '$app/stores';
 import { browser } from '$app/environment';
 import { gameState } from '$lib/stores/gameState';
+import { gameStateMutator } from './gameStateMutator';
 import { gameStore } from '$lib/stores/gameStore';
 import { logService } from '$lib/services/logService.js';
 import type { SideEffect } from './sideEffectService';
@@ -36,7 +37,7 @@ export const gameModeService = {
     } else {
       gameMode = new VsComputerGameMode();
     }
-    gameState.reset();
+    gameStateMutator.resetGame();
     gameMode.initialize(get(gameState)!);
     gameStore.setMode(gameMode);
   },
@@ -102,7 +103,7 @@ export const gameModeService = {
     if (activeGameMode) {
       activeGameMode.cleanup();
       gameStore.setMode(null);
-      gameState.destroy();
+      gameStateMutator.destroy();
       logService.GAME_MODE('Game mode cleaned up and state destroyed.');
     }
   }

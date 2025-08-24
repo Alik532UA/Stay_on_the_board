@@ -1,5 +1,6 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/gameState';
+  import { gameStateMutator } from '$lib/services/gameStateMutator';
   import { _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
   import { navigationService } from '$lib/services/navigationService.js';
@@ -13,13 +14,13 @@
     
     if (state) {
       // Ініціалізуємо стан гри з поточними гравцями та налаштуваннями
-      gameState.reset({
-        size: state.settings.boardSize,
+      gameStateMutator.resetGame({
+        newSize: state.settings.boardSize,
         players: state.players,
       });
 
       // Робимо знімок початкових (нульових) рахунків перед стартом
-      gameState.snapshotScores();
+      gameStateMutator.snapshotScores();
 
       // Переходимо на сторінку локальної гри
       navigationService.goTo('/game/local');
@@ -37,13 +38,13 @@
         <ColorPicker
           value={player.color}
           on:change={(e) => {
-            gameState.updatePlayer(player.id, { color: e.detail.value });
+            gameStateMutator.updatePlayer(player.id, { color: e.detail.value });
           }}
         />
         <button
           class="player-type-btn"
           use:customTooltip={$_('localGame.togglePlayerType')}
-          on:click={() => gameState.updatePlayer(player.id, { type: player.type === 'human' ? 'computer' : 'human' })}
+          on:click={() => gameStateMutator.updatePlayer(player.id, { type: player.type === 'human' ? 'computer' : 'human' })}
         >
           {player.type === 'computer' ? '🤖' : '👤'}
         </button>
@@ -52,7 +53,7 @@
           class="player-name-input"
           placeholder="Ім'я гравця"
           value={player.name}
-          on:input={(e) => gameState.updatePlayer(player.id, { name: e.currentTarget.value })}
+          on:input={(e) => gameStateMutator.updatePlayer(player.id, { name: e.currentTarget.value })}
           data-testid="player-name-input-{player.id}"
         />
         <button
@@ -60,7 +61,7 @@
           use:customTooltip={$_('localGame.removePlayer')}
           on:click={() => {
             logService.action(`Click: "Видалити гравця: ${player.name}" (PlayerManager)`);
-            gameState.removePlayer(player.id);
+            gameStateMutator.removePlayer(player.id);
           }}
           disabled={$gameState.players.length <= 2}
           data-testid="remove-player-btn-{player.id}"
@@ -76,7 +77,7 @@
       class="add-player-btn"
       on:click={() => {
         logService.action('Click: "Додати гравця" (PlayerManager)');
-        gameState.addPlayer();
+        gameStateMutator.addPlayer();
       }}
       disabled={$gameState.players.length >= 8}
       data-testid="add-player-btn"

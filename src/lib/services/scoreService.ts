@@ -1,4 +1,5 @@
-import type { GameState, Player } from '$lib/stores/gameState';
+import type { GameState } from '$lib/stores/gameState';
+import type { Player } from '$lib/models/player';
 import { isMirrorMove } from '$lib/utils/boardUtils';
 import { logService } from './logService';
 import type { FinalScoreDetails } from '$lib/models/score';

@@ -156,8 +156,8 @@ export const isPlayerTurn = derived(gameState, $gameState =>
  * @type {import('svelte/store').Readable<import('$lib/services/gameLogicService').Move[]>}
  */
 export const availableMoves = derived(
-  [gameState, settingsStore, lastPlayerMove, lastComputerMove],
-  ([$gameState, $settingsStore, $lastPlayerMove, $lastComputerMove]) => {
+  [gameState, settingsStore],
+  ([$gameState, $settingsStore]) => {
     if (!$gameState) return [];
     const {
       playerRow,
@@ -165,14 +165,27 @@ export const availableMoves = derived(
       boardSize,
       cellVisitCounts,
       board,
+      moveQueue,
+      players,
+      currentPlayerIndex
     } = $gameState;
 
     const { blockOnVisitCount, blockModeEnabled } = $settingsStore;
-
-    // Для перевірки штрафних ходів нам потрібен останній хід *супротивника*.
-    // У локальній грі це lastPlayerMove (хід попереднього гравця).
-    // У грі проти ШІ це lastComputerMove.
-    const moveForPenaltyCheck = $lastComputerMove;
+    
+    const isVsComputer = players.some(p => p.type === 'ai');
+    const lastMove = moveQueue.length > 0 ? moveQueue[moveQueue.length - 1] : null;
+    
+    let moveForPenaltyCheck = null;
+    if (isVsComputer && lastMove && players[currentPlayerIndex]?.type === 'human') {
+        // In vs computer, penalty check is against the last move if it was the computer's
+        const lastComputerMove = [...moveQueue].reverse().find(m => players[m.player - 1]?.type === 'ai');
+        if (lastComputerMove) {
+            moveForPenaltyCheck = { direction: lastComputerMove.direction, distance: lastComputerMove.distance };
+        }
+    } else if (!isVsComputer && lastMove) {
+        // In local multiplayer, penalty check is against the previous player's move
+        moveForPenaltyCheck = { direction: lastMove.direction, distance: lastMove.distance };
+    }
 
     return getAvailableMoves(
       playerRow,

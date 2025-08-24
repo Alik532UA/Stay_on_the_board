@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import { BaseGameMode } from './BaseGameMode';
-import { gameState, type GameState, type Player } from '$lib/stores/gameState';
+import { gameState, type GameState } from '$lib/stores/gameState';
+import type { Player } from '$lib/models/player';
 import { logService } from '$lib/services/logService';
 import { serverSyncService } from '$lib/services/serverSyncService';
 import { gameStatePatcher } from '$lib/services/gameStatePatcher';

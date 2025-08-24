@@ -4,7 +4,8 @@ import { _, locale } from 'svelte-i18n';
 import { BaseGameMode } from './index';
 import { moveDirections } from '$lib/utils/translations';
 import { lastComputerMove, availableMoves as derivedAvailableMoves } from '$lib/stores/derivedState';
-import { gameState, type GameState, type Player } from '$lib/stores/gameState';
+import { gameState, type GameState } from '$lib/stores/gameState';
+import type { Player } from '$lib/models/player';
 import { gameStateMutator } from '$lib/services/gameStateMutator';
 import * as gameLogicService from '$lib/services/gameLogicService';
 import { settingsStore } from '$lib/stores/settingsStore';
@@ -26,13 +27,7 @@ export class VsComputerGameMode extends BaseGameMode {
   }
 
   async claimNoMoves(): Promise<void> {
-    const currentAvailableMoves = get(derivedAvailableMoves);
-
-    if (currentAvailableMoves.length > 0) {
-      await this.endGame('modal.errorContent', { count: currentAvailableMoves.length });
-    } else {
-      await this.handleNoMoves('human');
-    }
+    await super.claimNoMoves();
   }
 
   getPlayersConfiguration(): Player[] {

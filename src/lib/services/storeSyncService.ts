@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameState } from '$lib/stores/gameState';
+import { gameStateMutator } from './gameStateMutator';
 import { logService } from './logService';
 
 let initialized = false;
@@ -29,7 +30,7 @@ export function initializeStoreSync() {
 
       if (blockModeJustEnabled) {
         logService.state('Block mode was enabled in settings, resetting game state for it.');
-        gameState.resetBlockModeState();
+        gameStateMutator.resetBlockModeState();
       }
 
       lastKnownBlockModeState = settings.blockModeEnabled;
