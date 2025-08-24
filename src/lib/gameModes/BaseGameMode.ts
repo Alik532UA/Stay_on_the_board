@@ -5,18 +5,17 @@ import { gameState, type GameState } from '$lib/stores/gameState';
 import type { Player } from '$lib/models/player';
 import { gameStateMutator } from '$lib/services/gameStateMutator';
 import * as gameLogicService from '$lib/services/gameLogicService';
-import { calculateFinalScore, determineWinner } from '$lib/services/scoreService';
 import { playerInputStore, initialState } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
-import { userActionService } from '$lib/services/userActionService';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
-import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { logService } from '$lib/services/logService';
-import { getAvailableMoves } from '$lib/utils/boardUtils';
 import { animationStore } from '$lib/stores/animationStore';
+import { endGameService } from '$lib/services/endGameService';
+import { noMovesService } from '$lib/services/noMovesService';
+import { availableMovesService } from '$lib/services/availableMovesService';
 
 export abstract class BaseGameMode implements IGameMode {
   /**
@@ -27,28 +26,9 @@ export abstract class BaseGameMode implements IGameMode {
 
   /**
    * Handles the player's claim that there are no available moves.
-   * If moves are available, the game ends. Otherwise, it proceeds to the no-moves handling logic.
    */
   async claimNoMoves(): Promise<void> {
-    const state = get(gameState);
-    const settings = get(settingsStore);
-    const availableMoves = getAvailableMoves(
-      state.playerRow,
-      state.playerCol,
-      state.boardSize,
-      state.cellVisitCounts,
-      settings.blockOnVisitCount,
-      state.board,
-      settings.blockModeEnabled,
-      null
-    );
-
-    if (Object.keys(availableMoves).length > 0) {
-      const currentPlayerName = state.players[state.currentPlayerIndex].name;
-      await this.endGame('modal.gameOverReasonPlayerLied', { playerName: currentPlayerName });
-    } else {
-      await this.handleNoMoves('human');
-    }
+    await noMovesService.claimNoMoves();
   }
 
   /**
@@ -82,16 +62,7 @@ export abstract class BaseGameMode implements IGameMode {
         blockModeEnabled: settings.blockModeEnabled
       }],
       moveQueue: [] as any[],
-      availableMoves: getAvailableMoves(
-        state.playerRow,
-        state.playerCol,
-        state.boardSize,
-        {},
-        settings.blockOnVisitCount,
-        state.board,
-        settings.blockModeEnabled,
-        null
-      ),
+      availableMoves: availableMovesService.getAvailableMoves(),
       noMovesClaimed: false,
       isComputerMoveInProgress: false,
       wasResumed: true,
@@ -181,53 +152,10 @@ export abstract class BaseGameMode implements IGameMode {
     });
 
     if (reason === 'out_of_bounds') {
-      await this.endGame('modal.gameOverReasonOut');
+      await endGameService.endGame('modal.gameOverReasonOut');
     } else if (reason === 'blocked_cell') {
-      await this.endGame('modal.gameOverReasonBlocked');
+      await endGameService.endGame('modal.gameOverReasonBlocked');
     }
-  }
-
-  protected _dispatchNoMovesEvent(playerType: 'human' | 'computer') {
-    const state = get(gameState);
-    const scoreDetails = calculateFinalScore(state as any, 'vs-computer');
-    gameEventBus.dispatch('ShowNoMovesModal', {
-      playerType,
-      scoreDetails,
-      boardSize: state.boardSize
-    });
-  }
-
-  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
-    logService.GAME_MODE(`[${this.constructor.name}] endGame called with reason:`, reasonKey);
-    const state = get(gameState);
-    const humanPlayersCount = get(gameState).players.filter(p => p.type === 'human').length;
-    const gameType = humanPlayersCount > 1 ? 'local' : 'vs-computer';
-    const finalScoreDetails = calculateFinalScore(state as any, gameType);
-
-    const endGameChanges = {
-      isGameOver: true,
-      gameOverReasonKey: reasonKey,
-      gameOverReasonValues: reasonValues,
-    };
-    gameStateMutator.setGameOver(reasonKey, reasonValues);
-
-    const { winners } = determineWinner(state, reasonKey);
-    gameOverStore.setGameOver({
-      scores: state.players.map(p => ({ playerId: p.id, score: p.score })),
-      winners: winners,
-      reasonKey,
-      reasonValues,
-      finalScoreDetails,
-      gameType: gameType,
-    });
-
-    gameEventBus.dispatch('GameOver', {
-      reasonKey,
-      reasonValues,
-      finalScoreDetails,
-      gameType,
-      state
-    });
   }
 
   /**

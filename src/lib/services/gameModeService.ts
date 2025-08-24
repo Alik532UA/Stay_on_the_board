@@ -16,6 +16,7 @@ import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
 import { OnlineGameMode } from '$lib/gameModes/OnlineGameMode';
 import { TimedVsComputerGameMode } from '$lib/gameModes/TimedVsComputerGameMode';
 import { BaseGameMode } from '$lib/gameModes/BaseGameMode';
+import { endGameService } from './endGameService';
 
 export const gameModeService = {
   setCurrentGameMode(mode: 'local' | 'vs-computer' | 'online' | 'timed-vs-computer') {
@@ -62,7 +63,7 @@ export const gameModeService = {
 
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
     const activeGameMode = this._ensureGameMode();
-    await activeGameMode.endGame(reasonKey, reasonValues);
+    await endGameService.endGame(reasonKey, reasonValues);
   },
 
   async restartGame(): Promise<void> {
