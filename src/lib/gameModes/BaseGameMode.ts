@@ -90,7 +90,7 @@ export abstract class BaseGameMode implements IGameMode {
     gameOverStore.resetGameOverState();
     animationService.reset();
 
-    await this.advanceToNextPlayer();
+    // await this.advanceToNextPlayer();
     gameEventBus.dispatch('CloseModal');
   }
   protected abstract advanceToNextPlayer(): Promise<void>;
