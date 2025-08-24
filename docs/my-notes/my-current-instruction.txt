@@ -3,4 +3,218 @@
 **Опис дії**: Перейди на стислий режим: мінімум пояснень (приблизно до 200 символів, але бажано 30-70 символів), максимум дій.
 
 Поточнє завдання:
+
+зроби @/docs/plans/fix-modal-test-failures-plan.md 
+це сталося бо ми зробили @/docs/plans/architecture-improvement-plan-v17.md 
+проаназілуй ось це @git-changes
+
+тести працюють правильно, і правильно вказують на проблеми які зв'явилися, після @git-changes
+```
+npx playwright test
+
+Running 21 tests using 4 workers
+  1) [chromium] › tests\happy-flow-1.spec.ts:11:3 › хепі флоу › хепі флоу 1 @inProgress @HF-1 › Перевірка модального вікна "Суперник у пастці!" 
+
+    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+
+    Locator: getByTestId('opponent-trapped-modal')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByTestId('opponent-trapped-modal')
+
+
+      30 |
+      31 |     await test.step('Перевірка модального вікна "Суперник у пастці!"', async () => {
+    > 32 |       await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
+         |                                                                ^
+      33 |       await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.computerNoMovesTitle');
+      34 |     });
+      35 |
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\happy-flow-1.spec.ts:32:64
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\happy-flow-1.spec.ts:31:16
+
+    Error Context: test-results\happy-flow-1-хепі-флоу-хепі-флоу-1-chromium\error-context.md
+
+  2) [chromium] › tests\main-menu-flow.spec.ts:6:3 › Кнопка "Головне меню" › Повинна повертати на головне меню після модального вікна "Суперник у пастці" @done @MMF-1 › Налаштування гри та доведення до стану "Суперник у пастці" 
+
+    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+
+    Locator: getByTestId('opponent-trapped-modal')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByTestId('opponent-trapped-modal')
+
+
+      11 |       await makeMove(page, 'right', 1);
+      12 |       await makeMove(page, 'left', 1, false);
+    > 13 |       await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
+         |                                                                ^
+      14 |     });
+      15 |
+      16 |     await test.step('Завершення гри та перехід до головного меню', async () => {
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\main-menu-flow.spec.ts:13:64
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\main-menu-flow.spec.ts:7:5
+
+    Error Context: test-results\main-menu-flow-Кнопка-Голо-7ef50-го-вікна-Суперник-у-пастці--chromium\error-context.md
+
+  3) [chromium] › tests\opponent-trapped-modal.spec.ts:11:3 › Модальне вікно "Суперник у пастці" › Повинно відображатися, коли режим блокування УВІМКНЕНО (дошка 2x2) @OTM @done @OTM-1-1 › Перевірка появи модального вікна "Суперник у пастці!" 
+
+    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+
+    Locator: getByTestId('opponent-trapped-modal')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByTestId('opponent-trapped-modal')
+
+
+      21 |
+      22 |     await test.step('Перевірка появи модального вікна "Суперник у пастці!"', async () => {
+    > 23 |       await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
+         |                                                                ^
+      24 |       await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.computerNoMovesTitle');
+      25 |     });
+      26 |   });
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\opponent-trapped-modal.spec.ts:23:64
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\opponent-trapped-modal.spec.ts:22:16
+
+    Error Context: test-results\opponent-trapped-modal-Мод-ac05b-ування-УВІМКНЕНО-дошка-2x2--chromium\error-context.md
+
+  4) [chromium] › tests\main-menu-flow.spec.ts:29:3 › Кнопка "Головне меню" › Повинна повертати на головне меню після модального вікна "Блискучий аналіз" @done @MMF-2 › Налаштування гри та доведення до стану "Блискучий аналіз" 
+
+    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+
+    Locator: getByTestId('player-no-moves-modal')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByTestId('player-no-moves-modal')
+
+
+      38 |       await makeMove(page, 'down', 1);
+      39 |       await page.getByTestId('no-moves-btn').click();
+    > 40 |       await expect(page.getByTestId('player-no-moves-modal')).toBeVisible();
+         |                                                               ^
+      41 |     });
+      42 |
+      43 |     await test.step('Завершення гри та перехід до головного меню', async () => {
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\main-menu-flow.spec.ts:40:63
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\main-menu-flow.spec.ts:30:5
+
+    Error Context: test-results\main-menu-flow-Кнопка-Голо-f52ba-ого-вікна-Блискучий-аналіз--chromium\error-context.md
+
+  5) [chromium] › tests\opponent-trapped-modal.spec.ts:28:3 › Модальне вікно "Суперник у пастці" › Повинно відображатися, коли режим блокування УВІМКНЕНО (дошка 3x3) @OTM @done @OTM-1-2 › Перевірка появи модального вікна "Суперник у пастці!" 
+
+    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+
+    Locator: getByTestId('opponent-trapped-modal')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByTestId('opponent-trapped-modal')
+
+
+      44 |
+      45 |     await test.step('Перевірка появи модального вікна "Суперник у пастці!"', async () => {
+    > 46 |       await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
+         |                                                                ^
+      47 |       await expect(page.getByTestId('opponent-trapped-modal-title')).toHaveAttribute('data-i18n-key', 'modal.computerNoMovesTitle');
+      48 |     });
+      49 |   });
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\opponent-trapped-modal.spec.ts:46:64
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\opponent-trapped-modal.spec.ts:45:16
+
+    Error Context: test-results\opponent-trapped-modal-Мод-1d296-ування-УВІМКНЕНО-дошка-3x3--chromium\error-context.md
+
+  6) [chromium] › tests\play-again-flow.spec.ts:6:3 › Кнопка "Грати ще раз" › Повинна починати нову гру після модального вікна "Суперник у пастці" @done @PAG-1 › Налаштування гри та доведення до стану "Суперник у пастці" 
+
+    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+
+    Locator: getByTestId('opponent-trapped-modal')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByTestId('opponent-trapped-modal')
+
+
+      11 |       await makeMove(page, 'right', 1);
+      12 |       await makeMove(page, 'left', 1, false);
+    > 13 |       await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
+         |                                                                ^
+      14 |     });
+      15 |
+      16 |     await test.step('Завершення гри та натискання кнопки "Грати ще раз"', async () => {
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\play-again-flow.spec.ts:13:64
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\play-again-flow.spec.ts:7:5
+
+    Error Context: test-results\play-again-flow-Кнопка-Гра-10771-го-вікна-Суперник-у-пастці--chromium\error-context.md
+
+  7) [chromium] › tests\play-again-flow.spec.ts:29:3 › Кнопка "Грати ще раз" › Повинна починати нову гру після модального вікна "Блискучий аналіз" @done @PAG-2 › Налаштування гри та доведення до стану "Блискучий аналіз" 
+
+    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+
+    Locator: getByTestId('player-no-moves-modal')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByTestId('player-no-moves-modal')
+
+
+      38 |       await makeMove(page, 'down', 1);
+      39 |       await page.getByTestId('no-moves-btn').click();
+    > 40 |       await expect(page.getByTestId('player-no-moves-modal')).toBeVisible();
+         |                                                               ^
+      41 |     });
+      42 |
+      43 |     await test.step('Завершення гри та натискання кнопки "Грати ще раз"', async () => {
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\play-again-flow.spec.ts:40:63
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\play-again-flow.spec.ts:30:5
+
+    Error Context: test-results\play-again-flow-Кнопка-Гра-f9004-ого-вікна-Блискучий-аналіз--chromium\error-context.md
+
+  8) [chromium] › tests\player-no-moves-modal.spec.ts:11:3 › Модальне вікно "Блискучий аналіз" › Повинно відображатися, коли режим блокування УВІМКНЕНО @done @PNMM-1 › Гравець натискає "Ходів немає" та перевіряє модальне вікно 
+
+    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+
+    Locator: getByTestId('player-no-moves-modal')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByTestId('player-no-moves-modal')
+
+
+      24 |     await test.step('Гравець натискає "Ходів немає" та перевіряє модальне вікно', async () => {
+      25 |       await page.getByTestId('no-moves-btn').click();
+    > 26 |       await expect(page.getByTestId('player-no-moves-modal')).toBeVisible();
+         |                                                               ^
+      27 |       await expect(page.getByTestId('player-no-moves-modal-title')).toHaveAttribute('data-i18n-key', 'modal.playerNoMovesTitle');
+      28 |     });
+      29 |   });
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\player-no-moves-modal.spec.ts:26:63
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\player-no-moves-modal.spec.ts:24:5
+
+    Error Context: test-results\player-no-moves-modal-Мода-9ec37--режим-блокування-УВІМКНЕНО-chromium\error-context.md
+
+  8 failed
+    [chromium] › tests\happy-flow-1.spec.ts:11:3 › хепі флоу › хепі флоу 1 @inProgress @HF-1 ───────
+    [chromium] › tests\main-menu-flow.spec.ts:6:3 › Кнопка "Головне меню" › Повинна повертати на головне меню після модального вікна "Суперник у пастці" @done @MMF-1
+    [chromium] › tests\main-menu-flow.spec.ts:29:3 › Кнопка "Головне меню" › Повинна повертати на головне меню після модального вікна "Блискучий аналіз" @done @MMF-2
+    [chromium] › tests\opponent-trapped-modal.spec.ts:11:3 › Модальне вікно "Суперник у пастці" › Повинно відображатися, коли режим блокування УВІМКНЕНО (дошка 2x2) @OTM @done @OTM-1-1
+    [chromium] › tests\opponent-trapped-modal.spec.ts:28:3 › Модальне вікно "Суперник у пастці" › Повинно відображатися, коли режим блокування УВІМКНЕНО (дошка 3x3) @OTM @done @OTM-1-2
+    [chromium] › tests\play-again-flow.spec.ts:6:3 › Кнопка "Грати ще раз" › Повинна починати нову гру після модального вікна "Суперник у пастці" @done @PAG-1
+    [chromium] › tests\play-again-flow.spec.ts:29:3 › Кнопка "Грати ще раз" › Повинна починати нову гру після модального вікна "Блискучий аналіз" @done @PAG-2
+    [chromium] › tests\player-no-moves-modal.spec.ts:11:3 › Модальне вікно "Блискучий аналіз" › Повинно відображатися, коли режим блокування УВІМКНЕНО @done @PNMM-1
+  13 passed (29.6s)
+```
+
 перевір які задачі зроблені та відміть їх та виконай ті що ще не зроблені "Задачі для покращення архітектури" з @/docs/plans/architecture-improvement-plan-v16.md 

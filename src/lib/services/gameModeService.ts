@@ -14,14 +14,16 @@ import type { SideEffect } from './sideEffectService';
 import { VsComputerGameMode } from '$lib/gameModes/VsComputerGameMode';
 import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
 import { OnlineGameMode } from '$lib/gameModes/OnlineGameMode';
+import { TimedVsComputerGameMode } from '$lib/gameModes/TimedVsComputerGameMode';
 import { BaseGameMode } from '$lib/gameModes/BaseGameMode';
 
 export const gameModeService = {
-  setCurrentGameMode(mode: 'local' | 'vs-computer' | 'online') {
+  setCurrentGameMode(mode: 'local' | 'vs-computer' | 'online' | 'timed-vs-computer') {
     const currentMode = get(gameStore).mode;
     const isSameMode = (currentMode instanceof LocalGameMode && mode === 'local') ||
                      (currentMode instanceof VsComputerGameMode && mode === 'vs-computer') ||
-                     (currentMode instanceof OnlineGameMode && mode === 'online');
+                     (currentMode instanceof OnlineGameMode && mode === 'online') ||
+                     (currentMode instanceof TimedVsComputerGameMode && mode === 'timed-vs-computer');
 
     if (isSameMode) {
       logService.GAME_MODE(`Game mode is already set to: ${mode}. No changes needed.`);
@@ -34,6 +36,8 @@ export const gameModeService = {
       gameMode = new LocalGameMode();
     } else if (mode === 'online') {
       gameMode = new OnlineGameMode();
+    } else if (mode === 'timed-vs-computer') {
+      gameMode = new TimedVsComputerGameMode();
     } else {
       gameMode = new VsComputerGameMode();
     }
@@ -44,7 +48,7 @@ export const gameModeService = {
 
   initializeGameMode() {
     const gameType = this._determineGameType();
-    this.setCurrentGameMode(gameType as 'local' | 'vs-computer' | 'online');
+    this.setCurrentGameMode(gameType as 'local' | 'vs-computer' | 'online' | 'timed-vs-computer');
   },
 
   _ensureGameMode(): BaseGameMode {
@@ -93,6 +97,8 @@ export const gameModeService = {
       return 'vs-computer';
     } else if (currentPath.includes('/game/online')) {
       return 'online';
+    } else if (currentPath.includes('/game/timed-vs-computer')) {
+      return 'timed-vs-computer';
     }
     
     return 'vs-computer';
