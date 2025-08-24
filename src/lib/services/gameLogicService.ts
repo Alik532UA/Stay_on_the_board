@@ -218,7 +218,7 @@ export function performMove(
 
   const changes = _applyMoveToState(currentState, newPosition, playerIndex, direction, distance, scoreChanges, settings);
 
-  // Логіка для "дзеркального" ходу та бонусів тепер обробляється в LocalGameMode та VsComputerGameMode,
+  // Логіка для "дзеркального" ходу та бонусів тепер обробляється в LocalGameMode та TrainingGameMode,
   // які отримують `scoreChanges` і вирішують, як їх застосувати.
   // Це робить `performMove` більш чистою функцією, що відповідає лише за сам хід.
 

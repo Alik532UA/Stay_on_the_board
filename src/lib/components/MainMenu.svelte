@@ -86,7 +86,7 @@
     logService.action(`Click: "Гра проти комп'ютера" (MainMenu)`);
     const state = get(gameState);
     if (state && !state.isGameOver && state.moveHistory.length > 1) {
-      navigationService.resumeGame('/game/vs-computer');
+      navigationService.resumeGame('/game/training');
     } else {
       const settings = get(settingsStore);
       if (settings.showGameModeModal) {
@@ -248,7 +248,8 @@
       </div>
     {/if}
     <div id="main-menu-buttons" use:hotkeysAndTooltips>
-      <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="vs-computer-btn">{$_('mainMenu.playVsComputer')}</button>
+      <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="training-btn">{$_('mainMenu.training')}</button>
+      <button class="modal-button secondary" onclick={() => navigateTo('/game/timed')} data-testid="timed-game-btn">{$_('mainMenu.timedGame')}</button>
       <button
         class="modal-button secondary"
         class:pseudo-disabled={!import.meta.env.DEV}

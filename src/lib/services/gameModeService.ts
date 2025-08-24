@@ -11,18 +11,20 @@ import { gameStateMutator } from './gameStateMutator';
 import { gameStore } from '$lib/stores/gameStore';
 import { logService } from '$lib/services/logService.js';
 import type { SideEffect } from './sideEffectService';
-import { VsComputerGameMode } from '$lib/gameModes/VsComputerGameMode';
+import { TrainingGameMode } from '$lib/gameModes/TrainingGameMode';
 import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
 import { OnlineGameMode } from '$lib/gameModes/OnlineGameMode';
 import { TimedVsComputerGameMode } from '$lib/gameModes/TimedVsComputerGameMode';
+import { TimedGameMode } from '$lib/gameModes/TimedGameMode';
 import { BaseGameMode } from '$lib/gameModes/BaseGameMode';
 import { endGameService } from './endGameService';
 
 export const gameModeService = {
-  setCurrentGameMode(mode: 'local' | 'vs-computer' | 'online' | 'timed-vs-computer') {
+  setCurrentGameMode(mode: 'local' | 'training' | 'online' | 'timed' | 'timed-vs-computer') {
     const currentMode = get(gameStore).mode;
     const isSameMode = (currentMode instanceof LocalGameMode && mode === 'local') ||
-                     (currentMode instanceof VsComputerGameMode && mode === 'vs-computer') ||
+                     (currentMode instanceof TrainingGameMode && mode === 'training') ||
+                     (currentMode instanceof TimedGameMode && mode === 'timed') ||
                      (currentMode instanceof OnlineGameMode && mode === 'online') ||
                      (currentMode instanceof TimedVsComputerGameMode && mode === 'timed-vs-computer');
 
@@ -39,8 +41,10 @@ export const gameModeService = {
       gameMode = new OnlineGameMode();
     } else if (mode === 'timed-vs-computer') {
       gameMode = new TimedVsComputerGameMode();
+    } else if (mode === 'timed') {
+      gameMode = new TimedGameMode();
     } else {
-      gameMode = new VsComputerGameMode();
+      gameMode = new TrainingGameMode();
     }
     gameStateMutator.resetGame();
     gameMode.initialize(get(gameState)!);
@@ -49,7 +53,7 @@ export const gameModeService = {
 
   initializeGameMode() {
     const gameType = this._determineGameType();
-    this.setCurrentGameMode(gameType as 'local' | 'vs-computer' | 'online' | 'timed-vs-computer');
+    this.setCurrentGameMode(gameType as 'local' | 'training' | 'online' | 'timed' | 'timed-vs-computer');
   },
 
   _ensureGameMode(): BaseGameMode {
@@ -88,21 +92,23 @@ export const gameModeService = {
 
   _determineGameType(): string {
     if (!browser) {
-      return 'vs-computer'; // Default for SSR context
+      return 'training'; // Default for SSR context
     }
     const currentPath = get(page).url.pathname;
     
     if (currentPath.includes('/game/local')) {
       return 'local';
-    } else if (currentPath.includes('/game/vs-computer')) {
-      return 'vs-computer';
+    } else if (currentPath.includes('/game/training')) {
+      return 'training';
+    } else if (currentPath.includes('/game/timed')) {
+      return 'timed';
     } else if (currentPath.includes('/game/online')) {
       return 'online';
     } else if (currentPath.includes('/game/timed-vs-computer')) {
       return 'timed-vs-computer';
     }
     
-    return 'vs-computer';
+    return 'training';
   },
   
   cleanupCurrentGameMode() {
@@ -113,5 +119,9 @@ export const gameModeService = {
       gameStateMutator.destroy();
       logService.GAME_MODE('Game mode cleaned up and state destroyed.');
     }
+  },
+
+  getCurrentGameMode(): BaseGameMode | null {
+    return get(gameStore).mode;
   }
 };

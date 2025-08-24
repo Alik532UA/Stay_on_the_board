@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { replayStore } from '$lib/stores/replayStore.js';
-  import ReplayViewer from '$lib/components/ReplayViewer.svelte';
-  // НАВІЩО: Ця сторінка тепер відповідає ТІЛЬКИ за відображення ігрових віджетів
-  // у потрібному порядку для режиму "гра проти комп'ютера".
+  // НАВІЩО: Ця сторінка відповідає ТІЛЬКИ за відображення ігрових віджетів
+  // у потрібному порядку для режиму "гра на час".
   // Вся спільна логіка (модальні вікна, гарячі клавіші) винесена в layout.
-
+  
   import '$lib/css/components/game-board.css';
   import '$lib/css/components/controls.css';
   import DraggableColumns from '$lib/components/DraggableColumns.svelte';
@@ -16,21 +14,13 @@
   import SettingsExpanderWidget from '$lib/components/widgets/SettingsExpanderWidget.svelte';
   import GameInfoWidget from '$lib/components/widgets/GameInfoWidget.svelte';
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import TimerWidget from '$lib/components/widgets/TimerWidget.svelte';
   import { onMount } from 'svelte';
-  import { afterNavigate } from '$app/navigation';
-  import { calculateFinalScore } from '$lib/services/scoreService.js';
   import { animationService } from '$lib/services/animationService.js';
-  import { gameState } from '$lib/stores/gameState.js';
-  import { modalStore } from '$lib/stores/modalStore.js';
-  import { gameOverStore } from '$lib/stores/gameOverStore';
   import { gameModeService } from '$lib/services/gameModeService';
-  import { get } from 'svelte/store';
-  import { _ } from 'svelte-i18n';
-  import { gameStore } from '$lib/stores/gameStore';
 
   onMount(() => {
-    gameModeService.setCurrentGameMode('vs-computer');
+    gameModeService.setCurrentGameMode('timed');
     animationService.initialize();
   });
 
@@ -41,6 +31,7 @@
     [WIDGETS.CONTROLS_PANEL]: ControlsPanelWidget,
     [WIDGETS.SETTINGS_EXPANDER]: SettingsExpanderWidget,
     [WIDGETS.GAME_INFO]: GameInfoWidget,
+    [WIDGETS.TIMER]: TimerWidget,
   };
 
   $: columns = $layoutStore.map(col => ({
@@ -50,10 +41,6 @@
       .filter(id => id !== WIDGETS.PLAYER_TURN_INDICATOR)
       .map(id => ({ id, label: id }))
   }));
-
-  // НАВІЩО: Логіка модальних вікон залишається тут, оскільки вона специфічна
-  // для ігрового процесу, а не для layout
-  // Ця логіка тепер обробляється в `endGame` відповідного режиму гри
 
   function itemContent(item: {id: string, label: string}) {
     const Comp = widgetMap[item.id];

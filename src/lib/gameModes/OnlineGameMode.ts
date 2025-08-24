@@ -9,10 +9,16 @@ import { gameStatePatcher } from '$lib/services/gameStatePatcher';
 export class OnlineGameMode extends BaseGameMode {
   private syncInterval: number | null = null;
 
+  constructor() {
+    super();
+    this.turnDuration = 15; // 15 секунд на хід
+  }
+
   initialize(initialState: GameState): void {
     logService.GAME_MODE('[OnlineGameMode] Initializing...');
     // TODO: Connect to the server, set up listeners for opponent moves, etc.
     this.startSync();
+    this.startTurn();
   }
 
   cleanup(): void {

@@ -10,7 +10,7 @@ test.describe('Модальне вікно вибору режиму гри', ()
         settingsStore.updateSettings({ testMode: true });
       }
     });
-    await page.getByTestId('vs-computer-btn').click();
+    await page.getByTestId('training-btn').click();
     await expect(page.getByTestId('game-mode-modal-title')).toBeVisible();
   });
 
@@ -20,7 +20,7 @@ test.describe('Модальне вікно вибору режиму гри', ()
       await expect(page.getByTestId('faq-modal')).toBeVisible();
       await expect(page.getByTestId('faq-modal-title')).toHaveAttribute('data-i18n-key', 'faq.title');
       await page.getByTestId('faq-modal-modal.ok-btn').click();
-      await page.waitForURL('**/game/vs-computer');
+      await page.waitForURL('**/game/training');
       await expect(page.locator('.direction-controls-panel')).toBeVisible();
     });
   });
@@ -29,7 +29,7 @@ test.describe('Модальне вікно вибору режиму гри', ()
     await test.step('Вибір режиму "досвідчений" та перевірка відсутності FAQ', async () => {
       await page.getByTestId('experienced-mode-btn').click();
       await expect(page.getByTestId('game-mode-modal')).not.toBeVisible();
-      await page.waitForURL('**/game/vs-computer');
+      await page.waitForURL('**/game/training');
       await expect(page.locator('.direction-controls-panel')).toBeVisible();
     });
   });
@@ -38,7 +38,7 @@ test.describe('Модальне вікно вибору режиму гри', ()
     await test.step('Вибір режиму "профі" та перевірка відсутності FAQ', async () => {
       await page.getByTestId('pro-mode-btn').click();
       await expect(page.getByTestId('game-mode-modal')).not.toBeVisible();
-      await page.waitForURL('**/game/vs-computer');
+      await page.waitForURL('**/game/training');
       await expect(page.locator('.direction-controls-panel')).toBeVisible();
     });
   });

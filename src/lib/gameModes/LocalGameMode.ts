@@ -16,6 +16,11 @@ import { noMovesService } from '$lib/services/noMovesService';
 import { endGameService } from '$lib/services/endGameService';
 
 export class LocalGameMode extends BaseGameMode {
+  constructor() {
+    super();
+    this.turnDuration = 10; // 10 секунд на хід
+  }
+
   initialize(initialState: GameState): void {
     // Initialization for local games is handled in the `local-setup` page.
     animationService.initialize();

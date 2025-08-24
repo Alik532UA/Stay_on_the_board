@@ -1,7 +1,7 @@
 import { tick } from 'svelte';
 import { get } from 'svelte/store';
 import { _, locale } from 'svelte-i18n';
-import { BaseGameMode } from './index';
+import { BaseGameMode } from './BaseGameMode';
 import { moveDirections } from '$lib/utils/translations';
 import { lastComputerMove, availableMoves as derivedAvailableMoves } from '$lib/stores/derivedState';
 import { gameState, type GameState } from '$lib/stores/gameState';
@@ -22,7 +22,7 @@ import { noMovesService } from '$lib/services/noMovesService';
 import { endGameService } from '$lib/services/endGameService';
 import { timeService } from '$lib/services/timeService';
 
-export class VsComputerGameMode extends BaseGameMode {
+export class TrainingGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
     const settings = get(settingsStore);
     gameLogicService.resetGame({ players: this.getPlayersConfiguration(), settings }, get(gameState));
@@ -115,7 +115,7 @@ export class VsComputerGameMode extends BaseGameMode {
 
   async continueAfterNoMoves(): Promise<void> {
     await super.continueAfterNoMoves();
-    // In VsComputerGameMode, the turn does not advance to the computer after clearing the board.
+    // In TrainingGameMode, the turn does not advance to the computer after clearing the board.
     // The human player continues their turn from a clean board.
     // We need to counteract the advanceToNextPlayer() call in the base method.
     gameStateMutator.setCurrentPlayer(0);
@@ -138,8 +138,8 @@ export class VsComputerGameMode extends BaseGameMode {
   }
 
   protected startTurn(): void {
+    // У режимі тренування таймер не запускається
     timeService.stopTurnTimer();
-    super.startTurn();
   }
 
   cleanup(): void {
