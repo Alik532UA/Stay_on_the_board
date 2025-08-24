@@ -179,6 +179,7 @@
     <ul
       bind:this={colRefs[i]}
       class="dnd-column"
+      data-testid="dnd-column-{col.id}"
       class:editing-column={$columnStyleMode === 'editing'}
       style={$columnStyleMode === 'editing'
         ? 'padding: 0; background: none; border-radius: 8px; list-style: none; min-height: 80px;'
