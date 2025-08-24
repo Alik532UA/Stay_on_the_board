@@ -5,6 +5,7 @@ import { gameEventBus } from './gameEventBus';
 import { calculateFinalScore } from './scoreService';
 import { endGameService } from './endGameService';
 import { availableMovesService } from './availableMovesService';
+import { gameStore } from '$lib/stores/gameStore';
 
 export const noMovesService = {
   async claimNoMoves(): Promise<void> {
@@ -31,5 +32,9 @@ export const noMovesService = {
       scoreDetails,
       boardSize: state.boardSize
     });
+    const gameMode = get(gameStore).mode;
+    if (gameMode) {
+      gameMode.pauseTimers();
+    }
   }
 };
