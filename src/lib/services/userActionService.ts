@@ -144,7 +144,7 @@ export const userActionService = {
           await this.continueAfterNoMoves();
           break;
         case 'resetGame':
-          gameLogicService.resetGame({ newSize: payload.newSize }, get(gameState));
+          await gameModeService.restartGame({ newSize: payload.newSize });
           gameEventBus.dispatch('CloseModal');
           break;
         case 'closeModal':

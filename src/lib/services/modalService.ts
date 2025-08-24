@@ -12,11 +12,19 @@ import { determineWinner } from './scoreService';
 import { logService } from './logService.js';
 import { navigationService } from './navigationService.js';
 
-export const modalService = {
+import { gameModeService } from './gameModeService';
 
+export const modalService = {
+  _showModalWithPause(modalConfig: any): void {
+    const gameMode = gameModeService.getCurrentGameMode();
+    if (gameMode) {
+      gameMode.pauseTimers();
+    }
+    modalStore.showModal(modalConfig);
+  },
 
   showBoardResizeModal(newSize: number): void {
-    modalStore.showModal({
+    this._showModalWithPause({
       titleKey: 'modal.resetScoreTitle',
       contentKey: 'modal.resetScoreContent',
       buttons: [
@@ -41,6 +49,10 @@ export const modalService = {
    * Closes the currently active modal.
    */
   closeModal(): void {
+    const gameMode = gameModeService.getCurrentGameMode();
+    if (gameMode) {
+      gameMode.resumeTimers();
+    }
     modalStore.closeModal();
   },
 

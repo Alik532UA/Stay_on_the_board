@@ -72,9 +72,9 @@ export const gameModeService = {
     await endGameService.endGame(reasonKey, reasonValues);
   },
 
-  async restartGame(): Promise<void> {
+  async restartGame(options: { newSize?: number } = {}): Promise<void> {
     const activeGameMode = this._ensureGameMode();
-    await activeGameMode.restartGame();
+    await activeGameMode.restartGame(options);
   },
 
   async handlePlayerMove(direction: any, distance: any): Promise<void> {
