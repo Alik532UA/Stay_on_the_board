@@ -1,27 +1,21 @@
 <script lang="ts">
   import { gameTime, turnTime } from '$lib/services/timeService.js';
-  import { gameModeService } from '$lib/services/gameModeService.js';
-  import { onMount } from 'svelte';
-  import type { BaseGameMode } from '$lib/gameModes';
+  import { gameStore } from '$lib/stores/gameStore';
 
-  let currentGameMode: BaseGameMode | null = null;
-  onMount(() => {
-    currentGameMode = gameModeService.getCurrentGameMode();
-  });
   function formatTime(seconds: number) {
     return seconds;
   }
 </script>
 
 <div class="game-info-widget timer-widget" data-testid="timer-widget">
-  {#if currentGameMode}
-    {#if currentGameMode.gameDuration > 0}
+  {#if $gameStore.mode}
+    {#if $gameStore.mode.gameDuration > 0}
       <div class="info-item">
         <span class="label">Час гри:</span>
         <span class="value">{formatTime($gameTime)}</span>
       </div>
     {/if}
-    {#if currentGameMode.turnDuration > 0}
+    {#if $gameStore.mode.turnDuration > 0}
       <div class="info-item">
         <span class="label">Час ходу:</span>
         <span class="value">{formatTime($turnTime)}</span>
