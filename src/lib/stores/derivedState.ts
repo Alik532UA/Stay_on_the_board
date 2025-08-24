@@ -10,7 +10,7 @@ import type { PlayerInputState } from './playerInputStore';
 import { settingsStore } from './settingsStore';
 import { languages } from '$lib/constants';
 import { animationStore } from './animationStore';
-import { getAvailableMoves } from '$lib/utils/boardUtils';
+import { availableMovesService } from '$lib/services/availableMovesService';
 
 /**
  * Визначає, чи є поточна гра локальною (грають кілька людей).
@@ -159,47 +159,9 @@ export const availableMoves = derived(
   [gameState, settingsStore],
   ([$gameState, $settingsStore]) => {
     if (!$gameState) return [];
-    const {
-      playerRow,
-      playerCol,
-      boardSize,
-      cellVisitCounts,
-      board,
-      moveQueue,
-      players,
-      currentPlayerIndex
-    } = $gameState;
-
-    const { blockOnVisitCount, blockModeEnabled } = $settingsStore;
-    
-    const isVsComputer = players.some(p => p.type === 'ai');
-    const lastMove = moveQueue.length > 0 ? moveQueue[moveQueue.length - 1] : null;
-    
-    let moveForPenaltyCheck = null;
-    if (isVsComputer && lastMove && players[currentPlayerIndex]?.type === 'human') {
-        // In vs computer, penalty check is against the last move if it was the computer's
-        const lastComputerMove = [...moveQueue].reverse().find(m => players[m.player - 1]?.type === 'ai');
-        if (lastComputerMove) {
-            moveForPenaltyCheck = { direction: lastComputerMove.direction, distance: lastComputerMove.distance };
-        }
-    } else if (!isVsComputer && lastMove) {
-        // In local multiplayer, penalty check is against the previous player's move
-        moveForPenaltyCheck = { direction: lastMove.direction, distance: lastMove.distance };
-    }
-
-    return getAvailableMoves(
-      playerRow,
-      playerCol,
-      boardSize,
-      cellVisitCounts,
-      blockOnVisitCount,
-      board,
-      blockModeEnabled,
-      moveForPenaltyCheck
-    );
+    return availableMovesService.getAvailableMoves().map(move => ({ ...move, isPenalty: false }));
   }
 );
-
 /**
  * Отримує колір попереднього гравця в локальній грі (який тільки що зробив хід).
  * @type {import('svelte/store').Readable<string | null>}

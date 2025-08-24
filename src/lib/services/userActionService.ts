@@ -11,6 +11,7 @@ import { gameStore } from '$lib/stores/gameStore';
 import { modalService } from './modalService';
 import { gameModeService } from './gameModeService';
 import { sideEffectService, type SideEffect } from './sideEffectService';
+import { gameEventBus } from './gameEventBus';
 import { replayService } from './replayService';
 import { logService } from './logService.js';
 import { gameState } from '$lib/stores/gameState';
@@ -18,10 +19,10 @@ import ReplayViewer from '$lib/components/ReplayViewer.svelte';
 import * as gameLogicService from '$lib/services/gameLogicService.js';
 import { navigationService } from './navigationService';
 import { settingsStore } from '$lib/stores/settingsStore';
-import { getAvailableMoves } from '$lib/utils/boardUtils.ts';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { animationStore } from '$lib/stores/animationStore';
 import { base } from '$app/paths';
+import { endGameService } from './endGameService';
 
 export const userActionService = {
   async confirmMove(direction: string, distance: number): Promise<void> {
@@ -113,7 +114,7 @@ export const userActionService = {
   async finishWithBonus(reasonKey: string): Promise<void> {
     logService.logicMove('[userActionService] finishWithBonus called with reason:', reasonKey);
     gameState.update(state => ({...state, finishedByFinishButton: true}));
-    await gameModeService.endGame(reasonKey);
+    await endGameService.endGame(reasonKey);
   },
 
   async continueAfterNoMoves(): Promise<void> {
@@ -145,10 +146,10 @@ export const userActionService = {
           break;
         case 'resetGame':
           gameLogicService.resetGame({ newSize: payload.newSize }, get(gameState));
-          sideEffectService.execute({ type: 'ui/closeModal' });
+          gameEventBus.dispatch('CloseModal');
           break;
         case 'closeModal':
-          sideEffectService.execute({ type: 'ui/closeModal' });
+          gameEventBus.dispatch('CloseModal');
           break;
         default:
           logService.logicMove(`[userActionService.handleModalAction] Unknown action: ${action}`);

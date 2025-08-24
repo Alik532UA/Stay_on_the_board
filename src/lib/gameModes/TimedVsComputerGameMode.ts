@@ -1,46 +1,32 @@
-import { get } from 'svelte/store';
+// src/lib/gameModes/TimedVsComputerGameMode.ts
 import { VsComputerGameMode } from './VsComputerGameMode';
 import { timeService } from '$lib/services/timeService';
-import { gameState, type GameState } from '$lib/stores/gameState';
-import { logService } from '$lib/services/logService';
-import type { MoveDirectionType } from '$lib/models/Figure';
+import { endGameService } from '$lib/services/endGameService';
 
 export class TimedVsComputerGameMode extends VsComputerGameMode {
-  private unsubscribe: () => void;
+  private gameTimer: NodeJS.Timeout | null = null;
 
-  initialize(initialState: GameState): void {
+  initialize(initialState: any): void {
     super.initialize(initialState);
-    timeService.startGame();
-    this.unsubscribe = timeService.timeLeft.subscribe(timeLeft => {
-      if (timeLeft <= 0) {
-        this.endGame('modal.gameOverReasonTimeUp');
-      }
-    });
+    this.startGameTimer();
   }
 
-  async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
-    const moveResult = await super.handlePlayerMove(direction, distance);
-    
-    // Add score only on successful player move
-    const state = get(gameState);
-    if (state.currentPlayerIndex === 0) { // Assuming player is always at index 0
-        timeService.addScore(1); // Add 1 point for each successful move
-    }
+  private startGameTimer() {
+    this.stopGameTimer();
+    this.gameTimer = setTimeout(() => {
+      endGameService.endGame('modal.gameOverReasonTimeUp');
+    }, 60000); // 1 minute game
   }
 
-  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
-    timeService.stopGame();
-    if (this.unsubscribe) {
-      this.unsubscribe();
+  private stopGameTimer() {
+    if (this.gameTimer) {
+      clearTimeout(this.gameTimer);
+      this.gameTimer = null;
     }
-    super.endGame(reasonKey, reasonValues);
   }
 
   cleanup(): void {
     super.cleanup();
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
-    timeService.stopGame();
+    this.stopGameTimer();
   }
 }

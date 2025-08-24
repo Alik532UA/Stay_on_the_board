@@ -15,11 +15,11 @@ import { gameEventBus } from '$lib/services/gameEventBus';
 import type { SideEffect } from '$lib/services/sideEffectService';
 import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
-import { getAvailableMoves } from '$lib/utils/boardUtils';
 import { logService } from '$lib/services/logService';
 import { calculateFinalScore } from '$lib/services/scoreService';
 import { animationStore } from '$lib/stores/animationStore';
-
+import { noMovesService } from '$lib/services/noMovesService';
+import { endGameService } from '$lib/services/endGameService';
 import { timeService } from '$lib/services/timeService';
 
 export class VsComputerGameMode extends BaseGameMode {
@@ -133,13 +133,13 @@ export class VsComputerGameMode extends BaseGameMode {
     const titleKey = playerType === 'human' ? 'modal.playerNoMovesTitle' : 'modal.computerNoMovesTitle';
     const contentKey = playerType === 'human' ? 'modal.playerNoMovesContent' : 'modal.computerNoMovesContent';
 
-    this._dispatchNoMovesEvent(playerType);
+    noMovesService.dispatchNoMovesEvent(playerType);
   }
 
   private startTurn() {
     timeService.stopTurnTimer();
     timeService.startTurnTimer(() => {
-      this.endGame('modal.gameOverReasonTimeUp');
+      endGameService.endGame('modal.gameOverReasonTimeUp');
     });
   }
 

@@ -6,13 +6,14 @@ import { playerInputStore } from '../stores/playerInputStore';
 import { gameState, createInitialState } from '../stores/gameState';
 import type { Player } from '$lib/models/player';
 import { gameStateMutator } from './gameStateMutator';
-import { getAvailableMoves, isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
+import { isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
 import { lastPlayerMove } from '$lib/stores/derivedState';
 import { settingsStore } from '../stores/settingsStore';
 import { logService } from './logService.js';
 import { testModeStore } from '$lib/stores/testModeStore';
 import { calculateMoveScore } from './scoreService';
 import type { Direction } from '$lib/utils/gameUtils';
+import { availableMovesService } from './availableMovesService';
 
 // --- Мутатори стану (ex-gameActions.ts) ---
 
@@ -227,18 +228,7 @@ export function getComputerMove(): { direction: MoveDirectionType; distance: num
   }
 
   logService.testMode('gameLogicService: виконується випадковий хід');
-  const state = get(gameState);
-  const settings = get(settingsStore);
-  const availableMoves = getAvailableMoves(
-    state.playerRow,
-    state.playerCol,
-    state.boardSize,
-    state.cellVisitCounts,
-    settings.blockOnVisitCount,
-    state.board,
-    settings.blockModeEnabled,
-    null
-  );
+  const availableMoves = availableMovesService.getAvailableMoves();
 
   if (availableMoves.length === 0) {
     logService.logicAI('getComputerMove: немає доступних ходів');
