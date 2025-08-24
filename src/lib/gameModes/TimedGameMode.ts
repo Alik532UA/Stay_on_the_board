@@ -20,6 +20,8 @@ export class TimedGameMode extends TrainingGameMode {
     const state = get(gameState);
     if (state.isFirstMove) {
       this.startGameTimer();
+    } else if (state.wasResumed) {
+      this.resumeTimers();
     }
     await super.handlePlayerMove(direction, distance);
   }

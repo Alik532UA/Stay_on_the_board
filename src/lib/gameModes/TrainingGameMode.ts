@@ -21,6 +21,7 @@ import { animationService } from '$lib/services/animationService';
 import { noMovesService } from '$lib/services/noMovesService';
 import { endGameService } from '$lib/services/endGameService';
 import { timeService } from '$lib/services/timeService';
+import { gameStore } from '$lib/stores/gameStore';
 
 export class TrainingGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
@@ -118,7 +119,12 @@ export class TrainingGameMode extends BaseGameMode {
     // In TrainingGameMode, the turn does not advance to the computer after clearing the board.
     // The human player continues their turn from a clean board.
     // We need to counteract the advanceToNextPlayer() call in the base method.
-    gameStateMutator.setCurrentPlayer(0);
+    gameStateMutator.setCurrentPlayer(0); // 0 is always the human player in this mode
+    this.startTurn();
+    // const gameMode = get(gameStore).mode;
+    // if (gameMode) {
+    //   gameMode.resumeTimers();
+    // }
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
