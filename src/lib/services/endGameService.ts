@@ -6,12 +6,16 @@ import { gameStateMutator } from './gameStateMutator';
 import { calculateFinalScore, determineWinner } from './scoreService';
 import { gameEventBus } from './gameEventBus';
 import { logService } from './logService';
+import { timeService } from './timeService';
 
 export const endGameService = {
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
     logService.GAME_MODE(`[endGameService] endGame called with reason:`, reasonKey);
     const state = get(gameState);
     if (!state) return;
+
+    timeService.stopGameTimer();
+    timeService.stopTurnTimer();
 
     const humanPlayersCount = state.players.filter(p => p.type === 'human').length;
     const gameType = humanPlayersCount > 1 ? 'local' : 'vs-computer';

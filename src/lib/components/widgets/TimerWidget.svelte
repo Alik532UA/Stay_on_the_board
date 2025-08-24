@@ -11,14 +11,12 @@
   {#if $gameStore.mode}
     {#if $gameStore.mode.gameDuration > 0}
       <div class="info-item">
-        <span class="label">Час гри:</span>
-        <span class="value">{formatTime($gameTime)}</span>
+        <span class="value" data-testid="game-time-value">{formatTime($gameTime)}</span>
       </div>
     {/if}
     {#if $gameStore.mode.turnDuration > 0}
       <div class="info-item">
-        <span class="label">Час ходу:</span>
-        <span class="value">{formatTime($turnTime)}</span>
+        <span class="value" data-testid="turn-time-value">{formatTime($turnTime)}</span>
       </div>
     {/if}
   {/if}
@@ -26,7 +24,7 @@
 
 <style>
   .timer-widget {
-    padding: 12px 15px; /* Adjusted padding */
+    padding: 0 15px; /* Adjusted padding */
     border-radius: var(--unified-border-radius);
     background: var(--bg-secondary);
     color: var(--text-primary);
@@ -42,7 +40,7 @@
   }
   .info-item {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     gap: 16px;
   }
