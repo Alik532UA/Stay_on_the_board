@@ -5,13 +5,12 @@ import { gameState, type GameState } from '$lib/stores/gameState';
 import type { Player } from '$lib/models/player';
 import { gameStateMutator } from '$lib/services/gameStateMutator';
 import * as gameLogicService from '$lib/services/gameLogicService';
-import { playerInputStore } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import { logService } from '$lib/services/logService';
-import { animationStore } from '$lib/stores/animationStore';
+import { animationService } from '$lib/services/animationService';
 import { timeService } from '$lib/services/timeService';
 import { noMovesService } from '$lib/services/noMovesService';
 import { endGameService } from '$lib/services/endGameService';
@@ -19,6 +18,7 @@ import { endGameService } from '$lib/services/endGameService';
 export class LocalGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
     // Initialization for local games is handled in the `local-setup` page.
+    animationService.initialize();
     this.checkComputerTurn();
     this.startTurn();
   }
@@ -89,14 +89,7 @@ export class LocalGameMode extends BaseGameMode {
     }
   }
 
-  private startTurn() {
-    timeService.startTurnTimer(() => {
-      endGameService.endGame('modal.gameOverReasonTimeUp');
-    });
-  }
-
   cleanup(): void {
     super.cleanup();
-    timeService.stopTurnTimer();
   }
 }

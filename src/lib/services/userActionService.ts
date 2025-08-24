@@ -6,7 +6,6 @@ import { get } from 'svelte/store';
 import { tick } from 'svelte';
 import { replayStore } from '$lib/stores/replayStore.js';
 import { modalStore } from '$lib/stores/modalStore';
-import { playerInputStore } from '$lib/stores/playerInputStore';
 import { gameStore } from '$lib/stores/gameStore';
 import { modalService } from './modalService';
 import { gameModeService } from './gameModeService';
@@ -26,12 +25,12 @@ import { endGameService } from './endGameService';
 
 export const userActionService = {
   async confirmMove(direction: string, distance: number): Promise<void> {
-    if (get(playerInputStore).isMoveInProgress) {
+    if (get(gameState)?.isComputerMoveInProgress) {
       return;
     }
-    playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+    // gameStateMutator.applyMove({ isComputerMoveInProgress: true });
     try {
-      logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+      logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
       let activeGameMode = get(gameStore).mode;
       if (!activeGameMode) {
         gameModeService.initializeGameMode();
@@ -49,17 +48,17 @@ export const userActionService = {
       // Це усуває стан гонитви (race condition).
       await tick();
       logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
-      playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+      // gameStateMutator.applyMove({ isComputerMoveInProgress: false });
     }
   },
 
   async claimNoMoves(): Promise<void> {
-    if (get(playerInputStore).isMoveInProgress) {
+    if (get(gameState)?.isComputerMoveInProgress) {
       return;
     }
-    playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+    // gameStateMutator.applyMove({ isComputerMoveInProgress: true });
     try {
-      logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+      logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
       let activeGameMode = get(gameStore).mode;
       if (!activeGameMode) {
         gameModeService.initializeGameMode();
@@ -76,7 +75,7 @@ export const userActionService = {
       // Це усуває стан гонитви (race condition).
       await tick();
       logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
-      playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+      // gameStateMutator.applyMove({ isComputerMoveInProgress: false });
     }
   },
 
@@ -122,12 +121,12 @@ export const userActionService = {
   },
 
   async handleModalAction(action: string, payload?: any): Promise<void> {
-    if (get(playerInputStore).isMoveInProgress) {
+    if (get(gameState)?.isComputerMoveInProgress) {
       return;
     }
-    playerInputStore.update(state => ({ ...state, isMoveInProgress: true }));
+    // gameStateMutator.applyMove({ isComputerMoveInProgress: true });
     try {
-      logService.logicMove('[userActionService] Input locked: isMoveInProgress=true');
+      logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
       switch (action) {
         case 'restartGame':
           await this.requestRestart();
@@ -161,7 +160,7 @@ export const userActionService = {
       // Це усуває стан гонитви (race condition).
       await tick();
       logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
-      playerInputStore.update(state => ({ ...state, isMoveInProgress: false }));
+      // gameStateMutator.applyMove({ isComputerMoveInProgress: false });
     }
   },
 

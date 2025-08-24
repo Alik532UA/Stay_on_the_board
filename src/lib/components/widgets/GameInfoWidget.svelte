@@ -32,7 +32,7 @@
       if (!$gameState) return '';
 
       const isCompact = $settingsStore.showGameInfoWidget === 'compact';
-      const humanPlayersCount = $gameState.players.filter(p => p.type === 'human').length;
+      const humanPlayersCount = $gameState.players.filter((p: any) => p.type === 'human').length;
       const isLocalGame = humanPlayersCount > 1;
 
       if ($gameState.isGameOver) return $_('gameBoard.gameInfo.gameOver');
@@ -47,7 +47,7 @@
       if ($gameState.wasResumed) return $_('gameBoard.gameInfo.gameResumed');
 
       if ($lastComputerMove && !$isPauseBetweenMoves) {
-        const directionKey = $lastComputerMove.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+        const directionKey = $lastComputerMove.direction.replace(/-(\w)/g, (_: string, c: string) => c.toUpperCase());
         const direction = $_(`gameBoard.directions.${directionKey}`);
         const distance = $lastComputerMove.distance;
 
@@ -69,7 +69,7 @@
         const previousPlayer = $gameState.players[previousPlayerIndex];
         const previousPlayerStyle = getPlayerNameStyle($gameState.players, previousPlayer.name);
         const currentPlayerStyle = getPlayerNameStyle($gameState.players, currentPlayer.name);
-        const directionKey = $lastPlayerMove.direction.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+        const directionKey = $lastPlayerMove.direction.replace(/-(\w)/g, (_: string, c: string) => c.toUpperCase());
         const direction = $_(`gameBoard.directions.${directionKey}`);
         return `<div class="message-line-1"><span class="player-name-plate" style="${previousPlayerStyle}">${previousPlayer.name}</span> зробив хід: ${direction} на ${$lastPlayerMove.distance}.</div><div class="message-line-2"><span class="player-name-plate" style="${currentPlayerStyle}">${currentPlayer.name}</span> ваша черга робити хід!</div>`;
       }

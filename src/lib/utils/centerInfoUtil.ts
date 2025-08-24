@@ -68,9 +68,9 @@ export function getCenterInfoState({
   // Якщо немає вибраного ходу і є хід комп'ютера
   if (!selectedDirection && !selectedDistance && lastComputerMove) {
     // Якщо зараз пауза між ходами - приховуємо хід комп'ютера
-    if (isPauseBetweenMoves) {
-      return { class: '', content: '', clickable: false, aria: 'Пауза між ходами' };
-    }
+    // if (isPauseBetweenMoves) {
+    //   return { class: '', content: '', clickable: false, aria: 'Пауза між ходами' };
+    // }
     
     let dir = '';
     let dist = '';

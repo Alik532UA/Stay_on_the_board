@@ -130,7 +130,7 @@
   function onCellRightClick(event: MouseEvent, row: number, col: number): void {
     event.preventDefault();
     if ($gameState && $settingsStore.blockModeEnabled && !(row === $gameState.playerRow && col === $gameState.playerCol)) {
-      const visualCounts = get(visualCellVisitCounts);
+      const visualCounts = get(visualCellVisitCounts) as Record<string, number>;
       const blocked = isCellBlocked(row, col, visualCounts, $settingsStore);
       logService.ui(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`);
     }

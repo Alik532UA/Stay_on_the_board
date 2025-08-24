@@ -2,24 +2,22 @@
 import { Figure, MoveDirection } from '../models/Figure';
 import type { MoveDirectionType } from '../models/Figure';
 import { get } from 'svelte/store';
-import { playerInputStore } from '../stores/playerInputStore';
 import { gameState, createInitialState } from '../stores/gameState';
 import type { Player } from '$lib/models/player';
 import { gameStateMutator } from './gameStateMutator';
 import { isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
-import { lastPlayerMove } from '$lib/stores/derivedState';
 import { settingsStore } from '../stores/settingsStore';
 import { logService } from './logService.js';
-import { testModeStore } from '$lib/stores/testModeStore';
 import { calculateMoveScore } from './scoreService';
 import type { Direction } from '$lib/utils/gameUtils';
 import { availableMovesService } from './availableMovesService';
+import { aiService } from './aiService';
 
 // --- Мутатори стану (ex-gameActions.ts) ---
 
 /**
  * @file Contains all pure functions (actions) that mutate the game's state.
- * These are simple mutators that work exclusively with gameState and playerInputStore.
+ * These are simple mutators that work exclusively with gameState.
  */
 
 export function resetGame(options: { newSize?: number; players?: Player[]; settings?: any } = {}, currentState: any) {
@@ -56,42 +54,31 @@ export function resetGame(options: { newSize?: number; players?: Player[]; setti
 }
 
 export function setDirection(dir: Direction) {
-  const currentInput = get(playerInputStore);
-  const { boardSize } = get(gameState);
+  const state = get(gameState);
+  if (!state) return;
+
+  const { boardSize, selectedDirection, selectedDistance } = state;
   const maxDist = boardSize - 1;
-  let newDistance = currentInput.selectedDistance;
-  let newManuallySelected = currentInput.distanceManuallySelected;
+  let newDistance = selectedDistance;
 
-  if (currentInput.selectedDirection !== dir) {
-    if (!currentInput.distanceManuallySelected) {
-      newDistance = 1;
-      newManuallySelected = false;
-    }
+  if (selectedDirection !== dir) {
+    newDistance = 1;
   } else {
-    if (!currentInput.distanceManuallySelected) {
-      newDistance = (!currentInput.selectedDistance || currentInput.selectedDistance >= maxDist) ? 1 : currentInput.selectedDistance + 1;
-      newManuallySelected = false;
-    }
+    newDistance = (!selectedDistance || selectedDistance >= maxDist) ? 1 : selectedDistance + 1;
   }
-
-  // Оновлюємо playerInputStore
-  playerInputStore.update(state => ({
-    ...state,
+  
+  gameStateMutator.applyMove({
     selectedDirection: dir,
     selectedDistance: newDistance,
-    distanceManuallySelected: newManuallySelected
-  }));
+  });
   
-  logService.logicMove('setDirection: встановлено напрямок', { dir, newDistance, newManuallySelected });
+  logService.logicMove('setDirection: встановлено напрямок', { dir, newDistance });
 }
 
 export function setDistance(dist: number) {
-  // Оновлюємо playerInputStore
-  playerInputStore.update(state => ({
-    ...state,
+  gameStateMutator.applyMove({
     selectedDistance: dist,
-    distanceManuallySelected: true
-  }));
+  });
   
   logService.logicMove('setDistance: встановлено відстань', { dist });
 }
@@ -117,6 +104,60 @@ function _validateMove(
   return { success: true };
 }
 
+function _createUpdatedVisitCounts(currentState: any) {
+  const updatedCellVisitCounts = { ...currentState.cellVisitCounts };
+  const startCellKey = `${currentState.playerRow}-${currentState.playerCol}`;
+  updatedCellVisitCounts[startCellKey] = (updatedCellVisitCounts[startCellKey] || 0) + 1;
+  return updatedCellVisitCounts;
+}
+
+function _createUpdatedBoard(currentState: any, newPosition: { row: number; col: number }) {
+  const newBoard = currentState.board.map((row: number[]) => [...row]);
+  if (currentState.playerRow !== null && currentState.playerCol !== null) {
+    newBoard[currentState.playerRow][currentState.playerCol] = 0;
+  }
+  newBoard[newPosition.row][newPosition.col] = 1;
+  return newBoard;
+}
+
+function _createUpdatedMoveQueue(
+  currentState: any,
+  newPosition: { row: number; col: number },
+  playerIndex: number,
+  direction: MoveDirectionType,
+  distance: number
+) {
+  return [...currentState.moveQueue, {
+    player: playerIndex + 1,
+    direction,
+    distance,
+    to: { row: newPosition.row, col: newPosition.col }
+  }];
+}
+
+function _createUpdatedMoveHistory(
+  currentState: any,
+  newPosition: { row: number; col: number },
+  updatedCellVisitCounts: any,
+  settings: any
+) {
+  return [...currentState.moveHistory, {
+    pos: { row: newPosition.row, col: newPosition.col },
+    blocked: [] as {row: number, col: number}[],
+    visits: { ...updatedCellVisitCounts },
+    blockModeEnabled: settings.blockModeEnabled
+  }];
+}
+
+function _createUpdatedPlayers(currentState: any, playerIndex: number, scoreChanges: any) {
+  const updatedPlayers = [...currentState.players];
+  updatedPlayers[playerIndex] = {
+    ...updatedPlayers[playerIndex],
+    score: updatedPlayers[playerIndex].score + scoreChanges.baseScoreChange
+  };
+  return updatedPlayers;
+}
+
 function _applyMoveToState(
   currentState: any,
   newPosition: { row: number; col: number },
@@ -126,35 +167,11 @@ function _applyMoveToState(
   scoreChanges: any,
   settings: any
 ) {
-  const updatedCellVisitCounts = { ...currentState.cellVisitCounts };
-  const startCellKey = `${currentState.playerRow}-${currentState.playerCol}`;
-  updatedCellVisitCounts[startCellKey] = (updatedCellVisitCounts[startCellKey] || 0) + 1;
-
-  const newBoard = currentState.board.map((row: number[]) => [...row]);
-  if (currentState.playerRow !== null && currentState.playerCol !== null) {
-    newBoard[currentState.playerRow][currentState.playerCol] = 0;
-  }
-  newBoard[newPosition.row][newPosition.col] = 1;
-
-  const updatedMoveQueue = [...currentState.moveQueue, {
-    player: playerIndex + 1,
-    direction,
-    distance,
-    to: { row: newPosition.row, col: newPosition.col }
-  }];
-
-  const updatedMoveHistory = [...currentState.moveHistory, {
-    pos: { row: newPosition.row, col: newPosition.col },
-    blocked: [] as {row: number, col: number}[],
-    visits: { ...updatedCellVisitCounts },
-    blockModeEnabled: settings.blockModeEnabled
-  }];
-
-  const updatedPlayers = [...currentState.players];
-  updatedPlayers[playerIndex] = {
-    ...updatedPlayers[playerIndex],
-    score: updatedPlayers[playerIndex].score + scoreChanges.baseScoreChange
-  };
+  const updatedCellVisitCounts = _createUpdatedVisitCounts(currentState);
+  const newBoard = _createUpdatedBoard(currentState, newPosition);
+  const updatedMoveQueue = _createUpdatedMoveQueue(currentState, newPosition, playerIndex, direction, distance);
+  const updatedMoveHistory = _createUpdatedMoveHistory(currentState, newPosition, updatedCellVisitCounts, settings);
+  const updatedPlayers = _createUpdatedPlayers(currentState, playerIndex, scoreChanges);
 
   return {
     board: newBoard,
@@ -168,7 +185,8 @@ function _applyMoveToState(
     movesInBlockMode: currentState.movesInBlockMode + scoreChanges.movesInBlockModeChange,
     jumpedBlockedCells: currentState.jumpedBlockedCells + scoreChanges.jumpedBlockedCellsChange,
     distanceBonus: (currentState.distanceBonus || 0) + scoreChanges.distanceBonusChange,
-    isFirstMove: false
+    isFirstMove: false,
+    lastMove: { direction, distance, player: playerIndex }
   };
 }
 
@@ -178,7 +196,7 @@ function _applyMoveToState(
  * @param distance Відстань ходу
  * @param playerIndex Індекс гравця (0 для гравця, 1 для комп'ютера)
  */
-export async function performMove(
+export function performMove(
   direction: MoveDirectionType,
   distance: number,
   playerIndex: number = 0,
@@ -216,32 +234,7 @@ export async function performMove(
 
 
 export function getComputerMove(): { direction: MoveDirectionType; distance: number } | null {
-  const testModeState = get(testModeStore);
-  logService.testMode('gameLogicService: отримано стан testModeStore', testModeState);
-
-  if (testModeState.computerMoveMode === 'manual' && testModeState.manualComputerMove.direction && testModeState.manualComputerMove.distance) {
-    logService.testMode('gameLogicService: виконується ручний хід', testModeState.manualComputerMove);
-    return {
-      direction: testModeState.manualComputerMove.direction as MoveDirectionType,
-      distance: testModeState.manualComputerMove.distance
-    };
-  }
-
-  logService.testMode('gameLogicService: виконується випадковий хід');
-  const availableMoves = availableMovesService.getAvailableMoves();
-
-  if (availableMoves.length === 0) {
-    logService.logicAI('getComputerMove: немає доступних ходів');
-    return null;
-  }
-
-  const randomIndex = Math.floor(Math.random() * availableMoves.length);
-  const randomMove = availableMoves[randomIndex];
-  
-  logService.logicAI('getComputerMove: знайдено доступні ходи', availableMoves);
-  logService.logicAI('getComputerMove: обрано випадковий хід', randomMove);
-  
-  return randomMove;
+  return aiService.getComputerMove();
 }
 
 export function validatePlayerMove(changes: any, currentState: any): { errors: string[], warnings: string[] } {

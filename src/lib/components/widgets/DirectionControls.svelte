@@ -6,11 +6,9 @@
   import { logService } from '$lib/services/logService.js';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
-  import { playerInputStore } from '$lib/stores/playerInputStore.js';
-  
-  $: isMoveInProgress = $playerInputStore.isMoveInProgress;
-  $: selectedDirection = $playerInputStore.selectedDirection;
-  $: selectedDistance = $playerInputStore.selectedDistance;
+  export let isMoveInProgress = false;
+  export let selectedDirection = null;
+  export let selectedDistance = null;
   
   export const availableDirections: string[] = [
     'up-left', 'up', 'up-right',
