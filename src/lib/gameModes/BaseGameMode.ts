@@ -18,6 +18,9 @@ import { availableMovesService } from '$lib/services/availableMovesService';
 import { timeService } from '$lib/services/timeService';
 
 export abstract class BaseGameMode implements IGameMode {
+  public turnDuration: number = 0; // Default to 0, means no timer
+  public gameDuration: number = 0; // Default to 0, means no timer
+
   /**
    * Initializes the game mode with a given state.
    * @param initialState The initial state of the game.
@@ -28,9 +31,11 @@ export abstract class BaseGameMode implements IGameMode {
    * Starts the turn timer.
    */
   protected startTurn(): void {
-    timeService.startTurnTimer(() => {
-      endGameService.endGame('modal.gameOverReasonTimeUp');
-    });
+    if (this.turnDuration > 0) {
+      timeService.startTurnTimer(this.turnDuration, () => {
+        endGameService.endGame('modal.gameOverReasonTimeUp');
+      });
+    }
   }
 
   /**
@@ -184,5 +189,20 @@ export abstract class BaseGameMode implements IGameMode {
   cleanup(): void {
     logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
     timeService.stopTurnTimer();
+    timeService.stopGameTimer();
+  }
+
+  /**
+   * Pauses the game timers.
+   */
+  pauseTimers(): void {
+    timeService.pauseGameTimer();
+  }
+
+  /**
+   * Resumes the game timers.
+   */
+  resumeTimers(): void {
+    timeService.resumeGameTimer();
   }
 }

@@ -1,7 +1,8 @@
 export default {
   title: "Залишитися на дошці",
   menu: "Меню",
-  playVsComputer: "Гра проти комп'ютера",
+  training: "Тренування",
+  timedGame: "Гра на час",
   localGame: "Локальна гра",
   playOnline: "Грати онлайн",
   settings: "Налаштування",

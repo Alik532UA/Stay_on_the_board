@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('Game page loads and renders correctly on direct navigation', { tag: ['@done', '@GPS-1'] } , async ({ page }) => {
   await test.step('Перехід на сторінку гри та перевірка статусу', async () => {
-    const response = await page.goto('/Stay_on_the_board/game/vs-computer');
+    const response = await page.goto('/Stay_on_the_board/game/training');
     expect(response?.status()).toBe(200);
   });
 

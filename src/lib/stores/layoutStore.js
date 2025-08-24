@@ -12,6 +12,7 @@ export const WIDGETS = {
   SETTINGS_EXPANDER: 'settings-expander',
   GAME_INFO: 'game-info-widget',
   PLAYER_TURN_INDICATOR: 'player-turn-indicator',
+  TIMER: 'timer-widget',
 };
 
 // Структура макета за замовчуванням

@@ -1,9 +1,9 @@
 // src/lib/gameModes/TimedVsComputerGameMode.ts
-import { VsComputerGameMode } from './VsComputerGameMode';
+import { TrainingGameMode } from './TrainingGameMode';
 import { timeService } from '$lib/services/timeService';
 import { endGameService } from '$lib/services/endGameService';
 
-export class TimedVsComputerGameMode extends VsComputerGameMode {
+export class TimedVsComputerGameMode extends TrainingGameMode {
   private gameTimer: NodeJS.Timeout | null = null;
 
   initialize(initialState: any): void {
