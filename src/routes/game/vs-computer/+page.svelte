@@ -20,7 +20,7 @@
   import { onMount } from 'svelte';
   import { afterNavigate } from '$app/navigation';
   import { calculateFinalScore } from '$lib/services/scoreService.js';
-  import { animationStore } from '$lib/stores/animationStore.js';
+  import { animationService } from '$lib/services/animationService.js';
   import { gameState } from '$lib/stores/gameState.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { gameOverStore } from '$lib/stores/gameOverStore';
@@ -31,7 +31,7 @@
 
   onMount(() => {
     gameModeService.setCurrentGameMode('vs-computer');
-    animationStore.initialize();
+    animationService.initialize();
   });
 
   const widgetMap = {

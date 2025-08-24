@@ -1,23 +1,27 @@
 // src/lib/stores/derivedState.ts
-import { derived, get } from 'svelte/store';
-import { page } from '$app/stores';
+import { derived } from 'svelte/store';
 import { gameState } from './gameState';
-import { logService } from '$lib/services/logService';
-import type { GameState } from './gameState';
-import type { Direction } from '$lib/utils/gameUtils';
-import { playerInputStore } from './playerInputStore';
-import type { PlayerInputState } from './playerInputStore';
 import { settingsStore } from './settingsStore';
 import { languages } from '$lib/constants';
 import { animationStore } from './animationStore';
 import { availableMovesService } from '$lib/services/availableMovesService';
 
 /**
- * Визначає, чи є поточна гра локальною (грають кілька людей).
- * @type {import('svelte/store').Readable<boolean>}
+ * @private
+ * Допоміжна функція для розбиття масиву на частини.
+ * @param {T[]} arr
+ * @param {number} n
+ * @returns {T[][]}
+ * @template T
  */
+function chunk<T>(arr: T[], n: number): T[][] {
+  const res = [];
+  for (let i = 0; i < arr.length; i += n) res.push(arr.slice(i, i + n));
+  return res;
+}
 
 /**
+ * @typedef {import('$lib/utils/gameUtils').Direction} Direction
  * @typedef {object} ComputerMove
  * @property {Direction} direction
  * @property {number} distance
@@ -25,145 +29,63 @@ import { availableMovesService } from '$lib/services/availableMovesService';
 
 /**
  * Derived store, що завжди містить останній хід комп'ютера.
- * Він автоматично оновлюється, коли змінюється gameState.moveQueue.
  * @type {import('svelte/store').Readable<ComputerMove | null>}
  */
-// ГАРАНТІЯ: lastComputerMove derived ТІЛЬКИ з gameState.moveQueue. НЕ МОЖНА додавати залежність від animationStore, BoardWrapperWidget чи будь-якої візуалізації!
-// Це гарантує, що center-info/control-btn завжди оновлюється одразу після зміни стану гри, незалежно від анімації.
 export const lastComputerMove = derived(
-  [gameState],
-  ([$gameState]) => {
-    if (!$gameState) return null;
-    
-    for (let i = $gameState.moveQueue.length - 1; i >= 0; i--) {
-      const move = $gameState.moveQueue[i];
-      if (move.player === 2) {
-        return { direction: move.direction as Direction, distance: move.distance };
-      }
+  gameState,
+  ($gameState) => {
+    if (!$gameState || !$gameState.lastMove) {
+      return null;
+    }
+    const { lastMove } = $gameState;
+    if (lastMove && $gameState.players[lastMove.player]?.type === 'ai') {
+      return {
+        direction: lastMove.direction,
+        distance: lastMove.distance
+      };
     }
     return null;
   }
 );
 
 /**
- * Derived store, що завжди містить останній хід гравця в локальній грі.
- * Він автоматично оновлюється, коли змінюється gameState.moveQueue.
- * @type {import('svelte/store').Readable<ComputerMove | null>}
- */
-export const lastPlayerMove = derived(gameState, $gameState => {
-  if (!$gameState || $gameState.moveQueue.length === 0) return null;
-  const lastMove = $gameState.moveQueue[$gameState.moveQueue.length - 1];
-  return {
-    direction: lastMove.direction as Direction,
-    distance: lastMove.distance
-  };
-});
-
-/**
- * Derived store, що визначає, чи триває пауза між ходом гравця та комп'ютера.
- * Використовується для приховування ходу комп'ютера в center-info під час паузи.
- * @type {import('svelte/store').Readable<boolean>}
- */
-export const isPauseBetweenMoves = derived(
-  [gameState],
-  ([$gameState]) => {
-    if (!$gameState) return false;
-
-    const lastMove = $gameState.moveQueue[$gameState.moveQueue.length - 1];
-    if (!lastMove) {
-      return false;
-    }
-
-    // Якщо останній хід не гравця, паузи немає
-    if (lastMove.player !== 1) {
-      return false;
-    }
-
-    // Шукаємо, чи є хід комп'ютера ПІСЛЯ останнього ходу гравця
-    let lastPlayerMoveIndex = -1;
-    for (let i = $gameState.moveQueue.length - 1; i >= 0; i--) {
-      if ($gameState.moveQueue[i].player === 1) {
-        lastPlayerMoveIndex = i;
-        break;
-      }
-    }
-
-    if (lastPlayerMoveIndex !== -1) {
-      for (let i = lastPlayerMoveIndex + 1; i < $gameState.moveQueue.length; i++) {
-        if ($gameState.moveQueue[i].player === 2) {
-          return false; // Знайдено хід комп'ютера після ходу гравця
-        }
-      }
-    }
-
-    // Якщо хід комп'ютера не знайдено, пауза триває
-    return true;
-  }
-);
-
-/**
- * @typedef {object} CenterInfoState
- * @property {string} class - CSS-клас для стилізації.
- * @property {string} content - Текст для відображення.
- * @property {boolean} clickable - Чи є кнопка клікабельною.
- * @property {string} aria - Текст для aria-label.
- */
-
-const directionArrows: Record<Direction, string> = {
-  'up-left': '↖', 'up': '↑', 'up-right': '↗',
-  'left': '←', 'right': '→',
-  'down-left': '↙', 'down': '↓', 'down-right': '↘'
-};
-
-/**
- * Derived стор, що обчислює стан центральної кнопки/інфо-панелі.
- * Залежить від трьох джерел: gameState, playerInputStore та lastComputerMove.
- * @type {import('svelte/store').Readable<CenterInfoState>}
- */
-// ВАЖЛИВО: center-info derived не залежить від анімації чи паузи (animationStore, BoardWrapperWidget), а оновлюється миттєво після зміни стану гри. Це гарантує SoC, SSoT, UDF.
-// Це гарантує, що center-info/control-btn завжди оновлюється одразу після зміни стану гри, незалежно від анімації.
-
-/**
  * Derived стор, що визначає, чи заблокована кнопка підтвердження ходу.
  * @type {import('svelte/store').Readable<boolean>}
  */
 export const isConfirmButtonDisabled = derived(
-  [gameState, playerInputStore],
-  ([$gameState, $playerInputStore]) => {
+  [gameState],
+  ([$gameState]) => {
     if (!$gameState) return true;
     const isPlayerTurn = $gameState.players[$gameState.currentPlayerIndex]?.type === 'human';
-    const { selectedDirection, selectedDistance, isMoveInProgress } = $playerInputStore;
+    const { selectedDirection, selectedDistance, isComputerMoveInProgress } = $gameState;
 
-    return !isPlayerTurn || isMoveInProgress || !selectedDirection || !selectedDistance;
+    return !isPlayerTurn || isComputerMoveInProgress || !selectedDirection || !selectedDistance;
   }
-); 
+);
 
 /**
- * Обчислює масив доступних відстаней для поточного розміру дошки.
- * @type {import('svelte/store').Readable<number[]>}
- */
-/**
- * Визначає, чи зараз хід гравця (індекс 0 — гравець).
+ * Визначає, чи зараз хід гравця (людини).
  * @type {import('svelte/store').Readable<boolean>}
  */
 export const isPlayerTurn = derived(gameState, $gameState =>
   $gameState ? $gameState.players[$gameState.currentPlayerIndex]?.type === 'human' : false
 );
 
-
 /**
  * Реактивно обчислює доступні ходи на основі поточного стану гри.
  * @type {import('svelte/store').Readable<import('$lib/services/gameLogicService').Move[]>}
  */
 export const availableMoves = derived(
-  [gameState, settingsStore],
-  ([$gameState, $settingsStore]) => {
+  [gameState],
+  ([$gameState]) => {
     if (!$gameState) return [];
+    // availableMovesService залежить від gameState, тому виклик getAvailableMoves() завжди актуальний
     return availableMovesService.getAvailableMoves().map(move => ({ ...move, isPenalty: false }));
   }
 );
+
 /**
- * Отримує колір попереднього гравця в локальній грі (який тільки що зробив хід).
+ * Отримує колір попереднього гравця в локальній грі.
  * @type {import('svelte/store').Readable<string | null>}
  */
 export const previousPlayerColor = derived(
@@ -182,6 +104,10 @@ export const previousPlayerColor = derived(
   }
 );
 
+/**
+ * Обчислює масив доступних відстаней для поточного розміру дошки.
+ * @type {import('svelte/store').Readable<number[]>}
+ */
 export const availableDistances = derived(gameState, $gameState =>
   $gameState ? Array.from({ length: $gameState.boardSize - 1 }, (_, i) => i + 1) : []
 );
@@ -197,21 +123,8 @@ export const distanceRows = derived(availableDistances, $availableDistances => {
   if (dists.length === 6) return [dists.slice(0, 3), dists.slice(3)];
   if (dists.length === 7) return [dists.slice(0, 4), dists.slice(4)];
   if (dists.length === 8) return [dists.slice(0, 4), dists.slice(4)];
-  // Для більшої кількості кнопок використовуємо chunk
   return chunk(dists, 4);
 });
-
-/**
- * @private
- * Допоміжна функція для розбиття масиву на частини.
- * @param {any[]} arr
- * @param {number} n
- */
-function chunk(arr: any[], n: number) {
-  const res = [];
-  for (let i = 0; i < arr.length; i += n) res.push(arr.slice(i, i + n));
-  return res;
-} 
 
 /**
  * Derived стор, що містить SVG поточного вибраного прапора.
@@ -222,12 +135,33 @@ export const currentLanguageFlagSvg = derived(
   $settingsStore => {
     return languages.find(lang => lang.code === $settingsStore.language)?.svg || languages[0].svg;
   }
-); 
+);
 
 /**
- * Визначає, чи потрібно приховати дошку після ходу гравця.
- * @type {import('svelte/store').Readable<boolean>}
+ * Derived store, що містить дані поточного гравця.
+ * @type {import('svelte/store').Readable<import('./gameState').Player | null>}
  */
+export const currentPlayer = derived(
+  [gameState],
+  ([$gameState]) => {
+    if (!$gameState) return null;
+    return $gameState.players[$gameState.currentPlayerIndex];
+  }
+);
+
+/**
+ * Обчислює колір поточного гравця для локальної гри.
+ * @type {import('svelte/store').Readable<string | null>}
+ */
+export const currentPlayerColor = derived(
+  [gameState],
+  ([$gameState]) => {
+    if (!$gameState) return null;
+    const currentPlayerIndex = $gameState.currentPlayerIndex;
+    const currentPlayer = $gameState.players[currentPlayerIndex];
+    return currentPlayer?.color || null;
+  }
+);
 
 // ===== НОВІ DERIVED STORES ДЛЯ ВІЗУАЛЬНИХ ДАНИХ =====
 
@@ -236,8 +170,6 @@ export const currentLanguageFlagSvg = derived(
  * Показує проміжні стани під час ходів для кращого UX.
  * @type {import('svelte/store').Readable<{row: number|null, col: number|null}>}
  */
-// ВАЖЛИВО: visualPosition залежить від animationStore, щоб відображати
-// позицію фігури синхронно з анімацією, а не з логікою гри.
 export const visualPosition = derived(
   [gameState, animationStore],
   ([$gameState, $animationStore]) => {
@@ -265,13 +197,10 @@ export const visualCellVisitCounts = derived(
   [visualPosition, gameState, animationStore],
   ([$visualPosition, $gameState, $animationStore]) => {
     if (!$gameState) return {};
-    // Якщо гра не анімується, візуальний стан ПОВИНЕН відповідати логічному.
-    // Це виправляє баг, коли cellVisitCounts скидається, але візуалізація не оновлюється.
     if (!$animationStore.isAnimating) {
       return $gameState.cellVisitCounts;
     }
 
-    // Якщо анімація триває, використовуємо стару логіку для відображення історичного стану.
     if (!$visualPosition || $visualPosition.row === null || $visualPosition.col === null) {
       return $gameState.moveHistory[0]?.visits || {};
     }
@@ -291,7 +220,7 @@ export const visualCellVisitCounts = derived(
 /**
  * Візуальний стан дошки (комбінує логічні дані з візуальними прапорцями).
  * Централізований derived store для всіх візуальних даних дошки.
- * @type {import('svelte/store').Readable<VisualBoardState>}
+ * @type {import('svelte/store').Readable<any>}
  */
 export const visualBoardState = derived(
   [gameState, animationStore],
@@ -309,7 +238,6 @@ export const visualBoardState = derived(
       };
     }
     return {
-      // Логічні дані з gameState
       position: {
         row: $gameState.playerRow,
         col: $gameState.playerCol
@@ -318,11 +246,7 @@ export const visualBoardState = derived(
       availableMoves: $gameState.availableMoves,
       board: $gameState.board,
       boardSize: $gameState.boardSize,
-      
-      // Візуальні прапорці з animationStore
       isAnimating: $animationStore.isAnimating,
-      
-      // Додаткові візуальні властивості
       isGameOver: $gameState.isGameOver,
       currentPlayerIndex: $gameState.currentPlayerIndex
     };
@@ -330,40 +254,31 @@ export const visualBoardState = derived(
 );
 
 /**
- * Обчислює індекс поточного гравця на основі ВІЗУАЛЬНОЇ черги анімації.
- * Це дозволяє UI реагувати на те, що бачить користувач, а не на миттєвий логічний стан.
- * @type {import('svelte/store').Readable<number>}
+ * Derived store, що завжди містить останній хід гравця.
+ * @type {import('svelte/store').Readable<ComputerMove | null>}
  */
-
-/**
- * Derived store, що містить дані поточного гравця.
- * @type {import('svelte/store').Readable<{id: number|string, type: 'human'|'ai', name: string}>}
- */
-export const currentPlayer = derived(
-  [gameState],
-  ([$gameState]) => {
-    if (!$gameState) return null;
-    return $gameState.players[$gameState.currentPlayerIndex];
+export const lastPlayerMove = derived(
+  gameState,
+  ($gameState) => {
+    if (!$gameState || !$gameState.lastMove) {
+      return null;
+    }
+    const { lastMove } = $gameState;
+    if (lastMove && $gameState.players[lastMove.player]?.type === 'human') {
+      return {
+        direction: lastMove.direction,
+        distance: lastMove.distance
+      };
+    }
+    return null;
   }
 );
 
 /**
- * Обчислює колір поточного гравця для локальної гри.
- * Використовується для зміни кольору тіней елементів інтерфейсу.
- * @type {import('svelte/store').Readable<string | null>}
+ * Визначає, чи є пауза між ходами (наприклад, для анімації).
+ * @type {import('svelte/store').Readable<boolean>}
  */
-export const currentPlayerColor = derived(
-  [gameState],
-  ([$gameState]) => {
-    if (!$gameState) return null;
-
-    const currentPlayerIndex = $gameState.currentPlayerIndex;
-    const currentPlayer = $gameState.players[currentPlayerIndex];
-
-    return currentPlayer?.color || null;
-  }
+export const isPauseBetweenMoves = derived(
+  animationStore,
+  $animationStore => $animationStore.isAnimating && $animationStore.animationQueue.length === 0
 );
-
-/**
- * Типи для візуального стану дошки
- */

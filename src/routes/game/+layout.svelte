@@ -10,7 +10,6 @@
   import { get } from 'svelte/store';
   import { setDirection, setDistance } from '$lib/services/gameLogicService.js';
   import { gameModeService } from '$lib/services/gameModeService';
-  import { playerInputStore } from '$lib/stores/playerInputStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { gameState } from '$lib/stores/gameState.js';
   import { localInputProvider } from '$lib/services/localInputProvider';

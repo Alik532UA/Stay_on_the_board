@@ -1,6 +1,6 @@
 ﻿<script lang="ts">
   import { modalState, modalStore } from '$lib/stores/modalStore.js';
-  import { playerInputStore } from '$lib/stores/playerInputStore.js';
+  import { gameState } from '$lib/stores/gameState';
 
   import { get } from 'svelte/store';
   import { _, init } from 'svelte-i18n';
@@ -258,7 +258,7 @@
               bind:this={hotBtn}
               use:hotkeyTooltip={{ key: btn.hotKey }}
               onclick={async () => {
-                if (processingButtons[i] || get(playerInputStore).isMoveInProgress) return;
+                if (processingButtons[i] || ($gameState && $gameState.isComputerMoveInProgress)) return;
                 processingButtons[i] = true;
 
                 logService.action(`Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`);
@@ -270,9 +270,9 @@
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
               data-testid={btn.dataTestId || `${$modalState.dataTestId}-${btn.textKey || btn.text}-btn`}
-              disabled={btn.disabled || $playerInputStore.isMoveInProgress || processingButtons[i]}
+              disabled={btn.disabled || ($gameState && $gameState.isComputerMoveInProgress) || processingButtons[i]}
             >
-              <!-- НАВІЩО: Додано `$playerInputStore.isMoveInProgress` для глобального блокування кнопок.
+              <!-- НАВІЩО: Додано `$gameState.isComputerMoveInProgress` для глобального блокування кнопок.
                    Це запобігає подвійним клікам під час виконання асинхронних операцій
                    і вирішує проблему стану гонитви (race condition) в автотестах. -->
               {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
@@ -286,7 +286,7 @@
               class:danger-btn={btn.customClass === 'danger-btn'}
               use:hotkeyTooltip={{ key: btn.hotKey }}
               onclick={async () => {
-                if (processingButtons[i] || get(playerInputStore).isMoveInProgress) return;
+                if (processingButtons[i] || ($gameState && $gameState.isComputerMoveInProgress)) return;
                 processingButtons[i] = true;
 
                 logService.action(`Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`);
@@ -298,9 +298,9 @@
               }}
               aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
               data-testid={btn.dataTestId || `${$modalState.dataTestId}-${btn.textKey || btn.text}-btn`}
-              disabled={btn.disabled || $playerInputStore.isMoveInProgress || processingButtons[i]}
+              disabled={btn.disabled || ($gameState && $gameState.isComputerMoveInProgress) || processingButtons[i]}
             >
-              <!-- НАВІЩО: Додано `$playerInputStore.isMoveInProgress` для глобального блокування кнопок.
+              <!-- НАВІЩО: Додано `$gameState.isComputerMoveInProgress` для глобального блокування кнопок.
                    Це запобігає подвійним клікам під час виконання асинхронних операцій
                    і вирішує проблему стану гонитви (race condition) в автотестах. -->
               {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}

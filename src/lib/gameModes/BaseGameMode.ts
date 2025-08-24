@@ -5,17 +5,17 @@ import { gameState, type GameState } from '$lib/stores/gameState';
 import type { Player } from '$lib/models/player';
 import { gameStateMutator } from '$lib/services/gameStateMutator';
 import * as gameLogicService from '$lib/services/gameLogicService';
-import { playerInputStore, initialState } from '$lib/stores/playerInputStore';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { logService } from '$lib/services/logService';
-import { animationStore } from '$lib/stores/animationStore';
+import { animationService } from '$lib/services/animationService';
 import { endGameService } from '$lib/services/endGameService';
 import { noMovesService } from '$lib/services/noMovesService';
 import { availableMovesService } from '$lib/services/availableMovesService';
+import { timeService } from '$lib/services/timeService';
 
 export abstract class BaseGameMode implements IGameMode {
   /**
@@ -23,6 +23,15 @@ export abstract class BaseGameMode implements IGameMode {
    * @param initialState The initial state of the game.
    */
   abstract initialize(initialState: GameState): void;
+
+  /**
+   * Starts the turn timer.
+   */
+  protected startTurn(): void {
+    timeService.startTurnTimer(() => {
+      endGameService.endGame('modal.gameOverReasonTimeUp');
+    });
+  }
 
   /**
    * Handles the player's claim that there are no available moves.
@@ -74,7 +83,7 @@ export abstract class BaseGameMode implements IGameMode {
     gameStateMutator.applyMove(continueChanges);
     
     gameOverStore.resetGameOverState();
-    animationStore.reset();
+    animationService.reset();
 
     await this.advanceToNextPlayer();
     gameEventBus.dispatch('CloseModal');
@@ -114,7 +123,10 @@ export abstract class BaseGameMode implements IGameMode {
       gameStateMutator.applyMove({ wasResumed: false });
     }
 
-    playerInputStore.set(initialState);
+    gameStateMutator.applyMove({
+      selectedDirection: null,
+      selectedDistance: null,
+    });
 
     await this.advanceToNextPlayer();
     
@@ -171,5 +183,6 @@ export abstract class BaseGameMode implements IGameMode {
    */
   cleanup(): void {
     logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
+    timeService.stopTurnTimer();
   }
 }

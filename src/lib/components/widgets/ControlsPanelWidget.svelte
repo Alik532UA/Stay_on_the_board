@@ -1,6 +1,5 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/gameState.js';
-  import { playerInputStore } from '$lib/stores/playerInputStore.js';
   import { setDirection, setDistance } from '$lib/services/gameLogicService.js';
   import { localInputProvider } from '$lib/services/localInputProvider';
   import { userActionService } from '$lib/services/userActionService';
@@ -22,8 +21,9 @@
   $: $isPauseBetweenMoves;
   $: $previousPlayerColor;
 
-  $: selectedDirection = $playerInputStore.selectedDirection;
-  $: selectedDistance = $playerInputStore.selectedDistance;
+  $: selectedDirection = $gameState?.selectedDirection;
+  $: selectedDistance = $gameState?.selectedDistance;
+  $: isMoveInProgress = $gameState?.isComputerMoveInProgress;
 
   $: centerInfoProps = getCenterInfoState({
     selectedDirection: selectedDirection as any,
@@ -110,6 +110,9 @@
     blockModeEnabled={$settingsStore.blockModeEnabled}
     isConfirmDisabled={$isConfirmButtonDisabled}
     centerInfoProps={centerInfoProps}
+    isMoveInProgress={isMoveInProgress}
+    selectedDirection={selectedDirection}
+    selectedDistance={selectedDistance}
     on:direction={handleDirection}
     on:distance={handleDistance}
     on:central={handleCentral}

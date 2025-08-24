@@ -17,7 +17,7 @@ import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { logService } from '$lib/services/logService';
 import { calculateFinalScore } from '$lib/services/scoreService';
-import { animationStore } from '$lib/stores/animationStore';
+import { animationService } from '$lib/services/animationService';
 import { noMovesService } from '$lib/services/noMovesService';
 import { endGameService } from '$lib/services/endGameService';
 import { timeService } from '$lib/services/timeService';
@@ -26,6 +26,7 @@ export class VsComputerGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
     const settings = get(settingsStore);
     gameLogicService.resetGame({ players: this.getPlayersConfiguration(), settings }, get(gameState));
+    animationService.initialize();
     this.startTurn();
   }
 
@@ -136,15 +137,12 @@ export class VsComputerGameMode extends BaseGameMode {
     noMovesService.dispatchNoMovesEvent(playerType);
   }
 
-  private startTurn() {
+  protected startTurn(): void {
     timeService.stopTurnTimer();
-    timeService.startTurnTimer(() => {
-      endGameService.endGame('modal.gameOverReasonTimeUp');
-    });
+    super.startTurn();
   }
 
   cleanup(): void {
     super.cleanup();
-    timeService.stopTurnTimer();
   }
 }

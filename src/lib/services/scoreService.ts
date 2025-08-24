@@ -52,7 +52,7 @@ function _calculateMirrorMovePenalty(currentState: any, direction: string, dista
   let penaltyPoints = 0;
   let penaltyPointsForMove = 0;
   const humanPlayersCount = currentState.players.filter((p: any) => p.type === 'human').length;
-  const lastComputerMove = currentState.moveQueue[currentState.moveQueue.length - 1];
+  const lastComputerMove = currentState.lastMove;
 
   if (direction && lastComputerMove && lastComputerMove.player !== 0 && !settings.blockModeEnabled) {
     const isMirror = isMirrorMove(direction, distance, lastComputerMove.direction, lastComputerMove.distance);

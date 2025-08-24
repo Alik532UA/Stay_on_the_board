@@ -27,6 +27,9 @@ export interface GameState {
   cellVisitCounts: any;
   moveHistory: MoveHistoryEntry[];
   moveQueue: Array<{player: number, direction: string, distance: number}>;
+  selectedDirection: string | null;
+  selectedDistance: number | null;
+  lastMove: { direction: string, distance: number, player: number } | null;
   gameOverReasonKey: string | null;
   gameOverReasonValues: Record<string, any> | null;
   baseScore?: number;
@@ -84,6 +87,9 @@ export function createInitialState(config: any = {}): GameState {
     gameOverReasonKey: null,
     gameOverReasonValues: null,
     moveQueue: [],
+    selectedDirection: null,
+    selectedDistance: null,
+    lastMove: null,
     noMovesClaimsCount: 0,
     noMovesClaimed: false,
     noMovesBonus: 0,

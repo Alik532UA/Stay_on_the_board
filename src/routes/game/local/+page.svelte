@@ -21,7 +21,7 @@
   import { settingsStore } from '$lib/stores/settingsStore.js';
   import { onMount, onDestroy } from 'svelte';
   import { afterNavigate } from '$app/navigation';
-  import { animationStore } from '$lib/stores/animationStore.js';
+  import { animationService } from '$lib/services/animationService.js';
   import { gameOverStore } from '$lib/stores/gameOverStore';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { gameModeService } from '$lib/services/gameModeService';
@@ -52,7 +52,7 @@
   onMount(() => {
     // Ініціалізуємо режим гри та анімації
     gameModeService.setCurrentGameMode('local');
-    animationStore.initialize();
+    animationService.initialize();
   });
 
   onDestroy(() => {
