@@ -1,7 +1,8 @@
 import { get } from 'svelte/store';
 import { _ } from 'svelte-i18n';
 import { BaseGameMode } from './index';
-import { gameState, type GameState, type Player } from '$lib/stores/gameState';
+import { gameState, type GameState } from '$lib/stores/gameState';
+import type { Player } from '$lib/models/player';
 import { gameStateMutator } from '$lib/services/gameStateMutator';
 import * as gameLogicService from '$lib/services/gameLogicService';
 import { playerInputStore } from '$lib/stores/playerInputStore';
@@ -24,27 +25,7 @@ export class LocalGameMode extends BaseGameMode {
   }
 
   async claimNoMoves(): Promise<void> {
-    const state = get(gameState);
-    const settings = get(settingsStore);
-    const availableMoves = getAvailableMoves(
-      state.playerRow,
-      state.playerCol,
-      state.boardSize,
-      state.cellVisitCounts,
-      settings.blockOnVisitCount,
-      state.board,
-      settings.blockModeEnabled,
-      null
-    );
-
-    if (Object.keys(availableMoves).length > 0) {
-      // If moves are available, the player loses.
-      const currentPlayerName = state.players[state.currentPlayerIndex].name;
-      await this.endGame('modal.gameOverReasonPlayerLied', { playerName: currentPlayerName });
-    } else {
-      // If there are no moves, show the modal.
-      this._handleLocalNoMoves();
-    }
+    await super.claimNoMoves();
   }
 
   private _handleLocalNoMoves(): void {
@@ -102,7 +83,7 @@ export class LocalGameMode extends BaseGameMode {
     const nextPlayerIndex = (currentState.currentPlayerIndex + 1) % currentState.players.length;
 
     if (nextPlayerIndex === 0) {
-      gameState.snapshotScores();
+      gameStateMutator.snapshotScores();
     }
 
     gameStateMutator.setCurrentPlayer(nextPlayerIndex);
@@ -116,10 +97,10 @@ export class LocalGameMode extends BaseGameMode {
     const currentPlayer = state.players[state.currentPlayerIndex];
 
     if (bonusPoints > 0) {
-      gameState.addPlayerBonusPoints(currentPlayer.id, bonusPoints);
+      gameStateMutator.addPlayerBonus(currentPlayer.id, bonusPoints);
     }
     if (penaltyPoints > 0) {
-      gameState.addPlayerPenaltyPoints(currentPlayer.id, penaltyPoints);
+      gameStateMutator.addPlayerPenalty(currentPlayer.id, penaltyPoints);
     }
   }
 

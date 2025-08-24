@@ -8,6 +8,7 @@ const LOG_GROUPS = {
   LOGIC_MOVE: 'logic_move',       // Для performMove та розрахунку ходів
   LOGIC_AI: 'logic_ai',         // Для логіки вибору ходу комп'ютером
   LOGIC_AVAILABILITY: 'logic_availability', // Для getAvailableMoves
+  LOGIC_TIME: 'logic_time', // Для логіки, пов'язаної з часом
   SCORE: 'score',       // Для всього, що пов'язано з нарахуванням балів
   UI: 'ui',             // Для Svelte компонентів та їх життєвого циклу
   TOOLTIP: 'tooltip',   // Для логів тултіпів
@@ -25,6 +26,7 @@ const defaultConfig = {
           [LOG_GROUPS.LOGIC_MOVE]: false,
           [LOG_GROUPS.LOGIC_AI]: false,
           [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
+          [LOG_GROUPS.LOGIC_TIME]: true,
           [LOG_GROUPS.SCORE]: false,
           [LOG_GROUPS.UI]: false,
           [LOG_GROUPS.TOOLTIP]: false,
@@ -75,6 +77,7 @@ const styles = {
   [LOG_GROUPS.LOGIC_MOVE]: 'color: #03A9F4; font-weight: bold;', // Blue
   [LOG_GROUPS.LOGIC_AI]: 'color: #2962FF; font-weight: bold;', // Indigo
   [LOG_GROUPS.LOGIC_AVAILABILITY]: 'color: #64B5F6; font-weight: bold;', // Light Blue
+  [LOG_GROUPS.LOGIC_TIME]: 'color: #FFC107; font-weight: bold;', // Amber
   [LOG_GROUPS.SCORE]: 'color: #4CAF50; font-weight: bold;', // Green
   [LOG_GROUPS.UI]: 'color: #FF9800; font-weight: bold;',    // Orange
   [LOG_GROUPS.TOOLTIP]: 'color: #6c757d; font-weight: bold;', // Gray
@@ -109,6 +112,7 @@ export const logService = {
   logicMove: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_MOVE, message, ...data),
   logicAI: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_AI, message, ...data),
   logicAvailability: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_AVAILABILITY, message, ...data),
+  logicTime: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_TIME, message, ...data),
   score: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.SCORE, message, ...data),
   ui: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.UI, message, ...data),
   tooltip: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.TOOLTIP, message, ...data),

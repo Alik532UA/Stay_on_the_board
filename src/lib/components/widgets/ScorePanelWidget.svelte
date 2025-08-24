@@ -119,8 +119,7 @@
   }
 
   async function cashOutAndEndGame() {
-    const sideEffects = await gameModeService.endGame('modal.gameOverReasonCashOut');
-    sideEffectService.executeMany(sideEffects);
+    await gameModeService.endGame('modal.gameOverReasonCashOut');
   }
 </script>
 

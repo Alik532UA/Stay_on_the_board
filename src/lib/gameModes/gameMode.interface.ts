@@ -1,4 +1,5 @@
-import type { GameState, Player } from '$lib/stores/gameState';
+import type { GameState } from '$lib/stores/gameState';
+import type { Player } from '$lib/models/player';
 import type { FinalScoreDetails } from '$lib/models/score';
 import type { MoveDirectionType } from '$lib/models/Figure';
 import type { SideEffect } from '$lib/services/sideEffectService';

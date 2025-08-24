@@ -6,11 +6,12 @@
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { gameState } from '$lib/stores/gameState.js';
+  import { gameStateMutator } from '$lib/services/gameStateMutator';
   import { get } from 'svelte/store';
 
   onMount(() => {
     if (!get(gameState)) {
-      gameState.reset();
+      gameStateMutator.resetGame();
     }
   });
 </script>

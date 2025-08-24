@@ -3,7 +3,8 @@ import { Figure, MoveDirection } from '../models/Figure';
 import type { MoveDirectionType } from '../models/Figure';
 import { get } from 'svelte/store';
 import { playerInputStore } from '../stores/playerInputStore';
-import { gameState, createInitialState, type Player } from '../stores/gameState';
+import { gameState, createInitialState } from '../stores/gameState';
+import type { Player } from '$lib/models/player';
 import { gameStateMutator } from './gameStateMutator';
 import { getAvailableMoves, isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils.ts'; // Імпортуємо чисті функції
 import { lastPlayerMove } from '$lib/stores/derivedState';
@@ -49,7 +50,7 @@ export function resetGame(options: { newSize?: number; players?: Player[]; setti
   const newState = get(gameState);
   const humanPlayersCount = newState.players.filter((p: Player) => p.type === 'human').length;
   if (humanPlayersCount > 1) {
-    gameState.resetScores(); // This is a method on the store, might need to be moved to mutator later
+    gameStateMutator.resetScores();
   }
 }
 
@@ -94,26 +95,12 @@ export function setDistance(dist: number) {
   logService.logicMove('setDistance: встановлено відстань', { dist });
 }
 
-/**
- * Виконує хід (гравця або комп'ютера)
- * @param direction Напрямок ходу
- * @param distance Відстань ходу
- * @param playerIndex Індекс гравця (0 для гравця, 1 для комп'ютера)
- */
-export async function performMove(
-  direction: MoveDirectionType,
-  distance: number,
-  playerIndex: number = 0,
+function _validateMove(
+  newPosition: { row: number; col: number },
+  figure: Figure,
   currentState: any,
   settings: any
-) {
-
-  logService.logicMove('performMove: початок з параметрами:', { direction, distance, playerIndex });
-  
-  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
-
-  const newPosition = figure.calculateNewPosition(direction, distance);
-
+): { success: boolean; reason?: string } {
   // 1. Перевірка виходу за межі дошки
   if (!figure.isValidPosition(newPosition.row, newPosition.col)) {
     logService.logicMove('performMove: вихід за межі дошки');
@@ -126,15 +113,21 @@ export async function performMove(
     return { success: false, reason: 'blocked_cell' };
   }
 
-  // --- Якщо всі перевірки пройдено, виконуємо хід ---
-  
+  return { success: true };
+}
+
+function _applyMoveToState(
+  currentState: any,
+  newPosition: { row: number; col: number },
+  playerIndex: number,
+  direction: MoveDirectionType,
+  distance: number,
+  scoreChanges: any,
+  settings: any
+) {
   const updatedCellVisitCounts = { ...currentState.cellVisitCounts };
   const startCellKey = `${currentState.playerRow}-${currentState.playerCol}`;
   updatedCellVisitCounts[startCellKey] = (updatedCellVisitCounts[startCellKey] || 0) + 1;
-
-  const scoreChanges = calculateMoveScore(currentState, newPosition, playerIndex, settings, distance, direction);
-
-  const lastMove = { direction, distance };
 
   const newBoard = currentState.board.map((row: number[]) => [...row]);
   if (currentState.playerRow !== null && currentState.playerCol !== null) {
@@ -153,7 +146,7 @@ export async function performMove(
     pos: { row: newPosition.row, col: newPosition.col },
     blocked: [] as {row: number, col: number}[],
     visits: { ...updatedCellVisitCounts },
-    blockModeEnabled: settings.blockModeEnabled // <-- ДОДАЙ ЦЕЙ РЯДОК
+    blockModeEnabled: settings.blockModeEnabled
   }];
 
   const updatedPlayers = [...currentState.players];
@@ -162,7 +155,7 @@ export async function performMove(
     score: updatedPlayers[playerIndex].score + scoreChanges.baseScoreChange
   };
 
-  const changes = {
+  return {
     board: newBoard,
     playerRow: newPosition.row,
     playerCol: newPosition.col,
@@ -176,13 +169,40 @@ export async function performMove(
     distanceBonus: (currentState.distanceBonus || 0) + scoreChanges.distanceBonusChange,
     isFirstMove: false
   };
+}
 
-  // gameState.update(state => ({...state, ...changes}));
-  
+/**
+ * Виконує хід (гравця або комп'ютера)
+ * @param direction Напрямок ходу
+ * @param distance Відстань ходу
+ * @param playerIndex Індекс гравця (0 для гравця, 1 для комп'ютера)
+ */
+export async function performMove(
+  direction: MoveDirectionType,
+  distance: number,
+  playerIndex: number = 0,
+  currentState: any,
+  settings: any
+) {
+  logService.logicMove('performMove: початок з параметрами:', { direction, distance, playerIndex });
+
+  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
+  const newPosition = figure.calculateNewPosition(direction, distance);
+
+  const validation = _validateMove(newPosition, figure, currentState, settings);
+  if (!validation.success) {
+    return { success: false, reason: validation.reason };
+  }
+
+  // --- Якщо всі перевірки пройдено, виконуємо хід ---
+  const scoreChanges = calculateMoveScore(currentState, newPosition, playerIndex, settings, distance, direction);
+
+  const changes = _applyMoveToState(currentState, newPosition, playerIndex, direction, distance, scoreChanges, settings);
+
   // Логіка для "дзеркального" ходу та бонусів тепер обробляється в LocalGameMode та VsComputerGameMode,
   // які отримують `scoreChanges` і вирішують, як їх застосувати.
   // Це робить `performMove` більш чистою функцією, що відповідає лише за сам хід.
-  
+
   logService.logicMove('performMove: завершено успішно');
   return {
     success: true,

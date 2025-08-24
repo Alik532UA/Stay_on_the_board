@@ -1,26 +1,15 @@
 // file: src/lib/stores/gameState.ts
 import { writable } from 'svelte/store';
-import { createEmptyBoard, getRandomCell, getAvailableMoves } from '$lib/utils/boardUtils.ts';
-import type { Direction, Move } from '$lib/utils/gameUtils';
-import { logService } from '../services/logService.js';
+import { createEmptyBoard, getRandomCell } from '$lib/utils/boardUtils.ts';
+import type { Move } from '$lib/utils/gameUtils';
 import { get } from 'svelte/store';
 import { testModeStore } from './testModeStore';
 
 const initialBoardSize = 4;
 
-export interface Player {
-  id: number;
-  type: any;
-  name: string;
-  score: number;
-  color: string;
-  isComputer: boolean;
-  penaltyPoints: number;
-  bonusPoints: number;
-  bonusHistory: any[];
-}
+import type { Player } from '$lib/models/player';
+import type { MoveHistoryEntry } from '$lib/models/moveHistory';
 
-export interface MoveHistoryEntry { pos: {row: number, col: number}, blocked: {row: number, col: number}[], visits?: any, blockModeEnabled?: boolean }
 export interface GameState {
   gameId: number;
   boardSize: number;
@@ -57,29 +46,6 @@ export interface GameState {
   scoresAtRoundStart: number[];
   isComputerMoveInProgress: boolean;
 }
-
-const generateId = () => Date.now() + Math.random();
-
-const availableColors = [
-  '#e63946', '#457b9d', '#2a9d8f', '#f4a261',
-  '#e76f51', '#9b5de5', '#f15bb5', '#00bbf9'
-];
-
-const getRandomColor = () => availableColors[Math.floor(Math.random() * availableColors.length)];
-
-const getRandomUnusedColor = (usedColors: string[]) => {
-  const unused = availableColors.filter(c => !usedColors.includes(c));
-  if (unused.length === 0) return getRandomColor();
-  return unused[Math.floor(Math.random() * unused.length)];
-};
-
-const availableNames = ['Alik', 'Noah', 'Jack', 'Mateo', 'Lucas', 'Sofia', 'Olivia', 'Nora', 'Lucia', 'Emilia'];
-
-const getRandomUnusedName = (usedNames: string[]) => {
-  const unused = availableNames.filter(name => !usedNames.includes(name));
-  if (unused.length === 0) return `Player ${usedNames.length + 1}`;
-  return unused[Math.floor(Math.random() * unused.length)];
-};
 
 export function createInitialState(config: any = {}): GameState {
   const size = config.size ?? initialBoardSize;
@@ -142,164 +108,6 @@ function createGameStateStore() {
     subscribe,
     set,
     update,
-
-    addPlayer: () => {
-      update(state => {
-        if (!state || state.players.length >= 8) return state;
-        const usedColors = state.players.map(p => p.color);
-        const usedNames = state.players.map(p => p.name);
-        const newPlayer: Player = {
-          id: generateId(),
-          name: getRandomUnusedName(usedNames),
-          color: getRandomUnusedColor(usedColors),
-          score: 0,
-          isComputer: false,
-          type: 'human',
-          penaltyPoints: 0,
-          bonusPoints: 0,
-          bonusHistory: []
-        };
-        return { ...state, players: [...state.players, newPlayer] };
-      });
-    },
-
-    removePlayer: (playerId: number) => {
-      update(state => {
-        if (!state || state.players.length <= 2) return state;
-        return { ...state, players: state.players.filter(p => p.id !== playerId) };
-      });
-    },
-
-    updatePlayer: (playerId: number, updatedData: Partial<Player>) => {
-      update(state => {
-        if (!state) return null;
-        return {
-          ...state,
-          players: state.players.map(p =>
-            p.id === playerId ? { ...p, ...updatedData } : p
-          )
-        };
-      });
-    },
-
-    updateSettings: (newSettings: Partial<any>) => {
-      update(state => {
-        if (!state) return null;
-        return {
-          ...state,
-          settings: { ...state.settings, ...newSettings }
-        }
-      });
-    },
-
-    snapshotScores: () => {
-      update(state => {
-        if (!state) return null;
-        const scores = state.players.map(p => p.bonusPoints - p.penaltyPoints);
-        return { ...state, scoresAtRoundStart: scores };
-      });
-    },
-    
-    resetScores: () => {
-      update(state => {
-        if (!state) return null;
-        return {
-          ...state,
-          players: state.players.map(p => ({ ...p, score: 0, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as any[] }))
-        }
-      });
-    },
-
-    addPlayerPenaltyPoints: (playerId: number, penaltyPointsToAdd: number) => {
-      update(state => {
-        if (!state) return null;
-        return {
-          ...state,
-          players: state.players.map(p =>
-            p.id === playerId ? { ...p, penaltyPoints: p.penaltyPoints + penaltyPointsToAdd } : p
-          )
-        }
-      });
-    },
-    
-    addPlayerBonusPoints: (playerId: number, bonusPointsToAdd: number, reason: string = '') => {
-      update(state => {
-        if (!state) return null;
-        return {
-          ...state,
-          players: state.players.map(p =>
-            p.id === playerId ? {
-              ...p,
-              bonusPoints: p.bonusPoints + bonusPointsToAdd,
-              bonusHistory: [...p.bonusHistory, {
-                points: bonusPointsToAdd,
-                reason: reason,
-                timestamp: Date.now()
-              }]
-            } : p
-          )
-        }
-      });
-    },
-
-    addPlayerBonus: (playerId: number, bonusPointsToAdd: number, reason: string = '') => {
-      update(state => {
-        if (!state) return null;
-        return {
-          ...state,
-          players: state.players.map(p =>
-            p.id === playerId ? {
-              ...p,
-              bonusPoints: p.bonusPoints + bonusPointsToAdd,
-              bonusHistory: [...p.bonusHistory, {
-                points: bonusPointsToAdd,
-                reason: reason,
-                timestamp: Date.now()
-              }]
-            } : p
-          )
-        }
-      });
-    },
-
-    addPlayerPenalty: (playerId: number, penaltyPointsToAdd: number) => {
-      update(state => {
-        if (!state) return null;
-        return {
-          ...state,
-          players: state.players.map(p =>
-            p.id === playerId ? { ...p, penaltyPoints: p.penaltyPoints + penaltyPointsToAdd } : p
-          )
-        }
-      });
-    },
-
-    reset: (config?: any) => {
-      set(createInitialState(config));
-    },
-
-    resetBlockModeState: () => {
-      update(state => {
-        if (!state) return null;
-        logService.state('Скидання стану Block Mode');
-        const resetHistoryEntry = {
-          pos: { row: state.playerRow, col: state.playerCol },
-          blocked: [] as {row: number, col: number}[],
-          visits: {},
-          blockModeEnabled: true
-        };
-        return {
-          ...state,
-          cellVisitCounts: {},
-          movesInBlockMode: 0,
-          moveHistory: [...state.moveHistory, resetHistoryEntry]
-        };
-      });
-    },
-
-    destroy: () => {
-      set(null);
-    }
   };
 }
 

@@ -1,7 +1,8 @@
 import { get } from 'svelte/store';
 import { _ } from 'svelte-i18n';
 import type { IGameMode } from './gameMode.interface';
-import { gameState, type GameState, type Player } from '$lib/stores/gameState';
+import { gameState, type GameState } from '$lib/stores/gameState';
+import type { Player } from '$lib/models/player';
 import { gameStateMutator } from '$lib/services/gameStateMutator';
 import * as gameLogicService from '$lib/services/gameLogicService';
 import { calculateFinalScore, determineWinner } from '$lib/services/scoreService';
@@ -14,10 +15,32 @@ import { sideEffectService, type SideEffect } from '$lib/services/sideEffectServ
 import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { logService } from '$lib/services/logService';
+import { getAvailableMoves } from '$lib/utils/boardUtils';
 
 export abstract class BaseGameMode implements IGameMode {
   abstract initialize(initialState: GameState): void;
-  abstract claimNoMoves(): Promise<void>;
+  async claimNoMoves(): Promise<void> {
+    const state = get(gameState);
+    const settings = get(settingsStore);
+    const availableMoves = getAvailableMoves(
+      state.playerRow,
+      state.playerCol,
+      state.boardSize,
+      state.cellVisitCounts,
+      settings.blockOnVisitCount,
+      state.board,
+      settings.blockModeEnabled,
+      null
+    );
+
+    if (Object.keys(availableMoves).length > 0) {
+      const currentPlayerName = state.players[state.currentPlayerIndex].name;
+      await this.endGame('modal.gameOverReasonPlayerLied', { playerName: currentPlayerName });
+    } else {
+      await this.handleNoMoves('human');
+    }
+  }
+
   abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
   abstract getPlayersConfiguration(): Player[];
   abstract continueAfterNoMoves(): Promise<void>;
