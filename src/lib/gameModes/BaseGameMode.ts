@@ -179,7 +179,10 @@ export abstract class BaseGameMode implements IGameMode {
    * Restarts the game.
    */
   async restartGame(): Promise<void> {
-    gameStateMutator.resetGame();
+    const settings = get(settingsStore);
+    const players = this.getPlayersConfiguration();
+    gameStateMutator.resetGame({ settings, players });
+    this.initialize(get(gameState)!);
     gameEventBus.dispatch('CloseModal');
   }
   
