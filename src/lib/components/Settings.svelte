@@ -291,7 +291,8 @@
   }
   .settings-button-group {
     display: flex;
-    gap: 4px;
+    flex-wrap: wrap;
+    gap: 8px;
     width: 100%;
   }
 
