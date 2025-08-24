@@ -178,10 +178,10 @@ export abstract class BaseGameMode implements IGameMode {
   /**
    * Restarts the game.
    */
-  async restartGame(): Promise<void> {
+  async restartGame(options: { newSize?: number } = {}): Promise<void> {
     const settings = get(settingsStore);
     const players = this.getPlayersConfiguration();
-    gameStateMutator.resetGame({ settings, players });
+    gameStateMutator.resetGame({ settings, players, newSize: options.newSize });
     this.initialize(get(gameState)!);
     gameEventBus.dispatch('CloseModal');
   }

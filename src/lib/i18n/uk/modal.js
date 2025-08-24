@@ -31,6 +31,7 @@ export default {
   gameOverReasonPlayerBlocked: "{playerName} спробував(-ла) стати на заблоковану клітинку.",
   gameOverReasonCashOut: "Ви вирішили завершити гру і забрати свій рахунок.",
   gameOverReasonBonus: "Ви вирішили завершити гру та забрати бонус.",
+  gameOverReasonTimeUp: "Час вийшов.",
   scoreDetails: {
     baseScore: "Базовий рахунок:",
     sizeBonus: "Бонус за розмір дошки:",

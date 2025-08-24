@@ -26,6 +26,7 @@ export default {
   gameOverReasonPlayerBlocked: "{playerName} bloklanğan hücrege basmağa tırıştı.",
   gameOverReasonCashOut: "Siz oyunnı bitirip esabıñıznı almağa qarar berdiñiz.",
   gameOverReasonBonus: "Siz oyunnı bitirip bonusnı almağa qarar berdiñiz.",
+  anotherKey: "Qırımtatarca metin",
   scoreDetails: {
     baseScore: "Esas esap:",
     sizeBonus: "Tahta ölçüsi içün bonus:",
