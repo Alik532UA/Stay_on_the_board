@@ -41,6 +41,7 @@
 	import TestModeWidget from '$lib/components/widgets/TestModeWidget.svelte';
 	import { tooltipStore } from '$lib/stores/tooltipStore.js';
 	import Tooltip from '$lib/components/Tooltip.svelte';
+	import ModalManager from '$lib/components/ModalManager.svelte';
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
@@ -154,6 +155,7 @@
 	<Tooltip content={$tooltipStore.content} x={$tooltipStore.x} y={$tooltipStore.y} />
 {/if}
 <Modal />
+<ModalManager />
 
 {#if $settingsStore.testMode}
 	<div class="test-mode-container" data-testid="test-mode-widget-container">

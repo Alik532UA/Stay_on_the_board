@@ -20,10 +20,13 @@ import { logService } from '$lib/services/logService';
 import { calculateFinalScore } from '$lib/services/scoreService';
 import { animationStore } from '$lib/stores/animationStore';
 
+import { timeService } from '$lib/services/timeService';
+
 export class VsComputerGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
     const settings = get(settingsStore);
     gameLogicService.resetGame({ players: this.getPlayersConfiguration(), settings }, get(gameState));
+    this.startTurn();
   }
 
   async claimNoMoves(): Promise<void> {
@@ -55,6 +58,8 @@ export class VsComputerGameMode extends BaseGameMode {
     if (nextPlayer.type === 'ai' && !get(gameState).isComputerMoveInProgress) {
       logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера.');
       await this.triggerComputerMove();
+    } else {
+      this.startTurn();
     }
   }
 
@@ -108,51 +113,11 @@ export class VsComputerGameMode extends BaseGameMode {
   }
 
   async continueAfterNoMoves(): Promise<void> {
-    logService.GAME_MODE('[VsComputerGameMode] continueAfterNoMoves called');
-    const state = get(gameState);
-    const settings = get(settingsStore);
-    const bonus = state.boardSize;
-
-    const continueChanges = {
-      noMovesBonus: state.noMovesBonus + bonus,
-      cellVisitCounts: {},
-      moveHistory: [{
-        pos: { row: state.playerRow, col: state.playerCol },
-        blocked: [] as {row: number, col: number}[],
-        visits: {},
-        blockModeEnabled: settings.blockModeEnabled
-      }],
-      moveQueue: [] as any[],
-      availableMoves: getAvailableMoves(
-        state.playerRow,
-        state.playerCol,
-        state.boardSize,
-        {},
-        settings.blockOnVisitCount,
-        state.board,
-        settings.blockModeEnabled,
-        null
-      ),
-      noMovesClaimed: false,
-      isComputerMoveInProgress: false,
-      wasResumed: true,
-      isGameOver: false,
-      gameOverReasonKey: null as string | null,
-      gameOverReasonValues: null as Record<string, any> | null,
-      // Згідно з правилами, хід залишається у гравця-людини (індекс 0).
-      // Тому currentPlayerIndex тут явно встановлюється в 0.
-      currentPlayerIndex: 0
-    };
-
-    gameStateMutator.applyMove(continueChanges);
-    
-    gameOverStore.resetGameOverState();
-    animationStore.reset();
-
-    // У цьому режимі хід не передається комп'ютеру після очищення дошки.
-    // Гравець-людина продовжує свій хід з чистої дошки.
-    // Тому this.advanceToNextPlayer() тут не викликається.
-    gameEventBus.dispatch('CloseModal');
+    await super.continueAfterNoMoves();
+    // In VsComputerGameMode, the turn does not advance to the computer after clearing the board.
+    // The human player continues their turn from a clean board.
+    // We need to counteract the advanceToNextPlayer() call in the base method.
+    gameStateMutator.setCurrentPlayer(0);
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
@@ -165,29 +130,21 @@ export class VsComputerGameMode extends BaseGameMode {
       noMovesBonus: (state.noMovesBonus || 0) + state.boardSize
     });
 
-    const updatedState = get(gameState);
-    const potentialScoreDetails = calculateFinalScore(updatedState as any, 'vs-computer');
     const titleKey = playerType === 'human' ? 'modal.playerNoMovesTitle' : 'modal.computerNoMovesTitle';
     const contentKey = playerType === 'human' ? 'modal.playerNoMovesContent' : 'modal.computerNoMovesContent';
 
-    gameEventBus.dispatch('ShowModal', {
-      titleKey,
-      content: {
-        reason: get(_)(contentKey),
-        scoreDetails: potentialScoreDetails
-      },
-      buttons: [
-        { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: () => userActionService.handleModalAction('continueAfterNoMoves'), dataTestId: 'continue-game-no-moves-btn' },
-        {
-          text: get(_)('modal.finishGameWithBonus', { values: { bonus: updatedState.boardSize } }),
-          onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonBonus' }),
-          dataTestId: 'finish-game-with-bonus-btn'
-        },
-        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: `watch-replay-${playerType}-no-moves-btn` }
-      ],
-      closable: false,
-      dataTestId: playerType === 'human' ? 'player-no-moves-modal' : 'opponent-trapped-modal',
-      titleDataTestId: 'opponent-trapped-modal-title'
+    this._dispatchNoMovesEvent(playerType);
+  }
+
+  private startTurn() {
+    timeService.stopTurnTimer();
+    timeService.startTurnTimer(() => {
+      this.endGame('modal.gameOverReasonTimeUp');
     });
+  }
+
+  cleanup(): void {
+    super.cleanup();
+    timeService.stopTurnTimer();
   }
 }

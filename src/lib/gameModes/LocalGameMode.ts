@@ -17,11 +17,13 @@ import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { logService } from '$lib/services/logService';
 import { lastPlayerMove } from '$lib/stores/derivedState';
 import { animationStore } from '$lib/stores/animationStore';
+import { timeService } from '$lib/services/timeService';
 
 export class LocalGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
     // Initialization for local games is handled in the `local-setup` page.
     this.checkComputerTurn();
+    this.startTurn();
   }
 
   async claimNoMoves(): Promise<void> {
@@ -31,52 +33,25 @@ export class LocalGameMode extends BaseGameMode {
   private _handleLocalNoMoves(): void {
     const state = get(gameState);
     const currentPlayerName = state.players[state.currentPlayerIndex].name;
-
-    gameEventBus.dispatch('ShowModal', {
-      titleKey: 'modal.playerNoMovesTitle',
-      contentKey: 'modal.noMovesLocalGameContent',
-      content: { playerName: currentPlayerName },
-      buttons: [
-        {
-          textKey: 'modal.continueGame',
-          onClick: () => userActionService.handleModalAction('continueAfterNoMoves'),
-          primary: true,
-          isHot: true,
-          dataTestId: 'continue-game-btn'
-        },
-        {
-          textKey: 'modal.endGame',
-          onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonNoMovesLeft' }),
-          dataTestId: 'end-game-btn'
-        },
-        {
-          textKey: 'modal.reviewRecord',
-          customClass: 'blue-btn',
-          onClick: () => userActionService.handleModalAction('requestReplay'),
-          dataTestId: 'review-record-btn'
-        }
-      ]
-    });
+    this._dispatchNoMovesEvent('human');
   }
 
   async continueAfterNoMoves(): Promise<void> {
-    logService.GAME_MODE('[LocalGameMode] continueAfterNoMoves called');
-    gameStateMutator.clearCellVisits();
-    animationStore.reset();
-    await this.advanceToNextPlayer();
-    gameEventBus.dispatch('CloseModal');
+    await super.continueAfterNoMoves();
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
-    logService.GAME_MODE('handleNoMoves is not applicable in LocalGameMode');
+    if (playerType === 'human') {
+      this._handleLocalNoMoves();
+    } else {
+      logService.GAME_MODE('handleNoMoves for computer is not applicable in LocalGameMode');
+    }
   }
 
   getPlayersConfiguration(): Player[] {
     // Player configuration is now directly in gameState
     return get(gameState).players;
   }
-
-
 
   protected async advanceToNextPlayer(): Promise<void> {
     const currentState = get(gameState);
@@ -89,6 +64,7 @@ export class LocalGameMode extends BaseGameMode {
     gameStateMutator.setCurrentPlayer(nextPlayerIndex);
 
     await this.checkComputerTurn();
+    this.startTurn();
   }
 
   protected async applyScoreChanges(scoreChanges: any): Promise<void> {
@@ -120,5 +96,17 @@ export class LocalGameMode extends BaseGameMode {
         await this.endGame('modal.gameOverReasonPlayerBlocked');
       }
     }
+  }
+
+  private startTurn() {
+    timeService.stopTurnTimer();
+    timeService.startTurnTimer(() => {
+      this.endGame('modal.gameOverReasonTimeUp');
+    });
+  }
+
+  cleanup(): void {
+    super.cleanup();
+    timeService.stopTurnTimer();
   }
 }

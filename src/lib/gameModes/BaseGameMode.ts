@@ -16,9 +16,19 @@ import type { FinalScoreDetails } from '$lib/models/score';
 import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { logService } from '$lib/services/logService';
 import { getAvailableMoves } from '$lib/utils/boardUtils';
+import { animationStore } from '$lib/stores/animationStore';
 
 export abstract class BaseGameMode implements IGameMode {
+  /**
+   * Initializes the game mode with a given state.
+   * @param initialState The initial state of the game.
+   */
   abstract initialize(initialState: GameState): void;
+
+  /**
+   * Handles the player's claim that there are no available moves.
+   * If moves are available, the game ends. Otherwise, it proceeds to the no-moves handling logic.
+   */
   async claimNoMoves(): Promise<void> {
     const state = get(gameState);
     const settings = get(settingsStore);
@@ -41,12 +51,71 @@ export abstract class BaseGameMode implements IGameMode {
     }
   }
 
+  /**
+   * Handles the situation where there are no available moves for a player.
+   * @param playerType The type of player ('human' or 'computer').
+   */
   abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
+
+  /**
+   * Gets the player configuration for the specific game mode.
+   * @returns An array of Player objects.
+   */
   abstract getPlayersConfiguration(): Player[];
-  abstract continueAfterNoMoves(): Promise<void>;
+
+  /**
+   * Continues the game after a no-moves situation has been resolved (e.g., by clearing the board).
+   */
+  async continueAfterNoMoves(): Promise<void> {
+    logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
+    const state = get(gameState);
+    const settings = get(settingsStore);
+    const bonus = state.boardSize;
+
+    const continueChanges = {
+      noMovesBonus: (state.noMovesBonus || 0) + bonus,
+      cellVisitCounts: {},
+      moveHistory: [{
+        pos: { row: state.playerRow, col: state.playerCol },
+        blocked: [] as {row: number, col: number}[],
+        visits: {},
+        blockModeEnabled: settings.blockModeEnabled
+      }],
+      moveQueue: [] as any[],
+      availableMoves: getAvailableMoves(
+        state.playerRow,
+        state.playerCol,
+        state.boardSize,
+        {},
+        settings.blockOnVisitCount,
+        state.board,
+        settings.blockModeEnabled,
+        null
+      ),
+      noMovesClaimed: false,
+      isComputerMoveInProgress: false,
+      wasResumed: true,
+      isGameOver: false,
+      gameOverReasonKey: null as string | null,
+      gameOverReasonValues: null as Record<string, any> | null
+    };
+
+    gameStateMutator.applyMove(continueChanges);
+    
+    gameOverStore.resetGameOverState();
+    animationStore.reset();
+
+    await this.advanceToNextPlayer();
+    gameEventBus.dispatch('CloseModal');
+  }
   protected abstract advanceToNextPlayer(): Promise<void>;
   protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
 
+  /**
+   * Processes a player's move.
+   * @param direction The direction of the move.
+   * @param distance The distance of the move.
+   */
   async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
     const state = get(gameState);
     const settings = get(settingsStore);
@@ -118,6 +187,16 @@ export abstract class BaseGameMode implements IGameMode {
     }
   }
 
+  protected _dispatchNoMovesEvent(playerType: 'human' | 'computer') {
+    const state = get(gameState);
+    const scoreDetails = calculateFinalScore(state as any, 'vs-computer');
+    gameEventBus.dispatch('ShowNoMovesModal', {
+      playerType,
+      scoreDetails,
+      boardSize: state.boardSize
+    });
+  }
+
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
     logService.GAME_MODE(`[${this.constructor.name}] endGame called with reason:`, reasonKey);
     const state = get(gameState);
@@ -151,11 +230,17 @@ export abstract class BaseGameMode implements IGameMode {
     });
   }
 
+  /**
+   * Restarts the game.
+   */
   async restartGame(): Promise<void> {
     gameStateMutator.resetGame();
     gameEventBus.dispatch('CloseModal');
   }
   
+  /**
+   * Cleans up any resources or subscriptions when the game mode is destroyed.
+   */
   cleanup(): void {
     logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
   }
