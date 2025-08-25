@@ -16,6 +16,7 @@
   import ToggleButton from '../ToggleButton.svelte';
   import { blurOnClick } from '$lib/utils/actions';
   import { customTooltip } from '$lib/actions/customTooltip.js';
+  import { gameModeService } from '$lib/services/gameModeService';
 
   let expanderRef: HTMLDetailsElement;
   let summaryRef: HTMLElement;
@@ -41,16 +42,13 @@
     const fit = () => {
       if (buttons.length === 0) return;
 
-      // Reset font size to get natural width
       buttons.forEach(btn => btn.style.fontSize = '');
 
-      // Allow the browser to render the changes
       tick().then(() => {
         const initialFontSize = parseFloat(getComputedStyle(buttons[0]).fontSize);
         let currentFontSize = initialFontSize;
 
-        const fontSizeStep = 0.5; // <-- Змінюйте це значення для налаштування кроку зменшення шрифту
-        // Iteratively reduce font size until it fits
+        const fontSizeStep = 0.5;
         while (node.scrollWidth > node.clientWidth && currentFontSize > 12) {
           currentFontSize -= fontSizeStep;
           buttons.forEach(btn => btn.style.fontSize = `${currentFontSize}px`);
@@ -61,7 +59,6 @@
     const observer = new ResizeObserver(fit);
     observer.observe(node);
     
-    // Initial fit after the DOM has been updated
     tick().then(fit);
 
     return {
@@ -83,7 +80,6 @@
   });
 
   $: {
-    // Re-calculate height when blockModeEnabled changes, as it affects content size
     const blockModeDependency = $settingsStore.blockModeEnabled;
 
     if (isOpen && contentRef) {
@@ -181,13 +177,11 @@
     --button-border-width: 1.5px;
     --button-border-radius: 8px;
     --button-font-size: 1em;
-    /* width: 100%; */
     background: var(--bg-secondary);
     border-radius: var(--unified-border-radius);
     border: var(--unified-border);
     box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
     transition: background 0.25s, box-shadow 0.25s;
-    /* margin-bottom: 16px; */
     backdrop-filter: var(--unified-backdrop-filter);
   }
   .settings-expander:hover {
@@ -386,9 +380,9 @@
   </div>
   <div class="settings-expander__content" bind:this={contentRef} style="max-height: {contentHeight}px; opacity: {isOpen ? 1 : 0};">
     <div class="settings-expander__game-mode-row" use:fitTextAction={$_('gameModes.beginner')}>
-      <button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => settingsStore.applyGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
-      <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => settingsStore.applyGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
-      <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'pro'} on:click={() => settingsStore.applyGameModePreset('pro')}>{$_('gameModes.pro')}</button>
+      <button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => gameModeService.applyGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
+      <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => gameModeService.applyGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
+      <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'pro'} on:click={() => gameModeService.applyGameModePreset('pro')}>{$_('gameModes.pro')}</button>
     </div>
     <hr class="settings-expander__divider" />
     <div class="settings-expander__setting-item">
@@ -479,7 +473,7 @@
       <ToggleButton
         label={$_('gameControls.speech')}
         checked={speechEnabled}
-        on:toggle={() => settingsStore.toggleSpeech(undefined)}
+        on:toggle={() => userActionService.toggleSpeech()}
         dataTestId="speech-toggle"
       />
       <button data-testid="settings-expander-voice-settings-btn" class="settings-expander__square-btn" use:blurOnClick use:customTooltip={$_('gameControls.voiceSettingsTitle')} on:click|stopPropagation={openVoiceSettingsModal}>

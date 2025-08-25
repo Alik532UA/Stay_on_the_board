@@ -9,6 +9,8 @@
   import { languages } from '$lib/constants.js';
   import { logService } from '$lib/services/logService.js';
   import { clearCache } from '$lib/utils/cacheManager.js';
+  import { gameModeService } from '$lib/services/gameModeService';
+  import { userActionService } from '$lib/services/userActionService';
 
   $: settings = $settingsStore;
 
@@ -117,7 +119,7 @@
           <button
             class="settings-group-button"
             class:active={settings.rememberGameMode && settings.gameMode === 'beginner'}
-            on:click={() => settingsStore.applyGameModePreset('beginner')}
+            on:click={() => gameModeService.applyGameModePreset('beginner')}
             data-testid="settings-page-game-mode-beginner"
           >
             Новачок
@@ -125,7 +127,7 @@
           <button
             class="settings-group-button"
             class:active={settings.rememberGameMode && settings.gameMode === 'experienced'}
-            on:click={() => settingsStore.applyGameModePreset('experienced')}
+            on:click={() => gameModeService.applyGameModePreset('experienced')}
             data-testid="settings-page-game-mode-experienced"
           >
             Розбійник
@@ -133,7 +135,7 @@
           <button
             class="settings-group-button"
             class:active={settings.rememberGameMode && settings.gameMode === 'pro'}
-            on:click={() => settingsStore.applyGameModePreset('pro')}
+            on:click={() => gameModeService.applyGameModePreset('pro')}
             data-testid="settings-page-game-mode-pro"
           >
             Потужний
