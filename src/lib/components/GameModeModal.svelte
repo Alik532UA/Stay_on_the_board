@@ -4,19 +4,19 @@
   import { modalStore } from '$lib/stores/modalStore.js';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
-  import { gameOrchestrator } from '$lib/gameOrchestrator';
   import { get } from 'svelte/store';
   import { gameState } from '$lib/stores/gameState';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
   import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
   import { enableAllGameCheckboxesIfNeeded } from '$lib/utils/uiUtils.js';
+  import { gameModeService } from '$lib/services/gameModeService';
 
   /**
    * @param {'beginner' | 'experienced' | 'pro'} mode
    */
   function selectMode(mode) {
-    const shouldShowFaq = settingsStore.applyGameModePreset(mode);
-    // Ініціалізуємо чекбокси після вибору режиму, забезпечуючи видимість на старті незалежно від autoHideBoard
+    // НАВІЩО: Викликаємо метод з правильного сервісу (SoC).
+    const shouldShowFaq = gameModeService.applyGameModePreset(mode);
     enableAllGameCheckboxesIfNeeded();
     gotoAfterFaq();
 
@@ -71,4 +71,4 @@
     gap: 16px;
     padding-top: 16px;
   }
-</style> 
+</style>

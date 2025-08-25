@@ -23,13 +23,16 @@ import { gameOverStore } from '$lib/stores/gameOverStore';
 import { animationStore } from '$lib/stores/animationStore';
 import { base } from '$app/paths';
 import { endGameService } from './endGameService';
+import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService.js';
+import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
+import { locale } from 'svelte-i18n';
 
 export const userActionService = {
   async confirmMove(direction: string, distance: number): Promise<void> {
-    if (get(gameState)?.isComputerMoveInProgress) {
+    const state = get(gameState);
+    if (state?.isComputerMoveInProgress) {
       return;
     }
-    // gameStateMutator.applyMove({ isComputerMoveInProgress: true });
     try {
       logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
       let activeGameMode = get(gameStore).mode;
@@ -41,24 +44,18 @@ export const userActionService = {
           return;
         }
       }
-
       await activeGameMode.handlePlayerMove(direction, distance);
-
     } finally {
-      // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
-      // завершаться перед тим, як розблокувати ввід для наступних дій.
-      // Це усуває стан гонитви (race condition).
       await tick();
       logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
-      // gameStateMutator.applyMove({ isComputerMoveInProgress: false });
     }
   },
 
   async claimNoMoves(): Promise<void> {
-    if (get(gameState)?.isComputerMoveInProgress) {
+    const state = get(gameState);
+    if (state?.isComputerMoveInProgress) {
       return;
     }
-    // gameStateMutator.applyMove({ isComputerMoveInProgress: true });
     try {
       logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
       let activeGameMode = get(gameStore).mode;
@@ -72,12 +69,8 @@ export const userActionService = {
       }
       await activeGameMode.claimNoMoves();
     } finally {
-      // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
-      // завершаться перед тим, як розблокувати ввід для наступних дій.
-      // Це усуває стан гонитви (race condition).
       await tick();
       logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
-      // gameStateMutator.applyMove({ isComputerMoveInProgress: false });
     }
   },
 
@@ -85,11 +78,10 @@ export const userActionService = {
     const state = get(gameState);
     if (!state) return;
     const { players, penaltyPoints, boardSize } = state;
-    const score = players.reduce((acc, p) => acc + p.score, 0);
+    const score = players.reduce((acc: number, p: any) => acc + p.score, 0);
     if (newSize === boardSize) return;
 
     if (score === 0 && penaltyPoints === 0) {
-      // ВИДАЛЕНО: gameLogicService.resetGame. Тепер це відповідальність gameModeService.
       await gameModeService.restartGame({ newSize });
     } else {
       modalService.showBoardResizeModal(newSize);
@@ -102,7 +94,9 @@ export const userActionService = {
   },
 
   async requestReplay(): Promise<void> {
-    const { moveHistory, boardSize } = get(gameState);
+    const state = get(gameState);
+    if (!state) return;
+    const { moveHistory, boardSize } = state;
     modalStore.showModal({
       component: ReplayViewer,
       props: {
@@ -117,7 +111,7 @@ export const userActionService = {
 
   async finishWithBonus(reasonKey: string): Promise<void> {
     logService.logicMove('[userActionService] finishWithBonus called with reason:', reasonKey);
-    gameState.update(state => ({...state, finishedByFinishButton: true}));
+    gameState.update(state => state ? ({...state, finishedByFinishButton: true}) : null);
     await endGameService.endGame(reasonKey);
   },
 
@@ -126,10 +120,10 @@ export const userActionService = {
   },
 
   async handleModalAction(action: string, payload?: any): Promise<void> {
-    if (get(gameState)?.isComputerMoveInProgress) {
+    const state = get(gameState);
+    if (state?.isComputerMoveInProgress) {
       return;
     }
-    // gameStateMutator.applyMove({ isComputerMoveInProgress: true });
     try {
       logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
       switch (action) {
@@ -160,13 +154,37 @@ export const userActionService = {
           break;
       }
     } finally {
-      // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
-      // завершаться перед тим, як розблокувати ввід для наступних дій.
-      // Це усуває стан гонитви (race condition).
       await tick();
       logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
-      // gameStateMutator.applyMove({ isComputerMoveInProgress: false });
     }
   },
 
+  async toggleSpeech(): Promise<void> {
+    const currentState = get(settingsStore);
+    const isEnabled = !currentState.speechEnabled;
+
+    if (!isEnabled) {
+      settingsStore.toggleSimpleSpeech();
+      return;
+    }
+
+    const allVoices = await loadAndGetVoices();
+    const currentLocale = get(locale) || 'uk';
+    const availableVoices = filterVoicesByLang(allVoices, currentLocale);
+    const hasConfiguredSpeech = typeof window !== 'undefined' && localStorage.getItem('hasConfiguredSpeech') === 'true';
+
+    if (availableVoices.length > 0) {
+      if (!hasConfiguredSpeech) {
+        openVoiceSettingsModal();
+        if (typeof window !== 'undefined') localStorage.setItem('hasConfiguredSpeech', 'true');
+      }
+      settingsStore.toggleSimpleSpeech();
+    } else {
+      openVoiceSettingsModal();
+    }
+  },
+
+  resetKeybindings(): void {
+    settingsStore.resetKeybindings();
+  }
 };

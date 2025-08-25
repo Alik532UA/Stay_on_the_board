@@ -4,6 +4,7 @@
   import { settingsStore } from '$lib/stores/settingsStore.ts';
   import { onMount } from 'svelte';
   import { customTooltip } from '$lib/actions/customTooltip.js';
+  import { userActionService } from '$lib/services/userActionService';
 
   /** @type {{ action: import('$lib/stores/settingsStore.ts').KeybindingAction, index: number } | null} */
   let listeningFor = null;
@@ -132,20 +133,20 @@
                   class="key-button"
                   class:listening={listeningFor?.action === action && listeningFor?.index === i}
                   class:conflict={conflicts.has(key)}
-                  on:click={() => listenForKey(/** @type {import('$lib/stores/settingsStore').KeybindingAction} */(action), i)}
+                  on:click={() => listenForKey(/** @type {import('$lib/stores/settingsStore.ts').KeybindingAction} */(action), i)}
                 >
                   {listeningFor?.action === action && listeningFor?.index === i
                     ? $_('controlsPage.pressKey')
                     : formatKeyCode(key)}
                 </button>
-                <button class="remove-key-btn" use:customTooltip={$_('controlsPage.removeKey')} on:click={() => removeKey(/** @type {import('$lib/stores/settingsStore').KeybindingAction} */(action), i)}>×</button>
+                <button class="remove-key-btn" use:customTooltip={$_('controlsPage.removeKey')} on:click={() => removeKey(/** @type {import('$lib/stores/settingsStore.ts').KeybindingAction} */(action), i)}>×</button>
               </div>
             {/each}
             {#if (keybindings[action]?.length || 0) < 8}
               {#if listeningFor?.action === action && listeningFor?.index === -1}
                 <span class="press-key-hint">{$_('controlsPage.pressKey') || 'Натисніть клавішу'}</span>
               {:else}
-                <button class="add-key-btn" on:click={() => listenForKey(/** @type {import('$lib/stores/settingsStore').KeybindingAction} */(action), -1)}>+</button>
+                <button class="add-key-btn" on:click={() => listenForKey(/** @type {import('$lib/stores/settingsStore.ts').KeybindingAction} */(action), -1)}>+</button>
               {/if}
             {/if}
           </div>
@@ -158,7 +159,7 @@
     {#if conflicts.size > 0}
       <p class="conflict-warning">{$_('controlsPage.keyConflict')}</p>
     {/if}
-    <button class="reset-button" on:click={settingsStore.resetKeybindings}>
+    <button class="reset-button" on:click={userActionService.resetKeybindings}>
       {$_('controlsPage.resetToDefaults')}
     </button>
   </div>
@@ -306,4 +307,4 @@
     from { opacity: 0; }
     to { opacity: 1; }
   }
-</style> 
+</style>
