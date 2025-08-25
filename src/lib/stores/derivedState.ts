@@ -80,7 +80,7 @@ export const availableMoves = derived(
   ([$gameState]) => {
     if (!$gameState) return [];
     // availableMovesService залежить від gameState, тому виклик getAvailableMoves() завжди актуальний
-    return availableMovesService.getAvailableMoves().map(move => ({ ...move, isPenalty: false }));
+    return availableMovesService.getAvailableMoves();
   }
 );
 

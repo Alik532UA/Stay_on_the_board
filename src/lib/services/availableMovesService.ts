@@ -3,7 +3,7 @@ import { get } from 'svelte/store';
 import { gameState } from '$lib/stores/gameState';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { Figure, MoveDirection } from '$lib/models/Figure';
-import { isCellBlocked } from '$lib/utils/boardUtils';
+import { isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils';
 
 export const availableMovesService = {
   getAvailableMoves() {
@@ -13,7 +13,7 @@ export const availableMovesService = {
     }
 
     const settings = get(settingsStore);
-    const { playerRow, playerCol, boardSize, cellVisitCounts } = state;
+    const { playerRow, playerCol, boardSize, cellVisitCounts, lastMove } = state;
     const availableMoves = [];
     const figure = new Figure(playerRow, playerCol, boardSize);
 
@@ -26,17 +26,21 @@ export const availableMovesService = {
         }
 
         if (isCellBlocked(newPosition.row, newPosition.col, cellVisitCounts, settings)) {
-          // Важливо: Не перериваємо цикл (`break`), а продовжуємо (`continue`).
-          // Це дозволяє фігурі "перестрибувати" через зайняті клітинки,
-          // аналізуючи всі можливі ходи в поточному напрямку до краю дошки.
           continue;
         }
+        
+        // ВАЖЛИВО: Штрафні бали за "дзеркальні" ходи нараховуються тільки
+        // якщо режим блокування клітинок ВИМКНЕНО.
+        // Це ключова бізнес-логіка гри. Якщо змінювати її,
+        // потрібно також оновити scoreService та документацію.
+        const isPenalty = !settings.blockModeEnabled && lastMove ? isMirrorMove(direction, distance, lastMove.direction, lastMove.distance) : false;
 
         availableMoves.push({
           direction,
           distance,
           row: newPosition.row,
           col: newPosition.col,
+          isPenalty
         });
       }
     }
