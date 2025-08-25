@@ -18,6 +18,7 @@ import { availableMovesService } from '$lib/services/availableMovesService';
 import { tick } from 'svelte';
 import { testModeStore } from '$lib/stores/testModeStore';
 import { aiService } from '$lib/services/aiService';
+import { getInitialPosition } from '$lib/utils/initialPositionUtils';
 
 export class LocalGameMode extends BaseGameMode {
   constructor() {
@@ -28,13 +29,18 @@ export class LocalGameMode extends BaseGameMode {
   initialize(options: { newSize?: number } = {}): void {
     const settings = get(settingsStore);
     const currentState = get(gameState);
+    const size = options.newSize ?? settings.boardSize;
+    const testModeState = get(testModeStore);
     
     const players = currentState ? currentState.players : this.getPlayersConfiguration();
     
+    const initialPosition = getInitialPosition(size, testModeState);
+
     const newInitialState = createInitialState({
-      size: options.newSize ?? settings.boardSize,
-      players: players,
-      testMode: get(testModeStore).isEnabled
+      size,
+      players,
+      testMode: testModeState.isEnabled,
+      initialPosition
     });
     const moves = availableMovesService.getAvailableMoves(newInitialState);
     newInitialState.availableMoves = moves;

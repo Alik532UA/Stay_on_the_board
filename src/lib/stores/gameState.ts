@@ -1,6 +1,7 @@
 // file: src/lib/stores/gameState.ts
 import { writable } from 'svelte/store';
-import { createEmptyBoard, getRandomCell } from '$lib/utils/boardUtils.ts';
+import { createEmptyBoard } from '$lib/utils/boardUtils.ts';
+import { getRandomCell } from '$lib/utils/initialPositionUtils';
 import type { Move } from '$lib/utils/gameUtils';
 import { get } from 'svelte/store';
 import { testModeStore } from './testModeStore';
@@ -50,21 +51,22 @@ export interface GameState {
   isFirstMove: boolean;
 }
 
-export function createInitialState(config: any = {}): GameState {
+export interface GameStateConfig {
+  size?: number;
+  players?: Player[];
+  testMode?: boolean;
+  initialPosition?: { row: number; col: number };
+}
+
+export function createInitialState(config: GameStateConfig = {}): GameState {
   const size = config.size ?? initialBoardSize;
   const players = config.players ?? [
     { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#e63946', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
     { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#457b9d', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
   ];
   
-  const testModeActive = config.testMode ?? false;
-  const testModeState = get(testModeStore);
-  const { row: initialRow, col: initialCol } =
-    testModeActive && testModeState.startPositionMode === 'manual' && testModeState.manualStartPosition
-    ? { row: testModeState.manualStartPosition.y, col: testModeState.manualStartPosition.x }
-    : testModeActive && testModeState.startPositionMode === 'predictable'
-    ? { row: 0, col: 0 }
-    : getRandomCell(size);
+  const { row: initialRow, col: initialCol } = config.initialPosition ?? getRandomCell(size);
+  
   const board = createEmptyBoard(size);
   board[initialRow][initialCol] = 1;
   

@@ -7,12 +7,18 @@
   import { onMount } from 'svelte';
   import { gameState, createInitialState } from '$lib/stores/gameState.js';
   import { get } from 'svelte/store';
+  import { testModeStore } from '$lib/stores/testModeStore';
+  import { getInitialPosition } from '$lib/utils/initialPositionUtils';
 
   onMount(() => {
     // НАВІЩО: Створюємо початковий стан для сторінки налаштувань, якщо його ще немає.
     // Це єдина точка ініціалізації для цього екрану, що відповідає SSoT.
     if (!get(gameState)) {
-      gameState.set(createInitialState());
+      const testModeState = get(testModeStore);
+      const size = 4; // Default size for setup page
+      const initialPosition = getInitialPosition(size, testModeState);
+
+      gameState.set(createInitialState({ size, initialPosition, testMode: testModeState.isEnabled }));
     }
   });
 </script>
