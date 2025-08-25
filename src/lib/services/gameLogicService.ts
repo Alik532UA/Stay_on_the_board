@@ -20,19 +20,7 @@ import { aiService } from './aiService';
  * These are simple mutators that work exclusively with gameState.
  */
 
-export function resetGame(options: { newSize?: number; players?: Player[]; settings?: any } = {}, currentState: any) {
-  const newSize = options.newSize ?? currentState?.boardSize ?? 4;
-  
-  gameStateMutator.resetGame({ newSize, players: options.players });
-
-  
-  // Скидаємо рахунки гравців в локальній грі
-  const newState = get(gameState);
-  const humanPlayersCount = newState.players.filter((p: Player) => p.type === 'human').length;
-  if (humanPlayersCount > 1) {
-    gameStateMutator.resetScores();
-  }
-}
+// ВИДАЛЕНО: функція resetGame. Її відповідальність перенесена в GameMode.
 
 export function setDirection(dir: Direction) {
   const state = get(gameState);

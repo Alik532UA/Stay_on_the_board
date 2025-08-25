@@ -16,6 +16,7 @@ test.describe('Модальне вікно "Суперник у пастці"', 
 
     await test.step('Гравець блокує комп\'ютера', async () => {
       await makeMove(page, 'right', 1);
+      await page.getByTestId('test-mode-computer-move-random-btn').click();
       await makeMove(page, 'left', 1, false);
     });
 

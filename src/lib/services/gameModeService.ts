@@ -29,7 +29,7 @@ export const gameModeService = {
                      (currentMode instanceof OnlineGameMode && mode === 'online') ||
                      (currentMode instanceof TimedVsComputerGameMode && mode === 'timed-vs-computer');
 
-    if (isSameMode) {
+    if (isSameMode && get(gameState)) {
       logService.GAME_MODE(`Game mode is already set to: ${mode}. No changes needed.`);
       return;
     }
@@ -47,10 +47,11 @@ export const gameModeService = {
     } else {
       gameMode = new TrainingGameMode();
     }
-    if (!get(gameState)) {
-      gameStateMutator.resetGame();
-    }
-    gameMode.initialize(get(gameState)!);
+    
+    // НАВІЩО: Викликаємо initialize без аргументів. Клас GameMode тепер сам
+    // відповідає за створення свого початкового стану. Це усуває помилку TypeScript.
+    gameMode.initialize();
+    
     timeService.initializeTimers(gameMode.gameDuration, gameMode.turnDuration);
     gameStore.setMode(gameMode);
   },

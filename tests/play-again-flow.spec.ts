@@ -9,6 +9,7 @@ test.describe('Кнопка "Грати ще раз"', () => {
       await setBoardSize(page, 2);
       await setBlockMode(page, BlockModeState.On);
       await makeMove(page, 'right', 1);
+      await page.getByTestId('test-mode-computer-move-random-btn').click();
       await makeMove(page, 'left', 1, false);
       await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
     });

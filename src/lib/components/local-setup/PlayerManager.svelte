@@ -10,21 +10,12 @@
   
   function startGame() {
     logService.action('Click: "Почати гру" (PlayerManager)');
-    const state = get(gameState);
     
-    if (state) {
-      // Ініціалізуємо стан гри з поточними гравцями та налаштуваннями
-      gameStateMutator.resetGame({
-        newSize: state.settings.boardSize,
-        players: state.players,
-      });
-
-      // Робимо знімок початкових (нульових) рахунків перед стартом
-      gameStateMutator.snapshotScores();
-
-      // Переходимо на сторінку локальної гри
-      navigationService.goTo('/game/local');
-    }
+    // НАВІЩО: Відповідальність цього компонента - лише ініціювати перехід.
+    // Вся логіка створення та ініціалізації гри тепер інкапсульована
+    // в gameModeService та LocalGameMode, які спрацюють на сторінці /game/local.
+    // Це відновлює правильний SoC та UDF.
+    navigationService.goTo('/game/local');
   }
 </script>
 
@@ -196,4 +187,4 @@
     background: var(--confirm-action-bg);
     color: var(--confirm-action-text);
   }
-</style> 
+</style>

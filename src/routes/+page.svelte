@@ -1,20 +1,23 @@
 <script lang="ts">
   import MainMenu from '$lib/components/MainMenu.svelte';
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
-  import { settingsStore } from '$lib/stores/settingsStore';
+  import { testModeStore, toggleTestMode } from '$lib/stores/testModeStore';
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
   
-  let testMode = false;
+  let testModeEnabled = false;
   
   onMount(() => {
-    const unsubscribe = settingsStore.subscribe(settings => {
-      testMode = settings.testMode;
+    const unsubscribe = testModeStore.subscribe(state => {
+      testModeEnabled = state.isEnabled;
     });
     return unsubscribe;
   });
   
   function handleTestModeChange() {
-    settingsStore.updateSettings({ testMode: !testMode });
+    // НАВІЩО: Компонент більше не містить логіки. Він лише викликає
+    // централізовану функцію зі стору, що відповідає принципам UDF та SoC.
+    toggleTestMode();
   }
 </script>
 
@@ -23,8 +26,8 @@
 
 {#if import.meta.env.DEV}
   <div class="test-mode-toggle">
-    <button on:click={handleTestModeChange} class:active={testMode} data-testid="test-mode-btn">
-      Test Mode: {testMode ? 'ON' : 'OFF'}
+    <button on:click={handleTestModeChange} class:active={testModeEnabled} data-testid="test-mode-btn">
+      Test Mode: {testModeEnabled ? 'ON' : 'OFF'}
     </button>
   </div>
 {/if}

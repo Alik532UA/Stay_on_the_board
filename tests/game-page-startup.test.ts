@@ -14,7 +14,9 @@ test('Game page loads and renders correctly on direct navigation', { tag: ['@don
   });
 
   await test.step('Перевірка, що текст перекладено і не містить ключів локалізації', async () => {
-    const gameInfo = page.locator('.game-info-widget');
+    // ВИПРАВЛЕНО: Використовуємо унікальний data-testid замість неоднозначного класу.
+    // Це робить тест надійним і стійким до змін у CSS.
+    const gameInfo = page.getByTestId('game-info-panel');
     await expect(gameInfo).not.toContainText('gameBoard.gameInfo.firstMove');
     // TODO: Додати перевірку на конкретний перекладений текст, коли буде стабільна локалізація
     // await expect(gameInfo).toContainText('Ваш хід');

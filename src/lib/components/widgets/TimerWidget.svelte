@@ -44,11 +44,6 @@
     align-items: center;
     gap: 16px;
   }
-  .label {
-    font-weight: 500;
-    color: var(--text-secondary);
-    white-space: nowrap;
-  }
   .value {
     font-family: 'M PLUS Rounded 1c', sans-serif;
     font-size: 1.2rem;

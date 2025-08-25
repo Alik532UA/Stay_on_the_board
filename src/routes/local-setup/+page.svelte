@@ -5,13 +5,14 @@
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
-  import { gameState } from '$lib/stores/gameState.js';
-  import { gameStateMutator } from '$lib/services/gameStateMutator';
+  import { gameState, createInitialState } from '$lib/stores/gameState.js';
   import { get } from 'svelte/store';
 
   onMount(() => {
+    // НАВІЩО: Створюємо початковий стан для сторінки налаштувань, якщо його ще немає.
+    // Це єдина точка ініціалізації для цього екрану, що відповідає SSoT.
     if (!get(gameState)) {
-      gameStateMutator.resetGame();
+      gameState.set(createInitialState());
     }
   });
 </script>
@@ -69,4 +70,4 @@
       grid-template-columns: 1fr;
     }
   }
-</style> 
+</style>

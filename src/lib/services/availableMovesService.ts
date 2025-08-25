@@ -6,8 +6,7 @@ import { Figure, MoveDirection } from '$lib/models/Figure';
 import { isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils';
 
 export const availableMovesService = {
-  getAvailableMoves() {
-    const state = get(gameState);
+  getAvailableMoves(state = get(gameState)) {
     if (!state || state.playerRow === null || state.playerCol === null) {
       return [];
     }

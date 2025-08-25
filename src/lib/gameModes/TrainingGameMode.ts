@@ -4,7 +4,7 @@ import { _, locale } from 'svelte-i18n';
 import { BaseGameMode } from './BaseGameMode';
 import { moveDirections } from '$lib/utils/translations';
 import { lastComputerMove, availableMoves as derivedAvailableMoves } from '$lib/stores/derivedState';
-import { gameState, type GameState } from '$lib/stores/gameState';
+import { gameState, type GameState, createInitialState } from '$lib/stores/gameState';
 import type { Player } from '$lib/models/player';
 import { gameStateMutator } from '$lib/services/gameStateMutator';
 import * as gameLogicService from '$lib/services/gameLogicService';
@@ -22,12 +22,24 @@ import { noMovesService } from '$lib/services/noMovesService';
 import { endGameService } from '$lib/services/endGameService';
 import { timeService } from '$lib/services/timeService';
 import { gameStore } from '$lib/stores/gameStore';
+import { availableMovesService } from '$lib/services/availableMovesService';
+import { testModeStore } from '$lib/stores/testModeStore';
 
 export class TrainingGameMode extends BaseGameMode {
-  initialize(initialState: GameState): void {
-    const settings = get(settingsStore);
-    gameStateMutator.updateSettings(settings);
-    gameLogicService.resetGame({ players: this.getPlayersConfiguration(), settings }, get(gameState));
+  initialize(options: { newSize?: number } = {}): void {
+    const currentSize = get(gameState)?.boardSize;
+    // НАВІЩО: Тепер ми явно передаємо стан тестового режиму в функцію
+    // створення стану гри, відновлюючи потік даних (UDF).
+    const newInitialState = createInitialState({
+      size: options.newSize ?? currentSize ?? 4,
+      players: this.getPlayersConfiguration(),
+      testMode: get(testModeStore).isEnabled
+    });
+    const moves = availableMovesService.getAvailableMoves(newInitialState);
+    newInitialState.availableMoves = moves;
+    
+    gameState.set(newInitialState);
+    
     animationService.initialize();
     this.startTurn();
   }
@@ -44,7 +56,6 @@ export class TrainingGameMode extends BaseGameMode {
   }
 
   public determineWinner(state: GameState, reasonKey: string) {
-    // У грі проти комп'ютера немає концепції переможця, лише рахунок
     return { winners: [] as number[], winningPlayerIndex: -1 };
   }
 
@@ -81,10 +92,12 @@ export class TrainingGameMode extends BaseGameMode {
       const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex, state, settings);
 
       if (!moveResult.success) {
-        logService.GAME_MODE('triggerComputerMove: Хід комп\'ютера не вдався, обробка "немає ходів".');
-        await this.handleNoMoves('computer');
+        await this.onPlayerMoveFailure(moveResult.reason, direction, distance);
       } else {
         gameStateMutator.applyMove(moveResult.changes);
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+
         await this.onPlayerMoveSuccess(moveResult);
         const settings = get(settingsStore);
         if (settings.speechEnabled) {
@@ -106,26 +119,27 @@ export class TrainingGameMode extends BaseGameMode {
       logService.GAME_MODE('triggerComputerMove: У комп\'ютера немає ходів, викликаємо handleNoMoves.');
       await this.handleNoMoves('computer');
     }
+    await tick();
     gameStateMutator.applyMove({ isComputerMoveInProgress: false });
   }
 
   protected async applyScoreChanges(scoreChanges: any): Promise<void> {
-    // У режимі гри з комп'ютером, всі очки (бонуси та штрафи) додаються до загального рахунку,
-    // а не до конкретного гравця. `performMove` вже оновив загальний стан,
-    // тому тут нічого робити не потрібно.
+    // No specific score changes to apply in training mode
   }
 
   async continueAfterNoMoves(): Promise<void> {
-    await super.continueAfterNoMoves();
-    // In TrainingGameMode, the turn does not advance to the computer after clearing the board.
-    // The human player continues their turn from a clean board.
-    // We need to counteract the advanceToNextPlayer() call in the base method.
-    gameStateMutator.setCurrentPlayer(0); // 0 is always the human player in this mode
+    logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
+    
+    // Централізовано скидаємо стан і перераховуємо доступні ходи
+    gameStateMutator.resetForNoMovesContinue(false);
+
+    const updated = get(gameState);
+    logService.logicAvailability('[TrainingGameMode] availableMoves after continue:', updated?.availableMoves || []);
+    
+    gameOverStore.resetGameOverState();
+    animationService.reset();
     this.startTurn();
-    // const gameMode = get(gameStore).mode;
-    // if (gameMode) {
-    //   gameMode.resumeTimers();
-    // }
+    gameEventBus.dispatch('CloseModal');
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
@@ -138,14 +152,10 @@ export class TrainingGameMode extends BaseGameMode {
       noMovesBonus: (state.noMovesBonus || 0) + state.boardSize
     });
 
-    const titleKey = playerType === 'human' ? 'modal.playerNoMovesTitle' : 'modal.computerNoMovesTitle';
-    const contentKey = playerType === 'human' ? 'modal.playerNoMovesContent' : 'modal.computerNoMovesContent';
-
     noMovesService.dispatchNoMovesEvent(playerType);
   }
 
   protected startTurn(): void {
-    // У режимі тренування таймер не запускається
     timeService.stopTurnTimer();
   }
 
