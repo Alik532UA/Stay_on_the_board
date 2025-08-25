@@ -18,7 +18,7 @@ export const endGameService = {
     timeService.stopTurnTimer();
 
     const humanPlayersCount = state.players.filter(p => p.type === 'human').length;
-    const gameType = humanPlayersCount > 1 ? 'local' : 'vs-computer';
+    const gameType = humanPlayersCount > 1 ? 'local' : 'training';
     const finalScoreDetails = calculateFinalScore(state, gameType);
 
     gameStateMutator.setGameOver(reasonKey, reasonValues);

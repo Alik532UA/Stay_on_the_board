@@ -44,7 +44,7 @@ class CommandService {
   private handleSpeakMove(payload: any) {
     logService.logicMove('CommandService: Handling SpeakMove event', payload);
     sideEffectService.execute({
-      type: 'audio/speak',
+      type: 'speak',
       payload: payload
     });
   }

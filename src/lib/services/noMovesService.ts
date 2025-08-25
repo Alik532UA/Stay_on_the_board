@@ -26,7 +26,7 @@ export const noMovesService = {
     const state = get(gameState);
     if (!state) return;
 
-    const scoreDetails = calculateFinalScore(state, 'vs-computer');
+    const scoreDetails = calculateFinalScore(state, 'training');
     gameEventBus.dispatch('ShowNoMovesModal', {
       playerType,
       scoreDetails,

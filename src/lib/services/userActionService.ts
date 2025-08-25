@@ -51,11 +51,11 @@ export const userActionService = {
     }
     try {
       logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
-      let activeGameMode = get(gameStore).mode;
+      let activeGameMode = gameModeService.getCurrentMode();
       if (!activeGameMode) {
         const settings = get(settingsStore);
         gameModeService.initializeGameMode(settings.gameMode);
-        activeGameMode = get(gameStore).mode;
+        activeGameMode = gameModeService.getCurrentMode();
         if (!activeGameMode) {
           logService.logicMove('[userActionService.confirmMove] No active game mode found after initialization.');
           return;
@@ -75,11 +75,11 @@ export const userActionService = {
     }
     try {
       logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
-      let activeGameMode = get(gameStore).mode;
+      let activeGameMode = gameModeService.getCurrentMode();
       if (!activeGameMode) {
         const settings = get(settingsStore);
         gameModeService.initializeGameMode(settings.gameMode);
-        activeGameMode = get(gameStore).mode;
+        activeGameMode = gameModeService.getCurrentMode();
         if (!activeGameMode) {
           logService.logicMove('[userActionService.claimNoMoves] No active game mode found after initialization.');
           return;
@@ -206,7 +206,7 @@ export const userActionService = {
     if (availableVoices.length > 0) {
       if (!hasConfiguredSpeech) {
         openVoiceSettingsModal();
-        if (typeof window !== 'undefined') localStorage.setItem('hasConfiguredSpeech', 'true');
+        sideEffectService.execute({ type: 'localStorage_set', payload: { key: 'hasConfiguredSpeech', value: 'true' } });
       }
       settingsStore.toggleSimpleSpeech();
     } else {

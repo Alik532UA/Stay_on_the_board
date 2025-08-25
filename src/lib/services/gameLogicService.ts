@@ -196,7 +196,7 @@ export function performMove(
   };
 }
 
-export function validatePlayerMove(changes: any, currentState: any): { errors: string[], warnings: string[] } {
+export function validatePlayerMove(changes: any, currentState: any, settings: any): { errors: string[], warnings: string[] } {
   const errors: string[] = [];
   const warnings: string[] = [];
 
@@ -213,7 +213,7 @@ export function validatePlayerMove(changes: any, currentState: any): { errors: s
   }
 
   if (changes.playerRow !== undefined && changes.playerCol !== undefined) {
-    if (isCellBlocked(changes.playerRow, changes.playerCol, currentState.cellVisitCounts, get(settingsStore))) {
+    if (isCellBlocked(changes.playerRow, changes.playerCol, currentState.cellVisitCounts, settings)) {
       errors.push('Player cannot move to a blocked cell');
     }
   }

@@ -1,76 +1,43 @@
-import { modalStore } from '$lib/stores/modalStore';
-import { speakMove, loadAndGetVoices } from '$lib/services/speechService';
-import { logService } from '$lib/services/logService';
-import { goto } from '$app/navigation';
+// src/lib/services/SideEffectService.ts
+import { navigationService } from './navigationService';
+import { speakText } from './speechService';
 import { modalService } from './modalService';
+import { gameEventBus } from './gameEventBus';
 
 export type SideEffect =
-  | { type: 'audio/speak'; payload: { move: any; lang: string; voiceURI: string | null } }
-  | { type: 'ui/showModal'; payload: any }
+  | { type: 'navigate'; payload: string }
+  | { type: 'speak'; payload: { text: string; lang: string; voiceURI: string | null } }
+  | { type: 'localStorage_set'; payload: { key: string; value: any } }
   | { type: 'ui/showGameOverModal'; payload: any }
   | { type: 'ui/closeModal' }
-  | { type: 'navigation/goto'; payload: { path: string } };
-
+  | { type: 'ui/showModal'; payload: any }
+  | { type: 'audio/speak'; payload: any };
 
 class SideEffectService {
-  constructor() {
-    this.init();
-  }
-
-  private init() {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      loadAndGetVoices();
-    }
-  }
-
   public execute(effect: SideEffect): void {
-    logService.logicMove('Executing side effect:', effect.type, 'payload' in effect ? effect.payload : '');
     switch (effect.type) {
-      case 'audio/speak':
-        this.speakText(effect.payload);
+      case 'navigate':
+        navigationService.goTo(effect.payload);
         break;
-      case 'ui/showModal':
-        this.showModal(effect.payload);
+      case 'speak':
+        speakText(effect.payload.text, effect.payload.lang, effect.payload.voiceURI);
+        break;
+      case 'localStorage_set':
+        localStorage.setItem(effect.payload.key, JSON.stringify(effect.payload.value));
         break;
       case 'ui/showGameOverModal':
-        this.showGameOverModal(effect.payload);
+        modalService.showGameOverModal(effect.payload);
         break;
       case 'ui/closeModal':
-        this.closeModal();
+        modalService.closeModal();
         break;
-      case 'navigation/goto':
-        this.navigateTo(effect.payload.path);
+      case 'ui/showModal':
+        modalService.showModal(effect.payload);
         break;
-      default:
-        const exhaustiveCheck: never = effect;
-        logService.ui(`Unknown side effect type: ${exhaustiveCheck}`);
+      case 'audio/speak':
+        speakText(effect.payload.text, effect.payload.lang, effect.payload.voiceURI);
+        break;
     }
-  }
-
-  public executeMany(effects: SideEffect[]): void {
-    effects.forEach(effect => this.execute(effect));
-  }
- 
-  private speakText(payload: { move: any; lang: string; voiceURI: string | null }): void {
-    speakMove(payload.move, payload.lang, payload.voiceURI);
-  }
-
-  private showModal(payload: any): void {
-    logService.ui('Showing modal:', payload);
-    modalService.showModal(payload);
-  }
-
-  private showGameOverModal(payload: any): void {
-    logService.ui('Showing game over modal:', payload);
-    modalService.showGameOverModal(payload);
-  }
-
-  private closeModal(): void {
-    modalStore.closeModal();
-  }
-
-  public navigateTo(path: string): void {
-    goto(path);
   }
 }
 

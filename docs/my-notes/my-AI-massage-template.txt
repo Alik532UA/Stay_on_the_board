@@ -99,7 +99,7 @@ npx playwright test tests/game-flow.spec.ts --headed
 логіка гри не повинна знати та залежати від візуалізації на дошці
 надважливе завдання: взяти до уваги попередження коді (в коментаріях) щодо логіки яка може зламатися під час рефакторінгу
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
-Створи файл `architecture-improvement-SoC-plan-v21.md` в папці "\Stay_on_the_board\docs\plans"
+Створи файл `architecture-improvement-SoC-plan-v23.md` в папці "\Stay_on_the_board\docs\plans"
 у першій частині:
 Проведи комплексний аудит коду за критерієм:
 **SoC (Separation of Concerns):** Наскільки добре розділені відповідальності (стан, логіка, UI)?

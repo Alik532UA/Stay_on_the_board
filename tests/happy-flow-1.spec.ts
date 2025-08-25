@@ -9,7 +9,7 @@ test.describe('хепі флоу', () => {
   });
 
   test('хепі флоу 1', { tag: ['@inProgress', '@HF-1'] }, async ({ page }) => {
-    // test.setTimeout(1000 * 60 * 120); // 120 minutes
+    test.setTimeout(1000 * 60 * 120); // 120 minutes
 
     await test.step('Початок гри та налаштування дошки', async () => {
       await startNewGame(page);
@@ -41,6 +41,9 @@ test.describe('хепі флоу', () => {
 
     await test.step('Повернення до модального вікна "Суперник у пастці!" та продовження гри', async () => {
       await expect(page.getByTestId('opponent-trapped-modal')).toBeVisible();
+
+      // await page.waitForTimeout(7777777); // пауза
+
       await page.getByTestId('continue-game-no-moves-btn').click();
       await expect(page.getByTestId('opponent-trapped-modal')).not.toBeVisible();
     });
