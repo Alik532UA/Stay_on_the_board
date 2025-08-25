@@ -1,74 +1,97 @@
-// src/lib/services/timeService.ts
-import { writable, get } from 'svelte/store';
+// file: src/lib/services/timeService.ts
+import { gameState } from '$lib/stores/gameState';
+import { gameStateMutator } from './gameStateMutator';
+import { logService } from './logService';
 
-export const turnTime = writable(0);
-export const gameTime = writable(0);
+class TimeService {
+  private gameTimerInterval: NodeJS.Timeout | null = null;
+  private turnTimerInterval: NodeJS.Timeout | null = null;
+  private gameTimerConfig: { duration: number, onTimeout: () => void } | null = null;
+  private isGameTimerPaused: boolean = false;
 
-let turnTimer: NodeJS.Timeout | null = null;
-let gameTimer: NodeJS.Timeout | null = null;
-let isGameTimerPaused = false;
-
-export const timeService = {
-  initializeTimers(gameDuration: number, turnDuration: number) {
+  public startGameTimer(duration: number, onTimeout: () => void) {
     this.stopGameTimer();
-    gameTime.set(gameDuration);
-    turnTime.set(turnDuration);
-  },
+    this.gameTimerConfig = { duration, onTimeout };
+    this.isGameTimerPaused = false;
+    logService.GAME_MODE(`[TimeService] Starting game timer for ${duration} seconds.`);
+    
+    gameStateMutator.applyMove({ modeState: { remainingTime: duration } });
 
-  startTurnTimer(duration: number, onTimeUp: () => void) {
-    this.stopTurnTimer();
-    turnTime.set(duration);
-    turnTimer = setInterval(() => {
-      turnTime.update(t => {
-        if (t > 0) {
-          return t - 1;
-        } else {
-          this.stopTurnTimer();
-          onTimeUp();
-          return 0;
+    this.gameTimerInterval = setInterval(() => {
+      gameState.update(state => {
+        if (!state || state.modeState.remainingTime === undefined || this.isGameTimerPaused) return state;
+
+        const newTime = state.modeState.remainingTime - 1;
+        if (newTime <= 0) {
+          this.stopGameTimer();
+          onTimeout();
         }
+        return {
+          ...state,
+          modeState: { ...state.modeState, remainingTime: newTime }
+        };
       });
     }, 1000);
-  },
-
-  stopTurnTimer() {
-    if (turnTimer) {
-      clearInterval(turnTimer);
-      turnTimer = null;
-    }
-  },
-
-  startGameTimer(duration: number, onTimeUp: () => void) {
-    this.stopGameTimer();
-    gameTime.set(duration);
-    isGameTimerPaused = false;
-    gameTimer = setInterval(() => {
-      if (!isGameTimerPaused) {
-        gameTime.update(t => {
-          if (t > 0) {
-            return t - 1;
-          } else {
-            this.stopGameTimer();
-            onTimeUp();
-            return 0;
-          }
-        });
-      }
-    }, 1000);
-  },
-
-  stopGameTimer() {
-    if (gameTimer) {
-      clearInterval(gameTimer);
-      gameTimer = null;
-    }
-  },
-
-  pauseGameTimer() {
-    isGameTimerPaused = true;
-  },
-
-  resumeGameTimer() {
-    isGameTimerPaused = false;
   }
-};
+
+  public stopGameTimer() {
+    if (this.gameTimerInterval) {
+      logService.GAME_MODE('[TimeService] Stopping game timer.');
+      clearInterval(this.gameTimerInterval);
+      this.gameTimerInterval = null;
+      this.gameTimerConfig = null;
+    }
+  }
+
+  public pauseGameTimer() {
+    if (this.gameTimerInterval) {
+      logService.GAME_MODE('[TimeService] Pausing game timer.');
+      this.isGameTimerPaused = true;
+    }
+  }
+
+  public resumeGameTimer() {
+    if (this.gameTimerConfig && this.isGameTimerPaused) {
+      logService.GAME_MODE('[TimeService] Resuming game timer.');
+      this.isGameTimerPaused = false;
+    }
+  }
+
+  public startTurnTimer(duration: number, onTimeout: () => void) {
+    this.stopTurnTimer();
+    logService.GAME_MODE(`[TimeService] Starting turn timer for ${duration} seconds.`);
+    
+    gameStateMutator.applyMove({ modeState: { turnTimeLimit: duration } });
+
+    this.turnTimerInterval = setInterval(() => {
+      gameState.update(state => {
+        if (!state || state.modeState.turnTimeLimit === undefined) return state;
+
+        const newTime = state.modeState.turnTimeLimit - 1;
+        if (newTime <= 0) {
+          this.stopTurnTimer();
+          onTimeout();
+        }
+        return {
+          ...state,
+          modeState: { ...state.modeState, turnTimeLimit: newTime }
+        };
+      });
+    }, 1000);
+  }
+
+  public stopTurnTimer() {
+    if (this.turnTimerInterval) {
+      logService.GAME_MODE('[TimeService] Stopping turn timer.');
+      clearInterval(this.turnTimerInterval);
+      this.turnTimerInterval = null;
+    }
+  }
+
+  public cleanup() {
+    this.stopGameTimer();
+    this.stopTurnTimer();
+  }
+}
+
+export const timeService = new TimeService();

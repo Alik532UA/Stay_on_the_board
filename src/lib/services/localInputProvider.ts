@@ -18,6 +18,6 @@ export const localInputProvider = {
       return;
     }
 
-    userActionService.confirmMove(state.selectedDirection, state.selectedDistance);
+    userActionService.confirmMove();
   }
 };

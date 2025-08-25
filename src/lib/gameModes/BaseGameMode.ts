@@ -1,5 +1,7 @@
 import { get } from 'svelte/store';
 import { _ } from 'svelte-i18n';
+import { tick } from 'svelte';
+import { aiService } from '$lib/services/aiService';
 import type { IGameMode } from './gameMode.interface';
 import { gameState, type GameState } from '$lib/stores/gameState';
 import type { Player } from '$lib/models/player';
@@ -21,8 +23,14 @@ export abstract class BaseGameMode implements IGameMode {
   public turnDuration: number = 0; // Default to 0, means no timer
   public gameDuration: number = 0; // Default to 0, means no timer
 
+  // Abstract methods to be implemented by subclasses
   abstract initialize(options?: { newSize?: number }): void;
+  abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
+  abstract getPlayersConfiguration(): Player[];
+  protected abstract advanceToNextPlayer(): Promise<void>;
+  protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
 
+  // Common implemented methods
   protected startTurn(): void {
     if (this.turnDuration > 0) {
       timeService.startTurnTimer(this.turnDuration, () => {
@@ -35,55 +43,7 @@ export abstract class BaseGameMode implements IGameMode {
     await noMovesService.claimNoMoves();
   }
 
-  abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
-
-  abstract getPlayersConfiguration(): Player[];
-
-  async continueAfterNoMoves(): Promise<void> {
-    logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
-    
-    gameState.update(state => {
-        if (!state) return null;
-
-        const settings = get(settingsStore);
-        const bonus = state.boardSize;
-
-        // Створюємо проміжний стан з очищеною дошкою
-        const intermediateState = {
-            ...state,
-            noMovesBonus: (state.noMovesBonus || 0) + bonus,
-            cellVisitCounts: {},
-            moveHistory: [{
-                pos: { row: state.playerRow, col: state.playerCol },
-                blocked: [] as {row: number, col: number}[],
-                visits: {},
-                blockModeEnabled: settings.blockModeEnabled
-            }],
-            moveQueue: [] as any[],
-            noMovesClaimed: false,
-            isComputerMoveInProgress: false,
-            isResumedGame: true,
-            isNewGame: false,
-            isGameOver: false,
-            gameOverReasonKey: null as (string | null)
-        };
-
-        // Розраховуємо нові ходи на основі чистого стану
-        const newAvailableMoves = availableMovesService.getAvailableMoves(intermediateState);
-
-        // Повертаємо фінальний оновлений стан
-        return {
-            ...intermediateState,
-            availableMoves: newAvailableMoves
-        };
-    });
-    
-    gameOverStore.resetGameOverState();
-    animationService.reset();
-    gameEventBus.dispatch('CloseModal');
-  }
-  protected abstract advanceToNextPlayer(): Promise<void>;
-  protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
+  abstract continueAfterNoMoves(): Promise<void>;
 
   async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
     const state = get(gameState);
@@ -119,7 +79,6 @@ export abstract class BaseGameMode implements IGameMode {
     if (Object.keys(stateUpdate).length > 0) {
       gameStateMutator.applyMove(stateUpdate);
     }
-
 
     await this.advanceToNextPlayer();
 
@@ -168,8 +127,6 @@ export abstract class BaseGameMode implements IGameMode {
 
   async restartGame(options: { newSize?: number } = {}): Promise<void> {
     this.initialize(options);
-    // НАВІЩО: Гарантуємо, що стан анімації скидається разом з ігровим станом.
-    // Це усуває розсинхронізацію між логікою та візуалізацією.
     animationService.reset();
     gameEventBus.dispatch('CloseModal');
   }
@@ -186,5 +143,24 @@ export abstract class BaseGameMode implements IGameMode {
 
   resumeTimers(): void {
     timeService.resumeGameTimer();
+  }
+
+  protected async triggerComputerMove(): Promise<void> {
+    logService.GAME_MODE('triggerComputerMove: Початок ходу комп\'ютера.');
+    gameStateMutator.applyMove({ isComputerMoveInProgress: true });
+
+    const computerMove = aiService.getComputerMove();
+    logService.GAME_MODE('triggerComputerMove: Результат getComputerMove:', computerMove);
+
+    if (computerMove) {
+      logService.GAME_MODE('triggerComputerMove: Комп\'ютер має хід, виконуємо...');
+      const { direction, distance } = computerMove;
+      await this.handlePlayerMove(direction, distance);
+    } else {
+      logService.GAME_MODE('triggerComputerMove: У комп\'ютера немає ходів, викликаємо handleNoMoves.');
+      await this.handleNoMoves('computer');
+    }
+    await tick();
+    gameStateMutator.applyMove({ isComputerMoveInProgress: false });
   }
 }

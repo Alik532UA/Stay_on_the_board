@@ -17,6 +17,7 @@ import { gameState } from '$lib/stores/gameState.js';
 import { gameStateMutator } from '$lib/services/gameStateMutator';
 import ReplayViewer from '$lib/components/ReplayViewer.svelte';
 import * as gameLogicService from '$lib/services/gameLogicService.js';
+import type { Direction } from '$lib/utils/gameUtils';
 import { navigationService } from './navigationService';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
@@ -28,7 +29,22 @@ import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
 import { locale } from 'svelte-i18n';
 
 export const userActionService = {
-  async confirmMove(direction: string, distance: number): Promise<void> {
+  selectDirection(direction: Direction): void {
+    gameLogicService.setDirection(direction);
+  },
+
+  selectDistance(distance: number): void {
+    gameLogicService.setDistance(distance);
+  },
+
+  confirmMove(): void {
+    const state = get(gameState);
+    if (state?.selectedDirection && state?.selectedDistance) {
+      this.executeMove(state.selectedDirection as Direction, state.selectedDistance);
+    }
+  },
+
+  async executeMove(direction: Direction, distance: number): Promise<void> {
     const state = get(gameState);
     if (state?.isComputerMoveInProgress) {
       return;

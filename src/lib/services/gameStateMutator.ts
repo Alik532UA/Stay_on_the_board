@@ -160,43 +160,43 @@ class GameStateMutator {
     logService.state('[GameStateMutator] Resetting state for continue after no moves');
     gameState.update(state => {
       if (!state) return null;
+
       const settings = get(settingsStore);
       const bonus = state.boardSize;
       const nextPlayerIndex = isLocalGame ? (state.currentPlayerIndex + 1) % state.players.length : 0;
 
-      // Побудова "чистого" стану
-      const baseState: GameState = {
-        ...state,
-        noMovesBonus: isLocalGame ? state.noMovesBonus : (state.noMovesBonus || 0) + bonus,
-        cellVisitCounts: {},
-        moveHistory: [{
-          pos: { row: state.playerRow, col: state.playerCol },
-          blocked: [] as {row: number, col: number}[],
-          visits: {},
-          blockModeEnabled: settings.blockModeEnabled
-        }],
-        moveQueue: [] as any[],
-        noMovesClaimed: false,
-        isComputerMoveInProgress: false,
-        isResumedGame: true,
-        isNewGame: false,
-        isGameOver: false,
-        gameOverReasonKey: null as string | null,
-        gameOverReasonValues: null as Record<string, any> | null,
-        currentPlayerIndex: nextPlayerIndex,
-        // Тимчасово: заповнимо нижче, щоб уникнути "спалахів" некоректних значень
-        availableMoves: [] as Move[],
+      // Створюємо проміжний стан з очищеною дошкою
+      const intermediateState = {
+          ...state,
+          noMovesBonus: isLocalGame ? state.noMovesBonus : (state.noMovesBonus || 0) + bonus,
+          cellVisitCounts: {},
+          moveHistory: [{
+              pos: { row: state.playerRow, col: state.playerCol },
+              blocked: [] as {row: number, col: number}[],
+              visits: {},
+              blockModeEnabled: settings.blockModeEnabled
+          }],
+          moveQueue: [] as any[],
+          noMovesClaimed: false,
+          isComputerMoveInProgress: false,
+          isResumedGame: true,
+          isNewGame: false,
+          isGameOver: false,
+          gameOverReasonKey: null as (string | null),
+          gameOverReasonValues: null as Record<string, any> | null,
+          currentPlayerIndex: nextPlayerIndex,
       };
 
-      // Перерахунок доступних ходів на основі нового (чистого) стану
-      const newAvailableMoves = availableMovesService.getAvailableMoves(baseState);
+      // Розраховуємо нові ходи на основі чистого стану
+      const newAvailableMoves = availableMovesService.getAvailableMoves(intermediateState);
       logService.logicAvailability('[GameStateMutator] Recalculated available moves after continue:', newAvailableMoves);
 
-      const finalState: GameState = {
-        ...baseState,
-        availableMoves: newAvailableMoves
+      // Повертаємо фінальний оновлений стан
+      const finalState = {
+          ...intermediateState,
+          availableMoves: newAvailableMoves
       };
-
+      
       logService.state('[GameStateMutator] State after reset for no moves:', finalState);
       return finalState;
     });

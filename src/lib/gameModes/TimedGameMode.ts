@@ -12,7 +12,6 @@ export class TimedGameMode extends TrainingGameMode {
 
   initialize(options: { newSize?: number } = {}): void {
     super.initialize(options);
-    timeService.initializeTimers(this.gameDuration, this.turnDuration);
     // Таймер запускається після першого ходу
   }
 

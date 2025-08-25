@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameTime, turnTime } from '$lib/services/timeService.js';
+  import { remainingTime, turnTimeLimit } from '$lib/stores/derivedState';
   import { gameStore } from '$lib/stores/gameStore';
 
   function formatTime(seconds: number) {
@@ -11,12 +11,12 @@
   {#if $gameStore.mode}
     {#if $gameStore.mode.gameDuration > 0}
       <div class="info-item">
-        <span class="value" data-testid="game-time-value">{formatTime($gameTime)}</span>
+        <span class="value" data-testid="game-time-value">{formatTime($remainingTime)}</span>
       </div>
     {/if}
     {#if $gameStore.mode.turnDuration > 0}
       <div class="info-item">
-        <span class="value" data-testid="turn-time-value">{formatTime($turnTime)}</span>
+        <span class="value" data-testid="turn-time-value">{formatTime($turnTimeLimit)}</span>
       </div>
     {/if}
   {/if}
