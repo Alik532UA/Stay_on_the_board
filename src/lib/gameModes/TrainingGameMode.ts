@@ -26,14 +26,21 @@ import { gameStore } from '$lib/stores/gameStore';
 import { availableMovesService } from '$lib/services/availableMovesService';
 import { testModeStore } from '$lib/stores/testModeStore';
 import { aiService } from '$lib/services/aiService';
+import { getInitialPosition } from '$lib/utils/initialPositionUtils';
 
 export class TrainingGameMode extends BaseGameMode {
   initialize(options: { newSize?: number } = {}): void {
     const currentSize = get(gameState)?.boardSize;
+    const size = options.newSize ?? currentSize ?? 4;
+    const testModeState = get(testModeStore);
+    
+    const initialPosition = getInitialPosition(size, testModeState);
+
     const newInitialState = createInitialState({
-      size: options.newSize ?? currentSize ?? 4,
+      size,
       players: this.getPlayersConfiguration(),
-      testMode: get(testModeStore).isEnabled
+      testMode: testModeState.isEnabled,
+      initialPosition
     });
     const moves = availableMovesService.getAvailableMoves(newInitialState);
     newInitialState.availableMoves = moves;

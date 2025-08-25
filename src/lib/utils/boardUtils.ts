@@ -21,18 +21,6 @@ export function createEmptyBoard(size: number): number[][] {
 }
 
 /**
- * Генерує випадкову позицію на дошці
- * @param size - розмір дошки
- * @returns об'єкт з координатами
- */
-export function getRandomCell(size: number): { row: number; col: number } {
-  return {
-    row: Math.floor(Math.random() * size),
-    col: Math.floor(Math.random() * size)
-  };
-}
-
-/**
  * Розраховує доступні ходи для ферзя з заданої позиції
  */
 
