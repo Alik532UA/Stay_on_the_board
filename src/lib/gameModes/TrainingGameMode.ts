@@ -1,3 +1,4 @@
+// src/lib/gameModes/TrainingGameMode.ts
 import { tick } from 'svelte';
 import { get } from 'svelte/store';
 import { _, locale } from 'svelte-i18n';
@@ -24,12 +25,11 @@ import { timeService } from '$lib/services/timeService';
 import { gameStore } from '$lib/stores/gameStore';
 import { availableMovesService } from '$lib/services/availableMovesService';
 import { testModeStore } from '$lib/stores/testModeStore';
+import { aiService } from '$lib/services/aiService';
 
 export class TrainingGameMode extends BaseGameMode {
   initialize(options: { newSize?: number } = {}): void {
     const currentSize = get(gameState)?.boardSize;
-    // НАВІЩО: Тепер ми явно передаємо стан тестового режиму в функцію
-    // створення стану гри, відновлюючи потік даних (UDF).
     const newInitialState = createInitialState({
       size: options.newSize ?? currentSize ?? 4,
       players: this.getPlayersConfiguration(),
@@ -82,7 +82,7 @@ export class TrainingGameMode extends BaseGameMode {
     const state = get(gameState);
     gameStateMutator.applyMove({ isComputerMoveInProgress: true });
 
-    const computerMove = gameLogicService.getComputerMove();
+    const computerMove = aiService.getComputerMove();
     logService.GAME_MODE('triggerComputerMove: Результат getComputerMove:', computerMove);
 
     if (computerMove) {

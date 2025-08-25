@@ -1,3 +1,4 @@
+// src/lib/gameModes/LocalGameMode.ts
 import { get } from 'svelte/store';
 import { _ } from 'svelte-i18n';
 import { BaseGameMode } from './index';
@@ -16,6 +17,7 @@ import { endGameService } from '$lib/services/endGameService';
 import { availableMovesService } from '$lib/services/availableMovesService';
 import { tick } from 'svelte';
 import { testModeStore } from '$lib/stores/testModeStore';
+import { aiService } from '$lib/services/aiService';
 
 export class LocalGameMode extends BaseGameMode {
   constructor() {
@@ -110,7 +112,7 @@ export class LocalGameMode extends BaseGameMode {
     if (currentPlayer.type === 'computer') {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      const move = gameLogicService.getComputerMove();
+      const move = aiService.getComputerMove();
       if (move) {
         await this.handlePlayerMove(move.direction, move.distance);
       } else {
