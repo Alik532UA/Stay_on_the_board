@@ -105,7 +105,10 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
     scoresAtRoundStart: players.map((p: any) => p.score),
     isComputerMoveInProgress: false,
     isFirstMove: true,
-    modeState: {},
+    modeState: {
+      remainingTime: undefined,
+      turnTimeLimit: undefined,
+    },
   };
 }
 

@@ -1,7 +1,5 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/gameState.js';
-  import { setDirection, setDistance } from '$lib/services/gameLogicService.js';
-  import { localInputProvider } from '$lib/services/localInputProvider';
   import { userActionService } from '$lib/services/userActionService';
   import { _ } from 'svelte-i18n';
   import { settingsStore } from '$lib/stores/settingsStore.js';
@@ -35,13 +33,13 @@
     previousPlayerColor: $previousPlayerColor
   });
 
-  function handleDirection(e: CustomEvent<any>) { 
+  function handleDirection(e: CustomEvent<any>) {
     logService.action(`Click: "Напрямок: ${e.detail}" (ControlsPanelWidget)`);
-    setDirection(e.detail); 
+    userActionService.selectDirection(e.detail);
   }
-  function handleDistance(e: CustomEvent<any>) { 
+  function handleDistance(e: CustomEvent<any>) {
     logService.action(`Click: "Відстань: ${e.detail}" (ControlsPanelWidget)`);
-    setDistance(e.detail); 
+    userActionService.selectDistance(e.detail);
   }
   function handleCentral() { 
     logService.action('Click: "Центральна кнопка" (ControlsPanelWidget)');
@@ -66,7 +64,7 @@
       });
       return;
     }
-    localInputProvider.confirmMove();
+    userActionService.confirmMove();
   }
 </script>
 

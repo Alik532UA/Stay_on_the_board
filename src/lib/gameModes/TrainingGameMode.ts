@@ -84,51 +84,6 @@ export class TrainingGameMode extends BaseGameMode {
     }
   }
 
-  private async triggerComputerMove(): Promise<void> {
-    logService.GAME_MODE('triggerComputerMove: Початок ходу комп\'ютера.');
-    const state = get(gameState);
-    gameStateMutator.applyMove({ isComputerMoveInProgress: true });
-
-    const computerMove = aiService.getComputerMove();
-    logService.GAME_MODE('triggerComputerMove: Результат getComputerMove:', computerMove);
-
-    if (computerMove) {
-      logService.GAME_MODE('triggerComputerMove: Комп\'ютер має хід, виконуємо...');
-      const { direction, distance } = computerMove;
-      const settings = get(settingsStore);
-      const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex, state, settings);
-
-      if (!moveResult.success) {
-        await this.onPlayerMoveFailure(moveResult.reason, direction, distance);
-      } else {
-        gameStateMutator.applyMove(moveResult.changes);
-
-        await new Promise(resolve => setTimeout(resolve, 0));
-
-        await this.onPlayerMoveSuccess(moveResult);
-        const settings = get(settingsStore);
-        if (settings.speechEnabled) {
-          const lastMove = get(lastComputerMove);
-          if (lastMove) {
-            const allVoices = window.speechSynthesis.getVoices();
-            const selectedVoice = allVoices.find(v => v.voiceURI === settings.selectedVoiceURI);
-            const speechLang = selectedVoice ? selectedVoice.lang.split('-') : (get(locale) || 'uk');
-            gameEventBus.dispatch('SpeakMove', { move: lastMove, lang: speechLang, voiceURI: settings.selectedVoiceURI });
-          }
-        }
-        
-        const currentState = get(gameState);
-        if (currentState.isResumedGame) {
-          gameStateMutator.applyMove({ isResumedGame: false });
-        }
-      }
-    } else {
-      logService.GAME_MODE('triggerComputerMove: У комп\'ютера немає ходів, викликаємо handleNoMoves.');
-      await this.handleNoMoves('computer');
-    }
-    await tick();
-    gameStateMutator.applyMove({ isComputerMoveInProgress: false });
-  }
 
   protected async applyScoreChanges(scoreChanges: any): Promise<void> {
     // No specific score changes to apply in training mode
@@ -136,12 +91,7 @@ export class TrainingGameMode extends BaseGameMode {
 
   async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
-    
-    // Централізовано скидаємо стан і перераховуємо доступні ходи
     gameStateMutator.resetForNoMovesContinue(false);
-
-    const updated = get(gameState);
-    logService.logicAvailability('[TrainingGameMode] availableMoves after continue:', updated?.availableMoves || []);
     
     gameOverStore.resetGameOverState();
     animationService.reset();

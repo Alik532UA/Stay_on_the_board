@@ -58,11 +58,7 @@ export class LocalGameMode extends BaseGameMode {
 
   async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
-
     gameStateMutator.resetForNoMovesContinue(true);
-
-    const updated = get(gameState);
-    logService.logicAvailability('[LocalGameMode] availableMoves after continue:', updated?.availableMoves || []);
 
     gameOverStore.resetGameOverState();
     animationService.reset();
@@ -125,13 +121,7 @@ export class LocalGameMode extends BaseGameMode {
 
     if (currentPlayer.type === 'computer') {
       await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const move = aiService.getComputerMove();
-      if (move) {
-        await this.handlePlayerMove(move.direction, move.distance);
-      } else {
-        await endGameService.endGame('modal.gameOverReasonPlayerBlocked');
-      }
+      await this.triggerComputerMove();
     }
   }
 

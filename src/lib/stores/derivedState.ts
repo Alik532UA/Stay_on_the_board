@@ -291,3 +291,13 @@ export const isPauseBetweenMoves = derived(
   animationStore,
   $animationStore => $animationStore.isAnimating && $animationStore.animationQueue.length === 0
 );
+
+export const remainingTime = derived(
+  gameState,
+  $gameState => $gameState?.modeState?.remainingTime ?? 0
+);
+
+export const turnTimeLimit = derived(
+  gameState,
+  $gameState => $gameState?.modeState?.turnTimeLimit ?? 0
+);
