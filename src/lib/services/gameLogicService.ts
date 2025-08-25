@@ -1,3 +1,4 @@
+// src/lib/services/gameLogicService.ts
 // --- Чисті функції та константи для ігрової логіки (ex-gameCore.ts) ---
 import { Figure, MoveDirection } from '../models/Figure';
 import type { MoveDirectionType } from '../models/Figure';
@@ -19,8 +20,6 @@ import { aiService } from './aiService';
  * @file Contains all pure functions (actions) that mutate the game's state.
  * These are simple mutators that work exclusively with gameState.
  */
-
-// ВИДАЛЕНО: функція resetGame. Її відповідальність перенесена в GameMode.
 
 export function setDirection(dir: Direction) {
   const state = get(gameState);
@@ -187,10 +186,6 @@ export function performMove(
 
   const changes = _applyMoveToState(currentState, newPosition, playerIndex, direction, distance, scoreChanges, settings);
 
-  // Логіка для "дзеркального" ходу та бонусів тепер обробляється в LocalGameMode та TrainingGameMode,
-  // які отримують `scoreChanges` і вирішують, як їх застосувати.
-  // Це робить `performMove` більш чистою функцією, що відповідає лише за сам хід.
-
   logService.logicMove('performMove: завершено успішно');
   return {
     success: true,
@@ -199,11 +194,6 @@ export function performMove(
     bonusPoints: scoreChanges.bonusPoints,
     penaltyPoints: scoreChanges.penaltyPointsForMove
   };
-}
-
-
-export function getComputerMove(): { direction: MoveDirectionType; distance: number } | null {
-  return aiService.getComputerMove();
 }
 
 export function validatePlayerMove(changes: any, currentState: any): { errors: string[], warnings: string[] } {
