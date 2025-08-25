@@ -18,9 +18,9 @@ export class TimedGameMode extends TrainingGameMode {
 
   async handlePlayerMove(direction: any, distance: any): Promise<void> {
     const state = get(gameState);
-    if (state.isFirstMove) {
+    if (state.isNewGame) {
       this.startGameTimer();
-    } else if (state.wasResumed) {
+    } else if (state.isResumedGame) {
       this.resumeTimers();
     }
     await super.handlePlayerMove(direction, distance);

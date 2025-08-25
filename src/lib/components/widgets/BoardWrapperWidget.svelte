@@ -55,7 +55,7 @@
         return;
       }
 
-      if ($gameState.moveHistory.length === 1) {
+      if ($gameState.moveHistory.length === 1 && $gameState.isNewGame) {
         enableAllGameCheckboxesIfNeeded();
       }
 

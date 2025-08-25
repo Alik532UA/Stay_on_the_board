@@ -47,7 +47,9 @@ export const gameModeService = {
     } else {
       gameMode = new TrainingGameMode();
     }
-    gameStateMutator.resetGame();
+    if (!get(gameState)) {
+      gameStateMutator.resetGame();
+    }
     gameMode.initialize(get(gameState)!);
     timeService.initializeTimers(gameMode.gameDuration, gameMode.turnDuration);
     gameStore.setMode(gameMode);

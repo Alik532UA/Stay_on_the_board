@@ -304,7 +304,7 @@ function createSettingsStore() {
         return { ...state, keyConflictResolution: newResolution };
       });
     },
-    toggleShowBoard: (forceState: boolean | undefined) => {
+    toggleShowBoard: (forceState?: boolean) => {
       update((state: any) => {
         const newShowBoardState = typeof forceState === 'boolean' ? forceState : !state.showBoard;
         const newSettings = { ...state, showBoard: newShowBoardState };
@@ -406,25 +406,33 @@ function createSettingsStore() {
     applyGameModePreset: (mode: 'beginner' | 'experienced' | 'pro', modal = modalStore) => {
       let settingsToApply: Partial<any> = {};
       let showFaq = false;
-      switch (mode) {
-        case 'beginner':
-          settingsToApply = { showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: false, speechEnabled: false, autoHideBoard: false };
-          showFaq = true;
-          break;
-        case 'experienced':
-          // autoHideBoard вмикається для experienced/pro для стимулювання гри по пам'яті, інтегруючись з gameState для виявлення ходів
-          settingsToApply = { showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'compact', blockModeEnabled: false, speechEnabled: true, autoHideBoard: true };
-          break;
-        case 'pro':
-          settingsToApply = { showBoard: true, showPiece: true, showMoves: true, showGameInfoWidget: 'hidden', blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true };
-          break;
+      const gameStateValue = get(gameState);
+      const isNewGame = !gameStateValue || gameStateValue.isNewGame;
+    
+      // Базові налаштування для кожного режиму
+      const presets = {
+        beginner: { showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: false, speechEnabled: false, autoHideBoard: false },
+        experienced: { showPiece: true, showMoves: true, showGameInfoWidget: 'compact', blockModeEnabled: false, speechEnabled: true, autoHideBoard: true },
+        pro: { showPiece: true, showMoves: true, showGameInfoWidget: 'hidden', blockModeEnabled: true, blockOnVisitCount: 0, speechEnabled: true, autoHideBoard: true }
+      };
+    
+      settingsToApply = presets[mode];
+      if (mode === 'beginner') {
+        showFaq = true;
       }
+    
+      // Встановлюємо `showBoard: true` тільки якщо це нова гра
+      if (isNewGame) {
+        settingsToApply.showBoard = true;
+      }
+    
       settingsToApply.gameMode = mode;
       if (modal === modalStore) {
         settingsToApply.rememberGameMode = get(settingsStore).showGameModeModal ? false : true;
       } else {
         settingsToApply.rememberGameMode = true;
       }
+    
       methods.updateSettings(settingsToApply);
       modal.closeModal();
       return showFaq;

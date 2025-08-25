@@ -25,25 +25,6 @@ export function resetGame(options: { newSize?: number; players?: Player[]; setti
   
   gameStateMutator.resetGame({ newSize, players: options.players });
 
-  // Застосовуємо налаштування з локальної гри, якщо вони передані
-  if (options.settings) {
-    settingsStore.updateSettings({
-      blockModeEnabled: options.settings.blockModeEnabled,
-      autoHideBoard: options.settings.autoHideBoard,
-      lockSettings: options.settings.lockSettings,
-      // Гарантуємо, що дошка видима на початку гри
-      showBoard: true,
-      showPiece: true,
-      showMoves: true
-    });
-  } else {
-    // Стандартні налаштування видимості для нової гри
-    settingsStore.updateSettings({
-      showBoard: true,
-      showPiece: true,
-      showMoves: true
-    });
-  }
   
   // Скидаємо рахунки гравців в локальній грі
   const newState = get(gameState);
