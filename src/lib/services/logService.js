@@ -23,7 +23,7 @@ const LOG_GROUPS = {
 // 2. Конфігурація
 const defaultConfig = {
           [LOG_GROUPS.STATE]: true,
-          [LOG_GROUPS.LOGIC_MOVE]: true,
+          [LOG_GROUPS.LOGIC_MOVE]: false,
           [LOG_GROUPS.LOGIC_AI]: false,
           [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
           [LOG_GROUPS.LOGIC_TIME]: false,

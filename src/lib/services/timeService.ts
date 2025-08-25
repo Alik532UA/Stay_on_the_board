@@ -11,7 +11,6 @@ let isGameTimerPaused = false;
 export const timeService = {
   initializeTimers(gameDuration: number, turnDuration: number) {
     this.stopGameTimer();
-    this.stopTurnTimer();
     gameTime.set(gameDuration);
     turnTime.set(turnDuration);
   },

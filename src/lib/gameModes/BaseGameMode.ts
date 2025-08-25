@@ -79,7 +79,8 @@ export abstract class BaseGameMode implements IGameMode {
       availableMoves: availableMovesService.getAvailableMoves(),
       noMovesClaimed: false,
       isComputerMoveInProgress: false,
-      wasResumed: true,
+      isResumedGame: true,
+      isNewGame: false,
       isGameOver: false,
       gameOverReasonKey: null as string | null,
       gameOverReasonValues: null as Record<string, any> | null
@@ -121,11 +122,17 @@ export abstract class BaseGameMode implements IGameMode {
 
   protected async onPlayerMoveSuccess(moveResult: any): Promise<void> {
     const currentState = get(gameState);
-    if (currentState.isFirstMove) {
-      gameStateMutator.applyMove({ isFirstMove: false });
+    const stateUpdate: Partial<GameState> = {};
+
+    if (currentState.isNewGame) {
+      stateUpdate.isNewGame = false;
     }
-    if (currentState.wasResumed) {
-      gameStateMutator.applyMove({ wasResumed: false });
+    if (currentState.isResumedGame) {
+      stateUpdate.isResumedGame = false;
+    }
+
+    if (Object.keys(stateUpdate).length > 0) {
+      gameStateMutator.applyMove(stateUpdate);
     }
 
     gameStateMutator.applyMove({
@@ -179,9 +186,9 @@ export abstract class BaseGameMode implements IGameMode {
    * Restarts the game.
    */
   async restartGame(options: { newSize?: number } = {}): Promise<void> {
-    const settings = get(settingsStore);
+    const state = get(gameState);
     const players = this.getPlayersConfiguration();
-    gameStateMutator.resetGame({ settings, players, newSize: options.newSize });
+    gameStateMutator.resetGame({ settings: state.settings, players, newSize: options.newSize });
     this.initialize(get(gameState)!);
     gameEventBus.dispatch('CloseModal');
   }

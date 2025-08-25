@@ -26,6 +26,7 @@ import { gameStore } from '$lib/stores/gameStore';
 export class TrainingGameMode extends BaseGameMode {
   initialize(initialState: GameState): void {
     const settings = get(settingsStore);
+    gameStateMutator.updateSettings(settings);
     gameLogicService.resetGame({ players: this.getPlayersConfiguration(), settings }, get(gameState));
     animationService.initialize();
     this.startTurn();
@@ -97,8 +98,8 @@ export class TrainingGameMode extends BaseGameMode {
         }
         
         const currentState = get(gameState);
-        if (currentState.wasResumed) {
-          gameStateMutator.applyMove({ wasResumed: false });
+        if (currentState.isResumedGame) {
+          gameStateMutator.applyMove({ isResumedGame: false });
         }
       }
     } else {

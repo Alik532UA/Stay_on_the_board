@@ -23,6 +23,7 @@ export class LocalGameMode extends BaseGameMode {
 
   initialize(initialState: GameState): void {
     // Initialization for local games is handled in the `local-setup` page.
+    gameStateMutator.updateSettings(get(settingsStore));
     animationService.initialize();
     this.checkComputerTurn();
     this.startTurn();

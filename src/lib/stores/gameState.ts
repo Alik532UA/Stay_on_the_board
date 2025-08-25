@@ -43,11 +43,12 @@ export interface GameState {
   totalScore?: number;
   noMovesClaimsCount: number;
   noMovesClaimed: boolean;
-  isFirstMove: boolean;
-  wasResumed: boolean;
+  isNewGame: boolean;
+  isResumedGame: boolean;
   settings: any;
   scoresAtRoundStart: number[];
   isComputerMoveInProgress: boolean;
+  isFirstMove: boolean;
 }
 
 export function createInitialState(config: any = {}): GameState {
@@ -94,8 +95,8 @@ export function createInitialState(config: any = {}): GameState {
     noMovesClaimed: false,
     noMovesBonus: 0,
     distanceBonus: 0,
-    isFirstMove: true,
-    wasResumed: false,
+    isNewGame: true,
+    isResumedGame: false,
     settings: {
       boardSize: 4,
       blockModeEnabled: false,
@@ -104,6 +105,7 @@ export function createInitialState(config: any = {}): GameState {
     },
     scoresAtRoundStart: players.map((p: any) => p.score),
     isComputerMoveInProgress: false,
+    isFirstMove: true,
   };
 }
 
