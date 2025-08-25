@@ -2,7 +2,7 @@
   // @ts-check
   import { gameState } from '$lib/stores/gameState.js';
   import { gameOrchestrator } from '$lib/gameOrchestrator.js';
-  import { gameModeService } from '$lib/services/gameModeService';
+  import { userActionService } from '$lib/services/userActionService';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { replayStore } from '$lib/stores/replayStore.js';
   import { _ } from 'svelte-i18n';
@@ -119,7 +119,7 @@
   }
 
   async function cashOutAndEndGame() {
-    await gameModeService.endGame('modal.gameOverReasonCashOut');
+    await userActionService.finishWithBonus('modal.gameOverReasonCashOut');
   }
 </script>
 

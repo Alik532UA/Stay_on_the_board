@@ -57,7 +57,7 @@ class SideEffectService {
 
   private showModal(payload: any): void {
     logService.ui('Showing modal:', payload);
-    modalStore.showModal(payload);
+    modalService.showModal(payload);
   }
 
   private showGameOverModal(payload: any): void {

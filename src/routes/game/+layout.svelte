@@ -23,7 +23,10 @@
 
   onDestroy(() => {
     logService.GAME_MODE('Game layout is being destroyed, cleaning up game mode.');
-    gameModeService.cleanupCurrentGameMode();
+    const activeGameMode = gameModeService.getCurrentMode();
+    if (activeGameMode) {
+      activeGameMode.cleanup();
+    }
   });
  
   onMount(() => {

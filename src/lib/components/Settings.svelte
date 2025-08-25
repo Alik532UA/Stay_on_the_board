@@ -119,7 +119,7 @@
           <button
             class="settings-group-button"
             class:active={settings.rememberGameMode && settings.gameMode === 'beginner'}
-            on:click={() => gameModeService.applyGameModePreset('beginner')}
+            on:click={() => userActionService.applyGameModePreset('beginner')}
             data-testid="settings-page-game-mode-beginner"
           >
             Новачок
@@ -127,7 +127,7 @@
           <button
             class="settings-group-button"
             class:active={settings.rememberGameMode && settings.gameMode === 'experienced'}
-            on:click={() => gameModeService.applyGameModePreset('experienced')}
+            on:click={() => userActionService.applyGameModePreset('experienced')}
             data-testid="settings-page-game-mode-experienced"
           >
             Розбійник
@@ -135,7 +135,7 @@
           <button
             class="settings-group-button"
             class:active={settings.rememberGameMode && settings.gameMode === 'pro'}
-            on:click={() => gameModeService.applyGameModePreset('pro')}
+            on:click={() => userActionService.applyGameModePreset('pro')}
             data-testid="settings-page-game-mode-pro"
           >
             Потужний

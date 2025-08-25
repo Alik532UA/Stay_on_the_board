@@ -9,14 +9,15 @@
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
   import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
   import { enableAllGameCheckboxesIfNeeded } from '$lib/utils/uiUtils.js';
-  import { gameModeService } from '$lib/services/gameModeService';
+  import { userActionService } from '$lib/services/userActionService';
 
   /**
    * @param {'beginner' | 'experienced' | 'pro'} mode
    */
   function selectMode(mode) {
     // НАВІЩО: Викликаємо метод з правильного сервісу (SoC).
-    const shouldShowFaq = gameModeService.applyGameModePreset(mode);
+    userActionService.applyGameModePreset(mode);
+    const shouldShowFaq = mode === 'beginner';
     enableAllGameCheckboxesIfNeeded();
     gotoAfterFaq();
 

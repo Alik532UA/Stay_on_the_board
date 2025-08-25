@@ -69,7 +69,10 @@
   
   /** @param {HTMLElement} node */
   onMount(() => {
-    gameModeService.cleanupCurrentGameMode();
+    const activeGameMode = gameModeService.getCurrentMode();
+    if (activeGameMode) {
+      activeGameMode.cleanup();
+    }
     settingsStore.init();
   });
 

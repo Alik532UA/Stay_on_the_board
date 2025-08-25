@@ -35,23 +35,10 @@
   // Примітка: onMount та ініціалізація гри тут не потрібні,
   // оскільки вони відбуваються на сторінці /local-setup
  
-  /**
-   * Показує модальне вікно завершення гри, якщо це необхідно.
-   */
-  function showGameOverModalIfNeeded() {
-    const gameOverState = get(gameOverStore);
-    if (gameOverState.isGameOver && gameOverState.gameResult && gameOverState.gameResult.gameType === 'local') {
-      const { reasonKey, reasonValues } = gameOverState.gameResult;
-      if (!get(gameStore).mode) {
-        gameModeService.initializeGameMode();
-      }
-      gameModeService.endGame(reasonKey, reasonValues);
-    }
-  }
 
   onMount(() => {
     // Ініціалізуємо режим гри та анімації
-    gameModeService.setCurrentGameMode('local');
+    gameModeService.initializeGameMode('local');
     animationService.initialize();
   });
 
