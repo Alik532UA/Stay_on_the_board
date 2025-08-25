@@ -37,7 +37,8 @@ export const userActionService = {
       logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
       let activeGameMode = get(gameStore).mode;
       if (!activeGameMode) {
-        gameModeService.initializeGameMode();
+        const settings = get(settingsStore);
+        gameModeService.initializeGameMode(settings.gameMode);
         activeGameMode = get(gameStore).mode;
         if (!activeGameMode) {
           logService.logicMove('[userActionService.confirmMove] No active game mode found after initialization.');
@@ -60,7 +61,8 @@ export const userActionService = {
       logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
       let activeGameMode = get(gameStore).mode;
       if (!activeGameMode) {
-        gameModeService.initializeGameMode();
+        const settings = get(settingsStore);
+        gameModeService.initializeGameMode(settings.gameMode);
         activeGameMode = get(gameStore).mode;
         if (!activeGameMode) {
           logService.logicMove('[userActionService.claimNoMoves] No active game mode found after initialization.');
@@ -82,7 +84,10 @@ export const userActionService = {
     if (newSize === boardSize) return;
 
     if (score === 0 && penaltyPoints === 0) {
-      await gameModeService.restartGame({ newSize });
+      const activeGameMode = gameModeService.getCurrentMode();
+      if (activeGameMode) {
+        await activeGameMode.restartGame({ newSize });
+      }
     } else {
       modalService.showBoardResizeModal(newSize);
     }
@@ -90,7 +95,10 @@ export const userActionService = {
 
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
-    await gameModeService.restartGame();
+    const activeGameMode = gameModeService.getCurrentMode();
+    if (activeGameMode) {
+      await activeGameMode.restartGame();
+    }
   },
 
   async requestReplay(): Promise<void> {
@@ -116,7 +124,10 @@ export const userActionService = {
   },
 
   async continueAfterNoMoves(): Promise<void> {
-    await gameModeService.continueAfterNoMoves();
+    const activeGameMode = gameModeService.getCurrentMode();
+    if (activeGameMode) {
+      await activeGameMode.continueAfterNoMoves();
+    }
   },
 
   async handleModalAction(action: string, payload?: any): Promise<void> {
@@ -143,7 +154,10 @@ export const userActionService = {
           await this.continueAfterNoMoves();
           break;
         case 'resetGame':
-          await gameModeService.restartGame({ newSize: payload.newSize });
+          const activeGameMode = gameModeService.getCurrentMode();
+          if (activeGameMode) {
+            await activeGameMode.restartGame({ newSize: payload.newSize });
+          }
           gameEventBus.dispatch('CloseModal');
           break;
         case 'closeModal':
@@ -186,5 +200,11 @@ export const userActionService = {
 
   resetKeybindings(): void {
     settingsStore.resetKeybindings();
+  },
+
+  applyGameModePreset(preset: 'beginner' | 'experienced' | 'pro'): void {
+    settingsStore.applyPreset(preset);
+    const newMode = get(settingsStore).gameMode;
+    gameModeService.initializeGameMode(newMode);
   }
 };

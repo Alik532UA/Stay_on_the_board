@@ -79,6 +79,14 @@ function createSettingsStore() {
     setGameInfoWidgetState: (newState: 'hidden' | 'shown' | 'compact') => update(state => ({ ...state, showGameInfoWidget: newState })),
     toggleBlockMode: () => update(state => ({ ...state, blockModeEnabled: !state.blockModeEnabled })),
     toggleSimpleSpeech: () => update(state => ({ ...state, speechEnabled: !state.speechEnabled })),
+    applyPreset: (preset: 'beginner' | 'experienced' | 'pro') => {
+        const presets = {
+            beginner: { gameMode: 'training', boardSize: 3, blockModeEnabled: false },
+            experienced: { gameMode: 'local', boardSize: 4, blockModeEnabled: true },
+            pro: { gameMode: 'timed', boardSize: 5, blockModeEnabled: true }
+        };
+        methods.updateSettings(presets[preset]);
+    },
   };
 
   return {

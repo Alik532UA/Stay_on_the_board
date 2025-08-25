@@ -20,7 +20,7 @@
   import { gameModeService } from '$lib/services/gameModeService';
 
   onMount(() => {
-    gameModeService.setCurrentGameMode('timed');
+    gameModeService.initializeGameMode('timed');
     animationService.initialize();
   });
 

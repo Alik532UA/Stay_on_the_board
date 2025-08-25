@@ -81,7 +81,15 @@ export class LocalGameMode extends BaseGameMode {
   }
 
   getPlayersConfiguration(): Player[] {
-    return get(gameState).players;
+    const currentState = get(gameState);
+    if (currentState) {
+      return currentState.players;
+    }
+    // Provide a default configuration for new games started via presets
+    return [
+      { id: 1, name: 'Player 1', type: 'human', score: 0, color: '#ff0000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
+      { id: 2, name: 'Player 2', type: 'human', score: 0, color: '#0000ff', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
+    ];
   }
 
   protected async advanceToNextPlayer(): Promise<void> {

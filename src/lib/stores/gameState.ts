@@ -49,6 +49,10 @@ export interface GameState {
   scoresAtRoundStart: number[];
   isComputerMoveInProgress: boolean;
   isFirstMove: boolean;
+  modeState: {
+    remainingTime?: number;
+    turnTimeLimit?: number;
+  };
 }
 
 export interface GameStateConfig {
@@ -101,6 +105,7 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
     scoresAtRoundStart: players.map((p: any) => p.score),
     isComputerMoveInProgress: false,
     isFirstMove: true,
+    modeState: {},
   };
 }
 

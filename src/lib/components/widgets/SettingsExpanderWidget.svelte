@@ -380,9 +380,9 @@
   </div>
   <div class="settings-expander__content" bind:this={contentRef} style="max-height: {contentHeight}px; opacity: {isOpen ? 1 : 0};">
     <div class="settings-expander__game-mode-row" use:fitTextAction={$_('gameModes.beginner')}>
-      <button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => gameModeService.applyGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
-      <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => gameModeService.applyGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
-      <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'pro'} on:click={() => gameModeService.applyGameModePreset('pro')}>{$_('gameModes.pro')}</button>
+      <button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'beginner'} on:click={() => userActionService.applyGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
+      <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'experienced'} on:click={() => userActionService.applyGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
+      <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$settingsStore.gameMode === 'pro'} on:click={() => userActionService.applyGameModePreset('pro')}>{$_('gameModes.pro')}</button>
     </div>
     <hr class="settings-expander__divider" />
     <div class="settings-expander__setting-item">

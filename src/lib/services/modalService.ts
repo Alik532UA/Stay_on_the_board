@@ -15,8 +15,8 @@ import { navigationService } from './navigationService.js';
 import { gameModeService } from './gameModeService';
 
 export const modalService = {
-  _showModalWithPause(modalConfig: any): void {
-    const gameMode = gameModeService.getCurrentGameMode();
+  showModal(modalConfig: any): void {
+    const gameMode = gameModeService.getCurrentMode();
     if (gameMode) {
       gameMode.pauseTimers();
     }
@@ -24,7 +24,7 @@ export const modalService = {
   },
 
   showBoardResizeModal(newSize: number): void {
-    this._showModalWithPause({
+    this.showModal({
       titleKey: 'modal.resetScoreTitle',
       contentKey: 'modal.resetScoreContent',
       buttons: [
@@ -49,7 +49,7 @@ export const modalService = {
    * Closes the currently active modal.
    */
   closeModal(): void {
-    const gameMode = gameModeService.getCurrentGameMode();
+    const gameMode = gameModeService.getCurrentMode();
     if (gameMode) {
       gameMode.resumeTimers();
     }
