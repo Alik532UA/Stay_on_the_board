@@ -60,7 +60,7 @@ export const modalService = {
     reasonKey: string;
     reasonValues: any;
     finalScoreDetails: FinalScoreDetails;
-    gameType: 'vs-computer' | 'local';
+    gameType: 'training' | 'local';
     state: GameState;
   }): void {
     const { reasonKey, reasonValues, finalScoreDetails, gameType, state } = payload;

@@ -50,8 +50,6 @@ export interface GameState {
   isComputerMoveInProgress: boolean;
   isFirstMove: boolean;
   modeState: {
-    remainingTime?: number;
-    turnTimeLimit?: number;
   };
 }
 
@@ -106,8 +104,6 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
     isComputerMoveInProgress: false,
     isFirstMove: true,
     modeState: {
-      remainingTime: undefined,
-      turnTimeLimit: undefined,
     },
   };
 }

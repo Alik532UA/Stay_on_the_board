@@ -1,6 +1,5 @@
 // file: src/lib/services/timeService.ts
-import { gameState } from '$lib/stores/gameState';
-import { gameStateMutator } from './gameStateMutator';
+import { timerStore } from '$lib/stores/timerStore';
 import { logService } from './logService';
 
 class TimeService {
@@ -15,20 +14,20 @@ class TimeService {
     this.isGameTimerPaused = false;
     logService.GAME_MODE(`[TimeService] Starting game timer for ${duration} seconds.`);
     
-    gameStateMutator.applyMove({ modeState: { remainingTime: duration } });
+    timerStore.setRemainingTime(duration);
 
     this.gameTimerInterval = setInterval(() => {
-      gameState.update(state => {
-        if (!state || state.modeState.remainingTime === undefined || this.isGameTimerPaused) return state;
+      timerStore.update(state => {
+        if (state.remainingTime === null || this.isGameTimerPaused) return state;
 
-        const newTime = state.modeState.remainingTime - 1;
+        const newTime = state.remainingTime - 1;
         if (newTime <= 0) {
           this.stopGameTimer();
           onTimeout();
         }
         return {
           ...state,
-          modeState: { ...state.modeState, remainingTime: newTime }
+          remainingTime: newTime
         };
       });
     }, 1000);
@@ -61,20 +60,20 @@ class TimeService {
     this.stopTurnTimer();
     logService.GAME_MODE(`[TimeService] Starting turn timer for ${duration} seconds.`);
     
-    gameStateMutator.applyMove({ modeState: { turnTimeLimit: duration } });
+    timerStore.setTurnTimeLeft(duration);
 
     this.turnTimerInterval = setInterval(() => {
-      gameState.update(state => {
-        if (!state || state.modeState.turnTimeLimit === undefined) return state;
+      timerStore.update(state => {
+        if (state.turnTimeLeft === null) return state;
 
-        const newTime = state.modeState.turnTimeLimit - 1;
+        const newTime = state.turnTimeLeft - 1;
         if (newTime <= 0) {
           this.stopTurnTimer();
           onTimeout();
         }
         return {
           ...state,
-          modeState: { ...state.modeState, turnTimeLimit: newTime }
+          turnTimeLeft: newTime
         };
       });
     }, 1000);

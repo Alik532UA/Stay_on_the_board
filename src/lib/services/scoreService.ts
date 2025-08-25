@@ -4,7 +4,7 @@ import { isMirrorMove } from '$lib/utils/boardUtils';
 import { logService } from './logService';
 import type { FinalScoreDetails } from '$lib/models/score';
 
-export function calculateFinalScore(state: GameState, gameMode: 'local' | 'vs-computer'): FinalScoreDetails {
+export function calculateFinalScore(state: GameState, gameMode: 'local' | 'training'): FinalScoreDetails {
   const { players, penaltyPoints, boardSize, movesInBlockMode, jumpedBlockedCells, finishedByFinishButton, noMovesBonus, distanceBonus } = state;
 
   const baseScore = players.reduce((acc, p) => acc + p.score, 0);

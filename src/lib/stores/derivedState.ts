@@ -2,6 +2,7 @@
 import { derived } from 'svelte/store';
 import { gameState } from './gameState';
 import { settingsStore } from './settingsStore';
+import { timerStore } from './timerStore';
 import { languages } from '$lib/constants';
 import { animationStore } from './animationStore';
 import { availableMovesService } from '$lib/services/availableMovesService';
@@ -293,11 +294,11 @@ export const isPauseBetweenMoves = derived(
 );
 
 export const remainingTime = derived(
-  gameState,
-  $gameState => $gameState?.modeState?.remainingTime ?? 0
+  timerStore,
+  $timerStore => $timerStore.remainingTime ?? 0
 );
 
 export const turnTimeLimit = derived(
-  gameState,
-  $gameState => $gameState?.modeState?.turnTimeLimit ?? 0
+  timerStore,
+  $timerStore => $timerStore.turnTimeLeft ?? 0
 );
