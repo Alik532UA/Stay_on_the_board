@@ -1,3 +1,4 @@
+import { logService } from '$lib/services/logService';
 
 const directionArrows: Record<any, string> = {
   'up-left': '↖',
@@ -27,6 +28,17 @@ export function getCenterInfoState({
   isPauseBetweenMoves?: boolean;
   previousPlayerColor?: string | null;
 }): any {
+  // НАВІЩО: Додано логування для відладки стану центральної кнопки.
+  // Це допоможе швидко діагностувати проблеми з її відображенням у майбутньому.
+  logService.ui('[centerInfoUtil] Calculating state', {
+    selectedDirection,
+    selectedDistance,
+    lastComputerMove,
+    lastPlayerMove,
+    isPlayerTurn,
+    isPauseBetweenMoves
+  });
+
   // Якщо є вибраний хід - показуємо його
   if (selectedDirection && selectedDistance) {
     let dir = '';
@@ -113,4 +125,4 @@ export function getCenterInfoState({
   }
   
   return { class: '', content: '', clickable: false, aria: '' };
-} 
+}

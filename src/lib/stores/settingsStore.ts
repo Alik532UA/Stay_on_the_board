@@ -9,9 +9,10 @@ import { logService } from '../services/logService.js';
 export type KeybindingAction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right'|'confirm'|'no-moves'|'toggle-block-mode'|'toggle-board'|'increase-board'|'decrease-board'|'toggle-speech'|'distance-1'|'distance-2'|'distance-3'|'distance-4'|'distance-5'|'distance-6'|'distance-7'|'distance-8';
 
 const isBrowser = typeof window !== 'undefined';
-// const defaultStyle = import.meta.env.DEV ? 'gray' : 'purple';
 const defaultStyle = import.meta.env.DEV ? 'gray' : 'gray';
 const SETTINGS_VERSION = 2;
+
+let isInitialized = false;
 
 const defaultSettings: any = {
   version: SETTINGS_VERSION,
@@ -58,7 +59,6 @@ const defaultSettings: any = {
   showDifficultyWarningModal: true,
   showGameInfoWidget: 'shown',
   lockSettings: false,
-  testMode: false,
 };
 
 /**
@@ -168,7 +168,6 @@ function loadSettings(): any {
       showDifficultyWarningModal: 'showDifficultyWarningModal',
       showGameInfoWidget: 'showGameInfoWidget',
       lockSettings: 'lockSettings',
-      testMode: 'testMode'
     };
 
     let hasMigrated = false;
@@ -187,7 +186,6 @@ function loadSettings(): any {
           case 'rememberGameMode':
           case 'showDifficultyWarningModal':
           case 'lockSettings':
-          case 'testMode':
             // @ts-ignore
             mergedSettings[settingsKey] = storedValue === 'true';
             break;
@@ -222,10 +220,13 @@ function loadSettings(): any {
 }
 
 function createSettingsStore() {
-  const { subscribe, set, update } = writable<any>(loadSettings());
+  const { subscribe, set, update } = writable<any>(defaultSettings);
 
   const methods = {
     init: () => {
+      if (isInitialized) return;
+      isInitialized = true;
+
       try {
         if (isBrowser) {
           const settings = loadSettings();
@@ -235,6 +236,11 @@ function createSettingsStore() {
             document.documentElement.setAttribute('data-style', currentSettings.style);
           });
         }
+        gameState.subscribe(state => {
+          if (state && state.isNewGame) {
+            methods.updateSettings({ showBoard: true, showPiece: true, showMoves: true });
+          }
+        });
         logService.init('settingsStore ініціалізовано успішно');
       } catch (error) {
         logService.init('Помилка ініціалізації settingsStore:', error);
@@ -309,8 +315,6 @@ function createSettingsStore() {
         const newShowBoardState = typeof forceState === 'boolean' ? forceState : !state.showBoard;
         const newSettings = { ...state, showBoard: newShowBoardState };
 
-        // НАВІЩО: Забезпечуємо консистентність стану. Якщо дошка прихована,
-        // фігура та доступні ходи також не можуть бути видимими.
         if (!newShowBoardState) {
           newSettings.showPiece = false;
           newSettings.showMoves = false;
@@ -318,7 +322,6 @@ function createSettingsStore() {
 
         if (isBrowser) {
           localStorage.setItem('showBoard', String(newSettings.showBoard));
-          // Зберігаємо також залежні стани, щоб уникнути розсинхронізації при перезавантаженні.
           if (!newShowBoardState) {
             localStorage.setItem('showPiece', 'false');
             localStorage.setItem('showMoves', 'false');
@@ -367,8 +370,6 @@ function createSettingsStore() {
     toggleBlockMode: () => {
       update((state: any) => {
         const newState = !state.blockModeEnabled;
-        // The logic for resetting game state is now handled reactively
-        // by the storeSyncService, ensuring a single source of truth.
         return { ...state, blockModeEnabled: newState };
       });
     },
@@ -409,7 +410,6 @@ function createSettingsStore() {
       const gameStateValue = get(gameState);
       const isNewGame = !gameStateValue || gameStateValue.isNewGame;
     
-      // Базові налаштування для кожного режиму
       const presets = {
         beginner: { showPiece: true, showMoves: true, showGameInfoWidget: 'shown', blockModeEnabled: false, speechEnabled: false, autoHideBoard: false },
         experienced: { showPiece: true, showMoves: true, showGameInfoWidget: 'compact', blockModeEnabled: false, speechEnabled: true, autoHideBoard: true },
@@ -421,9 +421,9 @@ function createSettingsStore() {
         showFaq = true;
       }
     
-      // Встановлюємо `showBoard: true` тільки якщо це нова гра
       if (isNewGame) {
         settingsToApply.showBoard = true;
+        logService.state('[settingsStore]', 'Setting showBoard to true for new game.');
       }
     
       settingsToApply.gameMode = mode;
@@ -436,13 +436,6 @@ function createSettingsStore() {
       methods.updateSettings(settingsToApply);
       modal.closeModal();
       return showFaq;
-    },
-    toggleTestMode: () => {
-      update(state => {
-        const newState = !state.testMode;
-        if (isBrowser) localStorage.setItem('testMode', String(newState));
-        return { ...state, testMode: newState };
-      });
     },
   };
   return { subscribe, get, ...methods };

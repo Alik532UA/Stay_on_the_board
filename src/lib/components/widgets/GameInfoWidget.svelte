@@ -44,7 +44,7 @@
         }
         return $_('gameBoard.gameInfo.firstMove');
       }
-      if ($gameState.wasResumed) return $_('gameBoard.gameInfo.gameResumed');
+      if ($gameState.isResumedGame) return $_('gameBoard.gameInfo.gameResumed');
 
       if ($lastComputerMove && !$isPauseBetweenMoves) {
         const directionKey = $lastComputerMove.direction.replace(/-(\w)/g, (_: string, c: string) => c.toUpperCase());

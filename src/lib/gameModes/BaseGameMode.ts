@@ -21,15 +21,8 @@ export abstract class BaseGameMode implements IGameMode {
   public turnDuration: number = 0; // Default to 0, means no timer
   public gameDuration: number = 0; // Default to 0, means no timer
 
-  /**
-   * Initializes the game mode with a given state.
-   * @param initialState The initial state of the game.
-   */
-  abstract initialize(initialState: GameState): void;
+  abstract initialize(options?: { newSize?: number }): void;
 
-  /**
-   * Starts the turn timer.
-   */
   protected startTurn(): void {
     if (this.turnDuration > 0) {
       timeService.startTurnTimer(this.turnDuration, () => {
@@ -38,70 +31,60 @@ export abstract class BaseGameMode implements IGameMode {
     }
   }
 
-  /**
-   * Handles the player's claim that there are no available moves.
-   */
   async claimNoMoves(): Promise<void> {
     await noMovesService.claimNoMoves();
   }
 
-  /**
-   * Handles the situation where there are no available moves for a player.
-   * @param playerType The type of player ('human' or 'computer').
-   */
   abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
 
-  /**
-   * Gets the player configuration for the specific game mode.
-   * @returns An array of Player objects.
-   */
   abstract getPlayersConfiguration(): Player[];
 
-  /**
-   * Continues the game after a no-moves situation has been resolved (e.g., by clearing the board).
-   */
   async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
-    const state = get(gameState);
-    const settings = get(settingsStore);
-    const bonus = state.boardSize;
+    
+    gameState.update(state => {
+        if (!state) return null;
 
-    const continueChanges = {
-      noMovesBonus: (state.noMovesBonus || 0) + bonus,
-      cellVisitCounts: {},
-      moveHistory: [{
-        pos: { row: state.playerRow, col: state.playerCol },
-        blocked: [] as {row: number, col: number}[],
-        visits: {},
-        blockModeEnabled: settings.blockModeEnabled
-      }],
-      moveQueue: [] as any[],
-      availableMoves: availableMovesService.getAvailableMoves(),
-      noMovesClaimed: false,
-      isComputerMoveInProgress: false,
-      isResumedGame: true,
-      isNewGame: false,
-      isGameOver: false,
-      gameOverReasonKey: null as string | null,
-      gameOverReasonValues: null as Record<string, any> | null
-    };
+        const settings = get(settingsStore);
+        const bonus = state.boardSize;
 
-    gameStateMutator.applyMove(continueChanges);
+        // Створюємо проміжний стан з очищеною дошкою
+        const intermediateState = {
+            ...state,
+            noMovesBonus: (state.noMovesBonus || 0) + bonus,
+            cellVisitCounts: {},
+            moveHistory: [{
+                pos: { row: state.playerRow, col: state.playerCol },
+                blocked: [] as {row: number, col: number}[],
+                visits: {},
+                blockModeEnabled: settings.blockModeEnabled
+            }],
+            moveQueue: [] as any[],
+            noMovesClaimed: false,
+            isComputerMoveInProgress: false,
+            isResumedGame: true,
+            isNewGame: false,
+            isGameOver: false,
+            gameOverReasonKey: null as (string | null)
+        };
+
+        // Розраховуємо нові ходи на основі чистого стану
+        const newAvailableMoves = availableMovesService.getAvailableMoves(intermediateState);
+
+        // Повертаємо фінальний оновлений стан
+        return {
+            ...intermediateState,
+            availableMoves: newAvailableMoves
+        };
+    });
     
     gameOverStore.resetGameOverState();
     animationService.reset();
-
-    // await this.advanceToNextPlayer();
     gameEventBus.dispatch('CloseModal');
   }
   protected abstract advanceToNextPlayer(): Promise<void>;
   protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
 
-  /**
-   * Processes a player's move.
-   * @param direction The direction of the move.
-   * @param distance The distance of the move.
-   */
   async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
     const state = get(gameState);
     const settings = get(settingsStore);
@@ -112,7 +95,6 @@ export abstract class BaseGameMode implements IGameMode {
       await this.applyScoreChanges(moveResult);
       await this.onPlayerMoveSuccess(moveResult);
     } else {
-      // невдалий хід також може мати зміни стану (наприклад, історія ходів)
       if (moveResult.changes) {
         gameStateMutator.applyMove(moveResult.changes);
       }
@@ -131,22 +113,24 @@ export abstract class BaseGameMode implements IGameMode {
       stateUpdate.isResumedGame = false;
     }
 
+    stateUpdate.selectedDirection = null;
+    stateUpdate.selectedDistance = null;
+
     if (Object.keys(stateUpdate).length > 0) {
       gameStateMutator.applyMove(stateUpdate);
     }
 
-    gameStateMutator.applyMove({
-      selectedDirection: null,
-      selectedDistance: null,
-    });
 
     await this.advanceToNextPlayer();
+
+    const updatedState = get(gameState);
+    if (updatedState) {
+      const moves = availableMovesService.getAvailableMoves(updatedState);
+      gameStateMutator.applyMove({ availableMoves: moves });
+    }
     
-    // Побічні ефекти з moveResult (якщо є) тепер мають відправлятися через gameEventBus
-    // всередині gameLogicService або тут, якщо це логіка режиму гри.
-    // Наразі `performMove` не повертає sideEffects, тому цей код можна видалити.
     if (moveResult.sideEffects && moveResult.sideEffects.length > 0) {
-      moveResult.sideEffects.forEach((effect: SideEffect) => sideEffectService.execute(effect)); // Тимчасовий воркраунд
+      moveResult.sideEffects.forEach((effect: SideEffect) => sideEffectService.execute(effect));
     }
   }
 
@@ -182,36 +166,24 @@ export abstract class BaseGameMode implements IGameMode {
     }
   }
 
-  /**
-   * Restarts the game.
-   */
   async restartGame(options: { newSize?: number } = {}): Promise<void> {
-    const state = get(gameState);
-    const players = this.getPlayersConfiguration();
-    gameStateMutator.resetGame({ settings: state.settings, players, newSize: options.newSize });
-    this.initialize(get(gameState)!);
+    this.initialize(options);
+    // НАВІЩО: Гарантуємо, що стан анімації скидається разом з ігровим станом.
+    // Це усуває розсинхронізацію між логікою та візуалізацією.
+    animationService.reset();
     gameEventBus.dispatch('CloseModal');
   }
   
-  /**
-   * Cleans up any resources or subscriptions when the game mode is destroyed.
-   */
   cleanup(): void {
     logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
     timeService.stopTurnTimer();
     timeService.stopGameTimer();
   }
 
-  /**
-   * Pauses the game timers.
-   */
   pauseTimers(): void {
     timeService.pauseGameTimer();
   }
 
-  /**
-   * Resumes the game timers.
-   */
   resumeTimers(): void {
     timeService.resumeGameTimer();
   }

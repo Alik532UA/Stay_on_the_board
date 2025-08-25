@@ -5,11 +5,24 @@
 Поточнє завдання:
 виправити баг:
 
-режим data-testid="settings-expander-visibility-btn-withMoves"
-після першого ходу (який стався після кнопки продовжити)
-Актуальний результат: доступні ходи не показуються
-Очікуваний результат: доступні ходи показуються
-у першій грі працює коректно, але після натискання продовжити, логіка правильно очіщає заблоковані клітини, але не показує доступні ходи
+---
+
+Error: expect(locator).toBeVisible() failed
+
+Locator:  locator('.control-btn.center-info.computer-move-display')
+Expected: visible
+Received: <element(s) not found>
+Timeout:  5000ms
+
+Call log:
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for locator('.control-btn.center-info.computer-move-display')
+
+---
+
+npx playwright test --grep "@HF-1" 
+
+---
 
 
 ---
@@ -37,3 +50,12 @@
 **Верифікація:** Переконайся, що проблема вирішена і не з'явилися нові баги в суміжних частинах системи.
 
 ---
+
+**Візуалізація дошки (`game-board`) НІКОЛИ не повинна впливати на `center-info` та логіку гри.**
+*   Логіка гри та `center-info` НІЧОГО не знають про існування візуальної дошки.
+*   Додавання або видалення пауз та анімацій стосується **тільки** візуального шару і не повинно жодним чином затримувати чи змінювати логіку гри та оновлення `center-info`.
+
+---
+
+тест правильно виявив, що є проблема з появою '.control-btn.center-info.computer-move-display'
+треба fix

@@ -100,8 +100,7 @@
       return (
         $settingsStore.showMoves &&
         !$animationStore.isAnimating &&
-        $currentPlayer?.type === 'human' &&
-        $animationStore.isComputerMoveCompleted
+        $currentPlayer?.type === 'human'
       );
     }
   );

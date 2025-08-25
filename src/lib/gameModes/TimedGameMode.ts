@@ -10,8 +10,8 @@ export class TimedGameMode extends TrainingGameMode {
     this.gameDuration = 100; // 100 секунд на гру
   }
 
-  initialize(initialState: GameState): void {
-    super.initialize(initialState);
+  initialize(options: { newSize?: number } = {}): void {
+    super.initialize(options);
     timeService.initializeTimers(this.gameDuration, this.turnDuration);
     // Таймер запускається після першого ходу
   }

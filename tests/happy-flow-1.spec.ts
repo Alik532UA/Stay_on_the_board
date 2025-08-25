@@ -98,9 +98,11 @@ test.describe('хепі флоу', () => {
 
     await test.step('Гравець змінює розмір дошки та робить хід на велику відстань', async () => {
       await setBoardSize(page, 6);
+      // await page.waitForTimeout(7777777);
       await page.getByTestId('test-mode-dir-btn-up-left').click();
       await page.getByTestId('test-mode-move-dist-input').fill('4');
       await page.getByTestId('test-mode-set-move-dist-btn').click();
+      // await page.waitForTimeout(7777777);
       await makeMove(page, 'down-right', 5);
       await page.getByTestId('test-mode-computer-move-random-btn').click();
       await makeMove(page, 'right', 2);

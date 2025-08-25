@@ -1,19 +1,21 @@
 import { get } from 'svelte/store';
 import { _ } from 'svelte-i18n';
 import { BaseGameMode } from './index';
-import { gameState, type GameState } from '$lib/stores/gameState';
+import { gameState, type GameState, createInitialState } from '$lib/stores/gameState';
 import type { Player } from '$lib/models/player';
 import { gameStateMutator } from '$lib/services/gameStateMutator';
 import * as gameLogicService from '$lib/services/gameLogicService';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
-import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import { logService } from '$lib/services/logService';
 import { animationService } from '$lib/services/animationService';
 import { timeService } from '$lib/services/timeService';
 import { noMovesService } from '$lib/services/noMovesService';
 import { endGameService } from '$lib/services/endGameService';
+import { availableMovesService } from '$lib/services/availableMovesService';
+import { tick } from 'svelte';
+import { testModeStore } from '$lib/stores/testModeStore';
 
 export class LocalGameMode extends BaseGameMode {
   constructor() {
@@ -21,9 +23,22 @@ export class LocalGameMode extends BaseGameMode {
     this.turnDuration = 10; // 10 секунд на хід
   }
 
-  initialize(initialState: GameState): void {
-    // Initialization for local games is handled in the `local-setup` page.
-    gameStateMutator.updateSettings(get(settingsStore));
+  initialize(options: { newSize?: number } = {}): void {
+    const settings = get(settingsStore);
+    const currentState = get(gameState);
+    
+    const players = currentState ? currentState.players : this.getPlayersConfiguration();
+    
+    const newInitialState = createInitialState({
+      size: options.newSize ?? settings.boardSize,
+      players: players,
+      testMode: get(testModeStore).isEnabled
+    });
+    const moves = availableMovesService.getAvailableMoves(newInitialState);
+    newInitialState.availableMoves = moves;
+    
+    gameState.set(newInitialState);
+    
     animationService.initialize();
     this.checkComputerTurn();
     this.startTurn();
@@ -34,7 +49,19 @@ export class LocalGameMode extends BaseGameMode {
   }
 
   async continueAfterNoMoves(): Promise<void> {
-    await super.continueAfterNoMoves();
+    logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
+
+    gameStateMutator.resetForNoMovesContinue(true);
+
+    const updated = get(gameState);
+    logService.logicAvailability('[LocalGameMode] availableMoves after continue:', updated?.availableMoves || []);
+
+    gameOverStore.resetGameOverState();
+    animationService.reset();
+    
+    await this.checkComputerTurn();
+    this.startTurn();
+    gameEventBus.dispatch('CloseModal');
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
@@ -46,7 +73,6 @@ export class LocalGameMode extends BaseGameMode {
   }
 
   getPlayersConfiguration(): Player[] {
-    // Player configuration is now directly in gameState
     return get(gameState).players;
   }
 
@@ -82,14 +108,12 @@ export class LocalGameMode extends BaseGameMode {
     const currentPlayer = state.players[state.currentPlayerIndex];
 
     if (currentPlayer.type === 'computer') {
-      // Додаємо невелику затримку для імітації "роздумів" комп'ютера
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       const move = gameLogicService.getComputerMove();
       if (move) {
         await this.handlePlayerMove(move.direction, move.distance);
       } else {
-        // Якщо комп'ютер не може зробити хід, це означає кінець гри для нього
         await endGameService.endGame('modal.gameOverReasonPlayerBlocked');
       }
     }

@@ -14,7 +14,7 @@ export class OnlineGameMode extends BaseGameMode {
     this.turnDuration = 15; // 15 секунд на хід
   }
 
-  initialize(initialState: GameState): void {
+  initialize(options: { newSize?: number } = {}): void {
     logService.GAME_MODE('[OnlineGameMode] Initializing...');
     // TODO: Connect to the server, set up listeners for opponent moves, etc.
     this.startSync();

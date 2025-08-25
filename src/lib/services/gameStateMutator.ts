@@ -5,26 +5,12 @@ import { logService } from './logService';
 import { get } from 'svelte/store';
 import { settingsStore } from '$lib/stores/settingsStore';
 import { generateId, getRandomUnusedColor, getRandomUnusedName } from '$lib/utils/playerUtils.ts';
+import { animationService } from './animationService';
+import type { Move } from '$lib/utils/gameUtils';
+import { availableMovesService } from './availableMovesService';
 
 class GameStateMutator {
   
-  public resetGame(options: { newSize?: number; players?: any[], settings?: any } = {}) {
-    logService.state('[GameStateMutator] Resetting game state', options);
-    const newSize = options.newSize ?? get(gameState)?.boardSize ?? 4;
-    
-    // Отримуємо статус тестового режиму з налаштувань
-    const settings = options.settings ?? get(settingsStore);
-    const isTestMode = settings.testMode;
-    logService.testMode(`[GameStateMutator] Test mode is ${isTestMode ? 'ON' : 'OFF'}`);
-
-    const newState = createInitialState({
-      size: newSize,
-      players: options.players,
-      testMode: isTestMode // Передаємо статус в конфігурацію
-    });
-    gameState.set(newState);
-  }
-
   public applyMove(changes: Partial<GameState>) {
     logService.state('[GameStateMutator] Applying move', changes);
     gameState.update(state => {
@@ -101,16 +87,6 @@ class GameStateMutator {
     });
   }
 
-  public updateSettings(newSettings: Partial<any>) {
-    gameState.update(state => {
-      if (!state) return null;
-      return {
-        ...state,
-        settings: { ...state.settings, ...newSettings }
-      }
-    });
-  }
-
   public snapshotScores() {
     gameState.update(state => {
       if (!state) return null;
@@ -177,6 +153,52 @@ class GameStateMutator {
         movesInBlockMode: 0,
         moveHistory: [...state.moveHistory, resetHistoryEntry]
       };
+    });
+  }
+
+  public resetForNoMovesContinue(isLocalGame: boolean) {
+    logService.state('[GameStateMutator] Resetting state for continue after no moves');
+    gameState.update(state => {
+      if (!state) return null;
+      const settings = get(settingsStore);
+      const bonus = state.boardSize;
+      const nextPlayerIndex = isLocalGame ? (state.currentPlayerIndex + 1) % state.players.length : 0;
+
+      // Побудова "чистого" стану
+      const baseState: GameState = {
+        ...state,
+        noMovesBonus: isLocalGame ? state.noMovesBonus : (state.noMovesBonus || 0) + bonus,
+        cellVisitCounts: {},
+        moveHistory: [{
+          pos: { row: state.playerRow, col: state.playerCol },
+          blocked: [] as {row: number, col: number}[],
+          visits: {},
+          blockModeEnabled: settings.blockModeEnabled
+        }],
+        moveQueue: [] as any[],
+        noMovesClaimed: false,
+        isComputerMoveInProgress: false,
+        isResumedGame: true,
+        isNewGame: false,
+        isGameOver: false,
+        gameOverReasonKey: null as string | null,
+        gameOverReasonValues: null as Record<string, any> | null,
+        currentPlayerIndex: nextPlayerIndex,
+        // Тимчасово: заповнимо нижче, щоб уникнути "спалахів" некоректних значень
+        availableMoves: [] as Move[],
+      };
+
+      // Перерахунок доступних ходів на основі нового (чистого) стану
+      const newAvailableMoves = availableMovesService.getAvailableMoves(baseState);
+      logService.logicAvailability('[GameStateMutator] Recalculated available moves after continue:', newAvailableMoves);
+
+      const finalState: GameState = {
+        ...baseState,
+        availableMoves: newAvailableMoves
+      };
+
+      logService.state('[GameStateMutator] State after reset for no moves:', finalState);
+      return finalState;
     });
   }
 

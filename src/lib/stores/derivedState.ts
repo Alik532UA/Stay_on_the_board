@@ -79,8 +79,7 @@ export const availableMoves = derived(
   [gameState],
   ([$gameState]) => {
     if (!$gameState) return [];
-    // availableMovesService залежить від gameState, тому виклик getAvailableMoves() завжди актуальний
-    return availableMovesService.getAvailableMoves();
+    return $gameState.availableMoves;
   }
 );
 
@@ -174,6 +173,16 @@ export const visualPosition = derived(
   [gameState, animationStore],
   ([$gameState, $animationStore]) => {
     if (!$gameState) return { row: null, col: null };
+    
+    // НАВІЩО: Якщо анімація не активна, візуальна позиція ПОВИННА дорівнювати логічній.
+    // Це гарантує синхронізацію після скидання гри або інших неанімованих змін.
+    if (!$animationStore.isAnimating && $animationStore.animationQueue.length === 0) {
+      return {
+        row: $gameState.playerRow,
+        col: $gameState.playerCol
+      };
+    }
+
     if ($animationStore.visualMoveQueue && $animationStore.visualMoveQueue.length > 0) {
       const lastAnimatedMove = $animationStore.visualMoveQueue[$animationStore.visualMoveQueue.length - 1];
       return {

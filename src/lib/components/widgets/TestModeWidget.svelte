@@ -2,12 +2,24 @@
   import { onMount } from 'svelte';
   import { testModeStore, type PositionMode, type ComputerMoveMode, type TestModeState } from '$lib/stores/testModeStore';
   import { logService } from '$lib/services/logService.js';
-  import { settingsStore } from '$lib/stores/settingsStore';
 
   let manualDirection: string | null = null;
   let manualDistance: number = 1;
   let manualX: number = 0;
   let manualY: number = 0;
+
+  // НАВІЩО: Цей реактивний блок є ключовим виправленням. Він підписується на зміни
+  // в testModeStore і гарантує, що локальні змінні компонента (які керують UI)
+  // ЗАВЖДИ синхронізовані з єдиним джерелом правди (SSoT).
+  // Це усуває розсинхронізацію і вирішує проблему скидання стану.
+  $: {
+    if ($testModeStore) {
+      manualDirection = $testModeStore.manualComputerMove.direction;
+      manualDistance = $testModeStore.manualComputerMove.distance ?? 1;
+      manualX = $testModeStore.manualStartPosition?.x ?? 0;
+      manualY = $testModeStore.manualStartPosition?.y ?? 0;
+    }
+  }
 
   function setStartPositionMode(mode: PositionMode) {
     testModeStore.update(state => ({ ...state, startPositionMode: mode, manualStartPosition: null }));
@@ -51,42 +63,7 @@
   }
   onMount(() => {
     logService.testMode('TestModeWidget mounted');
-    const unsubscribe = settingsStore.subscribe(settings => {
-      logService.testMode('TestModeWidget settingsStore subscription fired', { testMode: settings.testMode });
-      autorun(settings.testMode);
-    });
-    return unsubscribe;
   });
-  function autorun(isTestModeOn: boolean) {
-    logService.testMode(`autorun called with isTestModeOn: ${isTestModeOn}`);
-    if (isTestModeOn) {
-      logService.testMode('Applying ON defaults');
-      manualX = 0;
-      manualY = 0;
-      manualDirection = 'down';
-      manualDistance = 1;
-      testModeStore.update(state => ({
-        ...state,
-        startPositionMode: 'manual',
-        manualStartPosition: { x: 0, y: 0 },
-        computerMoveMode: 'manual',
-        manualComputerMove: { direction: 'down', distance: 1 }
-      }));
-    } else {
-      logService.testMode('Applying OFF defaults');
-      manualX = 0;
-      manualY = 0;
-      manualDirection = null;
-      manualDistance = 1;
-      testModeStore.update(state => ({
-        ...state,
-        startPositionMode: 'random',
-        manualStartPosition: null,
-        computerMoveMode: 'random',
-        manualComputerMove: { direction: null, distance: null }
-      }));
-    }
-  }
 </script>
 
 <div class="test-mode-widget">

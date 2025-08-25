@@ -12,6 +12,7 @@ function createAnimationService() {
     animationStore.update(state => {
       const newQueue = [...state.animationQueue, move];
       if (!state.isPlayingAnimation) {
+        // Запускаємо чергу анімацій асинхронно, щоб Svelte встиг обробити зміни
         setTimeout(() => playNextAnimation(true), 0);
       }
       return { ...state, animationQueue: newQueue };
@@ -20,33 +21,39 @@ function createAnimationService() {
 
   function playNextAnimation(isFirstCall = false) {
     if (isFirstCall) {
+      // Встановлюємо прапорці на початку всієї послідовності анімацій
       animationStore.update(s => ({ ...s, isAnimating: true, isPlayingAnimation: true, isComputerMoveCompleted: false, visualMoveQueue: [] }));
     }
 
     const state = get(animationStore);
     if (state.animationQueue.length === 0) {
+      // Завершуємо анімацію, коли черга порожня
       animationStore.update(s => ({ ...s, isAnimating: false, isPlayingAnimation: false }));
       return;
     }
 
-    const move = state.animationQueue[0]; // Get the first move from the queue
+    const move = state.animationQueue[0]; // Беремо перший хід з черги
     animationStore.update(s => ({
       ...s,
-      visualMoveQueue: [...s.visualMoveQueue, move]
+      visualMoveQueue: [...s.visualMoveQueue, move] // Додаємо до візуальної черги для рендерингу
     }));
 
     const isPlayerMove = move.player === 1;
-    const animationDuration = 500;
-    const pauseAfterMove = isPlayerMove ? 101 : 100;
+    const animationDuration = 500; // Тривалість CSS анімації руху
+    // ЗМІНЕНО: Пауза після ходу гравця тепер 1 секунда. Це створює ефект "роздумів" комп'ютера.
+    const pauseAfterMove = isPlayerMove ? 1000 : 100;
 
     setTimeout(() => {
       if (!isPlayerMove) {
+        // Позначаємо, що анімація ходу комп'ютера завершена
         animationStore.update(s => ({ ...s, isComputerMoveCompleted: true }));
       }
+      // Видаляємо оброблений хід з черги
       animationStore.update(s => ({
         ...s,
         animationQueue: s.animationQueue.slice(1)
       }));
+      // Рекурсивно викликаємо для наступного ходу
       playNextAnimation(false);
     }, animationDuration + pauseAfterMove);
   }
@@ -60,14 +67,6 @@ function createAnimationService() {
     gameState.subscribe((currentState: any | null) => {
       if (!currentState) {
         animationStore.reset();
-        lastProcessedMoveIndex = 0;
-        return;
-      }
-
-      const animationState = get(animationStore);
-      if (currentState.gameId !== animationState.gameId) {
-        logService.animation('AnimationService: New game detected.');
-        animationStore.set({ ...get(animationStore), gameId: currentState.gameId, animationQueue: [], visualMoveQueue: [] });
         lastProcessedMoveIndex = 0;
         return;
       }

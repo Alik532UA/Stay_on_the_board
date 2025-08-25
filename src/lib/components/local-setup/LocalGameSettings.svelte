@@ -1,12 +1,13 @@
 <script>
-  import { gameState } from '$lib/stores/gameState';
-  import { gameStateMutator } from '$lib/services/gameStateMutator';
+  import { settingsStore } from '$lib/stores/settingsStore';
   import { _ } from 'svelte-i18n';
   import { logService } from '$lib/services/logService.js';
   import ToggleButton from '$lib/components/ToggleButton.svelte';
+  import { get } from 'svelte/store';
 
-  // Створюємо локальні змінні для зручності доступу до налаштувань
-  $: settings = $gameState ? $gameState.settings : null;
+  // НАВІЩО: Тепер компонент працює виключно з settingsStore,
+  // що відповідає принципу SSoT.
+  $: settings = $settingsStore;
 
   /**
    * Оновлює налаштування розміру дошки в store
@@ -16,12 +17,12 @@
     logService.action(`Click: "Змінити розмір дошки: ${increment > 0 ? '+' : ''}${increment}" (LocalGameSettings)`);
     const newSize = settings.boardSize + increment;
     if (newSize >= 2 && newSize <= 9) {
-      gameStateMutator.updateSettings({ boardSize: newSize });
+      settingsStore.updateSettings({ boardSize: newSize });
     }
   }
 </script>
 
-{#if $gameState}
+{#if settings}
 <div class="settings-card">
   <h2 data-testid="local-game-settings-title">{$_('localGame.settingsTitle')}</h2>
 
@@ -53,7 +54,7 @@
       on:toggle={() => {
         const newCheckedState = !settings.blockModeEnabled;
         logService.action(`Click: "Режим заблокованих клітинок: ${newCheckedState}" (LocalGameSettings)`);
-        gameStateMutator.updateSettings({ blockModeEnabled: newCheckedState });
+        settingsStore.updateSettings({ blockModeEnabled: newCheckedState });
       }}
       dataTestId="block-mode-toggle"
     />
@@ -65,7 +66,7 @@
       on:toggle={() => {
         const newCheckedState = !settings.autoHideBoard;
         logService.action(`Click: "Автоматично приховувати дошку: ${newCheckedState}" (LocalGameSettings)`);
-        gameStateMutator.updateSettings({ autoHideBoard: newCheckedState });
+        settingsStore.updateSettings({ autoHideBoard: newCheckedState });
       }}
       dataTestId="auto-hide-board-toggle"
     />
@@ -77,7 +78,7 @@
       on:toggle={() => {
         const newCheckedState = !settings.lockSettings;
         logService.action(`Click: "Заборонити змінювати правила: ${newCheckedState}" (LocalGameSettings)`);
-        gameStateMutator.updateSettings({ lockSettings: newCheckedState });
+        settingsStore.updateSettings({ lockSettings: newCheckedState });
       }}
       dataTestId="lock-settings-toggle"
     />
@@ -148,4 +149,4 @@
     min-width: 50px;
     text-align: center;
   }
-</style> 
+</style>

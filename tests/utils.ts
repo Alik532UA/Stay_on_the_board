@@ -22,16 +22,17 @@ export enum GameMode {
 
 // Вмикає тестовий режим
 export async function enableTestMode(page: Page) {
-  await page.waitForFunction(() => (window as any).settingsStore, null, { timeout: 10000 });
+  // НАВІЩО: Чекаємо, доки наш тестовий хук стане доступним на window.
+  await page.waitForFunction(() => (window as any).toggleTestMode, null, { timeout: 10000 });
+  
+  // НАВІЩО: Викликаємо єдину, централізовану функцію для ввімкнення
+  // тестового режиму. Це гарантує, що тест взаємодіє з додатком
+  // через той самий SSoT, що й користувацький інтерфейс.
   await page.evaluate(() => {
-    (window as any).settingsStore.updateSettings({ testMode: true });
-    // Примусово встановлюємо значення в localStorage для надійності тесту
-    localStorage.setItem('testMode', 'true');
+    (window as any).toggleTestMode();
   });
-  // Перевіряємо, що значення дійсно встановлено
-  await page.waitForFunction(() => localStorage.getItem('testMode') === 'true', null, {
-    timeout: 5000,
-  });
+
+  // Перевіряємо результат дії, а не імплементацію
   await expect(page.getByTestId('test-mode-widget-container')).toBeVisible();
 }
 

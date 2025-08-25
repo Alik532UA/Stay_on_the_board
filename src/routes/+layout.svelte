@@ -42,13 +42,13 @@
 	import { tooltipStore } from '$lib/stores/tooltipStore.js';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 	import ModalManager from '$lib/components/ModalManager.svelte';
+	import { testModeStore, toggleTestMode } from '$lib/stores/testModeStore';
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
 
 	onMount(async () => {
 		try {
-			// Додаємо випадковий параметр, щоб уникнути кешування самого файлу версії
 			const response = await fetch(`${base}/version.json?v=${new Date().getTime()}`);
 			if (!response.ok) return;
 
@@ -60,18 +60,21 @@
 			if (localVersion && localVersion !== serverVersion) {
 				showUpdateNotice = true;
 			} else if (!localVersion) {
-				// Якщо версії ще немає, просто записуємо її
 				localStorage.setItem(APP_VERSION_KEY, serverVersion);
 			}
-			settingsStore.init(); // <-- Ініціалізуємо налаштування на клієнті
-			initializeI18n(); // Ініціалізуємо локалізацію
-			initializeStoreSync(); // Ініціалізуємо синхронізацію сторів
+			settingsStore.init();
+			initializeI18n();
+			initializeStoreSync();
 		} catch (error) {
 			logService.init('Failed to check for app update:', error);
 		}
 
-		if (import.meta.env.DEV || get(settingsStore).testMode) {
-			(window as any).settingsStore = settingsStore; // Додаємо settingsStore для доступу в тестах
+		// НАВІЩО: Спрощуємо умову. Тестові хуки повинні бути доступні
+		// ЗАВЖДИ в режимі розробки, незалежно від поточного стану.
+		// Це усуває "парадокс курки та яйця" і робить тести стабільними.
+		if (import.meta.env.DEV) {
+			(window as any).settingsStore = settingsStore;
+			(window as any).toggleTestMode = toggleTestMode;
 		}
 	});
 
@@ -80,7 +83,6 @@
 	});
 
 	function handleReload() {
-		// Очищуємо кеш, зберігаючи вигляд, і перезавантажуємо
 		clearCache({ keepAppearance: true });
 	}
 
@@ -91,28 +93,11 @@
 		}
 		if (event.ctrlKey && event.altKey && event.code === 'KeyT') {
 			event.preventDefault();
-			settingsStore.toggleTestMode();
+			toggleTestMode();
 		}
 	}
 
-	// Видалено гарячу клавішу для переходу на /dev-dnd-columns
-	// onMount(() => {
-	//   if (import.meta.env.DEV) {
-	//     window.addEventListener('keydown', (e: KeyboardEvent) => {
-	//       if (e.key === '[') {
-	//         window.location.href = '/dev-dnd-columns';
-	//       }
-	//     });
-	//   }
-	// });
-
-	// onMount(() => {
-	// 	document.documentElement.setAttribute('data-theme', 'dark');
-	// 	document.documentElement.setAttribute('data-style', 'purple');
-	// });
-
 	afterNavigate(() => {
-		// Не закриваємо модальне вікно, якщо ми щойно відновили його зі сторінки replay
 		if (sessionStorage.getItem('isRestoringReplay')) {
 			sessionStorage.removeItem('isRestoringReplay');
 			return;
@@ -157,7 +142,7 @@
 <Modal />
 <ModalManager />
 
-{#if $settingsStore.testMode}
+{#if $testModeStore.isEnabled}
 	<div class="test-mode-container" data-testid="test-mode-widget-container">
 		<TestModeWidget />
 	</div>

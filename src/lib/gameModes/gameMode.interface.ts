@@ -11,10 +11,10 @@ import type { SideEffect } from '$lib/services/sideEffectService';
  */
 export interface IGameMode {
   /**
-   * Ініціалізує режим гри з початковим станом.
-   * @param initialState - Початковий стан гри.
+   * Ініціалізує або перезапускає режим гри.
+   * @param options - Опції для ініціалізації, наприклад, новий розмір дошки.
    */
-  initialize(initialState: GameState): void;
+  initialize(options?: { newSize?: number }): void;
 
   /**
    * Обробляє хід гравця.

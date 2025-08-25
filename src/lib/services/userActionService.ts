@@ -5,7 +5,7 @@
 import { get } from 'svelte/store';
 import { tick } from 'svelte';
 import { replayStore } from '$lib/stores/replayStore.js';
-import { modalStore } from '$lib/stores/modalStore';
+import { modalStore } from '$lib/stores/modalStore.js';
 import { gameStore } from '$lib/stores/gameStore';
 import { modalService } from './modalService';
 import { gameModeService } from './gameModeService';
@@ -13,7 +13,8 @@ import { sideEffectService, type SideEffect } from './sideEffectService';
 import { gameEventBus } from './gameEventBus';
 import { replayService } from './replayService';
 import { logService } from './logService.js';
-import { gameState } from '$lib/stores/gameState';
+import { gameState } from '$lib/stores/gameState.js';
+import { gameStateMutator } from '$lib/services/gameStateMutator';
 import ReplayViewer from '$lib/components/ReplayViewer.svelte';
 import * as gameLogicService from '$lib/services/gameLogicService.js';
 import { navigationService } from './navigationService';
@@ -42,6 +43,7 @@ export const userActionService = {
       }
 
       await activeGameMode.handlePlayerMove(direction, distance);
+
     } finally {
       // НАВІЩО: Гарантуємо, що всі оновлення DOM (наприклад, закриття модального вікна)
       // завершаться перед тим, як розблокувати ввід для наступних дій.
@@ -80,12 +82,15 @@ export const userActionService = {
   },
 
   async changeBoardSize(newSize: number): Promise<void> {
-    const { players, penaltyPoints, boardSize } = get(gameState);
+    const state = get(gameState);
+    if (!state) return;
+    const { players, penaltyPoints, boardSize } = state;
     const score = players.reduce((acc, p) => acc + p.score, 0);
     if (newSize === boardSize) return;
 
     if (score === 0 && penaltyPoints === 0) {
-      gameLogicService.resetGame({ newSize }, get(gameState));
+      // ВИДАЛЕНО: gameLogicService.resetGame. Тепер це відповідальність gameModeService.
+      await gameModeService.restartGame({ newSize });
     } else {
       modalService.showBoardResizeModal(newSize);
     }
