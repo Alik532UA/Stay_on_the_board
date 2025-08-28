@@ -52,7 +52,7 @@ export class TrainingGameMode extends BaseGameMode {
   }
 
   async claimNoMoves(): Promise<void> {
-    await super.claimNoMoves();
+    await noMovesService.claimNoMoves();
   }
 
   getPlayersConfiguration(): Player[] {
