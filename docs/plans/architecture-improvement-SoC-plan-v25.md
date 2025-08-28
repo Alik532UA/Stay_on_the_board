@@ -33,23 +33,23 @@
 
 **Мета:** Швидко усунути найбільш кричущі порушення SoC та підготувати базу для глибокого рефакторингу.
 
-- [ ] **1. Ізолювати логіку гарячих клавіш (з v24)**
+- [+] **1. Ізолювати логіку гарячих клавіш (з v24)**
     - **Пріоритет: 100**
-    - [ ] Створити `src/lib/services/hotkeyService.ts`.
-    - [ ] Повністю перенести логіку з `handleHotkey` та `executeAction` з `game/+layout.svelte` в `hotkeyService.ts`.
-    - [ ] `game/+layout.svelte` повинен лише ініціалізувати сервіс в `onMount`.
+    - [+] Створити `src/lib/services/hotkeyService.ts`.
+    - [+] Повністю перенести логіку з `handleHotkey` та `executeAction` з `game/+layout.svelte` в `hotkeyService.ts`.
+    - [+] `game/+layout.svelte` повинен лише ініціалізувати сервіс в `onMount`.
 
-- [ ] **2. Зробити сервіси "чистими" (з v24)**
+- [+] **2. Зробити сервіси "чистими" (з v24)**
     - **Пріоритет: 95**
-    - [ ] Ввести правило: **сервіси логіки не повинні використовувати `get()`**. Вони мають отримувати стан як аргумент.
-    - [ ] Модифікувати `performMove` та інші функції в `gameLogicService`, щоб вони приймали `currentState`.
-    - [ ] Оновити `userActionService`, щоб він читав стан (`get(gameState)`) і передавав його в функції логіки.
+    - [+] Ввести правило: **сервіси логіки не повинні використовувати `get()`**. Вони мають отримувати стан як аргумент.
+    - [+] Модифікувати `performMove` та інші функції в `gameLogicService`, щоб вони приймали `currentState`.
+    - [+] Оновити `userActionService`, щоб він читав стан (`get(gameState)`) і передавав його в функції логіки.
 
-- [ ] **3. Ізолювати логіку `testMode` (з v24)**
+- [+] **3. Ізолювати логіку `testMode` (з v24)**
     - **Пріоритет: 90**
-    - [ ] Створити `src/lib/services/testModeService.ts`.
-    - [ ] Перенести логіку підписки на `testModeStore` з `gameState.ts` в `testModeService.ts`.
-    - [ ] `testModeService` має оновлювати `gameState` через `gameStateMutator`.
+    - [+] Створити `src/lib/services/testModeService.ts`.
+    - [+] Перенести логіку підписки на `testModeStore` з `gameState.ts` в `testModeService.ts`.
+    - [+] `testModeService` має оновлювати `gameState` через `gameStateMutator`.
 
 ### Фаза 2: Стратегічний рефакторинг ядра
 

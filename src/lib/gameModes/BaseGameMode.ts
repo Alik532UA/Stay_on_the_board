@@ -1,3 +1,4 @@
+// src/lib/gameModes/BaseGameMode.ts
 import { get } from 'svelte/store';
 import { _ } from 'svelte-i18n';
 import { tick } from 'svelte';
@@ -23,14 +24,17 @@ export abstract class BaseGameMode implements IGameMode {
   public turnDuration: number = 0; // Default to 0, means no timer
   public gameDuration: number = 0; // Default to 0, means no timer
 
-  // Abstract methods to be implemented by subclasses
+  // НАВІЩО: Визначаємо абстрактні методи як контракт для всіх дочірніх класів.
+  // Кожен режим гри ЗОБОВ'ЯЗАНИЙ реалізувати цю логіку.
   abstract initialize(options?: { newSize?: number }): void;
   abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
   abstract getPlayersConfiguration(): Player[];
   protected abstract advanceToNextPlayer(): Promise<void>;
   protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
+  abstract continueAfterNoMoves(): Promise<void>;
 
-  // Common implemented methods
+  // НАВІЩО: Визначаємо спільні методи, які будуть успадковані всіма режимами.
+  // Це дотримується принципу DRY.
   protected startTurn(): void {
     if (this.turnDuration > 0) {
       timeService.startTurnTimer(this.turnDuration, () => {
@@ -42,8 +46,6 @@ export abstract class BaseGameMode implements IGameMode {
   async claimNoMoves(): Promise<void> {
     await noMovesService.claimNoMoves();
   }
-
-  abstract continueAfterNoMoves(): Promise<void>;
 
   async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
     const state = get(gameState);
@@ -149,7 +151,8 @@ export abstract class BaseGameMode implements IGameMode {
     logService.GAME_MODE('triggerComputerMove: Початок ходу комп\'ютера.');
     gameStateMutator.applyMove({ isComputerMoveInProgress: true });
 
-    const computerMove = aiService.getComputerMove();
+    const state = get(gameState);
+    const computerMove = aiService.getComputerMove(state);
     logService.GAME_MODE('triggerComputerMove: Результат getComputerMove:', computerMove);
 
     if (computerMove) {

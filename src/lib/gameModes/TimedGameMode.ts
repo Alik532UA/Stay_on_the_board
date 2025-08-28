@@ -1,3 +1,4 @@
+// src/lib/gameModes/TimedGameMode.ts
 import { timeService } from '$lib/services/timeService';
 import { endGameService } from '$lib/services/endGameService';
 import { get } from 'svelte/store';

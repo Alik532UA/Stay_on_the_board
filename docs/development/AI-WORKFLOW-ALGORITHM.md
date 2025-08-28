@@ -1,33 +1,33 @@
-# AI Workflow Algorithm: Atomic Operations and State Persistence
+# Алгоритм Робочого Процесу AI: Атомарні Операції та Збереження Стану
 
-## 1. Principle
+## 1. Принцип
 
-To ensure stability and recoverability during development, all AI-driven changes must be **atomic** and **self-contained**. After each significant change, the intermediate result must be saved to a temporary file, and the master plan must be updated.
+Для забезпечення стабільності та можливості відновлення під час розробки, всі зміни, що вносяться AI, повинні бути **атомарними** та **самодостатніми**. Після кожної значної зміни проміжний результат повинен бути збережений у тимчасовий файл, а головний план — оновлений.
 
-This algorithm is designed to minimize risks associated with interruptions, ensuring that work can be resumed smoothly and efficiently.
+Цей алгоритм розроблено для мінімізації ризиків, пов'язаних із перериваннями, та гарантує, що роботу можна буде відновити плавно та ефективно.
 
-## 2. Algorithm Steps
+## 2. Кроки Алгоритму
 
-1.  **Detailed Plan:**
-    *   Before starting any task, a detailed plan in `.md` format with checkboxes must be created. This serves as the roadmap for the task.
+1.  **Детальний План:**
+    *   Перед початком будь-якого завдання необхідно створити детальний план у форматі `.md` з чекбоксами. Він слугуватиме дорожньою картою для виконання завдання.
 
-2.  **Create a Backup:**
-    *   Before modifying a critical file (e.g., `gameLogicService.ts`), create a backup copy with a `.bak` extension (e.g., `gameLogicService.ts.bak`). This file is the recovery point.
+2.  **Створення Резервної Копії:**
+    *   Перед модифікацією критично важливого файлу (напр., `gameLogicService.ts`), створіть резервну копію з розширенням `.bak` (напр., `gameLogicService.ts.bak`). Цей файл є точкою відновлення.
 
-3.  **Atomic Changes:**
-    *   Apply changes in small, logical increments. Prefer `apply_diff` for targeted, isolated edits over rewriting entire files with `write_to_file`.
+3.  **Атомарні Зміни:**
+    *   Застосовуйте зміни невеликими, логічними кроками. Надавайте перевагу `apply_diff` для цільових, ізольованих правок замість перезапису цілих файлів за допомогою `write_to_file`.
 
-4.  **Intermediate Verification:**
-    *   After each successful modification, run `npm run check` to ensure no syntax errors have been introduced.
+4.  **Проміжна Перевірка:**
+    *   Після кожної успішної модифікації запускайте `npm run check`, щоб переконатися, що не було внесено синтаксичних помилок.
 
-5.  **Update the Plan:**
-    *   After each successful step, update the `.md` plan file by checking off the completed item.
+5.  **Оновлення Плану:**
+    *   Після кожного успішного кроку оновлюйте `.md` файл плану, відмічаючи виконаний пункт.
 
-6.  **Final Verification and Cleanup:**
-    *   Only after the file modification is complete and all checks (`npm run check` and `npx playwright test`) have passed, delete the `.bak` file.
+6.  **Фінальна Перевірка та Очищення:**
+    *   Лише після того, як модифікація файлу завершена і всі перевірки (`npm run check` та `npx playwright test`) пройдені успішно, видаліть файл `.bak`.
 
-## 3. Benefits
+## 3. Переваги
 
-*   **Recovery After Failure:** If an interruption occurs, the `.bak` file provides the last working version. The `.md` plan will show exactly where the work stopped, allowing for a seamless continuation.
-*   **Risk Mitigation:** Working in small increments significantly reduces the probability of introducing critical bugs.
-*   **Transparency:** The plan file provides a clear and up-to-date view of the task's progress.
+*   **Відновлення після збою:** Якщо станеться переривання, файл `.bak` надасть останню робочу версію. План у `.md` файлі точно покаже, на якому етапі зупинилася робота, що дозволить безшовно її продовжити.
+*   **Зменшення ризиків:** Робота невеликими кроками значно знижує ймовірність внесення критичних помилок.
+*   **Прозорість:** Файл плану надає чітке та актуальне уявлення про прогрес виконання завдання.

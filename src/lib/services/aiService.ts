@@ -1,24 +1,23 @@
+// src/lib/services/aiService.ts
 import { get } from 'svelte/store';
-import { testModeStore } from '$lib/stores/testModeStore';
+import { gameState, type GameState } from '$lib/stores/gameState';
 import { logService } from './logService';
 import { availableMovesService } from './availableMovesService';
 import type { MoveDirectionType } from '../models/Figure';
 
 class AiService {
-  public getComputerMove(): { direction: MoveDirectionType; distance: number } | null {
-    const testModeState = get(testModeStore);
-    logService.testMode('aiService: отримано стан testModeStore', testModeState);
+  public getComputerMove(state: GameState | null = get(gameState)): { direction: MoveDirectionType; distance: number } | null {
+    if (!state) return null;
 
-    if (testModeState.computerMoveMode === 'manual' && testModeState.manualComputerMove.direction && testModeState.manualComputerMove.distance) {
-      logService.testMode('aiService: виконується ручний хід', testModeState.manualComputerMove);
-      return {
-        direction: testModeState.manualComputerMove.direction as MoveDirectionType,
-        distance: testModeState.manualComputerMove.distance
-      };
+    logService.testMode('aiService: отримано стан gameState', state);
+
+    if (state.testModeOverrides?.nextComputerMove) {
+      logService.testMode('aiService: виконується ручний хід з gameState overrides', state.testModeOverrides.nextComputerMove);
+      return state.testModeOverrides.nextComputerMove;
     }
 
     logService.testMode('aiService: виконується випадковий хід');
-    const availableMoves = availableMovesService.getAvailableMoves();
+    const availableMoves = availableMovesService.getAvailableMoves(state);
 
     if (availableMoves.length === 0) {
       logService.logicAI('getComputerMove: немає доступних ходів');

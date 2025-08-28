@@ -1,15 +1,13 @@
-// file: src/lib/stores/gameState.ts
+// src/lib/stores/gameState.ts
 import { writable } from 'svelte/store';
 import { createEmptyBoard } from '$lib/utils/boardUtils.ts';
-import { getRandomCell } from '$lib/utils/initialPositionUtils';
+import { getRandomCell, getInitialPosition } from '$lib/utils/initialPositionUtils';
 import type { Move } from '$lib/utils/gameUtils';
 import { get } from 'svelte/store';
 import { testModeStore } from './testModeStore';
-
-const initialBoardSize = 4;
-
 import type { Player } from '$lib/models/player';
 import type { MoveHistoryEntry } from '$lib/models/moveHistory';
+import type { MoveDirectionType } from '$lib/models/Figure';
 
 export interface GameState {
   gameId: number;
@@ -51,6 +49,9 @@ export interface GameState {
   isFirstMove: boolean;
   modeState: {
   };
+  testModeOverrides: {
+    nextComputerMove?: { direction: MoveDirectionType; distance: number };
+  };
 }
 
 export interface GameStateConfig {
@@ -61,7 +62,7 @@ export interface GameStateConfig {
 }
 
 export function createInitialState(config: GameStateConfig = {}): GameState {
-  const size = config.size ?? initialBoardSize;
+  const size = config.size ?? 4;
   const players = config.players ?? [
     { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#e63946', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
     { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#457b9d', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
@@ -71,6 +72,19 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
   
   const board = createEmptyBoard(size);
   board[initialRow][initialCol] = 1;
+
+  // НАВІЩО: Це ключове виправлення. При створенні нового стану гри ми
+  // одразу читаємо поточний стан testModeStore. Це гарантує, що
+  // testModeOverrides будуть встановлені з самого початку, вирішуючи
+  // проблему стану гонитви (race condition).
+  const currentTestModeState = get(testModeStore);
+  const initialOverrides: GameState['testModeOverrides'] = {};
+  if (currentTestModeState.isEnabled && currentTestModeState.computerMoveMode === 'manual' && currentTestModeState.manualComputerMove.direction && currentTestModeState.manualComputerMove.distance) {
+    initialOverrides.nextComputerMove = {
+      direction: currentTestModeState.manualComputerMove.direction as MoveDirectionType,
+      distance: currentTestModeState.manualComputerMove.distance
+    };
+  }
   
   return {
     gameId: Date.now(),
@@ -105,6 +119,7 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
     isFirstMove: true,
     modeState: {
     },
+    testModeOverrides: initialOverrides, // Встановлюємо початкові перевизначення
   };
 }
 
