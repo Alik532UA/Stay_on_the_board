@@ -80,3 +80,25 @@ export function getDamageClass(row: number, col: number, cellVisitCounts: Record
   }
   return '';
 } 
+
+export function getMovePath(
+  start: { row: number; col: number },
+  end: { row: number; col: number }
+): { row: number; col: number }[] {
+  const path = [];
+  let { row, col } = start;
+  const { row: endRow, col: endCol } = end;
+
+  const rowStep = Math.sign(endRow - row);
+  const colStep = Math.sign(endCol - col);
+
+  while (row !== endRow || col !== endCol) {
+    row += rowStep;
+    col += colStep;
+    if (row !== endRow || col !== endCol) {
+      path.push({ row, col });
+    }
+  }
+
+  return path;
+} 

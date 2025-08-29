@@ -1,4 +1,16 @@
 <script lang="ts">
+  // IMPORTANT: This component's checked state (`dontShowAgain`) is intentionally not
+  // reactively bound to the `showGameModeModal` setting in the gameSettingsStore.
+  //
+  // - `onMount`, the component initializes its state from the store.
+  // - `on:change`, the component updates the store.
+  //
+  // This is to prevent a bug where closing another modal (like the FAQ modal)
+  // could inadvertently change the `showGameModeModal` setting and cause this
+  // checkbox to become checked as a side effect.
+  //
+  // By not having a reactive link, we ensure that the checkbox state is only
+  // changed by direct user interaction.
   import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
   import { _ } from 'svelte-i18n';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
@@ -8,17 +20,10 @@
   export let modalType: 'gameMode' | 'expertMode' = 'gameMode';
   let dontShowAgain = false;
 
-  $: {
-    if (modalType === 'gameMode') {
-      dontShowAgain = !$gameSettingsStore.showGameModeModal;
-    } else if (modalType === 'expertMode') {
-      dontShowAgain = !$gameSettingsStore.showDifficultyWarningModal;
-    }
-  }
-
   function handleCheckboxChange(event: Event) {
     const input = event.currentTarget as HTMLInputElement;
     if (input && typeof input.checked === 'boolean') {
+      logService.action(`[DontShowAgainCheckbox] handleCheckboxChange called with checked: ${input.checked}`);
       if (modalType === 'gameMode') {
         gameSettingsStore.updateSettings({ showGameModeModal: !input.checked });
       } else if (modalType === 'expertMode') {
@@ -42,6 +47,12 @@
   let inputEl: HTMLInputElement | null = null;
 
   onMount(() => {
+    if (modalType === 'gameMode') {
+      dontShowAgain = !$gameSettingsStore.showGameModeModal;
+    } else if (modalType === 'expertMode') {
+      dontShowAgain = !$gameSettingsStore.showDifficultyWarningModal;
+    }
+    logService.ui(`[DontShowAgainCheckbox] onMount. dontShowAgain is ${dontShowAgain}`);
     window.addEventListener('keydown', handleKeydown);
     return () => {
       window.removeEventListener('keydown', handleKeydown);

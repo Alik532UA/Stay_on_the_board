@@ -28,10 +28,14 @@ class GameModeService {
     // та назвами реалізацій ігрових режимів. Це дозволяє UI оперувати
     // зрозумілими для користувача назвами ("Новачок"), а сервісу - працювати з конкретними
     // класами (`TrainingGameMode`). Це приклад розділення відповідальностей (SoC).
+    // IMPORTANT: This map defines which game mode implementation is used for each preset
+    // selected in the GameModeModal. All presets from this modal should map to 'training'
+    // (player vs. computer) mode. The specific settings for each preset (like board size)
+    // are handled in gameSettingsStore.applyPreset.
     const presetToModeMap: Record<string, string> = {
         beginner: 'training',
-        experienced: 'local',
-        pro: 'timed'
+        experienced: 'training',
+        pro: 'training'
     };
     const implementationName = name ? presetToModeMap[name] || name : 'training'; // Fallback to training if null
 
