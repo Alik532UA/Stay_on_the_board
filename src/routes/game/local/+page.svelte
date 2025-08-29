@@ -16,12 +16,20 @@
   import { animationService } from '$lib/services/animationService.js';
   import { gameModeService } from '$lib/services/gameModeService';
   import { get } from 'svelte/store';
+  import { boardStore } from '$lib/stores/boardStore';
+  import { logService } from '$lib/services/logService';
   import { _ } from 'svelte-i18n';
   import { i18nReady } from '$lib/i18n/init.js';
   import { replayStore } from '$lib/stores/replayStore';
 
-  onMount(() => {
-    gameModeService.initializeGameMode('local');
+    onMount(() => {
+    const boardState = get(boardStore);
+    if (!boardState || boardState.moveHistory.length <= 1) {
+        logService.init('[LocalGamePage] onMount: No active game found, initializing "local" mode.');
+        gameModeService.initializeGameMode('local');
+    } else {
+        logService.init('[LocalGamePage] onMount: Active game found, not re-initializing.');
+    }
     animationService.initialize();
   });
 
