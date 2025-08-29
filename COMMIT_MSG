@@ -1,0 +1,7 @@
+fix(game): resolve incorrect available moves in training mode
+
+This commit fixes a bug where available moves were calculated based on a stale piece position in the training game mode.
+
+The root cause was a double initialization of the game state. The game was being initialized once on application load and then again when the training page was mounted. This resulted in the `availableMovesService` using an incorrect, outdated position of the game piece.
+
+The fix removes the redundant game state initialization from the `onMount` lifecycle hook in the `TrainingPage.svelte` component. This ensures that the game state is initialized only once, providing a single source of truth for the piece's position and guaranteeing that available moves are calculated correctly.

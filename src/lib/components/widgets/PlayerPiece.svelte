@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { logService } from '$lib/services/logService.js';
   export let row: number;
   export let col: number;
   export let boardSize: number;
   import SvgIcons from '../SvgIcons.svelte';
+
+  $: logService.animation('Visual Position (PlayerPiece props)', { row, col });
 </script>
 <div
   class="player-piece"

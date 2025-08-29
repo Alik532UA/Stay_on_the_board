@@ -1,6 +1,7 @@
 /**
  * Enum для напрямків руху фігури
  */
+import { logService } from '$lib/services/logService.js';
 export const MoveDirection = {
   UP: 'up',
   DOWN: 'down',
@@ -112,6 +113,7 @@ export class Figure {
    * Отримати список доступних ходів
    */
   getAvailableMoves(): any[] {
+    logService.logicAvailability('Available Moves Calculation Position', { row: this.row, col: this.col });
     const moves: any[] = [];
     const directions = Object.values(MoveDirection);
     
@@ -148,4 +150,4 @@ export class Figure {
     const deltaCol = Math.abs(this.col - other.col);
     return Math.max(deltaRow, deltaCol);
   }
-} 
+}

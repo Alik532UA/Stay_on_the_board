@@ -8,6 +8,7 @@ import { timerStore } from './timerStore';
 import { languages } from '$lib/constants';
 import { animationStore } from './animationStore';
 import { availableMovesStore } from './availableMovesStore';
+import { logService } from '$lib/services/logService';
 
 function chunk<T>(arr: T[], n: number): T[][] {
   const res = [];
@@ -114,18 +115,28 @@ export const currentPlayerColor = derived(
 export const visualPosition = derived(
   [boardStore, animationStore],
   ([$boardStore, $animationStore]) => {
-    if (!$boardStore) return { row: null, col: null };
-    if (!$animationStore.isAnimating && $animationStore.animationQueue.length === 0) {
-      return { row: $boardStore.playerRow, col: $boardStore.playerCol };
+    if (!$boardStore) {
+      logService.piece("(visualPosition) no boardStore, returning null");
+      return { row: null, col: null };
     }
-    if ($animationStore.visualMoveQueue && $animationStore.visualMoveQueue.length > 0) {
+
+    let result;
+    if (!$animationStore.isAnimating && $animationStore.animationQueue.length === 0) {
+      result = { row: $boardStore.playerRow, col: $boardStore.playerCol };
+      logService.piece(`(visualPosition) no animation, returning logical position: [${result.row}, ${result.col}]`);
+    } else if ($animationStore.visualMoveQueue && $animationStore.visualMoveQueue.length > 0) {
       const lastAnimatedMove = $animationStore.visualMoveQueue[$animationStore.visualMoveQueue.length - 1];
-      return {
+      result = {
         row: lastAnimatedMove.to?.row ?? $boardStore.playerRow,
         col: lastAnimatedMove.to?.col ?? $boardStore.playerCol
       };
+      logService.piece(`(visualPosition) animation in progress, returning animated position: [${result.row}, ${result.col}]`);
+    } else {
+      result = { row: $boardStore.playerRow, col: $boardStore.playerCol };
+      logService.piece(`(visualPosition) fallback, returning logical position: [${result.row}, ${result.col}]`);
     }
-    return { row: $boardStore.playerRow, col: $boardStore.playerCol };
+
+    return result;
   }
 );
 

@@ -5,6 +5,7 @@ const isDev = import.meta.env.DEV;
 // 1. Визначення груп логування
 const LOG_GROUPS = {
   STATE: 'state',       // Для StateManager та змін стану
+  PIECE: 'piece',       // Для логіки пов'язаної з фігурою
   LOGIC_MOVE: 'logic_move',       // Для performMove та розрахунку ходів
   LOGIC_AI: 'logic_ai',         // Для логіки вибору ходу комп'ютером
   LOGIC_AVAILABILITY: 'logic_availability', // Для getAvailableMoves
@@ -24,15 +25,16 @@ const LOG_GROUPS = {
 // 2. Конфігурація
 const defaultConfig = {
           [LOG_GROUPS.STATE]: true,
+          [LOG_GROUPS.PIECE]: true,
           [LOG_GROUPS.LOGIC_MOVE]: false,
           [LOG_GROUPS.LOGIC_AI]: false,
           [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
           [LOG_GROUPS.LOGIC_TIME]: false,
-          [LOG_GROUPS.SCORE]: true,
+          [LOG_GROUPS.SCORE]: false,
           [LOG_GROUPS.UI]: false, 
           [LOG_GROUPS.TOOLTIP]: false,
-          [LOG_GROUPS.ANIMATION]: false,
-          [LOG_GROUPS.INIT]: false,
+          [LOG_GROUPS.ANIMATION]: true,
+          [LOG_GROUPS.INIT]: true,
           [LOG_GROUPS.ACTION]: false,
           [LOG_GROUPS.GAME_MODE]: true,
           [LOG_GROUPS.SPEECH]: false,
@@ -112,6 +114,7 @@ function log(group, message, ...data) {
 // 4. Публічний сервіс з методами для кожної групи
 export const logService = {
   state: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.STATE, message, ...data),
+  piece: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.PIECE, message, ...data),
   logicMove: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_MOVE, message, ...data),
   logicAI: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_AI, message, ...data),
   logicAvailability: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_AVAILABILITY, message, ...data),

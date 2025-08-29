@@ -1,6 +1,7 @@
 # Message template for communicating with AI
 🔴🟠🟡🟢🔵🟣⚫️⚪️🟤
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
 Актуальний результат: 
 Очікуваний результат: 
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
@@ -28,6 +29,7 @@ npx playwright test tests/game-page-startup.test.ts
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
 npx playwright test --headed
 npx playwright test --grep "@PAG-1"
+npx playwright test --grep "@GMM" --repeat-each=22
 
 npx playwright test tests/game-mode-modal.spec.ts
 npx playwright test tests/game-flow.spec.ts --headed
@@ -196,4 +198,5 @@ p.s.занеси цю перевірку в чекліст
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
 я оновив завдання і записав його в @docs/my-notes/my-current-instruction.txt виконуй
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
-
+працює добре
+зроби `git diff HEAD` та проаналізуй та напиши назву та опис для коміту, та зроби коміт

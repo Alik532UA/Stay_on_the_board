@@ -5,6 +5,7 @@ import { gameSettingsStore, type GameSettingsState } from '$lib/stores/gameSetti
 import { Figure, MoveDirection } from '$lib/models/Figure';
 import { isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils';
 import { availableMovesStore } from '$lib/stores/availableMovesStore';
+import { logService } from '$lib/services/logService';
 import { playerStore, type PlayerState } from '$lib/stores/playerStore';
 
 /**
@@ -21,10 +22,12 @@ import { playerStore, type PlayerState } from '$lib/stores/playerStore';
 // НЕ ВИДАЛЯЙТЕ ПАРАМЕТРИ І НЕ ВИКОРИСТОВУЙТЕ get() ВСЕРЕДИНІ.
 export function calculateAvailableMoves(boardState: BoardState, playerState: PlayerState, settings: GameSettingsState) {
   if (!boardState || !playerState || boardState.playerRow === null || boardState.playerCol === null) {
+    logService.logicAvailability('(calculateAvailableMoves) No board state or player position, returning empty moves');
     return [];
   }
 
   const { playerRow, playerCol, boardSize, cellVisitCounts, moveHistory } = boardState;
+  logService.logicAvailability(`(calculateAvailableMoves) Calculating for position [${playerRow}, ${playerCol}]`);
   const { players, currentPlayerIndex } = playerState;
   const lastMoveEntry = moveHistory.length > 0 ? moveHistory[moveHistory.length - 1] : null;
   
