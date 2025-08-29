@@ -1,6 +1,6 @@
 // svelte-app/src/lib/i18n/init.js
 import { register, init, getLocaleFromNavigator, locale } from 'svelte-i18n';
-import { settingsStore } from '$lib/stores/settingsStore.ts';
+import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
 import { get, writable } from 'svelte/store';
 
 export const i18nReady = writable(false);
@@ -14,14 +14,14 @@ register('nl', () => import('./nl.js'));
 // Ця функція буде викликатися на стороні клієнта
 export function initializeI18n() {
   try {
-    const initialLocale = get(settingsStore).language || getLocaleFromNavigator() || 'uk';
+    const initialLocale = get(appSettingsStore).language || getLocaleFromNavigator() || 'uk';
 
     init({
       fallbackLocale: 'uk',
       initialLocale: initialLocale,
     });
 
-    settingsStore.subscribe((settings) => {
+    appSettingsStore.subscribe((settings) => {
       if (settings.language && get(locale) !== settings.language) {
         locale.set(settings.language);
       }

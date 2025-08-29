@@ -4,7 +4,7 @@
 
 Функціональність блокування налаштувань під час гри, яка дозволяє гравцям заборонити зміну ігрових параметрів під час активного ігрового процесу.
 
-## Зміни в settingsStore
+## Зміни в appSettingsStore
 
 ### Розширений SettingsState
 
@@ -54,7 +54,7 @@ export function resetGame(options: {
   // ... існуючий код
   
   if (options.settings) {
-    settingsStore.updateSettings({
+    appSettingsStore.updateSettings({
       blockModeEnabled: options.settings.blockModeEnabled,
       autoHideBoard: options.settings.autoHideBoard,
       lockSettings: options.settings.lockSettings, // Нова властивість
@@ -95,7 +95,7 @@ function startGame() {
 ```typescript
 async function toggleExpander() {
   // Перевіряємо, чи заблоковані налаштування
-  if ($settingsStore.lockSettings) {
+  if ($appSettingsStore.lockSettings) {
     return;
   }
   isOpen = !isOpen;
@@ -110,16 +110,16 @@ async function toggleExpander() {
 
 **Додано класи блокування:**
 ```svelte
-<div class="settings-expander {isOpen ? 'open' : ''}" class:disabled={$settingsStore.lockSettings}>
+<div class="settings-expander {isOpen ? 'open' : ''}" class:disabled={$appSettingsStore.lockSettings}>
   <div 
     class="settings-summary" 
-    class:disabled={$settingsStore.lockSettings}
+    class:disabled={$appSettingsStore.lockSettings}
     role="button" 
     aria-label={$_('gameControls.settings')} 
     on:click={toggleExpander} 
     on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleExpander()} 
     bind:this={summaryRef} 
-    tabindex={$settingsStore.lockSettings ? -1 : 0}
+    tabindex={$appSettingsStore.lockSettings ? -1 : 0}
   >
     <!-- вміст -->
   </div>
@@ -163,10 +163,10 @@ resetGame({
 });
 ```
 
-### 3. Застосування в settingsStore
+### 3. Застосування в appSettingsStore
 ```typescript
 // В gameLogicService.resetGame()
-settingsStore.updateSettings({
+appSettingsStore.updateSettings({
   lockSettings: options.settings.lockSettings
 });
 ```
@@ -174,7 +174,7 @@ settingsStore.updateSettings({
 ### 4. Блокування UI
 ```typescript
 // В SettingsExpanderWidget
-if ($settingsStore.lockSettings) {
+if ($appSettingsStore.lockSettings) {
   return; // Блокуємо функцію
 }
 ```
@@ -195,7 +195,7 @@ if ($settingsStore.lockSettings) {
 ## Принципи архітектури
 
 ### SSoT (Single Source of Truth):
-- **lockSettings** зберігається в `settingsStore`
+- **lockSettings** зберігається в `appSettingsStore`
 - **Єдине джерело правди** для стану блокування
 
 ### UDF (Unidirectional Data Flow):

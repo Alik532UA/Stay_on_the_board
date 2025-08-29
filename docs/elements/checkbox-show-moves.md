@@ -6,13 +6,13 @@
 
 ## Джерело Правда (SSoT) та Залежності від Стану (State Dependencies)
 
--   **`settingsStore.showMoves`**: Основне джерело стану.
--   **`settingsStore.showBoard`**: Неактивний, якщо `showBoard` є `false`.
--   **`settingsStore.showQueen`**: Неактивний, якщо `showQueen` є `false`.
+-   **`appSettingsStore.showMoves`**: Основне джерело стану.
+-   **`appSettingsStore.showBoard`**: Неактивний, якщо `showBoard` є `false`.
+-   **`appSettingsStore.showQueen`**: Неактивний, якщо `showQueen` є `false`.
 
 ## Поведінка (Behavior)
 
--   Якщо `$settingsStore.showMoves` є `true`, на дошці відображаються точки на доступних для ходу клітинках, але **тільки коли настає черга гравця**.
+-   Якщо `$appSettingsStore.showMoves` є `true`, на дошці відображаються точки на доступних для ходу клітинках, але **тільки коли настає черга гравця**.
 -   **Час та анімація показу**:
     1.  Точки **приховані** під час анімації руху (як гравця, так і комп'ютера).
     2.  Вони **плавно з'являються** після того, як комп'ютер завершив свій хід, і настала черга гравця.
@@ -21,12 +21,12 @@
 
 ## Взаємодія з Користувачем (User Interaction)
 
--   **Клік**: Викликає `settingsStore.toggleShowMoves()`.
+-   **Клік**: Викликає `appSettingsStore.toggleShowMoves()`.
 
 ## Архітектурні Нотатки та UI/UX
 
--   Це найпростіший візуальний перемикач. Його єдина відповідальність — змінити один булевий прапорець у `settingsStore`.
--   Сама логіка відображення точок знаходиться в `BoardWrapperWidget` і залежить від комбінації `$settingsStore.showMoves`, `$animationStore.isAnimating` та `$visualCurrentPlayerIndex`, щоб показувати їх тільки коли настає черга гравця.
+-   Це найпростіший візуальний перемикач. Його єдина відповідальність — змінити один булевий прапорець у `appSettingsStore`.
+-   Сама логіка відображення точок знаходиться в `BoardWrapperWidget` і залежить від комбінації `$appSettingsStore.showMoves`, `$animationStore.isAnimating` та `$visualCurrentPlayerIndex`, щоб показувати їх тільки коли настає черга гравця.
 
 ## Критерії Прийняття (Acceptance Criteria)
 

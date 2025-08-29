@@ -9,7 +9,7 @@ test.describe('хепі флоу', () => {
   });
 
   test('хепі флоу 1', { tag: ['@inProgress', '@HF-1'] }, async ({ page }) => {
-    test.setTimeout(1000 * 60 * 120); // 120 minutes
+    // test.setTimeout(1000 * 60 * 120); // 120 minutes
 
     await test.step('Початок гри та налаштування дошки', async () => {
       await startNewGame(page);
@@ -78,6 +78,7 @@ test.describe('хепі флоу', () => {
     await test.step('Повернення до модального вікна "Блискучий аналіз!" та завершення гри з бонусом', async () => {
       await expect(page.getByTestId('player-no-moves-modal')).toBeVisible();
       scoreBeforeBonus = await getScoreByTestId(page, 'final-score-value');
+      // await page.waitForTimeout(7777777);
       await page.getByTestId('finish-game-with-bonus-btn').click();
     });
 
@@ -85,6 +86,7 @@ test.describe('хепі флоу', () => {
       await expect(page.getByTestId('game-over-modal')).toBeVisible();
       await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
       const scoreAfterBonus = await getScoreByTestId(page, 'final-score-value');
+      // await page.waitForTimeout(7777777); // пауза
       expect(scoreAfterBonus).toBeGreaterThan(scoreBeforeBonus);
     });
     

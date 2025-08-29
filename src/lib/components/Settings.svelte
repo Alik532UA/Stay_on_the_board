@@ -1,5 +1,6 @@
-<script>
-  import { settingsStore } from '../stores/settingsStore.js';
+<script lang="ts">
+  import { appSettingsStore } from '../stores/appSettingsStore.js';
+  import { gameSettingsStore, type GameSettingsState } from '../stores/gameSettingsStore.js';
   import { _ } from 'svelte-i18n';
   import SvgIcons from './SvgIcons.svelte';
   import { customTooltip } from '$lib/actions/customTooltip.js';
@@ -12,7 +13,8 @@
   import { gameModeService } from '$lib/services/gameModeService';
   import { userActionService } from '$lib/services/userActionService';
 
-  $: settings = $settingsStore;
+  $: settings = $appSettingsStore;
+  $: gameSettings = $gameSettingsStore;
 
   function handleClearAll() {
     logService.action('Повне очищення кешу');
@@ -24,29 +26,25 @@
     clearCache({ keepAppearance: true });
   }
 
-  /** @param {string} lang */
-  function selectLang(lang) {
+  function selectLang(lang: string) {
     logService.ui(`Зміна мови: ${lang}`);
-    settingsStore.updateSettings({ language: lang });
+    appSettingsStore.updateSettings({ language: lang });
     localStorage.setItem('language', lang);
     locale.set(lang);
   }
 
-  /** @param {Event} e */
-  /** @param {string} style @param {string} theme */
-  function selectTheme(style, theme) {
+  function selectTheme(style: string, theme: string) {
     logService.ui(`Зміна теми: ${style}, ${theme}`);
-    settingsStore.updateSettings({ style, theme });
+    appSettingsStore.updateSettings({ style, theme });
   }
 
-  /** @param {Event} e */
-  /** @param {string} name */
-  function toggleSetting(name) {
+  function toggleSetting(name: string) {
     logService.ui(`Зміна налаштування: ${name}`);
-    settingsStore.updateSettings({ [name]: !settings[name] });
+    const key = name as keyof GameSettingsState;
+    gameSettingsStore.updateSettings({ [key]: !gameSettings[key] });
   }
   function resetSettings() {
-    settingsStore.resetSettings();
+    gameSettingsStore.resetSettings();
   }
 </script>
 
@@ -105,9 +103,9 @@
         <div class="settings-button-group" data-testid="settings-page-game-mode-group">
           <button
             class="settings-group-button"
-            class:active={!settings.rememberGameMode}
+            class:active={!gameSettings.rememberGameMode}
             on:click={() => {
-              settingsStore.updateSettings({ gameMode: null, showGameModeModal: true, rememberGameMode: false });
+              gameSettingsStore.updateSettings({ gameMode: null, showGameModeModal: true, rememberGameMode: false });
               if (typeof window !== 'undefined') {
                 sessionStorage.removeItem('gameMode');
               }
@@ -118,24 +116,24 @@
           </button>
           <button
             class="settings-group-button"
-            class:active={settings.rememberGameMode && settings.gameMode === 'beginner'}
-            on:click={() => userActionService.applyGameModePreset('beginner')}
+            class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'beginner'}
+            on:click={() => userActionService.setGameModePreset('beginner')}
             data-testid="settings-page-game-mode-beginner"
           >
             Новачок
           </button>
           <button
             class="settings-group-button"
-            class:active={settings.rememberGameMode && settings.gameMode === 'experienced'}
-            on:click={() => userActionService.applyGameModePreset('experienced')}
+            class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'experienced'}
+            on:click={() => userActionService.setGameModePreset('experienced')}
             data-testid="settings-page-game-mode-experienced"
           >
             Розбійник
           </button>
           <button
             class="settings-group-button"
-            class:active={settings.rememberGameMode && settings.gameMode === 'pro'}
-            on:click={() => userActionService.applyGameModePreset('pro')}
+            class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'pro'}
+            on:click={() => userActionService.setGameModePreset('pro')}
             data-testid="settings-page-game-mode-pro"
           >
             Потужний
@@ -146,7 +144,7 @@
       <div class="settings-option" data-testid="settings-page-difficulty-warning-option">
         <button
           class="settings-toggle-button"
-          class:active={settings.showDifficultyWarningModal}
+          class:active={gameSettings.showDifficultyWarningModal}
           on:click={() => toggleSetting('showDifficultyWarningModal')}
           data-testid="settings-page-show-difficulty-warning-modal-toggle"
         >

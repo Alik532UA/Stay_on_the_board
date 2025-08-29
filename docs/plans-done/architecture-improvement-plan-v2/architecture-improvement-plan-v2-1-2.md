@@ -92,7 +92,7 @@
   import SettingsExpanderWidget from './widgets/SettingsExpanderWidget.svelte';
 
   // Імпорти для логіки модальних вікон та ініціалізації
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
@@ -102,7 +102,7 @@
   import { resetGame } from '$lib/services/gameLogicService.js'; // Для onMount
 
   onMount(() => {
-    settingsStore.init();
+    appSettingsStore.init();
     // Скидаємо гру для коректної ініціалізації при перезавантаженні
     resetGame();
   });

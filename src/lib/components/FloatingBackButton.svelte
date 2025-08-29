@@ -1,18 +1,8 @@
 <script lang="ts">
   import { navigationService } from '$lib/services/navigationService.js';
-  import { modalStore } from '$lib/stores/modalStore.js';
-  import { gameOrchestrator } from '$lib/gameOrchestrator.ts';
   import { _ } from 'svelte-i18n';
   import { customTooltip } from '$lib/actions/customTooltip.js';
-  import { get } from 'svelte/store';
-  import { userActionService } from '$lib/services/userActionService';
-  import { gameState } from '$lib/stores/gameState.js';
   import { logService } from '$lib/services/logService.js';
-  import { gameOverStore } from '$lib/stores/gameOverStore.js';
-  import { replayService } from '$lib/services/replayService';
-  import { gameModeService } from '$lib/services/gameModeService';
-
-  import { modalService } from '$lib/services/modalService';
 
   function handleBackClick() {
     logService.ui('FloatingBackButton: handleBackClick called');
@@ -25,7 +15,7 @@
   class="floating-back-btn"
   aria-label={$_('ui.goBack') || 'Повернутися назад'}
   use:customTooltip={$_('ui.goBack') || 'Повернутися назад'}
-  onclick={handleBackClick}
+  on:click={handleBackClick}
 >
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <line x1="19" y1="12" x2="5" y2="12"></line>

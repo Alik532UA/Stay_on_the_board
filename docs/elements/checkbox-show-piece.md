@@ -6,13 +6,13 @@
 
 ## Джерело Правда (SSoT) та Залежності від Стану (State Dependencies)
 
--   **`settingsStore.showQueen`**: Основне джерело стану.
--   **`settingsStore.showBoard`**: Чекбокс стає неактивним (`disabled`), якщо `showBoard` є `false`.
+-   **`appSettingsStore.showQueen`**: Основне джерело стану.
+-   **`appSettingsStore.showBoard`**: Чекбокс стає неактивним (`disabled`), якщо `showBoard` є `false`.
 
 ## Поведінка (Behavior)
 
 1.  **Візуалізація**:
-    *   Якщо `$settingsStore.showQueen` є `true`, фігура ферзя (`PlayerPiece.svelte`) рендериться на дошці.
+    *   Якщо `$appSettingsStore.showQueen` є `true`, фігура ферзя (`PlayerPiece.svelte`) рендериться на дошці.
     *   Якщо `false`, фігура не рендериться.
 2.  **Каскадна логіка**:
     *   Коли цей чекбокс **вимкнений** (`false`), чекбокс "Показувати доступні ходи" автоматично **вимикається і стає неактивним**. Неможливо показувати ходи для невидимої фігури.
@@ -20,11 +20,11 @@
 
 ## Взаємодія з Користувачем (User Interaction)
 
--   **Клік**: Викликає `settingsStore.toggleShowQueen()`.
+-   **Клік**: Викликає `appSettingsStore.toggleShowQueen()`.
 
 ## Архітектурні Нотатки та UI/UX
 
--   Логічна залежність (`showMoves` залежить від `showQueen`) реалізована всередині `settingsStore`, щоб забезпечити консистентність стану. Компонент UI лише відображає цей стан.
+-   Логічна залежність (`showMoves` залежить від `showQueen`) реалізована всередині `appSettingsStore`, щоб забезпечити консистентність стану. Компонент UI лише відображає цей стан.
 
 ## Критерії Прийняття (Acceptance Criteria)
 

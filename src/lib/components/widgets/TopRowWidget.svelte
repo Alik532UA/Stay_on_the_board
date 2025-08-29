@@ -1,25 +1,23 @@
-<script>
+<script lang="ts">
   import { navigationService } from '$lib/services/navigationService.js';
   import { _ } from 'svelte-i18n';
   import SvgIcons from '../SvgIcons.svelte';
-  import { showGameModeSelector, showGameInfoModal } from '$lib/utils/uiHelpers.js';
+  import { showGameInfoModal } from '$lib/utils/uiHelpers.js';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
-  import { gameState } from '$lib/stores/gameState';
   import { modalService } from '$lib/services/modalService';
-
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
   import { logService } from '$lib/services/logService.js';
+  import { uiStateStore } from '$lib/stores/uiStateStore';
 
   function handleMainMenuClick() {
-    const state = get(gameState);
-    if (state.isGameOver) {
+    const uiState = get(uiStateStore);
+    if (uiState?.isGameOver) {
       navigationService.goToMainMenu();
     } else {
-      // modalService.showExitConfirmation();
       navigationService.goToMainMenu();
     }
   }
@@ -28,8 +26,7 @@
     navigationService.goTo('/local-setup');
   }
 
-  /** @param {KeyboardEvent} e */
-  function handleKeydown(e) {
+  function handleKeydown(e: KeyboardEvent) {
     if (e.code === 'KeyI') {
       e.preventDefault();
       showGameInfoModal();

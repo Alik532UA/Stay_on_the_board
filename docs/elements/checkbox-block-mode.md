@@ -6,8 +6,8 @@
 
 ## Джерело Правда (SSoT) та Залежності від Стану (State Dependencies)
 
--   **`settingsStore.blockModeEnabled`**: Основне джерело стану.
--   **`settingsStore.blockOnVisitCount`**: Залежне налаштування, яке стає видимим, коли `blockModeEnabled` є `true`.
+-   **`appSettingsStore.blockModeEnabled`**: Основне джерело стану.
+-   **`appSettingsStore.blockOnVisitCount`**: Залежне налаштування, яке стає видимим, коли `blockModeEnabled` є `true`.
 
 ## Поведінка (Behavior)
 
@@ -22,8 +22,8 @@
 
 ## Взаємодія з Користувачем (User Interaction)
 
--   **Клік на чекбокс**: Викликає `settingsStore.toggleBlockMode()`.
--   **Клік на кнопки "Блокувати після"**: Викликає `settingsStore.updateSettings({ blockOnVisitCount: count })`.
+-   **Клік на чекбокс**: Викликає `appSettingsStore.toggleBlockMode()`.
+-   **Клік на кнопки "Блокувати після"**: Викликає `appSettingsStore.updateSettings({ blockOnVisitCount: count })`.
 
 ## Архітектурні Нотатки та UI/UX
 

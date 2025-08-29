@@ -1,12 +1,13 @@
 <script lang="ts">
   import { derived } from 'svelte/store';
-  import { gameState } from '$lib/stores/gameState.js';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
   import { _ } from 'svelte-i18n';
   import { lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves } from '$lib/stores/derivedState.ts';
   import { i18nReady } from '$lib/i18n/init.js';
   import { fade, slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
+  import { playerStore } from '$lib/stores/playerStore';
+  import { uiStateStore } from '$lib/stores/uiStateStore';
 
   // --- Допоміжні функції ---
   function getPlayerColor(players: any[], playerName: string): string | null {
@@ -27,25 +28,24 @@
 
   // --- Derived стор для генерації повідомлень ---
   const displayMessage = derived(
-    [gameState, lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves, _, settingsStore],
-    ([$gameState, $lastComputerMove, $lastPlayerMove, $isPlayerTurn, $isPauseBetweenMoves, $_, $settingsStore]) => {
-      if (!$gameState) return '';
+    [playerStore, uiStateStore, lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves, _, gameSettingsStore],
+    ([$playerStore, $uiStateStore, $lastComputerMove, $lastPlayerMove, $isPlayerTurn, $isPauseBetweenMoves, $_, $gameSettingsStore]) => {
+      if (!$playerStore || !$uiStateStore) return '';
 
-      const isCompact = $settingsStore.showGameInfoWidget === 'compact';
-      const humanPlayersCount = $gameState.players.filter((p: any) => p.type === 'human').length;
+      const isCompact = $gameSettingsStore.showGameInfoWidget === 'compact';
+      const humanPlayersCount = $playerStore.players.filter((p: any) => p.type === 'human').length;
       const isLocalGame = humanPlayersCount > 1;
 
-      if ($gameState.isGameOver) return $_('gameBoard.gameInfo.gameOver');
-      if ($gameState.isFirstMove) {
+      if ($uiStateStore.isGameOver) return $_('gameBoard.gameInfo.gameOver');
+      if ($uiStateStore.isFirstMove) {
         if (isLocalGame) {
-          const currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
-          const playerStyle = getPlayerNameStyle($gameState.players, currentPlayer.name);
+          const currentPlayer = $playerStore.players[$playerStore.currentPlayerIndex];
+          const playerStyle = getPlayerNameStyle($playerStore.players, currentPlayer.name);
           return `Гра почалась!<br><div><span class="player-name-plate" style="${playerStyle}">${currentPlayer.name}</span>, ваша черга робити хід</div>`;
         }
         return $_('gameBoard.gameInfo.firstMove');
       }
-      if ($gameState.isResumedGame) return $_('gameBoard.gameInfo.gameResumed');
-
+      
       if ($lastComputerMove && !$isPauseBetweenMoves) {
         const directionKey = $lastComputerMove.direction.replace(/-(\w)/g, (_: string, c: string) => c.toUpperCase());
         const direction = $_(`gameBoard.directions.${directionKey}`);
@@ -64,11 +64,11 @@
       }
 
       if ($lastPlayerMove && !$isPauseBetweenMoves && isLocalGame) {
-        const currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
-        const previousPlayerIndex = ($gameState.currentPlayerIndex + $gameState.players.length - 1) % $gameState.players.length;
-        const previousPlayer = $gameState.players[previousPlayerIndex];
-        const previousPlayerStyle = getPlayerNameStyle($gameState.players, previousPlayer.name);
-        const currentPlayerStyle = getPlayerNameStyle($gameState.players, currentPlayer.name);
+        const currentPlayer = $playerStore.players[$playerStore.currentPlayerIndex];
+        const previousPlayerIndex = ($playerStore.currentPlayerIndex + $playerStore.players.length - 1) % $playerStore.players.length;
+        const previousPlayer = $playerStore.players[previousPlayerIndex];
+        const previousPlayerStyle = getPlayerNameStyle($playerStore.players, previousPlayer.name);
+        const currentPlayerStyle = getPlayerNameStyle($playerStore.players, currentPlayer.name);
         const directionKey = $lastPlayerMove.direction.replace(/-(\w)/g, (_: string, c: string) => c.toUpperCase());
         const direction = $_(`gameBoard.directions.${directionKey}`);
         return `<div class="message-line-1"><span class="player-name-plate" style="${previousPlayerStyle}">${previousPlayer.name}</span> зробив хід: ${direction} на ${$lastPlayerMove.distance}.</div><div class="message-line-2"><span class="player-name-plate" style="${currentPlayerStyle}">${currentPlayer.name}</span> ваша черга робити хід!</div>`;
@@ -78,8 +78,8 @@
 
       if ($isPlayerTurn) {
         if (isLocalGame) {
-          const currentPlayer = $gameState.players[$gameState.currentPlayerIndex];
-          const currentPlayerStyle = getPlayerNameStyle($gameState.players, currentPlayer.name);
+          const currentPlayer = $playerStore.players[$playerStore.currentPlayerIndex];
+          const currentPlayerStyle = getPlayerNameStyle($playerStore.players, currentPlayer.name);
           return `Хід гравця: <span class="player-name-plate" style="${currentPlayerStyle}">${currentPlayer.name}</span>`;
         }
         return $_('gameBoard.gameInfo.playerTurn');
@@ -91,6 +91,33 @@
     }
   );
 </script>
+
+
+{#if $i18nReady && $uiStateStore && $playerStore}
+  {#if $gameSettingsStore.showGameInfoWidget !== 'hidden'}
+    <div class="game-info-widget"
+         class:compact={$gameSettingsStore.showGameInfoWidget === 'compact'}
+         transition:slide={{ duration: 400, easing: quintOut }}
+         data-testid="game-info-panel"
+    >
+      <div class="game-info-content" data-testid="game-info-content">
+        {#key $displayMessage}
+          <div class="fade-wrapper" in:fade={{ duration: 250, delay: 250 }} out:fade={{ duration: 250 }}>
+            {#if typeof $displayMessage === 'object' && $displayMessage.isCompact}
+              <div class="compact-message-line">
+                <span>{$displayMessage.part1}</span>
+                <span class="compact-move-display">{$displayMessage.move}</span>
+              </div>
+              <span>{$displayMessage.part2}</span>
+            {:else}
+              {@html $displayMessage}
+            {/if}
+          </div>
+        {/key}
+      </div>
+    </div>
+  {/if}
+{/if}
 
 <style>
   .game-info-widget {
@@ -177,29 +204,3 @@
     flex-wrap: wrap;
   }
 </style>
-
-{#if $i18nReady && $gameState}
-  {#if $settingsStore.showGameInfoWidget !== 'hidden'}
-    <div class="game-info-widget"
-         class:compact={$settingsStore.showGameInfoWidget === 'compact'}
-         transition:slide={{ duration: 400, easing: quintOut }}
-         data-testid="game-info-panel"
-    >
-      <div class="game-info-content" data-testid="game-info-content">
-        {#key $displayMessage}
-          <div class="fade-wrapper" in:fade={{ duration: 250, delay: 250 }} out:fade={{ duration: 250 }}>
-            {#if typeof $displayMessage === 'object' && $displayMessage.isCompact}
-              <div class="compact-message-line">
-                <span>{$displayMessage.part1}</span>
-                <span class="compact-move-display">{$displayMessage.move}</span>
-              </div>
-              <span>{$displayMessage.part2}</span>
-            {:else}
-              {@html $displayMessage}
-            {/if}
-          </div>
-        {/key}
-      </div>
-    </div>
-  {/if}
-{/if}

@@ -114,7 +114,7 @@
     ```javascript
     // src/lib/services/uiService.js
     import { get } from 'svelte/store';
-    import { settingsStore } from '$lib/stores/settingsStore.js';
+    import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
     import { modalStore } from '$lib/stores/modalStore.js';
     import { gameState } from '$lib/stores/gameState.js';
     import { resetGame } from '$lib/services/gameLogicService.js';
@@ -133,19 +133,19 @@
         resetGame();
       }
       
-      settingsStore.init(); // Переконуємося, що налаштування актуальні
+      appSettingsStore.init(); // Переконуємося, що налаштування актуальні
 
-      if (get(settingsStore).showGameModeModal) {
+      if (get(appSettingsStore).showGameModeModal) {
         modalStore.showModal({
           titleKey: 'gameModes.title',
           component: GameModeModal,
           closable: true
         });
       } else {
-        const currentMode = get(settingsStore).gameMode;
+        const currentMode = get(appSettingsStore).gameMode;
         if (!currentMode) {
           // Якщо режим не встановлено, застосовуємо "новачок" за замовчуванням
-          settingsStore.applyGameModePreset('beginner');
+          appSettingsStore.applyGameModePreset('beginner');
         }
         goto(`${base}/game`);
       }
@@ -177,17 +177,17 @@
           if (get(gameState).isGameOver) {
             resetGame();
           }
-          settingsStore.init();
-          if (get(settingsStore).showGameModeModal) {
+          appSettingsStore.init();
+          if (get(appSettingsStore).showGameModeModal) {
             modalStore.showModal({
               titleKey: 'gameModes.title',
               component: GameModeModal,
               closable: true
             });
           } else {
-            const currentMode = get(settingsStore).gameMode;
+            const currentMode = get(appSettingsStore).gameMode;
             if (!currentMode) {
-              settingsStore.applyGameModePreset('beginner');
+              appSettingsStore.applyGameModePreset('beginner');
             }
             goto(`${base}/game`);
           }

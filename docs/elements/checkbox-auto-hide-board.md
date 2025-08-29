@@ -6,17 +6,17 @@
 
 ## Джерело Правда (SSoT) та Залежності від Стану (State Dependencies)
 
--   **`settingsStore.autoHideBoard`**: Основне джерело стану.
+-   **`appSettingsStore.autoHideBoard`**: Основне джерело стану.
 
 ## Поведінка (Behavior)
 
--   Сам чекбокс лише встановлює прапорець `autoHideBoard` у `settingsStore`.
+-   Сам чекбокс лише встановлює прапорець `autoHideBoard` у `appSettingsStore`.
 -   **Побічний ефект** цієї дії обробляється в іншому місці (наприклад, у `BoardWrapperWidget.svelte` або централізованому `uiEffectsStore`).
--   Слухач (`subscriber`) в `BoardWrapperWidget` відстежує зміни в `gameState.playerRow`/`playerCol`. Якщо позиція змінилася (тобто гравець зробив хід) і `$settingsStore.autoHideBoard` є `true`, він викликає `settingsStore.toggleShowBoard(false)` з невеликою затримкою.
+-   Слухач (`subscriber`) в `BoardWrapperWidget` відстежує зміни в `gameState.playerRow`/`playerCol`. Якщо позиція змінилася (тобто гравець зробив хід) і `$appSettingsStore.autoHideBoard` є `true`, він викликає `appSettingsStore.toggleShowBoard(false)` з невеликою затримкою.
 
 ## Взаємодія з Користувачем (User Interaction)
 
--   **Клік**: Викликає `settingsStore.toggleAutoHideBoard()`.
+-   **Клік**: Викликає `appSettingsStore.toggleAutoHideBoard()`.
 
 ## Архітектурні Нотатки та UI/UX
 
@@ -26,7 +26,7 @@
 
 ## Відомі проблеми та виправлення
 
-Першопричина бага — локальні змінні в subscribe не зберігали стан; виправлено винесенням за callback і інтеграцією з gameState.isFirstMove для точного виявлення ходу гравця. Derived shouldHideBoard видалено як надлишковий для SSoT в settingsStore.showBoard.
+Першопричина бага — локальні змінні в subscribe не зберігали стан; виправлено винесенням за callback і інтеграцією з gameState.isFirstMove для точного виявлення ходу гравця. Derived shouldHideBoard видалено як надлишковий для SSoT в appSettingsStore.showBoard.
 
 ## Критерії Прийняття (Acceptance Criteria)
 

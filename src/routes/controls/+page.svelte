@@ -1,12 +1,12 @@
 <script>
   import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
   import { _ } from 'svelte-i18n';
-  import { settingsStore } from '$lib/stores/settingsStore.ts';
+  import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
   import { onMount } from 'svelte';
   import { customTooltip } from '$lib/actions/customTooltip.js';
   import { userActionService } from '$lib/services/userActionService';
 
-  /** @type {{ action: import('$lib/stores/settingsStore.ts').KeybindingAction, index: number } | null} */
+  /** @type {{ action: import('$lib/stores/gameSettingsStore').KeybindingAction, index: number } | null} */
   let listeningFor = null;
 
   /**
@@ -32,7 +32,7 @@
   ];
 
   /** @type {Record<string, string[]>} */
-  $: keybindings = $settingsStore.keybindings;
+  $: keybindings = $gameSettingsStore.keybindings;
 
   /** @type {Set<string>} */
   $: conflicts = (() => {
@@ -52,7 +52,7 @@
   })();
 
   /**
-   * @param {import('$lib/stores/settingsStore.ts').KeybindingAction} action
+   * @param {import('$lib/stores/gameSettingsStore').KeybindingAction} action
    * @param {number} [index=-1]
    */
   function listenForKey(action, index = -1) {
@@ -60,15 +60,15 @@
   }
 
   /**
-   * @param {import('$lib/stores/settingsStore.ts').KeybindingAction} action
+   * @param {import('$lib/stores/gameSettingsStore').KeybindingAction} action
    * @param {number} index
    */
   function removeKey(action, index) {
-    const newKeybindings = { ...$settingsStore.keybindings };
+    const newKeybindings = { ...$gameSettingsStore.keybindings };
     const updatedKeys = [...newKeybindings[action]];
     updatedKeys.splice(index, 1);
     newKeybindings[action] = updatedKeys;
-    settingsStore.updateSettings({ keybindings: newKeybindings });
+    gameSettingsStore.updateSettings({ keybindings: newKeybindings });
   }
 
   /** @param {KeyboardEvent} event */
@@ -80,7 +80,7 @@
         return;
       }
       const { action, index } = listeningFor;
-      const newKeybindings = { ...$settingsStore.keybindings };
+      const newKeybindings = { ...$gameSettingsStore.keybindings };
       const keysForAction = [...(newKeybindings[action] || [])];
       if (index !== -1) {
         keysForAction[index] = event.code;
@@ -88,7 +88,7 @@
         keysForAction.push(event.code);
       }
       newKeybindings[action] = keysForAction;
-      settingsStore.updateSettings({ keybindings: newKeybindings });
+      gameSettingsStore.updateSettings({ keybindings: newKeybindings });
       listeningFor = null;
     }
   }
@@ -133,20 +133,20 @@
                   class="key-button"
                   class:listening={listeningFor?.action === action && listeningFor?.index === i}
                   class:conflict={conflicts.has(key)}
-                  on:click={() => listenForKey(/** @type {import('$lib/stores/settingsStore.ts').KeybindingAction} */(action), i)}
+                  on:click={() => listenForKey(/** @type {import('$lib/stores/gameSettingsStore').KeybindingAction} */(action), i)}
                 >
                   {listeningFor?.action === action && listeningFor?.index === i
                     ? $_('controlsPage.pressKey')
                     : formatKeyCode(key)}
                 </button>
-                <button class="remove-key-btn" use:customTooltip={$_('controlsPage.removeKey')} on:click={() => removeKey(/** @type {import('$lib/stores/settingsStore.ts').KeybindingAction} */(action), i)}>×</button>
+                <button class="remove-key-btn" use:customTooltip={$_('controlsPage.removeKey')} on:click={() => removeKey(/** @type {import('$lib/stores/gameSettingsStore').KeybindingAction} */(action), i)}>×</button>
               </div>
             {/each}
             {#if (keybindings[action]?.length || 0) < 8}
               {#if listeningFor?.action === action && listeningFor?.index === -1}
                 <span class="press-key-hint">{$_('controlsPage.pressKey') || 'Натисніть клавішу'}</span>
               {:else}
-                <button class="add-key-btn" on:click={() => listenForKey(/** @type {import('$lib/stores/settingsStore.ts').KeybindingAction} */(action), -1)}>+</button>
+                <button class="add-key-btn" on:click={() => listenForKey(/** @type {import('$lib/stores/gameSettingsStore').KeybindingAction} */(action), -1)}>+</button>
               {/if}
             {/if}
           </div>

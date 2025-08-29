@@ -13,12 +13,12 @@
 Логіка, яка зараз знаходиться всередині компонента, має бути перенесена у центральний файл з обчислюваними сторами, щоб її можна було перевикористовувати та тестувати окремо.
 
 - [ ] **Оновити файл `$lib/stores/derivedState.ts`.**
-    Додайте новий `derived` стор `shouldHideBoard`, який буде залежати від `settingsStore` та `gameState`.
+    Додайте новий `derived` стор `shouldHideBoard`, який буде залежати від `appSettingsStore` та `gameState`.
 
     **Код для додавання у `src/lib/stores/derivedState.ts`:**
     ```typescript
     import { derived } from 'svelte/store';
-    import { settingsStore } from './settingsStore';
+    import { appSettingsStore } from './appSettingsStore';
     import { gameState } from './gameState';
     // ... інші імпорти та стори ...
 
@@ -27,10 +27,10 @@
      * @type {import('svelte/store').Readable<boolean>}
      */
     export const shouldHideBoard = derived(
-      [settingsStore, gameState],
-      ([$settingsStore, $gameState]) => {
+      [appSettingsStore, gameState],
+      ([$appSettingsStore, $gameState]) => {
         // Якщо опція автоматичного приховування вимкнена, дошку не ховаємо
-        if (!$settingsStore.autoHideBoard) {
+        if (!$appSettingsStore.autoHideBoard) {
           return false;
         }
         
@@ -58,10 +58,10 @@
 
       // ЦЕЙ БЛОК ПОВНІСТЮ ВИДАЛЯЄМО
       const shouldHideBoard = derived([
-        settingsStore,
+        appSettingsStore,
         gameState
-      ], ([$settingsStore, $gameState]) => {
-        if (!$settingsStore.autoHideBoard) return false;
+      ], ([$appSettingsStore, $gameState]) => {
+        if (!$appSettingsStore.autoHideBoard) return false;
         const lastMove = $gameState.moveQueue?.[$gameState.moveQueue.length - 1];
         return lastMove && lastMove.player === 1;
       });

@@ -108,7 +108,7 @@
 ```svelte
 <script>
   import { _ } from 'svelte-i18n';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
@@ -121,7 +121,7 @@
    * @param {'beginner' | 'experienced' | 'pro'} mode
    */
   function selectMode(mode) {
-    const shouldShowFaq = settingsStore.applyGameModePreset(mode);
+    const shouldShowFaq = appSettingsStore.applyGameModePreset(mode);
     const { score, penaltyPoints, boardSize } = get(gameState);
     if (score === 0 && penaltyPoints === 0 && boardSize !== 4) {
       gameOrchestrator.setBoardSize(4); // Оновлено

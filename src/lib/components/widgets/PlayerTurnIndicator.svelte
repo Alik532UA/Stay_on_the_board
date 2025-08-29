@@ -1,9 +1,9 @@
-<script>
-  import { gameState } from '$lib/stores/gameState';
-  import { customTooltip } from '$lib/actions/customTooltip';
+<script lang="ts">
+  import { playerStore } from '$lib/stores/playerStore';
+  import { customTooltip } from '$lib/actions/customTooltip.js';
 
-  $: players = $gameState.players;
-  $: currentPlayerIndex = $gameState.currentPlayerIndex;
+  $: players = $playerStore?.players;
+  $: currentPlayerIndex = $playerStore?.currentPlayerIndex;
 </script>
 
 <style>
@@ -22,6 +22,7 @@
   }
 </style>
 
+{#if players}
 <div class="indicator-wrapper">
   {#each players as player, i}
     <div 
@@ -31,3 +32,4 @@
     ></div>
   {/each}
 </div>
+{/if}

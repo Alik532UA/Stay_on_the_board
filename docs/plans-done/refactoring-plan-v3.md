@@ -26,12 +26,12 @@ author: ""
     - [x] Додати натомість наступні імпорти:
       ```javascript
       import { getAvailableMoves } from './gameCore.js';
-      import { settingsStore } from './stores/settingsStore.js';
+      import { appSettingsStore } from './stores/appSettingsStore.js';
       import { get } from 'svelte/store';
       ```
     - [x] У функції `getComputerMove`, знайти рядок `const blockOnVisitCount = 0;` і замінити його на:
       ```javascript
-      const { blockOnVisitCount } = get(settingsStore);
+      const { blockOnVisitCount } = get(appSettingsStore);
       ```
     - [x] У тій же функції, знайти рядок `const moves = getAllValidMoves(board, cellVisitCounts, blockOnVisitCount, boardSize);` і замінити його на:
       ```javascript
@@ -80,7 +80,7 @@ author: ""
       export function _updateAvailableMoves() {
         appState.update(state => {
           if (state.playerRow === null || state.playerCol === null) return state;
-          const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.cellVisitCounts, get(settingsStore).blockOnVisitCount);
+          const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.cellVisitCounts, get(appSettingsStore).blockOnVisitCount);
           return { ...state, availableMoves: newAvailableMoves };
         });
       }

@@ -1,25 +1,16 @@
-<script>
+<script lang="ts">
   import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
   import PlayerManager from '$lib/components/local-setup/PlayerManager.svelte';
   import LocalGameSettings from '$lib/components/local-setup/LocalGameSettings.svelte';
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
-  import { gameState, createInitialState } from '$lib/stores/gameState.js';
   import { get } from 'svelte/store';
   import { testModeStore } from '$lib/stores/testModeStore';
-  import { getInitialPosition } from '$lib/utils/initialPositionUtils';
+  import { gameService } from '$lib/services/gameService';
 
   onMount(() => {
-    // НАВІЩО: Створюємо початковий стан для сторінки налаштувань, якщо його ще немає.
-    // Це єдина точка ініціалізації для цього екрану, що відповідає SSoT.
-    if (!get(gameState)) {
-      const testModeState = get(testModeStore);
-      const size = 4; // Default size for setup page
-      const initialPosition = getInitialPosition(size, testModeState);
-
-      gameState.set(createInitialState({ size, initialPosition, testMode: testModeState.isEnabled }));
-    }
+    gameService.initializeNewGame();
   });
 </script>
 

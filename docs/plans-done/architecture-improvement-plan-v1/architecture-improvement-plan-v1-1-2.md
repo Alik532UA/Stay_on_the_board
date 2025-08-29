@@ -143,7 +143,7 @@
       const boardSize = derived(gameState, $gameState => Number($gameState.boardSize));
       // ...
       function isAvailable(row: number, col: number) {
-        return $settingsStore.showMoves && $animationStore.showAvailableMoveDots && $gameState.availableMoves && $gameState.availableMoves.some(move => move.row === row && move.col === col);
+        return $appSettingsStore.showMoves && $animationStore.showAvailableMoveDots && $gameState.availableMoves && $gameState.availableMoves.some(move => move.row === row && move.col === col);
       }
       // ...
     </script>
@@ -158,8 +158,8 @@
       const boardSize = derived(gameState, $gameState => Number($gameState.boardSize));
       // ...
       function isAvailable(row: number, col: number) {
-        // Тепер залежить ТІЛЬКИ від animationStore та settingsStore
-        return $settingsStore.showMoves && $animationStore.showAvailableMoveDots && get(gameState).availableMoves && get(gameState).availableMoves.some(move => move.row === row && move.col === col);
+        // Тепер залежить ТІЛЬКИ від animationStore та appSettingsStore
+        return $appSettingsStore.showMoves && $animationStore.showAvailableMoveDots && get(gameState).availableMoves && get(gameState).availableMoves.some(move => move.row === row && move.col === col);
       }
       // ...
     </script>
@@ -172,16 +172,16 @@
     ```svelte
     <!-- ... -->
     <div
-      class="board-cell {getDamageClass(rowIdx, colIdx, $animationStore.cellVisitCounts, $settingsStore)}"
-      class:blocked-cell={isCellBlocked(rowIdx, colIdx, $animationStore.cellVisitCounts, $settingsStore)}
+      class="board-cell {getDamageClass(rowIdx, colIdx, $animationStore.cellVisitCounts, $appSettingsStore)}"
+      class:blocked-cell={isCellBlocked(rowIdx, colIdx, $animationStore.cellVisitCounts, $appSettingsStore)}
       <!-- ... -->
     >
-      {#if isCellBlocked(rowIdx, colIdx, $animationStore.cellVisitCounts, $settingsStore)}
+      {#if isCellBlocked(rowIdx, colIdx, $animationStore.cellVisitCounts, $appSettingsStore)}
         <!-- ... -->
       {/if}
     </div>
     <!-- ... -->
-    {#if $settingsStore.showQueen && $animationStore.row !== null && $animationStore.col !== null}
+    {#if $appSettingsStore.showQueen && $animationStore.row !== null && $animationStore.col !== null}
       <div class="player-piece"
         style="top: {$animationStore.row * (100 / $boardSize)}%; left: {$animationStore.col * (100 / $boardSize)}%; z-index: 10;">
         <!-- ... -->
@@ -194,16 +194,16 @@
     ```svelte
     <!-- ... -->
     <div
-      class="board-cell {getDamageClass(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $settingsStore)}"
-      class:blocked-cell={isCellBlocked(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $settingsStore)}
+      class="board-cell {getDamageClass(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $appSettingsStore)}"
+      class:blocked-cell={isCellBlocked(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $appSettingsStore)}
       <!-- ... -->
     >
-      {#if isCellBlocked(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $settingsStore)}
+      {#if isCellBlocked(rowIdx, colIdx, $animationStore.visualCellVisitCounts, $appSettingsStore)}
         <!-- ... -->
       {/if}
     </div>
     <!-- ... -->
-    {#if $settingsStore.showQueen && $animationStore.visualRow !== null && $animationStore.visualCol !== null}
+    {#if $appSettingsStore.showQueen && $animationStore.visualRow !== null && $animationStore.visualCol !== null}
       <div class="player-piece"
         style="top: {$animationStore.visualRow * (100 / $boardSize)}%; left: {$animationStore.visualCol * (100 / $boardSize)}%; z-index: 10;">
         <!-- ... -->

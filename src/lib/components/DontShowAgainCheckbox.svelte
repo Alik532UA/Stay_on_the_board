@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { settingsStore } from '$lib/stores/settingsStore.ts';
+  import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
   import { _ } from 'svelte-i18n';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { logService } from '$lib/services/logService.js';
@@ -10,9 +10,9 @@
 
   $: {
     if (modalType === 'gameMode') {
-      dontShowAgain = !$settingsStore.showGameModeModal;
+      dontShowAgain = !$gameSettingsStore.showGameModeModal;
     } else if (modalType === 'expertMode') {
-      dontShowAgain = !$settingsStore.showDifficultyWarningModal;
+      dontShowAgain = !$gameSettingsStore.showDifficultyWarningModal;
     }
   }
 
@@ -20,9 +20,9 @@
     const input = event.currentTarget as HTMLInputElement;
     if (input && typeof input.checked === 'boolean') {
       if (modalType === 'gameMode') {
-        settingsStore.updateSettings({ showGameModeModal: !input.checked });
+        gameSettingsStore.updateSettings({ showGameModeModal: !input.checked });
       } else if (modalType === 'expertMode') {
-        settingsStore.updateSettings({ showDifficultyWarningModal: !input.checked });
+        gameSettingsStore.updateSettings({ showDifficultyWarningModal: !input.checked });
       }
     }
   }

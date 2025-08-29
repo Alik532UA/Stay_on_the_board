@@ -23,15 +23,15 @@ author: ""
 - [x] **Блок 1: Фіналізація `playerAgents.js`**
     - [x] Відкрити файл `svelte-app/src/lib/playerAgents.js`.
     - [x] Видалити поточний імпорт `getAllValidMoves` з `ai.js`.
-    - [x] Додати правильний імпорт `getAllValidMoves` з `gameCore.js` та `settingsStore` з `settingsStore.js`:
+    - [x] Додати правильний імпорт `getAllValidMoves` з `gameCore.js` та `appSettingsStore` з `appSettingsStore.js`:
       ```javascript
       import { getAllValidMoves } from './gameCore.js';
-      import { settingsStore } from './stores/settingsStore.js';
+      import { appSettingsStore } from './stores/appSettingsStore.js';
       import { get } from 'svelte/store';
       ```
-    - [x] У функції `getComputerMove` виправити отримання `blockOnVisitCount` для використання `settingsStore`:
+    - [x] У функції `getComputerMove` виправити отримання `blockOnVisitCount` для використання `appSettingsStore`:
         *   **Знайти рядок:** `const blockOnVisitCount = 0;`
-        *   **Замінити на:** `const { blockOnVisitCount } = get(settingsStore);`
+        *   **Замінити на:** `const { blockOnVisitCount } = get(appSettingsStore);`
     - [x] Видалити файл `svelte-app/src/lib/ai.js`.
 
 ---
@@ -61,7 +61,7 @@ author: ""
       export function _updateAvailableMoves() {
         appState.update(state => {
           if (state.playerRow === null || state.playerCol === null) return state;
-          const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.cellVisitCounts, get(settingsStore).blockOnVisitCount);
+          const newAvailableMoves = getAvailableMoves(state.playerRow, state.playerCol, state.boardSize, state.cellVisitCounts, get(appSettingsStore).blockOnVisitCount);
           return { ...state, availableMoves: newAvailableMoves };
         });
       }
@@ -110,7 +110,7 @@ author: ""
       }
       ```
     - [x] Імпортувати `getAvailableMoves` та `calculateFinalScore` з `gameCore.js` на початку файлу `gameStore.js`.
-    - [x] Імпортувати `settingsStore` з `settingsStore.js`.
+    - [x] Імпортувати `appSettingsStore` з `appSettingsStore.js`.
 
 ---
 

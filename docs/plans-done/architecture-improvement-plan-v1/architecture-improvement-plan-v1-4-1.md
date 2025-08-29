@@ -1,29 +1,29 @@
-Звісно. Цей рефакторинг спрямований на усунення дублювання логіки, пов'язаної з вибором та застосуванням ігрових режимів, яка зараз, ймовірно, розкидана між `MainMenu.svelte` та `GameModeModal.svelte`. Ми централізуємо цю логіку в `settingsStore.js`, оскільки саме він відповідає за налаштування гри.
+Звісно. Цей рефакторинг спрямований на усунення дублювання логіки, пов'язаної з вибором та застосуванням ігрових режимів, яка зараз, ймовірно, розкидана між `MainMenu.svelte` та `GameModeModal.svelte`. Ми централізуємо цю логіку в `appSettingsStore.js`, оскільки саме він відповідає за налаштування гри.
 
 ---
 
 ### Детальний План: Рефакторинг дублювання логіки ігрових режимів
 
-**Мета:** Створити єдину функцію `applyGameModePreset` всередині `settingsStore`, яка буде відповідати за зміну налаштувань відповідно до обраного режиму ("Новачок", "Розбійник", "Потужний"). Це дозволить уникнути дублювання коду та зробить логіку більш надійною та легкою для змін.
+**Мета:** Створити єдину функцію `applyGameModePreset` всередині `appSettingsStore`, яка буде відповідати за зміну налаштувань відповідно до обраного режиму ("Новачок", "Розбійник", "Потужний"). Це дозволить уникнути дублювання коду та зробить логіку більш надійною та легкою для змін.
 
 ---
 
-#### Крок 1: Створення централізованого методу в `settingsStore.js`
+#### Крок 1: Створення централізованого методу в `appSettingsStore.js`
 
-Ми додамо новий метод `applyGameModePreset` до нашого `settingsStore`. Цей метод буде приймати назву режиму і застосовувати відповідний набір налаштувань.
+Ми додамо новий метод `applyGameModePreset` до нашого `appSettingsStore`. Цей метод буде приймати назву режиму і застосовувати відповідний набір налаштувань.
 
-1.  **Відкрийте файл:** `src/lib/stores/settingsStore.js`
+1.  **Відкрийте файл:** `src/lib/stores/appSettingsStore.js`
 2.  **Додайте новий метод `applyGameModePreset`** всередину об'єкта `methods`:
 
     ```javascript
-    // src/lib/stores/settingsStore.js
+    // src/lib/stores/appSettingsStore.js
     import { writable, get } from 'svelte/store';
     import { modalStore } from '$lib/stores/modalStore.js'; // Імпортуємо modalStore
     // ... інші імпорти
 
     // ...
 
-    function createSettingsStore() {
+    function createappSettingsStore() {
       const { subscribe, set, update } = writable(defaultSettings);
 
       const methods = {
@@ -87,7 +87,7 @@
       return { subscribe, ...methods };
     }
 
-    export const settingsStore = createSettingsStore();
+    export const appSettingsStore = createappSettingsStore();
     ```
 
 **Пояснення:**
@@ -118,7 +118,7 @@
     ```svelte
     <script>
       import { _ } from 'svelte-i18n';
-      import { settingsStore } from '$lib/stores/settingsStore.js';
+      import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
       import { modalStore } from '$lib/stores/modalStore.js';
       import { goto } from '$app/navigation';
       import { base } from '$app/paths';
@@ -131,7 +131,7 @@
        * @param {'beginner' | 'experienced' | 'pro'} mode
        */
       function selectMode(mode) {
-        const shouldShowFaq = settingsStore.applyGameModePreset(mode);
+        const shouldShowFaq = appSettingsStore.applyGameModePreset(mode);
         
         // Логіка зміни розміру дошки та навігації залишається,
         // оскільки вона специфічна для цього модального вікна
@@ -182,7 +182,7 @@
     <!-- Розмітка залишається без змін -->
     ```
 
-**Пояснення:** Ми видалили дублювання логіки налаштувань. Компонент тепер викликає `settingsStore.applyGameModePreset(mode)` і використовує результат для подальших дій (показ FAQ, навігація).
+**Пояснення:** Ми видалили дублювання логіки налаштувань. Компонент тепер викликає `appSettingsStore.applyGameModePreset(mode)` і використовує результат для подальших дій (показ FAQ, навігація).
 
 #### Крок 3: Спрощення `uiService.js` (створеного на попередньому кроці)
 
@@ -194,12 +194,12 @@
     **Було:**
     ```javascript
     // ...
-    if (get(settingsStore).showGameModeModal) {
+    if (get(appSettingsStore).showGameModeModal) {
       // ...
     } else {
-      const currentMode = get(settingsStore).gameMode;
+      const currentMode = get(appSettingsStore).gameMode;
       if (!currentMode) {
-        settingsStore.updateSettings({ gameMode: 'beginner', ... }); // Дублювання логіки
+        appSettingsStore.updateSettings({ gameMode: 'beginner', ... }); // Дублювання логіки
       }
       goto(`${base}/game`);
     }
@@ -208,25 +208,25 @@
     **Стане:**
     ```javascript
     // ...
-    if (get(settingsStore).showGameModeModal) {
+    if (get(appSettingsStore).showGameModeModal) {
       modalStore.showModal({
         titleKey: 'gameModes.title',
         component: GameModeModal,
         closable: true
       });
     } else {
-      const currentMode = get(settingsStore).gameMode;
+      const currentMode = get(appSettingsStore).gameMode;
       if (!currentMode) {
         // Просто викликаємо метод з пресетом за замовчуванням
-        settingsStore.applyGameModePreset('beginner');
+        appSettingsStore.applyGameModePreset('beginner');
       }
       goto(`${base}/game`);
     }
     ```
 
 **Результат:**
-*   **DRY:** Логіка налаштування ігрових режимів тепер знаходиться в одному місці — `settingsStore.js`.
-*   **SSoT:** `settingsStore` є єдиним джерелом правди про те, які налаштування відповідають якому режиму.
+*   **DRY:** Логіка налаштування ігрових режимів тепер знаходиться в одному місці — `appSettingsStore.js`.
+*   **SSoT:** `appSettingsStore` є єдиним джерелом правди про те, які налаштування відповідають якому режиму.
 *   **Чистота коду:** Компоненти `MainMenu.svelte` та `GameModeModal.svelte` стали простішими, оскільки вони лише ініціюють дію, а не реалізують її логіку.
 
 **Що протестувати:**

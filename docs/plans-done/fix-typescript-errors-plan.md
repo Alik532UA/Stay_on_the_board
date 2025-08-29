@@ -20,7 +20,7 @@
 
 ## Крок 3: Виправлення помилок
 
-### 3.1. Файл: `src/lib/stores/settingsStore.ts`
+### 3.1. Файл: `src/lib/stores/appSettingsStore.ts`
 - [ ] Додати явні типи для властивостей `selectedVoiceURI` та `gameMode`.
 - [ ] Додати явні типи для параметрів функції `safeJsonParse`.
 - [ ] Додати явний тип для параметра `style` у функції `convertStyle`.

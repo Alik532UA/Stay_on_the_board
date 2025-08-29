@@ -6,12 +6,12 @@
 
 ## Джерело Правда (SSoT) та Залежності від Стану (State Dependencies)
 
--   **`settingsStore.showGameInfoWidget`**: Основне джерело стану. Чекбокс відображає та змінює це значення.
+-   **`appSettingsStore.showGameInfoWidget`**: Основне джерело стану. Чекбокс відображає та змінює це значення.
 
 ## Поведінка (Behavior)
 
 1.  **Візуалізація**:
-    *   Якщо `$settingsStore.showGameInfoWidget` є `true`, чекбокс відмічений, а компонент `GameInfoWidget` видимий.
+    *   Якщо `$appSettingsStore.showGameInfoWidget` є `true`, чекбокс відмічений, а компонент `GameInfoWidget` видимий.
     *   Якщо `false`, чекбокс невідмічений, а `GameInfoWidget` прихований з плавною анімацією зникнення.
 2.  **Анімація приховування**:
     *   При вимкненні чекбокса віджет плавно зменшується в розмірі та стає прозорим.
@@ -20,7 +20,7 @@
 
 ## Взаємодія з Користувачем (User Interaction)
 
--   **Клік**: Викликає функцію `settingsStore.toggleShowGameInfoWidget()`, яка інвертує значення `showGameInfoWidget` у сторі.
+-   **Клік**: Викликає функцію `appSettingsStore.toggleShowGameInfoWidget()`, яка інвертує значення `showGameInfoWidget` у сторі.
 
 ## Архітектурні Нотатки та UI/UX
 
@@ -40,7 +40,7 @@
 ## Технічна реалізація
 
 ### Файли:
-- `src/lib/stores/settingsStore.js` - додано налаштування та метод toggle
+- `src/lib/stores/appSettingsStore.js` - додано налаштування та метод toggle
 - `src/lib/components/widgets/SettingsExpanderWidget.svelte` - додано чекбокс
 - `src/lib/components/widgets/GameInfoWidget.svelte` - додано логіку приховування
 - `src/lib/i18n/*/gameControls.js` - додано переклади

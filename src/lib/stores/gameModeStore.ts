@@ -5,7 +5,7 @@ export interface GameModeState {
   // Add any mode-specific state properties here in the future
 }
 
-const initialState: GameModeState = {
+export const initialState: GameModeState = {
   activeMode: null,
 };
 

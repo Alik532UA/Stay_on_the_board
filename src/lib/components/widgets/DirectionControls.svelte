@@ -27,10 +27,10 @@
 
   /**
    * @param {number} dist
-   * @returns {import('$lib/stores/settingsStore').KeybindingAction}
+   * @returns {import('$lib/stores/gameSettingsStore').KeybindingAction}
    */
   function getActionForDistance(dist: number) {
-    return `distance-${dist}` as import('$lib/stores/settingsStore').KeybindingAction;
+    return `distance-${dist}` as import('$lib/stores/gameSettingsStore').KeybindingAction;
   }
  
   function handleDirection(dir: string) {

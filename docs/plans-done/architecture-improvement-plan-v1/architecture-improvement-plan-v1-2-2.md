@@ -4,7 +4,7 @@
 
 ### Детальний План: Розділення `gameActions.ts`
 
-**Мета:** Перетворити `gameActions.ts` на набір чистих функцій-мутаторів, які працюють виключно зі станом `gameState`. Всю складну логіку, що залежить від інших сторів (`settingsStore`, `playerInputStore`) або має побічні ефекти (навігація, виклик модальних вікон), буде перенесено до `gameOrchestrator.js`.
+**Мета:** Перетворити `gameActions.ts` на набір чистих функцій-мутаторів, які працюють виключно зі станом `gameState`. Всю складну логіку, що залежить від інших сторів (`appSettingsStore`, `playerInputStore`) або має побічні ефекти (навігація, виклик модальних вікон), буде перенесено до `gameOrchestrator.js`.
 
 ---
 
@@ -18,7 +18,7 @@
     *   **Дія:** Ми перенесемо цю логіку в `gameOrchestrator.js`.
 
 3.  **Проаналізуйте функцію `processPlayerMove`:**
-    *   **Проблема:** Ця функція залежить від `settingsStore`, `lastComputerMove` (похідний від `gameState`), та `playerInputStore`. Вона виконує складні розрахунки, які є частиною ігрового циклу, а не простою мутацією.
+    *   **Проблема:** Ця функція залежить від `appSettingsStore`, `lastComputerMove` (похідний від `gameState`), та `playerInputStore`. Вона виконує складні розрахунки, які є частиною ігрового циклу, а не простою мутацією.
     *   **Дія:** Ми перенесемо її логіку в `gameOrchestrator.js`.
 
 4.  **Проаналізуйте функцію `endGame`:**
@@ -150,7 +150,7 @@
     ```javascript
     // Всередині об'єкта gameOrchestrator
     _processPlayerMove(startRow, startCol, newRow, newCol) {
-      const settings = get(settingsStore);
+      const settings = get(appSettingsStore);
       const computerMove = get(lastComputerMove);
       const { selectedDistance, selectedDirection } = get(playerInputStore);
       const { cellVisitCounts } = get(gameState);

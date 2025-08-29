@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { gameStore } from '$lib/stores/gameStore';
-import { settingsStore } from '$lib/stores/settingsStore';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameModeStore } from '$lib/stores/gameModeStore';
 import { BaseGameMode } from '$lib/gameModes/BaseGameMode';
 import { TrainingGameMode } from '$lib/gameModes/TrainingGameMode';
@@ -22,16 +22,28 @@ class GameModeService {
   }
 
   public initializeGameMode(modeName: string | null = null) {
-    const name = modeName || get(settingsStore).gameMode;
-    const mode = this.modes.get(name);
+    const name = modeName || get(gameSettingsStore).gameMode;
+
+    // НАВІЩО (Архітектурне рішення): Створюємо мапінг між назвами пресетів (зберігаються в налаштуваннях)
+    // та назвами реалізацій ігрових режимів. Це дозволяє UI оперувати
+    // зрозумілими для користувача назвами ("Новачок"), а сервісу - працювати з конкретними
+    // класами (`TrainingGameMode`). Це приклад розділення відповідальностей (SoC).
+    const presetToModeMap: Record<string, string> = {
+        beginner: 'training',
+        experienced: 'local',
+        pro: 'timed'
+    };
+    const implementationName = name ? presetToModeMap[name] || name : 'training'; // Fallback to training if null
+
+    const mode = this.modes.get(implementationName);
 
     if (mode) {
       gameStore.setMode(mode);
-      gameModeStore.setActiveMode(name);
+      gameModeStore.setActiveMode(implementationName); // Store the implementation name
       mode.initialize();
-      logService.GAME_MODE(`Game mode initialized: ${name}`);
+      logService.GAME_MODE(`Game mode initialized: ${implementationName} (from preset: ${name})`);
     } else {
-      logService.GAME_MODE(`Unknown game mode: ${name}`);
+      logService.GAME_MODE(`Unknown game mode or preset: ${name}`);
     }
   }
 

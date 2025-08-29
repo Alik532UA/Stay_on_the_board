@@ -1,3 +1,4 @@
+// src/lib/services/hotkeyService.ts
 import { get } from 'svelte/store';
 import { setDirection, setDistance } from '$lib/services/gameLogicService.js';
 import { userActionService } from '$lib/services/userActionService';
@@ -5,11 +6,12 @@ import { goto } from '$app/navigation';
 import { base } from '$app/paths';
 import { logService } from '$lib/services/logService.js';
 import { localInputProvider } from '$lib/services/localInputProvider';
-import { settingsStore } from '$lib/stores/settingsStore';
-import { gameState } from '$lib/stores/gameState';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+import { boardStore } from '$lib/stores/boardStore';
 
 function changeBoardSize(increment: number) {
-  const currentSize = get(gameState).boardSize;
+  const currentSize = get(boardStore)?.boardSize;
+  if (typeof currentSize !== 'number') return;
   const newSize = currentSize + increment;
   if (newSize >= 2 && newSize <= 9) {
     userActionService.changeBoardSize(newSize);
@@ -26,13 +28,11 @@ function executeAction(action: string) {
       changeBoardSize(-1);
       break;
     case 'toggle-block-mode':
-      settingsStore.toggleBlockMode();
+      gameSettingsStore.toggleBlockMode();
       break;
     case 'toggle-board':
-      settingsStore.toggleShowBoard(undefined);
+      gameSettingsStore.toggleShowBoard(undefined);
       break;
-  }
-  switch (action) {
     case 'up-left': setDirection('up-left'); break;
     case 'up': setDirection('up'); break;
     case 'up-right': setDirection('up-right'); break;
@@ -57,7 +57,6 @@ function executeAction(action: string) {
 function handleHotkey(e: KeyboardEvent) {
   if (e.target && (e.target as HTMLElement).tagName !== 'BODY') return;
   
-  // L або Д (українська Д) для переходу в local-setup (тільки в DEV)
   if ((e.key === 'l' || e.key === 'д' || e.key === 'L' || e.key === 'Д') && import.meta.env.DEV) {
     logService.action(`Hotkey: "L/Д" (GameLayout) - перехід до local-setup`);
     e.preventDefault();
@@ -66,7 +65,7 @@ function handleHotkey(e: KeyboardEvent) {
   }
   
   const key = e.code;
-  const currentSettings = get(settingsStore);
+  const currentSettings = get(gameSettingsStore);
   const keybindings = currentSettings.keybindings;
   const resolutions = currentSettings.keyConflictResolution;
 
@@ -94,8 +93,6 @@ function handleHotkey(e: KeyboardEvent) {
     executeAction(resolutions[key]);
     return;
   }
-  
-  // ... (логіка обробки конфліктів залишається)
 }
 
 export function initializeHotkeyService() {

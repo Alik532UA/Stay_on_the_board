@@ -12,7 +12,7 @@
 
 План базується на ключових принципах розробки для забезпечення чистоти, масштабованості та підтримки коду.
 
--   **SoC (Separation of Concerns):** Ми створимо новий, ізольований store (`testModeStore.ts`) виключно для стану віджету "Test Mode". Це дозволить не "засмічувати" основні stores (`settingsStore`, `gameState`) логікою, що стосується лише тестування. UI буде реалізовано в окремому компоненті `TestModeWidget.svelte`.
+-   **SoC (Separation of Concerns):** Ми створимо новий, ізольований store (`testModeStore.ts`) виключно для стану віджету "Test Mode". Це дозволить не "засмічувати" основні stores (`appSettingsStore`, `gameState`) логікою, що стосується лише тестування. UI буде реалізовано в окремому компоненті `TestModeWidget.svelte`.
 
 -   **SSoT (Single Source of Truth):** `testModeStore.ts` стане єдиним джерелом правди для налаштувань тестового режиму. Ігрова логіка буде лише читати дані з цього store, але не змінювати їх.
 
@@ -61,7 +61,7 @@ export const testModeStore = writable<TestModeState>(initialState);
 
 1.  **Створити головний віджет `src/lib/components/widgets/TestModeWidget.svelte`:**
     -   Цей компонент буде контейнером для елементів керування.
-    -   Він буде відображатися на головній сторінці (`src/routes/+page.svelte`) тільки якщо `$settingsStore.testMode` має значення `true`.
+    -   Він буде відображатися на головній сторінці (`src/routes/+page.svelte`) тільки якщо `$appSettingsStore.testMode` має значення `true`.
 
 2.  **Реалізувати логіку всередині `TestModeWidget.svelte`:**
     -   **Керування початковою позицією:**
@@ -114,19 +114,19 @@ export const testModeStore = writable<TestModeState>(initialState);
 
 ### Крок 4: Оновлення головної сторінки
 
--   У файлі `src/routes/+page.svelte` додати логіку для відображення `TestModeWidget.svelte`, коли `$settingsStore.testMode` є `true`.
+-   У файлі `src/routes/+page.svelte` додати логіку для відображення `TestModeWidget.svelte`, коли `$appSettingsStore.testMode` є `true`.
 
 ```svelte
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
   import TestModeWidget from '$lib/components/widgets/TestModeWidget.svelte';
-  import { settingsStore } from '$lib/stores/settingsStore';
+  import { appSettingsStore } from '$lib/stores/appSettingsStore';
   // ... інший код
 </script>
 
 <!-- ... інший код -->
 
-{#if $settingsStore.testMode}
+{#if $appSettingsStore.testMode}
   <TestModeWidget />
 {/if}
 ```

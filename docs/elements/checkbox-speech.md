@@ -6,8 +6,8 @@
 
 ## Джерело Правда (SSoT) та Залежності від Стану (State Dependencies)
 
--   **`settingsStore.speechEnabled`**: Основне джерело стану.
--   **`settingsStore.selectedVoiceURI`**: Зберігає обраний голос.
+-   **`appSettingsStore.speechEnabled`**: Основне джерело стану.
+-   **`appSettingsStore.selectedVoiceURI`**: Зберігає обраний голос.
 
 ## Поведінка (Behavior)
 
@@ -19,7 +19,7 @@
 
 ## Взаємодія з Користувачем (User Interaction)
 
--   **Клік на чекбокс**: Викликає `settingsStore.toggleSpeech()`, яка містить асинхронну логіку перевірки доступності голосів та виклику модального вікна.
+-   **Клік на чекбокс**: Викликає `appSettingsStore.toggleSpeech()`, яка містить асинхронну логіку перевірки доступності голосів та виклику модального вікна.
 -   **Клік на іконку налаштувань**: Викликає `openVoiceSettingsModal()`.
 
 ## Архітектурні Нотатки та UI/UX

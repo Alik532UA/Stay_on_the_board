@@ -95,7 +95,7 @@
    - Всі методи стали асинхронними
 
 4. **Покращення обробки помилок:**
-   - Додано `try-catch` блоки в `initializeI18n()` та `settingsStore.init()`
+   - Додано `try-catch` блоки в `initializeI18n()` та `appSettingsStore.init()`
    - Гарантоване встановлення `i18nReady = true` навіть при помилках
    - Виправлено імпорт шляхів в `+layout.svelte`
 

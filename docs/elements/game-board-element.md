@@ -10,7 +10,7 @@
     *   `boardSize`: для визначення розміру сітки.
     *   `availableMoves`: для відображення підказок (точок).
     *   `gameId`: для повного перерендерингу компонента при старті нової гри (через `{#key $gameState.gameId}`).
-2.  **`settingsStore`**:
+2.  **`appSettingsStore`**:
     *   `showBoard`, `showQueen`, `showMoves`: для умовного рендерингу елементів.
     *   `blockModeEnabled`, `blockOnVisitCount`: для стилізації заблокованих та "пошкоджених" клітинок.
 3.  **`derivedState` (візуальна частина)**:
@@ -25,12 +25,12 @@
 1.  **Рендеринг сітки**: Створює сітку `N x N` на основі `$gameState.boardSize`.
 2.  **Стилізація клітинок**:
     *   Застосовує класи `.light` та `.dark` для створення шахового візерунка.
-    *   Застосовує класи `.cell-damage-*` та `.blocked-cell` на основі `$visualCellVisitCounts` та налаштувань `$settingsStore`.
+    *   Застосовує класи `.cell-damage-*` та `.blocked-cell` на основі `$visualCellVisitCounts` та налаштувань `$appSettingsStore`.
 3.  **Відображення ферзя**:
-    *   Рендерить компонент `PlayerPiece.svelte`, якщо `$settingsStore.showQueen` має значення `true`.
+    *   Рендерить компонент `PlayerPiece.svelte`, якщо `$appSettingsStore.showQueen` має значення `true`.
     *   Позиція ферзя (`top`, `left`) обчислюється на основі `$visualPosition.row` та `$visualPosition.col`.
 4.  **Відображення доступних ходів**:
-    *   Рендерить точки на клітинках, якщо `$settingsStore.showMoves` має значення `true`, немає активної анімації (`!$animationStore.isAnimating`), і настала черга гравця (`$visualCurrentPlayerIndex === 0`).
+    *   Рендерить точки на клітинках, якщо `$appSettingsStore.showMoves` має значення `true`, немає активної анімації (`!$animationStore.isAnimating`), і настала черга гравця (`$visualCurrentPlayerIndex === 0`).
 5.  **Анімації**:
     *   Компонент **не ініціює** анімації. Він лише реагує на зміни в `visualPosition`. Плавність руху ферзя забезпечується CSS-переходом (`transition`) для властивостей `top` та `left` у `PlayerPiece.svelte`.
     *   **Поява та зникнення точок доступних ходів має бути плавною** (наприклад, через зміну `opacity`), щоб уникнути різкого "блимання".

@@ -92,7 +92,7 @@ author: ""
         ```javascript
         import { get } from 'svelte/store';
         import { appState } from '$lib/stores/gameStore.js';
-        import { settingsStore } from '$lib/stores/settingsStore.js';
+        import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
         import { modalStore } from '$lib/stores/modalStore.js';
         import { performMove, getAvailableMoves, calculateFinalScore, oppositeDirections, dirMap } from './gameLogic.js';
         import { getRandomComputerMove } from '$lib/ai.js';
@@ -146,7 +146,7 @@ author: ""
     *   `[ ]` Вставити цей блок у `GameSettings.svelte`.
 
 *   `[ ]` **Блок 3.2: Перенесення логіки та імпортів**
-    *   `[ ]` З тегу `<script>` файлу `GameControls.svelte`, скопіювати всі необхідні імпорти (`settingsStore`, `modalStore`, `SvgIcons`, `_` тощо) та логіку, що стосується налаштувань (функції `onBlockModeChange`, `onSpeechChange`, `selectBlockCount`, `changeBoardSize` тощо) у тег `<script>` нового компонента `GameSettings.svelte`.
+    *   `[ ]` З тегу `<script>` файлу `GameControls.svelte`, скопіювати всі необхідні імпорти (`appSettingsStore`, `modalStore`, `SvgIcons`, `_` тощо) та логіку, що стосується налаштувань (функції `onBlockModeChange`, `onSpeechChange`, `selectBlockCount`, `changeBoardSize` тощо) у тег `<script>` нового компонента `GameSettings.svelte`.
     *   `[ ]` Переконатися, що всі змінні, які використовуються в розмітці `GameSettings.svelte`, визначені.
 
 *   `[ ]` **Блок 3.3: Інтеграція нового компонента**

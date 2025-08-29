@@ -25,7 +25,7 @@
       import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js'; // <-- НЕПРАВИЛЬНИЙ ІМПОРТ
       import { derived } from 'svelte/store';
       import { _ } from 'svelte-i18n';
-      import { settingsStore } from '$lib/stores/settingsStore.js';
+      import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
       import SvgIcons from '../SvgIcons.svelte';
       import { get } from 'svelte/store';
       import { centerInfo, isConfirmButtonDisabled, availableDistances, distanceRows } from '$lib/stores/derivedState.js';
@@ -42,7 +42,7 @@
       import { gameOrchestrator } from '$lib/gameOrchestrator.js'; // <-- ПРАВИЛЬНИЙ ІМПОРТ
       import { derived } from 'svelte/store';
       import { _ } from 'svelte-i18n';
-      import { settingsStore } from '$lib/stores/settingsStore.js';
+      import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
       import SvgIcons from '../SvgIcons.svelte';
       import { get } from 'svelte/store';
       import { centerInfo, isConfirmButtonDisabled, availableDistances, distanceRows } from '$lib/stores/derivedState.js';
@@ -122,7 +122,7 @@
   import { setDirection, setDistance } from '$lib/services/gameLogicService.js';
   import { gameOrchestrator } from '$lib/gameOrchestrator.js';
   import { _ } from 'svelte-i18n';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
   import SvgIcons from '../SvgIcons.svelte';
   import { get } from 'svelte/store';
   import { centerInfo, isConfirmButtonDisabled, availableDistances, distanceRows } from '$lib/stores/derivedState.js';

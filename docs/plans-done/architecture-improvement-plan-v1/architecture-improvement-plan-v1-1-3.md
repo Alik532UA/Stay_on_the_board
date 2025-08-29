@@ -33,13 +33,13 @@
     ```typescript
     const { row, col } = core.getRandomCell(size);
     // ...
-    newState.availableMoves = core.getAvailableMoves(row, col, size, {}, get(settingsStore).blockOnVisitCount);
+    newState.availableMoves = core.getAvailableMoves(row, col, size, {}, get(appSettingsStore).blockOnVisitCount);
     ```
     **Стане:**
     ```typescript
     const { row, col } = getRandomCell(size);
     // ...
-    newState.availableMoves = getAvailableMoves(row, col, size, {}, get(settingsStore).blockOnVisitCount);
+    newState.availableMoves = getAvailableMoves(row, col, size, {}, get(appSettingsStore).blockOnVisitCount);
     ```
 
 4.  **Структуруйте експорти:** Замість того, щоб експортувати кожну функцію окремо, ми можемо згрупувати їх в один об'єкт-сервіс для чистоти, хоча іменовані експорти також є прийнятним варіантом. Для простоти залишимо іменовані експорти, оскільки це вимагатиме менше змін у файлах, що їх використовують.
@@ -53,7 +53,7 @@ import { get } from 'svelte/store';
 import { gameState, createInitialState } from '../stores/gameState.js';
 import { playerInputStore } from '../stores/playerInputStore.js';
 import { replayStore } from '../stores/replayStore.js';
-import { settingsStore } from '../stores/settingsStore.js';
+import { appSettingsStore } from '../stores/appSettingsStore.js';
 // ... інші імпорти ...
 
 // --- ТИПИ ТА КОНСТАНТИ (з колишнього gameCore.ts) ---
@@ -151,7 +151,7 @@ export function setDistance(dist: number) { /* ... */ }
 -   **Чіткі межі:** Тепер у нас є чітке розділення:
     *   `gameLogicService.ts`: **Що** і **Як** робити з ігровим станом.
     *   `gameOrchestrator.js`: **Коли** і в **Якій послідовності** викликати логіку.
-    *   Стори (`gameState`, `settingsStore`): **Де** зберігається стан.
+    *   Стори (`gameState`, `appSettingsStore`): **Де** зберігається стан.
     *   Компоненти (`*.svelte`): **Як** відображати стан.
 
 **Що протестувати:**

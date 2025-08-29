@@ -1,13 +1,28 @@
 import { get } from 'svelte/store';
-import { settingsStore } from '$lib/stores/settingsStore.js';
+import { gameSettingsStore, type GameSettingsState } from '$lib/stores/gameSettingsStore.js';
 
 // НАВІЩО: Гарантуємо, що всі візуальні опції (showBoard, showPiece, showMoves) будуть активовані для коректного UX при старті нової гри.
 export function enableAllGameCheckboxesIfNeeded() {
-  const s = get(settingsStore);
-  let changed = false;
-  if (!s.showBoard) { settingsStore.toggleShowBoard(true); changed = true; }
-  if (!s.showPiece) { settingsStore.toggleShowPiece(); changed = true; }
-  if (!s.showMoves) { settingsStore.toggleShowMoves(); changed = true; }
-  // Якщо showPiece був вимкнений, showMoves міг автоматично вимкнутись, тому ще раз вмикаємо
-  if (!get(settingsStore).showMoves) { settingsStore.toggleShowMoves(); }
+  const s = get(gameSettingsStore);
+  
+  // НАВІЩО (Архітектурне виправлення): Замість трьох окремих викликів, які
+  // провокували три оновлення стору, ми збираємо всі зміни в один об'єкт
+  // і робимо одне атомарне оновлення. Це покращує продуктивність і
+  // відповідає принципу DRY.
+  const settingsToUpdate: Partial<GameSettingsState> = {};
+
+  if (!s.showBoard) {
+    settingsToUpdate.showBoard = true;
+  }
+  if (!s.showPiece) {
+    settingsToUpdate.showPiece = true;
+  }
+  // Якщо showPiece був вимкнений, showMoves міг автоматично вимкнутись, тому перевіряємо його теж
+  if (!s.showMoves) {
+    settingsToUpdate.showMoves = true;
+  }
+
+  if (Object.keys(settingsToUpdate).length > 0) {
+    gameSettingsStore.updateSettings(settingsToUpdate);
+  }
 }

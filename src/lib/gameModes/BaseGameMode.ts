@@ -1,14 +1,11 @@
 // src/lib/gameModes/BaseGameMode.ts
 import { get } from 'svelte/store';
-import { _ } from 'svelte-i18n';
 import { tick } from 'svelte';
 import { aiService } from '$lib/services/aiService';
 import type { IGameMode } from './gameMode.interface';
-import { gameState, type GameState } from '$lib/stores/gameState';
 import type { Player } from '$lib/models/player';
-import { gameStateMutator } from '$lib/services/gameStateMutator';
 import * as gameLogicService from '$lib/services/gameLogicService';
-import { settingsStore } from '$lib/stores/settingsStore';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
@@ -19,13 +16,15 @@ import { endGameService } from '$lib/services/endGameService';
 import { noMovesService } from '$lib/services/noMovesService';
 import { availableMovesService } from '$lib/services/availableMovesService';
 import { timeService } from '$lib/services/timeService';
+import { boardStore } from '$lib/stores/boardStore';
+import { playerStore } from '$lib/stores/playerStore';
+import { scoreStore } from '$lib/stores/scoreStore';
+import { uiStateStore } from '$lib/stores/uiStateStore';
 
 export abstract class BaseGameMode implements IGameMode {
-  public turnDuration: number = 0; // Default to 0, means no timer
-  public gameDuration: number = 0; // Default to 0, means no timer
+  public turnDuration: number = 0;
+  public gameDuration: number = 0;
 
-  // НАВІЩО: Визначаємо абстрактні методи як контракт для всіх дочірніх класів.
-  // Кожен режим гри ЗОБОВ'ЯЗАНИЙ реалізувати цю логіку.
   abstract initialize(options?: { newSize?: number }): void;
   abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
   abstract getPlayersConfiguration(): Player[];
@@ -33,8 +32,6 @@ export abstract class BaseGameMode implements IGameMode {
   protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
   abstract continueAfterNoMoves(): Promise<void>;
 
-  // НАВІЩО: Визначаємо спільні методи, які будуть успадковані всіма режимами.
-  // Це дотримується принципу DRY.
   protected startTurn(): void {
     if (this.turnDuration > 0) {
       timeService.startTurnTimer(this.turnDuration, () => {
@@ -48,47 +45,38 @@ export abstract class BaseGameMode implements IGameMode {
   }
 
   async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
-    const state = get(gameState);
-    const settings = get(settingsStore);
-    const moveResult = await gameLogicService.performMove(direction, distance, state.currentPlayerIndex, state, settings);
+    const boardState = get(boardStore);
+    const playerState = get(playerStore);
+    const scoreState = get(scoreStore);
+    const uiState = get(uiStateStore);
+    const settings = get(gameSettingsStore);
+
+    const combinedState = { ...boardState, ...playerState, ...scoreState, ...uiState };
+
+    const moveResult = gameLogicService.performMove(direction, distance, playerState!.currentPlayerIndex, combinedState, settings);
 
     if (moveResult.success) {
-      gameStateMutator.applyMove(moveResult.changes);
+      boardStore.update(s => s ? ({ ...s, ...moveResult.changes.boardState }) : null);
+      playerStore.update(s => s ? ({ ...s, ...moveResult.changes.playerState }) : null);
+      scoreStore.update(s => s ? ({ ...s, ...moveResult.changes.scoreState }) : null);
+      uiStateStore.update(s => s ? ({ ...s, ...moveResult.changes.uiState }) : null);
+      
       await this.applyScoreChanges(moveResult);
       await this.onPlayerMoveSuccess(moveResult);
     } else {
-      if (moveResult.changes) {
-        gameStateMutator.applyMove(moveResult.changes);
+      if (moveResult.changes && moveResult.changes.boardState) {
+        boardStore.update(s => s ? ({ ...s, ...moveResult.changes.boardState }) : null);
       }
       await this.onPlayerMoveFailure(moveResult.reason, direction, distance);
     }
   }
 
   protected async onPlayerMoveSuccess(moveResult: any): Promise<void> {
-    const currentState = get(gameState);
-    const stateUpdate: Partial<GameState> = {};
-
-    if (currentState.isNewGame) {
-      stateUpdate.isNewGame = false;
-    }
-    if (currentState.isResumedGame) {
-      stateUpdate.isResumedGame = false;
-    }
-
-    stateUpdate.selectedDirection = null;
-    stateUpdate.selectedDistance = null;
-
-    if (Object.keys(stateUpdate).length > 0) {
-      gameStateMutator.applyMove(stateUpdate);
-    }
-
+    uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null, isFirstMove: false }) : null);
+    
     await this.advanceToNextPlayer();
-
-    const updatedState = get(gameState);
-    if (updatedState) {
-      const moves = availableMovesService.getAvailableMoves(updatedState);
-      gameStateMutator.applyMove({ availableMoves: moves });
-    }
+    
+    availableMovesService.updateAvailableMoves();
     
     if (moveResult.sideEffects && moveResult.sideEffects.length > 0) {
       moveResult.sideEffects.forEach((effect: SideEffect) => sideEffectService.execute(effect));
@@ -96,28 +84,33 @@ export abstract class BaseGameMode implements IGameMode {
   }
 
   protected async onPlayerMoveFailure(reason: string | undefined, direction: MoveDirectionType, distance: number): Promise<void> {
-    const state = get(gameState);
-    const settings = get(settingsStore);
-    const figure = new Figure(state.playerRow!, state.playerCol!, state.boardSize);
+    const boardState = get(boardStore);
+    const playerState = get(playerStore);
+    if (!boardState || !playerState) return;
+
+    const figure = new Figure(boardState.playerRow!, boardState.playerCol!, boardState.boardSize);
     const finalInvalidPosition = figure.calculateNewPosition(direction, distance);
 
     const finalMoveForAnimation = {
-      player: 1,
+      player: playerState.currentPlayerIndex + 1,
       direction: direction,
       distance: distance,
       to: finalInvalidPosition
     };
     
-    const updatedMoveHistory = [...state.moveHistory, {
-      pos: { row: finalInvalidPosition.row, col: finalInvalidPosition.col },
-      blocked: [] as {row: number, col: number}[],
-      visits: { ...state.cellVisitCounts },
-      blockModeEnabled: settings.blockModeEnabled
-    }];
-
-    gameStateMutator.applyMove({
-      moveQueue: [...state.moveQueue, finalMoveForAnimation],
-      moveHistory: updatedMoveHistory
+    boardStore.update(s => {
+      if (!s) return null;
+      const updatedMoveHistory = [...s.moveHistory, {
+        pos: { row: finalInvalidPosition.row, col: finalInvalidPosition.col },
+        blocked: [] as {row: number, col: number}[],
+        visits: { ...s.cellVisitCounts },
+        blockModeEnabled: get(gameSettingsStore).blockModeEnabled
+      }];
+      return {
+        ...s,
+        moveQueue: [...s.moveQueue, finalMoveForAnimation],
+        moveHistory: updatedMoveHistory
+      };
     });
 
     if (reason === 'out_of_bounds') {
@@ -149,21 +142,28 @@ export abstract class BaseGameMode implements IGameMode {
 
   protected async triggerComputerMove(): Promise<void> {
     logService.GAME_MODE('triggerComputerMove: Початок ходу комп\'ютера.');
-    gameStateMutator.applyMove({ isComputerMoveInProgress: true });
+    uiStateStore.update(s => s ? ({ ...s, isComputerMoveInProgress: true }) : null);
 
-    const state = get(gameState);
-    const computerMove = aiService.getComputerMove(state);
+    const boardState = get(boardStore);
+    const playerState = get(playerStore);
+    const uiState = get(uiStateStore);
+    if (!boardState || !playerState || !uiState) return;
+
+    const computerMove = aiService.getComputerMove(boardState, playerState, uiState);
     logService.GAME_MODE('triggerComputerMove: Результат getComputerMove:', computerMove);
 
     if (computerMove) {
       logService.GAME_MODE('triggerComputerMove: Комп\'ютер має хід, виконуємо...');
       const { direction, distance } = computerMove;
       await this.handlePlayerMove(direction, distance);
+      // Set to false after successful move
+      uiStateStore.update(s => s ? ({ ...s, isComputerMoveInProgress: false }) : null);
     } else {
       logService.GAME_MODE('triggerComputerMove: У комп\'ютера немає ходів, викликаємо handleNoMoves.');
+      // Set to false before handling no moves
+      uiStateStore.update(s => s ? ({ ...s, isComputerMoveInProgress: false }) : null);
       await this.handleNoMoves('computer');
     }
     await tick();
-    gameStateMutator.applyMove({ isComputerMoveInProgress: false });
   }
 }

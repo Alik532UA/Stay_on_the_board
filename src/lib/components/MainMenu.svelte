@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
   import '../css/layouts/main-menu.css';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
-  import { gameState } from '$lib/stores/gameState.js';
+  import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
+  import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
   import { navigateToGame } from '$lib/services/uiService';
   import { navigationService } from '$lib/services/navigationService';
   import { logService } from '$lib/services/logService.js';
@@ -13,25 +13,23 @@
   import SvgIcons from './SvgIcons.svelte';
   import { appVersion } from '$lib/stores/versionStore.js';
   import { currentLanguageFlagSvg } from '$lib/stores/derivedState.ts';
-  import { languages } from '$lib/constants.js';
+  import { languages } from '$lib/constants';
   import { modalStore } from '$lib/stores/modalStore.js';
-  import { requestGameModeModal } from '$lib/stores/uiStore.js';
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
   import { get } from 'svelte/store';
   import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
+  import { uiStateStore } from '$lib/stores/uiStateStore';
+  import { boardStore } from '$lib/stores/boardStore';
 
   let showLangDropdown = false;
   let showThemeDropdown = false;
   let showWipNotice = false;
   let showDevMenu = false;
-  /** @param {string} lang */
-  function selectLang(lang) {
+
+  function selectLang(lang: string) {
     logService.action(`Click: "Мова: ${lang}" (MainMenu)`);
-    logService.ui(`Зміна мови: ${lang}`);
-    settingsStore.updateSettings({ language: lang });
-    localStorage.setItem('language', lang);
-    locale.set(lang);
+    appSettingsStore.updateSettings({ language: lang });
     showLangDropdown = false;
   }
   function toggleLangDropdown() {
@@ -42,20 +40,16 @@
     logService.action('Click: "Play Online (WIP)" (MainMenu)');
     showWipNotice = true;
   }
-  $: settings = $settingsStore;
+  $: settings = $appSettingsStore;
 
-  /** @param {string} route */
-  function navigateTo(route) {
+  function navigateTo(route: string) {
     logService.action(`Click: "Навігація: ${route}" (MainMenu)`);
-    logService.ui(`Навігація: ${route}`);
     goto(`${base}${route}`);
   }
 
-  /** @param {string} style @param {string} theme */
-  function selectTheme(style, theme) {
+  function selectTheme(style: string, theme: string) {
     logService.action(`Click: "Тема: ${style} ${theme}" (MainMenu)`);
-    logService.ui(`Зміна теми: ${style}, ${theme}`);
-    settingsStore.updateSettings({ style, theme });
+    appSettingsStore.updateSettings({ style, theme });
     showThemeDropdown = false;
   }
 
@@ -67,13 +61,12 @@
     showDevMenu = false;
   }
   
-  /** @param {HTMLElement} node */
   onMount(() => {
     const activeGameMode = gameModeService.getCurrentMode();
     if (activeGameMode) {
       activeGameMode.cleanup();
     }
-    settingsStore.init();
+    appSettingsStore.init();
   });
 
   function handleDevMenu() {
@@ -87,11 +80,12 @@
   }
   function handlePlayVsComputer() {
     logService.action(`Click: "Гра проти комп'ютера" (MainMenu)`);
-    const state = get(gameState);
-    if (state && !state.isGameOver && state.moveHistory.length > 1) {
+    uiStateStore.update(s => ({ ...s, intendedGameType: 'training' })); // Set intended game type
+    const uiState = get(uiStateStore);
+    if (uiState && !uiState.isGameOver && get(boardStore)?.moveHistory.length > 1) {
       navigationService.resumeGame('/game/training');
     } else {
-      const settings = get(settingsStore);
+      const settings = get(gameSettingsStore);
       if (settings.showGameModeModal) {
         import('./GameModeModal.svelte').then(module => {
           const GameModeModal = module.default;
@@ -116,6 +110,7 @@
   }
   function handleLocalGame() {
     logService.action('Click: "Локальна гра" (MainMenu)');
+    uiStateStore.update(s => ({ ...s, intendedGameType: 'local' })); // Set intended game type
     navigateTo('/local-setup');
   }
   function handleControls() {
@@ -252,7 +247,7 @@
     {/if}
     <div id="main-menu-buttons" use:hotkeysAndTooltips>
       <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="training-btn">{$_('mainMenu.training')}</button>
-      <button class="modal-button secondary" onclick={() => navigateTo('/game/timed')} data-testid="timed-game-btn">{$_('mainMenu.timedGame')}</button>
+      <button class="modal-button secondary" onclick={() => { uiStateStore.update(s => ({ ...s, intendedGameType: 'timed' })); navigateTo('/game/timed'); }} data-testid="timed-game-btn">{$_('mainMenu.timedGame')}</button>
       <button
         class="modal-button secondary"
         class:pseudo-disabled={!import.meta.env.DEV}

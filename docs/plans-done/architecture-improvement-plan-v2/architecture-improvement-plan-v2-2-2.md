@@ -29,15 +29,15 @@
 
 ### Крок 2: Створення обчислюваного стору (`currentLanguageFlagSvg`)
 
-Тепер створимо обчислюваний стор, який буде автоматично визначати SVG прапора на основі поточної мови, вибраної в `settingsStore`.
+Тепер створимо обчислюваний стор, який буде автоматично визначати SVG прапора на основі поточної мови, вибраної в `appSettingsStore`.
 
 - [ ] **Оновити файл `$lib/stores/derivedState.ts`.**
-    Додайте новий `derived` стор, який залежить від `settingsStore` та `languages` з `constants.ts`.
+    Додайте новий `derived` стор, який залежить від `appSettingsStore` та `languages` з `constants.ts`.
 
     **Код для додавання у `src/lib/stores/derivedState.ts`:**
     ```typescript
     import { derived } from 'svelte/store';
-    import { settingsStore } from './settingsStore';
+    import { appSettingsStore } from './appSettingsStore';
     import { languages } from '$lib/constants';
 
     // ... інші derived стори ...
@@ -47,9 +47,9 @@
      * @type {import('svelte/store').Readable<string>}
      */
     export const currentLanguageFlagSvg = derived(
-      settingsStore,
-      $settingsStore => {
-        const currentLang = languages.find(lang => lang.code === $settingsStore.language);
+      appSettingsStore,
+      $appSettingsStore => {
+        const currentLang = languages.find(lang => lang.code === $appSettingsStore.language);
         // Повертаємо SVG знайденої мови або SVG першої мови як запасний варіант
         return currentLang?.svg || languages[0].svg;
       }
@@ -82,7 +82,7 @@
     ```svelte
     <script>
       import { locale } from 'svelte-i18n';
-      import { settingsStore } from '$lib/stores/settingsStore.js';
+      import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
       import { currentLanguageFlagSvg } from '$lib/stores/derivedState.js'; // <-- Новий імпорт
       import { languages } from '$lib/constants.js'; // <-- Новий імпорт
       // ...

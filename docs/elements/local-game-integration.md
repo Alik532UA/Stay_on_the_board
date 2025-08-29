@@ -51,7 +51,7 @@ export function resetGame(options: {
 ```typescript
 // Застосовуємо налаштування з локальної гри, якщо вони передані
 if (options.settings) {
-  settingsStore.updateSettings({
+  appSettingsStore.updateSettings({
     blockModeEnabled: options.settings.blockModeEnabled,
     autoHideBoard: options.settings.autoHideBoard,
     // Гарантуємо, що дошка видима на початку гри
@@ -61,7 +61,7 @@ if (options.settings) {
   });
 } else {
   // Стандартні налаштування видимості для нової гри
-  settingsStore.updateSettings({
+  appSettingsStore.updateSettings({
     showBoard: true,
     showQueen: true,
     showMoves: true

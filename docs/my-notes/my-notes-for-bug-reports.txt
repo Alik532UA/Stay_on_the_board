@@ -4720,15 +4720,164 @@ p.s. якщо натиснути `data-testid="continue-game-no-moves-btn" в м
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
 під час твоєї роботи ти часто видаєш технічні несправності, треба придумати якийсь алгоритм дії, щоб коли ти зробив частину задач і потім вимкнувся, то щоб при наступній сесії ти міг продовжити розу
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
-це поламалось після наших змін
+це поламалось після diff
 class="test-mode-directions-3x3"
 Актуальний результат: не впливає на хід комп'ютера
 Очікуваний результат: хід комп'ютера залежить від class="test-mode-directions-3x3"
 
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+і так як минулий diff це поламав, то треба залишити в коді пояснення, що не треба змінювати та видаляти, щоб знову не сталася ця проблема!
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+fix @problems 
+зроби npm run check
+а причина errors в @git-changes 
+та в @/docs/plans/architecture-improvement-SoC-plan-v25.md 
+
+fix @problems 
+зроби npm run check
+якщо будуть помилки то причина в змінах після коміту
+та в @/docs/plans/architecture-improvement-SoC-plan-v25.md який прирвався під час реалізації
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+причина в змінах після останього коміту (до нього працювало правильно)
+але ми не можемо і НЕ ПОВИННІ відкотити весь коміт, бо там зроблена колосальний обсяг роботи, тож треба розбиратися і виправляти конкретну проблему
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+1. натиснути data-testid="training-btn"
+2. натиснути data-testid="experienced-mode-btn" або data-testid="pro-mode-btn"
+Актуальний результат: сторінка /game/local
+Очікуваний результат: сторінка /game/training
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+Поточнє завдання:
+
+поясни чому коли я запускаю окремо `npx playwright test --grep "@GMM-1"` або `npx playwright test --grep "@GMM"` , тоді всі тести проходять добре
+але якщо я запускаю `npx playwright test --grep "@GMM" --repeat-each=10` або `npx playwright test` , тоді @GMM-1 підає :
+```
+
+Running 30 tests using 4 workers
+  1) [chromium] › tests\game-mode-modal.spec.ts:17:3 › Модальне вікно вибору режиму гри › 1. Повинно показувати FAQ для режиму "новачок" @done @GMM-1 › Вибір режиму "новачок" та перевірка FAQ 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByTestId('faq-modal-modal.ok-btn')
+
+
+      20 |       await expect(page.getByTestId('faq-modal')).toBeVisible();
+      21 |       await expect(page.getByTestId('faq-modal-title')).toHaveAttribute('data-i18n-key', 'faq.title');
+    > 22 |       await page.getByTestId('faq-modal-modal.ok-btn').click();
+         |                                                        ^
+      23 |       await page.waitForURL('**/game/training');
+      24 |       await expect(page.locator('.direction-controls-panel')).toBeVisible();
+      25 |     });
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\game-mode-modal.spec.ts:22:56
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\game-mode-modal.spec.ts:18:5
+
+    Error Context: test-results\game-mode-modal-Модальне-в-5658d-ати-FAQ-для-режиму-новачок--chromium-repeat6\error-context.md
+
+  1 failed
+    [chromium] › tests\game-mode-modal.spec.ts:17:3 › Модальне вікно вибору режиму гри › 1. Повинно показувати FAQ для режиму "новачок" @done @GMM-1 
+  29 passed (50.9s)
+```
+
+---
+поки що не міняй код, а зроби глибокій аналіз причин такої поведінки
+
+додаткова інформація:
+якщо поставити: `workers: process.env.CI ? 1 : 1,` то проблеми немає
+
+мені здається, що коли автотести запускаються одночасно, то один автотест міняє якусь глобальну зміну і через це інший автотест падає, але коли запускаєш цей автотест окремо, то все працює правильно.
+якщо це так, то це не є порушенням одного чи декількох принципів?
+1.  **SSoT (Single Source of Truth):** Чи є єдине джерело правди для кожного елемента стану?
+2.  **UDF (Unidirectional Data Flow):** Чи є потік даних односпрямованим та передбачуваним?
+3.  **SoC (Separation of Concerns):** Наскільки добре розділені відповідальності (стан, логіка, UI)?
+4.  **Композиція:** Чи ефективно використовуються компоненти для побудови UI?
+5.  **Чистота та Побічні ефекти:** Наскільки добре ізольовані "нечисті" операції (API, DOM, таймери)?
+6.  **DRY (Don't Repeat Yourself):** Чи є дублювання коду, яке можна усунути?
+7.  **Простота та Читабельність (KISS):** Чи є надмірно складні рішення? Наскільки код зрозумілий (якість іменування)?
+8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
+9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
+
+---
+поки що не міняй код, а зроби глибокій аналіз причин такої поведінки
+
+---
+Так, запропонуй план виправлення, але поки що не міняй код, а поясни що і як ти зібрався виправляти
+
+
+---
+
+здається тести не ізолювалися, бо знову один і той самий тест 20 разів пройшов добре, а 2 рази впав
+
+```
+npx playwright test --grep "@GMM" --repeat-each=22
+
+Running 66 tests using 4 workers
+  1) [chromium] › tests\game-mode-modal.spec.ts:27:3 › Модальне вікно вибору режиму гри › 1. Повинно показувати FAQ для режиму "новачок" @done @GMM-1 › Вибір режиму "новачок" та перевірка FAQ 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByTestId('faq-modal-modal.ok-btn')
+        - locator resolved to <button title="" aria-label="OK" data-testid="faq-modal-modal.ok-btn" class="modal-btn-generic s-CbKqU8tqPnSX primary">OK</button>
+      - attempting click action
+        - waiting for element to be visible, enabled and stable
+      - element was detached from the DOM, retrying
+
+
+      30 |       await expect(page.getByTestId('faq-modal')).toBeVisible();
+      31 |       await expect(page.getByTestId('faq-modal-title')).toHaveAttribute('data-i18n-key', 'faq.title');
+    > 32 |       await page.getByTestId('faq-modal-modal.ok-btn').click();
+         |                                                        ^
+      33 |       await page.waitForURL('**/game/training');
+      34 |       await expect(page.locator('.direction-controls-panel')).toBeVisible();
+      35 |     });
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\game-mode-modal.spec.ts:32:56
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\game-mode-modal.spec.ts:28:5
+
+    Error Context: test-results\game-mode-modal-Модальне-в-5658d-ати-FAQ-для-режиму-новачок--chromium-repeat1\error-context.md
+
+  2) [chromium] › tests\game-mode-modal.spec.ts:27:3 › Модальне вікно вибору режиму гри › 1. Повинно показувати FAQ для режиму "новачок" @done @GMM-1 › Вибір режиму "новачок" та перевірка FAQ 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByTestId('faq-modal-modal.ok-btn')
+        - locator resolved to <button title="" aria-label="OK" data-testid="faq-modal-modal.ok-btn" class="modal-btn-generic s-CbKqU8tqPnSX primary">OK</button>
+      - attempting click action
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - performing click action
+        - <html lang="uk" data-theme="dark" data-style="gray">…</html> intercepts pointer events
+      - retrying click action
+        - waiting for element to be visible, enabled and stable
+      - element was detached from the DOM, retrying
+
+
+      30 |       await expect(page.getByTestId('faq-modal')).toBeVisible();
+      31 |       await expect(page.getByTestId('faq-modal-title')).toHaveAttribute('data-i18n-key', 'faq.title');
+    > 32 |       await page.getByTestId('faq-modal-modal.ok-btn').click();
+         |                                                        ^
+      33 |       await page.waitForURL('**/game/training');
+      34 |       await expect(page.locator('.direction-controls-panel')).toBeVisible();
+      35 |     });
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\game-mode-modal.spec.ts:32:56
+        at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\game-mode-modal.spec.ts:28:5
+
+    Error Context: test-results\game-mode-modal-Модальне-в-5658d-ати-FAQ-для-режиму-новачок--chromium-repeat9\error-context.md
+
+  2 failed
+    [chromium] › tests\game-mode-modal.spec.ts:27:3 › Модальне вікно вибору режиму гри › 1. Повинно показувати FAQ для режиму "новачок" @done @GMM-1 
+    [chromium] › tests\game-mode-modal.spec.ts:27:3 › Модальне вікно вибору режиму гри › 1. Повинно показувати FAQ для режиму "новачок" @done @GMM-1
+  64 passed (1.3m)
+```
+
+
+
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠

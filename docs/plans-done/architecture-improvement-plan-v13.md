@@ -14,7 +14,7 @@
 1.  **SSoT (Single Source of Truth):**
     *   **Оцінка: 75/100**
     *   **Добре:** `gameState` стає центральним джерелом правди, що є великим плюсом.
-    *   **Проблеми:** Залишається розсіяний стан (`playerInputStore`, `animationStore`, `settingsStore`). `stateManager` як єдиний мутатор стану використовується не завжди, є прямі виклики `store.update`.
+    *   **Проблеми:** Залишається розсіяний стан (`playerInputStore`, `animationStore`, `appSettingsStore`). `stateManager` як єдиний мутатор стану використовується не завжди, є прямі виклики `store.update`.
 
 2.  **UDF (Unidirectional Data Flow):**
     *   **Оцінка: 80/100**

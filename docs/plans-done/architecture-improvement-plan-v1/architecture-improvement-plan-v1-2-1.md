@@ -18,7 +18,7 @@
     import { gameState } from './stores/gameState.js';
     import { playerInputStore } from './stores/playerInputStore.js';
     import * as gameActions from './stores/gameActions.js';
-    import { settingsStore } from './stores/settingsStore.js';
+    import { appSettingsStore } from './stores/appSettingsStore.js';
     import { modalService } from '$lib/services/modalService.js';
     import { agents } from './playerAgents.js';
     import * as core from './gameCore.js';
@@ -43,7 +43,7 @@
 
         const state = get(gameState);
         const { playerRow, playerCol, boardSize } = state;
-        const { blockModeEnabled } = get(settingsStore);
+        const { blockModeEnabled } = get(appSettingsStore);
 
         if (!selectedDirection || !selectedDistance || playerRow === null || playerCol === null) {
           playerInputStore.update(s => ({ ...s, isMoveInProgress: false }));
@@ -60,7 +60,7 @@
         }));
 
         const visitCount = get(gameState).cellVisitCounts[`${newRow}-${newCol}`] || 0;
-        const isCellBlocked = blockModeEnabled && visitCount > get(settingsStore).blockOnVisitCount;
+        const isCellBlocked = blockModeEnabled && visitCount > get(appSettingsStore).blockOnVisitCount;
         const isOutsideBoard = newRow < 0 || newRow >= boardSize || newCol < 0 || newCol >= boardSize;
 
         if (isOutsideBoard || isCellBlocked) {
@@ -134,7 +134,7 @@
        * @param {any} move
        */
       _handleComputerMoveSideEffects(move) {
-        const latestSettings = get(settingsStore);
+        const latestSettings = get(appSettingsStore);
         if (latestSettings.speechEnabled) {
           let speechLang = langMap[/** @type {keyof typeof langMap} */(latestSettings.language)] || 'uk-UA';
           let speechVoice = latestSettings.selectedVoiceURI ?? null;

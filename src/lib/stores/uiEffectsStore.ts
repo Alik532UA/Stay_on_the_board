@@ -1,5 +1,5 @@
 import { writable, get } from 'svelte/store';
-import { settingsStore } from './settingsStore.js';
+import { gameSettingsStore } from './gameSettingsStore.js';
 import { logService } from '$lib/services/logService.js';
 
 /**
@@ -20,15 +20,23 @@ function createUiEffectsStore() {
     logService.ui(`Автоприховування дошки запущено з затримкою ${delayMs}ms, forceHide: ${forceHide}`);
 
     autoHideTimeout = setTimeout(() => {
-      const settings = get(settingsStore);
+      const settings = get(gameSettingsStore);
       if (settings.autoHideBoard && (settings.showBoard === forceHide)) {
-        settingsStore.toggleShowBoard(!forceHide);
+        gameSettingsStore.toggleShowBoard(!forceHide);
       }
     }, delayMs);
   }
 
+  function cancelAllEffects() {
+    if (autoHideTimeout) {
+      clearTimeout(autoHideTimeout);
+      autoHideTimeout = null;
+    }
+  }
+
   return {
-    autoHideBoard
+    autoHideBoard,
+    cancelAllEffects
   };
 }
 

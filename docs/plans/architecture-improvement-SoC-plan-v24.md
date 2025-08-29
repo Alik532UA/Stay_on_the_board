@@ -40,7 +40,7 @@
 - [ ] **`game/+layout.svelte`:**
   - [ ] Створити `src/lib/services/hotkeyService.ts`.
   - [ ] Перенести всю логіку з `handleHotkey` та `executeAction` в `hotkeyService.ts`.
-  - [ ] `hotkeyService` має викликати `userActionService` та `settingsStore`.
+  - [ ] `hotkeyService` має викликати `userActionService` та `appSettingsStore`.
   - [ ] `game/+layout.svelte` повинен лише викликати `hotkeyService.init()` в `onMount`.
 
 - [ ] **`gameLogicService.ts`:**

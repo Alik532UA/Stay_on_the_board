@@ -117,7 +117,7 @@
 
     ```typescript
     // src/lib/stores/derivedState.ts
-    import { settingsStore } from './settingsStore';
+    import { appSettingsStore } from './appSettingsStore';
     // ...
 
     const languages = [
@@ -132,9 +132,9 @@
      * @type {import('svelte/store').Readable<string>}
      */
     export const currentLanguageFlagSvg = derived(
-      settingsStore,
-      $settingsStore => {
-        return languages.find(lang => lang.code === $settingsStore.language)?.svg || languages[0].svg;
+      appSettingsStore,
+      $appSettingsStore => {
+        return languages.find(lang => lang.code === $appSettingsStore.language)?.svg || languages[0].svg;
       }
     );
     ```
@@ -148,8 +148,8 @@
     <script>
       // ...
       const languages = [ /* ... */ ];
-      $: settings = $settingsStore;
-      $: currentFlagSvg = languages.find(lang => lang.code === $settingsStore.language)?.svg || languages[0].svg;
+      $: settings = $appSettingsStore;
+      $: currentFlagSvg = languages.find(lang => lang.code === $appSettingsStore.language)?.svg || languages[0].svg;
     </script>
     <!-- ... -->
     <button ...>
@@ -185,7 +185,7 @@
 
     ```typescript
     // src/lib/stores/derivedState.ts
-    import { settingsStore } from './settingsStore';
+    import { appSettingsStore } from './appSettingsStore';
     import { gameState } from './gameState';
     // ...
 
@@ -194,9 +194,9 @@
      * @type {import('svelte/store').Readable<boolean>}
      */
     export const shouldHideBoard = derived(
-      [settingsStore, gameState],
-      ([$settingsStore, $gameState]) => {
-        if (!$settingsStore.autoHideBoard) return false;
+      [appSettingsStore, gameState],
+      ([$appSettingsStore, $gameState]) => {
+        if (!$appSettingsStore.autoHideBoard) return false;
         const lastMove = $gameState.moveQueue?.[$gameState.moveQueue.length - 1];
         return lastMove?.player === 1;
       }
@@ -211,10 +211,10 @@
     <script lang="ts">
       // ...
       const shouldHideBoard = derived([
-        settingsStore,
+        appSettingsStore,
         gameState
-      ], ([$settingsStore, $gameState]) => {
-        if (!$settingsStore.autoHideBoard) return false;
+      ], ([$appSettingsStore, $gameState]) => {
+        if (!$appSettingsStore.autoHideBoard) return false;
         const lastMove = $gameState.moveQueue?.[$gameState.moveQueue.length - 1];
         return lastMove && lastMove.player === 1;
       });

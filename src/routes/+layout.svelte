@@ -1,12 +1,10 @@
 <script lang="ts">
-	import { commandService } from '$lib/services/commandService';
 	import Header from './Header.svelte';
 	import '../app.css';
-	import { settingsStore } from '$lib/stores/settingsStore.ts';
+	import { appSettingsStore } from '$lib/stores/appSettingsStore';
 	import { get } from 'svelte/store';
 	import { initializeI18n, i18nReady } from '$lib/i18n/init.js';
 	import { appVersion } from '$lib/stores/versionStore.js';
-	import { initializeStoreSync } from '$lib/services/storeSyncService';
 	import { assets } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { base } from '$app/paths';
@@ -24,7 +22,8 @@
 	import Tooltip from '$lib/components/Tooltip.svelte';
 	import ModalManager from '$lib/components/ModalManager.svelte';
 	import { testModeStore, toggleTestMode } from '$lib/stores/testModeStore';
-	import { initializeTestModeSync } from '$lib/services/testModeService'; // <-- ДОДАНО ІМПОРТ
+	import { initializeTestModeSync } from '$lib/services/testModeService';
+	import { resetAllStores } from '$lib/services/testingService';
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
@@ -44,20 +43,17 @@
 			} else if (!localVersion) {
 				localStorage.setItem(APP_VERSION_KEY, serverVersion);
 			}
-			settingsStore.init();
+			appSettingsStore.init();
 			initializeI18n();
-			initializeStoreSync();
-			initializeTestModeSync(); // <-- ДОДАНО ВИКЛИК ІНІЦІАЛІЗАЦІЇ
+			initializeTestModeSync(); // <-- ДОДАНО: Ініціалізація сервісу-моста
 		} catch (error) {
 			logService.init('Failed to check for app update:', error);
 		}
 
-		// НАВІЩО: Спрощуємо умову. Тестові хуки повинні бути доступні
-		// ЗАВЖДИ в режимі розробки, незалежно від поточного стану.
-		// Це усуває "парадокс курки та яйця" і робить тести стабільними.
 		if (import.meta.env.DEV) {
-			(window as any).settingsStore = settingsStore;
+			(window as any).appSettingsStore = appSettingsStore;
 			(window as any).toggleTestMode = toggleTestMode;
+			(window as any).resetAllStores = resetAllStores; // Add reset function to window
 		}
 	});
 

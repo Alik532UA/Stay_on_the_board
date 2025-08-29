@@ -1,32 +1,28 @@
-/**
- * @file This service is the single entry point for all user-initiated actions.
- * It orchestrates the flow of user intentions to the appropriate services.
- */
+// src/lib/services/userActionService.ts
 import { get } from 'svelte/store';
 import { tick } from 'svelte';
-import { replayStore } from '$lib/stores/replayStore.js';
 import { modalStore } from '$lib/stores/modalStore.js';
 import { gameStore } from '$lib/stores/gameStore';
 import { modalService } from './modalService';
 import { gameModeService } from './gameModeService';
-import { sideEffectService, type SideEffect } from './sideEffectService';
-import { gameEventBus } from './gameEventBus';
-import { replayService } from './replayService';
 import { logService } from './logService.js';
-import { gameState } from '$lib/stores/gameState.js';
-import { gameStateMutator } from '$lib/services/gameStateMutator';
-import ReplayViewer from '$lib/components/ReplayViewer.svelte';
 import * as gameLogicService from '$lib/services/gameLogicService.js';
 import type { Direction } from '$lib/utils/gameUtils';
 import { navigationService } from './navigationService';
-import { settingsStore } from '$lib/stores/settingsStore';
-import { gameOverStore } from '$lib/stores/gameOverStore';
-import { animationStore } from '$lib/stores/animationStore';
-import { base } from '$app/paths';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
 import { endGameService } from './endGameService';
 import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService.js';
 import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
 import { locale } from 'svelte-i18n';
+import { boardStore } from '$lib/stores/boardStore';
+import { playerStore } from '$lib/stores/playerStore';
+import { scoreStore } from '$lib/stores/scoreStore';
+import { uiStateStore } from '$lib/stores/uiStateStore';
+import { gameService } from './gameService';
+import ReplayViewer from '$lib/components/ReplayViewer.svelte';
+import { gameEventBus } from './gameEventBus';
+import { sideEffectService } from './sideEffectService';
+import { navigateToGame } from './uiService'; // Add this import
 
 export const userActionService = {
   selectDirection(direction: Direction): void {
@@ -38,72 +34,43 @@ export const userActionService = {
   },
 
   confirmMove(): void {
-    const state = get(gameState);
-    if (state?.selectedDirection && state?.selectedDistance) {
-      this.executeMove(state.selectedDirection as Direction, state.selectedDistance);
+    const uiState = get(uiStateStore);
+    if (uiState?.selectedDirection && uiState?.selectedDistance) {
+      this.executeMove(uiState.selectedDirection, uiState.selectedDistance);
     }
   },
 
   async executeMove(direction: Direction, distance: number): Promise<void> {
-    const state = get(gameState);
-    if (state?.isComputerMoveInProgress) {
-      return;
-    }
-    try {
-      logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
-      let activeGameMode = gameModeService.getCurrentMode();
-      if (!activeGameMode) {
-        const settings = get(settingsStore);
-        gameModeService.initializeGameMode(settings.gameMode);
-        activeGameMode = gameModeService.getCurrentMode();
-        if (!activeGameMode) {
-          logService.logicMove('[userActionService.confirmMove] No active game mode found after initialization.');
-          return;
-        }
-      }
+    const uiState = get(uiStateStore);
+    if (uiState?.isComputerMoveInProgress) return;
+    
+    const activeGameMode = gameModeService.getCurrentMode();
+    if (activeGameMode) {
       await activeGameMode.handlePlayerMove(direction, distance);
-    } finally {
-      await tick();
-      logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
     }
   },
 
   async claimNoMoves(): Promise<void> {
-    const state = get(gameState);
-    if (state?.isComputerMoveInProgress) {
-      return;
-    }
-    try {
-      logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
-      let activeGameMode = gameModeService.getCurrentMode();
-      if (!activeGameMode) {
-        const settings = get(settingsStore);
-        gameModeService.initializeGameMode(settings.gameMode);
-        activeGameMode = gameModeService.getCurrentMode();
-        if (!activeGameMode) {
-          logService.logicMove('[userActionService.claimNoMoves] No active game mode found after initialization.');
-          return;
-        }
-      }
+    const uiState = get(uiStateStore);
+    if (uiState?.isComputerMoveInProgress) return;
+
+    const activeGameMode = gameModeService.getCurrentMode();
+    if (activeGameMode) {
       await activeGameMode.claimNoMoves();
-    } finally {
-      await tick();
-      logService.logicMove('[userActionService] Input unlocked: isMoveInProgress=false');
     }
   },
 
   async changeBoardSize(newSize: number): Promise<void> {
-    const state = get(gameState);
-    if (!state) return;
-    const { players, penaltyPoints, boardSize } = state;
-    const score = players.reduce((acc: number, p: any) => acc + p.score, 0);
-    if (newSize === boardSize) return;
+    const boardState = get(boardStore);
+    const playerState = get(playerStore);
+    const scoreState = get(scoreStore);
+    if (!boardState || !playerState || !scoreState) return;
 
-    if (score === 0 && penaltyPoints === 0) {
-      const activeGameMode = gameModeService.getCurrentMode();
-      if (activeGameMode) {
-        await activeGameMode.restartGame({ newSize });
-      }
+    const score = playerState.players.reduce((acc: number, p: any) => acc + p.score, 0);
+    if (newSize === boardState.boardSize) return;
+
+    if (score === 0 && scoreState.penaltyPoints === 0) {
+      gameService.initializeNewGame({ size: newSize });
     } else {
       modalService.showBoardResizeModal(newSize);
     }
@@ -111,16 +78,13 @@ export const userActionService = {
 
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
-    const activeGameMode = gameModeService.getCurrentMode();
-    if (activeGameMode) {
-      await activeGameMode.restartGame();
-    }
+    gameService.initializeNewGame();
   },
 
   async requestReplay(): Promise<void> {
-    const state = get(gameState);
-    if (!state) return;
-    const { moveHistory, boardSize } = state;
+    const boardState = get(boardStore);
+    if (!boardState) return;
+    const { moveHistory, boardSize } = boardState;
     modalStore.showModal({
       component: ReplayViewer,
       props: {
@@ -135,7 +99,6 @@ export const userActionService = {
 
   async finishWithBonus(reasonKey: string): Promise<void> {
     logService.logicMove('[userActionService] finishWithBonus called with reason:', reasonKey);
-    gameState.update(state => state ? ({...state, finishedByFinishButton: true}) : null);
     await endGameService.endGame(reasonKey);
   },
 
@@ -147,8 +110,8 @@ export const userActionService = {
   },
 
   async handleModalAction(action: string, payload?: any): Promise<void> {
-    const state = get(gameState);
-    if (state?.isComputerMoveInProgress) {
+    const uiState = get(uiStateStore);
+    if (uiState?.isComputerMoveInProgress) {
       return;
     }
     try {
@@ -190,11 +153,11 @@ export const userActionService = {
   },
 
   async toggleSpeech(): Promise<void> {
-    const currentState = get(settingsStore);
+    const currentState = get(gameSettingsStore);
     const isEnabled = !currentState.speechEnabled;
 
     if (!isEnabled) {
-      settingsStore.toggleSimpleSpeech();
+      gameSettingsStore.updateSettings({ speechEnabled: false });
       return;
     }
 
@@ -206,21 +169,28 @@ export const userActionService = {
     if (availableVoices.length > 0) {
       if (!hasConfiguredSpeech) {
         openVoiceSettingsModal();
-        sideEffectService.execute({ type: 'localStorage_set', payload: { key: 'hasConfiguredSpeech', value: 'true' } });
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('hasConfiguredSpeech', 'true');
+        }
       }
-      settingsStore.toggleSimpleSpeech();
+      gameSettingsStore.updateSettings({ speechEnabled: true });
     } else {
       openVoiceSettingsModal();
     }
   },
 
   resetKeybindings(): void {
-    settingsStore.resetKeybindings();
+    gameSettingsStore.resetKeybindings();
   },
 
-  applyGameModePreset(preset: 'beginner' | 'experienced' | 'pro'): void {
-    settingsStore.applyPreset(preset);
-    const newMode = get(settingsStore).gameMode;
-    gameModeService.initializeGameMode(newMode);
+  setGameModePreset(preset: 'beginner' | 'experienced' | 'pro'): void {
+    // НАВІЩО (Архітектурне виправлення): Ця функція тепер відповідає ТІЛЬКИ за оновлення
+    // налаштувань (SSoT) через виклик атомарного методу в сторі. Ініціалізація гри (SoC)
+    // повністю делегована відповідній ігровій сторінці.
+    gameSettingsStore.applyPreset(preset);
+  },
+
+  navigateToGame(): void {
+    navigateToGame();
   }
 };

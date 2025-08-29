@@ -124,20 +124,20 @@ author: ""
   ```svelte
   <script>
     import { appState, toggleBlockCell } from '$lib/stores/gameStore.js';
-    import { settingsStore } from '$lib/stores/settingsStore.js';
+    import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
     import { logStore } from '$lib/stores/logStore.js';
     import { modalStore } from '$lib/stores/modalStore.js';
     import SvgIcons from '../SvgIcons.svelte';
     import { replayPosition, replayCellVisitCounts, replaySegments } from '$lib/utils/replay.js';
 
-    let showBoard = $derived($settingsStore.showBoard);
+    let showBoard = $derived($appSettingsStore.showBoard);
     let boardSize = $derived(Number($appState.boardSize));
     let playerRow = $derived($appState.playerRow);
     let playerCol = $derived($appState.playerCol);
     let blockedCells = $derived($appState.blockedCells);
     let blockModeEnabled = $derived($appState.blockModeEnabled);
-    let showMoves = $derived($settingsStore.showMoves);
-    let blockOnVisitCount = $derived($settingsStore.blockOnVisitCount);
+    let showMoves = $derived($appSettingsStore.showMoves);
+    let blockOnVisitCount = $derived($appSettingsStore.blockOnVisitCount);
     let activeCellVisitCounts = $derived($appState.isReplayMode ? $replayCellVisitCounts : $appState.cellVisitCounts);
 
     function isAvailable(row, col) {
@@ -205,7 +205,7 @@ author: ""
             {#if getDamageClass(rowIdx, colIdx) === 'cell-damage-3'}<span class="crack-extra"></span>{/if}
             {#if isCellBlocked(rowIdx, colIdx)}
               <span class="blocked-x">✗</span>
-            {:else if !$appState.isReplayMode && $settingsStore.showMoves && isAvailable(rowIdx, colIdx)}
+            {:else if !$appState.isReplayMode && $appSettingsStore.showMoves && isAvailable(rowIdx, colIdx)}
               <span class="move-dot"></span>
             {/if}
           </div>
@@ -218,7 +218,7 @@ author: ""
           {/each}
         </svg>
       {/if}
-      {#if ($appState.isReplayMode || $settingsStore.showQueen) && $replayPosition}
+      {#if ($appState.isReplayMode || $appSettingsStore.showQueen) && $replayPosition}
         {#key $appState.gameId}
           <div class="player-piece" style="top: {$replayPosition.row * (100 / $appState.boardSize)}%; left: {$replayPosition.col * (100 / $appState.boardSize)}%;">
             <div class="piece-container"><SvgIcons name="piece" /></div>
@@ -242,7 +242,7 @@ author: ""
     import { appState, setDirection, setDistance, availableDistances } from '$lib/stores/gameStore.js';
     import { confirmPlayerMove, claimNoMoves } from '$lib/gameOrchestrator.js';
     import { _ } from 'svelte-i18n';
-    import { settingsStore } from '$lib/stores/settingsStore.js';
+    import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
     import SvgIcons from '../SvgIcons.svelte';
     import { get } from 'svelte/store';
 
@@ -284,15 +284,15 @@ author: ""
 
   <div class="game-controls-panel">
     <div class="directions directions-3x3">
-      <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => onDirectionClick('up-left')} title={`${$_('tooltips.up-left')}\n(${$settingsStore.keybindings['up-left'].join(', ')})`}>↖</button>
-      <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" on:click={() => onDirectionClick('up')} title={`${$_('tooltips.up')}\n(${$settingsStore.keybindings['up'].join(', ')})`}>↑</button>
-      <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" on:click={() => onDirectionClick('up-right')} title={`${$_('tooltips.up-right')}\n(${$settingsStore.keybindings['up-right'].join(', ')})`}>↗</button>
-      <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" on:click={() => onDirectionClick('left')} title={`${$_('tooltips.left')}\n(${$settingsStore.keybindings['left'].join(', ')})`}>←</button>
+      <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => onDirectionClick('up-left')} title={`${$_('tooltips.up-left')}\n(${$appSettingsStore.keybindings['up-left'].join(', ')})`}>↖</button>
+      <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" on:click={() => onDirectionClick('up')} title={`${$_('tooltips.up')}\n(${$appSettingsStore.keybindings['up'].join(', ')})`}>↑</button>
+      <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" on:click={() => onDirectionClick('up-right')} title={`${$_('tooltips.up-right')}\n(${$appSettingsStore.keybindings['up-right'].join(', ')})`}>↗</button>
+      <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" on:click={() => onDirectionClick('left')} title={`${$_('tooltips.left')}\n(${$appSettingsStore.keybindings['left'].join(', ')})`}>←</button>
       <button id="center-info" class="control-btn center-info {centerInfoState.class}" type="button" aria-label={centerInfoState.aria} on:click={onCentralClick} disabled={!centerInfoState.clickable}>{String(centerInfoState.content)}</button>
-      <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" on:click={() => onDirectionClick('right')} title={`${$_('tooltips.right')}\n(${$settingsStore.keybindings['right'].join(', ')})`}>→</button>
-      <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" on:click={() => onDirectionClick('down-left')} title={`${$_('tooltips.down-left')}\n(${$settingsStore.keybindings['down-left'].join(', ')})`}>↙</button>
-      <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" on:click={() => onDirectionClick('down')} title={`${$_('tooltips.down')}\n(${$settingsStore.keybindings['down'].join(', ')})`}>↓</button>
-      <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" on:click={() => onDirectionClick('down-right')} title={`${$_('tooltips.down-right')}\n(${$settingsStore.keybindings['down-right'].join(', ')})`}>↘</button>
+      <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" on:click={() => onDirectionClick('right')} title={`${$_('tooltips.right')}\n(${$appSettingsStore.keybindings['right'].join(', ')})`}>→</button>
+      <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" on:click={() => onDirectionClick('down-left')} title={`${$_('tooltips.down-left')}\n(${$appSettingsStore.keybindings['down-left'].join(', ')})`}>↙</button>
+      <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" on:click={() => onDirectionClick('down')} title={`${$_('tooltips.down')}\n(${$appSettingsStore.keybindings['down'].join(', ')})`}>↓</button>
+      <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" on:click={() => onDirectionClick('down-right')} title={`${$_('tooltips.down-right')}\n(${$appSettingsStore.keybindings['down-right'].join(', ')})`}>↘</button>
     </div>
     <div class="distance-select">
       <div>{$_('gameControls.selectDistance')}</div>
@@ -303,12 +303,12 @@ author: ""
       </div>
     </div>
     <div class="action-btns">
-      <button class="confirm-btn" on:click={confirmPlayerMove} disabled={buttonDisabled} title={`${$_('tooltips.confirm')}\n(${$settingsStore.keybindings['confirm']})`}>
+      <button class="confirm-btn" on:click={confirmPlayerMove} disabled={buttonDisabled} title={`${$_('tooltips.confirm')}\n(${$appSettingsStore.keybindings['confirm']})`}>
         <SvgIcons name="confirm" />
         {$_('gameControls.confirm')}
       </button>
       {#if $appState.blockModeEnabled}
-        <button class="no-moves-btn" on:click={claimNoMoves} title={`${$_('tooltips.no-moves')}\n(${$settingsStore.keybindings['no-moves']})`}>
+        <button class="no-moves-btn" on:click={claimNoMoves} title={`${$_('tooltips.no-moves')}\n(${$appSettingsStore.keybindings['no-moves']})`}>
           <SvgIcons name="no-moves" />
           {$_('gameControls.noMovesTitle')}
         </button>
@@ -331,13 +331,13 @@ author: ""
     import { modalStore } from '$lib/stores/modalStore.js';
     import { _ } from 'svelte-i18n';
     import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
-    import { settingsStore } from '$lib/stores/settingsStore.js';
+    import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
     import SvgIcons from '../SvgIcons.svelte';
     import { get } from 'svelte/store';
 
-    $: showMoves = $settingsStore.showMoves;
-    $: showBoard = $settingsStore.showBoard;
-    $: speechEnabled = $settingsStore.speechEnabled;
+    $: showMoves = $appSettingsStore.showMoves;
+    $: showBoard = $appSettingsStore.showBoard;
+    $: speechEnabled = $appSettingsStore.speechEnabled;
     $: blockModeEnabled = $appState.blockModeEnabled;
 
     function changeBoardSize(increment) {
@@ -370,12 +370,12 @@ author: ""
           titleKey: 'modal.expertModeTitle',
           contentKey: 'modal.expertModeContent',
           buttons: [
-            { textKey: 'modal.expertModeConfirm', primary: true, isHot: true, onClick: () => { localStorage.setItem('hasSeenExpertModeWarning', 'true'); settingsStore.updateSettings({ blockOnVisitCount: count }); modalStore.closeModal(); } },
+            { textKey: 'modal.expertModeConfirm', primary: true, isHot: true, onClick: () => { localStorage.setItem('hasSeenExpertModeWarning', 'true'); appSettingsStore.updateSettings({ blockOnVisitCount: count }); modalStore.closeModal(); } },
             { textKey: 'modal.expertModeCancel', onClick: modalStore.closeModal }
           ]
         });
       } else {
-        settingsStore.updateSettings({ blockOnVisitCount: count });
+        appSettingsStore.updateSettings({ blockOnVisitCount: count });
       }
     }
   </script>
@@ -395,33 +395,33 @@ author: ""
         </div>
       </div>
       <label class="ios-switch-label">
-        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={showBoard} on:change={settingsStore.toggleShowBoard} /><span class="slider"></span></div><span>{$_('gameControls.showBoard')}</span></div>
+        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={showBoard} on:change={appSettingsStore.toggleShowBoard} /><span class="slider"></span></div><span>{$_('gameControls.showBoard')}</span></div>
       </label>
       <label class="ios-switch-label" class:disabled={!showBoard}>
-        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={$settingsStore.showQueen} on:change={settingsStore.toggleShowQueen} disabled={!showBoard} /><span class="slider"></span></div><span>{$_('gameControls.showQueen')}</span></div>
+        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={$appSettingsStore.showQueen} on:change={appSettingsStore.toggleShowQueen} disabled={!showBoard} /><span class="slider"></span></div><span>{$_('gameControls.showQueen')}</span></div>
       </label>
-      <label class="ios-switch-label" class:disabled={!showBoard || !$settingsStore.showQueen}>
-        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={showMoves} on:change={settingsStore.toggleShowMoves} disabled={!showBoard || !$settingsStore.showQueen} /><span class="slider"></span></div><span>{$_('gameControls.showMoves')}</span></div>
+      <label class="ios-switch-label" class:disabled={!showBoard || !$appSettingsStore.showQueen}>
+        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={showMoves} on:change={appSettingsStore.toggleShowMoves} disabled={!showBoard || !$appSettingsStore.showQueen} /><span class="slider"></span></div><span>{$_('gameControls.showMoves')}</span></div>
       </label>
       <label class="ios-switch-label">
-        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={blockModeEnabled} on:change={() => settingsStore.updateSettings({ blockModeEnabled: !blockModeEnabled })} /><span class="slider"></span></div><span>{$_('gameControls.blockMode')}</span></div>
+        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={blockModeEnabled} on:change={() => appSettingsStore.updateSettings({ blockModeEnabled: !blockModeEnabled })} /><span class="slider"></span></div><span>{$_('gameControls.blockMode')}</span></div>
       </label>
       {#if blockModeEnabled}
         <div class="block-mode-options">
           <span class="options-label">{$_('gameControls.blockAfter')}</span>
           <div class="options-values" role="radiogroup">
             {#each [0, 1, 2, 3] as count}
-              <button class="count-selector-btn" class:active={$settingsStore.blockOnVisitCount === count} on:click={() => selectBlockCount(count)}>{count}</button>
+              <button class="count-selector-btn" class:active={$appSettingsStore.blockOnVisitCount === count} on:click={() => selectBlockCount(count)}>{count}</button>
             {/each}
           </div>
         </div>
       {/if}
       <label class="ios-switch-label">
-        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" bind:checked={speechEnabled} on:change={() => settingsStore.toggleSpeech()} /><span class="slider"></span></div><span>{$_('gameControls.speech')}</span></div>
+        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" bind:checked={speechEnabled} on:change={() => appSettingsStore.toggleSpeech()} /><span class="slider"></span></div><span>{$_('gameControls.speech')}</span></div>
         <button class="settings-icon-btn" title={$_('gameControls.voiceSettingsTitle')} on:click|stopPropagation={openVoiceSettingsModal}><SvgIcons name="voice-settings" /></button>
       </label>
       <label class="ios-switch-label">
-        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={$settingsStore.autoHideBoard} on:change={settingsStore.toggleAutoHideBoard} /><span class="slider"></span></div><span>{$_('gameModes.autoHideBoard')}</span></div>
+        <div class="switch-content-wrapper"><div class="ios-switch"><input type="checkbox" checked={$appSettingsStore.autoHideBoard} on:change={appSettingsStore.toggleAutoHideBoard} /><span class="slider"></span></div><span>{$_('gameModes.autoHideBoard')}</span></div>
       </label>
     </div>
   </details>

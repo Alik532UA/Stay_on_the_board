@@ -18,6 +18,7 @@ const defaultSettings: any = {
   showPiece: true,
   blockOnVisitCount: 0,
   autoHideBoard: false,
+  boardSize: 4,
   keybindings: {
     'up-left': ['Numpad7', 'KeyQ'],
     'up': ['Numpad8', 'KeyW'],
