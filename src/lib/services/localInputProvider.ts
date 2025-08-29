@@ -1,18 +1,12 @@
-/**
- * @file This service acts as a provider for local user input,
- * decoupling UI components from the core userActionService.
- */
+// src/lib/services/localInputProvider.ts
 import { get } from 'svelte/store';
-import { gameState } from '$lib/stores/gameState';
+import { uiStateStore } from '$lib/stores/uiStateStore';
 import { userActionService } from './userActionService';
 import { logService } from './logService';
 
 export const localInputProvider = {
-  /**
-   * Confirms a move based on the current state of the gameState.
-   */
   confirmMove(): void {
-    const state = get(gameState);
+    const state = get(uiStateStore);
     if (!state || !state.selectedDirection || !state.selectedDistance) {
       logService.logicMove('[LocalInputProvider] Attempted to confirm move without direction or distance.');
       return;

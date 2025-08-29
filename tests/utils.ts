@@ -1,7 +1,7 @@
 // test.setTimeout(1000 * 60 * 120); // 120 minutes
 // await page.waitForTimeout(7777777); // Додаємо паузу
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type Locator } from '@playwright/test';
 
 // Встановлює розмір ігрового поля
 export async function setBoardSize(page: Page, size: number) {
@@ -87,11 +87,16 @@ export async function makeMove(page: Page, direction: string, distance: number, 
   await page.getByTestId(`dir-btn-${direction}`).click();
   // Клікаємо на кнопку дистанції
   await page.getByTestId(`dist-btn-${distance}`).click();
+
+  // НАВІЩО: Додаємо явне очікування, що кнопка стала активною (не має класу 'disabled').
+  // Це робить тест більш надійним і переносить точку відмови ближче до реальної причини проблеми.
+  await expect(page.getByTestId('confirm-move-btn')).not.toHaveClass(/disabled/);
+
   // Клікаємо на кнопку підтвердження ходу
   await page.getByTestId('confirm-move-btn').click();
   // Якщо очікується хід комп'ютера, перевіряємо його видимість
   if (expectComputerMove) {
-    await expect(page.locator('.control-btn.center-info.computer-move-display')).toBeVisible();
+    await expectVisibleWithModalCheck(page, page.locator('.control-btn.center-info.computer-move-display'));
   }
 }
 
@@ -121,4 +126,35 @@ export async function expectScoreToBePositive(page: Page, testId: string) {
 export async function expectScoreToBeZeroOrNegative(page: Page, testId: string) {
   const score = await getScoreByTestId(page, testId);
   expect(score).toBeLessThanOrEqual(0);
+}
+
+/**
+ * Покращена перевірка видимості, яка у випадку помилки додає інформацію про активне модальне вікно.
+ * @param {Page} page - Поточна сторінка Playwright.
+ * @param {Locator} locator - Локатор елемента, який потрібно перевірити.
+ * @param {number} [timeout=5000] - Таймаут для очікування.
+ */
+export async function expectVisibleWithModalCheck(page: Page, locator: Locator, timeout = 5000) {
+  try {
+    await expect(locator).toBeVisible({ timeout });
+  } catch (error) {
+    // Якщо основна перевірка не вдалася, перевіряємо наявність модального вікна
+    const modalContext = await page.evaluate(() => {
+      // @ts-ignore
+      const service = window.modalService;
+      return service ? service.getCurrentModalContext() : null;
+    });
+
+    if (modalContext && modalContext.dataTestId) {
+      const enhancedError = new Error(
+        `Original expect(locator).toBeVisible() failed. Error: ${error.message}\n` +
+        `[DIAGNOSTIC INFO] An unexpected modal with data-testid '${modalContext.dataTestId}' was visible at the time of failure.`
+      );
+      enhancedError.stack = error.stack;
+      throw enhancedError;
+    } else {
+      // Якщо модального вікна немає, просто прокидаємо оригінальну помилку
+      throw error;
+    }
+  }
 }

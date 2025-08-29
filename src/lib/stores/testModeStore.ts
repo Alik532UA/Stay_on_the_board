@@ -16,7 +16,7 @@ export interface TestModeState {
   };
 }
 
-const initialState: TestModeState = {
+export const initialState: TestModeState = {
   isEnabled: false,
   startPositionMode: 'random',
   manualStartPosition: null,

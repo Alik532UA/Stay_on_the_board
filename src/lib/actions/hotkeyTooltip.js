@@ -1,5 +1,5 @@
 import { tooltipStore } from '$lib/stores/tooltipStore.js';
-import { settingsStore } from '$lib/stores/settingsStore.ts';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
 import { get } from 'svelte/store';
 
 /**
@@ -27,18 +27,18 @@ function formatHotkeys(keys) {
  * A Svelte action to show a tooltip with assigned hotkeys.
  * Can take a game action name to look up in settings, or a static key.
  * @param {HTMLElement} node The element to attach the tooltip to.
- * @param {import('$lib/stores/settingsStore.ts').KeybindingAction | {key: string}} param
+ * @param {import('$lib/stores/gameSettingsStore.js').KeybindingAction | {key: string}} param
  */
 export function hotkeyTooltip(node, param) {
   let tooltipContent = '';
   const originalTitle = node.title;
   node.title = '';
 
-  /** @param {import('$lib/stores/settingsStore.ts').KeybindingAction | {key: string}} newParam */
+  /** @param {import('$lib/stores/gameSettingsStore.js').KeybindingAction | {key: string}} newParam */
   function updateTooltipContent(newParam) {
     if (typeof newParam === 'string') {
-      const settings = get(settingsStore);
-      const keys = settings.keybindings[/** @type {import('$lib/stores/settingsStore.ts').KeybindingAction} */ (newParam)];
+      const settings = get(gameSettingsStore);
+      const keys = settings.keybindings[/** @type {import('$lib/stores/gameSettingsStore.js').KeybindingAction} */ (newParam)];
       tooltipContent = formatHotkeys(keys);
     } else if (typeof newParam === 'object' && newParam.key) {
       tooltipContent = formatHotkeys([newParam.key]);
@@ -49,9 +49,9 @@ export function hotkeyTooltip(node, param) {
 
   updateTooltipContent(param);
 
-  const unsubscribe = settingsStore.subscribe(settings => {
+  const unsubscribe = gameSettingsStore.subscribe(settings => {
     if (typeof param === 'string') {
-      const keys = settings.keybindings[/** @type {import('$lib/stores/settingsStore.ts').KeybindingAction} */ (param)];
+      const keys = settings.keybindings[/** @type {import('$lib/stores/gameSettingsStore.js').KeybindingAction} */ (param)];
       tooltipContent = formatHotkeys(keys);
     }
   });
@@ -78,7 +78,7 @@ export function hotkeyTooltip(node, param) {
 
   return {
     /**
-     * @param {import('$lib/stores/settingsStore.ts').KeybindingAction | {key: string}} newParam
+     * @param {import('$lib/stores/gameSettingsStore.js').KeybindingAction | {key: string}} newParam
      */
     update(newParam) {
       param = newParam;

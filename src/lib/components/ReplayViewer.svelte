@@ -8,7 +8,7 @@
     replaySegments as calculateReplaySegments,
     replayBlockModeEnabled as calculateReplayBlockModeEnabled
   } from '$lib/utils/replay.js';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
   import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
@@ -62,12 +62,12 @@
       {#each Array(boardSize) as _, rowIdx}
         {#each Array(boardSize) as _, colIdx}
           <div
-            class="board-cell {getDamageClass(rowIdx, colIdx, $replayCellVisitCounts, { blockModeEnabled: $replayBlockModeEnabled, blockOnVisitCount: $settingsStore.blockOnVisitCount })}"
+            class="board-cell {getDamageClass(rowIdx, colIdx, $replayCellVisitCounts, { blockModeEnabled: $replayBlockModeEnabled, blockOnVisitCount: $gameSettingsStore.blockOnVisitCount })}"
             class:light={(rowIdx + colIdx) % 2 === 0}
             class:dark={(rowIdx + colIdx) % 2 !== 0}
-            class:blocked-cell={isCellBlocked(rowIdx, colIdx, $replayCellVisitCounts, { blockModeEnabled: $replayBlockModeEnabled, blockOnVisitCount: $settingsStore.blockOnVisitCount })}
+            class:blocked-cell={isCellBlocked(rowIdx, colIdx, $replayCellVisitCounts, { blockModeEnabled: $replayBlockModeEnabled, blockOnVisitCount: $gameSettingsStore.blockOnVisitCount })}
           >
-            {#if isCellBlocked(rowIdx, colIdx, $replayCellVisitCounts, { blockModeEnabled: $replayBlockModeEnabled, blockOnVisitCount: $settingsStore.blockOnVisitCount })}
+            {#if isCellBlocked(rowIdx, colIdx, $replayCellVisitCounts, { blockModeEnabled: $replayBlockModeEnabled, blockOnVisitCount: $gameSettingsStore.blockOnVisitCount })}
               <!-- Хрест тепер рендериться через CSS, як і в основній грі -->
             {/if}
           </div>

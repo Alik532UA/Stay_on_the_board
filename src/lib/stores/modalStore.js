@@ -74,7 +74,7 @@ export function showModal({ dataTestId, ...modalDetails }) {
       if (!sameIdentity) {
         modalStack.push(currentState);
       } else {
-        logService.ui(`[ModalStore] showModal: Prevented stacking identical modal '${dataTestId || modalDetails.titleKey}'.`);
+        logService.modal(`[ModalStore] showModal: Prevented stacking identical modal '${dataTestId || modalDetails.titleKey}'.`);
       }
     }
     const newState = {
@@ -83,7 +83,7 @@ export function showModal({ dataTestId, ...modalDetails }) {
       dataTestId,
       isOpen: true,
     };
-    logService.ui(`[ModalStore] showModal called. New modal: '${newState.dataTestId || newState.titleKey}'. Stack size: ${modalStack.length}`);
+    logService.modal(`[ModalStore] showModal called. New modal: '${newState.dataTestId || newState.titleKey}'. Stack size: ${modalStack.length}`, { newState, stack: [...modalStack] });
     return newState;
   });
 }
@@ -92,25 +92,26 @@ export function showModal({ dataTestId, ...modalDetails }) {
  * @param {Partial<ModalState>} modalDetails
  */
 export function showModalAsReplacement(modalDetails) {
-  logService.ui(`[ModalStore] showModalAsReplacement called. Clearing stack and showing new modal: '${modalDetails.dataTestId || modalDetails.titleKey}'.`);
+  logService.modal(`[ModalStore] showModalAsReplacement called. Clearing stack and showing new modal: '${modalDetails.dataTestId || modalDetails.titleKey}'.`, { modalDetails });
   modalStack.length = 0; // Очищуємо стек
-  set({
+  const newState = {
     ...initialState,
     ...modalDetails,
     isOpen: true,
-  });
+  };
+  set(newState);
 }
 
 export function closeModal() {
-  logService.ui(`[ModalStore] closeModal called. Stack size: ${modalStack.length}`);
+  logService.modal(`[ModalStore] closeModal called. Stack size before action: ${modalStack.length}`, { stack: [...modalStack] });
   if (modalStack.length > 0) {
     const previousState = modalStack.pop();
     if (previousState) {
-      logService.ui(`[ModalStore] Popped '${previousState.dataTestId || previousState.titleKey}' from stack. Restoring previous state.`);
+      logService.modal(`[ModalStore] Popped '${previousState.dataTestId || previousState.titleKey}' from stack. Restoring previous state.`, { previousState });
       set(previousState);
     }
   } else {
-    logService.ui('[ModalStore] Stack is empty. Resetting to initial state.');
+    logService.modal('[ModalStore] Stack is empty. Resetting to initial state.', { initialState });
     set({ ...initialState });
   }
 }

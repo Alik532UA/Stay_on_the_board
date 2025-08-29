@@ -1,22 +1,18 @@
-import { writable, get } from 'svelte/store';
+// src/lib/stores/gameStore.ts
+import { writable } from 'svelte/store';
 import type { BaseGameMode } from '$lib/gameModes/BaseGameMode';
-import { gameState, type GameState } from './gameState';
 
 const createGameStore = () => {
-  const { subscribe, update } = writable<any>({
+  const { subscribe, update } = writable<{ mode: BaseGameMode | null }>({
     mode: null,
-    state: get(gameState)
-  });
-
-  gameState.subscribe(newState => {
-    update(game => ({ ...game, state: newState }));
   });
 
   return {
     subscribe,
     setMode: (mode: BaseGameMode) => {
       update(game => ({ ...game, mode }));
-    }
+    },
+    reset: () => update(() => ({ mode: null })),
   };
 };
 

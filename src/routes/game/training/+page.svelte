@@ -18,11 +18,14 @@
   import { onMount } from 'svelte';
   import { animationService } from '$lib/services/animationService.js';
   import { gameModeService } from '$lib/services/gameModeService';
+  import { logService } from '$lib/services/logService';
 
   onMount(() => {
+    logService.init('[TrainingPage] onMount: Ініціалізація режиму "training".');
     gameModeService.initializeGameMode('training');
     animationService.initialize();
   });
+
 
   const widgetMap = {
     [WIDGETS.TOP_ROW]: TopRowWidget,

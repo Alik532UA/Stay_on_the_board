@@ -3,16 +3,12 @@
 логіка гри та center-info оновлюються миттєво і не залежать від цієї паузи. Це гарантує SoC, SSoT, UDF.
 -->
 <script lang="ts">
-  // ВАЖЛИВО! Заборонено напряму змінювати moveQueue або board з UI-компонента!
-  // Компонент лише спостерігає за станом гри і ініціює анімацію через animationStore.
-  // Всі зміни логіки гри — лише через оркестратор/сервіси.
-  import { gameState } from '$lib/stores/gameState.js';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { gameSettingsStore, type GameSettingsState } from '$lib/stores/gameSettingsStore.js';
   import { modalStore } from '$lib/stores/modalStore.js';
-  import { slide } from 'svelte/transition'; // <--- КРОК 1: Імпортуємо slide
+  import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { animationStore } from '$lib/stores/animationStore.js';
-  import { visualPosition, visualCellVisitCounts, visualBoardState, currentPlayer, availableMoves } from '$lib/stores/derivedState.ts';
+  import { visualPosition, visualCellVisitCounts, currentPlayer, availableMoves } from '$lib/stores/derivedState.ts';
   import { derived, get } from 'svelte/store';
   import { onMount } from 'svelte';
   import { uiEffectsStore } from '$lib/stores/uiEffectsStore.js';
@@ -20,15 +16,12 @@
   import PlayerPiece from './PlayerPiece.svelte';
   import { logService } from '$lib/services/logService.js';
   import { enableAllGameCheckboxesIfNeeded } from '$lib/utils/uiUtils.ts';
-  // КРОК 2: Імпортуємо isCellBlocked та getDamageClass, щоб виправити помилку TypeScript
   import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
+  import { boardStore } from '$lib/stores/boardStore';
+  import { uiStateStore } from '$lib/stores/uiStateStore';
 
-  const boardSize = derived(gameState, $gameState => $gameState ? Number($gameState.boardSize) : 0);
+  const boardSize = derived(boardStore, $boardStore => $boardStore ? Number($boardStore.boardSize) : 0);
 
-  /**
-   * Кастомна Svelte-анімація, що поєднує slide та scale.
-   * Це дозволяє одночасно плавно згортати блок і змінювати його масштаб.
-   */
   function slideAndScale(node: HTMLElement, params: any) {
     const slideTransition = slide(node, params);
     return {
@@ -46,35 +39,37 @@
     let lastRow: number | null = null;
     let lastCol: number | null = null;
 
-    const unsubscribe = gameState.subscribe(($gameState) => {
-      if (!$gameState) return;
+    const unsubscribe = boardStore.subscribe(($boardStore) => {
+      if (!$boardStore) return;
+      const $uiState = get(uiStateStore);
+      if (!$uiState) return;
 
-      if ($gameState.isFirstMove) {
-        lastRow = $gameState.playerRow;
-        lastCol = $gameState.playerCol;
+      if ($uiState.isFirstMove) {
+        lastRow = $boardStore.playerRow;
+        lastCol = $boardStore.playerCol;
         return;
       }
 
-      if ($gameState.moveHistory.length === 1 && $gameState.isNewGame) {
+      if ($boardStore.moveHistory.length === 1 && $uiState.isFirstMove) {
         enableAllGameCheckboxesIfNeeded();
       }
 
       if (
-        get(settingsStore).autoHideBoard &&
-        get(settingsStore).showBoard &&
-        ($gameState.playerRow !== lastRow || $gameState.playerCol !== lastCol) &&
-        $gameState.moveHistory.length > 1
+        get(gameSettingsStore).autoHideBoard &&
+        get(gameSettingsStore).showBoard &&
+        ($boardStore.playerRow !== lastRow || $boardStore.playerCol !== lastCol) &&
+        $boardStore.moveHistory.length > 1
       ) {
         uiEffectsStore.autoHideBoard(0);
-        lastRow = $gameState.playerRow;
-        lastCol = $gameState.playerCol;
+        lastRow = $boardStore.playerRow;
+        lastCol = $boardStore.playerCol;
       }
 
       if (
-        $gameState.moveQueue &&
-        $gameState.moveQueue.length === 0 &&
-        $gameState.moveHistory.length > 1 &&
-        !$gameState.isComputerMoveInProgress
+        $boardStore.moveQueue &&
+        $boardStore.moveQueue.length === 0 &&
+        $boardStore.moveHistory.length > 1 &&
+        !$uiState.isComputerMoveInProgress
       ) {
         enableAllGameCheckboxesIfNeeded();
       }
@@ -82,23 +77,11 @@
     return unsubscribe;
   });
 
-  let prevGameId: number|null = null;
-  gameState.subscribe(($gameState) => {
-    if (!$gameState) {
-      prevGameId = null;
-      return;
-    }
-    if ($gameState.gameId !== prevGameId) {
-      prevGameId = $gameState.gameId;
-      logService.ui('[BoardWrapperWidget] Нова гра, скидаємо стан');
-    }
-  });
-
   const showAvailableMoves = derived(
-    [settingsStore, animationStore, currentPlayer],
-    ([$settingsStore, $animationStore, $currentPlayer]) => {
+    [gameSettingsStore, animationStore, currentPlayer],
+    ([$gameSettingsStore, $animationStore, $currentPlayer]) => {
       return (
-        $settingsStore.showMoves &&
+        $gameSettingsStore.showMoves &&
         !$animationStore.isAnimating &&
         $currentPlayer?.type === 'human'
       );
@@ -128,22 +111,24 @@
 
   function onCellRightClick(event: MouseEvent, row: number, col: number): void {
     event.preventDefault();
-    if ($gameState && $settingsStore.blockModeEnabled && !(row === $gameState.playerRow && col === $gameState.playerCol)) {
+    const $boardState = get(boardStore);
+    const $settings = get(gameSettingsStore);
+    if ($boardState && $settings.blockModeEnabled && !(row === $boardState.playerRow && col === $boardState.playerCol)) {
       const visualCounts = get(visualCellVisitCounts) as Record<string, number>;
-      const blocked = isCellBlocked(row, col, visualCounts, $settingsStore);
+      const blocked = isCellBlocked(row, col, visualCounts, $settings);
       logService.ui(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`);
     }
   }
 </script>
 
-{#if $gameState}
-  {#key $gameState.gameId}
-    {#if $settingsStore.showBoard}
+{#if $boardStore}
+  {#key $boardStore.boardSize}
+    {#if $gameSettingsStore.showBoard}
       <div
         class="board-bg-wrapper game-content-block"
         style="--board-size: {$boardSize}"
-        onclick={showBoardClickHint}
-        onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
+        on:click={showBoardClickHint}
+        on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
         role="button"
         tabindex="0"
         aria-label="Ігрове поле"
@@ -157,18 +142,15 @@
                 {rowIdx}
                 {colIdx}
                 visualCellVisitCounts={$visualCellVisitCounts}
-                settingsStore={$settingsStore}
+                gameSettings={$gameSettingsStore}
                 isAvailable={moveInfo.isAvailable}
                 isPenalty={moveInfo.isPenalty}
-                visualPosition={$visualPosition}
-                boardState={$visualBoardState}
-                gameState={$gameState}
                 on:cellRightClick={(e) => onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
               />
             {/each}
           {/each}
           
-          {#if $settingsStore.showPiece && $visualPosition.row !== null && $visualPosition.col !== null}
+          {#if $gameSettingsStore.showPiece && $visualPosition.row !== null && $visualPosition.col !== null}
             <PlayerPiece
               row={$visualPosition.row}
               col={$visualPosition.col}
@@ -182,5 +164,5 @@
 {/if}
 
 <style>
-  /* Стилі залишаються без змін, оскільки transition:slideAndScale не потребує додаткових CSS */
+  /* Стилі залишаються без змін */
 </style>

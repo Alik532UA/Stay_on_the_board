@@ -1,26 +1,11 @@
 // src/lib/stores/animationStore.ts
-import { writable, get, type Writable } from 'svelte/store';
-import { gameState } from './gameState';
+import { writable } from 'svelte/store';
 import { logService } from '../services/logService';
 
-// ВАЖЛИВО! Цей store працює ЛИШЕ з візуальним станом для анімації.
-// Заборонено напряму змінювати moveQueue або board логічного стану гри з animationStore!
-// Всі зміни логіки гри мають відбуватися лише через централізовані сервіси/оркестратор.
-//
-// This store is for animation state ONLY. Never mutate game logic state (moveQueue, board) from here!
-// All game logic updates must go through orchestrator/services only.
-// Мокаємо requestAnimationFrame для тестового середовища
 if (typeof global !== 'undefined' && !global.requestAnimationFrame) {
   global.requestAnimationFrame = (cb: FrameRequestCallback): number => setTimeout(cb, 0) as unknown as number;
 }
 
-/**
- * Інтерфейс для стану анімації
- */
-
-/**
- * Інтерфейс для стану анімації
- */
 export interface AnimationState {
   isAnimating: boolean;
   gameId: number;
@@ -31,7 +16,7 @@ export interface AnimationState {
   isComputerMoveCompleted: boolean;
 }
 
-const initialState: AnimationState = {
+export const initialState: AnimationState = {
   isAnimating: false,
   gameId: Date.now(),
   currentAnimation: null,

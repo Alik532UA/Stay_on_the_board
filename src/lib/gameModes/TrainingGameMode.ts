@@ -1,58 +1,28 @@
-// src/lib/gameModes/TrainingGameMode.ts
-import { tick } from 'svelte';
 import { get } from 'svelte/store';
-import { _, locale } from 'svelte-i18n';
 import { BaseGameMode } from './BaseGameMode';
-import { moveDirections } from '$lib/utils/translations';
-import { lastComputerMove, availableMoves as derivedAvailableMoves } from '$lib/stores/derivedState';
-import { gameState, type GameState, createInitialState } from '$lib/stores/gameState';
 import type { Player } from '$lib/models/player';
-import { gameStateMutator } from '$lib/services/gameStateMutator';
-import * as gameLogicService from '$lib/services/gameLogicService';
-import { settingsStore } from '$lib/stores/settingsStore';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
-import { userActionService } from '$lib/services/userActionService';
 import { gameEventBus } from '$lib/services/gameEventBus';
-import type { SideEffect } from '$lib/services/sideEffectService';
-import type { FinalScoreDetails } from '$lib/models/score';
-import { Figure, type MoveDirectionType } from '$lib/models/Figure';
 import { logService } from '$lib/services/logService';
-import { calculateFinalScore } from '$lib/services/scoreService';
 import { animationService } from '$lib/services/animationService';
 import { noMovesService } from '$lib/services/noMovesService';
-import { endGameService } from '$lib/services/endGameService';
 import { timeService } from '$lib/services/timeService';
-import { gameStore } from '$lib/stores/gameStore';
 import { availableMovesService } from '$lib/services/availableMovesService';
-import { testModeStore } from '$lib/stores/testModeStore';
-import { aiService } from '$lib/services/aiService';
-import { getInitialPosition } from '$lib/utils/initialPositionUtils';
+import { gameService } from '$lib/services/gameService';
+import { playerStore } from '$lib/stores/playerStore';
+import { scoreStore } from '$lib/stores/scoreStore';
+import { boardStore } from '$lib/stores/boardStore';
+import { uiStateStore } from '$lib/stores/uiStateStore';
 
 export class TrainingGameMode extends BaseGameMode {
   initialize(options: { newSize?: number } = {}): void {
-    const currentSize = get(gameState)?.boardSize;
-    const size = options.newSize ?? currentSize ?? 4;
-    const testModeState = get(testModeStore);
-    
-    const initialPosition = getInitialPosition(size, testModeState);
-
-    const newInitialState = createInitialState({
-      size,
+    gameService.initializeNewGame({
+      size: options.newSize,
       players: this.getPlayersConfiguration(),
-      testMode: testModeState.isEnabled,
-      initialPosition
     });
-    const moves = availableMovesService.getAvailableMoves(newInitialState);
-    newInitialState.availableMoves = moves;
-    
-    gameState.set(newInitialState);
-    
     animationService.initialize();
     this.startTurn();
-  }
-
-  async claimNoMoves(): Promise<void> {
-    await noMovesService.claimNoMoves();
   }
 
   getPlayersConfiguration(): Player[] {
@@ -62,21 +32,17 @@ export class TrainingGameMode extends BaseGameMode {
     ];
   }
 
-  public determineWinner(state: GameState, reasonKey: string) {
-    return { winners: [] as number[], winningPlayerIndex: -1 };
-  }
-
-
   protected async advanceToNextPlayer(): Promise<void> {
     logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
-    const currentState = get(gameState);
-    const nextPlayerIndex = (currentState.currentPlayerIndex + 1) % currentState.players.length;
+    const currentPlayerState = get(playerStore);
+    if (!currentPlayerState) return;
+    const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
 
-    gameStateMutator.setCurrentPlayer(nextPlayerIndex);
+    playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
 
-    const nextPlayer = get(gameState).players[nextPlayerIndex];
-    logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer.type}.`);
-    if (nextPlayer.type === 'ai' && !get(gameState).isComputerMoveInProgress) {
+    const nextPlayer = get(playerStore)?.players[nextPlayerIndex];
+    logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer?.type}.`);
+    if (nextPlayer?.type === 'ai') {
       logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера.');
       await this.triggerComputerMove();
     } else {
@@ -84,39 +50,57 @@ export class TrainingGameMode extends BaseGameMode {
     }
   }
 
-
   protected async applyScoreChanges(scoreChanges: any): Promise<void> {
     // No specific score changes to apply in training mode
   }
 
   async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
-    gameStateMutator.resetForNoMovesContinue(false);
+    const boardState = get(boardStore);
+    if (!boardState) return;
+
+    logService.logicMove('State of uiStateStore BEFORE continueAfterNoMoves:', get(uiStateStore));
+
+    boardStore.update(s => {
+        if (!s) return null;
+        return {
+            ...s,
+            cellVisitCounts: {},
+            moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
+            moveQueue: [],
+        };
+    });
+    availableMovesService.updateAvailableMoves();
     
     gameOverStore.resetGameOverState();
     animationService.reset();
+
+    // Явно повертаємо хід гравцю-людині
+    const humanPlayerIndex = get(playerStore)?.players.findIndex(p => p.type === 'human');
+    if (humanPlayerIndex !== undefined) {
+      playerStore.update(s => s ? { ...s, currentPlayerIndex: humanPlayerIndex } : null);
+      logService.logicMove('Set current player to human after continuing game.', { humanPlayerIndex });
+    }
+
+    // Скидаємо вибір гравця, щоб він міг зробити новий
+    uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null }) : null);
+    logService.logicMove('State of uiStateStore AFTER continueAfterNoMoves:', get(uiStateStore));
+
     this.startTurn();
     gameEventBus.dispatch('CloseModal');
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
     logService.GAME_MODE(`handleNoMoves: Обробка ситуації "немає ходів" для гравця типу: ${playerType}.`);
-    const state = get(gameState);
+    const boardState = get(boardStore);
+    if (!boardState) return;
+
     gameOverStore.resetGameOverState();
-
-    gameStateMutator.applyMove({
-      noMovesClaimed: true,
-      noMovesBonus: (state.noMovesBonus || 0) + state.boardSize
-    });
-
+    scoreStore.update(s => s ? { ...s, noMovesBonus: (s.noMovesBonus || 0) + boardState.boardSize } : null);
     noMovesService.dispatchNoMovesEvent(playerType);
   }
 
   protected startTurn(): void {
     timeService.stopTurnTimer();
-  }
-
-  cleanup(): void {
-    super.cleanup();
   }
 }

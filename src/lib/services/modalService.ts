@@ -1,21 +1,43 @@
-/**
- * @file Encapsulates all logic related to creating, displaying,
- * and managing modal windows.
- */
+// src/lib/services/modalService.ts
 import { get } from 'svelte/store';
 import { modalStore } from '$lib/stores/modalStore';
 import { userActionService } from './userActionService';
 import { _, locale } from 'svelte-i18n';
 import type { FinalScoreDetails } from '$lib/models/score';
-import type { GameState } from '$lib/stores/gameState';
 import { determineWinner } from './scoreService';
 import { logService } from './logService.js';
 import { navigationService } from './navigationService.js';
-
 import { gameModeService } from './gameModeService';
+import type { Player } from '$lib/models/player';
+import { gameEventBus } from './gameEventBus';
+import type { ModalState } from '$lib/stores/modalStore'; // Import ModalState
+
+// Define the interface for the GameOver event payload
+interface GameOverPayload {
+  scores: { playerId: number; score: number }[];
+  winners: number[];
+  reasonKey: string;
+  reasonValues: any;
+  finalScoreDetails: FinalScoreDetails;
+  gameType: 'training' | 'local';
+  state: any;
+}
+
+// Define the interface for ShowNoMovesModal payload
+interface ShowNoMovesModalPayload {
+  boardSize: number;
+  scoreDetails: FinalScoreDetails;
+  playerType: 'human' | 'computer';
+}
+
+// Define the interface for ShowBoardResizeModal payload
+interface ShowBoardResizeModalPayload {
+  newSize: number;
+}
 
 export const modalService = {
   showModal(modalConfig: any): void {
+    logService.modal('[ModalService] Showing modal:', modalConfig);
     const gameMode = gameModeService.getCurrentMode();
     if (gameMode) {
       gameMode.pauseTimers();
@@ -23,32 +45,8 @@ export const modalService = {
     modalStore.showModal(modalConfig);
   },
 
-  showBoardResizeModal(newSize: number): void {
-    this.showModal({
-      titleKey: 'modal.resetScoreTitle',
-      contentKey: 'modal.resetScoreContent',
-      buttons: [
-        {
-          textKey: 'modal.confirm',
-          onClick: () => userActionService.handleModalAction('resetGame', { newSize }),
-          customClass: 'danger-btn',
-          isHot: true,
-        },
-        {
-          textKey: 'modal.cancel',
-          onClick: () => userActionService.handleModalAction('closeModal'),
-        },
-      ],
-      closable: true,
-      closeOnOverlayClick: true,
-      dataTestId: 'board-resize-confirm-modal',
-    });
-  },
-
-  /**
-   * Closes the currently active modal.
-   */
   closeModal(): void {
+    logService.modal('[ModalService] Closing modal.');
     const gameMode = gameModeService.getCurrentMode();
     if (gameMode) {
       gameMode.resumeTimers();
@@ -56,20 +54,13 @@ export const modalService = {
     modalStore.closeModal();
   },
 
-  showGameOverModal(payload: {
-    reasonKey: string;
-    reasonValues: any;
-    finalScoreDetails: FinalScoreDetails;
-    gameType: 'training' | 'local';
-    state: GameState;
-  }): void {
-    const { reasonKey, reasonValues, finalScoreDetails, gameType, state } = payload;
+  showGameOverModal(payload: GameOverPayload): void {
+    const { reasonKey, reasonValues, finalScoreDetails, gameType, state, winners } = payload;
     const t = get(_);
-    const { winners } = determineWinner(state, reasonKey);
 
     let titleKey = 'modal.gameOverTitle';
     if (winners.length === 1) {
-      const winner = state.players.find(p => p.id === winners[0]);
+      const winner = state.players.find((p: Player) => p.id === winners[0]);
       if (winner) {
         titleKey = gameType === 'local' ? 'modal.winnerTitle' : 'modal.gameOverTitle';
       }
@@ -80,69 +71,101 @@ export const modalService = {
     modalStore.showModalAsReplacement({
       titleKey,
       titleValues: {
-        winnerName: state.players.find(p => p.id === winners[0])?.name || ''
+        winnerName: state.players.find((p: Player) => p.id === winners[0])?.name || ''
       },
       content: {
         reason: t(reasonKey, { values: reasonValues }),
         scoreDetails: finalScoreDetails,
+        playerScores: gameType === 'local' ? state.players.map((p: Player) => ({
+          playerName: p.name,
+          score: p.score,
+          isWinner: winners.includes(p.id),
+          isLoser: !winners.includes(p.id) && p.type === 'human'
+        })) : []
       },
       buttons: [
-        {
-          textKey: 'modal.playAgain',
-          onClick: () => userActionService.handleModalAction('playAgain'),
-          isHot: true,
-          customClass: 'green-btn',
-          dataTestId: 'play-again-btn',
-        },
-        {
-          textKey: 'modal.watchReplay',
-          onClick: () => userActionService.handleModalAction('requestReplay'),
-          customClass: 'blue-btn',
-          dataTestId: 'watch-replay-btn',
-        },
-        {
-          textKey: 'modal.mainMenu',
-          onClick: () => navigationService.goToMainMenu(),
-          dataTestId: 'game-over-main-menu-btn',
-        },
+        { textKey: 'modal.playAgain', primary: true, isHot: true, onClick: () => userActionService.requestRestart(), dataTestId: 'play-again-btn' },
+        { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: 'watch-replay-btn' },
+        { textKey: 'modal.mainMenu', onClick: () => navigationService.goToMainMenu(), dataTestId: 'game-over-main-menu-btn' }
       ],
-      closable: false,
       dataTestId: 'game-over-modal',
+      closeOnOverlayClick: false
     });
   },
 
-  /**
-   * Gets the current context of the modal for serialization.
-   * @returns The serializable modal context or null if the modal is not open.
-   */
+  showBoardResizeModal(newSize: number): void {
+    this.showModal({
+      titleKey: 'modal.resetScoreTitle',
+      contentKey: 'modal.resetScoreContent',
+      buttons: [
+        {
+          textKey: 'modal.confirm',
+          onClick: () => userActionService.changeBoardSize(newSize),
+          customClass: 'danger-btn',
+          isHot: true,
+        },
+        {
+          textKey: 'modal.cancel',
+          onClick: () => this.closeModal(),
+        },
+      ],
+      closable: true,
+      closeOnOverlayClick: true,
+      dataTestId: 'board-resize-confirm-modal',
+    });
+  },
+
   getCurrentModalContext() {
-    const modalState = get(modalStore);
+    const modalState: ModalState = get(modalStore); // Explicitly type modalState
     if (!modalState.isOpen) return null;
 
-    const serializableButtons = modalState.buttons.map(btn => {
-      let action = null;
-      if (btn.onClick) {
-        const onClickString = btn.onClick.toString();
-        if (onClickString.includes('continueAfterNoMoves')) action = 'continueAfterNoMoves';
-        else if (onClickString.includes('finishWithBonus')) action = 'finishWithBonus';
-        else if (onClickString.includes('startReplay')) action = 'startReplay';
-        else if (onClickString.includes('restartGame')) action = 'playAgain';
-      }
-      return {
-        textKey: btn.textKey,
-        text: btn.text,
-        customClass: btn.customClass,
-        isHot: btn.isHot,
-        action: action,
-        bonus: (btn as any).bonus
-      };
-    });
-
     return {
+      title: modalState.title,
       titleKey: modalState.titleKey,
       content: modalState.content,
-      buttons: serializableButtons,
-      closable: modalState.closable
+      contentKey: modalState.contentKey,
+      buttons: modalState.buttons,
+      component: modalState.component,
+      props: modalState.props,
+      closable: modalState.closable,
+      closeOnOverlayClick: modalState.closeOnOverlayClick,
+      dataTestId: modalState.dataTestId,
+      titleValues: modalState.titleValues,
     };
   }
 };
+
+// Event listeners
+gameEventBus.subscribe('ShowNoMovesModal', (payload: ShowNoMovesModalPayload) => {
+  const { playerType, scoreDetails, boardSize } = payload;
+  const t = get(_);
+  const titleKey = playerType === 'human' ? 'modal.playerNoMovesTitle' : 'modal.computerNoMovesTitle';
+  const contentKey = playerType === 'human' ? 'modal.playerNoMovesContent' : 'modal.computerNoMovesContent';
+
+  modalStore.showModal({
+    titleKey,
+    content: {
+      reason: t(contentKey),
+      scoreDetails: scoreDetails
+    },
+    buttons: [
+      { textKey: 'modal.continueGame', customClass: 'green-btn', isHot: true, onClick: () => userActionService.handleModalAction('continueAfterNoMoves'), dataTestId: 'continue-game-no-moves-btn' },
+      {
+        text: t('modal.finishGameWithBonus', { values: { bonus: boardSize } }),
+        onClick: () => userActionService.handleModalAction('finishWithBonus', { reasonKey: 'modal.gameOverReasonBonus' }),
+        dataTestId: 'finish-game-with-bonus-btn'
+      },
+      { textKey: 'modal.watchReplay', customClass: 'blue-btn', onClick: () => userActionService.handleModalAction('requestReplay'), dataTestId: `watch-replay-${playerType}-no-moves-btn` }
+    ],
+    closable: false,
+    dataTestId: playerType === 'human' ? 'player-no-moves-modal' : 'opponent-trapped-modal'
+  });
+});
+
+gameEventBus.subscribe('ShowBoardResizeModal', (payload: ShowBoardResizeModalPayload) => {
+  modalService.showBoardResizeModal(payload.newSize);
+});
+
+gameEventBus.subscribe('GameOver', (payload: GameOverPayload) => {
+  modalService.showGameOverModal(payload);
+});

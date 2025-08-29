@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
   import { loadAndGetVoices, filterVoicesByLang, resetVoicesPromise } from '$lib/speech.js';
   import { locale, _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
@@ -13,7 +13,7 @@
   /** @type {SpeechSynthesisVoice[]} */
   let availableVoices = [];
   /** @type {string} */
-  let selectedVoiceURI = get(settingsStore).selectedVoiceURI ?? '';
+  let selectedVoiceURI = get(gameSettingsStore).selectedVoiceURI ?? '';
 
   const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isEdge = typeof window !== 'undefined' && navigator.userAgent.includes("Edg/");
@@ -41,7 +41,7 @@
   });
 
   function selectVoice() {
-    settingsStore.updateSettings({ selectedVoiceURI: String(selectedVoiceURI ?? '') });
+    gameSettingsStore.updateSettings({ selectedVoiceURI: String(selectedVoiceURI ?? '') });
   }
 
   async function recheckVoices() {

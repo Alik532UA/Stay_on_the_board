@@ -3,6 +3,16 @@
   import { modalStore } from '$lib/stores/modalStore.js';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
+  import { onMount, onDestroy } from 'svelte';
+  import { logService } from '$lib/services/logService';
+
+  onMount(() => {
+    logService.modal('[FAQModal] Component has been mounted.');
+  });
+
+  onDestroy(() => {
+    logService.modal('[FAQModal] Component is being destroyed.');
+  });
 
   const faqItems = [
     { q: 'faq.q1', a: 'faq.a1' },

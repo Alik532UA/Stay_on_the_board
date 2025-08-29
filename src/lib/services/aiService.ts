@@ -1,23 +1,30 @@
 // src/lib/services/aiService.ts
 import { get } from 'svelte/store';
-import { gameState, type GameState } from '$lib/stores/gameState';
 import { logService } from './logService';
-import { availableMovesService } from './availableMovesService';
+import { calculateAvailableMoves } from './availableMovesService';
 import type { MoveDirectionType } from '../models/Figure';
+import type { BoardState } from '$lib/stores/boardStore';
+import type { PlayerState } from '$lib/stores/playerStore';
+import type { UiState } from '$lib/stores/uiStateStore';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 
 class AiService {
-  public getComputerMove(state: GameState | null = get(gameState)): { direction: MoveDirectionType; distance: number } | null {
-    if (!state) return null;
+  public getComputerMove(
+    boardState: BoardState, 
+    playerState: PlayerState, 
+    uiState: UiState
+  ): { direction: MoveDirectionType; distance: number } | null {
+    if (!boardState || !playerState || !uiState) return null;
 
-    logService.testMode('aiService: отримано стан gameState', state);
+    logService.testMode('aiService: отримано стан', { boardState, playerState, uiState });
 
-    if (state.testModeOverrides?.nextComputerMove) {
-      logService.testMode('aiService: виконується ручний хід з gameState overrides', state.testModeOverrides.nextComputerMove);
-      return state.testModeOverrides.nextComputerMove;
+    if (uiState.testModeOverrides?.nextComputerMove) {
+      logService.testMode('aiService: виконується ручний хід з testModeOverrides', uiState.testModeOverrides.nextComputerMove);
+      return uiState.testModeOverrides.nextComputerMove;
     }
 
     logService.testMode('aiService: виконується випадковий хід');
-    const availableMoves = availableMovesService.getAvailableMoves(state);
+    const availableMoves = calculateAvailableMoves(boardState, playerState, get(gameSettingsStore));
 
     if (availableMoves.length === 0) {
       logService.logicAI('getComputerMove: немає доступних ходів');

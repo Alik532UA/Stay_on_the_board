@@ -1,9 +1,6 @@
 // src/lib/gameModes/gameMode.interface.ts
-import type { GameState } from '$lib/stores/gameState';
 import type { Player } from '$lib/models/player';
-import type { FinalScoreDetails } from '$lib/models/score';
 import type { MoveDirectionType } from '$lib/models/Figure';
-import type { SideEffect } from '$lib/services/sideEffectService';
 
 export interface IGameMode {
   turnDuration: number;

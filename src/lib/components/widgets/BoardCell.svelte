@@ -2,7 +2,7 @@
   export let rowIdx: number;
   export let colIdx: number;
   export let visualCellVisitCounts: Record<string, number>;
-  export let settingsStore: any;
+  export let gameSettings: any;
   export let isAvailable: boolean;
   export let isPenalty = false;
   export const visualPosition: { row: number|null, col: number|null } = { row: null, col: null };
@@ -14,8 +14,8 @@
   function onCellRightClick(event: MouseEvent) {
     dispatch('cellRightClick', { event, row: rowIdx, col: colIdx });
   }
-  $: blocked = isCellBlocked(rowIdx, colIdx, visualCellVisitCounts, settingsStore);
-  $: damageClass = getDamageClass(rowIdx, colIdx, visualCellVisitCounts, settingsStore);
+  $: blocked = isCellBlocked(rowIdx, colIdx, visualCellVisitCounts, gameSettings);
+  $: damageClass = getDamageClass(rowIdx, colIdx, visualCellVisitCounts, gameSettings);
 </script>
 <div
   class="board-cell {damageClass}"

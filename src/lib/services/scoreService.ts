@@ -1,13 +1,25 @@
-import type { GameState } from '$lib/stores/gameState';
+// src/lib/services/scoreService.ts
 import type { Player } from '$lib/models/player';
 import { isMirrorMove } from '$lib/utils/boardUtils';
 import { logService } from './logService';
 import type { FinalScoreDetails } from '$lib/models/score';
+import type { BoardState } from '$lib/stores/boardStore';
+import type { PlayerState } from '$lib/stores/playerStore';
+import type { ScoreState } from '$lib/stores/scoreStore';
+import type { UiState } from '$lib/stores/uiStateStore';
 
-export function calculateFinalScore(state: GameState, gameMode: 'local' | 'training'): FinalScoreDetails {
-  const { players, penaltyPoints, boardSize, movesInBlockMode, jumpedBlockedCells, finishedByFinishButton, noMovesBonus, distanceBonus } = state;
+export function calculateFinalScore(
+  boardState: BoardState, 
+  playerState: PlayerState, 
+  scoreState: ScoreState, 
+  uiState: UiState,
+  gameMode: 'local' | 'training'
+): FinalScoreDetails {
+  const { players } = playerState;
+  const { penaltyPoints, movesInBlockMode, jumpedBlockedCells, noMovesBonus, distanceBonus } = scoreState;
+  const { boardSize } = boardState;
 
-  const baseScore = players.reduce((acc, p) => acc + p.score, 0);
+  const baseScore = players.reduce((acc: number, p: Player) => acc + p.score, 0);
   const totalPenalty = penaltyPoints;
   let sizeBonus = 0;
   if (baseScore > 0) {
@@ -15,7 +27,7 @@ export function calculateFinalScore(state: GameState, gameMode: 'local' | 'train
     sizeBonus = Math.round(baseScore * percent);
   }
   const blockModeBonus = movesInBlockMode;
-  const finishBonus = finishedByFinishButton ? boardSize : 0;
+  const finishBonus = uiState.gameOverReasonKey === 'modal.gameOverReasonBonus' ? boardSize : 0;
   const jumpBonus = jumpedBlockedCells;
   const finalNoMovesBonus = gameMode === 'local' ? 0 : noMovesBonus || 0;
 
@@ -33,7 +45,6 @@ export function calculateFinalScore(state: GameState, gameMode: 'local' | 'train
     totalScore
   };
 }
-
 
 function _calculateBaseScore(player: Player, settings: any): number {
   if (player?.type !== 'human') {
@@ -56,31 +67,19 @@ function _calculateMirrorMovePenalty(currentState: any, direction: string, dista
 
   if (direction && lastComputerMove && lastComputerMove.player !== 0 && !settings.blockModeEnabled) {
     const isMirror = isMirrorMove(direction, distance, lastComputerMove.direction, lastComputerMove.distance);
-    logService.logicMove(`_calculateMirrorMovePenalty: перевіряємо "дзеркальний" хід:`, {
-      currentMove: { direction, distance },
-      computerMove: { direction: lastComputerMove.direction, distance: lastComputerMove.distance },
-      isMirrorMove: isMirror
-    });
-
     if (isMirror) {
       if (humanPlayersCount <= 1) {
-        logService.score(`_calculateMirrorMovePenalty: додаємо 2 штрафних бали до загального penaltyPoints (single player game)`);
         penaltyPoints = 2;
       } else {
-        logService.score(`_calculateMirrorMovePenalty: НЕ додаємо штрафні бали до загального penaltyPoints (local game), будуть додані до гравця в performMove`);
         penaltyPointsForMove = 2;
       }
     }
-  } else {
-    logService.logicMove(`_calculateMirrorMovePenalty: пропускаємо перевірку "дзеркального" ходу.`);
   }
-
   return { penaltyPoints, penaltyPointsForMove };
 }
 
 function _calculateDistanceBonus(distance: number): { bonus: number; distanceBonusChange: number } {
   if (distance > 1) {
-    logService.score(`_calculateDistanceBonus: додаємо 1 бонусний бал за хід на відстань ${distance}`);
     return { bonus: 1, distanceBonusChange: 1 };
   }
   return { bonus: 0, distanceBonusChange: 0 };
@@ -88,11 +87,7 @@ function _calculateDistanceBonus(distance: number): { bonus: number; distanceBon
 
 function _calculateJumpBonus(jumpedCount: number, settings: any): number {
   if (jumpedCount > 0 && settings.blockModeEnabled) {
-    logService.score(`_calculateJumpBonus: додаємо ${jumpedCount} бонусних балів за перестрибування ${jumpedCount} заблокованих клітинок`);
     return jumpedCount;
-  }
-  if (jumpedCount > 0 && !settings.blockModeEnabled) {
-    logService.score(`_calculateJumpBonus: пропускаємо бонуси за перестрибування (blockModeEnabled = false)`);
   }
   return 0;
 }
@@ -113,18 +108,17 @@ export function calculateMoveScore(
   distanceBonusChange: number;
   penaltyPointsForMove: number;
 } {
-  
   const originalPlayer = currentState.players[playerIndex];
   const isHumanMove = originalPlayer?.type === 'human';
 
   const baseScoreChange = _calculateBaseScore(originalPlayer, settings);
   
   let penaltyResult = { penaltyPoints: 0, penaltyPointsForMove: 0 };
-  if (isHumanMove) {
-    penaltyResult = _calculateMirrorMovePenalty(currentState, direction!, distance, settings);
+  if (isHumanMove && direction) {
+    penaltyResult = _calculateMirrorMovePenalty(currentState, direction, distance, settings);
   }
   
-  const jumpedCount = 0;
+  const jumpedCount = 0; // TODO: Implement jump calculation
 
   const distanceBonusResult = _calculateDistanceBonus(distance);
   const jumpBonus = _calculateJumpBonus(jumpedCount, settings);
@@ -143,32 +137,9 @@ export function calculateMoveScore(
   };
 }
 
-export function validateScoreUpdate(changes: any, currentState: any): { errors: string[], warnings: string[] } {
-  const errors: string[] = [];
-  const warnings: string[] = [];
-
-  if (changes.scores !== undefined) {
-    if (!Array.isArray(changes.scores)) {
-      errors.push('scores must be an array');
-    } else if (changes.scores.length !== currentState.players.length) {
-      errors.push('scores array length must match players count');
-    } else {
-      for (let i = 0; i < changes.scores.length; i++) {
-        if (typeof changes.scores[i] !== 'number') {
-          errors.push(`score[${i}] must be a number`);
-        }
-      }
-    }
-  }
-
-  return { errors, warnings };
-}
-export function determineWinner(state: GameState, reasonKey: string): { winners: number[], winningPlayerIndex: number } {
-  const scores = state.scoresAtRoundStart;
-
-  const isNoMovesSurrender = reasonKey === 'modal.gameOverReasonNoMovesLeft';
-  const losingPlayerIndex = isNoMovesSurrender ? -1 : state.currentPlayerIndex;
-
+export function determineWinner(playerState: PlayerState, reasonKey: string, losingPlayerIndex: number | null = null): { winners: number[], winningPlayerIndex: number } {
+  logService.GAME_MODE('[scoreService] determineWinner called', { losingPlayerIndex });
+  const scores = playerState.players.map(p => p.score);
   let maxScore = -Infinity;
   for (let i = 0; i < scores.length; i++) {
     if (i !== losingPlayerIndex) {
@@ -181,10 +152,10 @@ export function determineWinner(state: GameState, reasonKey: string): { winners:
   const winners: number[] = [];
   for (let i = 0; i < scores.length; i++) {
     if (i !== losingPlayerIndex && scores[i] === maxScore) {
-      winners.push(i);
+      winners.push(playerState.players[i].id);
     }
   }
   
-  const winningPlayerIndex = winners.length > 0 ? winners[0] : -1;
+  const winningPlayerIndex = winners.length > 0 ? playerState.players.findIndex(p => p.id === winners[0]) : -1;
   return { winners, winningPlayerIndex };
 }

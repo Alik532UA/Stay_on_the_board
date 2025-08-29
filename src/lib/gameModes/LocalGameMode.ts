@@ -1,64 +1,50 @@
-// src/lib/gameModes/LocalGameMode.ts
 import { get } from 'svelte/store';
-import { _ } from 'svelte-i18n';
 import { BaseGameMode } from './index';
-import { gameState, type GameState, createInitialState } from '$lib/stores/gameState';
 import type { Player } from '$lib/models/player';
-import { gameStateMutator } from '$lib/services/gameStateMutator';
-import * as gameLogicService from '$lib/services/gameLogicService';
-import { settingsStore } from '$lib/stores/settingsStore';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import { logService } from '$lib/services/logService';
 import { animationService } from '$lib/services/animationService';
 import { timeService } from '$lib/services/timeService';
 import { noMovesService } from '$lib/services/noMovesService';
-import { endGameService } from '$lib/services/endGameService';
 import { availableMovesService } from '$lib/services/availableMovesService';
-import { tick } from 'svelte';
-import { testModeStore } from '$lib/stores/testModeStore';
-import { aiService } from '$lib/services/aiService';
-import { getInitialPosition } from '$lib/utils/initialPositionUtils';
+import { gameService } from '$lib/services/gameService';
+import { playerStore } from '$lib/stores/playerStore';
+import { boardStore } from '$lib/stores/boardStore';
 
 export class LocalGameMode extends BaseGameMode {
   constructor() {
     super();
-    this.turnDuration = 10; // 10 секунд на хід
+    this.turnDuration = 10;
   }
 
   initialize(options: { newSize?: number } = {}): void {
-    const settings = get(settingsStore);
-    const currentState = get(gameState);
-    const size = options.newSize ?? settings.boardSize;
-    const testModeState = get(testModeStore);
-    
-    const players = currentState ? currentState.players : this.getPlayersConfiguration();
-    
-    const initialPosition = getInitialPosition(size, testModeState);
-
-    const newInitialState = createInitialState({
-      size,
-      players,
-      testMode: testModeState.isEnabled,
-      initialPosition
+    gameService.initializeNewGame({
+      size: options.newSize,
+      players: this.getPlayersConfiguration(),
     });
-    const moves = availableMovesService.getAvailableMoves(newInitialState);
-    newInitialState.availableMoves = moves;
-    
-    gameState.set(newInitialState);
-    
     animationService.initialize();
     this.checkComputerTurn();
     this.startTurn();
   }
 
-  private _handleLocalNoMoves(): void {
-    noMovesService.dispatchNoMovesEvent('human');
-  }
-
   async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
-    gameStateMutator.resetForNoMovesContinue(true);
+    const boardState = get(boardStore);
+    if (!boardState) return;
+
+    boardStore.update(s => {
+        if (!s) return null;
+        return {
+            ...s,
+            cellVisitCounts: {},
+            moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
+            moveQueue: [],
+        };
+    });
+    availableMovesService.updateAvailableMoves();
+    await this.advanceToNextPlayer();
 
     gameOverStore.resetGameOverState();
     animationService.reset();
@@ -69,19 +55,14 @@ export class LocalGameMode extends BaseGameMode {
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
-    if (playerType === 'human') {
-      this._handleLocalNoMoves();
-    } else {
-      logService.GAME_MODE('handleNoMoves for computer is not applicable in LocalGameMode');
-    }
+    noMovesService.dispatchNoMovesEvent(playerType);
   }
 
   getPlayersConfiguration(): Player[] {
-    const currentState = get(gameState);
-    if (currentState) {
-      return currentState.players;
+    const playerState = get(playerStore);
+    if (playerState) {
+      return playerState.players;
     }
-    // Provide a default configuration for new games started via presets
     return [
       { id: 1, name: 'Player 1', type: 'human', score: 0, color: '#ff0000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
       { id: 2, name: 'Player 2', type: 'human', score: 0, color: '#0000ff', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
@@ -89,14 +70,11 @@ export class LocalGameMode extends BaseGameMode {
   }
 
   protected async advanceToNextPlayer(): Promise<void> {
-    const currentState = get(gameState);
-    const nextPlayerIndex = (currentState.currentPlayerIndex + 1) % currentState.players.length;
+    const currentPlayerState = get(playerStore);
+    if (!currentPlayerState) return;
+    const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
 
-    if (nextPlayerIndex === 0) {
-      gameStateMutator.snapshotScores();
-    }
-
-    gameStateMutator.setCurrentPlayer(nextPlayerIndex);
+    playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
 
     await this.checkComputerTurn();
     this.startTurn();
@@ -104,28 +82,28 @@ export class LocalGameMode extends BaseGameMode {
 
   protected async applyScoreChanges(scoreChanges: any): Promise<void> {
     const { bonusPoints, penaltyPoints } = scoreChanges;
-    const state = get(gameState);
-    const currentPlayer = state.players[state.currentPlayerIndex];
+    const playerState = get(playerStore);
+    if (!playerState) return;
 
-    if (bonusPoints > 0) {
-      gameStateMutator.addPlayerBonus(currentPlayer.id, bonusPoints);
-    }
-    if (penaltyPoints > 0) {
-      gameStateMutator.addPlayerPenalty(currentPlayer.id, penaltyPoints);
-    }
+    playerStore.update(s => {
+        if (!s) return null;
+        const newPlayers = [...s.players];
+        const playerToUpdate = { ...newPlayers[s.currentPlayerIndex] };
+        playerToUpdate.bonusPoints += bonusPoints;
+        playerToUpdate.penaltyPoints += penaltyPoints;
+        newPlayers[s.currentPlayerIndex] = playerToUpdate;
+        return { ...s, players: newPlayers };
+    });
   }
 
   private async checkComputerTurn(): Promise<void> {
-    const state = get(gameState);
+    const state = get(playerStore);
+    if (!state) return;
     const currentPlayer = state.players[state.currentPlayerIndex];
 
-    if (currentPlayer.type === 'computer') {
+    if (currentPlayer.type === 'ai') {
       await new Promise(resolve => setTimeout(resolve, 1000));
       await this.triggerComputerMove();
     }
-  }
-
-  cleanup(): void {
-    super.cleanup();
   }
 }

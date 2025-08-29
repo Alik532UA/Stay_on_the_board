@@ -1,30 +1,28 @@
 <script lang="ts">
-  import { gameState } from '$lib/stores/gameState.js';
   import { userActionService } from '$lib/services/userActionService';
   import { _ } from 'svelte-i18n';
-  import { settingsStore } from '$lib/stores/settingsStore.js';
+  import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
   import SvgIcons from '../SvgIcons.svelte';
   import { get } from 'svelte/store';
-  import { availableDistances, isPlayerTurn, isConfirmButtonDisabled, lastComputerMove, lastPlayerMove, isPauseBetweenMoves, distanceRows, previousPlayerColor } from '$lib/stores/derivedState.ts';
+  import { isPlayerTurn, isConfirmButtonDisabled, lastComputerMove, lastPlayerMove, isPauseBetweenMoves, distanceRows, previousPlayerColor } from '$lib/stores/derivedState.ts';
   import { modalStore } from '$lib/stores/modalStore.js';
   import DirectionControls from './DirectionControls.svelte';
   import { getCenterInfoState } from '$lib/utils/centerInfoUtil';
   import { logService } from '$lib/services/logService.js';
+  import { uiStateStore } from '$lib/stores/uiStateStore';
 
-  $: $availableDistances;
-  $: $isPlayerTurn;
-  $: $isConfirmButtonDisabled;
-  $: $lastComputerMove;
-  $: $lastPlayerMove;
-  $: $isPauseBetweenMoves;
-  $: $previousPlayerColor;
+  $: selectedDirection = $uiStateStore?.selectedDirection;
+  $: selectedDistance = $uiStateStore?.selectedDistance;
+  $: isMoveInProgress = $uiStateStore?.isComputerMoveInProgress;
 
-  $: selectedDirection = $gameState?.selectedDirection;
-  $: selectedDistance = $gameState?.selectedDistance;
-  $: isMoveInProgress = $gameState?.isComputerMoveInProgress;
+  $: logService.ui('[ControlsPanelWidget] Reactive change detected', { 
+    selectedDirection, 
+    selectedDistance, 
+    isConfirmButtonDisabled: $isConfirmButtonDisabled 
+  });
 
   $: centerInfoProps = getCenterInfoState({
-    selectedDirection: selectedDirection as any,
+    selectedDirection: selectedDirection,
     selectedDistance,
     lastComputerMove: $lastComputerMove,
     lastPlayerMove: $lastPlayerMove,
@@ -94,7 +92,7 @@
   }
 </style>
 
-{#if $gameState}
+{#if $uiStateStore}
 <div class="game-controls-panel" data-testid="controls-panel">
   <div class="select-direction-label">{$_('gameControls.selectDirectionAndDistance')}</div>
   <DirectionControls
@@ -105,7 +103,7 @@
     ]}
     distanceRows={$distanceRows}
     isPlayerTurn={$isPlayerTurn}
-    blockModeEnabled={$settingsStore.blockModeEnabled}
+    blockModeEnabled={$gameSettingsStore.blockModeEnabled}
     isConfirmDisabled={$isConfirmButtonDisabled}
     centerInfoProps={centerInfoProps}
     isMoveInProgress={isMoveInProgress}

@@ -2,7 +2,7 @@
 
 $outputFile = "bug_context.txt"
 $filesToCollect = @(
-    "src/lib/stores/settingsStore.ts",
+    "src/lib/stores/appSettingsStore.ts",
     "src/lib/stores/uiEffectsStore.ts",
     "src/lib/components/widgets/BoardWrapperWidget.svelte",
     "src/lib/components/GameModeModal.svelte",

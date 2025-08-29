@@ -1,13 +1,13 @@
 <script>
-  import { settingsStore } from '$lib/stores/settingsStore';
+  import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
   import { _ } from 'svelte-i18n';
   import { logService } from '$lib/services/logService.js';
   import ToggleButton from '$lib/components/ToggleButton.svelte';
   import { get } from 'svelte/store';
 
-  // НАВІЩО: Тепер компонент працює виключно з settingsStore,
+  // НАВІЩО: Тепер компонент працює виключно з gameSettingsStore,
   // що відповідає принципу SSoT.
-  $: settings = $settingsStore;
+  $: settings = $gameSettingsStore;
 
   /**
    * Оновлює налаштування розміру дошки в store
@@ -17,7 +17,7 @@
     logService.action(`Click: "Змінити розмір дошки: ${increment > 0 ? '+' : ''}${increment}" (LocalGameSettings)`);
     const newSize = settings.boardSize + increment;
     if (newSize >= 2 && newSize <= 9) {
-      settingsStore.updateSettings({ boardSize: newSize });
+      gameSettingsStore.updateSettings({ boardSize: newSize });
     }
   }
 </script>
@@ -54,7 +54,7 @@
       on:toggle={() => {
         const newCheckedState = !settings.blockModeEnabled;
         logService.action(`Click: "Режим заблокованих клітинок: ${newCheckedState}" (LocalGameSettings)`);
-        settingsStore.updateSettings({ blockModeEnabled: newCheckedState });
+        gameSettingsStore.updateSettings({ blockModeEnabled: newCheckedState });
       }}
       dataTestId="block-mode-toggle"
     />
@@ -66,7 +66,7 @@
       on:toggle={() => {
         const newCheckedState = !settings.autoHideBoard;
         logService.action(`Click: "Автоматично приховувати дошку: ${newCheckedState}" (LocalGameSettings)`);
-        settingsStore.updateSettings({ autoHideBoard: newCheckedState });
+        gameSettingsStore.updateSettings({ autoHideBoard: newCheckedState });
       }}
       dataTestId="auto-hide-board-toggle"
     />
@@ -78,7 +78,7 @@
       on:toggle={() => {
         const newCheckedState = !settings.lockSettings;
         logService.action(`Click: "Заборонити змінювати правила: ${newCheckedState}" (LocalGameSettings)`);
-        settingsStore.updateSettings({ lockSettings: newCheckedState });
+        gameSettingsStore.updateSettings({ lockSettings: newCheckedState });
       }}
       dataTestId="lock-settings-toggle"
     />

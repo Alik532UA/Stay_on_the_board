@@ -1,35 +1,22 @@
-<script>
-  // @ts-check
-  import { gameState } from '$lib/stores/gameState.js';
-  import { gameOrchestrator } from '$lib/gameOrchestrator.js';
+<script lang="ts">
   import { userActionService } from '$lib/services/userActionService';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { replayStore } from '$lib/stores/replayStore.js';
   import { _ } from 'svelte-i18n';
   import { customTooltip } from '$lib/actions/customTooltip.js';
-  import { sideEffectService } from '$lib/services/sideEffectService.js';
+  import { playerStore } from '$lib/stores/playerStore';
+  import { scoreStore } from '$lib/stores/scoreStore';
 
-  // Реактивні змінні для визначення поточного гравця та режиму гри
-  $: currentPlayer = $gameState ? $gameState.players[$gameState.currentPlayerIndex] : null;
-  $: isMultiplayer = $gameState ? $gameState.players.filter(p => p.type === 'human').length > 1 : false;
-  $: players = $gameState ? $gameState.players : [];
+  $: currentPlayer = $playerStore ? $playerStore.players[$playerStore.currentPlayerIndex] : null;
+  $: isMultiplayer = $playerStore ? $playerStore.players.filter(p => p.type === 'human').length > 1 : false;
+  $: players = $playerStore ? $playerStore.players : [];
 
-  /**
-   * Функція для отримання кольору гравця
-   * @param {string} playerName - Ім'я гравця
-   * @returns {string|null} Колір гравця або null
-   */
-  function getPlayerColor(playerName) {
+  function getPlayerColor(playerName: string) {
     const player = players.find(p => p.name === playerName);
     return player ? player.color : null;
   }
 
-  /**
-   * Функція для створення стилю з тінню кольору гравця
-   * @param {string} playerName - Ім'я гравця
-   * @returns {string} CSS стиль з тінню кольору
-   */
-  function getPlayerNameStyle(playerName) {
+  function getPlayerNameStyle(playerName: string) {
     const color = getPlayerColor(playerName);
     if (color) {
       return `background-color: ${color};`;
@@ -47,14 +34,10 @@
   }
 
   function showBonusInfo() {
-    // Знаходимо поточного гравця
-    const currentPlayer = players[$gameState.currentPlayerIndex];
-    
     if (currentPlayer && currentPlayer.bonusHistory && currentPlayer.bonusHistory.length > 0) {
-      // Формуємо детальний опис бонусних балів гравця
       let bonusDetails = `Бонусні бали гравця ${currentPlayer.name}:\n\n`;
       
-      currentPlayer.bonusHistory.forEach((bonus, index) => {
+      currentPlayer.bonusHistory.forEach((bonus: any, index: number) => {
         const time = new Date(bonus.timestamp).toLocaleTimeString();
         bonusDetails += `${index + 1}. +${bonus.points} балів - ${bonus.reason} (${time})\n`;
       });
@@ -68,7 +51,6 @@
         dataTestId: 'bonus-info-modal'
       });
     } else {
-      // Якщо немає бонусних балів, показуємо загальну інформацію
       modalStore.showModal({
         titleKey: 'gameBoard.bonusInfoTitle',
         contentKey: 'gameBoard.bonusHint',
@@ -78,31 +60,21 @@
     }
   }
 
-  function showPlayerBonusInfo(/** @type {any} */ player) {
+  function showPlayerBonusInfo(player: any) {
     let scoreDetails = '';
-
-    // Спрощена логіка для бонусів, оскільки bonusHistory може бути складним.
-    // Наразі, для виправлення, ми показуємо загальну суму бонусів.
-    // TODO: Розширити, якщо потрібна детальна історія з різними типами бонусів.
     if (player.bonusPoints > 0) {
-      // Припускаємо, що всі бонуси - це "Бонус за відстань" для простоти,
-      // оскільки це найчастіший випадок.
       scoreDetails += `Бонус за відстань: +${player.bonusPoints}\n`;
-      scoreDetails += `Бонус за перестрибування: +0\n`; // Заглушка
+      scoreDetails += `Бонус за перестрибування: +0\n`;
     } else {
       scoreDetails += `Бонус за відстань: +0\n`;
       scoreDetails += `Бонус за перестрибування: +0\n`;
     }
-
-    // Штрафні бали
     scoreDetails += `Штраф за зворотній хід: -${player.penaltyPoints}\n`;
-    
-    // Загальна сума
     const totalScore = player.bonusPoints - player.penaltyPoints;
     scoreDetails += `\nЗагальна сума балів: ${totalScore}`;
     
     modalStore.showModal({
-      title: `Поточні бали ${player.name}`, // Динамічний заголовок
+      title: `Поточні бали ${player.name}`,
       content: scoreDetails,
       buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
       dataTestId: `player-score-details-modal-${player.name}`
@@ -122,6 +94,93 @@
     await userActionService.finishWithBonus('modal.gameOverReasonCashOut');
   }
 </script>
+
+{#if !$replayStore.isReplayMode && $playerStore && $scoreStore}
+  <div class="score-panel game-content-block" data-testid="score-panel">
+    {#if isMultiplayer}
+      <div class="score-display-multiplayer">
+        <div class="score-label-multiplayer">{$_('gameBoard.scoreLabel')}</div>
+        {#each players as player}
+          <div class="score-row">
+            <span class="player-name-plate" style={getPlayerNameStyle(player.name)}>{player.name}</span>
+            {#if player.bonusPoints === 0 && player.penaltyPoints === 0}
+              <span
+                class="score-value-clickable"
+                on:click={() => showPlayerBonusInfo(player)}
+                on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
+                role="button"
+                tabindex="0"
+                use:customTooltip={"Натисніть для перегляду деталей балів"}
+              >0</span>
+            {/if}
+            {#if player.bonusPoints > 0}
+              <span
+                class="bonus-display"
+                on:click={() => showPlayerBonusInfo(player)}
+                on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
+                use:customTooltip={"Натисніть для перегляду деталей бонусних балів"}
+                role="button"
+                tabindex="0"
+              >+{player.bonusPoints}</span>
+            {/if}
+            {#if player.penaltyPoints > 0}
+              <span
+                class="penalty-display"
+                on:click={showPenaltyInfo}
+                on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+                use:customTooltip={$_('gameBoard.penaltyHint')}
+                role="button"
+                tabindex="0"
+              >-{player.penaltyPoints}</span>
+            {/if}
+          </div>
+        {/each}
+        {#if $scoreStore.penaltyPoints > 0}
+          <div class="score-row">
+            <span
+              class="penalty-display"
+              on:click={showPenaltyInfo}
+              on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+              use:customTooltip={$_('gameBoard.penaltyHint')}
+              role="button"
+              tabindex="0"
+            >Штраф: -{$scoreStore.penaltyPoints}</span>
+          </div>
+        {/if}
+      </div>
+    {:else}
+      <div class="score-display">
+        <span class="score-label-text">
+          {$_('gameBoard.scoreLabel')}:
+        </span>
+        <span
+          class="score-value-clickable"
+          class:positive-score={$playerStore.players[0]?.score > 0}
+          on:click={showScoreInfo}
+          on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
+          role="button"
+          tabindex="0"
+          use:customTooltip={$_('modal.scoreInfoTitle')}
+          data-testid="score-value"
+        >{$playerStore.players[0]?.score || 0}</span>
+        {#if $scoreStore.penaltyPoints > 0}
+          <span
+            class="penalty-display"
+            on:click={showPenaltyInfo}
+            on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
+            use:customTooltip={$_('gameBoard.penaltyHint')}
+            role="button"
+            tabindex="0"
+            data-testid="penalty-display"
+          >-{$scoreStore.penaltyPoints}</span>
+        {/if}
+      </div>
+    {/if}
+    <button class="cash-out-btn" on:click={cashOutAndEndGame} use:customTooltip={isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOutTooltip')} data-testid="cash-out-btn">
+      {@html isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}
+    </button>
+  </div>
+{/if}
 
 <style>
   .score-panel {
@@ -242,93 +301,3 @@
     transition: all 0.3s ease;
   }
 </style>
-
-{#if !$replayStore.isReplayMode && $gameState}
-  <div class="score-panel game-content-block" data-testid="score-panel">
-    {#if isMultiplayer}
-      <!-- Локальна гра - показуємо рахунок всіх гравців -->
-      <div class="score-display-multiplayer">
-        <div class="score-label-multiplayer">{$_('gameBoard.scoreLabel')}</div>
-        {#each players as player}
-          <div class="score-row">
-            <span class="player-name-plate" style={getPlayerNameStyle(player.name)}>{player.name}</span>
-            <!-- Оновлена логіка відображення рахунку -->
-            {#if player.bonusPoints === 0 && player.penaltyPoints === 0}
-              <span
-                class="score-value-clickable"
-                on:click={() => showPlayerBonusInfo(player)}
-                on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
-                role="button"
-                tabindex="0"
-                use:customTooltip={"Натисніть для перегляду деталей балів"}
-              >0</span>
-            {/if}
-            {#if player.bonusPoints > 0}
-              <span
-                class="bonus-display"
-                on:click={() => showPlayerBonusInfo(player)}
-                on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPlayerBonusInfo(player)}
-                use:customTooltip={"Натисніть для перегляду деталей бонусних балів"}
-                role="button"
-                tabindex="0"
-              >+{player.bonusPoints}</span>
-            {/if}
-            {#if player.penaltyPoints > 0}
-              <span
-                class="penalty-display"
-                on:click={showPenaltyInfo}
-                on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
-                use:customTooltip={$_('gameBoard.penaltyHint')}
-                role="button"
-                tabindex="0"
-              >-{player.penaltyPoints}</span>
-            {/if}
-          </div>
-        {/each}
-        {#if $gameState.penaltyPoints > 0}
-          <div class="score-row">
-            <span
-              class="penalty-display"
-              on:click={showPenaltyInfo}
-              on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
-              use:customTooltip={$_('gameBoard.penaltyHint')}
-              role="button"
-              tabindex="0"
-            >Штраф: -{$gameState.penaltyPoints}</span>
-          </div>
-        {/if}
-      </div>
-    {:else}
-      <!-- Гра з комп'ютером - показуємо загальний рахунок -->
-      <div class="score-display">
-        <span class="score-label-text">
-          {$_('gameBoard.scoreLabel')}:
-        </span>
-        <span
-          class="score-value-clickable"
-          class:positive-score={$gameState.players[0]?.score > 0}
-          on:click={showScoreInfo}
-          on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showScoreInfo()}
-          role="button"
-          tabindex="0"
-          use:customTooltip={$_('modal.scoreInfoTitle')}
-          data-testid="score-value"
-        >{$gameState.players[0]?.score || 0}</span>
-        {#if $gameState.penaltyPoints > 0}
-          <span
-            class="penalty-display"
-            on:click={showPenaltyInfo}
-            on:keydown={(/** @type {KeyboardEvent} */ e) => (e.key === 'Enter' || e.key === ' ') && showPenaltyInfo()}
-            use:customTooltip={$_('gameBoard.penaltyHint')}
-            role="button"
-            tabindex="0"
-            data-testid="penalty-display"
-          >-{$gameState.penaltyPoints}</span>
-        {/if}
-      </div>
-    {/if}
-    <button class="cash-out-btn" on:click={cashOutAndEndGame} use:customTooltip={isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOutTooltip')} data-testid="cash-out-btn">
-      {@html isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}
-    </button>
-  </div>
-{/if}

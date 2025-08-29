@@ -22,6 +22,14 @@ export const replayAutoPlayStore = {
   stepForward,
   stepBackward,
   togglePlayPause,
+  cancelAllEffects: () => {
+    update(store => {
+      if (store.intervalId) {
+        clearInterval(store.intervalId);
+      }
+      return { direction: 'paused', intervalId: null };
+    });
+  },
   // Залишаємо toggleAutoPlay для сумісності з ReplayViewer
   toggleAutoPlay: (
     direction: 'forward' | 'backward',

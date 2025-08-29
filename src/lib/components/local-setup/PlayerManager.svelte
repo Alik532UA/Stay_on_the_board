@@ -1,50 +1,83 @@
 <script lang="ts">
-  import { gameState } from '$lib/stores/gameState';
-  import { gameStateMutator } from '$lib/services/gameStateMutator';
+  import { playerStore } from '$lib/stores/playerStore';
   import { _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
   import { navigationService } from '$lib/services/navigationService.js';
   import ColorPicker from './ColorPicker.svelte';
   import { logService } from '$lib/services/logService.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
+  import { generateId, getRandomUnusedColor, getRandomUnusedName } from '$lib/utils/playerUtils';
+  import type { Player } from '$lib/models/player';
   
   function startGame() {
     logService.action('Click: "Почати гру" (PlayerManager)');
-    
-    // НАВІЩО: Відповідальність цього компонента - лише ініціювати перехід.
-    // Вся логіка створення та ініціалізації гри тепер інкапсульована
-    // в gameModeService та LocalGameMode, які спрацюють на сторінці /game/local.
-    // Це відновлює правильний SoC та UDF.
     navigationService.goTo('/game/local');
+  }
+
+  function addPlayer() {
+    playerStore.update(s => {
+      if (!s || s.players.length >= 8) return s;
+      const usedColors = s.players.map(p => p.color);
+      const usedNames = s.players.map(p => p.name);
+      const newPlayer: Player = {
+        id: generateId(),
+        name: getRandomUnusedName(usedNames),
+        color: getRandomUnusedColor(usedColors),
+        score: 0,
+        isComputer: false,
+        type: 'human' as const,
+        penaltyPoints: 0,
+        bonusPoints: 0,
+        bonusHistory: [] as any[]
+      };
+      return { ...s, players: [...s.players, newPlayer] };
+    });
+  }
+
+  function removePlayer(playerId: number) {
+    playerStore.update(s => {
+      if (!s || s.players.length <= 2) return s;
+      return { ...s, players: s.players.filter(p => p.id !== playerId) };
+    });
+  }
+
+  function updatePlayer(playerId: number, updatedData: Partial<Player>) {
+    playerStore.update(s => {
+      if (!s) return null;
+      return {
+        ...s,
+        players: s.players.map(p =>
+          p.id === playerId ? { ...p, ...updatedData } : p
+        )
+      };
+    });
   }
 </script>
 
-{#if $gameState}
+{#if $playerStore}
 <div class="player-manager-card">
   <h2 data-testid="player-manager-title">{$_('localGame.playerManagerTitle')}</h2>
 
   <div class="player-list">
-    {#each $gameState.players as player (player.id)}
+    {#each $playerStore.players as player (player.id)}
       <div class="player-row">
         <ColorPicker
           value={player.color}
-          on:change={(e) => {
-            gameStateMutator.updatePlayer(player.id, { color: e.detail.value });
-          }}
+          on:change={(e) => updatePlayer(player.id, { color: e.detail.value })}
         />
         <button
           class="player-type-btn"
           use:customTooltip={$_('localGame.togglePlayerType')}
-          on:click={() => gameStateMutator.updatePlayer(player.id, { type: player.type === 'human' ? 'computer' : 'human' })}
+          on:click={() => updatePlayer(player.id, { type: player.type === 'human' ? 'ai' : 'human' })}
         >
-          {player.type === 'computer' ? '🤖' : '👤'}
+          {player.type === 'ai' ? '🤖' : '👤'}
         </button>
         <input
           type="text"
           class="player-name-input"
           placeholder="Ім'я гравця"
           value={player.name}
-          on:input={(e) => gameStateMutator.updatePlayer(player.id, { name: e.currentTarget.value })}
+          on:input={(e) => updatePlayer(player.id, { name: (e.currentTarget as HTMLInputElement).value })}
           data-testid="player-name-input-{player.id}"
         />
         <button
@@ -52,9 +85,9 @@
           use:customTooltip={$_('localGame.removePlayer')}
           on:click={() => {
             logService.action(`Click: "Видалити гравця: ${player.name}" (PlayerManager)`);
-            gameStateMutator.removePlayer(player.id);
+            removePlayer(player.id);
           }}
-          disabled={$gameState.players.length <= 2}
+          disabled={$playerStore.players.length <= 2}
           data-testid="remove-player-btn-{player.id}"
         >
           ×
@@ -68,9 +101,9 @@
       class="add-player-btn"
       on:click={() => {
         logService.action('Click: "Додати гравця" (PlayerManager)');
-        gameStateMutator.addPlayer();
+        addPlayer();
       }}
-      disabled={$gameState.players.length >= 8}
+      disabled={$playerStore.players.length >= 8}
       data-testid="add-player-btn"
     >
       {$_('localGame.addPlayer')}

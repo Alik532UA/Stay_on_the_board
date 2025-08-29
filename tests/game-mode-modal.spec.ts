@@ -2,14 +2,24 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Модальне вікно вибору режиму гри', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/'); // Go to the page first to have the window object
+
+    // Wait for the reset function to be attached to the window object by Svelte
+    await page.waitForFunction(() => (window as any).resetAllStores, null, { timeout: 10000 });
+
+    // 1. Reset the state before EVERY test to ensure isolation
+    await page.evaluate(() => (window as any).resetAllStores());
+
+    // 2. Set up the specific state for THIS test
     // Вмикаємо тестовий режим програмно
     await page.evaluate(() => {
-      const settingsStore = (window as any).settingsStore;
-      if (settingsStore) {
-        settingsStore.updateSettings({ testMode: true });
+      const appSettingsStore = (window as any).appSettingsStore;
+      if (appSettingsStore) {
+        appSettingsStore.updateSettings({ testMode: true });
       }
     });
+
+    // 3. Perform test actions
     await page.getByTestId('training-btn').click();
     await expect(page.getByTestId('game-mode-modal-title')).toBeVisible();
   });
