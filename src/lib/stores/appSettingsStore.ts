@@ -1,3 +1,8 @@
+/**
+ * @file Manages global application settings.
+ * @description This store handles settings that are not tied to a specific game session,
+ * such as language, theme, and visual style. The settings are persisted in localStorage.
+ */
 // src/lib/stores/appSettingsStore.ts
 import { writable } from 'svelte/store';
 import { logService } from '../services/logService';

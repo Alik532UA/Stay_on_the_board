@@ -1,3 +1,9 @@
+/**
+ * @file Manages the state of the game board.
+ * @description This store holds all data directly related to the board's state,
+ * including its size, the grid itself, the player's position, and cell visit counts.
+ * It is initialized as null and set up when a game starts.
+ */
 // src/lib/stores/boardStore.ts
 import { writable } from 'svelte/store';
 import { createEmptyBoard } from '$lib/utils/boardUtils';
