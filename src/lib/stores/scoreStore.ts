@@ -1,3 +1,9 @@
+/**
+ * @file Manages the scoring and points system for the current game.
+ * @description This store tracks all variables related to the player's score,
+ * including penalty points, bonuses, and other metrics. It is initialized as null
+ * and set up when a game starts.
+ */
 // src/lib/stores/scoreStore.ts
 import { writable } from 'svelte/store';
 

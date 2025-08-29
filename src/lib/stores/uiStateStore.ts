@@ -1,3 +1,9 @@
+/**
+ * @file Manages the general UI state of the application.
+ * @description This store tracks transient UI states that are not specific to a single component,
+ * such as whether a computer move is in progress, game over status, and player input selections.
+ * It helps coordinate UI behavior across different parts of the application.
+ */
 // src/lib/stores/uiStateStore.ts
 import { writable } from 'svelte/store';
 import type { MoveDirectionType } from '$lib/models/Figure';

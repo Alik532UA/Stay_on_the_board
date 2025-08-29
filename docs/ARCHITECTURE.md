@@ -21,7 +21,7 @@ last-reviewed: 2025-08-07
 
 ## 1. Ключові Принципи
 
-- **Single Source of Truth (SSoT):** Весь логічний стан гри зберігається в `gameState`. Інші стани (UI, налаштування) зберігаються у власних спеціалізованих сторах. Похідні дані обчислюються за допомогою `derived` сторів.
+- **Single Source of Truth (SSoT):** Логічний стан гри розділено на декілька гранулярних сторів (`boardStore`, `playerStore`, `scoreStore` тощо), кожен з яких є єдиним джерелом правди для своєї зони відповідальності. Похідні дані обчислюються за допомогою `derived` сторів.
 - **Unidirectional Data Flow (UDF):** Потік даних є односпрямованим:
   1.  **UI (Компонент)** викликає дію з **`GameOrchestrator`**.
   2.  **`GameOrchestrator`** викликає чисті функції-мутатори з **`GameLogicService`**.
@@ -31,42 +31,74 @@ last-reviewed: 2025-08-07
 
 ## 2. Схема Потоку Даних (UDF)
 
-*На цьому місці ми створимо діаграму, яка візуалізує потік даних. Можна використовувати Mermaid синтаксис, який підтримується GitHub та багатьма редакторами.*
+Діаграма відображає нову, більш гранулярну архітектуру стану.
 
 ```mermaid
 graph TD
-    subgraph "UI Layer (Components)"
-        A[ControlsPanelWidget] -->|1. on:click| B(GameOrchestrator);
-        C[BoardWrapperWidget] --
->|4. subscribe| D(animationStore);
-        E[MainMenu] -->|1. on:click| F(uiService);
+    subgraph "UI Layer"
+        GameUI[Game Components, e.g., Board, InfoPanel]
+        SettingsUI[Settings Components]
     end
 
     subgraph "Service Layer"
-        B -->|2. Виклик мутаторів| G(GameLogicService);
-        F -->|Виклик дій| B;
-        B -->|Побічні ефекти| H(AudioService);
-        B -->|Побічні ефекти| I(NavigationService);
+        Orchestrator(GameOrchestrator)
+        Logic(GameLogicService)
+        UIService(uiService)
     end
 
-    subgraph "State Layer (Stores)"
-        G -->|3. update()| J[gameState];
-        J -->|reacts to| K[derivedState];
-        J -->|reacts to| D;
+    subgraph "State Layer (Granular Stores)"
+        board[boardStore <br/>- piecePosition<br/>- blockedCells]
+        player[playerStore <br/>- currentPlayer<br/>- players]
+        score[scoreStore <br/>- scores<br/>- moveHistory]
+        gameSettings[gameSettingsStore <br/>- boardSize<br/>- gameMode]
+        appSettings[appSettingsStore <br/>- theme<br/>- language]
+        uiState[uiStateStore <br/>- activeModal<br/>- isLoading]
     end
 
-    K -->|4. subscribe| A;
+    subgraph "Derived State"
+        derived[Derived Stores <br/> e.g., availableMoves]
+    end
+
+    %% Data Flow
+    GameUI -->|User moves| Orchestrator;
+    Orchestrator -->|Mutate state| Logic;
+    Logic -->|Updates| board;
+    Logic -->|Updates| player;
+    Logic -->|Updates| score;
+
+    SettingsUI -->|Changes settings| UIService;
+    UIService -->|Updates| appSettings;
+    UIService -->|Updates| gameSettings;
+    UIService -->|Updates| uiState;
+
+    %% Subscriptions
+    board --> derived;
+    player --> derived;
+    derived --> GameUI;
+
+    board -->|Read| GameUI;
+    player -->|Read| GameUI;
+    score -->|Read| GameUI;
+    gameSettings -->|Read| GameUI;
+    appSettings -->|Read| SettingsUI;
+    uiState -->|Read| GameUI;
+    uiState -->|Read| SettingsUI;
 ```
 
 ## 3. Опис Модулів
 
 ### 3.1. Стори (`src/lib/stores/`)
 
-- **`gameState.ts`**: **SSoT для ігрової логіки.** Містить все, що стосується поточної партії: розмір дошки, позицію ферзя, рахунок, історію ходів, чергу ходів для анімації (`moveQueue`).
-- **`appSettingsStore.js`**: **SSoT для налаштувань.** Зберігає вибір користувача: тема, мова, гарячі клавіші, стан чекбоксів. Зберігається в `localStorage`.
-- **`playerInputStore.js`**: Зберігає **тимчасовий** стан вводу гравця (`selectedDirection`, `selectedDistance`). Скидається після кожного ходу.
-- **`animationStore.js`**: **Сервіс-стор для візуалізації.** Підписується на `gameState.moveQueue` і відтворює анімації у власному темпі. Компоненти дошки залежать тільки від нього.
-- **`derivedState.ts`**: Містить `derived` стори, які обчислюють похідні дані (наприклад, `lastComputerMove`, `centerInfo`), щоб уникнути складної логіки в компонентах.
+Раніше єдиний `gameState` був розділений на декілька незалежних сторів, кожен з яких має свою чітку зону відповідальності. Це спрощує керування станом та зменшує зв'язаність компонентів.
+
+- **`boardStore.ts`**: Відповідає за стан ігрової дошки: позиція фігури, масив заблокованих клітинок.
+- **`playerStore.ts`**: Зберігає дані про гравців: хто зараз ходить (`currentPlayer`), масив об'єктів гравців (імена, кольори).
+- **`scoreStore.ts`**: Містить усе, що пов'язано з рахунком: поточний рахунок гравців, історія ходів, бонусні очки.
+- **`gameSettingsStore.ts`**: Зберігає налаштування, що стосуються *конкретної ігрової сесії*: розмір дошки, режим гри (гравець проти комп'ютера, два гравці), імена гравців. Скидається при старті нової гри.
+- **`appSettingsStore.ts`**: Зберігає глобальні налаштування застосунку, що не залежать від ігрової сесії: тема (світла/темна), мова, налаштування анімацій. Зберігається в `localStorage`.
+- **`uiStateStore.ts`**: Керує станом інтерфейсу, не пов'язаним напряму з грою: активні модальні вікна, стан завантаження, повідомлення для користувача.
+- **`animationStore.ts`**: **Сервіс-стор для візуалізації.** Як і раніше, відповідає за відтворення анімацій, але тепер може залежати від більш специфічних сторів (наприклад, `boardStore`).
+- **`derivedState.ts`**: Містить `derived` стори, які обчислюють похідні дані з нових гранулярних сторів, щоб уникнути складної логіки в компонентах.
 
 ### 3.2. Сервіси (`src/lib/services/`)
 

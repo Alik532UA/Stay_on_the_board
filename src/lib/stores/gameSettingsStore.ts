@@ -1,3 +1,10 @@
+/**
+ * @file Manages settings related to a specific game session.
+ * @description This store handles configurations that affect the gameplay of a single match,
+ * such as board size, difficulty presets (game mode), and control schemes (keybindings).
+ * While these settings are persisted in localStorage for convenience, they are conceptually
+ * tied to a game session and can be reset or changed for each new game.
+ */
 // src/lib/stores/gameSettingsStore.ts
 import { writable, get } from 'svelte/store';
 import { logService } from '../services/logService.js';
