@@ -22,8 +22,6 @@
 
   onMount(() => {
     logService.init('[TrainingPage] onMount: Ініціалізація режиму "training".');
-    gameModeService.initializeGameMode('training');
-    animationService.initialize();
   });
 
 
