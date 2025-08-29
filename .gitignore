@@ -33,3 +33,4 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /.vite/
+docs/my-notes/gcloud_multi_account_guide.md

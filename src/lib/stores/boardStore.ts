@@ -5,6 +5,7 @@
  * It is initialized as null and set up when a game starts.
  */
 // src/lib/stores/boardStore.ts
+import { logService } from '$lib/services/logService';
 import { writable } from 'svelte/store';
 import { createEmptyBoard } from '$lib/utils/boardUtils';
 import type { MoveHistoryEntry } from '$lib/models/moveHistory';
@@ -28,6 +29,7 @@ function createBoardStore() {
     update,
     // НАВІЩО: Інкапсулюємо логіку мутації безпосередньо тут
     movePlayer: (row: number, col: number) => {
+      logService.piece(`(boardStore) movePlayer to [${row}, ${col}]`);
       update(state => {
         if (!state) return null;
         const newBoard = state.board.map(r => [...r]);

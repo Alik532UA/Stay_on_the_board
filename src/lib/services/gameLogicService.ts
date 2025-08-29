@@ -44,6 +44,7 @@ export function performMove(
   currentState: any, // Combined state
   settings: any
 ) {
+  logService.state('Logical Position (at move start)', { row: currentState.playerRow, col: currentState.playerCol });
   logService.logicMove('performMove: початок з параметрами:', { direction, distance, playerIndex });
 
   const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
