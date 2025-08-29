@@ -14,6 +14,8 @@ npm run dev
 
 This will start a local development server at `http://localhost:5173`.
 
+**Note for AI Agent:** Do not run `npm run dev` yourself, as it is a long-running process that will cause you to hang. Ask the user to run this command for you when needed.
+
 ## Building
 
 To build the project for production, use the following command:
