@@ -1,6 +1,6 @@
 // src/lib/services/scoreService.ts
 import type { Player } from '$lib/models/player';
-import { isMirrorMove } from '$lib/utils/boardUtils';
+import { isMirrorMove, getMovePath, isCellBlocked } from '$lib/utils/boardUtils';
 import { logService } from './logService';
 import type { FinalScoreDetails } from '$lib/models/score';
 import type { BoardState } from '$lib/stores/boardStore';
@@ -19,6 +19,21 @@ export function calculateFinalScore(
   const { penaltyPoints, movesInBlockMode, jumpedBlockedCells, noMovesBonus, distanceBonus } = scoreState;
   const { boardSize } = boardState;
 
+  if (gameMode === 'local') {
+    const totalScore = (distanceBonus || 0) + jumpedBlockedCells - penaltyPoints;
+    return {
+      baseScore: 0,
+      totalPenalty: penaltyPoints,
+      sizeBonus: 0,
+      blockModeBonus: 0,
+      jumpBonus: jumpedBlockedCells,
+      noMovesBonus: 0,
+      finishBonus: 0,
+      distanceBonus: distanceBonus || 0,
+      totalScore
+    };
+  }
+
   const baseScore = players.reduce((acc: number, p: Player) => acc + p.score, 0);
   const totalPenalty = penaltyPoints;
   let sizeBonus = 0;
@@ -29,7 +44,7 @@ export function calculateFinalScore(
   const blockModeBonus = movesInBlockMode;
   const finishBonus = uiState.gameOverReasonKey === 'modal.gameOverReasonBonus' ? boardSize : 0;
   const jumpBonus = jumpedBlockedCells;
-  const finalNoMovesBonus = gameMode === 'local' ? 0 : noMovesBonus || 0;
+  const finalNoMovesBonus = noMovesBonus || 0;
 
   const totalScore = baseScore + sizeBonus + blockModeBonus + jumpBonus + (distanceBonus || 0) - totalPenalty + finalNoMovesBonus + finishBonus;
 
@@ -118,7 +133,14 @@ export function calculateMoveScore(
     penaltyResult = _calculateMirrorMovePenalty(currentState, direction, distance, settings);
   }
   
-  const jumpedCount = 0; // TODO: Implement jump calculation
+  const startPosition = { row: currentState.playerRow, col: currentState.playerCol };
+  const movePath = getMovePath(startPosition, newPosition);
+  const jumpedCount = movePath.reduce((count, cell) => {
+    if (isCellBlocked(cell.row, cell.col, currentState.cellVisitCounts, settings)) {
+      return count + 1;
+    }
+    return count;
+  }, 0);
 
   const distanceBonusResult = _calculateDistanceBonus(distance);
   const jumpBonus = _calculateJumpBonus(jumpedCount, settings);

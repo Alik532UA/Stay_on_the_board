@@ -1,175 +1,175 @@
-# Stay on the Board: Complete Game Guide
+# Stay on the Board: Повний посібник з гри
 
-## 1. Core Concept
+## 1. Основна концепція
 
-**"Stay on the Board"** is a strategy game where the primary objective is to keep a shared game piece on the board for as long as possible, avoiding moving it off the board or onto blocked cells.
+**"Stay on the Board"** - це стратегічна гра, головна мета якої - якомога довше утримувати спільну ігрову фішку на дошці, уникаючи її виходу за межі дошки або на заблоковані клітинки.
 
-## 2. Basic Rules
+## 2. Основні правила
 
-### Starting Conditions
-1.  **Initial Position**: A single piece (♛) is placed randomly on the board.
-2.  **Turns**: Players take turns moving the *same* piece.
-3.  **Movement**: A player chooses a direction (8 options) and a distance (from 1 to N-1, where N is the board size).
-4.  **Winning**: The player who remains on the board the longest wins.
+### Початкові умови
+1.  **Початкова позиція**: Одна фішка (♛) розміщується випадковим чином на дошці.
+2.  **Ходи**: Гравці по черзі переміщують *ту саму* фішку.
+3.  **Рух**: Гравець обирає напрямок (8 варіантів) та відстань (від 1 до N-1, де N - розмір дошки).
+4.  **Перемога**: Перемагає гравець, який найдовше залишається на дошці.
 
-### Losing Conditions
-A player loses if they:
--   **Move Off-Board**: Make a move that takes the piece off the board.
--   **Blocked Cell**: Land on a blocked cell (in Blocked Cells mode).
--   **Incorrect "No Moves" Claim**: Press the "No Moves" button when valid moves are still available.
+### Умови поразки
+Гравець програє, якщо він:
+-   **Виходить за межі дошки**: Робить хід, який виводить фішку за межі дошки.
+-   **Заблокована клітинка**: Потрапляє на заблоковану клітинку (у режимі "Заблоковані клітинки").
+-   **Неправильна заява "Немає ходів"**: Натискає кнопку "Немає ходів", коли ще є доступні ходи.
 
-### Winning Conditions
-A player wins if:
--   **Correct "No Moves" Claim**: They press the "No Moves" button, and no valid moves are left.
--   **Opponent's Mistake**: The opponent makes an invalid move.
+### Умови перемоги
+Гравець перемагає, якщо:
+-   **Правильна заява "Немає ходів"**: Він натискає кнопку "Немає ходів", і не залишилося жодного доступного ходу.
+-   **Помилка суперника**: Суперник робить недійсний хід.
 
-## 3. Movement Mechanics
+## 3. Механіка руху
 
-The piece moves like a queen in chess: any number of cells horizontally, vertically, or diagonally. Unlike a standard queen, this piece can **jump over** blocked cells, but it cannot land on them.
+Фішка рухається як ферзь у шахах: на будь-яку кількість клітинок по горизонталі, вертикалі або діагоналі. На відміну від стандартного ферзя, ця фішка може **перестрибувати** через заблоковані клітинки, але не може на них приземлятися.
 
-### Directions of Movement
-The piece can move in 8 directions, mapped to a numeric keypad layout:
+### Напрямки руху
+Фішка може рухатися у 8 напрямках, що відповідають розкладці цифрової клавіатури:
 ```
 7 8 9
 4 ♛ 6
 1 2 3
 ```
--   **7**: Up-Left (↖)
--   **8**: Up (↑)
--   **9**: Up-Right (↗)
--   **4**: Left (←)
--   **6**: Right (→)
--   **1**: Down-Left (↙)
--   **2**: Down (↓)
--   **3**: Down-Right (↘)
+-   **7**: Вгору-вліво (↖)
+-   **8**: Вгору (↑)
+-   **9**: Вгору-вправо (↗)
+-   **4**: Вліво (←)
+-   **6**: Вправо (→)
+-   **1**: Вниз-вліво (↙)
+-   **2**: Вниз (↓)
+-   **3**: Вниз-вправо (↘)
 
-### Distance of Movement
--   **Minimum**: 1 cell
--   **Maximum**: N-1 cells (where N is the board size). For example, on a 5x5 board, the maximum move distance is 4 cells.
+### Відстань руху
+-   **Мінімум**: 1 клітинка
+-   **Максимум**: N-1 клітинок (де N - розмір дошки). Наприклад, на дошці 5x5 максимальна відстань ходу - 4 клітинки.
 
-### Move Validity
-A move is valid if the new position is:
-1.  Within the board's boundaries.
-2.  Not on a blocked cell (in Blocked Cells mode).
+### Дійсність ходу
+Хід є дійсним, якщо нова позиція:
+1.  Знаходиться в межах дошки.
+2.  Не є заблокованою клітинкою (у режимі "Заблоковані клітинки").
 
-## 4. Game Modes
+## 4. Ігрові режими
 
-### Normal Mode
--   All cells remain available throughout the game.
--   The game ends only when a player moves the piece off the board.
--   Recommended for beginners.
+### Звичайний режим
+-   Усі клітинки залишаються доступними протягом усієї гри.
+-   Гра закінчується лише тоді, коли гравець виводить фішку за межі дошки.
+-   Рекомендовано для початківців.
 
-### Blocked Cells Mode
--   The cell from which a move is made becomes blocked and unavailable for future moves.
--   Blocked cells are marked with a red ✗.
--   The game ends if a player moves off-board or onto a blocked cell.
--   Offers a more strategic and challenging experience.
+### Режим "Заблоковані клітинки"
+-   Клітинка, з якої було зроблено хід, стає заблокованою і недоступною для майбутніх ходів.
+-   Заблоковані клітинки позначаються червоним ✗.
+-   Гра закінчується, якщо гравець виходить за межі дошки або потрапляє на заблоковану клітинку.
+-   Пропонує більш стратегічний та складний досвід.
 
-## 5. Scoring System
+## 5. Система нарахування очок
 
-### Basic Points
--   **+1 to +3 points** are awarded for each successful move, depending on the visibility settings (e.g., playing with the board hidden yields more points).
--   **Bonus points** are awarded for various in-game actions.
--   **Penalty points** are given for "mirror" moves in the Vs. Computer mode.
--   **Final Score** = (Sum of all points and bonuses) - Penalties.
+### Основні очки
+-   **+1 до +3 очок** нараховується за кожен успішний хід, залежно від налаштувань видимості (наприклад, гра з прихованою дошкою дає більше очок).
+-   **Бонусні очки** нараховуються за різні ігрові дії.
+-   **Штрафні очки** нараховуються за "дзеркальні" ходи в режимі "Проти комп'ютера".
+-   **Підсумковий рахунок** = (Сума всіх очок та бонусів) - Штрафи.
 
-### Bonus Points
--   **Distance Bonus (+1)**: For any move longer than 1 cell.
--   **Board Size Bonus**: A percentage of the base score, calculated as `(board_size * board_size) / 100 * base_score`.
--   **Blocked Mode Bonus (+1)**: For every move made in Blocked Cells mode.
--   **Jump Bonus (+1)**: For each blocked cell jumped over during a move.
--   **"No Moves" Bonus**: Equal to the board size (e.g., +5 points on a 5x5 board) for a correct claim.
--   **Game Finish Bonus**: Equal to the board size for choosing to end the game after a "No Moves" situation.
+### Бонусні очки
+-   **Бонус за відстань (+1)**: За будь-який хід довший за 1 клітинку.
+-   **Бонус за розмір дошки**: Відсоток від базового рахунку, що розраховується як `(розмір_дошки * розмір_дошки) / 100 * базовий_рахунок`.
+-   **Бонус за режим "Заблоковані клітинки" (+1)**: За кожен хід, зроблений у цьому режимі.
+-   **Бонус за стрибок (+1)**: За кожну заблоковану клітинку, перестрибнуту під час ходу.
+-   **Бонус "Немає ходів"**: Дорівнює розміру дошки (наприклад, +5 очок на дошці 5x5) за правильну заяву.
+-   **Бонус за завершення гри**: Дорівнює розміру дошки за вибір завершити гру після ситуації "Немає ходів".
 
-### Penalty Points
--   **Mirror Move Penalty (-2)**: In Vs. Computer mode, if the computer moves N cells in one direction, and the player immediately moves N or fewer cells in the exact opposite direction, a penalty is applied. This discourages repetitive, back-and-forth moves. This penalty does not apply in Blocked Cells mode.
+### Штрафні очки
+-   **Штраф за дзеркальний хід (-2)**: У режимі "Проти комп'ютера", якщо комп'ютер робить хід на N клітинок в одному напрямку, а гравець одразу ж робить хід на N або менше клітинок у протилежному напрямку, застосовується штраф. Це запобігає повторюваним ходам туди-сюди. Цей штраф не застосовується в режимі "Заблоковані клітинки".
 
-## 6. "No Moves" Button
+## 6. Кнопка "Немає ходів"
 
-### Logic
-1.  **Verification**: When a player clicks "No Moves," the system checks if any valid moves exist from the current position.
-2.  **Outcome**:
-    -   **No Moves Exist**: The player wins.
-    -   **Moves Exist**: The player loses for making an incorrect claim.
+### Логіка
+1.  **Перевірка**: Коли гравець натискає "Немає ходів", система перевіряє, чи існують доступні ходи з поточної позиції.
+2.  **Результат**:
+    -   **Ходів немає**: Гравець перемагає.
+    -   **Ходи є**: Гравець програє за неправильну заяву.
 
-### Strategic Use
-This button should be used when a player believes the piece is trapped. It's a high-risk, high-reward move that can end the game decisively.
+### Стратегічне використання
+Цю кнопку слід використовувати, коли гравець вважає, що фішка потрапила в пастку. Це хід з високим ризиком та високою винагородою, який може вирішити долю гри.
 
-## 7. Board Sizes
+## 7. Розміри дошки
 
--   **Minimum**: 2x2
--   **Maximum**: 9x9
--   **Default**: 3x3
--   **Recommended for Balance**: 5x5 offers a good mix of strategy and game length.
+-   **Мінімум**: 2x2
+-   **Максимум**: 9x9
+-   **За замовчуванням**: 3x3
+-   **Рекомендовано для балансу**: 5x5 пропонує гарне поєднання стратегії та тривалості гри.
 
-## 8. Game Types
+## 8. Типи гри
 
-### Vs. Computer
--   The player competes against a computer AI.
--   The computer's moves are determined by a random algorithm, making it unpredictable.
--   There is a 1-second delay before the computer makes its move.
+### Проти комп'ютера
+-   Гравець змагається зі штучним інтелектом комп'ютера.
+-   Ходи комп'ютера визначаються випадковим алгоритмом, що робить його непередбачуваним.
+-   Існує 1-секундна затримка перед ходом комп'ютера.
 
-### Local Game
--   Two players compete on the same device, taking turns.
--   Player names can be customized.
+### Локальна гра
+-   Двоє гравців змагаються на одному пристрої, роблячи ходи по черзі.
+-   Імена гравців можна налаштовувати.
 
-### Online Game
--   Players compete over the internet.
--   One player hosts a room, and the other joins using a room ID.
+### Онлайн-гра
+-   Гравці змагаються через Інтернет.
+-   Один гравець створює кімнату, а інший приєднується за допомогою ID кімнати.
 
-## 9. UI and Visual Aids
+## 9. Інтерфейс та візуальні підказки
 
-### Available Moves Display
--   A checkbox in the settings ("Show available moves") toggles the visibility of all possible moves.
--   Available landing cells are marked with a dot (●), helping with strategic planning.
+### Відображення доступних ходів
+-   Прапорець у налаштуваннях ("Показувати доступні ходи") вмикає/вимикає видимість усіх можливих ходів.
+-   Доступні для приземлення клітинки позначаються крапкою (●), що допомагає у стратегічному плануванні.
 
-### Center Control Button
--   Displays the currently selected direction and distance.
--   Transforms into a confirmation button once a full move is selected.
--   Shows the computer's last move for player reference.
+### Центральна кнопка керування
+-   Відображає поточний обраний напрямок та відстань.
+-   Перетворюється на кнопку підтвердження після вибору повного ходу.
+-   Показує останній хід комп'ютера для довідки гравця.
 
-## 10. Game States and Flow
+## 10. Стани гри та ігровий процес
 
-The game progresses through several states:
-1.  **Initial State**: The game is at the main menu.
-2.  **Game Mode Selection**: A modal appears to choose between Normal or Blocked Cells mode (for Vs. Computer).
-3.  **Piece Placement**: The piece is placed randomly on the board.
-4.  **Player Turn**: The player selects a direction and distance.
-5.  **Move Execution**: The piece moves to the new position.
-6.  **Game End Check**: The system checks for win/loss conditions.
-7.  **Computer Turn** (if applicable): The AI selects and executes its move.
-8.  **Victory/Defeat State**: A modal appears with the final score and options to start a new game or return to the menu.
+Гра проходить через кілька станів:
+1.  **Початковий стан**: Гра знаходиться в головному меню.
+2.  **Вибір режиму гри**: З'являється модальне вікно для вибору між звичайним режимом та режимом "Заблоковані клітинки" (для гри проти комп'ютера).
+3.  **Розміщення фішки**: Фішка розміщується випадковим чином на дошці.
+4.  **Хід гравця**: Гравець обирає напрямок та відстань.
+5.  **Виконання ходу**: Фішка переміщується на нову позицію.
+6.  **Перевірка кінця гри**: Система перевіряє умови перемоги/поразки.
+7.  **Хід комп'ютера** (якщо застосовно): ШІ обирає та виконує свій хід.
+8.  **Стан перемоги/поразки**: З'являється модальне вікно з підсумковим рахунком та опціями почати нову гру або повернутися до меню.
 
-## 11. Keyboard Shortcuts
+## 11. Гарячі клавіші
 
-The game supports full keyboard control for accessibility and faster play.
+Гра підтримує повне керування з клавіатури для доступності та швидшої гри.
 
-### Movement
--   **NumPad 7, 8, 9, 4, 6, 1, 2, 3** or **Q, W, E, A, D, Z, X, C** for directions.
--   Pressing a direction key repeatedly cycles through distances (1, 2, 3...).
+### Рух
+-   **NumPad 7, 8, 9, 4, 6, 1, 2, 3** або **Q, W, E, A, D, Z, X, C** для напрямків.
+-   Повторне натискання клавіші напрямку перемикає відстані (1, 2, 3...).
 
-### Actions
--   **Confirm Move**: [NumPad 5], [Enter], or [Spacebar].
--   **"No Moves" Claim**: [NumPad .] or [Backspace].
+### Дії
+-   **Підтвердити хід**: [NumPad 5], [Enter] або [Пробіл].
+-   **Заявити "Немає ходів"**: [NumPad .] або [Backspace].
 
-### Settings
--   **Toggle Block Mode**: [NumPad *] or [B].
--   **Toggle Board Visibility**: [NumPad /] or [H].
--   **Increase/Decrease Board Size**: [NumPad +]/[-] or [=]/[-].
+### Налаштування
+-   **Перемкнути режим блокування**: [NumPad *] або [B].
+-   **Перемкнути видимість дошки**: [NumPad /] або [H].
+-   **Збільшити/зменшити розмір дошки**: [NumPad +]/[-] або [=]/[-].
 
-## 12. Technical Details for Developers
+## 12. Технічні деталі для розробників
 
-### Data Structure
--   `board`: A 2D array representing the game board.
--   `blockedCells`: An array storing the coordinates of blocked cells.
--   `currentPlayer`: Indicates the current player (1 or 2).
+### Структура даних
+-   `board`: Двовимірний масив, що представляє ігрову дошку.
+-   `blockedCells`: Масив, що зберігає координати заблокованих клітинок.
+-   `currentPlayer`: Вказує на поточного гравця (1 або 2).
 
-### Core Functions
--   `getAllValidMoves()`: Returns all possible moves from the current position.
--   `hasValidMoves()`: Checks if any valid moves exist.
--   `processPlayerMove()`: Handles player input and transitions to the next state.
--   `makeComputerMove()`: Executes the AI's turn.
+### Основні функції
+-   `getAllValidMoves()`: Повертає всі можливі ходи з поточної позиції.
+-   `hasValidMoves()`: Перевіряє, чи існують доступні ходи.
+-   `processPlayerMove()`: Обробляє введення гравця та переходить до наступного стану.
+-   `makeComputerMove()`: Виконує хід ШІ.
 
-### Architecture Principles
--   The game board visualization (`game-board` component) is asynchronous and decoupled from the game logic.
--   Game logic is self-contained and does not depend on the DOM or rendering state. This is critical for animations and scalability.
+### Архітектурні принципи
+-   Візуалізація ігрової дошки (компонент `game-board`) є асинхронною та відокремленою від ігрової логіки.
+-   Ігрова логіка є самодостатньою і не залежить від DOM або стану рендерингу. Це критично важливо для анімацій та масштабованості.

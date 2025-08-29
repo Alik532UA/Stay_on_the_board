@@ -1,33 +1,33 @@
-# Git Guidelines
+# Посібник з Git
 
-This document provides guidelines and tips for working with Git in this project.
+Цей документ містить рекомендації та поради щодо роботи з Git у цьому проекті.
 
-## Analyzing Code History (`git blame`)
+## Аналіз історії коду (`git blame`)
 
-Our project sometimes undergoes large-scale refactoring (e.g., renaming files, changing indentation, or restructuring code). While these changes improve the codebase, they can add "noise" to the output of `git blame`, making it difficult to see who originally wrote the logic.
+У нашому проекті іноді відбувається масштабний рефакторинг (наприклад, перейменування файлів, зміна відступів або реструктуризація коду). Хоча ці зміни покращують кодову базу, вони можуть додавати "шум" у вивід `git blame`, ускладнюючи визначення того, хто спочатку написав логіку.
 
-To solve this, we use the `.git-blame-ignore-revs` file to tell Git to ignore specific commits that only contain stylistic or structural changes.
+Щоб вирішити цю проблему, ми використовуємо файл `.git-blame-ignore-revs`, щоб вказати Git ігнорувати певні коміти, які містять лише стилістичні або структурні зміни.
 
-### How to Use It
+### Як це використовувати
 
-For this feature to work, you need to configure your local Git repository one time:
+Щоб ця функція працювала, вам потрібно один раз налаштувати свій локальний репозиторій Git:
 
 ```bash
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
-After running this command, `git blame` (and the blame view in your IDE, like VS Code's "GitLens" extension) will ignore the commits listed in the file, giving you a much cleaner and more useful history.
+Після виконання цієї команди `git blame` (і подання blame у вашому IDE, наприклад, розширенні "GitLens" для VS Code) ігноруватиме коміти, перелічені у файлі, надаючи вам набагато чистішу та кориснішу історію.
 
-### Alternative `blame` Command
+### Альтернативна команда `blame`
 
-If you prefer not to change your local Git config, you can use the following command to get a better `blame` output on a case-by-case basis:
+Якщо ви не хочете змінювати свою локальну конфігурацію Git, ви можете використовувати наступну команду, щоб отримати кращий вивід `blame` в кожному окремому випадку:
 
 ```bash
-git blame -w -C -C <file_path>
+git blame -w -C -C <шлях_до_файлу>
 ```
 
-What these flags do:
-- `-w`: Ignores whitespace changes.
-- `-C`: Finds the original author if code was copied or moved *within the same file*. Using it twice (`-C -C`) makes the search more exhaustive and can track code moved from *other files* in the same commit.
+Що роблять ці прапори:
+- `-w`: Ігнорує зміни пробілів.
+- `-C`: Знаходить оригінального автора, якщо код було скопійовано або переміщено *в межах одного файлу*. Використання його двічі (`-C -C`) робить пошук більш вичерпним і може відстежувати код, переміщений з *інших файлів* у тому ж коміті.
 
-We recommend setting up the `ignoreRevsFile` for the best experience.
+Ми рекомендуємо налаштувати `ignoreRevsFile` для найкращого досвіду.
