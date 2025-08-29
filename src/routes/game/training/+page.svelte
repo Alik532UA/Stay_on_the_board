@@ -20,8 +20,17 @@
   import { gameModeService } from '$lib/services/gameModeService';
   import { logService } from '$lib/services/logService';
 
+  import { get } from 'svelte/store';
+  import { boardStore } from '$lib/stores/boardStore';
+
   onMount(() => {
-    logService.init('[TrainingPage] onMount: Ініціалізація режиму "training".');
+    const boardState = get(boardStore);
+    if (!boardState || boardState.moveHistory.length <= 1) {
+        logService.init('[TrainingPage] onMount: No active game found, initializing "training" mode.');
+        gameModeService.initializeGameMode('training');
+    } else {
+        logService.init('[TrainingPage] onMount: Active game found, not re-initializing.');
+    }
   });
 
 

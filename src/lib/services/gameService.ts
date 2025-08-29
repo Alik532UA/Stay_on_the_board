@@ -76,6 +76,12 @@ export const gameService = {
     scoreStore.set(initialScoreState);
     uiStateStore.set(initialUiState);
 
+    gameSettingsStore.updateSettings({
+      showBoard: true,
+      showPiece: true,
+      showMoves: true
+    });
+
     // Оновлюємо доступні ходи
     availableMovesService.updateAvailableMoves();
     

@@ -18,9 +18,18 @@
   import { onMount } from 'svelte';
   import { animationService } from '$lib/services/animationService.js';
   import { gameModeService } from '$lib/services/gameModeService';
+  import { get } from 'svelte/store';
+  import { boardStore } from '$lib/stores/boardStore';
+  import { logService } from '$lib/services/logService';
 
   onMount(() => {
-    gameModeService.initializeGameMode('timed');
+    const boardState = get(boardStore);
+    if (!boardState || boardState.moveHistory.length <= 1) {
+        logService.init('[TimedGamePage] onMount: No active game found, initializing "timed" mode.');
+        gameModeService.initializeGameMode('timed');
+    } else {
+        logService.init('[TimedGamePage] onMount: Active game found, not re-initializing.');
+    }
     animationService.initialize();
   });
 
