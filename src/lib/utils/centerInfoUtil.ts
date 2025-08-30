@@ -92,6 +92,7 @@ export function getCenterInfoState({
     if (typeof lastComputerMove.distance === 'number') {
       dist = String(lastComputerMove.distance);
     }
+    // ВАЖЛИВО: Не змінюйте порядок dir та dist. Це зламає інтерфейс.
     return {
       class: 'computer-move-display',
       content: `${dir}${dist}`,

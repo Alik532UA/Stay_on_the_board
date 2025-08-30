@@ -151,7 +151,7 @@ function createGameSettingsStore() {
                 gameMode: 'beginner', 
                 blockModeEnabled: false, 
                 autoHideBoard: false, 
-                speechEnabled: false, 
+                speechEnabled: true, 
                 rememberGameMode: true,
                 speechRate: 1,
                 shortSpeech: false,

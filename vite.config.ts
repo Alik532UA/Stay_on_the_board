@@ -1,5 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA, type ManifestOptions, type Display } from 'vite-plugin-pwa';
 
@@ -51,5 +51,8 @@ export default defineConfig({
 	],
 	build: {
 		sourcemap: true,
+	},
+	test: {
+		exclude: ['tests/**']
 	}
 });
