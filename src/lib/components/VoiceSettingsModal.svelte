@@ -5,6 +5,7 @@
   import { locale, _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
   import { logService } from '$lib/services/logService.js';
+  import ToggleButton from './ToggleButton.svelte';
 
   export let close = () => {};
 
@@ -24,9 +25,7 @@
       const allVoices = await loadAndGetVoices();
       let mainVoices = filterVoicesByLang(allVoices, currentLocale);
       if (currentLocale !== 'en') {
-        // Додаємо англійські голоси в кінець списку
         const enVoices = filterVoicesByLang(allVoices, 'en');
-        // Уникаємо дублікатів (на випадок, якщо англійський голос вже є у mainVoices)
         const mainVoiceURIs = new Set(mainVoices.map(v => v.voiceURI));
         const onlyEn = enVoices.filter(v => !mainVoiceURIs.has(v.voiceURI));
         availableVoices = [...mainVoices, ...onlyEn];
@@ -89,6 +88,42 @@
       <button class="modal-close" onclick={close}>&times;</button>
     </div>
     <div class="modal-body">
+      <div class="settings-section">
+        <span class="settings-label">{$_('voiceSettings.speed')}</span>
+        <div class="button-group">
+          <button class:active={$gameSettingsStore.speechRate === 1} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1 })}>x1</button>
+          <button class:active={$gameSettingsStore.speechRate === 1.2} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.2 })}>x1.2</button>
+          <button class:active={$gameSettingsStore.speechRate === 1.4} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.4 })}>x1.4</button>
+          <button class:active={$gameSettingsStore.speechRate === 1.6} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.6 })}>x1.6</button>
+          <button class:active={$gameSettingsStore.speechRate === 1.8} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.8 })}>x1.8</button>
+          <button class:active={$gameSettingsStore.speechRate === 2} onclick={() => gameSettingsStore.updateSettings({ speechRate: 2 })}>x2</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <span class="settings-label">{$_('voiceSettings.order')}</span>
+        <div class="button-group">
+          <button class:active={$gameSettingsStore.speechOrder === 'dist_dir'} onclick={() => gameSettingsStore.updateSettings({ speechOrder: 'dist_dir' })}>{$_('voiceSettings.dist_dir')}</button>
+          <button class:active={$gameSettingsStore.speechOrder === 'dir_dist'} onclick={() => gameSettingsStore.updateSettings({ speechOrder: 'dir_dist' })}>{$_('voiceSettings.dir_dist')}</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <ToggleButton 
+          label={$_('voiceSettings.shortSpeech')} 
+          checked={$gameSettingsStore.shortSpeech} 
+          on:toggle={() => gameSettingsStore.updateSettings({ shortSpeech: !$gameSettingsStore.shortSpeech })}
+        />
+      </div>
+
+      <div class="settings-section">
+        <span class="settings-label">{$_('voiceSettings.speakFor')}</span>
+        <div class="button-group">
+          <button class:active={$gameSettingsStore.speechFor.player} onclick={() => gameSettingsStore.updateSettings({ speechFor: { ...$gameSettingsStore.speechFor, player: !$gameSettingsStore.speechFor.player } })}>{$_('voiceSettings.player')}</button>
+          <button class:active={$gameSettingsStore.speechFor.computer} onclick={() => gameSettingsStore.updateSettings({ speechFor: { ...$gameSettingsStore.speechFor, computer: !$gameSettingsStore.speechFor.computer } })}>{$_('voiceSettings.computer')}</button>
+        </div>
+      </div>
+
+      <hr class="divider"/>
+
       {#if isLoading}
         <div class="loader-container">
           <div class="loading-spinner"></div>
@@ -381,5 +416,42 @@
   .edge-fix-instructions button {
     width: 100%;
     margin-top: 16px;
+  }
+
+  .settings-section {
+    margin-bottom: 20px;
+  }
+
+  .settings-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 10px;
+  }
+
+  .button-group button {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .button-group button.active {
+    background-color: var(--text-accent, #ffbe0b);
+    color: #000;
+    font-weight: bold;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 20px 0;
   }
 </style> 

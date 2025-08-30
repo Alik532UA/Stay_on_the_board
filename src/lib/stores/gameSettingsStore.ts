@@ -31,6 +31,10 @@ export type GameSettingsState = {
   showDifficultyWarningModal: boolean;
   showGameInfoWidget: 'hidden' | 'shown' | 'compact';
   lockSettings: boolean;
+  speechRate: number;
+  speechOrder: 'dir_dist' | 'dist_dir';
+  shortSpeech: boolean;
+  speechFor: { player: boolean; computer: boolean };
 };
 
 const isBrowser = typeof window !== 'undefined';
@@ -65,6 +69,10 @@ const defaultGameSettings: GameSettingsState = {
     showDifficultyWarningModal: true,
     showGameInfoWidget: 'shown',
     lockSettings: false,
+    speechRate: 1,
+    speechOrder: 'dir_dist',
+    shortSpeech: false,
+    speechFor: { player: true, computer: true },
 };
 
 function loadGameSettings(): GameSettingsState {
@@ -139,9 +147,36 @@ function createGameSettingsStore() {
     
     applyPreset: (preset: GameModePreset) => {
         const presets: Record<GameModePreset, Partial<GameSettingsState>> = {
-            beginner: { gameMode: 'beginner', blockModeEnabled: false, autoHideBoard: false, speechEnabled: false, rememberGameMode: true },
-            experienced: { gameMode: 'experienced', blockModeEnabled: false, autoHideBoard: true, speechEnabled: true, rememberGameMode: true },
-            pro: { gameMode: 'pro', blockModeEnabled: true, autoHideBoard: true, speechEnabled: true, rememberGameMode: true }
+            beginner: { 
+                gameMode: 'beginner', 
+                blockModeEnabled: false, 
+                autoHideBoard: false, 
+                speechEnabled: false, 
+                rememberGameMode: true,
+                speechRate: 1,
+                shortSpeech: false,
+                speechFor: { player: true, computer: true },
+            },
+            experienced: { 
+                gameMode: 'experienced', 
+                blockModeEnabled: false, 
+                autoHideBoard: true, 
+                speechEnabled: true, 
+                rememberGameMode: true,
+                speechRate: 1.4,
+                shortSpeech: true,
+                speechFor: { player: false, computer: true },
+            },
+            pro: { 
+                gameMode: 'pro', 
+                blockModeEnabled: true, 
+                autoHideBoard: true, 
+                speechEnabled: true, 
+                rememberGameMode: true,
+                speechRate: 1.8,
+                shortSpeech: true,
+                speechFor: { player: false, computer: true },
+            }
         };
         methods.updateSettings(presets[preset]);
     },

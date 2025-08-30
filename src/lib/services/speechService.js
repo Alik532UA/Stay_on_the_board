@@ -2,6 +2,7 @@
 import { writable, get } from 'svelte/store';
 import { logService } from '$lib/services/logService.js';
 import { _ } from 'svelte-i18n';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
 
 // Прямий імпорт усіх необхідних перекладів
 import ukTranslations from '$lib/i18n/uk/speech.js';
@@ -100,6 +101,8 @@ export function speakMove(move, lang, voiceURI) {
     return;
   }
 
+  const settings = get(gameSettingsStore);
+
   const selectedVoice = voiceURI ? allVoices.find(v => v.voiceURI === voiceURI) : null;
   const availableVoices = filterVoicesByLang(allVoices, lang);
   let voiceToUse = selectedVoice || availableVoices[0] || null;
@@ -108,15 +111,25 @@ export function speakMove(move, lang, voiceURI) {
   const actualLangCode = voiceLang.split('-')[0];
   logService.speech(`[Speech] Determined language for speech: ${actualLangCode} (based on voice lang: ${voiceLang})`);
 
-  // Вибираємо правильний об'єкт перекладів, з фолбеком на англійську
-  // Вибираємо правильний об'єкт перекладів, з фолбеком на англійську
-const translations = actualLangCode in speechTranslations
-  ? speechTranslations[/** @type {keyof typeof speechTranslations} */ (actualLangCode)]
-  : speechTranslations['en'];
+  const translations = actualLangCode in speechTranslations
+    ? speechTranslations[/** @type {keyof typeof speechTranslations} */ (actualLangCode)]
+    : speechTranslations['en'];
   
   const directionText = translations.directions[move.direction] || move.direction;
+  const distanceText = String(move.distance);
+
+  let textToSpeak = '';
+
+  if (settings.shortSpeech && move.distance === 1) {
+    textToSpeak = directionText;
+  } else {
+    if (settings.speechOrder === 'dist_dir') {
+      textToSpeak = `${distanceText} ${directionText}`;
+    } else {
+      textToSpeak = `${directionText} ${distanceText}`;
+    }
+  }
   
-  const textToSpeak = `${directionText} ${move.distance}`;
   logService.speech(`[Speech] Generating text for "${actualLangCode}": "${textToSpeak}"`);
 
   speakText(textToSpeak, voiceLang, voiceURI);
@@ -140,8 +153,9 @@ export function speakText(textToSpeak, lang, voiceURI) {
       return;
   }
 
+  const settings = get(gameSettingsStore);
   const utterance = new SpeechSynthesisUtterance(textToSpeak);
-  utterance.rate = 1.0;
+  utterance.rate = settings.speechRate || 1.0;
   utterance.pitch = 1.0;
   
   let selectedVoice = null;

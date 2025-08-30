@@ -4,11 +4,12 @@ import { speakText, speakMove } from './speechService';
 import { modalService } from './modalService';
 import { gameEventBus } from './gameEventBus';
 import { logService } from './logService';
+import type { MoveDirectionType } from '$lib/models/Figure';
 
 export type SideEffect =
   | { type: 'navigate'; payload: string }
   | { type: 'speak'; payload: { text: string; lang: string; voiceURI: string | null } }
-  | { type: 'speak_move'; payload: { move: { direction: string; distance: number }; lang: string; voiceURI: string | null } }
+  | { type: 'speak_move'; payload: { move: { direction: MoveDirectionType; distance: number }; lang: string; voiceURI: string | null } }
   | { type: 'localStorage_set'; payload: { key: string; value: any } }
   | { type: 'ui/showGameOverModal'; payload: any }
   | { type: 'ui/closeModal' }

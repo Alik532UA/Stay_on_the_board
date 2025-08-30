@@ -2,6 +2,9 @@
 import { BaseGameMode } from './BaseGameMode';
 import type { Player } from '$lib/models/player';
 import { logService } from '$lib/services/logService';
+import { gameService } from '$lib/services/gameService';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+import { animationService } from '$lib/services/animationService';
 
 export class OnlineGameMode extends BaseGameMode {
   constructor() {
@@ -10,7 +13,16 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   initialize(options: { newSize?: number } = {}): void {
-    logService.GAME_MODE('[OnlineGameMode] Initializing...');
+    gameService.initializeNewGame({
+      size: options.newSize,
+      players: this.getPlayersConfiguration(),
+    });
+    gameSettingsStore.updateSettings({
+      speechRate: 1.6,
+      shortSpeech: true,
+      speechFor: { player: false, computer: true },
+    });
+    animationService.initialize();
     this.startTurn();
   }
 

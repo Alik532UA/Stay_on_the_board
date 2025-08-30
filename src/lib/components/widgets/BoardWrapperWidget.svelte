@@ -88,16 +88,7 @@
     }
   );
 
-  function getMoveInfo(row: number, col: number) {
-    if (!$showAvailableMoves) {
-      return { isAvailable: false, isPenalty: false };
-    }
-    const move = get(availableMoves).find(m => m.row === row && m.col === col);
-    if (move) {
-      return { isAvailable: true, isPenalty: move.isPenalty || false };
-    }
-    return { isAvailable: false, isPenalty: false };
-  }
+  
 
   function showBoardClickHint(e: Event) {
     if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
@@ -137,14 +128,14 @@
         <div class="game-board" style="--board-size: {$boardSize}" role="grid" data-testid="game-board">
           {#each Array($boardSize) as _, rowIdx (rowIdx)}
             {#each Array($boardSize) as _, colIdx (colIdx)}
-              {@const moveInfo = getMoveInfo(rowIdx, colIdx)}
+              {@const move = $showAvailableMoves ? $availableMoves.find(m => m.row === rowIdx && m.col === colIdx) : undefined}
               <BoardCell
                 {rowIdx}
                 {colIdx}
                 visualCellVisitCounts={$visualCellVisitCounts}
                 gameSettings={$gameSettingsStore}
-                isAvailable={moveInfo.isAvailable}
-                isPenalty={moveInfo.isPenalty}
+                isAvailable={!!move}
+                isPenalty={move?.isPenalty || false}
                 on:cellRightClick={(e) => onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
               />
             {/each}

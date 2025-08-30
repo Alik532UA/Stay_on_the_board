@@ -19,5 +19,13 @@ export default {
   iosWarning: "Attention! Due to technical features of iOS, voiceover may work unstably, especially for computer moves. We are working to improve this feature.",
   close: "Close",
   volume: "Volume",
-  volumeLabel: "Volume"
+  volumeLabel: "Volume",
+  speed: 'Speed',
+  order: 'Order',
+  dir_dist: 'Direction, distance',
+  dist_dir: 'Distance, direction',
+  shortSpeech: 'Short speech',
+  speakFor: 'Speak for',
+  player: 'Player move',
+  computer: 'Computer move'
 }; 
