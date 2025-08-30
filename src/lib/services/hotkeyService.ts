@@ -7,6 +7,7 @@ import { logService } from '$lib/services/logService.js';
 import { localInputProvider } from '$lib/services/localInputProvider';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { boardStore } from '$lib/stores/boardStore';
+import { modalStore } from '$lib/stores/modalStore.js';
 
 function changeBoardSize(increment: number) {
   const currentSize = get(boardStore)?.boardSize;
@@ -54,6 +55,9 @@ function executeAction(action: string) {
 }
 
 function handleHotkey(e: KeyboardEvent) {
+  const modal = get(modalStore);
+  if (modal && modal.isOpen) return;
+
   if (e.target && (e.target as HTMLElement).tagName !== 'BODY') return;
   
   if ((e.key === 'l' || e.key === 'д' || e.key === 'L' || e.key === 'Д') && import.meta.env.DEV) {
