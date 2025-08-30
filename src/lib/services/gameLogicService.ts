@@ -87,12 +87,25 @@ export function performMove(
     }
   };
 
+  const sideEffects = [];
+  if (settings.speechEnabled) {
+    sideEffects.push({
+      type: 'speak_move',
+      payload: {
+        move: { direction, distance },
+        lang: get(appSettingsStore)?.language || 'uk',
+        voiceURI: settings.selectedVoiceURI
+      }
+    });
+  }
+
   logService.logicMove('performMove: завершено успішно');
   return {
     success: true,
     changes,
     newPosition,
     bonusPoints: scoreChanges.bonusPoints,
-    penaltyPoints: scoreChanges.penaltyPointsForMove
+    penaltyPoints: scoreChanges.penaltyPointsForMove,
+    sideEffects
   };
 }

@@ -20,6 +20,7 @@ import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
+import { resetAllStores } from '$lib/services/testingService';
 
 export abstract class BaseGameMode implements IGameMode {
   public turnDuration: number = 0;
@@ -74,13 +75,14 @@ export abstract class BaseGameMode implements IGameMode {
   protected async onPlayerMoveSuccess(moveResult: any): Promise<void> {
     uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null, isFirstMove: false }) : null);
     
+    if (moveResult.sideEffects && moveResult.sideEffects.length > 0) {
+      logService.GAME_MODE('[BaseGameMode] Executing side effects for move...', moveResult.sideEffects);
+      moveResult.sideEffects.forEach((effect: SideEffect) => sideEffectService.execute(effect));
+    }
+
     await this.advanceToNextPlayer();
     
     availableMovesService.updateAvailableMoves();
-    
-    if (moveResult.sideEffects && moveResult.sideEffects.length > 0) {
-      moveResult.sideEffects.forEach((effect: SideEffect) => sideEffectService.execute(effect));
-    }
   }
 
   protected async onPlayerMoveFailure(reason: string | undefined, direction: MoveDirectionType, distance: number): Promise<void> {
@@ -128,8 +130,7 @@ export abstract class BaseGameMode implements IGameMode {
   
   cleanup(): void {
     logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
-    timeService.stopTurnTimer();
-    timeService.stopGameTimer();
+    resetAllStores();
   }
 
   pauseTimers(): void {

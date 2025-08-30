@@ -78,7 +78,8 @@ export const userActionService = {
 
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
-    gameService.initializeNewGame();
+    const currentBoardSize = get(boardStore)?.boardSize;
+    gameService.initializeNewGame({ size: currentBoardSize });
   },
 
   async requestReplay(): Promise<void> {

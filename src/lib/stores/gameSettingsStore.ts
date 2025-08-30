@@ -139,9 +139,9 @@ function createGameSettingsStore() {
     
     applyPreset: (preset: GameModePreset) => {
         const presets: Record<GameModePreset, Partial<GameSettingsState>> = {
-            beginner: { gameMode: 'beginner', boardSize: 4, blockModeEnabled: false, autoHideBoard: false, speechEnabled: false, showBoard: true, showPiece: true, showMoves: true, rememberGameMode: true },
-            experienced: { gameMode: 'experienced', boardSize: 4, blockModeEnabled: false, autoHideBoard: true, speechEnabled: true, showBoard: true, showPiece: true, showMoves: true, rememberGameMode: true },
-            pro: { gameMode: 'pro', boardSize: 4, blockModeEnabled: true, autoHideBoard: true, speechEnabled: true, showBoard: true, showPiece: true, showMoves: true, rememberGameMode: true }
+            beginner: { gameMode: 'beginner', blockModeEnabled: false, autoHideBoard: false, speechEnabled: false, rememberGameMode: true },
+            experienced: { gameMode: 'experienced', blockModeEnabled: false, autoHideBoard: true, speechEnabled: true, rememberGameMode: true },
+            pro: { gameMode: 'pro', blockModeEnabled: true, autoHideBoard: true, speechEnabled: true, rememberGameMode: true }
         };
         methods.updateSettings(presets[preset]);
     },

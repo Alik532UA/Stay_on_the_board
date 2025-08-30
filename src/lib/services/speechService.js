@@ -130,31 +130,36 @@ const translations = actualLangCode in speechTranslations
  */
 export function speakText(textToSpeak, lang, voiceURI) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window) || !textToSpeak) return;
+  
+  logService.speech(`[Speech] speakText called. Current speaking state: ${window.speechSynthesis.speaking}. Queued text: "${textToSpeak}"`);
+
   const allVoices = speechSynthesis.getVoices();
   if (allVoices.length === 0) {
-      logService.ui('[Speech] Speak called, but no voices are available.');
+      logService.speech('[Speech] No voices available, aborting speakText.');
       loadAndGetVoices();
       return;
   }
-  window.speechSynthesis.cancel();
+
   const utterance = new SpeechSynthesisUtterance(textToSpeak);
   utterance.rate = 1.0;
   utterance.pitch = 1.0;
+  
   let selectedVoice = null;
   if (voiceURI) {
     selectedVoice = allVoices.find(v => v.voiceURI === voiceURI);
     if (selectedVoice) {
       utterance.voice = selectedVoice;
       utterance.lang = selectedVoice.lang;
+      logService.speech(`[Speech] Found and set requested voice: ${selectedVoice.name}`);
     } else {
-      logService.ui(`[Speech] Voice with URI "${voiceURI}" not found. Using default for lang "${lang}".`);
+      logService.speech(`[Speech] Voice with URI "${voiceURI}" not found. Using default for lang "${lang}".`);
       utterance.lang = lang;
     }
   } else {
     utterance.lang = lang;
   }
-  logService.speech(`[Speech] Attempting to speak: "${textToSpeak}" with lang: ${utterance.lang}`);
-  setTimeout(() => {
-    window.speechSynthesis.speak(utterance);
-  }, 50);
+
+  logService.speech(`[Speech] Queuing utterance "${textToSpeak}" with lang: ${utterance.lang}`);
+  window.speechSynthesis.speak(utterance);
+  logService.speech(`[Speech] Utterance queued. Current speaking state: ${window.speechSynthesis.speaking}.`);
 }

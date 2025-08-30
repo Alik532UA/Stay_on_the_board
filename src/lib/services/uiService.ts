@@ -31,6 +31,5 @@ export function navigateToGame() {
       break;
   }
 
-  gameModeService.initializeGameMode(modeToInitialize);
   goto(`${base}${targetPath}`);
 }
