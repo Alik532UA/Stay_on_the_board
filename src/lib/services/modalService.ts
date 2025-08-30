@@ -47,10 +47,6 @@ export const modalService = {
 
   closeModal(): void {
     logService.modal('[ModalService] Closing modal.');
-    const gameMode = gameModeService.getCurrentMode();
-    if (gameMode) {
-      gameMode.resumeTimers();
-    }
     modalStore.closeModal();
   },
 
@@ -100,7 +96,7 @@ export const modalService = {
       buttons: [
         {
           textKey: 'modal.confirm',
-          onClick: () => userActionService.changeBoardSize(newSize),
+          onClick: () => userActionService.requestRestartWithSize(newSize),
           customClass: 'danger-btn',
           isHot: true,
         },
