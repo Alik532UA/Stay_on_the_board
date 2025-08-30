@@ -9,6 +9,7 @@
 import { writable, get } from 'svelte/store';
 import { logService } from '../services/logService.js';
 import { uiStateStore } from './uiStateStore.js';
+import { boardStore } from './boardStore.ts';
 
 export type KeybindingAction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right'|'confirm'|'no-moves'|'toggle-block-mode'|'toggle-board'|'increase-board'|'decrease-board'|'toggle-speech'|'distance-1'|'distance-2'|'distance-3'|'distance-4'|'distance-5'|'distance-6'|'distance-7'|'distance-8';
 export type GameModePreset = 'beginner' | 'experienced' | 'pro';
@@ -142,7 +143,10 @@ function createGameSettingsStore() {
     },
     toggleAutoHideBoard: () => update(state => ({ ...state, autoHideBoard: !state.autoHideBoard })),
     setGameInfoWidgetState: (newState: 'hidden' | 'shown' | 'compact') => update(state => ({ ...state, showGameInfoWidget: newState })),
-    toggleBlockMode: () => update(state => ({ ...state, blockModeEnabled: !state.blockModeEnabled })),
+    toggleBlockMode: () => {
+      update(state => ({ ...state, blockModeEnabled: !state.blockModeEnabled }));
+      boardStore.resetCellVisitCounts();
+    },
     toggleSimpleSpeech: () => update(state => ({ ...state, speechEnabled: !state.speechEnabled })),
     
     applyPreset: (preset: GameModePreset) => {

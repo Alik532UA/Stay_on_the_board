@@ -48,6 +48,12 @@ function createBoardStore() {
         return { ...state, cellVisitCounts: newCounts };
       });
     },
+    resetCellVisitCounts: () => {
+      update(state => {
+        if (!state) return null;
+        return { ...state, cellVisitCounts: {} };
+      });
+    },
     // Інші мутатори, специфічні для дошки...
   };
 }
