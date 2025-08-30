@@ -1,12 +1,14 @@
 // src/lib/services/SideEffectService.ts
 import { navigationService } from './navigationService';
-import { speakText } from './speechService';
+import { speakText, speakMove } from './speechService';
 import { modalService } from './modalService';
 import { gameEventBus } from './gameEventBus';
+import { logService } from './logService';
 
 export type SideEffect =
   | { type: 'navigate'; payload: string }
   | { type: 'speak'; payload: { text: string; lang: string; voiceURI: string | null } }
+  | { type: 'speak_move'; payload: { move: { direction: string; distance: number }; lang: string; voiceURI: string | null } }
   | { type: 'localStorage_set'; payload: { key: string; value: any } }
   | { type: 'ui/showGameOverModal'; payload: any }
   | { type: 'ui/closeModal' }
@@ -21,6 +23,10 @@ class SideEffectService {
         break;
       case 'speak':
         speakText(effect.payload.text, effect.payload.lang, effect.payload.voiceURI);
+        break;
+      case 'speak_move':
+        logService.speech('[SideEffectService] Received speak_move effect', effect.payload);
+        speakMove(effect.payload.move, effect.payload.lang, effect.payload.voiceURI);
         break;
       case 'localStorage_set':
         localStorage.setItem(effect.payload.key, JSON.stringify(effect.payload.value));
