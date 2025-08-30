@@ -19,5 +19,13 @@ export default {
   iosWarning: "Let op! Door technische beperkingen van iOS kan spraak soms onstabiel werken, vooral voor zetten van de computer. We werken aan verbetering van deze functie.",
   close: "Sluiten",
   volume: "Volume",
-  volumeLabel: "Volume"
+  volumeLabel: "Volume",
+  speed: 'Speed',
+  order: 'Order',
+  dir_dist: 'Direction, distance',
+  dist_dir: 'Distance, direction',
+  shortSpeech: 'Short speech',
+  speakFor: 'Speak for',
+  player: 'Player move',
+  computer: 'Computer move'
 }; 

@@ -24,6 +24,11 @@ export class LocalGameMode extends BaseGameMode {
       size: options.newSize,
       players: this.getPlayersConfiguration(),
     });
+    gameSettingsStore.updateSettings({
+      speechRate: 1.6,
+      shortSpeech: true,
+      speechFor: { player: false, computer: true },
+    });
     animationService.initialize();
     this.checkComputerTurn();
     this.startTurn();

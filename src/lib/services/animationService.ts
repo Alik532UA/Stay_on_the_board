@@ -3,6 +3,9 @@ import { get } from 'svelte/store';
 import { animationStore } from '$lib/stores/animationStore';
 import { boardStore } from '$lib/stores/boardStore';
 import { logService } from './logService';
+import { gameModeStore } from '$lib/stores/gameModeStore';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+import { animationConfig, type AnimationConfigMode, type AnimationConfigPreset } from '$lib/config/animationConfig';
 
 function createAnimationService() {
   let lastProcessedMoveIndex = 0;
@@ -38,7 +41,24 @@ function createAnimationService() {
 
     const isPlayerMove = move.player === 1;
     const animationDuration = 500;
-    const pauseAfterMove = isPlayerMove ? 1000 : 100;
+
+    const activeMode = get(gameModeStore).activeMode as AnimationConfigMode;
+    const currentPreset = get(gameSettingsStore).gameMode as AnimationConfigPreset | null;
+
+    let pauseValues = { player: 100, computer: 100 }; // Default values
+
+    if (activeMode === 'training') {
+      if (currentPreset && animationConfig.training[currentPreset]) {
+        pauseValues = animationConfig.training[currentPreset];
+      }
+    } else if (activeMode && animationConfig[activeMode]) {
+      const configForMode = animationConfig[activeMode];
+      if ('player' in configForMode) {
+        pauseValues = configForMode;
+      }
+    }
+
+    const pauseAfterMove = isPlayerMove ? pauseValues.player : pauseValues.computer;
 
     setTimeout(() => {
       if (!isPlayerMove) {
