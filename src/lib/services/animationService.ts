@@ -1,15 +1,14 @@
 // src/lib/services/animationService.ts
 import { get } from 'svelte/store';
 import { animationStore } from '$lib/stores/animationStore';
-import { boardStore } from '$lib/stores/boardStore';
 import { logService } from './logService';
 import { gameModeStore } from '$lib/stores/gameModeStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { animationConfig, type AnimationConfigMode, type AnimationConfigPreset } from '$lib/config/animationConfig';
+import { gameEventBus } from './gameEventBus';
 
 function createAnimationService() {
-  let lastProcessedMoveIndex = 0;
-  let isInitialized = false;
+  let unsubscribe: (() => void) | null = null;
 
   function addToAnimationQueue(move: any) {
     logService.animation('[AnimationService] addToAnimationQueue:', move);
@@ -72,35 +71,20 @@ function createAnimationService() {
     }, animationDuration + pauseAfterMove);
   }
 
-  function initializeSubscription(): void {
-    if (isInitialized) return;
-
-    const initialBoardState = get(boardStore);
-    lastProcessedMoveIndex = initialBoardState?.moveQueue?.length || 0;
-
-    boardStore.subscribe((currentBoardState) => {
-      if (!currentBoardState) {
-        animationStore.reset();
-        lastProcessedMoveIndex = 0;
-        return;
-      }
-
-      const newMoves = currentBoardState.moveQueue.slice(lastProcessedMoveIndex);
-      if (newMoves.length > 0) {
-        newMoves.forEach(addToAnimationQueue);
-        lastProcessedMoveIndex = currentBoardState.moveQueue.length;
-      }
-    });
-
-    isInitialized = true;
-  }
-
   return {
-    initialize: initializeSubscription,
+    initialize: () => {
+      if (unsubscribe) return; // Prevent multiple subscriptions
+      unsubscribe = gameEventBus.subscribe('new_move_added', addToAnimationQueue);
+    },
+    destroy: () => {
+      if (unsubscribe) {
+        unsubscribe();
+        unsubscribe = null;
+      }
+    },
     reset: () => {
       logService.animation('[AnimationService] reset() called');
       animationStore.reset();
-      lastProcessedMoveIndex = 0;
     }
   };
 }

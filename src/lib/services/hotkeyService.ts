@@ -1,6 +1,5 @@
 // src/lib/services/hotkeyService.ts
 import { get } from 'svelte/store';
-import { setDirection, setDistance } from '$lib/services/gameLogicService.js';
 import { userActionService } from '$lib/services/userActionService';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
@@ -33,24 +32,24 @@ function executeAction(action: string) {
     case 'toggle-board':
       gameSettingsStore.toggleShowBoard(undefined);
       break;
-    case 'up-left': setDirection('up-left'); break;
-    case 'up': setDirection('up'); break;
-    case 'up-right': setDirection('up-right'); break;
-    case 'left': setDirection('left'); break;
-    case 'right': setDirection('right'); break;
-    case 'down-left': setDirection('down-left'); break;
-    case 'down': setDirection('down'); break;
-    case 'down-right': setDirection('down-right'); break;
+    case 'up-left': userActionService.selectDirection('up-left'); break;
+    case 'up': userActionService.selectDirection('up'); break;
+    case 'up-right': userActionService.selectDirection('up-right'); break;
+    case 'left': userActionService.selectDirection('left'); break;
+    case 'right': userActionService.selectDirection('right'); break;
+    case 'down-left': userActionService.selectDirection('down-left'); break;
+    case 'down': userActionService.selectDirection('down'); break;
+    case 'down-right': userActionService.selectDirection('down-right'); break;
     case 'confirm': localInputProvider.confirmMove(); break;
     case 'no-moves': userActionService.claimNoMoves(); break;
-    case 'distance-1': setDistance(1); break;
-    case 'distance-2': setDistance(2); break;
-    case 'distance-3': setDistance(3); break;
-    case 'distance-4': setDistance(4); break;
-    case 'distance-5': setDistance(5); break;
-    case 'distance-6': setDistance(6); break;
-    case 'distance-7': setDistance(7); break;
-    case 'distance-8': setDistance(8); break;
+    case 'distance-1': userActionService.selectDistance(1); break;
+    case 'distance-2': userActionService.selectDistance(2); break;
+    case 'distance-3': userActionService.selectDistance(3); break;
+    case 'distance-4': userActionService.selectDistance(4); break;
+    case 'distance-5': userActionService.selectDistance(5); break;
+    case 'distance-6': userActionService.selectDistance(6); break;
+    case 'distance-7': userActionService.selectDistance(7); break;
+    case 'distance-8': userActionService.selectDistance(8); break;
   }
 }
 

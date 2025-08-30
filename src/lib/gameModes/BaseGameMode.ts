@@ -62,6 +62,11 @@ export abstract class BaseGameMode implements IGameMode {
       scoreStore.update(s => s ? ({ ...s, ...moveResult.changes.scoreState }) : null);
       uiStateStore.update(s => s ? ({ ...s, ...moveResult.changes.uiState }) : null);
       
+      const newMove = moveResult.changes.boardState.moveQueue.slice(-1)[0];
+      if (newMove) {
+        gameEventBus.dispatch('new_move_added', newMove);
+      }
+
       await this.applyScoreChanges(moveResult);
       await this.onPlayerMoveSuccess(moveResult);
     } else {
@@ -114,6 +119,8 @@ export abstract class BaseGameMode implements IGameMode {
         moveHistory: updatedMoveHistory
       };
     });
+
+    gameEventBus.dispatch('new_move_added', finalMoveForAnimation);
 
     if (reason === 'out_of_bounds') {
       await endGameService.endGame('modal.gameOverReasonOut');
