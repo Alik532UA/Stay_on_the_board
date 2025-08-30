@@ -138,6 +138,7 @@ export abstract class BaseGameMode implements IGameMode {
   }
 
   resumeTimers(): void {
+    logService.GAME_MODE(`[${this.constructor.name}] Resuming timers.`);
     timeService.resumeGameTimer();
   }
 

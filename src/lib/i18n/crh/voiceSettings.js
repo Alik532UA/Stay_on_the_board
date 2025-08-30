@@ -19,5 +19,13 @@ export default {
   iosWarning: "Diqqat! iOS'un texnik hususiyetleri sebebinden, sesli oynatma bazen sabit olmayabilir, hususan kompyuter areketleri içün. Biz bu funksiyanı yaxşılamağa çalışamız.",
   close: "Qapat",
   volume: "Ses",
-  volumeLabel: "Ses"
+  volumeLabel: "Ses",
+  speed: 'Speed',
+  order: 'Order',
+  dir_dist: 'Direction, distance',
+  dist_dir: 'Distance, direction',
+  shortSpeech: 'Short speech',
+  speakFor: 'Speak for',
+  player: 'Player move',
+  computer: 'Computer move'
 }; 

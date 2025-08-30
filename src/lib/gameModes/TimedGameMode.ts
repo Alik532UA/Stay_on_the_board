@@ -4,6 +4,8 @@ import { endGameService } from '$lib/services/endGameService';
 import { get } from 'svelte/store';
 import { TrainingGameMode } from './TrainingGameMode';
 import { uiStateStore } from '$lib/stores/uiStateStore';
+import { timerStore } from '$lib/stores/timerStore';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 
 export class TimedGameMode extends TrainingGameMode {
   constructor() {
@@ -13,6 +15,12 @@ export class TimedGameMode extends TrainingGameMode {
 
   initialize(options: { newSize?: number } = {}): void {
     super.initialize(options);
+    timerStore.setRemainingTime(this.gameDuration);
+    gameSettingsStore.updateSettings({
+      speechRate: 1.6,
+      shortSpeech: true,
+      speechFor: { player: false, computer: true },
+    });
   }
 
   async handlePlayerMove(direction: any, distance: any): Promise<void> {

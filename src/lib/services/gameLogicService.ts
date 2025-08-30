@@ -9,6 +9,7 @@ import { uiStateStore } from '$lib/stores/uiStateStore';
 import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
+import { appSettingsStore } from '$lib/stores/appSettingsStore';
 
 export function setDirection(dir: Direction) {
   logService.logicMove(`[gameLogicService] setDirection called with: ${dir}`);
@@ -88,7 +89,12 @@ export function performMove(
   };
 
   const sideEffects = [];
-  if (settings.speechEnabled) {
+  const currentPlayer = currentState.players[playerIndex];
+  const shouldSpeak = (settings.speechEnabled && 
+                      (currentPlayer.isComputer && settings.speechFor.computer) || 
+                      (!currentPlayer.isComputer && settings.speechFor.player));
+
+  if (shouldSpeak) {
     sideEffects.push({
       type: 'speak_move',
       payload: {
