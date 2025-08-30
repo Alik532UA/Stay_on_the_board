@@ -28,6 +28,19 @@
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
 
+  let testModeEnabled = false;
+  
+  onMount(() => {
+    const unsubscribe = testModeStore.subscribe(state => {
+      testModeEnabled = state.isEnabled;
+    });
+    return unsubscribe;
+  });
+  
+  function handleTestModeChange() {
+    toggleTestMode();
+  }
+
 	onMount(async () => {
 		try {
 			const response = await fetch(`${base}/version.json?v=${new Date().getTime()}`);
@@ -127,6 +140,14 @@
 	</div>
 {/if}
 
+{#if import.meta.env.DEV}
+  <div class="test-mode-toggle">
+    <button on:click={handleTestModeChange} class:active={testModeEnabled} data-testid="test-mode-btn">
+      Test Mode: {testModeEnabled ? 'ON' : 'OFF'}
+    </button>
+  </div>
+{/if}
+
 <style>
 	.app {
 		display: flex;
@@ -169,4 +190,24 @@
 			padding: 12px 0;
 		}
 	}
+
+  .test-mode-toggle {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 1000;
+  }
+  .test-mode-toggle button {
+    background: #555;
+    color: white;
+    border: 2px solid #777;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+  .test-mode-toggle button.active {
+    background: #4CAF50;
+    border-color: #81C784;
+  }
 </style>
