@@ -11,33 +11,6 @@ import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { appSettingsStore } from '$lib/stores/appSettingsStore';
 
-export function setDirection(dir: Direction) {
-  logService.logicMove(`[gameLogicService] setDirection called with: ${dir}`);
-  const uiState = get(uiStateStore);
-  const boardState = get(boardStore);
-  if (!uiState || !boardState) return;
-
-  const { boardSize } = boardState;
-  const { selectedDirection, selectedDistance } = uiState;
-  const maxDist = boardSize - 1;
-  let newDistance = selectedDistance;
-
-  if (selectedDirection !== dir) {
-    newDistance = 1;
-  } else {
-    newDistance = (!selectedDistance || selectedDistance >= maxDist) ? 1 : selectedDistance + 1;
-  }
-  
-  uiStateStore.update(s => s ? ({ ...s, selectedDirection: dir, selectedDistance: newDistance }) : null);
-  
-  logService.logicMove('setDirection: встановлено напрямок', { dir, newDistance });
-}
-
-export function setDistance(dist: number) {
-  logService.logicMove(`[gameLogicService] setDistance called with: ${dist}`);
-  uiStateStore.update(s => s ? ({ ...s, selectedDistance: dist }) : null);
-}
-
 export function performMove(
   direction: MoveDirectionType,
   distance: number,

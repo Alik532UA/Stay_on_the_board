@@ -6,7 +6,6 @@ import { gameStore } from '$lib/stores/gameStore';
 import { modalService } from './modalService';
 import { gameModeService } from './gameModeService';
 import { logService } from './logService.js';
-import * as gameLogicService from '$lib/services/gameLogicService.js';
 import type { Direction } from '$lib/utils/gameUtils';
 import { navigationService } from './navigationService';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
@@ -26,11 +25,30 @@ import { navigateToGame } from './uiService'; // Add this import
 
 export const userActionService = {
   selectDirection(direction: Direction): void {
-    gameLogicService.setDirection(direction);
+    logService.logicMove(`[userActionService] setDirection called with: ${direction}`);
+    const uiState = get(uiStateStore);
+    const boardState = get(boardStore);
+    if (!uiState || !boardState) return;
+
+    const { boardSize } = boardState;
+    const { selectedDirection, selectedDistance } = uiState;
+    const maxDist = boardSize - 1;
+    let newDistance = selectedDistance;
+
+    if (selectedDirection !== direction) {
+      newDistance = 1;
+    } else {
+      newDistance = (!selectedDistance || selectedDistance >= maxDist) ? 1 : selectedDistance + 1;
+    }
+    
+    uiStateStore.update(s => s ? ({ ...s, selectedDirection: direction, selectedDistance: newDistance }) : null);
+    
+    logService.logicMove('setDirection: встановлено напрямок', { dir: direction, newDistance });
   },
 
   selectDistance(distance: number): void {
-    gameLogicService.setDistance(distance);
+    logService.logicMove(`[userActionService] setDistance called with: ${distance}`);
+    uiStateStore.update(s => s ? ({ ...s, selectedDistance: distance }) : null);
   },
 
   confirmMove(): void {

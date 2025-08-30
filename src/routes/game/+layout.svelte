@@ -13,11 +13,11 @@
   import { userActionService } from '$lib/services/userActionService';
   import { logService } from '$lib/services/logService.js';
   import { onMount, onDestroy } from 'svelte';
-  import { gameOrchestrator } from '$lib/gameOrchestrator';
   import PlayerColorProvider from '$lib/components/PlayerColorProvider.svelte';
   import { initializeHotkeyService } from '$lib/services/hotkeyService';
   import { testModeStore } from '$lib/stores/testModeStore'; // <-- ДОДАНО: Імпорт правильного стору
   import '$lib/services/commandService.ts';
+  import { animationService } from '$lib/services/animationService';
 
   onDestroy(() => {
     logService.GAME_MODE('Game layout is being destroyed, cleaning up game mode.');
@@ -30,15 +30,17 @@
   onMount(() => {
     // ЗМІНЕНО: Перевіряємо isEnabled з testModeStore, а не testMode з appSettingsStore
     if (import.meta.env.DEV || get(testModeStore)?.isEnabled) {
-  	(window as any).gameOrchestrator = gameOrchestrator;
   	(window as any).userActionService = userActionService;
   	(window as any).gameModeService = gameModeService;
   	(window as any).appSettingsStore = appSettingsStore;
   	(window as any).gameSettingsStore = gameSettingsStore;
     }
     const hotkeyService = initializeHotkeyService();
+    animationService.initialize();
+
     return () => {
         hotkeyService.destroy();
+        animationService.destroy();
     };
   });
 </script>
