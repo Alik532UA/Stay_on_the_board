@@ -161,7 +161,7 @@
           {/if}
           <h2 class="modal-title" data-testid={`${$modalState.dataTestId}-title`} data-i18n-key={$modalState.titleKey}>
             {#if $i18nReady && $modalState.titleKey}
-              {@html $_($modalState.titleKey, {
+              {$_($modalState.titleKey, {
                 values: $modalState.content as any
               })}
             {:else}
@@ -406,6 +406,7 @@
   color: #fffde7;
   text-align: center;
   flex: 1;
+  white-space: pre-line;
 }
 .modal-close {
   position: absolute;

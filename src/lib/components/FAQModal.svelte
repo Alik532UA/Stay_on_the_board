@@ -38,7 +38,7 @@
         </svg>
       </span>
     </summary>
-    <p>{@html $_(item.a)}</p>
+    <p>{$_(item.a)}</p>
   </details>
 {/each}
 

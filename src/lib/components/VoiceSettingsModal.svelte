@@ -157,11 +157,11 @@
           {#if isEdge}
             <div class="edge-fix-instructions">
               <h4>{$_('voiceSettings.edgeFixTitle')}</h4>
-              <ol>
-                <li>{@html $_('voiceSettings.edgeFixStep1')}</li>
-                <li>{@html $_('voiceSettings.edgeFixStep2')}</li>
-                <li>{@html $_('voiceSettings.edgeFixStep3')}</li>
-                <li>{@html $_('voiceSettings.edgeFixStep4')}</li>
+              <ol class="edge-fix-steps">
+                <li>{$_('voiceSettings.edgeFixStep1')}</li>
+                <li>{$_('voiceSettings.edgeFixStep2')}</li>
+                <li>{$_('voiceSettings.edgeFixStep3')}</li>
+                <li>{$_('voiceSettings.edgeFixStep4')}</li>
               </ol>
               <p>{$_('voiceSettings.edgeFixStep5')}</p>
               <button class="modal-btn-generic primary" onclick={recheckVoices}>
@@ -404,6 +404,9 @@
   .edge-fix-instructions ol {
     padding-left: 20px;
     margin-bottom: 12px;
+  }
+  .edge-fix-instructions .edge-fix-steps li {
+    white-space: pre-line;
   }
   .edge-fix-instructions li {
     margin-bottom: 8px;

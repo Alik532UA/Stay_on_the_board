@@ -8,7 +8,9 @@ export default {
   scoreLabel: "Esap",
   cashOut: "Yañı oyun başla",
   cashOutTooltip: "Ballarnı alıp yañı oyun başla",
-  cashOutLocal: "Oyunnı<br>erkenden<br>bitir",
+  cashOutLocal: `Oyunnı
+erkenden
+bitir`,
   tutorialTitle: "",
   tutorialContent: "Siziñ maqsadıñız – nevbetnen ortaq figurani tahtadan tışarı çıqarmadan areket ettirmektir. Er bir areket içün daa çoq bal qazanmaq içün, sozlamalarda vezirni ya da tahtanı gizletiñiz!",
   info: "Talimat",

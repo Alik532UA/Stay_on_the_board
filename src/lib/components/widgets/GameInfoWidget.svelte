@@ -30,20 +30,31 @@
   const displayMessage = derived(
     [playerStore, uiStateStore, lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves, _, gameSettingsStore],
     ([$playerStore, $uiStateStore, $lastComputerMove, $lastPlayerMove, $isPlayerTurn, $isPauseBetweenMoves, $_, $gameSettingsStore]) => {
-      if (!$playerStore || !$uiStateStore) return '';
+      if (!$playerStore || !$uiStateStore) return { type: 'SIMPLE', content: '' };
 
       const isCompact = $gameSettingsStore.showGameInfoWidget === 'compact';
       const humanPlayersCount = $playerStore.players.filter((p: any) => p.type === 'human').length;
       const isLocalGame = humanPlayersCount > 1;
 
-      if ($uiStateStore.isGameOver) return $_('gameBoard.gameInfo.gameOver');
+      if ($uiStateStore.isGameOver) return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.gameOver') };
       if ($uiStateStore.isFirstMove) {
         if (isLocalGame) {
           const currentPlayer = $playerStore.players[$playerStore.currentPlayerIndex];
-          const playerStyle = getPlayerNameStyle($playerStore.players, currentPlayer.name);
-          return `Гра почалась!<br><div><span class="player-name-plate" style="${playerStyle}">${currentPlayer.name}</span>, ваша черга робити хід</div>`;
+          return {
+            type: 'STRUCTURED',
+            lines: [
+              { type: 'line', parts: [{ type: 'text', content: 'Гра почалась!' }] },
+              {
+                type: 'line',
+                parts: [
+                  { type: 'player', name: currentPlayer.name, style: getPlayerNameStyle($playerStore.players, currentPlayer.name) },
+                  { type: 'text', content: ', ваша черга робити хід' }
+                ]
+              }
+            ]
+          };
         }
-        return $_('gameBoard.gameInfo.firstMove');
+        return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.firstMove') };
       }
       
       if ($lastComputerMove && !$isPauseBetweenMoves) {
@@ -52,42 +63,67 @@
         const distance = $lastComputerMove.distance;
 
         if (isCompact) {
-          const arrow = directionArrows[$lastComputerMove.direction] || '?';
           return {
-            isCompact: true,
+            type: 'COMPACT_COMPUTER_MOVE',
             part1: $_('gameBoard.gameInfo.computerMadeMovePart1'),
-            move: `${arrow}${distance}`,
+            move: `${directionArrows[$lastComputerMove.direction] || '?'}${distance}`,
             part2: $_('gameBoard.gameInfo.computerMadeMovePart2')
           };
         }
-        return $_('gameBoard.gameInfo.computerMadeMove', { values: { direction, distance } });
+        return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.computerMadeMove', { values: { direction, distance } }) };
       }
 
       if ($lastPlayerMove && !$isPauseBetweenMoves && isLocalGame) {
         const currentPlayer = $playerStore.players[$playerStore.currentPlayerIndex];
         const previousPlayerIndex = ($playerStore.currentPlayerIndex + $playerStore.players.length - 1) % $playerStore.players.length;
         const previousPlayer = $playerStore.players[previousPlayerIndex];
-        const previousPlayerStyle = getPlayerNameStyle($playerStore.players, previousPlayer.name);
-        const currentPlayerStyle = getPlayerNameStyle($playerStore.players, currentPlayer.name);
         const directionKey = $lastPlayerMove.direction.replace(/-(\w)/g, (_: string, c: string) => c.toUpperCase());
         const direction = $_(`gameBoard.directions.${directionKey}`);
-        return `<div class="message-line-1"><span class="player-name-plate" style="${previousPlayerStyle}">${previousPlayer.name}</span> зробив хід: ${direction} на ${$lastPlayerMove.distance}.</div><div class="message-line-2"><span class="player-name-plate" style="${currentPlayerStyle}">${currentPlayer.name}</span> ваша черга робити хід!</div>`;
+        return {
+          type: 'STRUCTURED',
+          lines: [
+            {
+              type: 'line',
+              parts: [
+                { type: 'player', name: previousPlayer.name, style: getPlayerNameStyle($playerStore.players, previousPlayer.name) },
+                { type: 'text', content: ` зробив хід: ${direction} на ${$lastPlayerMove.distance}.` }
+              ]
+            },
+            {
+              type: 'line',
+              parts: [
+                { type: 'player', name: currentPlayer.name, style: getPlayerNameStyle($playerStore.players, currentPlayer.name) },
+                { type: 'text', content: ' ваша черга робити хід!' }
+              ]
+            }
+          ]
+        };
       }
 
-      if ($isPauseBetweenMoves) return $_('gameBoard.gameInfo.pauseBetweenMoves');
+      if ($isPauseBetweenMoves) return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.pauseBetweenMoves') };
 
       if ($isPlayerTurn) {
         if (isLocalGame) {
           const currentPlayer = $playerStore.players[$playerStore.currentPlayerIndex];
-          const currentPlayerStyle = getPlayerNameStyle($playerStore.players, currentPlayer.name);
-          return `Хід гравця: <span class="player-name-plate" style="${currentPlayerStyle}">${currentPlayer.name}</span>`;
+          return {
+            type: 'STRUCTURED',
+            lines: [
+              {
+                type: 'line',
+                parts: [
+                  { type: 'text', content: 'Хід гравця: ' },
+                  { type: 'player', name: currentPlayer.name, style: getPlayerNameStyle($playerStore.players, currentPlayer.name) }
+                ]
+              }
+            ]
+          };
         }
-        return $_('gameBoard.gameInfo.playerTurn');
+        return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.playerTurn') };
       }
 
-      if (!$isPlayerTurn) return $_('gameBoard.gameInfo.computerTurn');
+      if (!$isPlayerTurn) return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.computerTurn') };
 
-      return $_('gameBoard.gameInfo.gameStarted');
+      return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.gameStarted') };
     }
   );
 </script>
@@ -103,14 +139,26 @@
       <div class="game-info-content" data-testid="game-info-content">
         {#key $displayMessage}
           <div class="fade-wrapper" in:fade={{ duration: 250, delay: 250 }} out:fade={{ duration: 250 }}>
-            {#if typeof $displayMessage === 'object' && $displayMessage.isCompact}
+            {#if $displayMessage.type === 'COMPACT_COMPUTER_MOVE'}
               <div class="compact-message-line">
                 <span>{$displayMessage.part1}</span>
                 <span class="compact-move-display">{$displayMessage.move}</span>
               </div>
               <span>{$displayMessage.part2}</span>
+            {:else if $displayMessage.type === 'STRUCTURED'}
+              {#each $displayMessage.lines as line}
+                <div class="message-line">
+                  {#each line.parts as part}
+                    {#if part.type === 'text'}
+                      <span>{part.content}</span>
+                    {:else if part.type === 'player'}
+                      <span class="player-name-plate" style={part.style}>{part.name}</span>
+                    {/if}
+                  {/each}
+                </div>
+              {/each}
             {:else}
-              {@html $displayMessage}
+              {$displayMessage.content}
             {/if}
           </div>
         {/key}
@@ -163,7 +211,7 @@
     width: 100%;
   }
 
-  :global(.message-line-1), :global(.message-line-2) {
+  .message-line {
     text-align: center;
     width: 100%;
   }

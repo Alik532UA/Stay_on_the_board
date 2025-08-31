@@ -177,7 +177,7 @@
       </div>
     {/if}
     <button class="cash-out-btn" on:click={cashOutAndEndGame} use:customTooltip={isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOutTooltip')} data-testid="cash-out-btn">
-      {@html isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}
+      {isMultiplayer ? $_('gameBoard.cashOutLocal') : $_('gameBoard.cashOut')}
     </button>
   </div>
 {/if}
@@ -275,6 +275,7 @@
     cursor: pointer;
     transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
     box-shadow: 0 2px 8px var(--shadow-color);
+    white-space: pre-line;
   }
   .cash-out-btn:hover {
     background: var(--control-hover);
