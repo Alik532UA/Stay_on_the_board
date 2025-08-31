@@ -38,7 +38,9 @@ export default {
     penalty: "Straf voor omgekeerde zetten:",
     finalScore: "Eindscore:",
     yourScore: "Jouw score:",
-    playerScore: "{playerName}: {score} punten"
+    playerScore: "{playerName}: {score} punten",
+    bonusPoints: "Bonuspunten:",
+    bonusScore: "Bonuspunten: +{bonus}"
   },
   boardClickTitle: "Hoe bestuur je het spel?",
   boardClickContent: "Het spel wordt niet op het bord bestuurd, maar met het bedieningspaneel eronder. Gebruik de pijlen om een richting te kiezen en de nummer knoppen om een afstand te kiezen. Het bord is alleen om de zetten te observeren.",

@@ -53,6 +53,6 @@ export default defineConfig({
 		sourcemap: true,
 	},
 	test: {
-		exclude: ['tests/**']
-	}
+    include: ['tests/**/*.test.ts']
+  }
 });
