@@ -170,7 +170,10 @@
           </h2>
         </div>
 
-        {#if !(($modalState.buttons && $modalState.buttons.length === 2 && $modalState.buttons.every(btn => typeof btn.onClick === 'function')) || $modalState.titleKey === 'modal.gameOverTitle' || ($modalState.buttons && $modalState.buttons.length === 1))}
+        {#if !(($modalState.buttons && $modalState.buttons.length === 2 && $modalState.buttons.every(btn => typeof btn.onClick === 'function')) || (
+            $modalState.titleKey && 
+            ['modal.gameOverTitle', 'modal.trainingOverTitle', 'modal.winnerTitle', 'modal.drawTitle'].includes($modalState.titleKey)
+          ) || ($modalState.buttons && $modalState.buttons.length === 1))}
           {#if $modalState.closable}
             <button class="modal-close" use:hotkeyTooltip={{ key: 'ESC' }} on:click={() => { logService.ui('Закриття модального вікна (X)'); modalStore.closeModal(); }} data-testid={`${$modalState.dataTestId}-close-btn`}>×</button>
           {/if}

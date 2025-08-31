@@ -5630,3 +5630,5 @@ data-testid="game-over-modal-title"
 "game-over-modal"
 Актуальний результат: пристуній data-testid="game-over-modal-close-btn"
 Очікуваний результат: немає кнопки закрити!
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
