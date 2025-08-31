@@ -21,7 +21,7 @@
 
   let expertVolume = 0.3;
   let volumePercentage = 30;
-  let isCompactScoreMode = false;
+  let isCompactScoreMode = true;
   let processingButtons: boolean[] = [];
   let currentModalContext: string | null = null;
 
@@ -129,12 +129,13 @@
   function checkCompactMode() {
     if (modalContent) {
       const hasScroll = modalContent.scrollHeight > modalContent.clientHeight;
+      logService.ui(`[Modal] checkCompactMode for ${$modalState.dataTestId}: scrollHeight=${modalContent.scrollHeight}, clientHeight=${modalContent.clientHeight}, hasScroll=${hasScroll}`);
       isCompactScoreMode = hasScroll;
     }
   }
 
   $: if ($modalState.isOpen && modalContent) {
-    setTimeout(checkCompactMode, 100);
+    tick().then(checkCompactMode);
   }
 
   function onOverlayKeyDown(e: KeyboardEvent) {

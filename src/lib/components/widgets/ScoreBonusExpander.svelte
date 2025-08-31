@@ -7,7 +7,7 @@
   export let totalBonus: number;
   export let expanded = false;
 
-  let isOpen: boolean = expanded;
+  $: isOpen = expanded;
 
   const dispatch = createEventDispatcher();
 

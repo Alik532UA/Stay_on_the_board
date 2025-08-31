@@ -31,7 +31,7 @@ const defaultConfig = {
           [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
           [LOG_GROUPS.LOGIC_TIME]: false,
           [LOG_GROUPS.SCORE]: false,
-          [LOG_GROUPS.UI]: false, 
+          [LOG_GROUPS.UI]: true, 
           [LOG_GROUPS.TOOLTIP]: false,
           [LOG_GROUPS.ANIMATION]: true,
           [LOG_GROUPS.INIT]: true,
