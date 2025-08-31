@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+  import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
   import { _ } from 'svelte-i18n';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { logService } from '$lib/services/logService.js';
   import { onMount, onDestroy } from 'svelte';
   import hotkeyService from '$lib/services/hotkeyService';
 
-  export let dataTestId = '';
+  export let tid = '';
   export let modalType: 'gameMode' | 'expertMode' = 'gameMode';
   export let scope: string;
 
@@ -49,7 +49,7 @@
     <div
       class="switch-content-wrapper"
       use:hotkeyTooltip={{ key: 'X' }}
-      data-testid={dataTestId}
+      data-testid={tid}
     >
       <div class="ios-switch">
         <input
