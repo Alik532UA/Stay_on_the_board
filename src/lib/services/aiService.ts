@@ -27,15 +27,15 @@ class AiService {
     const availableMoves = calculateAvailableMoves(boardState, playerState, get(gameSettingsStore));
 
     if (availableMoves.length === 0) {
-      logService.logicAI('getComputerMove: немає доступних ходів');
+      logService.logicVirtualPlayer('getComputerMove: немає доступних ходів');
       return null;
     }
 
     const randomIndex = Math.floor(Math.random() * availableMoves.length);
     const randomMove = availableMoves[randomIndex];
     
-    logService.logicAI('getComputerMove: знайдено доступні ходи', availableMoves);
-    logService.logicAI('getComputerMove: обрано випадковий хід', randomMove);
+    logService.logicVirtualPlayer('getComputerMove: знайдено доступні ходи', availableMoves);
+    logService.logicVirtualPlayer('getComputerMove: обрано випадковий хід', randomMove);
     
     return randomMove;
   }
