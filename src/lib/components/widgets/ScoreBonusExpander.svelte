@@ -24,12 +24,15 @@
     'distanceBonus',
     'finishBonus'
   ];
+
+  // Use reactive statements instead of {@const}
+  $: fullText = $_('modal.scoreDetails.bonusScore', { values: { bonus: totalBonus } });
+  $: parts = fullText.split('+');
+
 </script>
 
 <div class="bonus-expander" class:open={isOpen}>
   <div class="expander-summary" on:click={toggle} on:keydown={e => e.key === 'Enter' && toggle()} role="button" tabindex="0">
-    {@const fullText = $_('modal.scoreDetails.bonusScore', { values: { bonus: totalBonus } })}
-    {@const parts = fullText.split('+')}
     <span class="bonus-score-summary" data-testid="total-bonus-summary">
       {parts[0]}<span class="bonus-value">+{parts[1] || totalBonus}</span>
     </span>
@@ -68,11 +71,13 @@
 
   .bonus-score-summary {
     font-weight: normal;
+    color: var(--text-secondary);
   }
 
   .bonus-value {
     color: var(--confirm-action-bg);
     font-weight: bold;
+    margin-left: 0.5em;
   }
 
   .arrow {
