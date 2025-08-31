@@ -2,11 +2,12 @@
 	import Header from './Header.svelte';
 	import '../app.css';
 	import { appSettingsStore } from '$lib/stores/appSettingsStore';
+	import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 	import { get } from 'svelte/store';
 	import { initializeI18n, i18nReady } from '$lib/i18n/init.js';
 	import { appVersion } from '$lib/stores/versionStore.js';
 	import { assets } from '$app/paths';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { base } from '$app/paths';
 	import UpdateNotification from '$lib/components/UpdateNotification.svelte';
 	import { clearCache } from '$lib/utils/cacheManager.js';
@@ -24,24 +25,30 @@
 	import { testModeStore, toggleTestMode } from '$lib/stores/testModeStore';
 	import { initializeTestModeSync } from '$lib/services/testModeService';
 	import { resetAllStores } from '$lib/services/testingService';
+	import hotkeyService from '$lib/services/hotkeyService';
+	
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
 
   let testModeEnabled = false;
+  let unsubscribeTestMode: () => void;
   
   onMount(() => {
-    const unsubscribe = testModeStore.subscribe(state => {
+    unsubscribeTestMode = testModeStore.subscribe(state => {
       testModeEnabled = state.isEnabled;
     });
-    return unsubscribe;
+  });
+
+  onDestroy(() => {
+    if (unsubscribeTestMode) unsubscribeTestMode();
   });
   
   function handleTestModeChange() {
     toggleTestMode();
   }
 
-	onMount(async () => {
+	async function initializeApp() {
 		try {
 			const response = await fetch(`${base}/version.json?v=${new Date().getTime()}`);
 			if (!response.ok) return;
@@ -57,7 +64,9 @@
 				localStorage.setItem(APP_VERSION_KEY, serverVersion);
 			}
 			appSettingsStore.init();
+			gameSettingsStore.init();
 			initializeI18n();
+			
 			initializeTestModeSync(); // <-- ДОДАНО: Ініціалізація сервісу-моста
 		} catch (error) {
 			logService.init('Failed to check for app update:', error);
@@ -68,25 +77,31 @@
 			(window as any).toggleTestMode = toggleTestMode;
 			(window as any).resetAllStores = resetAllStores; // Add reset function to window
 		}
-	});
+	}
 
 	onMount(() => {
+		initializeApp();
+
+		
+
+		if (import.meta.env.DEV) {
+			hotkeyService.register('global', '[', (e: KeyboardEvent) => {
+				e.preventDefault();
+				showUpdateNotice = !showUpdateNotice;
+			});
+		}
+		hotkeyService.register('global', 't', (e: KeyboardEvent) => {
+			if (e.ctrlKey && e.altKey) {
+				e.preventDefault();
+				toggleTestMode();
+			}
+		});
+
 		document.body.classList.remove('preload-theme');
 	});
 
 	function handleReload() {
 		clearCache({ keepAppearance: true });
-	}
-
-	function handleDevKeys(event: KeyboardEvent) {
-		if (import.meta.env.DEV && event.code === 'BracketRight') {
-			event.preventDefault();
-			showUpdateNotice = !showUpdateNotice;
-		}
-		if (event.ctrlKey && event.altKey && event.code === 'KeyT') {
-			event.preventDefault();
-			toggleTestMode();
-		}
 	}
 
 	afterNavigate(() => {
@@ -100,7 +115,7 @@
 	});
 </script>
 
-<svelte:window on:keydown={handleDevKeys} />
+
 
 {#if showUpdateNotice}
 	<UpdateNotification on:reload={handleReload} />

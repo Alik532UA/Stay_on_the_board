@@ -4,6 +4,7 @@
   import SvgIcons from '../SvgIcons.svelte';
   import { clearCache } from '$lib/utils/cacheManager.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
+  import hotkeyService from '$lib/services/hotkeyService';
 
   let isVisible = false;
 
@@ -11,23 +12,9 @@
     clearCache({ keepAppearance: false });
   }
 
-  function handleKeydown(/** @type {KeyboardEvent} */ event) {
-    // R або К (українська К)
-    if ((event.key === 'r' || event.key === 'к' || event.key === 'R' || event.key === 'К') && import.meta.env.DEV) {
-      event.preventDefault();
-      handleClearCache();
-    }
-  }
-
   onMount(() => {
     if (import.meta.env.DEV) {
-      document.addEventListener('keydown', handleKeydown);
-    }
-  });
-
-  onDestroy(() => {
-    if (import.meta.env.DEV) {
-      document.removeEventListener('keydown', handleKeydown);
+      hotkeyService.register('global', 'KeyR', handleClearCache);
     }
   });
 </script>
@@ -64,7 +51,8 @@
     class="dev-clear-cache-button" 
     use:customTooltip={`${$_('gameBoard.clearCache')} (R/К)`}
     on:click={handleClearCache}
+    data-testid="dev-clear-cache-btn"
   >
     <SvgIcons name="clear-cache" />
   </button>
-{/if} 
+{/if}

@@ -5,6 +5,8 @@
   import { onMount } from 'svelte';
   import { customTooltip } from '$lib/actions/customTooltip.js';
   import { userActionService } from '$lib/services/userActionService';
+  import { isModalOpen } from '$lib/stores/isModalOpenStore';
+  import { get } from 'svelte/store';
 
   /** @type {{ action: import('$lib/stores/gameSettingsStore').KeybindingAction, index: number } | null} */
   let listeningFor = null;
@@ -73,6 +75,7 @@
 
   /** @param {KeyboardEvent} event */
   function handleKeydown(event) {
+    if (get(isModalOpen)) return;
     if (listeningFor) {
       event.preventDefault();
       if (event.code === 'Escape') {

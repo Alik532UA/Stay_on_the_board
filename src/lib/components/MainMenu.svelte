@@ -5,7 +5,8 @@
   import { navigateToGame } from '$lib/services/uiService';
   import { navigationService } from '$lib/services/navigationService';
   import { logService } from '$lib/services/logService.js';
-  import { gameModeService } from '$lib/services/gameModeService';
+  import { gameModeService } from '$lib/services/gameModeService.js';
+  import hotkeyService from '$lib/services/hotkeyService';
   
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
@@ -15,9 +16,9 @@
   import { currentLanguageFlagSvg } from '$lib/stores/derivedState.ts';
   import { languages } from '$lib/constants';
   import { modalStore } from '$lib/stores/modalStore.js';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import { get } from 'svelte/store';
-  import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
+  
   import { customTooltip } from '$lib/actions/customTooltip.js';
   import { uiStateStore } from '$lib/stores/uiStateStore';
   import { boardStore } from '$lib/stores/boardStore';
@@ -26,6 +27,34 @@
   let showThemeDropdown = false;
   let showWipNotice = false;
   let showDevMenu = false;
+  let mainMenuButtonsNode: HTMLElement;
+
+  const CONTEXT_NAME = 'main-menu';
+
+  onMount(() => {
+    hotkeyService.pushContext(CONTEXT_NAME);
+
+    const activeGameMode = gameModeService.getCurrentMode();
+    if (activeGameMode) {
+      activeGameMode.cleanup();
+    }
+    appSettingsStore.init();
+  });
+
+  onDestroy(() => {
+    hotkeyService.popContext();
+  });
+
+  $: if (mainMenuButtonsNode) {
+    const buttons = Array.from(mainMenuButtonsNode.querySelectorAll('button'));
+    buttons.forEach((btn, index) => {
+        if (index < 9) { // Only register for the first 9 buttons (1-9)
+            const key = `Digit${index + 1}`;
+            logService.action(`[MainMenu] Registering hotkey '${key}' for button`, btn);
+            hotkeyService.register(CONTEXT_NAME, key, () => btn.click());
+        }
+    });
+  }
 
   function selectLang(lang: string) {
     logService.action(`Click: "Мова: ${lang}" (MainMenu)`);
@@ -44,6 +73,7 @@
 
   function navigateTo(route: string) {
     logService.action(`Click: "Навігація: ${route}" (MainMenu)`);
+    hotkeyService.popContext();
     goto(`${base}${route}`);
   }
 
@@ -61,14 +91,6 @@
     showDevMenu = false;
   }
   
-  onMount(() => {
-    const activeGameMode = gameModeService.getCurrentMode();
-    if (activeGameMode) {
-      activeGameMode.cleanup();
-    }
-    appSettingsStore.init();
-  });
-
   function handleDevMenu() {
     logService.action('Click: "dev version" (MainMenu)');
     showDevMenu = !showDevMenu;
@@ -79,6 +101,7 @@
     showDevMenu = false;
   }
   function handlePlayVsComputer() {
+    hotkeyService.popContext();
     logService.action(`Click: "Гра проти комп'ютера" (MainMenu)`);
     uiStateStore.update(s => ({ ...s, intendedGameType: 'training' })); // Set intended game type
     const uiState = get(uiStateStore);
@@ -109,6 +132,7 @@
     }
   }
   function handleLocalGame() {
+    hotkeyService.popContext();
     logService.action('Click: "Локальна гра" (MainMenu)');
     uiStateStore.update(s => ({ ...s, intendedGameType: 'local' })); // Set intended game type
     navigateTo('/local-setup');
@@ -245,7 +269,7 @@
         </span>
       </div>
     {/if}
-    <div id="main-menu-buttons" use:hotkeysAndTooltips>
+    <div id="main-menu-buttons" bind:this={mainMenuButtonsNode}>
       <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="training-btn">{$_('mainMenu.training')}</button>
       <button class="modal-button secondary" onclick={() => { uiStateStore.update(s => ({ ...s, intendedGameType: 'timed' })); navigateTo('/game/timed'); }} data-testid="timed-game-btn">{$_('mainMenu.timedGame')}</button>
       <button

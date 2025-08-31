@@ -2,7 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import { _ } from 'svelte-i18n';
   import ToggleButton from './ToggleButton.svelte';
-  import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
+  
 
   export let limitReplayPath: boolean;
   export let currentStep: number;
@@ -22,7 +22,7 @@
     />
   </div>
 
-  <div class="replay-controls" use:hotkeysAndTooltips>
+  <div class="replay-controls">
     <button class="control-btn" data-testid="replay-prev-step-btn" on:click={() => dispatch('goToStep', currentStep - 1)} disabled={currentStep === 0}>«</button>
     <button class="control-btn play-pause" data-testid="replay-play-backward-btn" class:active={autoPlayDirection === 'backward'} on:click={() => dispatch('toggleAutoPlay', 'backward')}>
       {#if autoPlayDirection === 'backward'}❚❚{:else}◀{/if}

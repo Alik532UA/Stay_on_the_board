@@ -1,23 +1,18 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { modalState, modalStore } from '$lib/stores/modalStore.js';
   import { get } from 'svelte/store';
   import { _ } from 'svelte-i18n';
   import { i18nReady } from '$lib/i18n/init.js';
   import SvgIcons from './SvgIcons.svelte';
   import FAQModal from './FAQModal.svelte';
-  import { onMount, tick } from 'svelte';
+  import { onMount, tick, onDestroy } from 'svelte';
   import { audioService } from '$lib/services/audioService.js';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
   import { focusManager } from '$lib/stores/focusManager.js';
   import { logService } from '$lib/services/logService';
-
-  $: {
-    if ($modalState.isOpen && ($modalState.content as any)?.scoreDetails) {
-      const modalId = $modalState.dataTestId || 'unknown';
-      logService.score(`[Modal: '${modalId}'] Detected change in modalState with scoreDetails`, ($modalState.content as any).scoreDetails);
-    }
-  }
+  import hotkeyService from '$lib/services/hotkeyService';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
+  import { trapFocus } from '$lib/actions/trapFocus.js';
   import { uiStateStore } from '$lib/stores/uiStateStore';
 
   let buttonRefs: (HTMLButtonElement | null)[] = [];
@@ -27,6 +22,41 @@
   let volumePercentage = 30;
   let isCompactScoreMode = false;
   let processingButtons: boolean[] = [];
+  let currentModalContext: string | null = null;
+
+  // Use a reactive statement to manage the hotkey context
+  $: {
+    if ($modalState.isOpen) {
+      // Ensure we're not adding contexts repeatedly
+      if (currentModalContext !== $modalState.dataTestId) {
+        currentModalContext = `modal-${$modalState.dataTestId}`;
+        hotkeyService.pushContext(currentModalContext);
+
+        // Register hotkeys for the new context
+        tick().then(() => {
+          // Register Escape key
+          if ($modalState.closable) {
+            hotkeyService.register(currentModalContext!, 'Escape', () => {
+              logService.ui('Escape key pressed, closing modal');
+              modalStore.closeModal();
+            });
+          }
+
+          // Register button hotkeys
+          $modalState.buttons.forEach((btn, i) => {
+            if (btn.hotKey) {
+              hotkeyService.register(currentModalContext!, btn.hotKey, () => {
+                const buttonElement = buttonRefs[i];
+                buttonElement?.click();
+              });
+            }
+          });
+        });
+      }
+    } else {
+      // If a modal was open and is now closing, the onDestroy hook will handle the cleanup.
+    }
+  }
 
   $: if ($modalState.buttons) {
     processingButtons = Array($modalState.buttons.length).fill(false);
@@ -35,13 +65,6 @@
   onMount(() => {
     expertVolume = audioService.loadVolume();
 
-    const handleKeydown = (e: KeyboardEvent) => {
-      if ($modalState.isOpen && e.key === 'Escape') {
-        logService.ui('Escape key pressed, closing modal');
-        modalStore.closeModal();
-      }
-    };
-    
     const handleResize = () => {
       if ($modalState.isOpen) {
         checkCompactMode();
@@ -49,13 +72,20 @@
     };
     
     window.addEventListener('resize', handleResize);
-    window.addEventListener('keydown', handleKeydown);
     
     return () => {
       audioService.pause();
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('keydown', handleKeydown);
     };
+  });
+  
+  onDestroy(() => {
+      // Final cleanup to ensure no contexts are left hanging.
+      // This is the single source of truth for popping the context.
+      if (currentModalContext) {
+        hotkeyService.popContext(currentModalContext);
+        currentModalContext = null;
+      }
   });
 
   $: {
@@ -76,7 +106,6 @@
   $: if ($modalState.isOpen && $modalState.buttons) {
     const hotButtonIndex = $modalState.buttons.findIndex(b => b.isHot);
     if (hotButtonIndex !== -1) {
-      // Чекаємо, доки Svelte оновить DOM і заповнить масив buttonRefs
       tick().then(() => {
         const hotButtonElement = buttonRefs[hotButtonIndex];
         if (hotButtonElement) {
@@ -97,18 +126,9 @@
     setTimeout(checkCompactMode, 100);
   }
 
-  function onModalKeydown(e: KeyboardEvent) {
-    if (!$modalState.isOpen || !$modalState.buttons) return;
-    const idx = $modalState.buttons.findIndex(b => b.isHot);
-    if (idx !== -1 && (e.key === 'Enter' || e.key === ' ' || e.code === 'Numpad5')) {
-      e.preventDefault();
-      e.stopPropagation();
-      const button = $modalState.buttons[idx];
-      if (button && typeof button.onClick === 'function') {
-        button.onClick();
-      } else {
-        modalStore.closeModal();
-      }
+  function onOverlayKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      onOverlayClick(e as any);
     }
   }
 
@@ -123,7 +143,7 @@
 </script>
 
 {#if $modalState.isOpen}
-  <div class="modal-overlay screen-overlay-backdrop" role="button" tabindex="0" aria-label={$_('modal.ok')} on:click={onOverlayClick} on:keydown={onModalKeydown} data-testid="modal-overlay">
+  <div use:trapFocus class="modal-overlay screen-overlay-backdrop" role="button" tabindex="-1" on:click={onOverlayClick} on:keydown={onOverlayKeyDown} data-testid="modal-overlay">
     <div class="modal-window" data-testid={$modalState.dataTestId}>
       {#if $modalState.titleKey || $modalState.title}
       <div class="modal-header" data-testid={`${$modalState.dataTestId}-header`}>
@@ -173,7 +193,7 @@
           <p class="reason" data-testid={`${$modalState.dataTestId}-content-reason`} data-i18n-key={($modalState.content as any).reasonKey}>{$modalState.content.reason}</p>
         {/if}
         {#if $modalState.component}
-          <svelte:component this={$modalState.component as any} {...$modalState.props} />
+          <svelte:component this={$modalState.component as any} {...$modalState.props} dataTestId={$modalState.dataTestId} />
         {:else if typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq}
           <FAQModal />
         {:else if typeof $modalState.content === 'object' && $modalState.content && 'key' in $modalState.content && 'actions' in $modalState.content}
@@ -281,9 +301,9 @@
           </button>
         {/each}
         {#if $modalState.titleKey === 'gameModes.title'}
-          <DontShowAgainCheckbox modalType="gameMode" dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} />
+          <DontShowAgainCheckbox modalType="gameMode" dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} scope={$modalState.dataTestId} />
         {:else if $modalState.titleKey === 'modal.expertModeTitle'}
-          <DontShowAgainCheckbox modalType="expertMode" dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} />
+          <DontShowAgainCheckbox modalType="expertMode" dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} scope={$modalState.dataTestId} />
         {/if}
         <slot />
       </div>

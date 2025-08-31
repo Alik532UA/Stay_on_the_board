@@ -100,6 +100,12 @@
     });
   }
 
+  function handleBoardWrapperKeyDown(event: KeyboardEvent) {
+    if (event.code === 'Enter' || event.code === 'Space') {
+      showBoardClickHint(event);
+    }
+  }
+
   function onCellRightClick(event: MouseEvent, row: number, col: number): void {
     event.preventDefault();
     const $boardState = get(boardStore);
@@ -119,7 +125,7 @@
         class="board-bg-wrapper game-content-block"
         style="--board-size: {$boardSize}"
         on:click={showBoardClickHint}
-        on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && showBoardClickHint(e)}
+        on:keydown={handleBoardWrapperKeyDown}
         role="button"
         tabindex="0"
         aria-label="Ігрове поле"

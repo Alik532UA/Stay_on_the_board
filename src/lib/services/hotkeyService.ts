@@ -1,108 +1,98 @@
-// src/lib/services/hotkeyService.ts
+import { writable } from 'svelte/store';
 import { get } from 'svelte/store';
-import { userActionService } from '$lib/services/userActionService';
-import { goto } from '$app/navigation';
-import { base } from '$app/paths';
-import { logService } from '$lib/services/logService.js';
-import { localInputProvider } from '$lib/services/localInputProvider';
-import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
-import { boardStore } from '$lib/stores/boardStore';
-import { modalStore } from '$lib/stores/modalStore.js';
+import { logService } from './logService.js';
 
-function changeBoardSize(increment: number) {
-  const currentSize = get(boardStore)?.boardSize;
-  if (typeof currentSize !== 'number') return;
-  const newSize = currentSize + increment;
-  if (newSize >= 2 && newSize <= 9) {
-    userActionService.changeBoardSize(newSize);
-  }
-}
+type HotkeyAction = {
+    action: (event?: KeyboardEvent) => void;
+    condition?: () => boolean;
+};
 
-function executeAction(action: string) {
-  logService.action(`Hotkey: "${action}" (GameLayout)`);
-  switch (action) {
-    case 'increase-board':
-      changeBoardSize(1);
-      break;
-    case 'decrease-board':
-      changeBoardSize(-1);
-      break;
-    case 'toggle-block-mode':
-      gameSettingsStore.toggleBlockMode();
-      break;
-    case 'toggle-board':
-      gameSettingsStore.toggleShowBoard(undefined);
-      break;
-    case 'up-left': userActionService.selectDirection('up-left'); break;
-    case 'up': userActionService.selectDirection('up'); break;
-    case 'up-right': userActionService.selectDirection('up-right'); break;
-    case 'left': userActionService.selectDirection('left'); break;
-    case 'right': userActionService.selectDirection('right'); break;
-    case 'down-left': userActionService.selectDirection('down-left'); break;
-    case 'down': userActionService.selectDirection('down'); break;
-    case 'down-right': userActionService.selectDirection('down-right'); break;
-    case 'confirm': localInputProvider.confirmMove(); break;
-    case 'no-moves': userActionService.claimNoMoves(); break;
-    case 'distance-1': userActionService.selectDistance(1); break;
-    case 'distance-2': userActionService.selectDistance(2); break;
-    case 'distance-3': userActionService.selectDistance(3); break;
-    case 'distance-4': userActionService.selectDistance(4); break;
-    case 'distance-5': userActionService.selectDistance(5); break;
-    case 'distance-6': userActionService.selectDistance(6); break;
-    case 'distance-7': userActionService.selectDistance(7); break;
-    case 'distance-8': userActionService.selectDistance(8); break;
-  }
-}
+const contextStack = writable<string[]>(['global']);
+const hotkeyRegistry = new Map<string, Map<string, HotkeyAction>>();
 
-function handleHotkey(e: KeyboardEvent) {
-  const modal = get(modalStore);
-  if (modal && modal.isOpen) return;
+function handleKeydown(event: KeyboardEvent) {
+    const stack = get(contextStack);
+    // Використовуємо event.code для надійної ідентифікації клавіш
+    logService.action(`[hotkeyService] handleKeydown: code=${event.code}, stack=`, stack);
 
-  if (e.target && (e.target as HTMLElement).tagName !== 'BODY') return;
-  
-  if ((e.key === 'l' || e.key === 'д' || e.key === 'L' || e.key === 'Д') && import.meta.env.DEV) {
-    logService.action(`Hotkey: "L/Д" (GameLayout) - перехід до local-setup`);
-    e.preventDefault();
-    goto(`${base}/local-setup`);
-    return;
-  }
-  
-  const key = e.code;
-  const currentSettings = get(gameSettingsStore);
-  const keybindings = currentSettings.keybindings;
-  const resolutions = currentSettings.keyConflictResolution;
+    for (let i = stack.length - 1; i >= 0; i--) {
+        const context = stack[i];
+        const contextHotkeys = hotkeyRegistry.get(context);
 
-  if (e.key === '=' || e.key === '+' || e.code === 'Equal') {
-    executeAction('increase-board');
-    return;
-  }
-  if (e.key === '-' || e.key === '_' || e.code === 'Minus') {
-    executeAction('decrease-board');
-    return;
-  }
-
-  const matchingActions = Object.entries(keybindings)
-    .filter(([, keys]) => (keys as string[]).includes(key))
-    .map(([action]) => action);
-
-  if (matchingActions.length === 0) return;
-
-  if (matchingActions.length === 1) {
-    executeAction(matchingActions[0]);
-    return;
-  }
-
-  if (resolutions[key]) {
-    executeAction(resolutions[key]);
-    return;
-  }
-}
-
-export function initializeHotkeyService() {
-    window.addEventListener('keydown', handleHotkey);
-    return {
-        destroy() {
-            window.removeEventListener('keydown', handleHotkey);
+        if (contextHotkeys) {
+            const hotkey = contextHotkeys.get(event.code); // ЗМІНЕНО: з event.key на event.code
+            if (hotkey && (!hotkey.condition || hotkey.condition())) {
+                logService.action(`[hotkeyService] Executing hotkey '${event.code}' from context '${context}'`);
+                hotkey.action(event);
+                // Stop after finding and executing the first matching hotkey
+                return;
+            }
         }
-    };
+    }
+    logService.action(`[hotkeyService] No action found for key '${event.code}' in any active context.`);
 }
+
+function setup() {
+    if (typeof window !== 'undefined') {
+        logService.init('[hotkeyService] Setting up global keydown listener.');
+        window.addEventListener('keydown', handleKeydown);
+    }
+}
+
+function registerHotkey(context: string, key: string, action: (event?: KeyboardEvent) => void, condition?: () => boolean) {
+    if (!hotkeyRegistry.has(context)) {
+        hotkeyRegistry.set(context, new Map());
+    }
+    logService.action(`[hotkeyService] Registering hotkey '${key}' for context '${context}'`);
+    hotkeyRegistry.get(context)!.set(key, { action, condition });
+}
+
+function unregisterContext(context: string) {
+    logService.action(`[hotkeyService] Unregistering all hotkeys for context '${context}'`);
+    hotkeyRegistry.delete(context);
+}
+
+function pushContext(context: string) {
+    logService.action(`[hotkeyService] Pushing new context: '${context}'`);
+    contextStack.update(stack => [...stack, context]);
+}
+
+function popContext(context?: string) {
+    contextStack.update(stack => {
+        if (stack.length > 1) {
+            const topOfStack = stack[stack.length - 1];
+            // If a context is provided, only pop if it's the one on top.
+            if (context && context !== topOfStack) {
+                logService.action(`[hotkeyService] Tried to pop context '${context}' but '${topOfStack}' is on top. Aborting.`);
+                return stack;
+            }
+            const newStack = [...stack];
+            const poppedContext = newStack.pop()!;
+            logService.action(`[hotkeyService] Popping context: '${poppedContext}'`);
+            unregisterContext(poppedContext);
+            return newStack;
+        }
+        return stack;
+    });
+}
+
+function getCurrentContext() {
+    const stack = get(contextStack);
+    return stack[stack.length - 1];
+}
+
+// Immediately activate the service when the module is imported
+setup();
+
+const hotkeyService = {
+    register: registerHotkey,
+    unregister: unregisterContext,
+    pushContext,
+    popContext,
+    getCurrentContext, // Added this
+    get a() { // For debugging
+        return get(contextStack);
+    }
+};
+
+export default hotkeyService;
