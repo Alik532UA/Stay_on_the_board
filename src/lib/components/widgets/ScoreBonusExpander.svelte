@@ -28,7 +28,11 @@
 
 <div class="bonus-expander" class:open={isOpen}>
   <div class="expander-summary" on:click={toggle} on:keydown={e => e.key === 'Enter' && toggle()} role="button" tabindex="0">
-    <span>{$_('modal.scoreDetails.bonusScore', { values: { bonus: totalBonus } })}</span>
+    {@const fullText = $_('modal.scoreDetails.bonusScore', { values: { bonus: totalBonus } })}
+    {@const parts = fullText.split('+')}
+    <span class="bonus-score-summary" data-testid="total-bonus-summary">
+      {parts[0]}<span class="bonus-value">+{parts[1] || totalBonus}</span>
+    </span>
     <span class="arrow" class:open={isOpen} aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
   </div>
   {#if isOpen}
@@ -60,6 +64,15 @@
     cursor: pointer;
     font-weight: bold;
     color: var(--text-primary);
+  }
+
+  .bonus-score-summary {
+    font-weight: normal;
+  }
+
+  .bonus-value {
+    color: var(--confirm-action-bg);
+    font-weight: bold;
   }
 
   .arrow {
