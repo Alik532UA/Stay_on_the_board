@@ -57,5 +57,9 @@ export default {
   confirmMoveHintContent: "Use the arrow keys to select a direction and the number keys to select a distance. You can confirm your move only when both direction and distance are selected.",
   exitConfirmationTitle: "Exit Game?",
   exitConfirmationContent: "Your progress will be saved, and you can continue the game later. Are you sure you want to exit to the main menu?",
-  confirmExit: "Yes, exit"
+  confirmExit: "Yes, exit",
+  competitiveModeLockTitle: "Settings Locked",
+  competitiveModeLockContent: "In competitive modes, some settings are locked to ensure fair conditions. If you want to change them, please try the training mode.",
+  goToTraining: "Go to Training",
+  stay: "Stay"
 };

@@ -51,5 +51,9 @@ export default {
   expertModeConfirm: "Elbette!",
   expertModeCancel: "İptal",
   confirmMoveHintTitle: "Hamle nasıl onaylanır?",
-  confirmMoveHintContent: "Yön seçmek için ok tuşlarını ve mesafe seçmek için rakam tuşlarını kullanın. Hem yön hem de mesafe seçildiğinde hamleyi onaylayabilirsiniz."
+  confirmMoveHintContent: "Yön seçmek için ok tuşlarını ve mesafe seçmek için rakam tuşlarını kullanın. Hem yön hem de mesafe seçildiğinde hamleyi onaylayabilirsiniz.",
+  competitiveModeLockTitle: "Ayarlar Kilitlendi",
+  competitiveModeLockContent: "Yarışma modlarında, adil şartlar sağlamak için bazı ayarlar kilitlenir. Onları değiştirmek isterseniz, lütfen antrenman modunu deneyin.",
+  goToTraining: "Antrenmana Git",
+  stay: "Kal"
 }; 

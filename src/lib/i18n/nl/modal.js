@@ -51,5 +51,9 @@ export default {
   expertModeConfirm: "Zeker!",
   expertModeCancel: "Annuleren",
   confirmMoveHintTitle: "Hoe bevestig je een zet?",
-  confirmMoveHintContent: "Gebruik de pijltjestoetsen om een richting te kiezen en de cijfertoetsen om een afstand te selecteren. Je kunt je zet alleen bevestigen als zowel richting als afstand zijn gekozen."
+  confirmMoveHintContent: "Gebruik de pijltjestoetsen om een richting te kiezen en de cijfertoetsen om een afstand te selecteren. Je kunt je zet alleen bevestigen als zowel richting als afstand zijn gekozen.",
+  competitiveModeLockTitle: "Instellingen Vergrendeld",
+  competitiveModeLockContent: "In competitieve modi zijn sommige instellingen vergrendeld om eerlijke voorwaarden te garanderen. Als je ze wilt wijzigen, probeer dan de trainingsmodus.",
+  goToTraining: "Ga naar Training",
+  stay: "Blijven"
 }; 
