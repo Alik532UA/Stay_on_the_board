@@ -73,22 +73,7 @@
     processingButtons = Array($modalState.buttons.length).fill(false);
   }
 
-  onMount(() => {
-    expertVolume = audioService.loadVolume();
-
-    const handleResize = () => {
-      if ($modalState.isOpen) {
-        checkCompactMode();
-      }
-    };
-    
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      audioService.pause();
-      window.removeEventListener('resize', handleResize);
-    };
-  });
+  
   
   onDestroy(() => {
       // Final cleanup to ensure no contexts are left hanging.
@@ -126,17 +111,9 @@
     }
   }
 
-  function checkCompactMode() {
-    if (modalContent) {
-      const hasScroll = modalContent.scrollHeight > modalContent.clientHeight;
-      logService.ui(`[Modal] checkCompactMode for ${$modalState.dataTestId}: scrollHeight=${modalContent.scrollHeight}, clientHeight=${modalContent.clientHeight}, hasScroll=${hasScroll}`);
-      isCompactScoreMode = hasScroll;
-    }
-  }
+  
 
-  $: if ($modalState.isOpen && modalContent) {
-    tick().then(checkCompactMode);
-  }
+  
 
   function onOverlayKeyDown(e: KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') {
