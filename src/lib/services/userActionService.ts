@@ -109,7 +109,7 @@ export const userActionService = {
       gameModeService.initializeGameMode(activeMode);
     } else {
       // Fallback, though a mode should always be active when this is called.
-      logService.error('[userActionService] requestRestart called without an active game mode.');
+      logService.state('ERROR: [userActionService] requestRestart called without an active game mode.');
       const currentBoardSize = get(boardStore)?.boardSize;
       gameService.initializeNewGame({ size: currentBoardSize });
     }

@@ -275,7 +275,13 @@
       </button>
     </div>
     <hr class="settings-expander__divider" />
-    <div class:locked-setting={isCompetitiveMode} on:click|preventDefault|stopPropagation={isCompetitiveMode ? showCompetitiveModeModal : () => {}}>
+    <div 
+      class:locked-setting={isCompetitiveMode} 
+      on:click|preventDefault|stopPropagation={isCompetitiveMode ? showCompetitiveModeModal : () => {}}
+      on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && (isCompetitiveMode ? showCompetitiveModeModal() : () => {})}
+      role="button"
+      tabindex={isCompetitiveMode ? 0 : -1}
+    >
     <ToggleButton
       label={$_('gameModes.autoHideBoard')}
       checked={$gameSettingsStore.autoHideBoard}
@@ -283,7 +289,13 @@
       dataTestId="auto-hide-board-toggle"
     />
     </div>
-    <div class:locked-setting={isCompetitiveMode} on:click|preventDefault|stopPropagation={isCompetitiveMode ? showCompetitiveModeModal : () => {}}>
+    <div 
+      class:locked-setting={isCompetitiveMode} 
+      on:click|preventDefault|stopPropagation={isCompetitiveMode ? showCompetitiveModeModal : () => {}}
+      on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && (isCompetitiveMode ? showCompetitiveModeModal() : () => {})}
+      role="button"
+      tabindex={isCompetitiveMode ? 0 : -1}
+    >
     <ToggleButton
       label={$_('gameControls.blockMode')}
       checked={$gameSettingsStore.blockModeEnabled}
