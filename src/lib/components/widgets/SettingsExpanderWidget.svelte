@@ -1,7 +1,8 @@
 <script lang="ts">
   import { gameModeStore } from '$lib/stores/gameModeStore.js';
   import { goto } from '$app/navigation';
-  import { userActionService } from '$lib/services/userActionService';
+  import { base } from '$app/paths';
+  import { userActionService } from '$lib/services/userActionService.js';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { _ } from 'svelte-i18n';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
@@ -106,7 +107,7 @@
       dataTestId: 'competitive-mode-modal', // Added dataTestId
       contentKey: 'modal.competitiveModeLockContent',
       buttons: [
-        { textKey: 'modal.goToTraining', primary: true, onClick: () => { modalStore.closeModal(); goto('/game/training'); } },
+        { textKey: 'modal.goToTraining', primary: true, onClick: () => { modalStore.closeModal(); goto(`${base}/game/training`); } },
         { textKey: 'modal.stay', onClick: modalStore.closeModal }
       ],
       closeOnOverlayClick: true,
@@ -557,9 +558,9 @@
     margin: 0;
     text-align: center;
     font-size: 1.1em;
-  }                                                                                                                                 
- .locked-setting {                                                                                                                   
- opacity: 0.2;                                                                                                                     
-      cursor: help;                                                                                                                     
-    }  
+  }
+ .locked-setting {
+    opacity: 0.2;
+    cursor: help;
+  }
 </style>
