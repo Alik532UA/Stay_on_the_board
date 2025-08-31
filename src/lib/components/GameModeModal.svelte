@@ -10,7 +10,7 @@
   import { userActionService } from '$lib/services/userActionService';
   import { logService } from '$lib/services/logService';
 
-  export let dataTestId: string;
+  export let scope: string;
   let buttonsNode: HTMLElement;
 
   onMount(() => {
@@ -18,7 +18,7 @@
         const buttons = Array.from(buttonsNode.querySelectorAll('button'));
         buttons.forEach((btn, index) => {
             const key = `Digit${index + 1}`;
-            hotkeyService.register(dataTestId, key, () => btn.click());
+            hotkeyService.register(scope, key, () => btn.click());
         });
     }
   });
@@ -66,7 +66,7 @@
     {$_('gameModes.pro')}
   </button>
 </div>
-<DontShowAgainCheckbox dataTestId="game-mode-modal-dont-show-again-switch" scope={dataTestId} />
+<DontShowAgainCheckbox tid="game-mode-modal-dont-show-again-switch" {scope} />
 
 <style>
   .game-mode-buttons {

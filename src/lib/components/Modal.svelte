@@ -27,9 +27,14 @@
   // Use a reactive statement to manage the hotkey context
   $: {
     if ($modalState.isOpen) {
+      const newContext = `modal-${$modalState.dataTestId}`;
       // Ensure we're not adding contexts repeatedly
-      if (currentModalContext !== $modalState.dataTestId) {
-        currentModalContext = `modal-${$modalState.dataTestId}`;
+      if (currentModalContext !== newContext) {
+        // If there's an old context, pop it before pushing the new one.
+        if (currentModalContext) {
+            hotkeyService.popContext(currentModalContext);
+        }
+        currentModalContext = newContext;
         hotkeyService.pushContext(currentModalContext);
 
         // Register hotkeys for the new context
@@ -45,7 +50,8 @@
           // Register button hotkeys
           $modalState.buttons.forEach((btn, i) => {
             if (btn.hotKey) {
-              hotkeyService.register(currentModalContext!, btn.hotKey, () => {
+              const key = btn.hotKey === 'ESC' ? 'Escape' : btn.hotKey;
+              hotkeyService.register(currentModalContext!, key, () => {
                 const buttonElement = buttonRefs[i];
                 buttonElement?.click();
               });
@@ -54,7 +60,11 @@
         });
       }
     } else {
-      // If a modal was open and is now closing, the onDestroy hook will handle the cleanup.
+      // If a modal was open and is now closing, pop its context.
+      if (currentModalContext) {
+        hotkeyService.popContext(currentModalContext);
+        currentModalContext = null;
+      }
     }
   }
 
@@ -193,7 +203,7 @@
           <p class="reason" data-testid={`${$modalState.dataTestId}-content-reason`} data-i18n-key={($modalState.content as any).reasonKey}>{$modalState.content.reason}</p>
         {/if}
         {#if $modalState.component}
-          <svelte:component this={$modalState.component as any} {...$modalState.props} dataTestId={$modalState.dataTestId} />
+          <svelte:component this={$modalState.component as any} {...$modalState.props} dataTestId={$modalState.dataTestId} scope={currentModalContext} />
         {:else if typeof $modalState.content === 'object' && $modalState.content && 'isFaq' in $modalState.content && $modalState.content.isFaq}
           <FAQModal />
         {:else if typeof $modalState.content === 'object' && $modalState.content && 'key' in $modalState.content && 'actions' in $modalState.content}
@@ -301,9 +311,9 @@
           </button>
         {/each}
         {#if $modalState.titleKey === 'gameModes.title'}
-          <DontShowAgainCheckbox modalType="gameMode" dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} scope={$modalState.dataTestId} />
+          <DontShowAgainCheckbox modalType="gameMode" tid={`${$modalState.dataTestId}-dont-show-again-switch`} scope={currentModalContext} />
         {:else if $modalState.titleKey === 'modal.expertModeTitle'}
-          <DontShowAgainCheckbox modalType="expertMode" dataTestId={`${$modalState.dataTestId}-dont-show-again-switch`} scope={$modalState.dataTestId} />
+          <DontShowAgainCheckbox modalType="expertMode" tid={`${$modalState.dataTestId}-dont-show-again-switch`} scope={currentModalContext} />
         {/if}
         <slot />
       </div>
