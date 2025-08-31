@@ -1,24 +1,18 @@
 <script lang="ts">
-  // IMPORTANT: This component's checked state (`dontShowAgain`) is intentionally not
-  // reactively bound to the `showGameModeModal` setting in the gameSettingsStore.
-  //
-  // - `onMount`, the component initializes its state from the store.
-  // - `on:change`, the component updates the store.
-  //
-  // This is to prevent a bug where closing another modal (like the FAQ modal)
-  // could inadvertently change the `showGameModeModal` setting and cause this
-  // checkbox to become checked as a side effect.
-  //
-  // By not having a reactive link, we ensure that the checkbox state is only
-  // changed by direct user interaction.
   import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
   import { _ } from 'svelte-i18n';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { logService } from '$lib/services/logService.js';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
+  import hotkeyService from '$lib/services/hotkeyService';
+
   export let dataTestId = '';
   export let modalType: 'gameMode' | 'expertMode' = 'gameMode';
+  export let scope: string;
+
   let dontShowAgain = false;
+  let inputEl: HTMLInputElement | null = null;
+  
 
   function handleCheckboxChange(event: Event) {
     const input = event.currentTarget as HTMLInputElement;
@@ -32,20 +26,6 @@
     }
   }
 
-  /** @param {KeyboardEvent} e */
-  function handleKeydown(e: KeyboardEvent) {
-    logService.action('Keydown event on DontShowAgainCheckbox', { key: e.key, code: e.code });
-    if (e.code === 'KeyX') {
-      e.preventDefault();
-      logService.action('Toggling dontShowAgain via hotkey X');
-      if (inputEl) {
-        inputEl.click();
-      }
-    }
-  }
-
-  let inputEl: HTMLInputElement | null = null;
-
   onMount(() => {
     if (modalType === 'gameMode') {
       dontShowAgain = !$gameSettingsStore.showGameModeModal;
@@ -53,11 +33,15 @@
       dontShowAgain = !$gameSettingsStore.showDifficultyWarningModal;
     }
     logService.ui(`[DontShowAgainCheckbox] onMount. dontShowAgain is ${dontShowAgain}`);
-    window.addEventListener('keydown', handleKeydown);
-    return () => {
-      window.removeEventListener('keydown', handleKeydown);
-    };
+
+    hotkeyService.register(scope, 'KeyX', () => {
+        if (inputEl) {
+          inputEl.click();
+        }
+    });
   });
+
+  
 </script>
 
 <div class="dont-show-again-checkbox">
@@ -164,4 +148,4 @@
   }
   .dont-show-again-checkbox input:checked + .slider { background: var(--control-selected, #4caf50); }
   .dont-show-again-checkbox input:checked + .slider:before { transform: translateX(20px); }
-</style> 
+</style>

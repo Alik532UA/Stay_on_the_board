@@ -1,10 +1,42 @@
-<script>
+<script lang="ts">
   export let x = 0;
   export let y = 0;
   export let content = '';
+
+  let tooltipNode: HTMLElement;
+  let adjustedX = 0;
+  let adjustedY = 0;
+
+  $: if (tooltipNode && content && typeof window !== 'undefined') {
+    const width = tooltipNode.offsetWidth;
+    const height = tooltipNode.offsetHeight;
+    const safetyMargin = 10;
+
+    let newX = x;
+    let newY = y;
+
+    if (newX + width + safetyMargin > window.innerWidth) {
+        newX = window.innerWidth - width - safetyMargin;
+    }
+    if (newY + height + safetyMargin > window.innerHeight) {
+        newY = window.innerHeight - height - safetyMargin;
+    }
+    if (newX < safetyMargin) {
+        newX = safetyMargin;
+    }
+    if (newY < safetyMargin) {
+        newY = safetyMargin;
+    }
+    adjustedX = newX;
+    adjustedY = newY;
+  } else {
+    adjustedX = x;
+    adjustedY = y;
+  }
+
 </script>
 
-<div class="tooltip" style="left: {x}px; top: {y}px;">
+<div class="tooltip" style="left: {adjustedX}px; top: {adjustedY}px;" bind:this={tooltipNode}>
   {@html content}
 </div>
 

@@ -12,6 +12,7 @@
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
   import { logService } from '$lib/services/logService.js';
   import { uiStateStore } from '$lib/stores/uiStateStore';
+  import hotkeyService from '$lib/services/hotkeyService';
 
   function handleMainMenuClick() {
     const uiState = get(uiStateStore);
@@ -26,21 +27,9 @@
     navigationService.goTo('/local-setup');
   }
 
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.code === 'KeyI') {
-      e.preventDefault();
-      showGameInfoModal();
-    } else if (e.code === 'Escape') {
-      e.preventDefault();
-      handleMainMenuClick();
-    }
-  }
-
   onMount(() => {
-    window.addEventListener('keydown', handleKeydown);
-    return () => {
-      window.removeEventListener('keydown', handleKeydown);
-    };
+    hotkeyService.register('global', 'i', showGameInfoModal);
+    hotkeyService.register('global', 'Escape', handleMainMenuClick);
   });
 </script>
 

@@ -35,7 +35,7 @@ const defaultConfig = {
           [LOG_GROUPS.TOOLTIP]: false,
           [LOG_GROUPS.ANIMATION]: true,
           [LOG_GROUPS.INIT]: true,
-          [LOG_GROUPS.ACTION]: false,
+          [LOG_GROUPS.ACTION]: true,
           [LOG_GROUPS.GAME_MODE]: true,
           [LOG_GROUPS.SPEECH]: true,
           [LOG_GROUPS.TEST_MODE]: false,

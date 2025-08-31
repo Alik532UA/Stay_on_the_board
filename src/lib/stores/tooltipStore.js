@@ -46,7 +46,7 @@ export const tooltipStore = {
       update(state => ({ ...state, isVisible: true, content, x, y, timeoutId: null }));
     }, delay);
     
-    update(state => ({ ...state, timeoutId }));
+    update(state => ({ ...state, timeoutId, content, x, y }));
     logService.tooltip('[tooltipStore] show scheduled', { content, x, y, delay });
   },
   
@@ -54,7 +54,9 @@ export const tooltipStore = {
    * @param {number} x
    * @param {number} y
    */
-  move: (x, y) => update(state => ({ ...state, x, y })),
+  move: (x, y) => {
+      update(state => ({ ...state, x, y }));
+  },
 
   hide: () => {
     logService.tooltip('[tooltipStore] hide called, canceling scheduled show and hiding');

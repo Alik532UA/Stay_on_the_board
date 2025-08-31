@@ -1,14 +1,27 @@
 <script lang="ts">
   import { _ } from 'svelte-i18n';
-  
+  import { onMount } from 'svelte';
+  import hotkeyService from '$lib/services/hotkeyService';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { get } from 'svelte/store';
   import DontShowAgainCheckbox from './DontShowAgainCheckbox.svelte';
-  import { hotkeysAndTooltips } from '$lib/actions/hotkeysAndTooltips.js';
   import { userActionService } from '$lib/services/userActionService';
   import { logService } from '$lib/services/logService';
+
+  export let dataTestId: string;
+  let buttonsNode: HTMLElement;
+
+  onMount(() => {
+    if (buttonsNode) {
+        const buttons = Array.from(buttonsNode.querySelectorAll('button'));
+        buttons.forEach((btn, index) => {
+            const key = `Digit${index + 1}`;
+            hotkeyService.register(dataTestId, key, () => btn.click());
+        });
+    }
+  });
 
   function selectMode(mode: 'beginner' | 'experienced' | 'pro') {
     logService.modal(`[GameModeModal] selectMode called with: ${mode}`);
@@ -42,7 +55,7 @@
   }
 </script>
 
-<div class="game-mode-buttons" use:hotkeysAndTooltips>
+<div class="game-mode-buttons" bind:this={buttonsNode}>
   <button class="modal-btn-generic green-btn" on:click={() => selectMode('beginner')} data-testid="beginner-mode-btn">
     {$_('gameModes.beginner')}
   </button>
@@ -53,7 +66,7 @@
     {$_('gameModes.pro')}
   </button>
 </div>
-<DontShowAgainCheckbox dataTestId="game-mode-modal-dont-show-again-switch" />
+<DontShowAgainCheckbox dataTestId="game-mode-modal-dont-show-again-switch" scope={dataTestId} />
 
 <style>
   .game-mode-buttons {
