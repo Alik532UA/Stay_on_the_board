@@ -106,7 +106,7 @@
 		--size: 6px;
 		content: '';
 		width: 0;
-		height: 0;
+		height: 0px;
 		position: absolute;
 		top: 0;
 		left: calc(50% - var(--size));

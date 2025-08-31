@@ -27,11 +27,17 @@
     return {
       duration: params.duration,
       easing: params.easing,
-      css: (t: number, u: number) => `
-        ${slideTransition.css ? slideTransition.css(t, u) : ''}
-        transform-origin: top center;
-        transform: scale(${t});
-      `
+      css: (t: number, u: number) => {
+        const originalCss = slideTransition.css ? slideTransition.css(t, u) : '';
+        // Svelte's slide transition can produce a unitless `min-height: 0`, which causes a warning.
+        // This replacement ensures the value has units.
+        const fixedCss = originalCss.replace(/min-height:\s*0;?/, 'min-height: 0px;');
+        return `
+          ${fixedCss}
+          transform-origin: top center;
+          transform: scale(${t});
+        `;
+      }
     };
   }
 
