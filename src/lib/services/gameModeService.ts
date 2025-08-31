@@ -7,6 +7,7 @@ import { TrainingGameMode } from '$lib/gameModes/TrainingGameMode';
 import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
 import { TimedGameMode } from '$lib/gameModes/TimedGameMode';
 import { logService } from './logService';
+import { timerStore } from '$lib/stores/timerStore';
 
 class GameModeService {
   private modes: Map<string, BaseGameMode> = new Map();
@@ -42,6 +43,7 @@ class GameModeService {
     const mode = this.modes.get(implementationName);
 
     if (mode) {
+      timerStore.reset();
       if (name && ['beginner', 'experienced', 'pro', 'timed', 'local', 'online'].includes(name)) {
         gameSettingsStore.applyPreset(name as any);
       }
