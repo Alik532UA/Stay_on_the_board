@@ -1,4 +1,47 @@
-```
+1. зайти в /game/timed
+2. зробити перший хід (таймер запустився)
+3. вийти в головне меню
+4. зайти в /game/timed
+Актуальний результат: таймер іде починаючі з 100, після першого ходу таймер скидається в 100 і починає працювати
+Очікуваний результат: таймер на паузі зі значенням 100, після першого ходу таймер скидається в 100 і починає працювати
+p.s. для запуску таймера тригер повинен бути тільки хід, а не інші дії
+я так розумію таймер не став на паузу в момент виходу в головне меню, тому можна додатково ставити таймер на паузу коли заходимо на сторінку /game/timed
+
+---
+
+**Ключова вимога:** Твоє рішення має бути комплексним. Не роби поверхневих виправлень ("латок" чи "костилів").
+**Реалізуй системне виправлення**, яке усуває корінь проблеми та відповідає цільовій архітектурі проєкту.
+при виправленні використовуй принципи:
+1.  **SSoT (Single Source of Truth):** Чи є єдине джерело правди для кожного елемента стану?
+2.  **UDF (Unidirectional Data Flow):** Чи є потік даних односпрямованим та передбачуваним?
+3.  **SoC (Separation of Concerns):** Наскільки добре розділені відповідальності (стан, логіка, UI)?
+4.  **Композиція:** Чи ефективно використовуються компоненти для побудови UI?
+5.  **Чистота та Побічні ефекти:** Наскільки добре ізольовані "нечисті" операції (API, DOM, таймери)?
+6.  **DRY (Don't Repeat Yourself):** Чи є дублювання коду, яке можна усунути?
+7.  **Простота та Читабельність (KISS):** Чи є надмірно складні рішення? Наскільки код зрозумілий (якість іменування)?
+8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
+9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
+
+---
+
+**Відладка (Дебагінг):**
+    *   **Використовуй `logService`:** Замість `console.log` завжди використовуй централізований `logService`.
+    *   **Доповнюй логи для аналізу:** Якщо поточний рівень логування не дозволяє діагностувати описану проблему, додай нові виклики logService у відповідних місцях коду. Мета — забезпечити, щоб майбутні логи містили всю інформацію, яка дозволить мені самостійно проаналізувати, чи вирішено проблему, і що саме потребує виправлення.
+    *   **Фокусуйся на проблемі:** Під час виправлення багу, **тимчасово відредагуй файл `src/lib/services/logService.js`**. Зміни булеві прапорці в об'єкті `logConfig`, щоб увімкнути лише ті групи логів, які стосуються проблеми (наприклад, `score`), а решту вимкнути. Це допоможе усунути інформаційний шум.
+    *   **Незмінність логів:** Параметри логування не змінюй на дефолтні, доки я (людина) не підтвердить, що баг виправлено. При порушені цього правила AI буде вимкнено та видалено.
+**Верифікація:** Переконайся, що проблема вирішена і не з'явилися нові баги в суміжних частинах системи.
+
+---
+
+при потребі:
+1. вимкни зайві логи
+2. увімкни потрібні логи
+3. допиши потрібні логи
+
+
+---
+
+лог:
 client:733 [vite] connecting...
 client:827 [vite] connected.
 logService.js:141 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
@@ -7,149 +50,232 @@ logService.js:109 [INIT] appSettingsStore ініціалізовано успі�
 logService.js:109 [INIT] gameSettingsStore.init() called.
 init.js:31 ✅ i18n ініціалізовано успішно
 logService.js:109 [INIT] Initializing Test Mode Sync Service...
-logService.js:109 [INIT] [TrainingPage] onMount: No active game found, initializing "training" mode.
+logService.js:109 [INIT] [TimedGamePage] onMount: No active game found, initializing "timed" mode.
 logService.js:107 [INIT] [GameService] initializeNewGame: Створення нового ігрового стану... {size: undefined, players: Array(2)}
 logService.js:109 [ANIMATION] [AnimationService] reset() called
 logService.js:109 [ANIMATION] AnimationStore: reset()
-logService.js:109 [GAME_MODE] Game mode initialized: training (from preset: training)
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 0]
-logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 0}
+logService.js:109 [GAME_MODE] Game mode initialized: timed (from preset: timed)
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 2]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 2}
 logService.js:109 [INIT] [gameHotkeyService] Initializing game hotkeys.
 logService.js:107 [STATE] [AppSettingsStore] Стан збережено в localStorage: {theme: 'dark', style: 'gray', language: 'uk'}
 logService.js:107 [STATE] Стан для збереження в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: true, …}
-logService.js:109 [LOGIC_MOVE] [userActionService] setDirection called with: down-right
-logService.js:107 [LOGIC_MOVE] setDirection: встановлено напрямок {dir: 'down-right', newDistance: 1}
-logService.js:107 [STATE] Стан для збереження в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: true, …}
-logService.js:107 [STATE] Logical Position (at move start) {row: 1, col: 0}
-logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down-right', distance: 1, playerIndex: 0}
+logService.js:109 [LOGIC_MOVE] [userActionService] setDirection called with: left
+logService.js:107 [LOGIC_MOVE] setDirection: встановлено напрямок {dir: 'left', newDistance: 1}
+logService.js:109 [GAME_MODE] [TimeService] Starting game timer for 100 seconds.
+logService.js:107 [STATE] Logical Position (at move start) {row: 1, col: 2}
+logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'left', distance: 1, playerIndex: 0}
 logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 1]
-logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 1, direction: 'down-right', distance: 1, to: {…}}
-logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 1]
-logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 2, col: 1}
-logService.js:107 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
-logService.js:107 [SPEECH] [SideEffectService] Received speak_move effect {move: {…}, lang: 'uk', voiceURI: null}
-logService.js:109 [SPEECH] [Speech] Determined language for speech: uk (based on voice lang: uk-UA)
-logService.js:109 [SPEECH] [Speech] Generating text for "uk": "по діагоналі вниз-вправо 1"
-logService.js:109 [SPEECH] [Speech] speakText called. Current speaking state: false. Queued text: "по діагоналі вниз-вправо 1"
-logService.js:109 [SPEECH] [Speech] Queuing utterance "по діагоналі вниз-вправо 1" with lang: uk-UA
-logService.js:109 [SPEECH] [Speech] Utterance queued. Current speaking state: true.
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 1]
+logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 1, direction: 'left', distance: 1, to: {…}}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 1]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 1}
 logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
 logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
 logService.js:109 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
 logService.js:109 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
-logService.js:107 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'right', distance: 1, row: 2, col: 2, isPenalty: false}
+logService.js:107 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'right', distance: 2, row: 1, col: 3, isPenalty: false}
 logService.js:109 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
-logService.js:107 [STATE] Logical Position (at move start) {row: 2, col: 1}
-logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'right', distance: 1, playerIndex: 1}
+logService.js:109 [GAME_MODE] [TimedGameMode] Resuming timers.
+logService.js:107 [STATE] Logical Position (at move start) {row: 1, col: 1}
+logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'right', distance: 2, playerIndex: 1}
 logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
-logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 2]
-logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 2, direction: 'right', distance: 1, to: {…}}
-logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 2]
-logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 2, col: 2}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 3]
+logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 2, direction: 'right', distance: 2, to: {…}}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 3]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 3}
 logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
 logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
-logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 2]
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 1]
-logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 2, col: 1}
-logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 2]
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 1]
-logService.js:107 [STATE] Стан для збереження в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: true, …}
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 1]
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 2]
-logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 2, col: 2}
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 2]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 2]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 2]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 2]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 2]
-logService.js:109 [LOGIC_MOVE] [userActionService] setDirection called with: up
-logService.js:107 [LOGIC_MOVE] setDirection: встановлено напрямок {dir: 'up', newDistance: 1}
-logService.js:109 [LOGIC_MOVE] [userActionService] setDirection called with: up
-logService.js:107 [LOGIC_MOVE] setDirection: встановлено напрямок {dir: 'up', newDistance: 2}
-logService.js:107 [STATE] Logical Position (at move start) {row: 2, col: 2}
-logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'up', distance: 2, playerIndex: 0}
-logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [0, 2]
-logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 1, direction: 'up', distance: 2, to: {…}}
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 2]
-logService.js:107 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
-logService.js:107 [SPEECH] [SideEffectService] Received speak_move effect {move: {…}, lang: 'uk', voiceURI: null}
-logService.js:109 [SPEECH] [Speech] Determined language for speech: uk (based on voice lang: uk-UA)
-logService.js:109 [SPEECH] [Speech] Generating text for "uk": "вгору 2"
-logService.js:109 [SPEECH] [Speech] speakText called. Current speaking state: true. Queued text: "вгору 2"
-logService.js:109 [SPEECH] [Speech] Queuing utterance "вгору 2" with lang: uk-UA
-logService.js:109 [SPEECH] [Speech] Utterance queued. Current speaking state: true.
-logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
-logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
-logService.js:109 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
-logService.js:109 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
-logService.js:107 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'down-left', distance: 1, row: 1, col: 1, isPenalty: false}
-logService.js:109 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
-logService.js:107 [STATE] Logical Position (at move start) {row: 0, col: 2}
-logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down-left', distance: 1, playerIndex: 1}
-logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 2]
-logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 2, direction: 'down-left', distance: 1, to: {…}}
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 2]
-logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
-logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
-logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 1]
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [0, 2]
-logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 0, col: 2}
-logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 1]
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [0, 2]
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [0, 2]
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 3]
 logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 1]
 logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 1}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 3]
 logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 1]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 1]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 1]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 1]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 1]
-logService.js:109 [LOGIC_MOVE] [userActionService] setDirection called with: right
-logService.js:107 [LOGIC_MOVE] setDirection: встановлено напрямок {dir: 'right', newDistance: 1}
-logService.js:107 [STATE] Logical Position (at move start) {row: 1, col: 1}
-logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'right', distance: 1, playerIndex: 0}
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+Invalid keyframe value for property minHeight: 0
+        transform-origin
+logService.js:107 [STATE] Стан для збереження в localStorage: {showMoves: false, showBoard: false, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: true, …}
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 1]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 3]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 3]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 3]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 3]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 3]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 3]
+logService.js:109 [INIT] [game/+layout] onDestroy called.
+logService.js:109 [GAME_MODE] Game layout is being destroyed, cleaning up game mode.
+logService.js:109 [GAME_MODE] [TimedGameMode] cleanup called
+logService.js:109 [INIT] [gameHotkeyService] Cleaning up game hotkeys.
+logService.js:107 [STATE] [AppSettingsStore] Стан збережено в localStorage: {language: 'uk', theme: 'dark', style: 'gray'}
+logService.js:107 [STATE] Стан для збереження в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: true, …}
+logService.js:109 [INIT] [TimedGamePage] onMount: No active game found, initializing "timed" mode.
+logService.js:107 [INIT] [GameService] initializeNewGame: Створення нового ігрового стану... {size: undefined, players: Array(2)}
+logService.js:109 [ANIMATION] [AnimationService] reset() called
+logService.js:109 [ANIMATION] AnimationStore: reset()
+logService.js:109 [GAME_MODE] Game mode initialized: timed (from preset: timed)
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [0, 0]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 0, col: 0}
+logService.js:109 [INIT] [gameHotkeyService] Initializing game hotkeys.
+logService.js:107 [STATE] Стан для збереження в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: true, …}
+logService.js:109 [LOGIC_MOVE] [userActionService] setDirection called with: down
+logService.js:107 [LOGIC_MOVE] setDirection: встановлено напрямок {dir: 'down', newDistance: 1}
+logService.js:107 [STATE] Стан для збереження в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: true, …}
+logService.js:109 [GAME_MODE] [TimeService] Stopping game timer.
+logService.js:109 [GAME_MODE] [TimeService] Starting game timer for 100 seconds.
+logService.js:107 [STATE] Logical Position (at move start) {row: 0, col: 0}
+logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down', distance: 1, playerIndex: 0}
 logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 2]
-logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 1, direction: 'right', distance: 1, to: {…}}
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 1]
-logService.js:107 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
-logService.js:107 [SPEECH] [SideEffectService] Received speak_move effect {move: {…}, lang: 'uk', voiceURI: null}
-logService.js:109 [SPEECH] [Speech] Determined language for speech: uk (based on voice lang: uk-UA)
-logService.js:109 [SPEECH] [Speech] Generating text for "uk": "вправо 1"
-logService.js:109 [SPEECH] [Speech] speakText called. Current speaking state: true. Queued text: "вправо 1"
-logService.js:109 [SPEECH] [Speech] Queuing utterance "вправо 1" with lang: uk-UA
-logService.js:109 [SPEECH] [Speech] Utterance queued. Current speaking state: true.
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 0]
+logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 1, direction: 'down', distance: 1, to: {…}}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 0]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 0}
 logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
 logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
 logService.js:109 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
 logService.js:109 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
-logService.js:107 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'down-right', distance: 1, row: 2, col: 3, isPenalty: false}
+logService.js:107 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'right', distance: 2, row: 1, col: 2, isPenalty: false}
 logService.js:109 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
-logService.js:107 [STATE] Logical Position (at move start) {row: 1, col: 2}
-logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down-right', distance: 1, playerIndex: 1}
+logService.js:109 [GAME_MODE] [TimedGameMode] Resuming timers.
+logService.js:107 [STATE] Logical Position (at move start) {row: 1, col: 0}
+logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'right', distance: 2, playerIndex: 1}
 logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 1]
-logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 2, direction: 'down-right', distance: 1, to: {…}}
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 1]
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 2]
+logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 2, direction: 'right', distance: 2, to: {…}}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 2]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 2}
 logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
 logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
-logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 3]
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 2]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 0]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 0}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 2]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 0]
+logService.js:107 [STATE] Стан для збереження в localStorage: {showMoves: false, showBoard: false, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: true, …}
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 0]
 logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 2]
-logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 2}
-logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 3]
 logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 2]
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 2]
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 3]
-logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 2, col: 3}
-logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 3]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 3]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 3]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 3]
-logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 3]
-
-
-```
-а як тобі здається чи є ще проблеми з логом?
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 2]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 2]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 2]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 2]
