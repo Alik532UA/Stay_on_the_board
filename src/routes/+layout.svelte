@@ -3,6 +3,8 @@
 	import '../app.css';
 	import { appSettingsStore } from '$lib/stores/appSettingsStore';
 	import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+  import { settingsPersistenceService } from '$lib/services/SettingsPersistenceService';
+  import { debounce } from '$lib/utils/debounce';
 	import { get } from 'svelte/store';
 	import { initializeI18n, i18nReady } from '$lib/i18n/init.js';
 	import { appVersion } from '$lib/stores/versionStore.js';
@@ -64,8 +66,21 @@
 			} else if (!localVersion) {
 				localStorage.setItem(APP_VERSION_KEY, serverVersion);
 			}
+
+      // Load settings from persistence layer
+      const loadedSettings = settingsPersistenceService.load();
+      // Set the loaded settings into the store
+      gameSettingsStore.set(loadedSettings);
+      
+      // Debounce the save function to avoid excessive writes to localStorage
+      const debouncedSave = debounce(settingsPersistenceService.save, 300);
+      // Subscribe to store changes and save them back to persistence
+      gameSettingsStore.subscribe(settings => {
+          debouncedSave(settings);
+      });
+
 			appSettingsStore.init();
-			gameSettingsStore.init();
+			gameSettingsStore.init(); // This now only sets up other subscriptions
 			initializeI18n();
 			
 			initializeTestModeSync(); // <-- ДОДАНО: Ініціалізація сервісу-моста

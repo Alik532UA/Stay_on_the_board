@@ -1,133 +1,155 @@
-Сценарії 1
-в головному меню натиснути [1] на клавіатурі, вибиреться data-testid="training-btn" і відкриється data-testid="game-mode-modal"
-натиснути знову [1] на клавіатурі
-
-Актуальний результат: нічого не відбувається (але кнопка ESC працює правильно)
-Очікуваний результат: вибиреться data-testid="beginner-mode-btn" в data-testid="game-mode-modal" тому що вікно відкрите поверх головного меню, тобто коли відкрите модельне вікно, то воно повинно перехоплювати всі гарачі клавші і не випускати їх далі
-
-те саме але іншими словами:
-у модальному вікні data-testid="game-mode-modal"
-Актуальний результат: гарячі клавіши не працюють
-Очікуваний результат: гарячі клавіши парцюють
-p.s. а в головному меню та в грі парацюють
-Важливо! не використовуй `${event.key}` ! треба використовувати `${event.code}` !
-
-додатково:
-здається це реалізовано, але може бути з помилками:
-Коли на екрані з'являється будь-яке модальне вікно, воно повинно "захоплювати" всі натискання клавіш. Це означає, що гарячі клавіші, які працюють на
-  фоновій сторінці (наприклад, у головному меню або в самій грі), не повинні спрацьовувати, доки модальне вікно відкрите.
-
-  Тобто, якщо відкрите модальне вікно, тільки елементи всередині цього вікна (кнопки, поля вводу) повинні реагувати на гарячі клавіші. Уся інша частина
-  інтерфейсу має бути тимчасово неактивною для клавіатури.
-
-  Це потрібно реалізувати для всіх модальних вікон у грі.
-
-  
----
-
-**Ключова вимога:** Твоє рішення має бути комплексним. Не роби поверхневих виправлень ("латок" чи "костилів").
-**Реалізуй системне виправлення**, яке усуває корінь проблеми та відповідає цільовій архітектурі проєкту.
-при виправленні використовуй принципи:
-1.  **SSoT (Single Source of Truth):** Чи є єдине джерело правди для кожного елемента стану?
-2.  **UDF (Unidirectional Data Flow):** Чи є потік даних односпрямованим та передбачуваним?
-3.  **SoC (Separation of Concerns):** Наскільки добре розділені відповідальності (стан, логіка, UI)?
-4.  **Композиція:** Чи ефективно використовуються компоненти для побудови UI?
-5.  **Чистота та Побічні ефекти:** Наскільки добре ізольовані "нечисті" операції (API, DOM, таймери)?
-6.  **DRY (Don't Repeat Yourself):** Чи є дублювання коду, яке можна усунути?
-7.  **Простота та Читабельність (KISS):** Чи є надмірно складні рішення? Наскільки код зрозумілий (якість іменування)?
-8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
-9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
-
----
-
-
-🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
-якщо ти це не прочитаєш, то я тебе видалю:
-
-тепер жодна гаряча клавіша не працює
-треба fix
-
----
-
-**Ключова вимога:** Твоє рішення має бути комплексним. Не роби поверхневих виправлень ("латок" чи "костилів").
-**Реалізуй системне виправлення**, яке усуває корінь проблеми та відповідає цільовій архітектурі проєкту.
-при виправленні використовуй принципи:
-1.  **SSoT (Single Source of Truth):** Чи є єдине джерело правди для кожного елемента стану?
-2.  **UDF (Unidirectional Data Flow):** Чи є потік даних односпрямованим та передбачуваним?
-3.  **SoC (Separation of Concerns):** Наскільки добре розділені відповідальності (стан, логіка, UI)?
-4.  **Композиція:** Чи ефективно використовуються компоненти для побудови UI?
-5.  **Чистота та Побічні ефекти:** Наскільки добре ізольовані "нечисті" операції (API, DOM, таймери)?
-6.  **DRY (Don't Repeat Yourself):** Чи є дублювання коду, яке можна усунути?
-7.  **Простота та Читабельність (KISS):** Чи є надмірно складні рішення? Наскільки код зрозумілий (якість іменування)?
-8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
-9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
-
----
-
-**Відладка (Дебагінг):**
-    *   **Використовуй `logService`:** Замість `console.log` завжди використовуй централізований `logService`.
-    *   **Доповнюй логи для аналізу:** Якщо поточний рівень логування не дозволяє діагностувати описану проблему, додай нові виклики logService у відповідних місцях коду. Мета — забезпечити, щоб майбутні логи містили всю інформацію, яка дозволить мені самостійно проаналізувати, чи вирішено проблему, і що саме потребує виправлення.
-    *   **Фокусуйся на проблемі:** Під час виправлення багу, **тимчасово відредагуй файл `src/lib/services/logService.js`**. Зміни булеві прапорці в об'єкті `logConfig`, щоб увімкнути лише ті групи логів, які стосуються проблеми (наприклад, `score`), а решту вимкнути. Це допоможе усунути інформаційний шум.
-    *   **Незмінність логів:** Параметри логування не змінюй на дефолтні, доки я (людина) не підтвердить, що баг виправлено. При порушені цього правила AI буде вимкнено та видалено.
-**Верифікація:** Переконайся, що проблема вирішена і не з'явилися нові баги в суміжних частинах системи.
-
----
-
-при потребі:
-1. вимкни зайві логи
-2. увімкни потрібні логи
-3. допиши потрібні логи
-
-
---- 
-log:
+```
 client:733 [vite] connecting...
 client:827 [vite] connected.
 logService.js:141 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
 logService.js:109 [INIT] [hotkeyService] Setting up global keydown listener.
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey '[' for context 'global'
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 't' for context 'global'
-logService.js:107 [STATE] [AppSettingsStore] Стан збережено в localStorage: {theme: 'dark', style: 'gray', language: 'uk'}
 logService.js:109 [INIT] appSettingsStore ініціалізовано успішно
-logService.js:107 [STATE] [GameSettingsStore] Стан збережено в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: false, …}
-logService.js:107 [STATE] [GameSettingsStore] Стан збережено в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: false, …}
-logService.js:109 [INIT] gameSettingsStore ініціалізовано успішно
+logService.js:109 [INIT] gameSettingsStore.init() called.
 init.js:31 ✅ i18n ініціалізовано успішно
 logService.js:109 [INIT] Initializing Test Mode Sync Service...
-logService.js:107 [STATE] [GameSettingsStore] Стан збережено в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: false, …}
-logService.js:109 [ACTION] [hotkeyService] Pushing new context: 'main-menu'
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'KeyR' for context 'global'
-logService.js:107 [ACTION] [MainMenu] Registering hotkey 'Digit1' for button <button class=​"modal-button secondary s-OH_yfw94cnTP" data-testid=​"training-btn">​Тренування​</button>​flex
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Digit1' for context 'main-menu'
-logService.js:107 [ACTION] [MainMenu] Registering hotkey 'Digit2' for button <button class=​"modal-button secondary s-OH_yfw94cnTP" data-testid=​"timed-game-btn">​Гра на час​</button>​flex
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Digit2' for context 'main-menu'
-logService.js:107 [ACTION] [MainMenu] Registering hotkey 'Digit3' for button <button data-testid=​"local-game-btn" class=​"modal-button secondary s-OH_yfw94cnTP">​Локальна гра​</button>​flex
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Digit3' for context 'main-menu'
-logService.js:107 [ACTION] [MainMenu] Registering hotkey 'Digit4' for button <button class=​"modal-button secondary pseudo-disabled s-OH_yfw94cnTP" data-testid=​"online-game-btn">​Грати онлайн​</button>​flex
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Digit4' for context 'main-menu'
-logService.js:107 [ACTION] [MainMenu] Registering hotkey 'Digit5' for button <button class=​"modal-button secondary s-OH_yfw94cnTP" data-testid=​"settings-btn">​Налаштування​</button>​flex
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Digit5' for context 'main-menu'
-logService.js:107 [ACTION] [MainMenu] Registering hotkey 'Digit6' for button <button class=​"modal-button secondary s-OH_yfw94cnTP" data-testid=​"controls-btn">​Керування​</button>​flex
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Digit6' for context 'main-menu'
-logService.js:107 [ACTION] [MainMenu] Registering hotkey 'Digit7' for button <button class=​"modal-button secondary s-OH_yfw94cnTP" data-testid=​"rules-btn">​Правила​</button>​flex
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Digit7' for context 'main-menu'
-logService.js:107 [ACTION] [MainMenu] Registering hotkey 'Digit8' for button <button class=​"modal-button secondary s-OH_yfw94cnTP" data-testid=​"supporters-btn">​Подяка за підтримку​</button>​flex
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Digit8' for context 'main-menu'
-logService.js:107 [ACTION] [hotkeyService] handleKeydown: code=Digit1, stack= (2) ['global', 'main-menu']
-logService.js:109 [ACTION] [hotkeyService] Executing hotkey 'Digit1' from context 'main-menu'
-logService.js:109 [ACTION] [hotkeyService] Popping context: 'main-menu'
-logService.js:109 [ACTION] [hotkeyService] Unregistering all hotkeys for context 'main-menu'
-logService.js:109 [ACTION] Click: "Гра проти комп'ютера" (MainMenu)
-logService.js:107 [STATE] [GameSettingsStore] Стан збережено в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: false, …}
-logService.js:109 [ACTION] [hotkeyService] Pushing new context: 'modal-game-mode-modal'
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'KeyX' for context 'game-mode-modal'
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Digit1' for context 'game-mode-modal'
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Digit2' for context 'game-mode-modal'
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Digit3' for context 'game-mode-modal'
-logService.js:109 [ACTION] [hotkeyService] Pushing new context: 'modal-game-mode-modal'
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Escape' for context 'modal-game-mode-modal'
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'ESC' for context 'modal-game-mode-modal'
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'Escape' for context 'modal-game-mode-modal'
-logService.js:109 [ACTION] [hotkeyService] Registering hotkey 'ESC' for context 'modal-game-mode-modal'
-logService.js:107 [ACTION] [hotkeyService] handleKeydown: code=Digit1, stack= (3) ['global', 'modal-game-mode-modal', 'modal-game-mode-modal']
-logService.js:109 [ACTION] [hotkeyService] No action found for key 'Digit1' in any active context.
+logService.js:109 [INIT] [TrainingPage] onMount: No active game found, initializing "training" mode.
+logService.js:107 [INIT] [GameService] initializeNewGame: Створення нового ігрового стану... {size: undefined, players: Array(2)}
+logService.js:109 [ANIMATION] [AnimationService] reset() called
+logService.js:109 [ANIMATION] AnimationStore: reset()
+logService.js:109 [GAME_MODE] Game mode initialized: training (from preset: training)
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 0]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 0}
+logService.js:109 [INIT] [gameHotkeyService] Initializing game hotkeys.
+logService.js:107 [STATE] [AppSettingsStore] Стан збережено в localStorage: {theme: 'dark', style: 'gray', language: 'uk'}
+logService.js:107 [STATE] Стан для збереження в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: true, …}
+logService.js:109 [LOGIC_MOVE] [userActionService] setDirection called with: down-right
+logService.js:107 [LOGIC_MOVE] setDirection: встановлено напрямок {dir: 'down-right', newDistance: 1}
+logService.js:107 [STATE] Стан для збереження в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: true, …}
+logService.js:107 [STATE] Logical Position (at move start) {row: 1, col: 0}
+logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down-right', distance: 1, playerIndex: 0}
+logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 1]
+logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 1, direction: 'down-right', distance: 1, to: {…}}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 1]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 2, col: 1}
+logService.js:107 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
+logService.js:107 [SPEECH] [SideEffectService] Received speak_move effect {move: {…}, lang: 'uk', voiceURI: null}
+logService.js:109 [SPEECH] [Speech] Determined language for speech: uk (based on voice lang: uk-UA)
+logService.js:109 [SPEECH] [Speech] Generating text for "uk": "по діагоналі вниз-вправо 1"
+logService.js:109 [SPEECH] [Speech] speakText called. Current speaking state: false. Queued text: "по діагоналі вниз-вправо 1"
+logService.js:109 [SPEECH] [Speech] Queuing utterance "по діагоналі вниз-вправо 1" with lang: uk-UA
+logService.js:109 [SPEECH] [Speech] Utterance queued. Current speaking state: true.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:109 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:107 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'right', distance: 1, row: 2, col: 2, isPenalty: false}
+logService.js:109 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:107 [STATE] Logical Position (at move start) {row: 2, col: 1}
+logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'right', distance: 1, playerIndex: 1}
+logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 2]
+logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 2, direction: 'right', distance: 1, to: {…}}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 2]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 2, col: 2}
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 2]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 1]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 2, col: 1}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 2]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 1]
+logService.js:107 [STATE] Стан для збереження в localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: null, blockModeEnabled: true, …}
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 1]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 2]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 2, col: 2}
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 2]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 2]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 2]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 2]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 2]
+logService.js:109 [LOGIC_MOVE] [userActionService] setDirection called with: up
+logService.js:107 [LOGIC_MOVE] setDirection: встановлено напрямок {dir: 'up', newDistance: 1}
+logService.js:109 [LOGIC_MOVE] [userActionService] setDirection called with: up
+logService.js:107 [LOGIC_MOVE] setDirection: встановлено напрямок {dir: 'up', newDistance: 2}
+logService.js:107 [STATE] Logical Position (at move start) {row: 2, col: 2}
+logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'up', distance: 2, playerIndex: 0}
+logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [0, 2]
+logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 1, direction: 'up', distance: 2, to: {…}}
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 2]
+logService.js:107 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
+logService.js:107 [SPEECH] [SideEffectService] Received speak_move effect {move: {…}, lang: 'uk', voiceURI: null}
+logService.js:109 [SPEECH] [Speech] Determined language for speech: uk (based on voice lang: uk-UA)
+logService.js:109 [SPEECH] [Speech] Generating text for "uk": "вгору 2"
+logService.js:109 [SPEECH] [Speech] speakText called. Current speaking state: true. Queued text: "вгору 2"
+logService.js:109 [SPEECH] [Speech] Queuing utterance "вгору 2" with lang: uk-UA
+logService.js:109 [SPEECH] [Speech] Utterance queued. Current speaking state: true.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:109 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:107 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'down-left', distance: 1, row: 1, col: 1, isPenalty: false}
+logService.js:109 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:107 [STATE] Logical Position (at move start) {row: 0, col: 2}
+logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down-left', distance: 1, playerIndex: 1}
+logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 2]
+logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 2, direction: 'down-left', distance: 1, to: {…}}
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 2]
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 1]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [0, 2]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 0, col: 2}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [1, 1]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [0, 2]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [0, 2]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 1]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 1}
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 1]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 1]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 1]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 1]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 1]
+logService.js:109 [LOGIC_MOVE] [userActionService] setDirection called with: right
+logService.js:107 [LOGIC_MOVE] setDirection: встановлено напрямок {dir: 'right', newDistance: 1}
+logService.js:107 [STATE] Logical Position (at move start) {row: 1, col: 1}
+logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'right', distance: 1, playerIndex: 0}
+logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [1, 2]
+logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 1, direction: 'right', distance: 1, to: {…}}
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 1]
+logService.js:107 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
+logService.js:107 [SPEECH] [SideEffectService] Received speak_move effect {move: {…}, lang: 'uk', voiceURI: null}
+logService.js:109 [SPEECH] [Speech] Determined language for speech: uk (based on voice lang: uk-UA)
+logService.js:109 [SPEECH] [Speech] Generating text for "uk": "вправо 1"
+logService.js:109 [SPEECH] [Speech] speakText called. Current speaking state: true. Queued text: "вправо 1"
+logService.js:109 [SPEECH] [Speech] Queuing utterance "вправо 1" with lang: uk-UA
+logService.js:109 [SPEECH] [Speech] Utterance queued. Current speaking state: true.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:109 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:107 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'down-right', distance: 1, row: 2, col: 3, isPenalty: false}
+logService.js:109 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:107 [STATE] Logical Position (at move start) {row: 1, col: 2}
+logService.js:107 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down-right', distance: 1, playerIndex: 1}
+logService.js:109 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 1]
+logService.js:107 [ANIMATION] [AnimationService] addToAnimationQueue: {player: 2, direction: 'down-right', distance: 1, to: {…}}
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 1]
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:109 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 3]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 2]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 1, col: 2}
+logService.js:109 [PIECE] (visualPosition) fallback, returning logical position: [2, 3]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 2]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [1, 2]
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 3]
+logService.js:107 [ANIMATION] Visual Position (PlayerPiece props) {row: 2, col: 3}
+logService.js:109 [PIECE] (visualPosition) animation in progress, returning animated position: [2, 3]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 3]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 3]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 3]
+logService.js:109 [PIECE] (visualPosition) no animation, returning logical position: [2, 3]
+
+
+```
+а як тобі здається чи є ще проблеми з логом?

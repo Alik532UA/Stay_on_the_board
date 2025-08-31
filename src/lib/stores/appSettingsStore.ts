@@ -6,6 +6,7 @@
 // src/lib/stores/appSettingsStore.ts
 import { writable } from 'svelte/store';
 import { logService } from '../services/logService';
+import { debounce } from '$lib/utils/debounce';
 
 const isBrowser = typeof window !== 'undefined';
 let isInitialized = false;
@@ -55,10 +56,15 @@ function createAppSettingsStore() {
       const settings = loadAppSettings();
       set(settings);
       
+      const debouncedSave = debounce(saveAppSettings, 300);
+
       subscribe(currentSettings => {
+        // Apply visual changes immediately
         document.documentElement.setAttribute('data-theme', currentSettings.theme);
         document.documentElement.setAttribute('data-style', currentSettings.style);
-        saveAppSettings(currentSettings);
+        
+        // Debounce the save operation
+        debouncedSave(currentSettings);
       });
       logService.init('appSettingsStore ініціалізовано успішно');
     },
