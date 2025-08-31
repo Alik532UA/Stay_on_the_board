@@ -12,7 +12,7 @@ import { uiStateStore } from './uiStateStore.js';
 import { boardStore } from './boardStore.ts';
 import { availableMovesService } from '../services/availableMovesService.ts';
 
-export type KeybindingAction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right'|'confirm'|'no-moves'|'toggle-block-mode'|'toggle-board'|'increase-board'|'decrease-board'|'toggle-speech'|'distance-1'|'distance-2'|'distance-3'|'distance-4'|'distance-5'|'distance-6'|'distance-7'|'distance-8';
+export type KeybindingAction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right'|'confirm'|'no-moves'|'toggle-block-mode'|'toggle-board'|'increase-board'|'decrease-board'|'toggle-speech'|'distance-1'|'distance-2'|'distance-3'|'distance-4'|'distance-5'|'distance-6'|'distance-7'|'distance-8'|'auto-hide-board'|'show-help'|'main-menu'|'toggle-theme'|'toggle-language';
 export type GameModePreset = 'beginner' | 'experienced' | 'pro';
 
 export type GameSettingsState = {
@@ -62,7 +62,12 @@ const defaultGameSettings: GameSettingsState = {
         'distance-7': ['Digit7'], 'distance-8': ['Digit8'],
         'toggle-block-mode': ['NumpadMultiply', 'KeyB'], 'toggle-board': ['NumpadDivide', 'KeyH'],
         'increase-board': ['NumpadAdd', 'Equal'], 'decrease-board': ['NumpadSubtract', 'Minus'],
-        'toggle-speech': ['KeyS'],
+        'toggle-speech': ['KeyV'],
+        'auto-hide-board': ['Numpad0'],
+        'show-help': ['KeyI'],
+        'main-menu': ['Escape'],
+        'toggle-theme': ['KeyT'],
+        'toggle-language': ['KeyL'],
     },
     keyConflictResolution: {},
     gameMode: null,
@@ -121,14 +126,28 @@ function createGameSettingsStore() {
       update(state => ({ ...state, keybindings: defaultGameSettings.keybindings }));
     },
     toggleShowBoard: (forceState?: boolean) => {
-      update((state: GameSettingsState) => {
-        const newShowBoardState = typeof forceState === 'boolean' ? forceState : !state.showBoard;
-        const newSettings: Partial<GameSettingsState> = { ...state, showBoard: newShowBoardState };
-        if (!newShowBoardState) {
-          newSettings.showPiece = false;
-          newSettings.showMoves = false;
+      update(state => {
+        if (typeof forceState === 'boolean') {
+          const newSettings: Partial<GameSettingsState> = { ...state, showBoard: forceState };
+          if (!forceState) {
+            newSettings.showPiece = false;
+            newSettings.showMoves = false;
+          } else {
+            newSettings.showPiece = true;
+            newSettings.showMoves = true;
+          }
+          return newSettings as GameSettingsState;
         }
-        return newSettings as GameSettingsState;
+
+        const { showBoard } = state;
+        const newShowBoard = !showBoard;
+
+        return { 
+          ...state, 
+          showBoard: newShowBoard, 
+          showPiece: newShowBoard, 
+          showMoves: newShowBoard 
+        };
       });
     },
     toggleShowMoves: () => update(state => ({ ...state, showMoves: !state.showMoves })),

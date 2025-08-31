@@ -4,6 +4,8 @@ export default {
   altMovement: "Alternatieve besturing (WASD-stijl)",
   gameActions: "Spelacties",
   gameSettings: "Spelinstellingen beheren",
+  navigation: "Navigatie",
+  general: "Algemeen",
   upLeft: "Schuin omhoog-links",
   up: "Omhoog",
   upRight: "Schuin omhoog-rechts",
@@ -39,6 +41,11 @@ export default {
     'increase-board': "Bordgrootte vergroten",
     'decrease-board': "Bordgrootte verkleinen",
     'toggle-speech': "Voiceover",
+    'auto-hide-board': "Verberg bord automatisch",
+    'show-help': "Toon help",
+    'main-menu': "Hoofdmenu",
+    'toggle-theme': "Thema wisselen",
+    'toggle-language': "Taal wisselen",
     'distance-1': "Afstand 1",
     'distance-2': "Afstand 2",
     'distance-3': "Afstand 3",
@@ -50,4 +57,4 @@ export default {
   },
   distanceSelection: "Afstand selecteren",
   resetToDefaults: "Reset naar Standaard"
-}; 
+};

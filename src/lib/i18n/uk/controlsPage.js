@@ -4,6 +4,8 @@ export default {
   altMovement: "Альтернативне керування (WASD-стиль)",
   gameActions: "Дії в грі",
   gameSettings: "Керування налаштуваннями гри",
+  navigation: "Навігація",
+  general: "Загальні",
   upLeft: "Вгору-ліворуч",
   up: "Вгору",
   upRight: "Вгору-праворуч",
@@ -40,6 +42,11 @@ export default {
     'increase-board': "Збільшити дошку",
     'decrease-board': "Зменшити дошку",
     'toggle-speech': "Озвучування ходів",
+    'auto-hide-board': "Автоматично ховати дошку",
+    'show-help': "Показати допомогу",
+    'main-menu': "Головне меню",
+    'toggle-theme': "Перемкнути тему",
+    'toggle-language': "Перемкнути мову",
     'distance-1': "Відстань 1",
     'distance-2': "Відстань 2",
     'distance-3': "Відстань 3",
@@ -51,4 +58,4 @@ export default {
   },
   distanceSelection: "Вибір відстані",
   resetToDefaults: "Скинути до стандартних"
-}; 
+};

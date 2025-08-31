@@ -16,7 +16,7 @@
   import PlayerColorProvider from '$lib/components/PlayerColorProvider.svelte';
   import hotkeyService from '$lib/services/hotkeyService';
   
-    import { initializeGameHotkeys, cleanupGameHotkeys } from '$lib/services/gameHotkeyService';
+    import { initializeGameHotkeys, cleanupGameHotkeys, registerGameAction } from '$lib/services/gameHotkeyService';
   import { testModeStore } from '$lib/stores/testModeStore'; // <-- ДОДАНО: Імпорт правильного стору
   import '$lib/services/commandService.ts';
   import { animationService } from '$lib/services/animationService';
@@ -35,6 +35,35 @@
   onMount(() => {
     hotkeyService.pushContext('game');
     initializeGameHotkeys();
+
+    registerGameAction('auto-hide-board', () => {
+      gameSettingsStore.toggleAutoHideBoard();
+    });
+    registerGameAction('toggle-block-mode', () => {
+      gameSettingsStore.toggleBlockMode();
+    });
+    registerGameAction('toggle-board', () => {
+      gameSettingsStore.toggleShowBoard();
+    });
+    // Гарячі клавіші для зміни розміру дошки.
+    // Вони викликають userActionService.changeBoardSize, яка містить логіку
+    // для показу модального вікна підтвердження, якщо гра вже почалася.
+    registerGameAction('increase-board', () => {
+      const currentSize = get(gameSettingsStore).boardSize;
+      if (currentSize < 9) {
+        userActionService.changeBoardSize(currentSize + 1);
+      }
+    });
+    registerGameAction('decrease-board', () => {
+      const currentSize = get(gameSettingsStore).boardSize;
+      if (currentSize > 2) {
+        userActionService.changeBoardSize(currentSize - 1);
+      }
+    });
+    registerGameAction('toggle-speech', () => {
+      gameSettingsStore.toggleSimpleSpeech();
+    });
+
     // ЗМІНЕНО: Перевіряємо isEnabled з testModeStore, а не testMode з appSettingsStore
     if (import.meta.env.DEV || get(testModeStore)?.isEnabled) {
   	(window as any).userActionService = userActionService;
