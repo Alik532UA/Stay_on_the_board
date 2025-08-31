@@ -137,6 +137,8 @@ export abstract class BaseGameMode implements IGameMode {
   
   cleanup(): void {
     logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
+    timeService.stopGameTimer();
+    timeService.stopTurnTimer();
     resetAllStores();
   }
 
