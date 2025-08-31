@@ -1,9 +1,8 @@
 /**
  * @file Manages settings related to a specific game session.
- * @description This store handles configurations that affect the gameplay of a single match,
- * such as board size, difficulty presets (game mode), and control schemes (keybindings).
- * While these settings are persisted in localStorage for convenience, they are conceptually
- * tied to a game session and can be reset or changed for each new game.
+ * @description This store is the SSoT for all game-related settings.
+ * It is initialized with default values and can be updated by other services,
+ * like the SettingsPersistenceService which handles loading settings from localStorage.
  */
 // src/lib/stores/gameSettingsStore.ts
 import { writable, get } from 'svelte/store';
@@ -13,7 +12,7 @@ import { boardStore } from './boardStore.ts';
 import { availableMovesService } from '../services/availableMovesService.ts';
 
 export type KeybindingAction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right'|'confirm'|'no-moves'|'toggle-block-mode'|'toggle-board'|'increase-board'|'decrease-board'|'toggle-speech'|'distance-1'|'distance-2'|'distance-3'|'distance-4'|'distance-5'|'distance-6'|'distance-7'|'distance-8'|'auto-hide-board'|'show-help'|'main-menu'|'toggle-theme'|'toggle-language';
-export type GameModePreset = 'beginner' | 'experienced' | 'pro';
+export type GameModePreset = 'beginner' | 'experienced' | 'pro' | 'timed' | 'local' | 'online';
 
 export type GameSettingsState = {
   showMoves: boolean;
@@ -42,12 +41,12 @@ export type GameSettingsState = {
 const isBrowser = typeof window !== 'undefined';
 let isInitialized = false;
 
-const defaultGameSettings: GameSettingsState = {
+export const defaultGameSettings: GameSettingsState = {
     showMoves: true,
     showBoard: true,
     speechEnabled: false,
     selectedVoiceURI: null,
-    blockModeEnabled: false,
+    blockModeEnabled: true,
     showPiece: true,
     blockOnVisitCount: 0,
     autoHideBoard: false,
@@ -74,7 +73,7 @@ const defaultGameSettings: GameSettingsState = {
     rememberGameMode: false,
     showGameModeModal: true,
     showDifficultyWarningModal: true,
-    showGameInfoWidget: 'shown',
+    showGameInfoWidget: 'compact',
     lockSettings: false,
     speechRate: 1,
     speechOrder: 'dir_dist',
@@ -82,44 +81,32 @@ const defaultGameSettings: GameSettingsState = {
     speechFor: { player: true, computer: true },
 };
 
-function loadGameSettings(): GameSettingsState {
-    if (!isBrowser) return defaultGameSettings;
-    const saved = localStorage.getItem('gameSettings');
-    return saved ? { ...defaultGameSettings, ...JSON.parse(saved) } : defaultGameSettings;
-}
-
-function saveGameSettings(settings: GameSettingsState) {
-    if (!isBrowser) return;
-    localStorage.setItem('gameSettings', JSON.stringify(settings));
-    logService.state('[GameSettingsStore] Стан збережено в localStorage:', settings);
-}
-
 function createGameSettingsStore() {
-  const initialState = loadGameSettings();
-  const { subscribe, set, update } = writable<GameSettingsState>(initialState);
+  // The store is now initialized with the default settings.
+  // The SettingsPersistenceService is responsible for loading persisted data
+  // and updating the store via the `set` method.
+  const { subscribe, set, update } = writable<GameSettingsState>(defaultGameSettings);
 
   const methods = {
+    set, // Expose the set method to allow the persistence service to overwrite the state.
     init: () => {
       if (isInitialized || !isBrowser) return;
       isInitialized = true;
-      const settings = loadGameSettings();
-      set(settings);
-      subscribe(saveGameSettings);
 
+      // This subscription remains as it's a reaction to another store's state change.
       uiStateStore.subscribe(state => {
         if (state && state.isFirstMove) {
           methods.updateSettings({ showBoard: true, showPiece: true, showMoves: true });
         }
       });
-      logService.init('gameSettingsStore ініціалізовано успішно');
+      logService.init('gameSettingsStore.init() called.');
     },
     updateSettings: (newSettings: Partial<GameSettingsState>) => {
       update(state => ({ ...state, ...newSettings }));
     },
     resetSettings: () => {
-      if (isBrowser) {
-        localStorage.removeItem('gameSettings');
-      }
+      // Now reset just sets the defaults, persistence is handled elsewhere.
+      logService.action('[GameSettingsStore] Resetting settings to default.');
       set(defaultGameSettings);
     },
     resetKeybindings: () => {
@@ -181,6 +168,7 @@ function createGameSettingsStore() {
                 speechRate: 1,
                 shortSpeech: false,
                 speechFor: { player: true, computer: true },
+                showGameInfoWidget: 'compact',
             },
             experienced: { 
                 gameMode: 'experienced', 
@@ -191,6 +179,7 @@ function createGameSettingsStore() {
                 speechRate: 1.4,
                 shortSpeech: true,
                 speechFor: { player: false, computer: true },
+                showGameInfoWidget: 'compact',
             },
             pro: { 
                 gameMode: 'pro', 
@@ -198,7 +187,35 @@ function createGameSettingsStore() {
                 autoHideBoard: true, 
                 speechEnabled: true, 
                 rememberGameMode: true,
-                speechRate: 1.8,
+                speechRate: 1.6,
+                shortSpeech: true,
+                speechFor: { player: false, computer: true },
+                showGameInfoWidget: 'compact',
+            },
+            timed: {
+                autoHideBoard: true,
+                blockModeEnabled: true,
+                speechEnabled: false,
+                showGameInfoWidget: 'compact',
+                speechRate: 1.6,
+                shortSpeech: true,
+                speechFor: { player: false, computer: true },
+            },
+            local: {
+                autoHideBoard: true,
+                blockModeEnabled: true,
+                speechEnabled: false,
+                showGameInfoWidget: 'compact',
+                speechRate: 1.6,
+                shortSpeech: true,
+                speechFor: { player: false, computer: true },
+            },
+            online: {
+                autoHideBoard: true,
+                blockModeEnabled: true,
+                speechEnabled: false,
+                showGameInfoWidget: 'compact',
+                speechRate: 1.6,
                 shortSpeech: true,
                 speechFor: { player: false, computer: true },
             }

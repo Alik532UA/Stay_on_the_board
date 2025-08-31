@@ -1,56 +1,17 @@
 // src/lib/services/SettingsPersistenceService.ts
 import { logService } from './logService';
+import { defaultGameSettings } from '../stores/gameSettingsStore.js';
 
 const isBrowser = typeof window !== 'undefined';
 const defaultStyle = import.meta.env.DEV ? 'gray' : 'gray';
 const SETTINGS_VERSION = 2;
 
 const defaultSettings: any = {
+  ...defaultGameSettings,
   version: SETTINGS_VERSION,
-  showMoves: true,
-  showBoard: true,
   language: 'uk',
   theme: 'dark',
   style: defaultStyle,
-  speechEnabled: false,
-  selectedVoiceURI: null,
-  blockModeEnabled: false,
-  showPiece: true,
-  blockOnVisitCount: 0,
-  autoHideBoard: false,
-  boardSize: 4,
-  keybindings: {
-    'up-left': ['Numpad7', 'KeyQ'],
-    'up': ['Numpad8', 'KeyW'],
-    'up-right': ['Numpad9', 'KeyE'],
-    'left': ['Numpad4', 'KeyA'],
-    'right': ['Numpad6', 'KeyD'],
-    'down-left': ['Numpad1', 'KeyZ'],
-    'down': ['Numpad2', 'KeyX'],
-    'down-right': ['Numpad3', 'KeyC'],
-    'confirm': ['Numpad5', 'Enter', 'Space'],
-    'no-moves': ['NumpadDecimal', 'Backspace'],
-    'distance-1': ['Digit1'],
-    'distance-2': ['Digit2'],
-    'distance-3': ['Digit3'],
-    'distance-4': ['Digit4'],
-    'distance-5': ['Digit5'],
-    'distance-6': ['Digit6'],
-    'distance-7': ['Digit7'],
-    'distance-8': ['Digit8'],
-    'toggle-block-mode': ['NumpadMultiply', 'KeyB'],
-    'toggle-board': ['NumpadDivide', 'KeyH'],
-    'increase-board': ['NumpadAdd', 'Equal'],
-    'decrease-board': ['NumpadSubtract', 'Minus'],
-    'toggle-speech': ['KeyS'],
-  },
-  keyConflictResolution: {},
-  gameMode: null,
-  rememberGameMode: false,
-  showGameModeModal: true,
-  showDifficultyWarningModal: true,
-  showGameInfoWidget: 'shown',
-  lockSettings: false,
 };
 
 function safeJsonParse<T>(jsonString: string | null, defaultValue: T): T {
@@ -79,7 +40,10 @@ export const settingsPersistenceService = {
       
       let mergedSettings = { ...defaultSettings, ...storedSettings };
 
-      // ... (вся логіка міграції та об'єднання залишається тут)
+      if (storedSettings.version < SETTINGS_VERSION) {
+        mergedSettings.showGameInfoWidget = defaultSettings.showGameInfoWidget;
+        mergedSettings.version = SETTINGS_VERSION;
+      }
 
       return mergedSettings;
     } catch (error) {

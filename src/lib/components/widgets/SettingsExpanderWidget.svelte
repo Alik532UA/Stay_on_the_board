@@ -271,7 +271,7 @@
         <span class="settings-expander__label">{$_('gameControls.blockAfter')}</span>
         <div class="settings-expander__button-group" use:fitTextAction={$gameSettingsStore.blockOnVisitCount}>
           {#each [0, 1, 2, 3] as count}
-            <button data-testid="settings-expander-block-count-btn-{count}" class="settings-expander__square-btn" class:active={$gameSettingsStore.blockOnVisitCount === count} on:click={() => selectBlockCount(count)}>{count}</button>
+            <button data-testid="settings-expander-block-count-btn-{count}" class="settings-expander__square-btn" class:active={$gameSettingsStore.blockOnVisitCount === count} on:click={() => selectBlockCount(count)}>{count + 1}</button>
           {/each}
         </div>
       </div>
