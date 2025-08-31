@@ -17,7 +17,7 @@ test.describe('Сценарії завершення гри', { tag: '@GOS' }, (
 
     await test.step('Перевірка модального вікна "Гру завершено!"', async () => {
       await expect(page.getByTestId('game-over-modal')).toBeVisible();
-      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.trainingOverTitle');
     });
 
     await test.step('Перевірка, що рахунки нульові або від\'ємні', async () => {
@@ -41,7 +41,7 @@ test.describe('Сценарії завершення гри', { tag: '@GOS' }, (
 
     await test.step('Перевірка модального вікна "Гру завершено!"', async () => {
       await expect(page.getByTestId('game-over-modal')).toBeVisible();
-      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.trainingOverTitle');
     });
   });
 
@@ -58,7 +58,7 @@ test.describe('Сценарії завершення гри', { tag: '@GOS' }, (
 
     await test.step('Перевірка модального вікна "Гру завершено!"', async () => {
       await expect(page.getByTestId('game-over-modal')).toBeVisible();
-      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.trainingOverTitle');
       // await expect(page.getByTestId('modal-content-reason')).toHaveAttribute('data-i18n-key', 'modal.gameOverReasonCashOut');
     });
   });

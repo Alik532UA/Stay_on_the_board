@@ -55,7 +55,9 @@ export const modalService = {
     const t = get(_);
 
     let titleKey = 'modal.gameOverTitle';
-    if (winners.length === 1) {
+    if (gameType === 'training') {
+      titleKey = 'modal.trainingOverTitle';
+    } else if (winners.length === 1) {
       const winner = state.players.find((p: Player) => p.id === winners[0]);
       if (winner) {
         titleKey = gameType === 'local' ? 'modal.winnerTitle' : 'modal.gameOverTitle';

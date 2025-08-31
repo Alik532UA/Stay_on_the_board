@@ -46,7 +46,7 @@ test.describe('Модальне вікно "Блискучий аналіз"', (
       await setBlockMode(page, BlockModeState.On);
       await page.getByTestId('no-moves-btn').click();
       await expect(page.getByTestId('game-over-modal')).toBeVisible();
-      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.trainingOverTitle');
     });
   });
 });

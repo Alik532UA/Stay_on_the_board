@@ -5595,10 +5595,6 @@ data-testid="competitive-mode-modal-modal.goToTraining-btn"
 Актуальний результат: повідомлення "The server is configured with a public base URL of /Stay_on_the_board - did you mean to visit /Stay_on_the_board/game/training instead?"
 Очікуваний результат: переходить одразу правильно на потрібну сторінку на потрібний режим
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
-data-testid="game-over-modal-title"
-Актуальний результат: 
-Очікуваний результат: 
-🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
 data-testid="game-info-panel"
 при виборі напрямку
 Актуальний результат: зайвий раз перерендеривается
@@ -5614,4 +5610,12 @@ data-testid="game-info-panel" не повинен нічого знати про
 орієнтуватися тільки на логіку гри!
 
 
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+data-testid="game-over-modal-title"
+Актуальний результат: 
+в /game/training === gameOverTitle: "Гру завершено!",
+в /game/timed === gameOverTitle: "Гру завершено!",
+Очікуваний результат: 
+в /game/training === "Тренування завершено!",
+в /game/timed === "Гру завершено!",
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
