@@ -22,6 +22,7 @@ import ReplayViewer from '$lib/components/ReplayViewer.svelte';
 import { gameEventBus } from './gameEventBus';
 import { sideEffectService } from './sideEffectService';
 import { navigateToGame } from './uiService'; // Add this import
+import { gameModeStore } from '$lib/stores/gameModeStore';
 
 export const userActionService = {
   selectDirection(direction: Direction): void {
@@ -103,8 +104,15 @@ export const userActionService = {
 
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
-    const currentBoardSize = get(boardStore)?.boardSize;
-    gameService.initializeNewGame({ size: currentBoardSize });
+    const activeMode = get(gameModeStore).activeMode;
+    if (activeMode) {
+      gameModeService.initializeGameMode(activeMode);
+    } else {
+      // Fallback, though a mode should always be active when this is called.
+      logService.error('[userActionService] requestRestart called without an active game mode.');
+      const currentBoardSize = get(boardStore)?.boardSize;
+      gameService.initializeNewGame({ size: currentBoardSize });
+    }
   },
 
   async requestRestartWithSize(newSize: number): Promise<void> {
