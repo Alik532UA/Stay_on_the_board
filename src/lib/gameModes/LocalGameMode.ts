@@ -74,6 +74,10 @@ export class LocalGameMode extends BaseGameMode {
     ];
   }
 
+  getModeName(): 'training' | 'local' | 'timed' | 'online' {
+    return 'local';
+  }
+
   protected async advanceToNextPlayer(): Promise<void> {
     const currentPlayerState = get(playerStore);
     if (!currentPlayerState) return;

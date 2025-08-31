@@ -11,6 +11,7 @@ import { scoreStore, initialScoreState } from '$lib/stores/scoreStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
 import type { Player } from '$lib/models/player';
 import { tick } from 'svelte';
+import { gameModeService } from './gameModeService';
 
 export const endGameService = {
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
@@ -36,8 +37,8 @@ export const endGameService = {
       return;
     }
 
-    const humanPlayersCount = playerState.players.filter((p: Player) => p.type === 'human').length;
-    const gameType = humanPlayersCount > 1 ? 'local' : 'training';
+    const currentGameMode = gameModeService.getCurrentMode();
+    const gameType = currentGameMode ? currentGameMode.getModeName() : 'training';
 
     // 4. Розраховуємо фінальний рахунок на основі АКТУАЛЬНОГО стану
     logService.score('[endGameService] Calculating final score with states:', { 

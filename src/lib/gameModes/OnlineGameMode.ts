@@ -45,6 +45,10 @@ export class OnlineGameMode extends BaseGameMode {
     ];
   }
 
+  getModeName(): 'training' | 'local' | 'timed' | 'online' {
+    return 'online';
+  }
+
   async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE('[OnlineGameMode] Continuing after no moves...');
   }

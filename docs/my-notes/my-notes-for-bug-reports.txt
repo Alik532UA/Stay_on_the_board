@@ -5619,3 +5619,14 @@ data-testid="game-over-modal-title"
 в /game/training === "Тренування завершено!",
 в /game/timed === "Гру завершено!",
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+data-testid="game-over-modal-title"
+Актуальний результат: 
+в /game/training === gameOverTitle: "Тренування завершено!",
+в /game/timed === gameOverTitle: "Тренування завершено!",
+Очікуваний результат: 
+в /game/training === "Тренування завершено!",
+в /game/timed === "Гру завершено!",
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+"game-over-modal"
+Актуальний результат: пристуній data-testid="game-over-modal-close-btn"
+Очікуваний результат: немає кнопки закрити!

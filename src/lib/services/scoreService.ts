@@ -13,7 +13,7 @@ export function calculateFinalScore(
   playerState: PlayerState, 
   scoreState: ScoreState, 
   uiState: UiState,
-  gameMode: 'local' | 'training'
+  gameMode: 'local' | 'training' | 'timed' | 'online'
 ): FinalScoreDetails {
   const { players } = playerState;
   const { penaltyPoints, movesInBlockMode, jumpedBlockedCells, noMovesBonus, distanceBonus } = scoreState;

@@ -13,6 +13,10 @@ export class TimedGameMode extends TrainingGameMode {
     this.gameDuration = 100;
   }
 
+  getModeName(): 'training' | 'local' | 'timed' | 'online' {
+    return 'timed';
+  }
+
   initialize(options: { newSize?: number } = {}): void {
     super.initialize(options);
     timerStore.setRemainingTime(this.gameDuration);
