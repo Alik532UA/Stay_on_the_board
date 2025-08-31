@@ -84,7 +84,7 @@ test.describe('хепі флоу', () => {
 
     await test.step('Перевірка модального вікна "Гру завершено!"', async () => {
       await expect(page.getByTestId('game-over-modal')).toBeVisible();
-      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.trainingOverTitle');
       const scoreAfterBonus = await getScoreByTestId(page, 'final-score-value');
       // await page.waitForTimeout(7777777); // пауза
       expect(scoreAfterBonus).toBeGreaterThan(scoreBeforeBonus);
@@ -159,7 +159,7 @@ test.describe('хепі флоу', () => {
 
     await test.step('Перевірка модального вікна "Гру завершено!" та вихід в головне меню', async () => {
       await expect(page.getByTestId('game-over-modal')).toBeVisible();
-      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.trainingOverTitle');
       await page.getByTestId('play-again-btn').click();
       await expectScoreToBeZeroOrNegative(page, 'score-value');
     });
@@ -176,7 +176,7 @@ test.describe('хепі флоу', () => {
 
     await test.step('Перевірка модального вікна "Гру завершено!" та вихід в головне меню', async () => {
       await expect(page.getByTestId('game-over-modal')).toBeVisible();
-      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.gameOverTitle');
+      await expect(page.getByTestId('game-over-modal-title')).toHaveAttribute('data-i18n-key', 'modal.trainingOverTitle');
       await page.getByTestId('game-over-main-menu-btn').click();
     });
 
