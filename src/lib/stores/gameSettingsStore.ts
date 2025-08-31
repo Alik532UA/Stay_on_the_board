@@ -75,10 +75,10 @@ export const defaultGameSettings: GameSettingsState = {
     showDifficultyWarningModal: true,
     showGameInfoWidget: 'compact',
     lockSettings: false,
-    speechRate: 1,
-    speechOrder: 'dir_dist',
-    shortSpeech: false,
-    speechFor: { player: true, computer: true },
+    speechRate: 1.2,
+    speechOrder: 'dist_dir',
+    shortSpeech: true,
+    speechFor: { player: false, computer: true },
 };
 
 function createGameSettingsStore() {
