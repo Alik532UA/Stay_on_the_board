@@ -32,6 +32,10 @@ export class TrainingGameMode extends BaseGameMode {
     ];
   }
 
+  getModeName(): 'training' | 'local' | 'timed' | 'online' {
+    return 'training';
+  }
+
   protected async advanceToNextPlayer(): Promise<void> {
     logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
     const currentPlayerState = get(playerStore);
