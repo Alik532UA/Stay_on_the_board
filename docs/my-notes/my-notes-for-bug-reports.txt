@@ -5632,3 +5632,20 @@ data-testid="game-over-modal-title"
 Очікуваний результат: немає кнопки закрити!
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
 abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+сценарії 1
+1. зайти в /game/training і не робити жодний хід, AR: деякі кнопки налаштування кастомно заблоковані
+2. натиснути на кастомно заблоковану кнопку-чекбокс, AR: відкриється data-testid="competitive-mode-modal"
+3. натиснути data-testid="competitive-mode-modal-modal.goToTraining-btn"  AR: перенаправляє на /game/training
+Актуальний результат: на стонці /game/training оновилось нове меню налаштувань class="settings-expander open" яке повинно бути на сторінці /game/training
+Очікуваний результат: на стонці /game/training оновилось нове меню налаштувань class="settings-expander open" яке повинно бути на сторінці /game/training 
+
+сценарії 2
+1. пограти в /game/training, AR: деякі кнопки налаштування кастомно заблоковані
+2. натиснути на кастомно заблоковану кнопку-чекбокс, AR: відкриється data-testid="competitive-mode-modal"
+3. натиснути data-testid="competitive-mode-modal-modal.goToTraining-btn"  AR: перенаправляє на /game/training
+Актуальний результат: на стонці /game/training залишилось старе меню налаштувань class="settings-expander open"
+Очікуваний результат: на стонці /game/training оновилось нове меню налаштувань class="settings-expander open" яке повинно бути на сторінці /game/training 
+
+треба fix
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠

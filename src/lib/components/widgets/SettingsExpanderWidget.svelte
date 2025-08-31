@@ -107,7 +107,7 @@
       dataTestId: 'competitive-mode-modal', // Added dataTestId
       contentKey: 'modal.competitiveModeLockContent',
       buttons: [
-        { textKey: 'modal.goToTraining', primary: true, onClick: () => { modalStore.closeModal(); goto(`${base}/game/training`); } },
+        { textKey: 'modal.goToTraining', primary: true, onClick: () => { modalStore.closeModal(); gameModeService.initializeGameMode('training'); goto(`${base}/game/training`); } },
         { textKey: 'modal.stay', onClick: modalStore.closeModal }
       ],
       closeOnOverlayClick: true,
