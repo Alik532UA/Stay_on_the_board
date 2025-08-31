@@ -189,13 +189,13 @@
           <p class="reason">{$_('modal.keyConflictContent', { values: { key: $modalState.content.key as string } })}</p>
         {:else if $modalState.contentKey}
           <p class="reason">
-            {@html $_($modalState.contentKey, {
+            {$_($modalState.contentKey, {
               values: $modalState.content as any
             })}
           </p>
         {:else if typeof $modalState.content === 'string' && $modalState.content}
           <p class="reason">
-            {@html $modalState.content}
+            {$modalState.content}
           </p>
         {/if}
 
