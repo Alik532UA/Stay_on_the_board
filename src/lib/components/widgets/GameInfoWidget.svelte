@@ -2,12 +2,12 @@
   import { derived } from 'svelte/store';
   import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
   import { _ } from 'svelte-i18n';
-  import { lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves } from '$lib/stores/derivedState.ts';
+  import { lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves, isGameOver, isFirstMove } from '$lib/stores/derivedState.ts';
   import { i18nReady } from '$lib/i18n/init.js';
   import { fade, slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { playerStore } from '$lib/stores/playerStore';
-  import { uiStateStore } from '$lib/stores/uiStateStore';
+  import { logService } from '$lib/services/logService.js';
 
   // --- Допоміжні функції ---
   function getPlayerColor(players: any[], playerName: string): string | null {
@@ -26,18 +26,29 @@
     'down-left': '↙', 'down': '↓', 'down-right': '↘'
   };
 
+  // --- Derived стор для визначення компактного режиму ---
+  const isCompact = derived(gameSettingsStore, $settings => $settings.showGameInfoWidget === 'compact');
+
   // --- Derived стор для генерації повідомлень ---
   const displayMessage = derived(
-    [playerStore, uiStateStore, lastComputerMove, lastPlayerMove, isPlayerTurn, isPauseBetweenMoves, _, gameSettingsStore],
-    ([$playerStore, $uiStateStore, $lastComputerMove, $lastPlayerMove, $isPlayerTurn, $isPauseBetweenMoves, $_, $gameSettingsStore]) => {
-      if (!$playerStore || !$uiStateStore) return { type: 'SIMPLE', content: '' };
+    [playerStore, isGameOver, isFirstMove, lastComputerMove, lastPlayerMove, isPlayerTurn, _, isCompact],
+    ([$playerStore, $isGameOver, $isFirstMove, $lastComputerMove, $lastPlayerMove, $isPlayerTurn, $_, $isCompact]) => {
+      logService.ui('GameInfoWidget: displayMessage re-evaluating', {
+        isGameOver: $isGameOver,
+        isFirstMove: $isFirstMove,
+        lastComputerMove: $lastComputerMove,
+        lastPlayerMove: $lastPlayerMove,
+        isPlayerTurn: $isPlayerTurn,
+        isCompact: $isCompact
+      });
 
-      const isCompact = $gameSettingsStore.showGameInfoWidget === 'compact';
+      if (!$playerStore) return { type: 'SIMPLE', content: '' };
+
       const humanPlayersCount = $playerStore.players.filter((p: any) => p.type === 'human').length;
       const isLocalGame = humanPlayersCount > 1;
 
-      if ($uiStateStore.isGameOver) return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.gameOver') };
-      if ($uiStateStore.isFirstMove) {
+      if ($isGameOver) return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.gameOver') };
+      if ($isFirstMove) {
         if (isLocalGame) {
           const currentPlayer = $playerStore.players[$playerStore.currentPlayerIndex];
           return {
@@ -57,12 +68,12 @@
         return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.firstMove') };
       }
       
-      if ($lastComputerMove && !$isPauseBetweenMoves) {
+      if ($lastComputerMove) {
         const directionKey = $lastComputerMove.direction.replace(/-(\w)/g, (_: string, c: string) => c.toUpperCase());
         const direction = $_(`gameBoard.directions.${directionKey}`);
         const distance = $lastComputerMove.distance;
 
-        if (isCompact) {
+        if ($isCompact) {
           return {
             type: 'COMPACT_COMPUTER_MOVE',
             part1: $_('gameBoard.gameInfo.computerMadeMovePart1'),
@@ -73,7 +84,7 @@
         return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.computerMadeMove', { values: { direction, distance } }) };
       }
 
-      if ($lastPlayerMove && !$isPauseBetweenMoves && isLocalGame) {
+      if ($lastPlayerMove && isLocalGame) {
         const currentPlayer = $playerStore.players[$playerStore.currentPlayerIndex];
         const previousPlayerIndex = ($playerStore.currentPlayerIndex + $playerStore.players.length - 1) % $playerStore.players.length;
         const previousPlayer = $playerStore.players[previousPlayerIndex];
@@ -99,8 +110,6 @@
           ]
         };
       }
-
-      if ($isPauseBetweenMoves) return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.pauseBetweenMoves') };
 
       if ($isPlayerTurn) {
         if (isLocalGame) {
@@ -128,8 +137,7 @@
   );
 </script>
 
-
-{#if $i18nReady && $uiStateStore && $playerStore}
+{#if $i18nReady && $playerStore}
   {#if $gameSettingsStore.showGameInfoWidget !== 'hidden'}
     <div class="game-info-widget"
          class:compact={$gameSettingsStore.showGameInfoWidget === 'compact'}

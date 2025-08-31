@@ -175,3 +175,13 @@ export const turnTimeLimit = derived(
   timerStore,
   $timerStore => $timerStore.turnTimeLeft ?? 0
 );
+
+export const isGameOver = derived(
+  uiStateStore,
+  $uiStateStore => $uiStateStore.isGameOver
+);
+
+export const isFirstMove = derived(
+  uiStateStore,
+  $uiStateStore => $uiStateStore.isFirstMove
+);
