@@ -22,7 +22,7 @@ export function createInitialState(config: GameStateConfig = {}): GameState {
   const size = config.size ?? initialBoardSize;
   const players = config.players ?? [
     { id: 1, type: 'human', name: 'Гравець' },
-    { id: 2, type: 'ai', name: 'Комп\'ютер' }
+    { id: 2, type: 'virtual', name: 'VirtualPlayer' }
   ];
   
   // ... решта логіки створення стану

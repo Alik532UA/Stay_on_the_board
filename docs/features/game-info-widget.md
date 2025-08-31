@@ -8,11 +8,11 @@
 ### Відображувані ситуації:
 1. **Гра почалась** - "Гра почалась, зробіть хід"
 2. **Черга гравця** - "Ваша черга робити хід"
-3. **Комп'ютер думає** - "Комп'ютер думає..."
+3. **VirtualPlayer думає** - "VirtualPlayer думає..."
 4. **Вибрано напрямок** - "Вибрано напрямок: вгору"
 5. **Вибрано відстань** - "Вибрано відстань: 2"
 6. **Вибрано повний хід** - "Вибрано хід: вгору на 2"
-7. **Комп'ютер зробив хід** - "Комп'ютер зробив хід: вгору на 2, тепер ваша черга"
+7. **VirtualPlayer зробив хід** - "VirtualPlayer зробив хід: вгору на 2, тепер ваша черга"
 8. **Пауза між ходами** - "Пауза між ходами..."
 9. **Гра завершена** - "Гра завершена"
 
@@ -32,7 +32,7 @@
 ### Залежності:
 - `gameState` - стан гри
 - `playerInputStore` - введення гравця
-- `lastComputerMove` - останній хід комп'ютера
+- `lastVirtualPlayerMove` - останній хід VirtualPlayer
 - `isPlayerTurn` - чи черга гравця
 - `isPauseBetweenMoves` - чи пауза між ходами
 
@@ -66,11 +66,11 @@
 gameInfo: {
   gameStarted: "Гра почалась, зробіть хід",
   playerTurn: "Ваша черга робити хід",
-  computerTurn: "Комп'ютер думає...",
+  computerTurn: "VirtualPlayer думає...",
   playerSelectedDirection: "Вибрано напрямок: {direction}",
   playerSelectedDistance: "Вибрано відстань: {distance}",
   playerSelectedMove: "Вибрано хід: {direction} на {distance}",
-  computerMadeMove: "Комп'ютер зробив хід: {direction} на {distance}, тепер ваша черга",
+  computerMadeMove: "VirtualPlayer зробив хід: {direction} на {distance}, тепер ваша черга",
   pauseBetweenMoves: "Пауза між ходами...",
   gameOver: "Гра завершена"
 },

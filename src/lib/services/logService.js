@@ -7,7 +7,7 @@ const LOG_GROUPS = {
   STATE: 'state',       // Для StateManager та змін стану
   PIECE: 'piece',       // Для логіки пов'язаної з фігурою
   LOGIC_MOVE: 'logic_move',       // Для performMove та розрахунку ходів
-  LOGIC_AI: 'logic_ai',         // Для логіки вибору ходу комп'ютером
+  LOGIC_VIRTUAL_PLAYER: 'logic_virtual_player',         // Для логіки вибору ходу комп'ютером
   LOGIC_AVAILABILITY: 'logic_availability', // Для getAvailableMoves
   LOGIC_TIME: 'logic_time', // Для логіки, пов'язаної з часом
   SCORE: 'score',       // Для всього, що пов'язано з нарахуванням балів
@@ -27,7 +27,7 @@ const defaultConfig = {
           [LOG_GROUPS.STATE]: true,
           [LOG_GROUPS.PIECE]: true,
           [LOG_GROUPS.LOGIC_MOVE]: true,
-          [LOG_GROUPS.LOGIC_AI]: false,
+          [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: false,
           [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
           [LOG_GROUPS.LOGIC_TIME]: false,
           [LOG_GROUPS.SCORE]: false,
@@ -79,7 +79,7 @@ let logConfig = loadConfig();
 const styles = {
   [LOG_GROUPS.STATE]: 'color: #9C27B0; font-weight: bold;', // Purple
   [LOG_GROUPS.LOGIC_MOVE]: 'color: #03A9F4; font-weight: bold;', // Blue
-  [LOG_GROUPS.LOGIC_AI]: 'color: #2962FF; font-weight: bold;', // Indigo
+  [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: 'color: #2962FF; font-weight: bold;', // Indigo
   [LOG_GROUPS.LOGIC_AVAILABILITY]: 'color: #64B5F6; font-weight: bold;', // Light Blue
   [LOG_GROUPS.LOGIC_TIME]: 'color: #FFC107; font-weight: bold;', // Amber
   [LOG_GROUPS.SCORE]: 'color: #4CAF50; font-weight: bold;', // Green
@@ -116,7 +116,7 @@ export const logService = {
   state: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.STATE, message, ...data),
   piece: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.PIECE, message, ...data),
   logicMove: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_MOVE, message, ...data),
-  logicAI: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_AI, message, ...data),
+  logicVirtualPlayer: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_VIRTUAL_PLAYER, message, ...data),
   logicAvailability: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_AVAILABILITY, message, ...data),
   logicTime: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.LOGIC_TIME, message, ...data),
   score: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.SCORE, message, ...data),

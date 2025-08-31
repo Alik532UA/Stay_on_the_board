@@ -6,7 +6,7 @@
 
 ## Огляд
 
-Елемент `center-info` - це центральна кнопка в сітці напрямків гри "Залишитися на дошці", яка служить основним візуальним індикатором поточного стану вибору ходу гравця та відображення ходів комп'ютера.
+Елемент `center-info` - це центральна кнопка в сітці напрямків гри "Залишитися на дошці", яка служить основним візуальним індикатором поточного стану вибору ходу гравця та відображення ходів VirtualPlayer.
 
 ## Розташування та Структура
 
@@ -27,7 +27,7 @@
 
 ### Основні Функції
 1. **Відображення Поточного Вибору**: Показує вибраний напрямок та/або відстань
-2. **Показ Ходу Комп'ютера**: Відображає останній хід комп'ютера після його виконання
+2. **Показ Ходу VirtualPlayer**: Відображає останній хід VirtualPlayer після його виконання
 3. **Підтвердження Ходу**: Стає клікабельною кнопкою для підтвердження ходу
 4. **Візуальний Фідбек**: Надає інтуїтивний фідбек про стан гри
 
@@ -39,16 +39,16 @@
 - **Курсор**: `default`
 - **Клікабельний**: Ні
 - **Стилі**: Без обводки, прозорий фон
-- **Умова**: Не вибрано напрямок і відстань, немає ходу комп'ютера для показу
-- **Призначення**: Пауза між ходом комп'ютера та початком вибору гравцем
+- **Умова**: Не вибрано напрямок і відстань, немає ходу VirtualPlayer для показу
+- **Призначення**: Пауза між ходом VirtualPlayer та початком вибору гравцем
 
-### 2. Стан Показу Ходу Комп'ютера
-- **Відображення**: Останній хід комп'ютера (наприклад, `"→2"`)
-- **CSS Клас**: `computer-move-display`
+### 2. Стан Показу Ходу VirtualPlayer
+- **Відображення**: Останній хід VirtualPlayer (наприклад, `"→2"`)
+- **CSS Клас**: `virtual-player-move-display`
 - **Курсор**: `default`
 - **Клікабельний**: Ні
 - **Стилі**: Помаранчевий фон, без обводки
-- **Умова**: Не вибрано напрямок і відстань, але існує `computerLastMoveDisplay`
+- **Умова**: Не вибрано напрямок і відстань, але існує `virtualPlayerLastMoveDisplay`
 
 ### 3. Стан Тільки Напрямок
 - **Відображення**: Тільки стрілка напрямку (наприклад, `"→"`, `"↑"`, `"↙"`)
@@ -96,7 +96,7 @@
 }
 
 /* Прозорий фон тільки для початкового стану (коли немає класів) */
-#center-info:not(.confirm-btn-active):not(.computer-move-display):not(.direction-distance-state) {
+#center-info:not(.confirm-btn-active):not(.virtual-player-move-display):not(.direction-distance-state) {
     background: transparent !important;
 }
 ```
@@ -118,8 +118,8 @@
     transform: scale(1.02);
 }
 
-/* Показ ходу комп'ютера */
-#center-info.computer-move-display {
+/* Показ ходу VirtualPlayer */
+#center-info.virtual-player-move-display {
     background-color: orange;
     border: none;
 }
@@ -152,17 +152,17 @@ updateCenterInfo() {
     centerInfo.removeEventListener('click', this.centerInfoClickHandler);
     
     // Скидаємо всі стилі
-    centerInfo.classList.remove('confirm-btn-active', 'computer-move-display', 'direction-distance-state');
+    centerInfo.classList.remove('confirm-btn-active', 'virtual-player-move-display', 'direction-distance-state');
     centerInfo.style.cursor = 'default';
     centerInfo.style.border = 'none';
     centerInfo.style.backgroundColor = '';
     
     // Логіка визначення стану та відображення...
     
-    // Якщо користувач нічого не вибрав, але є хід комп'ютера
-    if (this.selectedDirection === null && this.selectedDistance === null && this.computerLastMoveDisplay) {
-        centerInfo.textContent = this.computerLastMoveDisplay;
-        centerInfo.classList.add('computer-move-display');
+    // Якщо користувач нічого не вибрав, але є хід VirtualPlayer
+    if (this.selectedDirection === null && this.selectedDistance === null && this.virtualPlayerLastMoveDisplay) {
+        centerInfo.textContent = this.virtualPlayerLastMoveDisplay;
+        centerInfo.classList.add('virtual-player-move-display');
         centerInfo.style.backgroundColor = 'orange';
         centerInfo.style.border = 'none';
         return;
@@ -175,7 +175,7 @@ updateCenterInfo() {
 ### Змінні Стану
 - `this.selectedDirection`: Поточний вибраний напрямок (1-9 або null)
 - `this.selectedDistance`: Поточна вибрана відстань (1 до boardSize-1 або null)
-- `this.computerLastMoveDisplay`: Останній хід комп'ютера для відображення
+- `this.virtualPlayerLastMoveDisplay`: Останній хід VirtualPlayer для відображення
 - `this.distanceManuallySelected`: Флаг ручного вибору відстані
 - `this.centerInfoClickHandler`: Обробник кліку для підтвердження ходу
 
@@ -187,11 +187,11 @@ updateCenterInfo() {
 
 ### GameLogic
 ```javascript
-// Показ ходу комп'ютера
-gameControlsComponent.showComputerMove(direction, distance);
+// Показ ходу VirtualPlayer
+gameControlsComponent.showVirtualPlayerMove(direction, distance);
 
-// Очищення показу комп'ютера
-gameControlsComponent.clearComputerMove();
+// Очищення показу VirtualPlayer
+gameControlsComponent.clearVirtualPlayerMove();
 ```
 
 ### State Manager
@@ -211,9 +211,9 @@ gameControlsComponent.clearComputerMove();
 - **Контент**: Порожній
 - **Стилі**: Без обводки, прозорий фон
 
-### Хід Комп'ютера
+### Хід VirtualPlayer
 ```html
-<button id="center-info" class="control-btn center-info computer-move-display" 
+<button id="center-info" class="control-btn center-info virtual-player-move-display" 
         style="background-color: orange; border: none;">→2</button>
 ```
 - **Контент**: `"→2"` (напрямок + відстань)
@@ -231,7 +231,7 @@ gameControlsComponent.clearComputerMove();
 
 ### Обмеження
 - Максимальна відстань обмежена розміром дошки (boardSize - 1)
-- Показ комп'ютера очищається при виборі гравцем
+- Показ VirtualPlayer очищається при виборі гравцем
 - Тільки один стан може бути активним одночасно
 - Клікабельність доступна тільки в підтверджуваному стані
 
@@ -239,12 +239,12 @@ gameControlsComponent.clearComputerMove();
 - Автоматичне оновлення при зміні стану гри
 - Збереження ручно вибраної відстані при зміні напрямку
 - Інтуїтивний візуальний фідбек для користувача
-- Помаранчевий фон для відрізнення ходів комп'ютера
+- Помаранчевий фон для відрізнення ходів VirtualPlayer
 - Анімація пульсації для привернення уваги до підтверджуваного ходу
 
 ### Логіка Фонів
 - **Прозорий фон**: Тільки в початковому стані (пауза між ходами)
-- **Помаранчевий фон**: При показі ходу комп'ютера
+- **Помаранчевий фон**: При показі ходу VirtualPlayer
 - **Зелений фон**: При підтверджуваному стані (готовий хід гравця)
 - **Стандартний фон**: При виборі тільки напрямку або тільки відстані
 
@@ -259,7 +259,7 @@ gameControlsComponent.clearComputerMove();
 - **Стрілка**: Вибрано тільки напрямок
 - **Число**: Вибрано тільки відстань
 - **Стрілка + число**: Повний хід готовий до підтвердження
-- **Помаранчевий фон**: Показ ходу комп'ютера
+- **Помаранчевий фон**: Показ ходу VirtualPlayer
 
 ## Тестування
 
@@ -268,7 +268,7 @@ gameControlsComponent.clearComputerMove();
 2. **Вибір напрямку**: Перевірка відображення стрілки
 3. **Вибір відстані**: Перевірка відображення числа
 4. **Повний хід**: Перевірка клікабельності та анімації
-5. **Хід комп'ютера**: Перевірка помаранчевого фону
+5. **Хід VirtualPlayer**: Перевірка помаранчевого фону
 6. **Очищення**: Перевірка скидання стану
 
 ### Очікувана Поведінка
@@ -278,10 +278,10 @@ gameControlsComponent.clearComputerMove();
 - Відповідність візуальних стилів стану 
 
 ## Важлива логіка (2025)
-- Хід комп'ютера у center-info зберігається до першої дії гравця (вибору напрямку або відстані), а не до підтвердження ходу. Це гарантує, що гравець завжди бачить останній хід комп'ютера, навіть якщо робить хід дуже швидко. 
+- Хід VirtualPlayer у center-info зберігається до першої дії гравця (вибору напрямку або відстані), а не до підтвердження ходу. Це гарантує, що гравець завжди бачить останній хід VirtualPlayer, навіть якщо робить хід дуже швидко. 
 
 ## Архітектура (2025)
-- Всі ходи (гравця і комп'ютера) одразу додаються у moveQueue (чергу ходів).
+- Всі ходи (гравця і VirtualPlayer) одразу додаються у moveQueue (чергу ходів).
 - Дошка лише анімує цю чергу у своєму темпі, не впливаючи на логіку center-info чи стан гри.
 - Center-info завжди показує останній хід з moveQueue, навіть якщо дошка ще анімує попередні ходи.
 - Таймери/анімації не блокують логіку гри.
@@ -301,7 +301,7 @@ gameControlsComponent.clearComputerMove();
 
 ### ✅ **Відображення станів**
 - [ ] **Початковий стан**: Порожній контент, прозорий фон, курсор `default`, не клікабельний
-- [x] **Хід комп'ютера**: Показує хід у форматі "→2", помаранчевий фон, не клікабельний
+- [x] **Хід VirtualPlayer**: Показує хід у форматі "→2", помаранчевий фон, не клікабельний
 - [ ] **Хід користувача, тільки напрямок**: Показує стрілку (наприклад, "→"), стандартний фон, не клікабельний
 - [ ] **Хід користувача, Тільки відстань**: Показує число (наприклад, "2"), стандартний фон, не клікабельний
 - [ ] **Хід користувача, повний хід**: Показує "→2", зелений фон, зелена обводка, анімація пульсації, курсор `pointer`, клікабельний
@@ -316,11 +316,11 @@ gameControlsComponent.clearComputerMove();
 - [ ] Напрямок 8 відображається як `↑` (вгору)
 - [ ] Напрямок 9 відображається як `↗` (вгору-праворуч)
 
-### ✅ **Логіка відображення ходу комп'ютера**
-- [x] Хід комп'ютера зберігається до першої дії гравця (вибору напрямку або відстані)
-- [x] Хід комп'ютера НЕ очищається при підтвердженні ходу гравця
-- [x] Хід комп'ютера очищається тільки при виборі напрямку або відстані гравцем
-- [x] Хід комп'ютера відображається з помаранчевим фоном
+### ✅ **Логіка відображення ходу VirtualPlayer**
+- [x] Хід VirtualPlayer зберігається до першої дії гравця (вибору напрямку або відстані)
+- [x] Хід VirtualPlayer НЕ очищається при підтвердженні ходу гравця
+- [x] Хід VirtualPlayer очищається тільки при виборі напрямку або відстані гравцем
+- [x] Хід VirtualPlayer відображається з помаранчевим фоном
 
 ### ✅ **Взаємодія**
 - [ ] Клік на елемент підтверджує хід тільки в стані "повний хід"
@@ -331,7 +331,7 @@ gameControlsComponent.clearComputerMove();
 
 ### ✅ **CSS стилі за станами**
 - [ ] **Початковий стан**: `background: transparent`, `border: none`
-- [x] **Хід комп'ютера**: `background-color: orange`, `border: none`
+- [x] **Хід VirtualPlayer**: `background-color: orange`, `border: none`
 - [ ] **Повний хід**: `background: var(--confirm-btn-bg)`, `color: white`, `border-color: var(--confirm-btn-bg)`
 - [ ] **Hover для повного ходу**: `background: var(--confirm-btn-hover)`, `border-color: var(--confirm-btn-hover)`
 
@@ -402,27 +402,27 @@ gameControlsComponent.clearComputerMove();
 
 Цей список критеріїв прийняття забезпечує повну відповідність компонента "center-info" вимогам документації та архітектурним принципам проекту.
 
-## ✅ Виправлення відображення ходу комп'ютера (2025-01-27)
-- **Проблема**: Стан "Хід комп'ютера" не відображався через відсутність `lastComputerMove` в `ControlsPanelWidget.svelte`
+## ✅ Виправлення відображення ходу VirtualPlayer (2025-01-27)
+- **Проблема**: Стан "Хід VirtualPlayer" не відображався через відсутність `lastVirtualPlayerMove` в `ControlsPanelWidget.svelte`
 - **Рішення**: 
-  1. Додано імпорт `lastComputerMove` з `derivedState.ts` в `ControlsPanelWidget.svelte`
-  2. Передано `$lastComputerMove` замість `null` в `getCenterInfoState()`
-  3. Додано локальні стилі для `#center-info.computer-move-display` з помаранчевим фоном
-- **Результат**: Хід комп'ютера тепер правильно відображається з помаранчевим фоном та текстом "→2"
+  1. Додано імпорт `lastVirtualPlayerMove` з `derivedState.ts` в `ControlsPanelWidget.svelte`
+  2. Передано `$lastVirtualPlayerMove` замість `null` в `getCenterInfoState()`
+  3. Додано локальні стилі для `#center-info.virtual-player-move-display` з помаранчевим фоном
+- **Результат**: Хід VirtualPlayer тепер правильно відображається з помаранчевим фоном та текстом "→2"
 - **Файли**: 
   - `src/lib/components/widgets/ControlsPanelWidget.svelte` рядки 12, 20, 26
   - `src/lib/components/widgets/DirectionControls.svelte` рядки 145-151
 
 ## ✅ Виправлення анімації ходів з паузами (2025-01-27)
-- **Проблема**: Фігура одразу переміщувалася на позицію після ходу комп'ютера, пропускаючи анімацію ходу гравця
+- **Проблема**: Фігура одразу переміщувалася на позицію після ходу VirtualPlayer, пропускаючи анімацію ходу гравця
 - **Рішення**: 
   1. Оновлено функцію `animateMovesWithPause` в `animationStore.ts`
-  2. Реалізовано покрокову анімацію: спочатку хід гравця, потім пауза 1 секунда, потім хід комп'ютера
+  2. Реалізовано покрокову анімацію: спочатку хід гравця, потім пауза 1 секунда, потім хід VirtualPlayer
   3. Пауза не впливає на `center-info`, який оновлюється миттєво
 - **Результат**: 
   - Фігура займає нове положення після ходу користувача
   - Секунда паузи
-  - Фігура займає нове положення після ходу комп'ютера
-  - `center-info` показує хід комп'ютера одразу, незалежно від анімації
+  - Фігура займає нове положення після ходу VirtualPlayer
+  - `center-info` показує хід VirtualPlayer одразу, незалежно від анімації
 - **Файли**: 
   - `src/lib/stores/animationStore.ts` рядки 250-290 

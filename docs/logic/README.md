@@ -27,7 +27,7 @@
 ### 🔧 Допоміжні файли
 
 - **[KEYBOARD_SHORTCUTS.md](KEYBOARD_SHORTCUTS.md)** - Клавіатурні скорочення
-- **[COMPUTER_AI.md](COMPUTER_AI.md)** - Алгоритм комп'ютера та його логіка
+- **[virtual-player-logic.md](../development/virtual-player-logic.md)** - Алгоритм VirtualPlayer та його логіка
 
 ## Принципи організації
 

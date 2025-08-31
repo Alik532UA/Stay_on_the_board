@@ -14,8 +14,15 @@ This section contains all the information needed to understand and play the game
 This section is for developers and contributors. It contains information about the project's architecture, development process, and coding conventions.
 
 -   **[Architecture](./development/ARCHITECTURE.md)**: An overview of the project's architecture.
--   **[Development Rules](./development/AI_AGENT_RULES.md)**: Rules and guidelines for the AI agent.
+-   **[Development Rules](./development/AGENT_RULES.md)**: Rules and guidelines for the Agent.
 -   **[Architectural Decision Records (ADR)](./adr/)**: A log of key architectural decisions made during the project's development.
+
+## 🧪 Testing
+
+This section contains documents related to testing and quality assurance.
+
+-   **[Stabilization Plan v1](./testing/stabilization-plan-v1.md)**: Plan to restore basic game functionality and implement manual testing.
+-   **[Detailed Checklist v1](./testing/detailed-checklist-v1.md)**: Comprehensive checklist for stabilization and improvements.
 
 ## 🗂️ Plans
 

@@ -54,7 +54,7 @@ date: "2024-06-09"
 
 ## 4. Центральна кнопка (`#center-info`) - Інші стани
 
-*   **Показ ходу комп'ютера (`.computer-move-display`):**
+*   **Показ ходу VirtualPlayer (`.virtual-player-move-display`):**
     *   Фон: `var(--no-moves-btn-bg)` (зазвичай помаранчевий/жовтий).
     *   Текст: `var(--no-moves-btn-text)`.
     *   Ефекти: Без анімації, виразна тінь.

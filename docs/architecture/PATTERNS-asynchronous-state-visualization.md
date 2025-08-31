@@ -89,10 +89,10 @@ last-reviewed: 2025-08-22
 ## Незалежність анімації дошки та миттєве оновлення center-info
 
 - Логіка гри (gameState, moveQueue) оновлюється миттєво та синхронно.
-- ControlsPanelWidget (center-info, control-btn, computer-move-display) миттєво реагує на зміни стану гри, незалежно від анімації дошки.
+- ControlsPanelWidget (center-info, control-btn, virtual-player-move-display) миттєво реагує на зміни стану гри, незалежно від анімації дошки.
 - BoardWrapperWidget має власну чергу анімацій:
   1. Анімує хід гравця (фігура рухається на нову позицію).
   2. Чекає паузу (наприклад, 1 секунда).
-  3. Анімує хід комп'ютера (фігура рухається на нову позицію).
+  3. Анімує хід VirtualPlayer (фігура рухається на нову позицію).
 - Цей процес не блокує логіку гри та не впливає на ControlsPanelWidget.
-- ControlsPanelWidget підписується лише на логічний стан (lastComputerMove, centerInfo) і оновлюється миттєво після зміни стану гри. 
+- ControlsPanelWidget підписується лише на логічний стан (lastVirtualPlayerMove, centerInfo) і оновлюється миттєво після зміни стану гри. 

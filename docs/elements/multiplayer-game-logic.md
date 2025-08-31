@@ -10,7 +10,7 @@
 
 ```typescript
 /**
- * Передає хід наступному гравцеві та визначає, чи потрібно запускати хід AI.
+ * Передає хід наступному гравцеві та визначає, чи потрібно запускати хід VirtualPlayer.
  */
 async _advanceToNextPlayer(): Promise<void> {
   const currentState = get(gameState);
@@ -25,9 +25,9 @@ async _advanceToNextPlayer(): Promise<void> {
 
   const nextPlayer = get(gameState).players[nextPlayerIndex];
 
-  // Якщо наступний гравець - комп'ютер, запускаємо його хід
-  if (nextPlayer.type === 'ai') {
-    this._triggerComputerMove();
+  // Якщо наступний гравець - VirtualPlayer, запускаємо його хід
+  if (nextPlayer.type === 'virtual') {
+    this._triggerVirtualPlayerMove();
   }
   // Якщо наступний гравець - людина, нічого не робимо, просто чекаємо на його хід
 }
@@ -45,7 +45,7 @@ this._triggerComputerMove();
 this._advanceToNextPlayer();
 ```
 
-### Оновлена функція: `_triggerComputerMove()`
+### Оновлена функція: `_triggerVirtualPlayerMove()`
 
 **Зміна:** Використання `currentPlayerIndex` замість хардкоду:
 
@@ -78,7 +78,7 @@ const moveResult = await gameLogicService.performMove(selectedDirection, selecte
 2. **Розрахунок наступного гравця:** `(currentPlayerIndex + 1) % players.length`
 3. **Оновлення стану** через `stateManager.applyChanges()`
 4. **Перевірка типу гравця:**
-   - Якщо `type === 'ai'` → запуск `_triggerComputerMove()`
+   - Якщо `type === 'virtual'` → запуск `_triggerVirtualPlayerMove()`
    - Якщо `type === 'human'` → очікування ходу гравця
 
 ### Циклічність:
@@ -97,7 +97,7 @@ interface GameState {
 
 interface Player {
   id: number;
-  type: PlayerType;  // 'human' | 'ai' | 'remote'
+  type: PlayerType;  // 'human' | 'virtual' | 'remote'
   name: string;
 }
 ```
@@ -106,7 +106,7 @@ interface Player {
 ```typescript
 players: [
   { id: 1, type: 'human', name: 'Гравець' },
-  { id: 2, type: 'ai', name: 'Комп\'ютер' }
+  { id: 2, type: 'virtual', name: 'VirtualPlayer' }
 ],
 currentPlayerIndex: 0
 ```
@@ -123,15 +123,15 @@ currentPlayerIndex: 0
 
 ### SoC (Separation of Concerns):
 - `_advanceToNextPlayer()` - відповідає за логіку перемикання
-- `_triggerComputerMove()` - відповідає за хід AI
+- `_triggerVirtualPlayerMove()` - відповідає за хід VirtualPlayer
 - `_processPlayerMove()` - відповідає за обробку ходу гравця
 
 ## Готовність до розширення
 
 ### Підтримувані сценарії:
-- ✅ Гравець проти комп'ютера (поточний)
+- ✅ Гравець проти VirtualPlayer (поточний)
 - ✅ Кілька гравців-людей (готова логіка)
-- ✅ Змішані режими (люди + AI)
+- ✅ Змішані режими (люди + VirtualPlayer)
 
 ### Можливі покращення:
 - Додавання анімацій перемикання ходів
@@ -142,12 +142,12 @@ currentPlayerIndex: 0
 ## Тестування
 
 ### Критичні сценарії:
-1. **Перемикання між людьми** - хід не повинен передаватися AI
-2. **Перемикання до AI** - повинен запускатися хід комп'ютера
+1. **Перемикання між людьми** - хід не повинен передаватися VirtualPlayer
+2. **Перемикання до VirtualPlayer** - повинен запускатися хід VirtualPlayer
 3. **Циклічність** - після останнього гравця повернення до першого
 4. **Стан гри** - `currentPlayerIndex` повинен оновлюватися коректно
 
 ### Валідація:
 - Перевірка правильності індексу після кожного ходу
-- Контроль типу гравця перед викликом AI
-- Логування змін стану для відлагодження 
+- Контроль типу гравця перед викликом VirtualPlayer
+- Логування змін стану для відлагодження

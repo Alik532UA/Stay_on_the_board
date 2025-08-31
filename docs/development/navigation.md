@@ -17,7 +17,7 @@
 #### Елементи меню
 1. **Заголовок**: "Stay on the Board"
 2. **Кнопки**:
-   - **Гра з комп'ютером** → GameBoardComponent (режим vsComputer)
+   - **Гра з VirtualPlayer** → GameBoardComponent (режим vsVirtualPlayer)
    - **Локальна гра** → GameBoardComponent (режим local)
    - **Онлайн гра** → OnlineMenuComponent
    - **Налаштування** → SettingsComponent
@@ -30,7 +30,7 @@
 - Стан зберігається в `stateManager`
 
 #### Вибір режиму гри (GameModeModal)
-- **Після натискання "Гра з комп'ютером"** спочатку з'являється модальне вікно "Вибір режиму гри" (`GameModeModal`).
+- **Після натискання "Гра з VirtualPlayer"** спочатку з'являється модальне вікно "Вибір режиму гри" (`GameModeModal`).
 - Гравець обирає режим: звичайний або з заблокованими клітинками.
 - Лише після вибору режиму відбувається перехід до GameBoardComponent.
 - Вибраний режим має бути застосований у налаштуваннях гри (appSettingsStore) та підсвічуватися у блоці game-mode-row у меню налаштувань.
@@ -47,7 +47,7 @@
 2. **Ігрова область**:
    - Дошка гри (динамічно створюється)
    - Контроли гри (кнопки, чекбокси)
-3. **Випадаючий список розміру дошки** (для гри з комп'ютером)
+3. **Випадаючий список розміру дошки** (для гри з VirtualPlayer)
 
 #### Логіка роботи
 - Показується після вибору режиму гри з головного меню
@@ -129,7 +129,7 @@
 
 ```
 MainMenuComponent
-├── GameBoardComponent (режим vsComputer)
+├── GameBoardComponent (режим vsVirtualPlayer)
 ├── GameBoardComponent (режим local)
 ├── OnlineMenuComponent
 │   ├── WaitingForPlayerComponent → GameBoardComponent
@@ -144,9 +144,9 @@ SettingsComponent → MainMenuComponent (кнопка "Назад")
 
 ## Потоки навігації
 
-### Гра з комп'ютером
+### Гра з VirtualPlayer
 ```
-Головне меню → Гра з комп'ютером → [Модальне вікно "Вибір режиму гри"] → Екран гри (режим vsComputer)
+Головне меню → Гра з VirtualPlayer → [Модальне вікно "Вибір режиму гри"] → Екран гри (режим vsVirtualPlayer)
 ```
 
 ### Локальна гра
