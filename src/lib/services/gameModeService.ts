@@ -42,6 +42,9 @@ class GameModeService {
     const mode = this.modes.get(implementationName);
 
     if (mode) {
+      if (name && ['beginner', 'experienced', 'pro', 'timed', 'local', 'online'].includes(name)) {
+        gameSettingsStore.applyPreset(name as any);
+      }
       gameStore.setMode(mode);
       gameModeStore.setActiveMode(implementationName); // Store the implementation name
       mode.initialize();

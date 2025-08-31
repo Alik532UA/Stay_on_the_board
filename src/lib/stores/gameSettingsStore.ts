@@ -168,7 +168,7 @@ function createGameSettingsStore() {
                 speechRate: 1,
                 shortSpeech: false,
                 speechFor: { player: true, computer: true },
-                showGameInfoWidget: 'compact',
+                showGameInfoWidget: 'shown',
             },
             experienced: { 
                 gameMode: 'experienced', 

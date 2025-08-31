@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { gameModeStore } from '$lib/stores/gameModeStore.js';
+  import { goto } from '$app/navigation';
   import { userActionService } from '$lib/services/userActionService';
   import { modalStore } from '$lib/stores/modalStore.js';
   import { _ } from 'svelte-i18n';
@@ -94,6 +96,23 @@
 
   $: speechEnabled = $gameSettingsStore.speechEnabled;
 
+  $: activeMode = $gameModeStore.activeMode;
+  $: isCompetitiveMode = activeMode === 'timed' || activeMode === 'local' || activeMode === 'online';
+
+  function showCompetitiveModeModal() {
+    logService.action('Click: on a locked setting in competitive mode (SettingsExpanderWidget)');
+    modalStore.showModal({
+      titleKey: 'modal.competitiveModeLockTitle',
+      dataTestId: 'competitive-mode-modal', // Added dataTestId
+      contentKey: 'modal.competitiveModeLockContent',
+      buttons: [
+        { textKey: 'modal.goToTraining', primary: true, onClick: () => { modalStore.closeModal(); goto('/game/training'); } },
+        { textKey: 'modal.stay', onClick: modalStore.closeModal }
+      ],
+      closeOnOverlayClick: true,
+    });
+  }
+
   function changeBoardSize(increment: number) {
     logService.action(`Click: "Змінити розмір дошки: ${increment > 0 ? '+' : ''}${increment}" (SettingsExpanderWidget)`);
     const currentSize = get(boardStore)?.boardSize;
@@ -146,8 +165,8 @@
       if (current) {
         gameSettingsStore.updateSettings({ showPiece: false, showMoves: false });
       } else {
-        gameSettingsStore.updateSettings({ showBoard: true, showPiece: true });
-      }
+     gameSettingsStore.updateSettings({ showBoard: true, showPiece: true });                                                       
+    }
     },
     () => {
       const current = get(gameSettingsStore).showMoves;
@@ -186,12 +205,14 @@
     <span class="settings-expander__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
   </div>
   <div class="settings-expander__content" bind:this={contentRef} style="max-height: {contentHeight}px; opacity: {isOpen ? 1 : 0};">
+    {#if !isCompetitiveMode}
     <div class="settings-expander__game-mode-row" use:fitTextAction={$_('gameModes.beginner')}>
       <button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'beginner'} on:click={() => userActionService.setGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
       <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'experienced'} on:click={() => userActionService.setGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
       <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'pro'} on:click={() => userActionService.setGameModePreset('pro')}>{$_('gameModes.pro')}</button>
     </div>
     <hr class="settings-expander__divider" />
+    {/if}
     <div class="settings-expander__setting-item">
       <span class="settings-expander__label">{$_('settings.boardSize')}</span>
       <div class="settings-expander__size-adjuster">
@@ -212,13 +233,13 @@
         >+</button>
       </div>
     </div>
-    <div class="settings-expander__button-group" use:fitTextAction={$_('settings.visibility.hidden')}>
+    <div class="settings-expander__button-group" class:locked-setting={isCompetitiveMode} use:fitTextAction={$_('settings.visibility.hidden')}>
       {#each [$_('settings.visibility.hidden'), $_('settings.visibility.boardOnly'), $_('settings.visibility.withPiece'), $_('settings.visibility.withMoves')] as label, i}
         <button
           data-testid="settings-expander-visibility-btn-{$_('settings.visibility.hidden') === label ? 'hidden' : $_('settings.visibility.boardOnly') === label ? 'boardOnly' : $_('settings.visibility.withPiece') === label ? 'withPiece' : 'withMoves'}"
           class="settings-expander__row-btn"
           class:active={getIsActive(i)}
-          on:click={toggleFunctions[i]}
+          on:click={() => isCompetitiveMode ? showCompetitiveModeModal() : toggleFunctions[i]()}
         >
           <SvgIcons name={icons[i]} />
           {label}
@@ -254,18 +275,22 @@
       </button>
     </div>
     <hr class="settings-expander__divider" />
+    <div class:locked-setting={isCompetitiveMode} on:click|preventDefault|stopPropagation={isCompetitiveMode ? showCompetitiveModeModal : () => {}}>
     <ToggleButton
       label={$_('gameModes.autoHideBoard')}
       checked={$gameSettingsStore.autoHideBoard}
-      on:toggle={handleToggleAutoHideBoard}
+      on:toggle={isCompetitiveMode ? () => {} : handleToggleAutoHideBoard}
       dataTestId="auto-hide-board-toggle"
     />
+    </div>
+    <div class:locked-setting={isCompetitiveMode} on:click|preventDefault|stopPropagation={isCompetitiveMode ? showCompetitiveModeModal : () => {}}>
     <ToggleButton
       label={$_('gameControls.blockMode')}
       checked={$gameSettingsStore.blockModeEnabled}
-      on:toggle={gameSettingsStore.toggleBlockMode}
+      on:toggle={isCompetitiveMode ? () => {} : gameSettingsStore.toggleBlockMode}
       dataTestId="block-mode-toggle"
     />
+    </div>
     {#if $gameSettingsStore.blockModeEnabled}
       <div class="settings-expander__options-group">
         <span class="settings-expander__label">{$_('gameControls.blockAfter')}</span>
@@ -520,5 +545,9 @@
     margin: 0;
     text-align: center;
     font-size: 1.1em;
-  }
+  }                                                                                                                                 
+ .locked-setting {                                                                                                                   
+ opacity: 0.2;                                                                                                                     
+      cursor: help;                                                                                                                     
+    }  
 </style>
