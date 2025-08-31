@@ -95,7 +95,7 @@
   <div class="rules-card rules-goal">
     <span class="rules-card-icon">🎯</span>
     <h2>{$_('rulesPage.goalTitle')}</h2>
-    <p>{@html $_('rulesPage.goalText')}</p>
+    <p class="rules-text">{$_('rulesPage.goalText')}</p>
   </div>
 
   <div class="rules-card rules-move-process">
@@ -263,6 +263,9 @@
 .rules-card h3 {
   margin-top: 0.2em;
   margin-bottom: 0.2em;
+}
+.rules-text {
+  white-space: pre-line;
 }
 .directions-grid-visual {
   display: grid;

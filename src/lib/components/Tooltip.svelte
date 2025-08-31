@@ -37,7 +37,7 @@
 </script>
 
 <div class="tooltip" style="left: {adjustedX}px; top: {adjustedY}px;" bind:this={tooltipNode}>
-  {@html content}
+  {content}
 </div>
 
 <style>
@@ -80,7 +80,7 @@
     z-index: 10001; /* Higher than modal overlay */
     pointer-events: none; /* Tooltip should not be interactive */
     font-size: 0.9em;
-    white-space: nowrap;
+    white-space: pre-line;
     opacity: 0;
     transform: translateY(5px);
     animation: fadeIn 0.2s ease-out forwards;
