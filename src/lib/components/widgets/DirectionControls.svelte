@@ -32,15 +32,18 @@
       }
     });
 
-    // Distance hotkeys
-    distanceRows.flat().forEach(dist => {
-      registerGameAction(getActionForDistance(dist), () => handleDistance(dist));
-    });
-
     // Action hotkeys
     registerGameAction('confirm', handleConfirm);
     registerGameAction('no-moves', handleNoMoves);
   });
+
+  $: {
+    if (distanceRows && distanceRows.length > 0) {
+      distanceRows.flat().forEach(dist => {
+        registerGameAction(getActionForDistance(dist), () => handleDistance(dist));
+      });
+    }
+  }
 
   onDestroy(() => {
     // No explicit unregistration needed here, as gameHotkeyService handles context cleanup

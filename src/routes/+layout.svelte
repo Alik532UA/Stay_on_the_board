@@ -27,6 +27,7 @@
 	import { resetAllStores } from '$lib/services/testingService';
 	import hotkeyService from '$lib/services/hotkeyService';
 	
+	
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = 'app_version';
@@ -114,6 +115,8 @@
 		tooltipStore.hide();
 	});
 </script>
+
+
 
 
 

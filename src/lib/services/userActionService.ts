@@ -87,12 +87,19 @@ export const userActionService = {
     const score = playerState.players.reduce((acc: number, p: any) => acc + p.score, 0);
     if (newSize === boardState.boardSize) return;
 
+    // Якщо гра ще не почалася (рахунок 0), змінюємо розмір дошки без підтвердження.
+    // Це дозволяє користувачам вільно налаштовувати дошку перед початком гри.
     if (score === 0 && scoreState.penaltyPoints === 0) {
       gameService.initializeNewGame({ size: newSize });
+      gameSettingsStore.updateSettings({ boardSize: newSize });
     } else {
+      // Якщо гра вже триває, показуємо модальне вікно для підтвердження,
+      // оскільки зміна розміру дошки скине поточний прогрес.
       modalService.showBoardResizeModal(newSize);
     }
   },
+
+  
 
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
@@ -102,7 +109,10 @@ export const userActionService = {
 
   async requestRestartWithSize(newSize: number): Promise<void> {
     modalStore.closeModal();
+    // Ця функція викликається після підтвердження у модальному вікні.
+    // Вона перезапускає гру з новим розміром дошки.
     gameService.initializeNewGame({ size: newSize });
+    gameSettingsStore.updateSettings({ boardSize: newSize });
   },
 
   async requestReplay(): Promise<void> {

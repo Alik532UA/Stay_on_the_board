@@ -4,6 +4,8 @@ export default {
   altMovement: "Alternative Movement (WASD-style)",
   gameActions: "Game Actions",
   gameSettings: "Game Settings Control",
+  navigation: "Navigation",
+  general: "General",
   upLeft: "Up-Left",
   up: "Up",
   upRight: "Up-Right",
@@ -39,6 +41,11 @@ export default {
     'increase-board': "Increase Board Size",
     'decrease-board': "Decrease Board Size",
     'toggle-speech': "Toggle Voiceover",
+    'auto-hide-board': "Auto-hide board",
+    'show-help': "Show help",
+    'main-menu': "Main menu",
+    'toggle-theme': "Toggle theme",
+    'toggle-language': "Toggle language",
     'distance-1': "Distance 1",
     'distance-2': "Distance 2",
     'distance-3': "Distance 3",
@@ -50,4 +57,4 @@ export default {
   },
   distanceSelection: "Distance Selection",
   resetToDefaults: "Reset to Defaults"
-}; 
+};

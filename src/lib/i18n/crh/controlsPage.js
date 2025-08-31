@@ -4,6 +4,8 @@ export default {
   altMovement: "Alternativ idare (WASD-stili)",
   gameActions: "Oyun areketleri",
   gameSettings: "Oyun sozlamalarını idare etüv",
+  navigation: "Navigatsiya",
+  general: "Umumiy",
   upLeft: "Yuqarı-solğa",
   up: "Yuqarı",
   upRight: "Yuqarı-oñğa",
@@ -39,6 +41,11 @@ export default {
     'increase-board': "Tahta ölçüsi artırılsın",
     'decrease-board': "Tahta ölçüsi eksiltilsin",
     'toggle-speech': "Seslendirüv",
+    'auto-hide-board': "Avtomatik olaraq tahtanı gizlet",
+    'show-help': "Yardimnı köster",
+    'main-menu': "Esas menü",
+    'toggle-theme': "Temanı deñiştir",
+    'toggle-language': "Tilni deñiştir",
     'distance-1': "Mesafe 1",
     'distance-2': "Mesafe 2",
     'distance-3': "Mesafe 3",
@@ -50,4 +57,4 @@ export default {
   },
   distanceSelection: "Mesafeni sayla",
   resetToDefaults: "Standartlarğa qaytar"
-}; 
+};
