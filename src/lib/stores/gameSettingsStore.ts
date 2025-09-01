@@ -155,7 +155,7 @@ function createGameSettingsStore() {
       boardStore.resetCellVisitCounts();
       availableMovesService.updateAvailableMoves();
     },
-    toggleSimpleSpeech: () => update(state => ({ ...state, speechEnabled: !state.speechEnabled })),
+    toggleSpeech: () => update(state => ({ ...state, speechEnabled: !state.speechEnabled })),
     
     applyPreset: (preset: GameModePreset) => {
         const presets: Record<GameModePreset, Partial<GameSettingsState>> = {
@@ -163,12 +163,15 @@ function createGameSettingsStore() {
                 gameMode: 'beginner', 
                 blockModeEnabled: false, 
                 autoHideBoard: false, 
-                speechEnabled: true, 
+                speechEnabled: false, 
                 rememberGameMode: true,
                 speechRate: 1,
                 shortSpeech: false,
                 speechFor: { player: true, computer: true },
                 showGameInfoWidget: 'shown',
+                showBoard: true,
+                showPiece: true,
+                showMoves: true,
             },
             experienced: { 
                 gameMode: 'experienced', 
@@ -220,7 +223,16 @@ function createGameSettingsStore() {
                 speechFor: { player: false, computer: true },
             }
         };
-        methods.updateSettings(presets[preset]);
+        
+        const presetSettings = presets[preset];
+        const currentState = get(gameSettingsStore);
+
+        if (presetSettings.blockModeEnabled !== undefined && presetSettings.blockModeEnabled !== currentState.blockModeEnabled) {
+            boardStore.resetCellVisitCounts();
+            availableMovesService.updateAvailableMoves();
+        }
+
+        methods.updateSettings(presetSettings);
     },
   };
 

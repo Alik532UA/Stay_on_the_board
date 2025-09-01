@@ -63,8 +63,8 @@ export function performMove(
 
   const sideEffects = [];
   const currentPlayer = currentState.players[playerIndex];
-  const shouldSpeak = (settings.speechEnabled && 
-                      (currentPlayer.isComputer && settings.speechFor.computer) || 
+  const shouldSpeak = settings.speechEnabled && 
+                      ((currentPlayer.isComputer && settings.speechFor.computer) || 
                       (!currentPlayer.isComputer && settings.speechFor.player));
 
   if (shouldSpeak) {

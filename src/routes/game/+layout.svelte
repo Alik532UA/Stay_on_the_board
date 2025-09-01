@@ -61,7 +61,7 @@
       }
     });
     registerGameAction('toggle-speech', () => {
-      gameSettingsStore.toggleSimpleSpeech();
+      gameSettingsStore.toggleSpeech();
     });
 
     // ЗМІНЕНО: Перевіряємо isEnabled з testModeStore, а не testMode з appSettingsStore

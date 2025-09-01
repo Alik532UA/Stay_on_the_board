@@ -195,30 +195,7 @@ export const userActionService = {
   },
 
   async toggleSpeech(): Promise<void> {
-    const currentState = get(gameSettingsStore);
-    const isEnabled = !currentState.speechEnabled;
-
-    if (!isEnabled) {
-      gameSettingsStore.updateSettings({ speechEnabled: false });
-      return;
-    }
-
-    const allVoices = await loadAndGetVoices();
-    const currentLocale = get(locale) || 'uk';
-    const availableVoices = filterVoicesByLang(allVoices, currentLocale);
-    const hasConfiguredSpeech = typeof window !== 'undefined' && localStorage.getItem('hasConfiguredSpeech') === 'true';
-
-    if (availableVoices.length > 0) {
-      if (!hasConfiguredSpeech) {
-        openVoiceSettingsModal();
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('hasConfiguredSpeech', 'true');
-        }
-      }
-      gameSettingsStore.updateSettings({ speechEnabled: true });
-    } else {
-      openVoiceSettingsModal();
-    }
+    gameSettingsStore.toggleSpeech();
   },
 
   resetKeybindings(): void {
