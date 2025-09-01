@@ -59,5 +59,10 @@ export default {
   competitiveModeLockContent: "In competitieve modi zijn sommige instellingen vergrendeld om eerlijke voorwaarden te garanderen. Als je ze wilt wijzigen, probeer dan de trainingsmodus.",
   goToTraining: "Ga naar Training",
   stay: "Blijven",
-  boardHiddenExplanationTitle: "Waarom is het bord verdwenen?"
+  boardHiddenExplanationTitle: "Waarom is het bord verdwenen?",
+  boardHiddenExplanation: {
+    p1: "Het bord wordt automatisch verborgen omdat de bijbehorende instelling is ingeschakeld.",
+    p2: "Het doel van het spel is om je ruimtelijk inbeeldingsvermogen te trainen door het bord en de positie van het stuk in je geheugen te houden.",
+    p3: "Als je wilt dat het bord zichtbaar blijft, schakel dan gewoon de optie 'Automatisch verbergen bord' uit in de instellingen."
+  }
 }; 

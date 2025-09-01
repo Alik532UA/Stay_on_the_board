@@ -85,25 +85,25 @@
   >
     <div class="modal-header">
       <h2 class="modal-title" id="voice-settings-title">{$_('voiceSettings.title')}</h2>
-      <button class="modal-close" onclick={close}>&times;</button>
+      <button class="modal-close" onclick={close} data-testid="voice-settings-close-header-btn">&times;</button>
     </div>
     <div class="modal-body">
       <div class="settings-section">
         <span class="settings-label">{$_('voiceSettings.speed')}</span>
         <div class="button-group">
-          <button class:active={$gameSettingsStore.speechRate === 1} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1 })}>x1</button>
-          <button class:active={$gameSettingsStore.speechRate === 1.2} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.2 })}>x1.2</button>
-          <button class:active={$gameSettingsStore.speechRate === 1.4} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.4 })}>x1.4</button>
-          <button class:active={$gameSettingsStore.speechRate === 1.6} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.6 })}>x1.6</button>
-          <button class:active={$gameSettingsStore.speechRate === 1.8} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.8 })}>x1.8</button>
-          <button class:active={$gameSettingsStore.speechRate === 2} onclick={() => gameSettingsStore.updateSettings({ speechRate: 2 })}>x2</button>
+          <button class:active={$gameSettingsStore.speechRate === 1} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1 })} data-testid="speech-rate-1-btn">x1</button>
+          <button class:active={$gameSettingsStore.speechRate === 1.2} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.2 })} data-testid="speech-rate-1.2-btn">x1.2</button>
+          <button class:active={$gameSettingsStore.speechRate === 1.4} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.4 })} data-testid="speech-rate-1.4-btn">x1.4</button>
+          <button class:active={$gameSettingsStore.speechRate === 1.6} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.6 })} data-testid="speech-rate-1.6-btn">x1.6</button>
+          <button class:active={$gameSettingsStore.speechRate === 1.8} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.8 })} data-testid="speech-rate-1.8-btn">x1.8</button>
+          <button class:active={$gameSettingsStore.speechRate === 2} onclick={() => gameSettingsStore.updateSettings({ speechRate: 2 })} data-testid="speech-rate-2-btn">x2</button>
         </div>
       </div>
       <div class="settings-section">
         <span class="settings-label">{$_('voiceSettings.order')}</span>
         <div class="button-group">
-          <button class:active={$gameSettingsStore.speechOrder === 'dist_dir'} onclick={() => gameSettingsStore.updateSettings({ speechOrder: 'dist_dir' })}>{$_('voiceSettings.dist_dir')}</button>
-          <button class:active={$gameSettingsStore.speechOrder === 'dir_dist'} onclick={() => gameSettingsStore.updateSettings({ speechOrder: 'dir_dist' })}>{$_('voiceSettings.dir_dist')}</button>
+          <button class:active={$gameSettingsStore.speechOrder === 'dist_dir'} onclick={() => gameSettingsStore.updateSettings({ speechOrder: 'dist_dir' })} data-testid="speech-order-dist-dir-btn">{$_('voiceSettings.dist_dir')}</button>
+          <button class:active={$gameSettingsStore.speechOrder === 'dir_dist'} onclick={() => gameSettingsStore.updateSettings({ speechOrder: 'dir_dist' })} data-testid="speech-order-dir-dist-btn">{$_('voiceSettings.dir_dist')}</button>
         </div>
       </div>
       <div class="settings-section">
@@ -111,14 +111,15 @@
           label={$_('voiceSettings.shortSpeech')} 
           checked={$gameSettingsStore.shortSpeech} 
           on:toggle={() => gameSettingsStore.updateSettings({ shortSpeech: !$gameSettingsStore.shortSpeech })}
+          data-testid="short-speech-toggle-btn"
         />
       </div>
 
       <div class="settings-section">
         <span class="settings-label">{$_('voiceSettings.speakFor')}</span>
         <div class="button-group">
-          <button class:active={$gameSettingsStore.speechFor.player} onclick={() => gameSettingsStore.updateSettings({ speechFor: { ...$gameSettingsStore.speechFor, player: !$gameSettingsStore.speechFor.player } })}>{$_('voiceSettings.player')}</button>
-          <button class:active={$gameSettingsStore.speechFor.computer} onclick={() => gameSettingsStore.updateSettings({ speechFor: { ...$gameSettingsStore.speechFor, computer: !$gameSettingsStore.speechFor.computer } })}>{$_('voiceSettings.computer')}</button>
+          <button class:active={$gameSettingsStore.speechFor.player} onclick={() => gameSettingsStore.updateSettings({ speechFor: { ...$gameSettingsStore.speechFor, player: !$gameSettingsStore.speechFor.player } })} data-testid="speech-for-player-btn">{$_('voiceSettings.player')}</button>
+          <button class:active={$gameSettingsStore.speechFor.computer} onclick={() => gameSettingsStore.updateSettings({ speechFor: { ...$gameSettingsStore.speechFor, computer: !$gameSettingsStore.speechFor.computer } })} data-testid="speech-for-computer-btn">{$_('voiceSettings.computer')}</button>
         </div>
       </div>
 
@@ -164,15 +165,15 @@
                 <li>{$_('voiceSettings.edgeFixStep4')}</li>
               </ol>
               <p>{$_('voiceSettings.edgeFixStep5')}</p>
-              <button class="modal-btn-generic primary" onclick={recheckVoices}>
+              <button class="modal-btn-generic primary" onclick={recheckVoices} data-testid="voice-settings-recheck-btn">
                 {$_('voiceSettings.checkAgainButton')}
               </button>
             </div>
-            <button class="details-button" onclick={() => showDetails = !showDetails}>
+            <button class="details-button" onclick={() => showDetails = !showDetails} data-testid="voice-settings-edge-details-btn">
               {showDetails ? $_('voiceSettings.hideDetailsButton') : $_('voiceSettings.whyIsThisNeededTitle')}
             </button>
           {:else}
-            <button class="details-button" onclick={() => showDetails = !showDetails}>
+            <button class="details-button" onclick={() => showDetails = !showDetails} data-testid="voice-settings-general-details-btn">
               {showDetails ? $_('voiceSettings.hideDetailsButton') : $_('voiceSettings.whyButton')}
             </button>
           {/if}
@@ -189,7 +190,7 @@
       {/if}
     </div>
     <div class="modal-footer">
-      <button class="modal-btn-generic primary" onclick={close}>{$_('voiceSettings.close')}</button>
+      <button class="modal-btn-generic primary" onclick={close} data-testid="voice-settings-close-footer-btn">{$_('voiceSettings.close')}</button>
     </div>
   </div>
 </div>

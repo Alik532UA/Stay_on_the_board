@@ -1,9 +1,11 @@
+<script lang="ts">
+  import { _ } from 'svelte-i18n';
+</script>
+
 <div class="modal-content-wrapper">
-    <p>
-        Дошка була автоматично прихована, оскільки увімкнено налаштування "Автоматично приховувати дошку".
-        Це налаштування допомагає зосередитись на панелі керування.
-        Ви можете вимкнути це налаштування у будь-який час.
-    </p>
+    <p>{$_('modal.boardHiddenExplanation.p1')}</p>
+    <p>{$_('modal.boardHiddenExplanation.p2')}</p>
+    <p>{$_('modal.boardHiddenExplanation.p3')}</p>
 </div>
 
 <style>

@@ -65,5 +65,10 @@ export default {
   competitiveModeLockContent: "In competitive modes, some settings are locked to ensure fair conditions. If you want to change them, please try the training mode.",
   goToTraining: "Go to Training",
   stay: "Stay",
-  boardHiddenExplanationTitle: "Why did the board disappear?"
+  boardHiddenExplanationTitle: "Why did the board disappear?",
+  boardHiddenExplanation: {
+    p1: "The board is hidden automatically because the corresponding setting is enabled.",
+    p2: "The point of the game is to train your spatial imagination by keeping the board and the position of the piece in your memory.",
+    p3: "If you want the board to remain visible, simply turn off the 'Automatically hide board' option in the settings."
+  }
 };

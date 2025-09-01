@@ -208,10 +208,10 @@
     {#if showWipNotice}
       <div class="wip-notice-overlay" role="dialog" tabindex="0" onclick={(e) => { e.stopPropagation(); }} onkeydown={(e) => (e.key === 'Escape') && closeDropdowns()}>
         <div class="wip-notice-content">
-          <button class="wip-close-btn" onclick={closeDropdowns} data-testid="wip-close-btn">×</button>
+                    <button class="wip-close-btn" onclick={closeDropdowns} data-testid="wip-notice-close-btn">×</button>
           <h3>{$_('mainMenu.wipNotice.title')}</h3>
           <p>{$_('mainMenu.wipNotice.description')}</p>
-          <button class="wip-donate-btn" onclick={handleDonate} data-testid="wip-donate-btn">
+          <button class="wip-donate-btn" onclick={handleDonate} data-testid="wip-notice-donate-btn">
             {$_('mainMenu.donate')}
           </button>
         </div>
