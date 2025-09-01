@@ -8,6 +8,7 @@
     modalStore.showModal({
       component: BoardHiddenExplanationModal,
       titleKey: 'modal.boardHiddenExplanationTitle',
+      dataTestId: 'board-hidden-explanation-modal',
       buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
     });
   }
@@ -18,12 +19,17 @@
 </script>
 
 <div class="hidden-board-info">
-  <button class="btn" on:click={showExplanation}>{$_('newWidget.whyBoardHidden')}</button>
-  <button class="btn" on:click={dismissWidget}>{$_('newWidget.iKnowWhy')}</button>
+  <button class="settings-expander__row-btn" on:click={showExplanation} data-testid="why-board-hidden-btn">{$_('newWidget.whyBoardHidden')}</button>
+  <button class="settings-expander__row-btn" on:click={dismissWidget} data-testid="i-know-why-btn">{$_('newWidget.iKnowWhy')}</button>
 </div>
 
 <style>
   .hidden-board-info {
+    --button-height: 36px;
+    --button-padding: 4px 8px;
+    --button-border-width: 1.5px;
+    --button-border-radius: 8px;
+    --button-font-size: 1em;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -34,17 +40,36 @@
     box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
     align-items: center;
   }
-  .btn {
-    width: 100%;
-    padding: 0.8rem;
-    font-size: 1rem;
+  .settings-expander__row-btn {
     background: var(--control-bg);
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    border: var(--button-border-width) solid #888;
     border-radius: var(--button-border-radius);
+    padding: 0 calc(var(--button-height) * 0.3);
+    height: var(--button-height);
+    min-height: var(--button-height);
+    box-sizing: border-box;
+    font-size: calc(var(--button-height) * 0.4);
+    font-weight: 600;
     cursor: pointer;
+    transition: background 0.18s, color 0.18s, border 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    width: 100%;
   }
-  .btn:hover {
+  .settings-expander__row-btn:hover, .settings-expander__row-btn:focus {
+    border-color: var(--control-selected);
+    color: var(--text-primary);
+    outline: none;
+  }
+  .settings-expander__row-btn.active {
     background: var(--control-selected);
+    color: var(--control-selected-text);
+    border-color: var(--control-selected);
+    box-shadow: 0 0 8px var(--control-selected, #4caf50);
+    transform: scale(1.07);
+    z-index: 1;
   }
 </style>

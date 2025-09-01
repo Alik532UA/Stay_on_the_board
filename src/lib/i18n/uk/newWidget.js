@@ -1,4 +1,4 @@
 export default {
   whyBoardHidden: "Чому зникла дошка?",
-  iKnowWhy: "Я знаю чому"
+  iKnowWhy: "Я розумію чому зникла дошка"
 };

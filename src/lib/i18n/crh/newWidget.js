@@ -1,4 +1,4 @@
 export default {
   whyBoardHidden: "Tahta neden ğayıp oldı?",
-  iKnowWhy: "Nedenini bilem"
+  iKnowWhy: "Tahta neden ğayıp olğanını añlayım"
 };

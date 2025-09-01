@@ -59,5 +59,10 @@ export default {
   competitiveModeLockContent: "Yarışma modlarında, adil şartlar sağlamak için bazı ayarlar kilitlenir. Onları değiştirmek isterseniz, lütfen antrenman modunu deneyin.",
   goToTraining: "Antrenmana Git",
   stay: "Kal",
-  boardHiddenExplanationTitle: "Tahta neden ğayıp oldı?"
+  boardHiddenExplanationTitle: "Tahta neden ğayıp oldı?",
+  boardHiddenExplanation: {
+    p1: "Тийишли айарлама ачыкъ олгъаны ичюн, тахта автоматик оларакъ гизлене.",
+    p2: "Оюннынъ макъсады - тахтаны ве фигуранынъ ерини акъылда тутып, мекян тасавурынъызны инкишаф этмектир.",
+    p3: "Эгер тахтанынъ корюнмесини истесенъиз, айарларда 'Тахтаны автоматик гизле' сеченегини къапатынъыз."
+  }
 }; 

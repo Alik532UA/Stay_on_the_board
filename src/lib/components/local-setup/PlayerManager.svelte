@@ -69,6 +69,7 @@
           class="player-type-btn"
           use:customTooltip={$_('localGame.togglePlayerType')}
           on:click={() => updatePlayer(player.id, { type: player.type === 'human' ? 'ai' : 'human' })}
+          data-testid="player-type-btn-{player.id}"
         >
           {player.type === 'ai' ? '🤖' : '👤'}
         </button>

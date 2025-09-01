@@ -193,6 +193,7 @@
 {#if $boardStore}
 <div class="settings-expander {isOpen ? 'open' : ''}" class:disabled={$gameSettingsStore.lockSettings}>
   <div
+    data-testid="settings-expander-summary"
     class="settings-expander__summary"
     class:disabled={$gameSettingsStore.lockSettings}
     role="button"
