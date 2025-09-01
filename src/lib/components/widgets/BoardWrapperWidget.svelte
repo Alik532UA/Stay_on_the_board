@@ -113,6 +113,16 @@
     }
   }
 
+  let showHiddenInfoWidget = false;
+
+  $: if (!$gameSettingsStore.showBoard && $uiStateStore.showBoardHiddenInfo) {
+    setTimeout(() => {
+      showHiddenInfoWidget = true;
+    }, 500); // Delay matches the board's disappearance animation
+  } else {
+    showHiddenInfoWidget = false;
+  }
+
   function onCellRightClick(event: MouseEvent, row: number, col: number): void {
     event.preventDefault();
     const $boardState = get(boardStore);
@@ -168,8 +178,10 @@
         </div>
       </div>
     {:else}
-      {#if $uiStateStore.showBoardHiddenInfo}
-        <BoardHiddenInfoWidget />
+      {#if showHiddenInfoWidget}
+        <div transition:slide={{ duration: 400, easing: quintOut }}>
+          <BoardHiddenInfoWidget />
+        </div>
       {/if}
     {/if}
   {/key}
