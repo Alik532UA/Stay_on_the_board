@@ -3,6 +3,8 @@
   import BoardHiddenExplanationModal from '../modals/BoardHiddenExplanationModal.svelte';
   import { uiStateStore } from '$lib/stores/uiStateStore';
   import { _ } from 'svelte-i18n';
+  import { slide } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
 
   function showExplanation() {
     modalStore.showModal({
@@ -18,7 +20,7 @@
   }
 </script>
 
-<div class="hidden-board-info">
+<div class="hidden-board-info" transition:slide={{ duration: 400, easing: quintOut }}>
   <button class="settings-expander__row-btn" on:click={showExplanation} data-testid="why-board-hidden-btn">{$_('newWidget.whyBoardHidden')}</button>
   <button class="settings-expander__row-btn" on:click={dismissWidget} data-testid="i-know-why-btn">{$_('newWidget.iKnowWhy')}</button>
 </div>
