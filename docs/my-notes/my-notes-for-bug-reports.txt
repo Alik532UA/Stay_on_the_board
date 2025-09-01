@@ -5649,3 +5649,32 @@ abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
 
 треба fix
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+data-testid="speech-toggle" OFF
+Актуальний результат: озвучка досі є
+Очікуваний результат: озвучка перестала працювати
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+таке враження що data-testid="speech-toggle" пов'язано тільки з <button class="s-7FFAMHOBqq-b active">Хід комп'ютера</button>
+тому що коли я вимикаю data-testid="speech-toggle" то перестає озвучвати хід комп'ютера, але озвучується хід гравця
+треба fix
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+при натисканні data-testid="settings-expander-game-mode-beginner-btn"
+Актуальний результат: якщо активна data-testid="settings-expander-visibility-btn-hidden", то нічого не міняється
+Очікуваний результат: якщо активна data-testid="settings-expander-visibility-btn-hidden", то переключається на 
+data-testid="settings-expander-visibility-btn-boardOnly"
+data-testid="settings-expander-visibility-btn-withPiece"
+data-testid="settings-expander-visibility-btn-withMoves"
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+при використанні data-testid="block-mode-toggle" попередні заблоковані клітини очіщаються, але якщо data-testid="block-mode-toggle" активовується не як натисання на data-testid="block-mode-toggle" як наслідок натискання на data-testid="settings-expander-game-mode-pro-btn", тоді заблоковані клітини не очіщається, і це проблема. повинно очіщатися. 
+
+іншими словами:
+коли користувач вмикає та вимикає data-testid="block-mode-toggle" правильно очіщуються, як зараз працює так і правильно
+коли користувач грав в режимі [Новачок] [Розбійник] на потім перейшов в режим [Потужний], то клітини на яких була фігура в передерніх режимах стають заблокованими, а не повинні, бо ми тільки що перейшли в режим [Потужний] і тільки з цього моменту треба заблоковувати клітини
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+коли спрацьовує приховання дошки через алгоритм чекбокса data-testid="auto-hide-board-toggle"
+Актуальний результат: 
+Очікуваний результат: 
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
