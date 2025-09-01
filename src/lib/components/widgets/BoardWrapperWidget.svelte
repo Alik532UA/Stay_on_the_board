@@ -19,6 +19,7 @@
   import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
   import { boardStore } from '$lib/stores/boardStore';
   import { uiStateStore } from '$lib/stores/uiStateStore';
+  import BoardHiddenInfoWidget from './BoardHiddenInfoWidget.svelte';
 
   const boardSize = derived(boardStore, $boardStore => $boardStore ? Number($boardStore.boardSize) : 0);
 
@@ -122,6 +123,10 @@
       logService.ui(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`);
     }
   }
+
+  $: if ($gameSettingsStore.showBoard && $uiStateStore.showBoardHiddenInfo) {
+    uiStateStore.update(s => ({ ...s, showBoardHiddenInfo: false }));
+  }
 </script>
 
 {#if $boardStore}
@@ -162,6 +167,10 @@
           {/if}
         </div>
       </div>
+    {:else}
+      {#if $uiStateStore.showBoardHiddenInfo}
+        <BoardHiddenInfoWidget />
+      {/if}
     {/if}
   {/key}
 {/if}

@@ -18,6 +18,7 @@ import supportersPage from './nl/supportersPage.js';
 import replay from './nl/replay.js';
 import faq from './nl/faq.js';
 import gameModes from './nl/gameModes.js';
+import newWidget from './nl/newWidget.js';
 
 export default {
   mainMenu,
@@ -39,5 +40,6 @@ export default {
   supportersPage,
   replay,
   faq,
-  gameModes
+  gameModes,
+  newWidget
 };

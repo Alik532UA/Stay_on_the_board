@@ -58,5 +58,6 @@ export default {
   competitiveModeLockTitle: "Ayarlar Kilitlendi",
   competitiveModeLockContent: "Yarışma modlarında, adil şartlar sağlamak için bazı ayarlar kilitlenir. Onları değiştirmek isterseniz, lütfen antrenman modunu deneyin.",
   goToTraining: "Antrenmana Git",
-  stay: "Kal"
+  stay: "Kal",
+  boardHiddenExplanationTitle: "Tahta neden ğayıp oldı?"
 }; 

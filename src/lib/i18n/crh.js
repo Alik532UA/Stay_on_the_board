@@ -18,6 +18,7 @@ import supportersPage from './crh/supportersPage.js';
 import replay from './crh/replay.js';
 import faq from './crh/faq.js';
 import gameModes from './crh/gameModes.js';
+import newWidget from './crh/newWidget.js';
 
 export default {
   mainMenu,
@@ -39,5 +40,6 @@ export default {
   supportersPage,
   replay,
   faq,
-  gameModes
+  gameModes,
+  newWidget
 };

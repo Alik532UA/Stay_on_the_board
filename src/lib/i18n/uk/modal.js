@@ -67,5 +67,6 @@ export default {
   competitiveModeLockTitle: "Налаштування заблоковано",
   competitiveModeLockContent: "У змагальних режимах деякі налаштування заблоковані для забезпечення чесних умов. Якщо ви хочете змінити їх, спробуйте тренувальний режим.",
   goToTraining: "Перейти до тренування",
-  stay: "Залишитися"
+  stay: "Залишитися",
+  boardHiddenExplanationTitle: "Чому зникла дошка?"
 };
