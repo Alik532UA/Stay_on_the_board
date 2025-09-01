@@ -58,5 +58,6 @@ export default {
   competitiveModeLockTitle: "Instellingen Vergrendeld",
   competitiveModeLockContent: "In competitieve modi zijn sommige instellingen vergrendeld om eerlijke voorwaarden te garanderen. Als je ze wilt wijzigen, probeer dan de trainingsmodus.",
   goToTraining: "Ga naar Training",
-  stay: "Blijven"
+  stay: "Blijven",
+  boardHiddenExplanationTitle: "Waarom is het bord verdwenen?"
 }; 

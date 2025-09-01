@@ -1,6 +1,7 @@
 import { writable, get } from 'svelte/store';
 import { gameSettingsStore } from './gameSettingsStore.js';
 import { logService } from '$lib/services/logService.js';
+import { uiStateStore } from './uiStateStore.js';
 
 /**
  * Store для централізованого керування побічними ефектами UI (таймери, затримки, автоприховування тощо).
@@ -23,6 +24,9 @@ function createUiEffectsStore() {
       const settings = get(gameSettingsStore);
       if (settings.autoHideBoard && (settings.showBoard === forceHide)) {
         gameSettingsStore.toggleShowBoard(!forceHide);
+        if (forceHide) {
+            uiStateStore.update(s => ({ ...s, showBoardHiddenInfo: true }));
+        }
       }
     }, delayMs);
   }

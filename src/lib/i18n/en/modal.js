@@ -64,5 +64,6 @@ export default {
   competitiveModeLockTitle: "Settings Locked",
   competitiveModeLockContent: "In competitive modes, some settings are locked to ensure fair conditions. If you want to change them, please try the training mode.",
   goToTraining: "Go to Training",
-  stay: "Stay"
+  stay: "Stay",
+  boardHiddenExplanationTitle: "Why did the board disappear?"
 };

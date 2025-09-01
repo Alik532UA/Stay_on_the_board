@@ -18,6 +18,7 @@ import supportersPage from './uk/supportersPage.js';
 import replay from './uk/replay.js';
 import faq from './uk/faq.js';
 import gameModes from './uk/gameModes.js';
+import newWidget from './uk/newWidget.js';
 
 export default {
   mainMenu,
@@ -39,5 +40,6 @@ export default {
   supportersPage,
   replay,
   faq,
-  gameModes
+  gameModes,
+  newWidget
 };

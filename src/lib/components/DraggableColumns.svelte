@@ -191,6 +191,7 @@
       {/if}
       {#each col.items as item, j (item.id)}
         <li
+          data-testid="widget-{item.id}"
           class="dnd-item"
           style="padding: 12px; margin: 8px 0; background: none; color: #fff; border-radius: 4px; {($columnStyleMode === 'editing') ? 'cursor: grab;' : 'cursor: default;'} opacity: {dragging && dragging.id === item.id ? 0.5 : 1};"
           on:pointerdown={($columnStyleMode === 'editing') ? (e) => handlePointerDown(e, item, col.id) : undefined}

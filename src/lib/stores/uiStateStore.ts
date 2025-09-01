@@ -9,6 +9,7 @@ import { writable } from 'svelte/store';
 import type { MoveDirectionType } from '$lib/models/Figure';
 
 export interface UiState {
+  showBoardHiddenInfo: boolean;
   isComputerMoveInProgress: boolean;
   isGameOver: boolean;
   gameOverReasonKey: string | null;
@@ -25,6 +26,7 @@ export interface UiState {
 }
 
 export const initialUIState: UiState = {
+  showBoardHiddenInfo: false,
   isComputerMoveInProgress: false,
   isGameOver: false,
   gameOverReasonKey: null,

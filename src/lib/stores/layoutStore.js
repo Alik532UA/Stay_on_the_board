@@ -5,6 +5,7 @@ const isBrowser = typeof window !== 'undefined';
 
 // Унікальні ідентифікатори для кожного віджета
 export const WIDGETS = {
+  BOARD_HIDDEN_INFO: 'board-hidden-info',
   TOP_ROW: 'game-board-top-row',
   SCORE_PANEL: 'score-panel',
   BOARD_WRAPPER: 'board-bg-wrapper',
