@@ -5,7 +5,7 @@
   import { _ } from 'svelte-i18n';
   import { getCenterInfoState } from '$lib/utils/centerInfoUtil';
   import { logService } from '$lib/services/logService.js';
-  
+  import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
   export let isMoveInProgress = false;
   export let selectedDirection = null;
@@ -83,10 +83,10 @@
 
 <div class="direction-controls-panel">
   <div class="directions-3x3">
-    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" on:click={() => handleDirection('up-left')} data-testid="dir-btn-up-left" disabled={isMoveInProgress}>↖</button>
-    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" on:click={() => handleDirection('up')} data-testid="dir-btn-up" disabled={isMoveInProgress}>↑</button>
-    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" on:click={() => handleDirection('up-right')} data-testid="dir-btn-up-right" disabled={isMoveInProgress}>↗</button>
-    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" on:click={() => handleDirection('left')} data-testid="dir-btn-left" disabled={isMoveInProgress}>←</button>
+    <button class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}" use:hotkeyTooltip={'up-left'} on:click={() => handleDirection('up-left')} data-testid="dir-btn-up-left" disabled={isMoveInProgress}>↖</button>
+    <button class="dir-btn {selectedDirection === 'up' ? 'active' : ''}" use:hotkeyTooltip={'up'} on:click={() => handleDirection('up')} data-testid="dir-btn-up" disabled={isMoveInProgress}>↑</button>
+    <button class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}" use:hotkeyTooltip={'up-right'} on:click={() => handleDirection('up-right')} data-testid="dir-btn-up-right" disabled={isMoveInProgress}>↗</button>
+    <button class="dir-btn {selectedDirection === 'left' ? 'active' : ''}" use:hotkeyTooltip={'left'} on:click={() => handleDirection('left')} data-testid="dir-btn-left" disabled={isMoveInProgress}>←</button>
     <button id="center-info"
       class="control-btn center-info {centerInfoProps.class}"
       type="button"
@@ -99,10 +99,10 @@
     >
       {centerInfoProps.content}
     </button>
-    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" on:click={() => handleDirection('right')} data-testid="dir-btn-right" disabled={isMoveInProgress}>→</button>
-    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" on:click={() => handleDirection('down-left')} data-testid="dir-btn-down-left" disabled={isMoveInProgress}>↙</button>
-    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" on:click={() => handleDirection('down')} data-testid="dir-btn-down" disabled={isMoveInProgress}>↓</button>
-    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" on:click={() => handleDirection('down-right')} data-testid="dir-btn-down-right" disabled={isMoveInProgress}>↘</button>
+    <button class="dir-btn {selectedDirection === 'right' ? 'active' : ''}" use:hotkeyTooltip={'right'} on:click={() => handleDirection('right')} data-testid="dir-btn-right" disabled={isMoveInProgress}>→</button>
+    <button class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}" use:hotkeyTooltip={'down-left'} on:click={() => handleDirection('down-left')} data-testid="dir-btn-down-left" disabled={isMoveInProgress}>↙</button>
+    <button class="dir-btn {selectedDirection === 'down' ? 'active' : ''}" use:hotkeyTooltip={'down'} on:click={() => handleDirection('down')} data-testid="dir-btn-down" disabled={isMoveInProgress}>↓</button>
+    <button class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}" use:hotkeyTooltip={'down-right'} on:click={() => handleDirection('down-right')} data-testid="dir-btn-down-right" disabled={isMoveInProgress}>↘</button>
   </div>
   <div class="distance-select">
     <div class="distance-btns">

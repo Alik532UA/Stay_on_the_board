@@ -28,7 +28,7 @@
   }
 
   onMount(() => {
-    hotkeyService.register('global', 'i', showGameInfoModal);
+    hotkeyService.register('global', 'KeyI', showGameInfoModal);
     hotkeyService.register('global', 'Escape', handleMainMenuClick);
   });
 </script>
@@ -40,7 +40,7 @@
 </style>
 
 <div class="game-board-top-row">
-  <button class="main-menu-btn" use:hotkeyTooltip={{ key: 'ESC' }} on:click={handleMainMenuClick} data-testid="top-row-main-menu-btn">
+  <button class="main-menu-btn" use:hotkeyTooltip={{ title: $_('gameBoard.mainMenu'), key: 'ESC' }} on:click={handleMainMenuClick} data-testid="top-row-main-menu-btn">
     <SvgIcons name="home" />
   </button>
   {#if $page.route.id?.includes('/game/local')}
@@ -48,7 +48,7 @@
       <SvgIcons name="hamburger-menu" />
     </button>
   {/if}
-  <button class="main-menu-btn" use:hotkeyTooltip={{ key: 'I' }} on:click={showGameInfoModal} data-testid="game-info-btn">
+  <button class="main-menu-btn" use:hotkeyTooltip={{ title: $_('faq.title'), key: 'I' }} on:click={showGameInfoModal} data-testid="game-info-btn">
     <SvgIcons name="info" />
   </button>
   {#if false}
