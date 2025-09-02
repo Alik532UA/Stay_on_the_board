@@ -37,10 +37,20 @@
 </script>
 
 <div class="tooltip" style="left: {adjustedX}px; top: {adjustedY}px;" bind:this={tooltipNode}>
-  {content}
+  {@html content}
 </div>
 
 <style>
+  :global(.tooltip-title) {
+    font-weight: bold;
+    margin-bottom: 6px; /* Add some space below the title */
+    text-align: center;
+  }
+  :global(.tooltip-divider) {
+    border: none;
+    border-top: 1px solid var(--border-color, #444);
+    margin: 6px 0; /* Add space around the divider */
+  }
   :global(.hotkey-title) {
     font-weight: bold;
     margin-bottom: 4px;

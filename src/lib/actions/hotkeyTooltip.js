@@ -3,15 +3,22 @@ import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
 import { get } from 'svelte/store';
 
 /**
- * @param {string[]} keys
+ * @param {string[] | undefined} keys
+ * @param {string=} title
  * @returns {string}
  */
-function formatHotkeys(keys) {
-  if (!keys || keys.length === 0) return '';
+function formatHotkeys(keys, title) {
+  const titleHtml = title ? `<div class="tooltip-title">${title}</div>` : '';
+  if (!keys || keys.length === 0) return titleHtml;
+
   const keyElements = keys.map(key => {
     let keyText = key;
     if (key.startsWith('Key')) {
-      keyText = key.substring(3);
+      if (key === 'KeyI') {
+        keyText = 'i';
+      } else {
+        keyText = key.substring(3);
+      }
     } else if (key.startsWith('Numpad')) {
       keyText = `NumPad ${key.substring(6)}`;
     } else if (key.startsWith('Digit')) {
@@ -20,40 +27,59 @@ function formatHotkeys(keys) {
     const className = keyText.length === 1 ? 'hotkey-kbd single-char' : 'hotkey-kbd';
     return `<div class="hotkey-item"><span class="${className}">${keyText}</span></div>`;
   }).join('');
-  return `<div class="hotkey-title">HotKey</div>${keyElements}`;
+  
+  const hotkeyHtml = `<div class="hotkey-title">HotKey</div>${keyElements}`;
+
+  return title ? `${titleHtml}<hr class="tooltip-divider">${hotkeyHtml}` : hotkeyHtml;
 }
 
 /**
  * A Svelte action to show a tooltip with assigned hotkeys.
  * Can take a game action name to look up in settings, or a static key.
  * @param {HTMLElement} node The element to attach the tooltip to.
- * @param {import('$lib/stores/gameSettingsStore.js').KeybindingAction | {key: string}} param
+ * @param {import('$lib/stores/gameSettingsStore.js').KeybindingAction | {key: string, title?: string} | string} param
  */
 export function hotkeyTooltip(node, param) {
   let tooltipContent = '';
   const originalTitle = node.title;
   node.title = '';
 
-  /** @param {import('$lib/stores/gameSettingsStore.js').KeybindingAction | {key: string}} newParam */
+  /** @param {import('$lib/stores/gameSettingsStore.js').KeybindingAction | {key: string, title?: string} | string} newParam */
   function updateTooltipContent(newParam) {
+    const settings = get(gameSettingsStore);
+    let keys, title;
+
     if (typeof newParam === 'string') {
-      const settings = get(gameSettingsStore);
-      const keys = settings.keybindings[/** @type {import('$lib/stores/gameSettingsStore.js').KeybindingAction} */ (newParam)];
-      tooltipContent = formatHotkeys(keys);
-    } else if (typeof newParam === 'object' && newParam.key) {
-      tooltipContent = formatHotkeys([newParam.key]);
-    } else {
-      tooltipContent = '';
+      keys = settings.keybindings[/** @type {import('$lib/stores/gameSettingsStore.js').KeybindingAction} */ (newParam)];
+      title = undefined;
+    } else if (typeof newParam === 'object') {
+      if ('key' in newParam) {
+        keys = [newParam.key];
+      } else if ('action' in newParam) {
+        keys = settings.keybindings[newParam.action];
+      }
+      title = newParam.title;
     }
+    
+    tooltipContent = formatHotkeys(keys, title);
   }
 
   updateTooltipContent(param);
 
   const unsubscribe = gameSettingsStore.subscribe(settings => {
+    let keys, title;
     if (typeof param === 'string') {
-      const keys = settings.keybindings[/** @type {import('$lib/stores/gameSettingsStore.js').KeybindingAction} */ (param)];
-      tooltipContent = formatHotkeys(keys);
+      keys = settings.keybindings[/** @type {import('$lib/stores/gameSettingsStore.js').KeybindingAction} */ (param)];
+      title = undefined;
+    } else if (typeof param === 'object') {
+      if ('key' in param) {
+        keys = [param.key];
+      } else if ('action' in param) {
+        keys = settings.keybindings[param.action];
+      }
+      title = param.title;
     }
+    tooltipContent = formatHotkeys(keys, title);
   });
 
   /** @param {MouseEvent} event */
@@ -78,7 +104,7 @@ export function hotkeyTooltip(node, param) {
 
   return {
     /**
-     * @param {import('$lib/stores/gameSettingsStore.js').KeybindingAction | {key: string}} newParam
+     * @param {import('$lib/stores/gameSettingsStore.js').KeybindingAction | {key: string, title?: string} | string} newParam
      */
     update(newParam) {
       param = newParam;
