@@ -11,7 +11,7 @@ function formatHotkeys(keys, title) {
   const titleHtml = title ? `<div class="tooltip-title">${title}</div>` : '';
   if (!keys || keys.length === 0) return titleHtml;
 
-  const keyElements = keys.map(key => {
+  const keyElements = (Array.isArray(keys) ? keys : []).filter(key => key).map(key => {
     let keyText = key;
     if (key.startsWith('Key')) {
       if (key === 'KeyI') {
@@ -34,17 +34,21 @@ function formatHotkeys(keys, title) {
 }
 
 /**
+ * @typedef {string | {key: string, title?: string} | {action: import('$lib/stores/gameSettingsStore.js').KeybindingAction, title?: string}} HotkeyTooltipParam
+ */
+
+/**
  * A Svelte action to show a tooltip with assigned hotkeys.
  * Can take a game action name to look up in settings, or a static key.
  * @param {HTMLElement} node The element to attach the tooltip to.
- * @param {import('$lib/stores/gameSettingsStore.js').KeybindingAction | {key: string, title?: string} | string} param
+ * @param {HotkeyTooltipParam} param
  */
 export function hotkeyTooltip(node, param) {
   let tooltipContent = '';
   const originalTitle = node.title;
   node.title = '';
 
-  /** @param {import('$lib/stores/gameSettingsStore.js').KeybindingAction | {key: string, title?: string} | string} newParam */
+  /** @param {HotkeyTooltipParam} newParam */
   function updateTooltipContent(newParam) {
     const settings = get(gameSettingsStore);
     let keys, title;
@@ -52,10 +56,10 @@ export function hotkeyTooltip(node, param) {
     if (typeof newParam === 'string') {
       keys = settings.keybindings[/** @type {import('$lib/stores/gameSettingsStore.js').KeybindingAction} */ (newParam)];
       title = undefined;
-    } else if (typeof newParam === 'object') {
-      if ('key' in newParam) {
+    } else if (newParam && typeof newParam === 'object') {
+      if ('key' in newParam && newParam.key) {
         keys = [newParam.key];
-      } else if ('action' in newParam) {
+      } else if ('action' in newParam && newParam.action) {
         keys = settings.keybindings[newParam.action];
       }
       title = newParam.title;
@@ -71,10 +75,10 @@ export function hotkeyTooltip(node, param) {
     if (typeof param === 'string') {
       keys = settings.keybindings[/** @type {import('$lib/stores/gameSettingsStore.js').KeybindingAction} */ (param)];
       title = undefined;
-    } else if (typeof param === 'object') {
-      if ('key' in param) {
+    } else if (param && typeof param === 'object') {
+      if ('key' in param && param.key) {
         keys = [param.key];
-      } else if ('action' in param) {
+      } else if ('action' in param && param.action) {
         keys = settings.keybindings[param.action];
       }
       title = param.title;
