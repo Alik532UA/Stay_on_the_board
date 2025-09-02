@@ -111,7 +111,7 @@
           label={$_('voiceSettings.shortSpeech')} 
           checked={$gameSettingsStore.shortSpeech} 
           on:toggle={() => gameSettingsStore.updateSettings({ shortSpeech: !$gameSettingsStore.shortSpeech })}
-          data-testid="short-speech-toggle-btn"
+          dataTestId="short-speech-toggle-btn"
         />
       </div>
 
