@@ -28,7 +28,7 @@
 	import { initializeTestModeSync } from '$lib/services/testModeService';
 	import { resetAllStores } from '$lib/services/testingService';
 	import hotkeyService from '$lib/services/hotkeyService';
-	import { _ } from 'svelte-i18n';
+	import { _, locale } from 'svelte-i18n';
 	
 	
 
