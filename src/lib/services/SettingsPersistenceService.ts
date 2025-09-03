@@ -1,17 +1,14 @@
 // src/lib/services/SettingsPersistenceService.ts
 import { logService } from './logService';
-import { defaultGameSettings } from '../stores/gameSettingsStore.js';
+import { defaultGameSettings, type GameSettingsState } from '../stores/gameSettingsStore.js';
 
 const isBrowser = typeof window !== 'undefined';
-const defaultStyle = import.meta.env.DEV ? 'gray' : 'gray';
+const GAME_SETTINGS_KEY = 'gameSettings';
 const SETTINGS_VERSION = 2;
 
-const defaultSettings: any = {
+const defaultSettings: GameSettingsState & { version: number } = {
   ...defaultGameSettings,
   version: SETTINGS_VERSION,
-  language: 'uk',
-  theme: 'dark',
-  style: defaultStyle,
 };
 
 function safeJsonParse<T>(jsonString: string | null, defaultValue: T): T {
@@ -19,56 +16,50 @@ function safeJsonParse<T>(jsonString: string | null, defaultValue: T): T {
   try {
     return JSON.parse(jsonString);
   } catch (e) {
+    logService.error('Failed to parse JSON from localStorage', e);
     return defaultValue;
   }
 }
 
-const convertStyle = (style: string | null): string | null => {
-  if (!style) return null;
-  const conversions: { [key: string]: string } = { 'ubuntu': 'purple', 'peak': 'green', 'cs2': 'blue', 'glass': 'gray', 'material': 'orange' };
-  return conversions[style] || style;
-};
-
 export const settingsPersistenceService = {
-  load(): any {
-    if (!isBrowser) return defaultSettings;
+  load(): GameSettingsState {
+    if (!isBrowser) return defaultGameSettings;
 
     try {
-      const storedSettingsRaw = localStorage.getItem('settings');
-      const sessionGameMode = isBrowser ? sessionStorage.getItem('gameMode') : null;
-      const storedSettings: any = safeJsonParse(storedSettingsRaw, {});
+      const storedSettingsRaw = localStorage.getItem(GAME_SETTINGS_KEY);
+      const storedSettings = safeJsonParse<Partial<GameSettingsState & { version: number }>>(storedSettingsRaw, {});
       
-      let mergedSettings = { ...defaultSettings, ...storedSettings };
+      let mergedSettings = { ...defaultGameSettings, ...storedSettings };
 
-      if (storedSettings.version < SETTINGS_VERSION) {
-        mergedSettings.showGameInfoWidget = defaultSettings.showGameInfoWidget;
+      if (!storedSettings.version || storedSettings.version < SETTINGS_VERSION) {
+        // If settings are outdated or version is missing, apply defaults for new/updated properties
+        mergedSettings.showGameInfoWidget = defaultGameSettings.showGameInfoWidget;
         mergedSettings.version = SETTINGS_VERSION;
       }
+      
+      // Remove version before returning the state to avoid polluting the store
+      const { version, ...gameSettings } = mergedSettings;
 
-      return mergedSettings;
+      return gameSettings as GameSettingsState;
     } catch (error) {
-      logService.init('Помилка завантаження налаштувань:', error);
-      return defaultSettings;
+      logService.error('Error loading game settings:', error);
+      return defaultGameSettings;
     }
   },
 
-  save(settings: any) {
+  save(settings: GameSettingsState) {
     if (!isBrowser) return;
     
-    const persistentState = { ...settings };
-    if (settings.rememberGameMode) {
-      persistentState.gameMode = settings.gameMode;
-    } else {
-      persistentState.gameMode = null;
-    }
+    const stateToPersist = { ...settings, version: SETTINGS_VERSION };
 
+    // Session-specific settings
     if (settings.gameMode) {
       sessionStorage.setItem('gameMode', settings.gameMode);
     } else {
       sessionStorage.removeItem('gameMode');
     }
 
-    logService.state('Стан для збереження в localStorage:', persistentState);
-    localStorage.setItem('settings', JSON.stringify(persistentState));
+    logService.state('Saving game settings to localStorage:', stateToPersist);
+    localStorage.setItem(GAME_SETTINGS_KEY, JSON.stringify(stateToPersist));
   }
 };

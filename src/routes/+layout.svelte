@@ -5,7 +5,7 @@
 	import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
   import { settingsPersistenceService } from '$lib/services/SettingsPersistenceService';
   import { debounce } from '$lib/utils/debounce';
-	import { get } from 'svelte/store';
+	import { uiStateStore } from '$lib/stores/uiStateStore.js';
 	import { initializeI18n, i18nReady } from '$lib/i18n/init.js';
 	import { appVersion } from '$lib/stores/versionStore.js';
 	import { assets } from '$app/paths';
@@ -51,7 +51,66 @@
     toggleTestMode();
   }
 
-	async function initializeApp() {
+	onMount(() => {
+    // 1. Initialize app settings (theme, language) FIRST
+    appSettingsStore.init();
+
+    // 2. Initialize game settings from localStorage
+    const loadedGameSettings = settingsPersistenceService.load();
+    gameSettingsStore.set(loadedGameSettings);
+
+    // 3. Subscribe to game settings changes to persist them
+    const debouncedSave = debounce(settingsPersistenceService.save, 300);
+    const unsubscribeGameSettings = gameSettingsStore.subscribe(settings => {
+      debouncedSave(settings);
+    });
+
+    // 4. Initialize internationalization
+    initializeI18n();
+
+    // 5. Initialize other services and stores
+    initializeTestModeSync();
+
+    // 6. Subscribe to UI state changes
+    const unsubscribeUiState = uiStateStore.subscribe(state => {
+      if (state && state.isFirstMove) {
+        gameSettingsStore.updateSettings({ showBoard: true, showPiece: true, showMoves: true });
+      }
+    });
+
+    // 7. Check for app updates
+    checkForUpdates();
+
+		if (import.meta.env.DEV) {
+			(window as any).appSettingsStore = appSettingsStore;
+			(window as any).toggleTestMode = toggleTestMode;
+			(window as any).resetAllStores = resetAllStores; // Add reset function to window
+		}
+
+    // Hotkeys
+		if (import.meta.env.DEV) {
+			hotkeyService.register('global', '[', (e: KeyboardEvent) => {
+				e.preventDefault();
+				showUpdateNotice = !showUpdateNotice;
+			});
+		}
+		hotkeyService.register('global', 't', (e: KeyboardEvent) => {
+			if (e.ctrlKey && e.altKey) {
+				e.preventDefault();
+				toggleTestMode();
+			}
+		});
+
+    document.body.classList.remove('preload-theme');
+
+    // Cleanup subscriptions on component destroy
+    return () => {
+      unsubscribeGameSettings();
+      unsubscribeUiState();
+    };
+  });
+
+	async function checkForUpdates() {
 		try {
 			const response = await fetch(`${base}/version.json?v=${new Date().getTime()}`);
 			if (!response.ok) return;
@@ -66,55 +125,10 @@
 			} else if (!localVersion) {
 				localStorage.setItem(APP_VERSION_KEY, serverVersion);
 			}
-
-      // Load settings from persistence layer
-      const loadedSettings = settingsPersistenceService.load();
-      // Set the loaded settings into the store
-      gameSettingsStore.set(loadedSettings);
-      
-      // Debounce the save function to avoid excessive writes to localStorage
-      const debouncedSave = debounce(settingsPersistenceService.save, 300);
-      // Subscribe to store changes and save them back to persistence
-      gameSettingsStore.subscribe(settings => {
-          debouncedSave(settings);
-      });
-
-			appSettingsStore.init();
-			gameSettingsStore.init(); // This now only sets up other subscriptions
-			initializeI18n();
-			
-			initializeTestModeSync(); // <-- ДОДАНО: Ініціалізація сервісу-моста
 		} catch (error) {
-			logService.init('Failed to check for app update:', error);
-		}
-
-		if (import.meta.env.DEV) {
-			(window as any).appSettingsStore = appSettingsStore;
-			(window as any).toggleTestMode = toggleTestMode;
-			(window as any).resetAllStores = resetAllStores; // Add reset function to window
+			logService.error('Failed to check for app update:', error);
 		}
 	}
-
-	onMount(() => {
-		initializeApp();
-
-		
-
-		if (import.meta.env.DEV) {
-			hotkeyService.register('global', '[', (e: KeyboardEvent) => {
-				e.preventDefault();
-				showUpdateNotice = !showUpdateNotice;
-			});
-		}
-		hotkeyService.register('global', 't', (e: KeyboardEvent) => {
-			if (e.ctrlKey && e.altKey) {
-				e.preventDefault();
-				toggleTestMode();
-			}
-		});
-
-		document.body.classList.remove('preload-theme');
-	});
 
 	function handleReload() {
 		clearCache({ keepAppearance: true });

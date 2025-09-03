@@ -9,7 +9,7 @@ import { uiStateStore } from '$lib/stores/uiStateStore';
 import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
-import { appSettingsStore } from '$lib/stores/appSettingsStore';
+import { appSettingsStore, type AppSettingsState } from '$lib/stores/appSettingsStore';
 
 export function performMove(
   direction: MoveDirectionType,
@@ -72,7 +72,7 @@ export function performMove(
       type: 'speak_move',
       payload: {
         move: { direction, distance },
-        lang: get(appSettingsStore)?.language || 'uk',
+        lang: (get(appSettingsStore) as AppSettingsState).language || 'uk',
         voiceURI: settings.selectedVoiceURI
       }
     });

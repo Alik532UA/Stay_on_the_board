@@ -17,29 +17,26 @@
   $: gameSettings = $gameSettingsStore;
 
   function handleClearAll() {
-    logService.action('Повне очищення кешу');
     clearCache({ keepAppearance: false });
   }
 
   function handleKeepAppearance() {
-    logService.action('Очищення кешу зі збереженням вигляду');
     clearCache({ keepAppearance: true });
   }
 
-  function selectLang(lang: string) {
+    function selectLang(lang: string) {
     logService.ui(`Зміна мови: ${lang}`);
     appSettingsStore.updateSettings({ language: lang });
     localStorage.setItem('language', lang);
     locale.set(lang);
   }
 
-  function selectTheme(style: string, theme: string) {
+    function selectTheme(style: string, theme: string) {
     logService.ui(`Зміна теми: ${style}, ${theme}`);
     appSettingsStore.updateSettings({ style, theme });
   }
 
   function toggleSetting(name: string) {
-    logService.ui(`Зміна налаштування: ${name}`);
     const key = name as keyof GameSettingsState;
     gameSettingsStore.updateSettings({ [key]: !gameSettings[key] });
   }
