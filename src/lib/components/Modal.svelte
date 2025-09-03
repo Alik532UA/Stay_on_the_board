@@ -17,6 +17,17 @@
   import ScoreBonusExpander from './widgets/ScoreBonusExpander.svelte';
 
   let buttonRefs: (HTMLButtonElement | null)[] = [];
+  let windowHeight = 0;
+
+  onMount(() => {
+    windowHeight = window.innerHeight;
+    const updateHeight = () => windowHeight = window.innerHeight;
+    window.addEventListener('resize', updateHeight);
+
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+    }
+  });
   let modalContent: HTMLDivElement | null = null;
 
   let expertVolume = 0.3;
@@ -134,7 +145,7 @@
 {#if $modalState.isOpen}
   <div use:trapFocus class="modal-overlay screen-overlay-backdrop" role="button" tabindex="-1" on:click={onOverlayClick} on:keydown={onOverlayKeyDown} data-testid="modal-overlay">
     <div class="modal-window" data-testid={$modalState.dataTestId}>
-      {#if $modalState.titleKey || $modalState.title}
+      {#if ($modalState.titleKey || $modalState.title) && !($modalState.dataTestId === 'replay-modal' && windowHeight < 870)}
       <div class="modal-header" data-testid={`${$modalState.dataTestId}-header`}>
         {#if $modalState.titleKey === 'modal.expertModeTitle'}
           <div class="volume-control-container" style="--volume-percentage: {volumePercentage}%; position: relative;" data-testid="expert-mode-volume-container">
