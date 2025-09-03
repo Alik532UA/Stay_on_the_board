@@ -13,15 +13,6 @@
 </script>
 
 <div class="replay-ui-container">
-  <div class="limit-path-container">
-    <ToggleButton
-      label={$_('replay.limitPath')}
-      checked={limitReplayPath}
-      on:toggle={() => dispatch('toggleLimitPath')}
-      dataTestId="limit-path-toggle"
-    />
-  </div>
-
   <div class="replay-controls">
     <button class="control-btn" data-testid="replay-prev-step-btn" on:click={() => dispatch('goToStep', currentStep - 1)} disabled={currentStep === 0}>«</button>
     <button class="control-btn play-pause" data-testid="replay-play-backward-btn" class:active={autoPlayDirection === 'backward'} on:click={() => dispatch('toggleAutoPlay', 'backward')}>
@@ -34,6 +25,15 @@
     <div class="step-counter" data-testid="replay-step-counter">
       {$_('replay.step', { values: { current: currentStep + 1, total: totalSteps } })}
     </div>
+  </div>
+
+  <div class="limit-path-container">
+    <ToggleButton
+      label={$_('replay.limitPath')}
+      checked={limitReplayPath}
+      on:toggle={() => dispatch('toggleLimitPath')}
+      dataTestId="limit-path-toggle"
+    />
   </div>
 </div>
 
