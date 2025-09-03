@@ -21,13 +21,19 @@ export default {
   computerNoMovesContent: "De computer kan geen zet doen. Je kunt het spel voortzetten door alle geblokkeerde cellen te wissen, of het nu beëindigen en bonuspunten ontvangen.",
   playerNoMovesContent: "Je kunt het veld leegmaken en het spel voortzetten, of het nu beëindigen en bonuspunten ontvangen.",
   errorContent: "Je hebt nog beschikbare zetten ({count} over). Je hebt verloren.",
+  noMovesLocalGameContent: "Speler {playerName} heeft correct vastgesteld dat er geen zetten beschikbaar zijn. Je kunt het bord leegmaken en het spel voortzetten, of het nu beëindigen.",
+  endGame: "Spel beëindigen",
+  reviewRecord: "Opname bekijken",
+  gameOverReasonPlayerLied: "{playerName} heeft een valse bewering gedaan over het niet hebben van zetten en heeft verloren.",
+  gameOverReasonNoMovesLeft: "Het spel is voorbij omdat de speler geen zetten meer heeft.",
+  gameOverReasonTimeUp: "De tijd is om.",
   gameOverReasonOut: "Je bent van het bord gegaan.",
   gameOverReasonBlocked: "Je probeerde naar een geblokkeerde cel te gaan.",
   gameOverReasonPlayerOut: "{playerName} ging van het bord af.",
   gameOverReasonPlayerBlocked: "{playerName} probeerde op een geblokkeerde cel te stappen.",
   gameOverReasonCashOut: "Je hebt besloten het spel te beëindigen en je score te innen.",
   gameOverReasonBonus: "Je hebt besloten het spel te beëindigen en een bonus te claimen.",
-  anotherKey: "Nederlandse tekst",
+  
   scoreDetails: {
     baseScore: "Basisscore:",
     sizeBonus: "Bonus voor bordgrootte:",
@@ -46,9 +52,13 @@ export default {
   boardClickTitle: "Hoe bestuur je het spel?",
   boardClickContent: "Het spel wordt niet op het bord bestuurd, maar met het bedieningspaneel. Gebruik de pijlen om een richting te kiezen en de nummer knoppen om een afstand te kiezen. Het bord is alleen om de zetten te observeren.",
   scoreInfoTitle: "Hoe worden punten toegekend?",
-  scoreInfoContent: `Punten per zet:\n• +1 punt: met het bord en de koningin zichtbaar.\n• +2 punten: met het bord zichtbaar, maar de koningin verborgen.\n• +3 punt: met het bord verborgen (moeilijkste modus).\n\nExtra bonuspunten worden automatisch toegekend aan het einde van het spel:\n• Bordgrootte Bonus.\n• Geblokkeerde Cellen Modus Bonus.\n• 'Geen Zetten' Knop Bonus.\n• Springbonus voor het springen over geblokkeerde cellen.\n• Afstand Bonus (+1 punt voor elke zet met afstand groter dan 1).`,
+  scoreInfoContent: "Punten per zet:\n• +1 punt: met het bord en de koningin zichtbaar.\n• +2 punten: met het bord zichtbaar, maar de koningin verborgen.\n• +3 punt: met het bord verborgen (moeilijkste modus).\n\nExtra bonuspunten worden automatisch toegekend aan het einde van het spel:\n• Bordgrootte Bonus.\n• Geblokkeerde Cellen Modus Bonus.\n• 'Geen Zetten' Knop Bonus.\n• Springbonus voor het springen over geblokkeerde cellen.\n• Afstand Bonus (+1 punt voor elke zet met afstand groter dan 1).",
   watchReplay: "Herhaling bekijken",
   cancel: "Annuleren",
+  close: "Sluiten",
+  exitConfirmationTitle: "Spel verlaten?",
+  exitConfirmationContent: "Je voortgang wordt opgeslagen en je kunt het spel later voortzetten. Weet je zeker dat je naar het hoofdmenu wilt gaan?",
+  confirmExit: "Ja, afsluiten",
   expertModeTitle: "Don't push the horses!",
   expertModeContent: "Je schakelt de modus voor hard blokkeren van cellen in. Dit maakt het spel moeilijker en sommige cellen worden na meerdere bezoeken niet meer beschikbaar. Doorgaan?",
   expertModeConfirm: "Zeker!",
@@ -65,4 +75,4 @@ export default {
     p2: "Het doel van het spel is om je ruimtelijk inbeeldingsvermogen te trainen door het bord en de positie van het stuk in je geheugen te houden.",
     p3: "Als je wilt dat het bord zichtbaar blijft, schakel dan gewoon de optie 'Automatisch verbergen bord' uit in de instellingen."
   }
-}; 
+};

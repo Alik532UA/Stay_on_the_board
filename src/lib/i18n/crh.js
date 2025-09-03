@@ -19,8 +19,16 @@ import replay from './crh/replay.js';
 import faq from './crh/faq.js';
 import gameModes from './crh/gameModes.js';
 import newWidget from './crh/newWidget.js';
+import updateNotification from './crh/updateNotification.js';
+import common from './crh/common.js';
+import testMode from './crh/testMode.js';
+import dndTest from './crh/dndTest.js';
 
 export default {
+  dndTest,
+  testMode,
+  common,
+  updateNotification,
   mainMenu,
   gameBoard,
   gameControls,

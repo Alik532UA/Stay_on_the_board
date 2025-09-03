@@ -20,7 +20,7 @@ import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
-import { resetAllStores } from '$lib/services/testingService';
+
 
 export abstract class BaseGameMode implements IGameMode {
   public turnDuration: number = 0;
@@ -140,7 +140,6 @@ export abstract class BaseGameMode implements IGameMode {
     logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
     timeService.stopGameTimer();
     timeService.stopTurnTimer();
-    resetAllStores();
   }
 
   pauseTimers(): void {

@@ -19,6 +19,7 @@ export default {
   styleBlue: "Синя",
   styleGray: "Сіра",
   styleOrange: "Помаранчева",
+  gameMode: "Режим гри",
   reset: "Скинути лише налаштування",
   resetHint: "Скидає всі налаштування до початкових значень, але не очищує кеш.",
   boardSize: "Дошка",

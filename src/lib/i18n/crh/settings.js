@@ -19,6 +19,7 @@ export default {
   styleBlue: "Mavi",
   styleGray: "Gri",
   styleOrange: "Turuncu",
+  gameMode: "Oyun rejimi",
   reset: "Yalıñız sozlamalarnı sıfırla",
   resetHint: "Bütün sozlamalarnı standart qıymetlerge qaytar, amma keşni temizlemey.",
   boardSize: "Tahta",
@@ -30,5 +31,11 @@ export default {
     boardOnly: "Yalıñız tahta",
     withPiece: "Taşnen",
     withMoves: "Areketlernen"
+  },
+  gameInfoWidget: {
+    title: "Malümat vidjeti",
+    hidden: "saqlamaq",
+    shown: "köstermek",
+    compact: "qısqartılğan"
   }
 };

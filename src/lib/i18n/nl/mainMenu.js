@@ -1,7 +1,8 @@
 export default {
   title: "Blijf op het bord",
   menu: "Menu",
-  playVsComputer: "Tegen de computer spelen",
+  training: "Training",
+  timedGame: "Spel tegen de klok",
   localGame: "Lokaal spel",
   playOnline: "Online spelen",
   settings: "Instellingen",
@@ -36,5 +37,9 @@ export default {
     fullClear: "Cache volledig wissen",
     keepAppearance: "Cache wissen, behalve thema en taal"
   },
-  dragAndDropTest: "Drag & Drop Test"
-}; 
+  gameModeModal: {
+    title: "Spelmoduskeuze"
+  },
+  dragAndDropTest: "Drag & Drop Test",
+  loadingTranslations: "Vertalingen laden..."
+};

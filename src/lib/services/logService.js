@@ -19,7 +19,8 @@ const LOG_GROUPS = {
   GAME_MODE: 'game_mode', // Для логіки ігрових режимів
   SPEECH: 'speech',      // Для логів, пов'язаних з озвученням
   TEST_MODE: 'test_mode', // Для логів, пов'язаних з тестовим режимом
-  MODAL: 'modal'       // Для логіки модальних вікон
+  MODAL: 'modal',       // Для логіки модальних вікон
+  ERROR: 'error'        // Для логів помилок
 };
 
 // 2. Конфігурація
@@ -40,6 +41,7 @@ const defaultConfig = {
           [LOG_GROUPS.SPEECH]: false,
           [LOG_GROUPS.TEST_MODE]: false,
           [LOG_GROUPS.MODAL]: false,
+          [LOG_GROUPS.ERROR]: true, // Errors should always be logged
         };
 
 const STORAGE_KEY = 'logConfig';
@@ -90,8 +92,9 @@ const styles = {
   [LOG_GROUPS.GAME_MODE]: 'color: #FF5722; font-weight: bold;', // Deep Orange
   [LOG_GROUPS.ACTION]: 'color: #FFEB3B; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;', // Yellow on dark
   [LOG_GROUPS.SPEECH]: 'color: #8E44AD; font-weight: bold;', // Purple
-    [LOG_GROUPS.TEST_MODE]: 'color: #FBC02D; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;', // Yellow on dark
-  [LOG_GROUPS.MODAL]: 'color: #673AB7; font-weight: bold;', // Deep Purple, // Yellow on dark
+  [LOG_GROUPS.TEST_MODE]: 'color: #FBC02D; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;', // Yellow on dark
+  [LOG_GROUPS.MODAL]: 'color: #673AB7; font-weight: bold;', // Deep Purple
+  [LOG_GROUPS.ERROR]: 'color: #F44336; font-weight: bold;', // Red
 };
 
 /**
@@ -129,6 +132,7 @@ export const logService = {
   speech: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.SPEECH, message, ...data),
   testMode: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.TEST_MODE, message, ...data),
   modal: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.MODAL, message, ...data),
+  error: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.ERROR, message, ...data),
 };
 
 // 5. Глобальний контролер для зручності розробника-людини

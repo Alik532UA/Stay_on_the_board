@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { testModeStore, type PositionMode, type ComputerMoveMode, type TestModeState } from '$lib/stores/testModeStore';
   import { logService } from '$lib/services/logService.js';
@@ -67,25 +68,25 @@
 </script>
 
 <div class="test-mode-widget">
-  <h3 class="test-mode-widget-title">Test Mode</h3>
+  <h3 class="test-mode-widget-title">{$_('testMode.title')}</h3>
 
   <div class="test-mode-control-group">
-    <h4 class="test-mode-group-title">Start Position</h4>
+    <h4 class="test-mode-group-title">{$_('testMode.startPosition')}</h4>
     <div class="test-mode-btn-group">
-      <button class="test-mode-row-btn" on:click={() => setStartPositionMode('random')} class:active={$testModeStore.startPositionMode === 'random'} data-testid="test-mode-start-pos-random-btn">Random</button>
-      <button class="test-mode-row-btn" on:click={() => setStartPositionMode('manual')} class:active={$testModeStore.startPositionMode === 'manual'} data-testid="test-mode-start-pos-manual-btn">Manual</button>
+      <button class="test-mode-row-btn" on:click={() => setStartPositionMode('random')} class:active={$testModeStore.startPositionMode === 'random'} data-testid="test-mode-start-pos-random-btn">{$_('testMode.random')}</button>
+      <button class="test-mode-row-btn" on:click={() => setStartPositionMode('manual')} class:active={$testModeStore.startPositionMode === 'manual'} data-testid="test-mode-start-pos-manual-btn">{$_('testMode.manual')}</button>
     </div>
     {#if $testModeStore.startPositionMode === 'manual'}
       <div class="test-mode-manual-coords">
         <div class="test-mode-input-group">
-          <label for="manualX">X</label>
+          <label for="manualX">{$_('testMode.x')}</label>
           <input id="manualX" class="test-mode-input" type="number" bind:value={manualX} min="0" max="7" data-testid="test-mode-start-pos-x">
         </div>
         <div class="test-mode-input-group">
-          <label for="manualY">Y</label>
+          <label for="manualY">{$_('testMode.y')}</label>
           <input id="manualY" class="test-mode-input" type="number" bind:value={manualY} min="0" max="7" data-testid="test-mode-start-pos-y">
         </div>
-        <button class="test-mode-square-btn" on:click={setManualStartPosition} data-testid="test-mode-set-start-pos-btn">Set</button>
+        <button class="test-mode-square-btn" on:click={setManualStartPosition} data-testid="test-mode-set-start-pos-btn">{$_('testMode.set')}</button>
       </div>
     {/if}
   </div>
@@ -93,9 +94,9 @@
   <hr class="test-mode-divider" />
 
   <div class="test-mode-control-group">
-    <h4 class="test-mode-group-title">Computer's Move</h4>
+    <h4 class="test-mode-group-title">{$_('testMode.computerMove')}</h4>
     <div class="test-mode-btn-group">
-        <button class="test-mode-row-btn" on:click={() => setComputerMoveMode('random')} class:active={$testModeStore.computerMoveMode === 'random'} data-testid="test-mode-computer-move-random-btn">Random</button>
+        <button class="test-mode-row-btn" on:click={() => setComputerMoveMode('random')} class:active={$testModeStore.computerMoveMode === 'random'} data-testid="test-mode-computer-move-random-btn">{$_('testMode.random')}</button>
     </div>
     <div class="test-mode-directions-3x3">
       <button class="test-mode-dir-btn" class:active={manualDirection === 'up-left'} on:click={() => handleDirection('up-left')} data-testid="test-mode-dir-btn-up-left">↖</button>
@@ -110,10 +111,10 @@
     </div>
     <div class="test-mode-manual-move-controls">
       <div class="test-mode-input-group">
-        <label for="manualDist">Dist</label>
+        <label for="manualDist">{$_('testMode.distance')}</label>
         <input id="manualDist" class="test-mode-input" type="number" bind:value={manualDistance} min="1" max="7" data-testid="test-mode-move-dist-input">
       </div>
-      <button class="test-mode-square-btn" on:click={setManualMoveProperties} data-testid="test-mode-set-move-dist-btn">Set</button>
+      <button class="test-mode-square-btn" on:click={setManualMoveProperties} data-testid="test-mode-set-move-dist-btn">{$_('testMode.set')}</button>
     </div>
   </div>
 </div>
