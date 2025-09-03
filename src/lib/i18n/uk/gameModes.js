@@ -1,5 +1,6 @@
 export default {
   title: "Вибір режиму гри",
+  choose: "Вибирати",
   beginner: "Новачок",
   experienced: "Розбійник",
   pro: "Потужний",

@@ -1,5 +1,6 @@
 export default {
   title: "Select Game Mode",
+  choose: "Choose",
   beginner: "Beginner",
   experienced: "Experienced",
   pro: "Pro",
