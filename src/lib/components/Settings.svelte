@@ -109,32 +109,34 @@
             }}
             data-testid="settings-page-game-mode-null"
           >
-            Вибирати
+            {$_('gameModes.choose')}
           </button>
-          <button
-            class="settings-group-button"
-            class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'beginner'}
-            on:click={() => userActionService.setGameModePreset('beginner')}
-            data-testid="settings-page-game-mode-beginner"
-          >
-            Новачок
-          </button>
-          <button
-            class="settings-group-button"
-            class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'experienced'}
-            on:click={() => userActionService.setGameModePreset('experienced')}
-            data-testid="settings-page-game-mode-experienced"
-          >
-            Розбійник
-          </button>
-          <button
-            class="settings-group-button"
-            class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'pro'}
-            on:click={() => userActionService.setGameModePreset('pro')}
-            data-testid="settings-page-game-mode-pro"
-          >
-            Потужний
-          </button>
+          <div class="game-mode-buttons">
+            <button
+              class="settings-group-button"
+              class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'beginner'}
+              on:click={() => userActionService.setGameModePreset('beginner')}
+              data-testid="settings-page-game-mode-beginner"
+            >
+              {$_('gameModes.beginner')}
+            </button>
+            <button
+              class="settings-group-button"
+              class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'experienced'}
+              on:click={() => userActionService.setGameModePreset('experienced')}
+              data-testid="settings-page-game-mode-experienced"
+            >
+              {$_('gameModes.experienced')}
+            </button>
+            <button
+              class="settings-group-button"
+              class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'pro'}
+              on:click={() => userActionService.setGameModePreset('pro')}
+              data-testid="settings-page-game-mode-pro"
+            >
+              {$_('gameModes.pro')}
+            </button>
+          </div>
         </div>
       </div>
       <hr class="settings-divider" data-testid="settings-page-divider-3" />
@@ -250,16 +252,19 @@
     gap: 8px;
   }
   .language-button {
-    background: var(--control-bg);
-    border: 2px solid var(--border-color);
+    background: transparent !important;
+    border: 2px solid transparent !important;
     border-radius: 8px;
     padding: 8px;
     cursor: pointer;
     transition: all 0.2s;
   }
+  .language-button:hover {
+    border-color: var(--control-selected) !important;
+  }
   .language-button.active {
-    border-color: var(--control-selected);
-    box-shadow: 0 0 8px var(--control-selected);
+    border-color: var(--control-selected) !important;
+    box-shadow: none !important;
   }
   .settings-toggle-button {
     width: 100%;
@@ -291,6 +296,18 @@
     flex-wrap: wrap;
     gap: 8px;
     width: 100%;
+  }
+
+  .game-mode-buttons {
+    display: flex;
+    flex: 1;
+    gap: 8px;
+  }
+
+  @media (max-width: 480px) {
+    .settings-button-group {
+      flex-direction: column;
+    }
   }
 
   .settings-group-button {

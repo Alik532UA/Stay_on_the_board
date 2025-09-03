@@ -1,5 +1,6 @@
 export default {
   title: "Oyun rejimini saylañız",
+  choose: "Saylañız",
   beginner: "Başlanğıç",
   experienced: "Tecribeli",
   pro: "Professional",
