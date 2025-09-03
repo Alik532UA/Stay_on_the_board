@@ -132,6 +132,7 @@ export const userActionService = {
       props: {
         moveHistory,
         boardSize,
+        autoPlayForward: true
       },
       titleKey: 'replay.title',
       buttons: [{ textKey: 'modal.close', onClick: () => modalStore.closeModal() }],

@@ -5870,6 +5870,28 @@ HotKey
 Очікуваний результат: перекладається на всі мови
 Задача: знайти всі місця в програмі там де є hardcode, і зробити правильно з підтримкою перекладів
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+при відкриті вікна data-testid="replay-modal"
+Актуальний результат: нічого не відбувається
+Очікуваний результат: 1 секунда паузи, а потім активовується кнопка data-testid="replay-play-forward-btn"
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+модальне вікно data-testid="replay-modal"
+порядок елементів
+Актуальний результат: 
+1. class="board-bg-wrapper game-content-block s-6pSPQAOO8rFI"
+2. data-testid="limit-path-toggle"
+3. class="replay-controls s-YgQN5GUGoqWX"
+Очікуваний результат: 
+1. class="board-bg-wrapper game-content-block s-6pSPQAOO8rFI"
+2. class="replay-controls s-YgQN5GUGoqWX"
+3. data-testid="limit-path-toggle"
+🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+2. class="replay-controls s-YgQN5GUGoqWX"
+3. data-testid="limit-path-toggle"
+елементи взагалі знкли
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+модальне вікно data-testid="replay-modal" 
+data-testid="replay-modal-header"
+Актуальний результат: показується "replay-modal-header" завжди 
+Очікуваний результат: не показується "replay-modal-header" якщо висота вікна менша 800px
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
