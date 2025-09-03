@@ -1,19 +1,11 @@
-ПЕРЕСТАНЬ БУТИ САМОВПЕВНЕНИЙ ТА БРЕХАТИ!
-ДОПИШИ ТАК ЛОГИ ЩОБ БАЧИТИ ПРОБЛЕМУ!
+Українська версія має всі правильні ключі
+приклад проблем
+1. `training: "Тренування",` є в українській версії, але немає в перекладах
+2. `playVsComputer: "Play vs Computer",` playVsComputer є в інших перекладах, хоча це застаріла інформація, ми більше не використовуємо цей термін
 
-проблема залишилась!
-
-Кроки відтворення:
-1. Поміняй тему чи мову чи (тему та мову)
-2. Перейди в режим гри
-3. Повернись в головне меню
-
-Актуальний результат: Налаштування теми та мови скинулись за замовчуванням
-Очікуваний результат: Налаштування теми та мови не скинулись за замовчуванням
-
-p.s. окрім цих налаштувань, може якісь ще скидаються. при переході між сторінками не повинні скидатися налаштування
-
-треба fix
+задача: взяти за основу українську версію
+і виправити всі інші переклади
+щоб у всіх інших перекладах були ті самі ключі, що і в українській версії (але звісно зі своїм перекладом)
 
 ---
 
@@ -47,20 +39,3 @@ p.s. окрім цих налаштувань, може якісь ще скид
 3. допиши потрібні логи
 
 ---
-
-client:733 [vite] connecting...
-client:827 [vite] connected.
-logService.js:141 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
-init.js:31 ✅ i18n ініціалізовано успішно
-logService.js:109 [UI] [layout] afterNavigate: hiding tooltip
-logService.js:109 [UI] [Speech] 'voiceschanged' event fired. Loaded 325 voices.
-logService.js:109 [UI] [Speech] Fallback check loaded 325 voices.
-logService.js:109 [UI] [DontShowAgainCheckbox] onMount. dontShowAgain is false
-logService.js:107 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: null, selectedDistance: null, isConfirmButtonDisabled: true}
-logService.js:107 [UI] [centerInfoUtil] Calculating state {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: false, …}
-logService.js:107 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
-logService.js:107 [UI] [centerInfoUtil] Calculating state {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
-logService.js:109 [UI] [layout] afterNavigate: hiding tooltip
-logService.js:109 [UI] NavigationService: Going to main menu
-logService.js:107 [UI] NavigationService: Navigating to /Stay_on_the_board/
-logService.js:109 [UI] [layout] afterNavigate: hiding tooltip

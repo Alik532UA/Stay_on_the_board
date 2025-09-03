@@ -96,7 +96,7 @@
   <div class="grid-column">
     <div class="settings-card">
       <div class="settings-section" data-testid="settings-page-game-mode-section">
-        <span class="settings-label" data-testid="settings-page-game-mode-label">Режим гри</span>
+        <span class="settings-label" data-testid="settings-page-game-mode-label">{$_('settings.gameMode')}</span>
         <div class="settings-button-group" data-testid="settings-page-game-mode-group">
           <button
             class="settings-group-button"

@@ -19,6 +19,7 @@ export default {
   styleBlue: "Blue",
   styleGray: "Gray",
   styleOrange: "Orange",
+  gameMode: "Game Mode",
   reset: "Reset settings only",
   resetHint: "Resets all settings to their default values, but does not clear the cache.",
   boardSize: "Board",
@@ -30,5 +31,11 @@ export default {
     boardOnly: "Board Only",
     withPiece: "With Piece",
     withMoves: "With Moves"
+  },
+  gameInfoWidget: {
+    title: "Information widget",
+    hidden: "hide",
+    shown: "show",
+    compact: "abbreviated"
   }
 };
