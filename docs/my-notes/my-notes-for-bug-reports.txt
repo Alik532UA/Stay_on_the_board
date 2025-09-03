@@ -5906,7 +5906,41 @@ data-testid="replay-modal-header"
 Чи є якісь ще рішення цієї проблеми?
 Поки обговорюється і не міняємо код!
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+<button data-testid="settings-page-game-mode-null" class="settings-group-button s-Twm6pjhj-ond active">Вибирати</button>
+<button data-testid="settings-page-game-mode-beginner" class="settings-group-button s-Twm6pjhj-ond">Новачок</button>
+<button data-testid="settings-page-game-mode-experienced" class="settings-group-button s-Twm6pjhj-ond">Розбійник</button>
+<button data-testid="settings-page-game-mode-pro" class="settings-group-button s-Twm6pjhj-ond">Потужний</button>
+Актуальний результат: має hardcode
+Очікуваний результат: перекладається на всі мови
+Задача: знайти всі місця в програмі там де є hardcode, і зробити правильно з підтримкою перекладів
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+Stay_on_the_board/settings page
+data-testid="settings-page-language-selector"
+Актуальний результат: прапори знаходяться в кнопках data-testid="settings-page-language-button-*"
+Очікуваний результат: прапори знаходяться в кнопках, але треба зробити візуально кнопку прозору: обводку прозору, фон кнопки прозорий, прибрати тінь
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+
+<button data-testid="settings-page-game-mode-null" class="settings-group-button s-Twm6pjhj-ond active">Вибирати</button>
+<button data-testid="settings-page-game-mode-beginner" class="settings-group-button s-Twm6pjhj-ond">Новачок</button>
+<button data-testid="settings-page-game-mode-experienced" class="settings-group-button s-Twm6pjhj-ond">Розбійник</button>
+<button data-testid="settings-page-game-mode-pro" class="settings-group-button s-Twm6pjhj-ond">Потужний</button>
+
+Актуальний результат: перенос кнопок на новий рядок НЕ контролюється
+Очікуваний результат: перенос кнопок на новий рядок контролюється
+коли переноситься тільки одна кнопка:
+Актуальний результат: 
+перший ряд: [Вибирати] [Новачок] [Розбійник]
+другий ряд: [Потужний]
+Очікуваний результат: 
+перший ряд: [Вибирати]
+другий ряд: [Новачок] [Розбійник] [Потужний]
+
+а коли переніс двох кнопок, то залишити як зараз працює
+перший ряд: [Вибирати] [Новачок]
+другий ряд: [Розбійник] [Потужний]
+
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
+Stay_on_the_board/game/training page
+<button class="settings-expander__toggle-btn s-D-5lNYez-F-W active" data-testid="auto-hide-board-toggle">Автоматично приховувати дошку</button>
+у вибраних кнопок в class="settings-expander__content s-7Vnx0XQsxohu" прибрати тінь (підвідчення на фоні)
 🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠
