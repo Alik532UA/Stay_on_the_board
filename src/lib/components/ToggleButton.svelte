@@ -52,7 +52,6 @@
     background: var(--control-selected);
     color: var(--control-selected-text);
     border-color: var(--control-selected);
-    box-shadow: 0 0 8px var(--control-selected, #4caf50);
   }
 
   .settings-expander__toggle-btn:disabled {
