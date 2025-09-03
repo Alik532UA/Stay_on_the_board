@@ -19,8 +19,16 @@ import replay from './en/replay.js';
 import faq from './en/faq.js';
 import gameModes from './en/gameModes.js';
 import newWidget from './en/newWidget.js';
+import updateNotification from './en/updateNotification.js';
+import common from './en/common.js';
+import testMode from './en/testMode.js';
+import dndTest from './en/dndTest.js';
 
 export default {
+  dndTest,
+  testMode,
+  common,
+  updateNotification,
   mainMenu,
   gameBoard,
   gameControls,

@@ -9,7 +9,6 @@ import { logService } from '../services/logService';
 import { debounce } from '$lib/utils/debounce';
 
 const isBrowser = typeof window !== 'undefined';
-let isInitialized = false;
 
 export type AppSettingsState = {
   language: string;
@@ -31,7 +30,7 @@ function loadAppSettings(): AppSettingsState {
     const language = localStorage.getItem('language') || defaultAppSettings.language;
     return { theme, style, language };
   } catch (e) {
-    logService.init('Failed to load app settings from localStorage', e);
+    logService.error('Failed to load app settings from localStorage', e);
     return defaultAppSettings;
   }
 }
@@ -41,7 +40,6 @@ function saveAppSettings(settings: AppSettingsState) {
   localStorage.setItem('theme', settings.theme);
   localStorage.setItem('style', settings.style);
   localStorage.setItem('language', settings.language);
-  logService.state('[AppSettingsStore] Стан збережено в localStorage:', settings);
 }
 
 function createAppSettingsStore() {
@@ -51,26 +49,18 @@ function createAppSettingsStore() {
   return {
     subscribe,
     init: () => {
-      if (isInitialized || !isBrowser) return;
-      isInitialized = true;
-      const settings = loadAppSettings();
-      set(settings);
-      
       const debouncedSave = debounce(saveAppSettings, 300);
 
       subscribe(currentSettings => {
-        // Apply visual changes immediately
         document.documentElement.setAttribute('data-theme', currentSettings.theme);
         document.documentElement.setAttribute('data-style', currentSettings.style);
-        
-        // Debounce the save operation
         debouncedSave(currentSettings);
       });
-      logService.init('appSettingsStore ініціалізовано успішно');
     },
     updateSettings: (newSettings: Partial<AppSettingsState>) => {
       update(state => ({ ...state, ...newSettings }));
     },
+    set,
     reset: () => set(defaultAppSettings),
   };
 }

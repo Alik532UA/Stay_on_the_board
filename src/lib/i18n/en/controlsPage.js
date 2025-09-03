@@ -25,6 +25,7 @@ export default {
   sKeySetting: "Action for 'S' key",
   keyConflict: "Conflict! Multiple actions assigned to the same key.",
   removeKey: "Remove key",
+  pressKey: "Press a key",
   actions: {
     'up-left': "Up-Left",
     'up': "Up",

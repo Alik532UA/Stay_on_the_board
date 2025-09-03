@@ -11,7 +11,7 @@ import { uiStateStore } from './uiStateStore.js';
 import { boardStore } from './boardStore.ts';
 import { availableMovesService } from '../services/availableMovesService.ts';
 
-export type KeybindingAction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right'|'confirm'|'no-moves'|'toggle-block-mode'|'toggle-board'|'increase-board'|'decrease-board'|'toggle-speech'|'distance-1'|'distance-2'|'distance-3'|'distance-4'|'distance-5'|'distance-6'|'distance-7'|'distance-8'|'auto-hide-board'|'show-help'|'main-menu'|'toggle-theme'|'toggle-language';
+export type KeybindingAction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right'|'confirm'|'no-moves'|'toggle-block-mode'|'toggle-board'|'increase-board'|'decrease-board'|'toggle-speech'|'distance-1'|'distance-2'|'distance-3'|'distance-4'|'distance-5'|'distance-6'|'distance-7'|'distance-8'|'auto-hide-board'|'show-help'|'main-menu';
 export type GameModePreset = 'beginner' | 'experienced' | 'pro' | 'timed' | 'local' | 'online';
 
 export type GameSettingsState = {
@@ -39,7 +39,6 @@ export type GameSettingsState = {
 };
 
 const isBrowser = typeof window !== 'undefined';
-let isInitialized = false;
 
 export const defaultGameSettings: GameSettingsState = {
     showMoves: true,
@@ -65,8 +64,6 @@ export const defaultGameSettings: GameSettingsState = {
         'auto-hide-board': ['Numpad0'],
         'show-help': ['KeyI'],
         'main-menu': ['Escape'],
-        'toggle-theme': ['KeyT'],
-        'toggle-language': ['KeyL'],
     },
     keyConflictResolution: {},
     gameMode: null,
@@ -89,18 +86,6 @@ function createGameSettingsStore() {
 
   const methods = {
     set, // Expose the set method to allow the persistence service to overwrite the state.
-    init: () => {
-      if (isInitialized || !isBrowser) return;
-      isInitialized = true;
-
-      // This subscription remains as it's a reaction to another store's state change.
-      uiStateStore.subscribe(state => {
-        if (state && state.isFirstMove) {
-          methods.updateSettings({ showBoard: true, showPiece: true, showMoves: true });
-        }
-      });
-      logService.init('gameSettingsStore.init() called.');
-    },
     updateSettings: (newSettings: Partial<GameSettingsState>) => {
       update(state => ({ ...state, ...newSettings }));
     },

@@ -21,14 +21,19 @@ export default {
   computerNoMovesContent: "Kompyuter areket etip olamay. Bütün bloklanğan hücrelerni temizlep oyunnı devam etmek ya da şimdi bitirip bonus ballarını almaqñız mümkün.",
   playerNoMovesContent: "Meydannı temizlep oyunnı devam etmek ya da şimdi bitirip bonus ballarını almaqñız mümkün.",
   errorContent: "Siziñ daa mümkün areketleriñiz bar ({count} qaldı). Siz yeñildiñiz.",
+  noMovesLocalGameContent: "Oyuncı {playerName} iç bir musayt ameli olmaganını doğru tayin etti. Tahtanı temizlep, oyunını devam etmege, ya da onı şimdi bitirmege olur.",
+  endGame: "Oyunını bitir",
+  reviewRecord: "Yazını baq",
+  gameOverReasonPlayerLied: "{playerName} areketi olmağanı aqqında sahte beyanatta bulunıp, yeñildi.",
+  gameOverReasonNoMovesLeft: "Oyun bitti, çünki oyuncınıñ areketleri qalmadı.",
   gameOverReasonOut: "Siz tahta sınırlarından tışına çıqtıñız.",
   gameOverReasonBlocked: "Siz bloklanğan hücrege basmağa tırıştıñız.",
   gameOverReasonPlayerOut: "{playerName} tahta sınırlarından tışına çıqtı.",
   gameOverReasonPlayerBlocked: "{playerName} bloklanğan hücrege basmağa tırıştı.",
   gameOverReasonCashOut: "Siz oyunnı bitirip esabıñıznı almağa qarar berdiñiz.",
   gameOverReasonBonus: "Siz oyunnı bitirip bonusnı almağa qarar berdiñiz.",
-  anotherKey: "Qırımtatarca metin",
-    scoreDetails: {
+  gameOverReasonTimeUp: "Vaqıt bitti.",
+  scoreDetails: {
     baseScore: "Esap:",
     sizeBonus: "Tahta ölçüsi içün bonus:",
     blockModeBonus: "Blok etme rejimi içün bonus:",
@@ -46,9 +51,13 @@ export default {
   boardClickTitle: "Oyun nasıl idare etilir?",
   boardClickContent: "Oyun tahtada degil, idare paneli vastasınen idare etile. Yönelişni saylamaq içün oqlarnı ve mesafeni saylamaq içün raqamlı döğmelerni qullanıñız. Tahta tek areketlerni közetmek içündür.",
   scoreInfoTitle: "Ballar nasıl esaplana?",
-  scoreInfoContent: `Er bir areket içün ballar:\n• +1 bal: tahta ve vezir körüngen.\n• +2 bal: tahta körüngen, amma vezir gizli.\n• +3 bal: tahta gizli (eñ zor rejim).\n\nQoşma bonus balları oyun soñunda avtomatik olaraq esaplana:\n• Tahta ölçüsi bonusı.\n• Bloklanğan hücreler rejimi bonusı.\n• 'Areket yoq' döğmesini muvafaqiyetli qullanuv bonusı.\n• Bloklanğan hücreler üzerinden atlama bonusı.\n• Mesafe bonusı (+1 bal her bir areket içün, mesafe 1-den büyük olsa).`,
+  scoreInfoContent: "Er bir areket içün ballar:\n• +1 bal: tahta ve vezir körüngen.\n• +2 bal: tahta körüngen, amma vezir gizli.\n• +3 bal: tahta gizli (eñ zor rejim).\n\nQoşma bonus balları oyun soñunda avtomatik olaraq esaplana:\n• Tahta ölçüsi bonusı.\n• Bloklanğan hücreler rejimi bonusı.\n• 'Areket yoq' döğmesini muvafaqiyetli qullanuv bonusı.\n• Bloklanğan hücreler üzerinden atlama bonusı.\n• Mesafe bonusı (+1 bal her bir areket içün, mesafe 1-den büyük olsa).",
   watchReplay: "Tekrarnı baq",
   cancel: "İptal et",
+  close: "Qapatmaq",
+  exitConfirmationTitle: "Oyundan çıqasızmı?",
+  exitConfirmationContent: "Сизинъ инкишафынъыз сакъланыр, ве оюнны сонъра девам эте билесинъиз. Эминсинъизми ки, баш менюгъа чыкъмакъ истейсинъиз?",
+  confirmExit: "Ebet, çıqmaq",
   expertModeTitle: "Don't push the horses!",
   expertModeContent: "Siz qattiy hücre bloklama rejimini açaqsınız. Bu oyunnı zorlaştırır ve bazı hücreler birqaç ziyaretten sonra kullanılamaz olur. Devam etmek ister misiniz?",
   expertModeConfirm: "Elbette!",
@@ -65,4 +74,4 @@ export default {
     p2: "Оюннынъ макъсады - тахтаны ве фигуранынъ ерини акъылда тутып, мекян тасавурынъызны инкишаф этмектир.",
     p3: "Эгер тахтанынъ корюнмесини истесенъиз, айарларда 'Тахтаны автоматик гизле' сеченегини къапатынъыз."
   }
-}; 
+};

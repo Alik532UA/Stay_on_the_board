@@ -1,4 +1,5 @@
 <script>
+  import { _ } from 'svelte-i18n';
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
   function reload() {
@@ -8,10 +9,10 @@
 
 <div class="update-notice">
   <div class="text-container">
-    <p class="title">Доступне оновлення!</p>
-    <p class="description">Щоб уникнути помилок через старий кеш, будь ласка, перезавантажте гру.</p>
+    <p class="title">{$_('updateNotification.title')}</p>
+    <p class="description">{$_('updateNotification.description')}</p>
   </div>
-  <button on:click={reload}>Оновити</button>
+  <button on:click={reload}>{$_('updateNotification.updateButton')}</button>
 </div>
 
 <style>
@@ -75,4 +76,4 @@ button:hover {
   transform: scale(1.03);
   box-shadow: 0 6px 16px var(--shadow-color);
 }
-</style> 
+</style>

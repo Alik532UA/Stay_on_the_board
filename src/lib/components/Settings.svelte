@@ -17,29 +17,26 @@
   $: gameSettings = $gameSettingsStore;
 
   function handleClearAll() {
-    logService.action('Повне очищення кешу');
     clearCache({ keepAppearance: false });
   }
 
   function handleKeepAppearance() {
-    logService.action('Очищення кешу зі збереженням вигляду');
     clearCache({ keepAppearance: true });
   }
 
-  function selectLang(lang: string) {
+    function selectLang(lang: string) {
     logService.ui(`Зміна мови: ${lang}`);
     appSettingsStore.updateSettings({ language: lang });
     localStorage.setItem('language', lang);
     locale.set(lang);
   }
 
-  function selectTheme(style: string, theme: string) {
+    function selectTheme(style: string, theme: string) {
     logService.ui(`Зміна теми: ${style}, ${theme}`);
     appSettingsStore.updateSettings({ style, theme });
   }
 
   function toggleSetting(name: string) {
-    logService.ui(`Зміна налаштування: ${name}`);
     const key = name as keyof GameSettingsState;
     gameSettingsStore.updateSettings({ [key]: !gameSettings[key] });
   }
@@ -99,7 +96,7 @@
   <div class="grid-column">
     <div class="settings-card">
       <div class="settings-section" data-testid="settings-page-game-mode-section">
-        <span class="settings-label" data-testid="settings-page-game-mode-label">Режим гри</span>
+        <span class="settings-label" data-testid="settings-page-game-mode-label">{$_('settings.gameMode')}</span>
         <div class="settings-button-group" data-testid="settings-page-game-mode-group">
           <button
             class="settings-group-button"
