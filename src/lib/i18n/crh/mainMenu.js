@@ -1,7 +1,8 @@
 export default {
   title: "Tahtada qalmaq",
   menu: "Menü",
-  playVsComputer: "Kompyuterge qarşı oyna",
+  training: "İdman",
+  timedGame: "Vaqıtqa qarşı oyun",
   localGame: "Mahalliy oyun",
   playOnline: "Onlayn oyna",
   settings: "Sozlamalar",
@@ -36,5 +37,9 @@ export default {
     fullClear: "Keşni tolusınen temizle",
     keepAppearance: "Keşni temizle, tema ve tilden ğayrı"
   },
-  dragAndDropTest: "Süyrep Taşuv Testi"
-}; 
+  gameModeModal: {
+    title: "Oyun rejimini saylav"
+  },
+  dragAndDropTest: "Süyrep Taşuv Testi",
+  loadingTranslations: "Tercimeler yükleniyor..."
+};

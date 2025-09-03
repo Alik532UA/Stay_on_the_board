@@ -19,6 +19,7 @@ export default {
   styleBlue: "Blauw",
   styleGray: "Grijs",
   styleOrange: "Oranje",
+  gameMode: "Spelmodus",
   reset: "Alleen instellingen resetten",
   resetHint: "Alle instellingen terugzetten naar hun standaardwaarden, maar de cache niet wissen.",
   boardSize: "Bord",
@@ -30,5 +31,11 @@ export default {
     boardOnly: "Alleen bord",
     withPiece: "Met stuk",
     withMoves: "Met zetten"
+  },
+  gameInfoWidget: {
+    title: "Informatiewidget",
+    hidden: "verbergen",
+    shown: "tonen",
+    compact: "afgekort"
   }
 };

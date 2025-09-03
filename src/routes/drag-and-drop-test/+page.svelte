@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from 'svelte-i18n';
   import ColorPicker from '$lib/components/local-setup/ColorPicker.svelte';
   import { logService } from '$lib/services/logService.js';
   
@@ -11,10 +12,10 @@
 </script>
 
 <div style="padding: 20px; background: #f0f0f0; min-height: 100vh;">
-  <h1>Тест ColorPicker</h1>
+  <h1>{$_('dndTest.title')}</h1>
   
   <div style="margin: 20px 0;">
-    <h3>Поточний колір: {testColor}</h3>
+    <h3>{$_('dndTest.currentColor', { values: { testColor } })}</h3>
     <div style="width: 50px; height: 50px; background-color: {testColor}; border: 2px solid #333; border-radius: 50%; margin: 10px 0;"></div>
   </div>
   
@@ -24,8 +25,8 @@
   />
   
   <div style="margin-top: 20px;">
-    <button on:click={() => testColor = '#ff0000'}>Встановити червоний</button>
-    <button on:click={() => testColor = '#00ff00'}>Встановити зелений</button>
-    <button on:click={() => testColor = '#0000ff'}>Встановити синій</button>
+    <button on:click={() => testColor = '#ff0000'}>{$_('dndTest.setRed')}</button>
+    <button on:click={() => testColor = '#00ff00'}>{$_('dndTest.setGreen')}</button>
+    <button on:click={() => testColor = '#0000ff'}>{$_('dndTest.setBlue')}</button>
   </div>
-</div> 
+</div>

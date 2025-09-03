@@ -161,7 +161,7 @@
 
 <main class="main-menu" data-testid="main-menu-container">
   {#if $isLoading}
-    <div class="main-menu-loading">Завантаження перекладу...</div>
+    <div class="main-menu-loading">{$_('mainMenu.loadingTranslations')}</div>
   {:else}
     <div class="main-menu-top-icons">
       <button class="main-menu-icon" use:customTooltip={$_('mainMenu.theme')} aria-label={$_('mainMenu.theme')} onclick={() => showThemeDropdown = !showThemeDropdown} data-testid="theme-btn">
