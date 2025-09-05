@@ -31,8 +31,8 @@ export default {
   noMovesButtonText2: "This is a risky but sometimes necessary strategy to win in a difficult situation.",
   scoringTitle: "Scoring System",
   scoringText: "The number of points per move depends on the difficulty:",
-  scoreNormal: "+1 point: with visible board and queen.",
-  scoreHideQueen: "+2 points: with visible board but hidden queen.",
+  scoreNormal: "+1 point: with visible board and piece.",
+  scoreHidePiece: "+2 points: with visible board but hidden piece.",
   scoreHideBoard: "+3 points: with hidden board (hardest mode).",
   settingsTitle: "Game Settings",
   boardSize: "Board Size",
@@ -40,10 +40,10 @@ export default {
   proModeTitle: "Pro Mode: Imagination Training",
   proModeText: "The real fun of the game is revealed when you move the board into your imagination and play almost blind. This turns the game into a powerful trainer for memory and spatial thinking.",
   proModeTip: "Try this mode for maximum immersion:",
-  proModeStep1: "1. Start with a 3x3 board.",
-  proModeStep2: "2. In settings, disable 'Show Board' but leave 'Move Voiceover' enabled.",
-  proModeStep3: "3. Enable 'Blocked Cells Mode' to add strategic depth.",
-  proModeStep4: "4. Use hotkeys to control the game without looking at the screen.",
-  proModeConclusion: "Now you can make moves, listen to the computer's response, and keep the entire game situation — the queen's position and blocked cells — only in your mind.",
+  proModeStep1: "Start with a 3x3 board.",
+  proModeStep2: "In settings, disable 'Show Board' but leave 'Move Voiceover' enabled.",
+  proModeStep3: "Enable 'Blocked Cells Mode' to add strategic depth.",
+  proModeStep4: 'Use <a href="/controls" class="inline-link-button">hotkeys</a> to control the game without looking at the screen.',
+  proModeConclusion: "Now you can make moves, listen to the computer's response, and keep the entire game situation — the piece's position and blocked cells — only in your mind.",
   proModeNextLevel: "When the 3x3 board becomes easy, increase the size to 4x4, then 5x5, and so on, gradually increasing the difficulty and training your imagination!"
-}; 
+};

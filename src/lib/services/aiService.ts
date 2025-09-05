@@ -2,7 +2,7 @@
 import { get } from 'svelte/store';
 import { logService } from './logService';
 import { calculateAvailableMoves } from './availableMovesService';
-import type { MoveDirectionType } from '../models/Figure';
+import type { MoveDirectionType } from '../models/Piece';
 import type { BoardState } from '$lib/stores/boardStore';
 import type { PlayerState } from '$lib/stores/playerStore';
 import type { UiState } from '$lib/stores/uiStateStore';

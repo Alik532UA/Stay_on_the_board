@@ -168,7 +168,7 @@
 
         <div class="modal-title-wrapper">
           {#if $modalState.titleKey === 'modal.gameOverTitle'}
-            <span class="modal-victory-icon"><SvgIcons name="queen" /></span>
+            <span class="modal-victory-icon"><SvgIcons name="piece" /></span>
           {/if}
           <h2 class="modal-title" data-testid={`${$modalState.dataTestId}-title`} data-i18n-key={$modalState.titleKey}>
             {#if $i18nReady && $modalState.titleKey}

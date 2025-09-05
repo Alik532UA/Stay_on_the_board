@@ -9,7 +9,7 @@ import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
-import { Figure, type MoveDirectionType } from '$lib/models/Figure';
+import { Piece, type MoveDirectionType } from '../models/Piece';
 import { logService } from '$lib/services/logService';
 import { animationService } from '$lib/services/animationService';
 import { endGameService } from '$lib/services/endGameService';
@@ -96,8 +96,8 @@ export abstract class BaseGameMode implements IGameMode {
     const playerState = get(playerStore);
     if (!boardState || !playerState) return;
 
-    const figure = new Figure(boardState.playerRow!, boardState.playerCol!, boardState.boardSize);
-    const finalInvalidPosition = figure.calculateNewPosition(direction, distance);
+    const piece = new Piece(boardState.playerRow!, boardState.playerCol!, boardState.boardSize);
+    const finalInvalidPosition = piece.calculateNewPosition(direction, distance);
 
     const finalMoveForAnimation = {
       player: playerState.currentPlayerIndex + 1,

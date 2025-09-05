@@ -4,7 +4,7 @@ import { speakText, speakMove } from './speechService';
 import { modalService } from './modalService';
 import { gameEventBus } from './gameEventBus';
 import { logService } from './logService';
-import type { MoveDirectionType } from '$lib/models/Figure';
+import type { MoveDirectionType } from '$lib/models/Piece';
 
 export type SideEffect =
   | { type: 'navigate'; payload: string }

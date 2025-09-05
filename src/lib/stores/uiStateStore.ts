@@ -6,7 +6,7 @@
  */
 // src/lib/stores/uiStateStore.ts
 import { writable } from 'svelte/store';
-import type { MoveDirectionType } from '$lib/models/Figure';
+import type { MoveDirectionType } from '$lib/models/Piece';
 
 export interface UiState {
   showBoardHiddenInfo: boolean;

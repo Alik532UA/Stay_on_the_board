@@ -1,5 +1,5 @@
 // src/lib/services/gameLogicService.ts
-import { Figure, type MoveDirectionType } from '../models/Figure';
+import { Piece, type MoveDirectionType } from '../models/Piece';
 import { get } from 'svelte/store';
 import { isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils';
 import { logService } from './logService.js';
@@ -21,10 +21,10 @@ export function performMove(
   logService.state('Logical Position (at move start)', { row: currentState.playerRow, col: currentState.playerCol });
   logService.logicMove('performMove: початок з параметрами:', { direction, distance, playerIndex });
 
-  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
-  const newPosition = figure.calculateNewPosition(direction, distance);
+  const piece = new Piece(currentState.playerRow, currentState.playerCol, currentState.boardSize);
+  const newPosition = piece.calculateNewPosition(direction, distance);
 
-  if (!figure.isValidPosition(newPosition.row, newPosition.col)) {
+  if (!piece.isValidPosition(newPosition.row, newPosition.col)) {
     logService.logicMove('performMove: вихід за межі дошки');
     return { success: false, reason: 'out_of_bounds' };
   }

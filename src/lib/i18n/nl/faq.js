@@ -17,7 +17,7 @@ export default {
   q3: "Hoe versla ik de computer?",
   a3: "Het is onmogelijk om de computer op de klassieke manier te verslaan. Hij maakt geen fouten. Jouw doel is om zoveel mogelijk punten te scoren door zo lang mogelijk op het bord te blijven.",
   q5: "Hoe verdien ik punten?",
-  a5: "Punten worden toegekend voor elke zet, afhankelijk van de moeilijkheidsgraad:\n• +1 punt: met zichtbaar bord en dame.\n• +2 punten: met zichtbaar bord, maar dame verborgen.\n• +3 punten: met verborgen bord.\nAan het einde van het spel worden bonussen toegekend voor bordgrootte, blokmodus en meer. Strafpunten (-2) worden gegeven voor een spiegelzet als reactie op de zet van de computer.",
+  a5: "Punten worden toegekend voor elke zet, afhankelijk van de moeilijkheidsgraad:\n• +1 punt: met zichtbaar bord en stuk.\n• +2 punten: met zichtbaar bord, maar stuk verborgen.\n• +3 punten: met verborgen bord.\nAan het einde van het spel worden bonussen toegekend voor bordgrootte, blokmodus en meer. Strafpunten (-2) worden gegeven voor een spiegelzet als reactie op de zet van de computer.",
   q6: "Hoe maak ik het spel interessanter?",
   a6: "Probeer te spelen in de 'Pro-modus'! De beste manier om het idee van het spel te ervaren is door met gesloten ogen te spelen, zetten te doen met sneltoetsen en naar de zet van de computer te luisteren. Kijk niet naar het scherm, maar stel het bord en het spel voor in je hoofd. Dit is een echte training voor geheugen en ruimtelijk inzicht."
 }; 

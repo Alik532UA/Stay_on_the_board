@@ -19,7 +19,7 @@ export type MoveDirectionType = typeof MoveDirection[keyof typeof MoveDirection]
 /**
  * Клас фігури, що представляє гравця на дошці
  */
-export class Figure {
+export class Piece {
   public row: number;
   public col: number;
   public boardSize: number;
@@ -131,21 +131,21 @@ export class Figure {
   /**
    * Клонувати фігуру
    */
-  clone(): Figure {
-    return new Figure(this.row, this.col, this.boardSize);
+  clone(): Piece {
+    return new Piece(this.row, this.col, this.boardSize);
   }
 
   /**
    * Порівняти з іншою фігурою
    */
-  equals(other: Figure): boolean {
+  equals(other: Piece): boolean {
     return this.row === other.row && this.col === other.col;
   }
 
   /**
    * Обчислити відстань до іншої фігури
    */
-  distanceTo(other: Figure): number {
+  distanceTo(other: Piece): number {
     const deltaRow = Math.abs(this.row - other.row);
     const deltaCol = Math.abs(this.col - other.col);
     return Math.max(deltaRow, deltaCol);

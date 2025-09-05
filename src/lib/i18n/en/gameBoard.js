@@ -11,7 +11,7 @@ export default {
   cashOutLocal: `End Game
 Early`,
   tutorialTitle: "",
-  tutorialContent: "Your goal is to take turns moving the shared piece without going off the board. Hide the queen or the board in the settings to earn more points for each move!",
+  tutorialContent: "Your goal is to take turns moving the shared piece without going off the board. Hide the piece or the board in the settings to earn more points for each move!",
   info: "Instructions",
   details: "Details",
   infoModalTitle: "About the Game and Its Goal",
