@@ -43,7 +43,7 @@ export default {
   proModeStep1: "3x3 tahta ile başlayıñız.",
   proModeStep2: "Sozlamalarda 'Tahtanı köster'ni kapatıp, 'Areket seslendirüv'ni açıq qaldırıñız.",
   proModeStep3: "Stratejik çetinlik içün 'Bloklanğan hücreler rejimi'ni açıñız.",
-  proModeStep4: 'Ekranga baqmadan oyunnı idare etmek içün <a href="/controls" class="inline-link-button">qısqa yollar</a> qullanıñız.',
+  proModeStep4: 'Ekranga baqmadan oyunnı idare etmek içün <a href="{controlsLink}" class="inline-link-button">qısqa yollar</a> qullanıñız.',
   proModeConclusion: "Endi areket yapıp, kompyuterniñ cevabını eşitip, bütün oyun vaziyetini — taşnıñ pozitsiyası ve bloklanğan hücreler — yalnız başıñızda saqlay alasız.",
   proModeNextLevel: "3x3 tahta asan olğanda, ölçüsini 4x4, sonra 5x5 ve şunıñ gibi arttırıñız, çetinlikni tedricen arttırıp, hayal gücünüzni terbiye etiñiz!"
 }; 

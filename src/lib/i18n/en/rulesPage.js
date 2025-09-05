@@ -43,7 +43,7 @@ export default {
   proModeStep1: "Start with a 3x3 board.",
   proModeStep2: "In settings, disable 'Show Board' but leave 'Move Voiceover' enabled.",
   proModeStep3: "Enable 'Blocked Cells Mode' to add strategic depth.",
-  proModeStep4: 'Use <a href="/controls" class="inline-link-button">hotkeys</a> to control the game without looking at the screen.',
+  proModeStep4: 'Use <a href="{controlsLink}" class="inline-link-button">hotkeys</a> to control the game without looking at the screen.',
   proModeConclusion: "Now you can make moves, listen to the computer's response, and keep the entire game situation — the piece's position and blocked cells — only in your mind.",
   proModeNextLevel: "When the 3x3 board becomes easy, increase the size to 4x4, then 5x5, and so on, gradually increasing the difficulty and training your imagination!"
 };
