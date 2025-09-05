@@ -2,7 +2,7 @@
 import { get } from 'svelte/store';
 import { boardStore, type BoardState } from '$lib/stores/boardStore';
 import { gameSettingsStore, type GameSettingsState } from '$lib/stores/gameSettingsStore';
-import { Figure, MoveDirection } from '$lib/models/Figure';
+import { Piece, MoveDirection } from '../models/Piece';
 import { isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils';
 import { availableMovesStore } from '$lib/stores/availableMovesStore';
 import { logService } from '$lib/services/logService';
@@ -32,7 +32,7 @@ export function calculateAvailableMoves(boardState: BoardState, playerState: Pla
   const lastMoveEntry = moveHistory.length > 0 ? moveHistory[moveHistory.length - 1] : null;
   
   const availableMoves = [];
-  const figure = new Figure(playerRow, playerCol, boardSize);
+  const piece = new Piece(playerRow, playerCol, boardSize);
 
   const currentPlayer = players[currentPlayerIndex];
   const lastMove = lastMoveEntry ? (lastMoveEntry as any).lastMove : null;
@@ -46,9 +46,9 @@ export function calculateAvailableMoves(boardState: BoardState, playerState: Pla
 
   for (const direction of Object.values(MoveDirection)) {
     for (let distance = 1; distance < boardSize; distance++) {
-      const newPosition = figure.calculateNewPosition(direction, distance);
+      const newPosition = piece.calculateNewPosition(direction, distance);
 
-      if (!figure.isValidPosition(newPosition.row, newPosition.col)) {
+      if (!piece.isValidPosition(newPosition.row, newPosition.col)) {
         break;
       }
 

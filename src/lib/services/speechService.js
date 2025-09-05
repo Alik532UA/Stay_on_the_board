@@ -87,7 +87,7 @@ export function filterVoicesByLang(voiceList, langCode) {
 
 /**
  * Озвучує ігровий хід.
- * @param {{direction: import('../models/Figure').MoveDirectionType, distance: number}} move
+ * @param {{direction: import('../models/Piece').MoveDirectionType, distance: number}} move
  * @param {string} lang - Мова інтерфейсу (для вибору голосу)
  * @param {string | null} voiceURI
  */

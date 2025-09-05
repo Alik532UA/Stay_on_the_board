@@ -1,6 +1,6 @@
 // src/lib/gameModes/gameMode.interface.ts
 import type { Player } from '$lib/models/player';
-import type { MoveDirectionType } from '$lib/models/Figure';
+import type { MoveDirectionType } from '../models/Piece';
 
 export interface IGameMode {
   turnDuration: number;

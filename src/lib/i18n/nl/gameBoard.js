@@ -11,7 +11,7 @@ export default {
   cashOutLocal: `Spel vroeg
 beëindigen`,
   tutorialTitle: "",
-  tutorialContent: "Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan. Verberg de koningin of het bord in de instellingen om meer punten te verdienen voor elke zet!",
+  tutorialContent: "Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan. Verberg het stuk of het bord in de instellingen om meer punten te verdienen voor elke zet!",
   info: "Instructies",
   details: "Details",
   infoModalTitle: "Over het spel en het doel",
