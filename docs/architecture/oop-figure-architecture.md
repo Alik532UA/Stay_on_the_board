@@ -1,15 +1,15 @@
-# ООП Архітектура з класом Figure
+# ООП Архітектура з класом Piece
 
 ## Огляд
 
-Нова архітектура використовує принципи ООП для управління фігурою гравця на дошці. Замість розсіяних маніпуляцій з координатами по всьому коду, тепер всі операції з фігурою інкапсульовані в класі `Figure`.
+Нова архітектура використовує принципи ООП для управління фігурою гравця на дошці. Замість розсіяних маніпуляцій з координатами по всьому коду, тепер всі операції з фігурою інкапсульовані в класі `Piece`.
 
 ## Ключові компоненти
 
-### 1. Клас Figure (`src/lib/models/Figure.js`)
+### 1. Клас Piece (`src/lib/models/Piece.js`)
 
 ```javascript
-export class Figure {
+export class Piece {
   constructor(row, col, boardSize = 4)
   getPosition()
   setPosition(row, col)
@@ -65,12 +65,12 @@ export const MoveDirection = {
 
 ### Створення фігури
 ```javascript
-const figure = new Figure(1, 1, 4); // Позиція (1,1) на дошці 4x4
+const piece = new Piece(1, 1, 4); // Позиція (1,1) на дошці 4x4
 ```
 
 ### Виконання руху
 ```javascript
-const result = figure.move(MoveDirection.UP, 1);
+const result = piece.move(MoveDirection.UP, 1);
 if (result.success) {
   console.log('Нова позиція:', result.newPosition);
 } else {
@@ -80,14 +80,14 @@ if (result.success) {
 
 ### Перевірка можливості руху
 ```javascript
-if (figure.canMove(MoveDirection.LEFT, 2)) {
+if (piece.canMove(MoveDirection.LEFT, 2)) {
   // Можна рухатися на 2 клітинки вліво
 }
 ```
 
 ### Отримання доступних ходів
 ```javascript
-const availableMoves = figure.getAvailableMoves();
+const availableMoves = piece.getAvailableMoves();
 // Повертає масив: [{ direction: 'up', distance: 1 }, ...]
 ```
 
@@ -97,13 +97,13 @@ const availableMoves = figure.getAvailableMoves();
 ```javascript
 export async function performMove(direction, distance, playerIndex = 0) {
   const currentState = get(gameState);
-  const figure = new Figure(currentState.playerRow, currentState.playerCol, currentState.boardSize);
+  const piece = new Piece(currentState.playerRow, currentState.playerCol, currentState.boardSize);
   
-  if (!figure.canMove(direction, distance)) {
+  if (!piece.canMove(direction, distance)) {
     return { success: false, error: 'Рух неможливий' };
   }
 
-  const moveResult = figure.move(direction, distance);
+  const moveResult = piece.move(direction, distance);
   // ... оновлення стану гри
 }
 ```
@@ -123,7 +123,7 @@ const moveResult = await gameLogicService.performMove(
 ### Що змінилося:
 1. **Видалено**: Ручне обчислення координат в `gameOrchestrator.js`
 2. **Видалено**: Прямі маніпуляції з `playerRow`/`playerCol` в різних місцях
-3. **Додано**: Клас `Figure` з інкапсульованою логікою
+3. **Додано**: Клас `Piece` з інкапсульованою логікою
 4. **Додано**: Enum `MoveDirection` для типобезпеки
 
 ### Що залишилося:
@@ -133,12 +133,12 @@ const moveResult = await gameLogicService.performMove(
 
 ## Тестування
 
-### Unit тести для Figure
+### Unit тести для Piece
 ```javascript
-describe('Figure Class', () => {
+describe('Piece Class', () => {
   it('повинен виконувати валідний рух', () => {
-    const figure = new Figure(1, 1, 4);
-    const result = figure.move(MoveDirection.UP, 1);
+    const piece = new Piece(1, 1, 4);
+    const result = piece.move(MoveDirection.UP, 1);
     expect(result.success).toBe(true);
     expect(result.newPosition).toEqual({ row: 0, col: 1 });
   });
@@ -147,8 +147,8 @@ describe('Figure Class', () => {
 
 ### Інтеграційні тести
 ```javascript
-describe('Game Logic with Figure', () => {
-  it('повинен використовувати Figure для ходів', async () => {
+describe('Game Logic with Piece', () => {
+  it('повинен використовувати Piece для ходів', async () => {
     const result = await gameLogicService.performMove('up', 1, 0);
     expect(result.success).toBe(true);
   });
@@ -159,18 +159,18 @@ describe('Game Logic with Figure', () => {
 
 ### 1. Різні типи фігур
 ```javascript
-class Queen extends Figure {
+class Queen extends Piece {
   // Спеціальні правила для ферзя
 }
 
-class Knight extends Figure {
+class Knight extends Piece {
   // Спеціальні правила для коня
 }
 ```
 
 ### 2. Розширені правила руху
 ```javascript
-class Figure {
+class Piece {
   canMoveWithObstacles(direction, distance, board) {
     // Перевірка перешкод на шляху
   }
@@ -179,7 +179,7 @@ class Figure {
 
 ### 3. Історія ходів
 ```javascript
-class Figure {
+class Piece {
   moveHistory = [];
   
   move(direction, distance) {
@@ -194,7 +194,7 @@ class Figure {
 
 ## Висновок
 
-Нова ООП архітектура з класом `Figure` забезпечує:
+Нова ООП архітектура з класом `Piece` забезпечує:
 - ✅ Кращу організацію коду
 - ✅ Типобезпеку через enum
 - ✅ Легке тестування
@@ -202,4 +202,4 @@ class Figure {
 - ✅ Інкапсуляцію логіки руху
 - ✅ Усуває "хаос" з маніпуляціями координат
 
-Це значно покращує якість коду та робить його більш підтримуваним. 
+Це значно покращує якість коду та робить його більш підтримуваним.
