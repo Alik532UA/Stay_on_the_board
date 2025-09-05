@@ -1,6 +1,7 @@
 <script>
   import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
   import { _ } from 'svelte-i18n';
+  import { base } from '$app/paths';
 </script>
 
 <div class="rules-page">
@@ -113,7 +114,7 @@
       <li>{$_('rulesPage.proModeStep1')}</li>
       <li>{$_('rulesPage.proModeStep2')}</li>
       <li>{$_('rulesPage.proModeStep3')}</li>
-      <li>{@html $_('rulesPage.proModeStep4')}</li>
+      <li>{@html $_('rulesPage.proModeStep4', { values: { controlsLink: `${base}/controls` } })}</li>
     </ol>
     <p>{$_('rulesPage.proModeConclusion')}</p>
     <p>{$_('rulesPage.proModeNextLevel')}</p>
@@ -218,7 +219,6 @@
 .pro-mode-title {
   margin-top: 1.5rem;
   padding-top: 0.7rem;
-  border-top: 2px solid var(--border-color, rgba(233, 84, 32, 0.3));
   color: var(--text-accent, #e95420);
 }
 
