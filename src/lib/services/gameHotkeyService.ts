@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 import { gameSettingsStore, type KeybindingAction } from '../stores/gameSettingsStore';
 import hotkeyService from './hotkeyService';
 import { logService } from './logService';
+import { showArrowKeyHintModal } from './arrowKeyHintService';
 
 let unsubscribeGameSettings: (() => void) | null = null;
 let registeredGameActionHandlers: Partial<Record<KeybindingAction, (event?: KeyboardEvent) => void>> = {};
@@ -43,6 +44,11 @@ export function initializeGameHotkeys() {
                 });
             }
         }
+
+        hotkeyService.register('game', 'ArrowUp', showArrowKeyHintModal);
+        hotkeyService.register('game', 'ArrowDown', showArrowKeyHintModal);
+        hotkeyService.register('game', 'ArrowLeft', showArrowKeyHintModal);
+        hotkeyService.register('game', 'ArrowRight', showArrowKeyHintModal);
     });
 }
 
