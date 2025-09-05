@@ -7,6 +7,7 @@
   import { logService } from '$lib/services/logService.js';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
   export let isMoveInProgress = false;
   export let selectedDirection = null;
   export let selectedDistance = null;
@@ -35,6 +36,11 @@
     // Action hotkeys
     registerGameAction('confirm', handleConfirm);
     registerGameAction('no-moves', handleNoMoves);
+
+    registerGameAction('ArrowUp', showArrowKeyHint);
+    registerGameAction('ArrowDown', showArrowKeyHint);
+    registerGameAction('ArrowLeft', showArrowKeyHint);
+    registerGameAction('ArrowRight', showArrowKeyHint);
   });
 
   $: {
@@ -78,6 +84,15 @@
   function handleNoMoves() {
     logService.action('Click: "Ходів немає" (DirectionControls)');
     dispatch('noMoves');
+  }
+
+  function showArrowKeyHint() {
+    modalStore.showModal({
+        titleKey: 'modal.arrowKeyHintTitle',
+        contentKey: 'modal.arrowKeyHintContent',
+        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
+        dataTestId: 'arrow-key-hint-modal'
+    });
   }
 </script>
 
@@ -281,4 +296,4 @@
   background: #f57c00;
   transform: scale(1.02);
 }
-</style> 
+</style>

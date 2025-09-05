@@ -74,5 +74,7 @@ export default {
     p1: "Het bord wordt automatisch verborgen omdat de bijbehorende instelling is ingeschakeld.",
     p2: "Het doel van het spel is om je ruimtelijk inbeeldingsvermogen te trainen door het bord en de positie van het stuk in je geheugen te houden.",
     p3: "Als je wilt dat het bord zichtbaar blijft, schakel dan gewoon de optie 'Automatisch verbergen bord' uit in de instellingen."
-  }
+  },
+  arrowKeyHintTitle: "Besturingstip",
+  arrowKeyHintContent: "De pijltjestoetsen ondersteunen geen diagonale zetten. We raden aan de NumPad-toetsen of de qweadzxc-toetsen te gebruiken voor een betere ervaring."
 };
