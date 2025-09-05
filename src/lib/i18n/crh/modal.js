@@ -73,5 +73,7 @@ export default {
     p1: "Тийишли айарлама ачыкъ олгъаны ичюн, тахта автоматик оларакъ гизлене.",
     p2: "Оюннынъ макъсады - тахтаны ве фигуранынъ ерини акъылда тутып, мекян тасавурынъызны инкишаф этмектир.",
     p3: "Эгер тахтанынъ корюнмесини истесенъиз, айарларда 'Тахтаны автоматик гизле' сеченегини къапатынъыз."
-  }
+  },
+  arrowKeyHintTitle: "İdare aqqında mesleat",
+  arrowKeyHintContent: "Klaviatura oqları diagonalga areket etmege imkân bermey, onıñ içün NumLock klaviaturası ya da qweadzxc düğmelerini qullanmağa tevsiye etemiz."
 };

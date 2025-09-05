@@ -7,6 +7,8 @@
   import { logService } from '$lib/services/logService.js';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
+  import { modalStore } from '$lib/stores/modalStore.js';
+  import hotkeyService from '$lib/services/hotkeyService';
   export let isMoveInProgress = false;
   export let selectedDirection = null;
   export let selectedDistance = null;
@@ -23,6 +25,8 @@
   export let isConfirmDisabled: boolean = false;
   
   const dispatch = createEventDispatcher();
+
+  
 
   onMount(() => {
     // Direction hotkeys
@@ -281,4 +285,4 @@
   background: #f57c00;
   transform: scale(1.02);
 }
-</style> 
+</style>
