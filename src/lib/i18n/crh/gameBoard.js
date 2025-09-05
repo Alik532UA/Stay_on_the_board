@@ -12,7 +12,7 @@ export default {
 erkenden
 bitir`,
   tutorialTitle: "",
-  tutorialContent: "Siziñ maqsadıñız – nevbetnen ortaq figurani tahtadan tışarı çıqarmadan areket ettirmektir. Er bir areket içün daa çoq bal qazanmaq içün, sozlamalarda vezirni ya da tahtanı gizletiñiz!",
+  tutorialContent: "Siziñ maqsadıñız – nevbetnen ortaq figurani tahtadan tışarı çıqarmadan areket ettirmektir. Er bir areket içün daa çoq bal qazanmaq içün, sozlamalarda taşnı ya da tahtanı gizletiñiz!",
   info: "Talimat",
   details: "Tafsilât",
   infoModalTitle: "Oyun ve Onıñ Maqsadı Hakkında",

@@ -51,7 +51,7 @@ export default {
   boardClickTitle: "Oyun nasıl idare etilir?",
   boardClickContent: "Oyun tahtada degil, idare paneli vastasınen idare etile. Yönelişni saylamaq içün oqlarnı ve mesafeni saylamaq içün raqamlı döğmelerni qullanıñız. Tahta tek areketlerni közetmek içündür.",
   scoreInfoTitle: "Ballar nasıl esaplana?",
-  scoreInfoContent: "Er bir areket içün ballar:\n• +1 bal: tahta ve vezir körüngen.\n• +2 bal: tahta körüngen, amma vezir gizli.\n• +3 bal: tahta gizli (eñ zor rejim).\n\nQoşma bonus balları oyun soñunda avtomatik olaraq esaplana:\n• Tahta ölçüsi bonusı.\n• Bloklanğan hücreler rejimi bonusı.\n• 'Areket yoq' döğmesini muvafaqiyetli qullanuv bonusı.\n• Bloklanğan hücreler üzerinden atlama bonusı.\n• Mesafe bonusı (+1 bal her bir areket içün, mesafe 1-den büyük olsa).",
+  scoreInfoContent: "Er bir areket içün ballar:\n• +1 bal: tahta ve taş körüngen.\n• +2 bal: tahta körüngen, amma taş gizli.\n• +3 bal: tahta gizli (eñ zor rejim).\n\nQoşma bonus balları oyun soñunda avtomatik olaraq esaplana:\n• Tahta ölçüsi bonusı.\n• Bloklanğan hücreler rejimi bonusı.\n• 'Areket yoq' döğmesini muvafaqiyetli qullanuv bonusı.\n• Bloklanğan hücreler üzerinden atlama bonusı.\n• Mesafe bonusı (+1 bal her bir areket içün, mesafe 1-den büyük olsa).",
   watchReplay: "Tekrarnı baq",
   cancel: "İptal et",
   close: "Qapatmaq",

@@ -3,84 +3,6 @@
   import { _ } from 'svelte-i18n';
 </script>
 
-<!-- СТАРИЙ КОНТЕНТ ЗБЕРЕЖЕНО ДЛЯ ПОРІВНЯННЯ
-<h1>{$_('rulesPage.title')}</h1>
-
-<h2>{$_('rulesPage.goalTitle')}</h2>
-<p>{$_('rulesPage.goalText')}</p>
-
-<h2>{$_('rulesPage.moveProcessTitle')}</h2>
-<p>{$_('rulesPage.moveProcessText')}</p>
-<ol>
-  <li><b>{$_('rulesPage.step1')}</b> {$_('rulesPage.step1Text')}
-    <div class="directions-grid-visual">
-      <div class="dir-btn-visual">↖</div>
-      <div class="dir-btn-visual">↑</div>
-      <div class="dir-btn-visual">↗</div>
-      <div class="dir-btn-visual">←</div>
-      <div class="dir-btn-visual center-piece">♛</div>
-      <div class="dir-btn-visual">→</div>
-      <div class="dir-btn-visual">↙</div>
-      <div class="dir-btn-visual">↓</div>
-      <div class="dir-btn-visual">↘</div>
-    </div>
-  </li>
-  <li><b>{$_('rulesPage.step2')}</b> {$_('rulesPage.step2Text')}</li>
-  <li><b>{$_('rulesPage.step3')}</b> {$_('rulesPage.step3Text')}</li>
-</ol>
-
-<h2>{$_('rulesPage.winLossTitle')}</h2>
-<h3>{$_('rulesPage.youLose')}</h3>
-<ul>
-  <li>{$_('rulesPage.lose1')}</li>
-  <li>{$_('rulesPage.lose2')}</li>
-  <li>{$_('rulesPage.lose3')}</li>
-</ul>
-<h3>{$_('rulesPage.youWin')}</h3>
-<ul>
-  <li>{$_('rulesPage.win1')}</li>
-  <li>{$_('rulesPage.win2')}</li>
-</ul>
-
-<h2>{$_('rulesPage.gameModesTitle')}</h2>
-<h3>{$_('rulesPage.normalMode')}</h3>
-<p>{$_('rulesPage.normalModeText')}</p>
-<h3>{$_('rulesPage.blockMode')}</h3>
-<p>{$_('rulesPage.blockModeText')}</p>
-
-<h2>{$_('rulesPage.noMovesButtonTitle')}</h2>
-<p>{$_('rulesPage.noMovesButtonText1')}</p>
-<ul>
-  <li><b>{$_('rulesPage.noMovesWin')}</b></li>
-  <li><b>{$_('rulesPage.noMovesLoss')}</b></li>
-</ul>
-<p>{$_('rulesPage.noMovesButtonText2')}</p>
-
-<h2>{$_('rulesPage.scoringTitle')}</h2>
-<p>{$_('rulesPage.scoringText')}</p>
-<ul>
-  <li>{$_('rulesPage.scoreNormal')}</li>
-  <li>{$_('rulesPage.scoreHideQueen')}</li>
-  <li>{$_('rulesPage.scoreHideBoard')}</li>
-</ul>
-
-<h2>{$_('rulesPage.settingsTitle')}</h2>
-<h3>{$_('rulesPage.boardSize')}</h3>
-<p>{$_('rulesPage.boardSizeText')}</p>
-
-<h2 class="pro-mode-title">{$_('rulesPage.proModeTitle')}</h2>
-<p>{$_('rulesPage.proModeText')}</p>
-<p><b>{$_('rulesPage.proModeTip')}</b></p>
-<ol>
-  <li>{$_('rulesPage.proModeStep1')}</li>
-  <li>{$_('rulesPage.proModeStep2')}</li>
-  <li>{$_('rulesPage.proModeStep3')}</li>
-  <li>{$_('rulesPage.proModeStep4')}</li>
-</ol>
-<p>{$_('rulesPage.proModeConclusion')}</p>
-<p>{$_('rulesPage.proModeNextLevel')}</p>
--->
-
 <div class="rules-page">
   <div class="rules-header">
     <div class="header-container">
@@ -170,7 +92,7 @@
     <p>{$_('rulesPage.scoringText')}</p>
     <ul>
       <li>{$_('rulesPage.scoreNormal')}</li>
-      <li>{$_('rulesPage.scoreHideQueen')}</li>
+      <li>{$_('rulesPage.scoreHidePiece')}</li>
       <li>{$_('rulesPage.scoreHideBoard')}</li>
     </ul>
   </div>
@@ -191,7 +113,7 @@
       <li>{$_('rulesPage.proModeStep1')}</li>
       <li>{$_('rulesPage.proModeStep2')}</li>
       <li>{$_('rulesPage.proModeStep3')}</li>
-      <li>{$_('rulesPage.proModeStep4')}</li>
+      <li>{@html $_('rulesPage.proModeStep4')}</li>
     </ol>
     <p>{$_('rulesPage.proModeConclusion')}</p>
     <p>{$_('rulesPage.proModeNextLevel')}</p>
@@ -299,6 +221,21 @@
   border-top: 2px solid var(--border-color, rgba(233, 84, 32, 0.3));
   color: var(--text-accent, #e95420);
 }
+
+:global(.inline-link-button) {
+    display: inline-block;
+    padding: 0.1em 0.4em;
+    margin: 0 0.2em;
+    line-height: 1.2;
+    font-size: 0.9em;
+    text-decoration: none;
+    color: var(--text-primary);
+    background-color: var(--control-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+}
+
 @media (max-width: 600px) {
   .rules-cards-row {
     flex-direction: column;
@@ -311,4 +248,4 @@
     font-size: 1.3em;
   }
 }
-</style> 
+</style>

@@ -84,7 +84,7 @@
         <div
           class="player-piece"
           style="top: {$replayPosition.row * (100 / boardSize)}%; left: {$replayPosition.col * (100 / boardSize)}%; z-index: 10;">
-          <div class="piece-container"><SvgIcons name="queen" /></div>
+          <div class="piece-container"><SvgIcons name="piece" /></div>
         </div>
       {/if}
     </div>

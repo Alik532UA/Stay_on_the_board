@@ -1,7 +1,7 @@
 import { testModeStore, type PositionMode, type ComputerMoveMode, type TestModeState } from '$lib/stores/testModeStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
 import { logService } from './logService';
-import type { MoveDirectionType } from '$lib/models/Figure';
+import type { MoveDirectionType } from '$lib/models/Piece';
 
 let isInitialized = false;
 

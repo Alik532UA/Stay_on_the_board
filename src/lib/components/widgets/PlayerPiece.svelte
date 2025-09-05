@@ -12,7 +12,7 @@
   style="top: {row * (100 / boardSize)}%; left: {col * (100 / boardSize)}%; z-index: 10;"
 >
   <div class="piece-container">
-    <SvgIcons name="queen" />
+    <SvgIcons name="piece" />
   </div>
 </div>
 

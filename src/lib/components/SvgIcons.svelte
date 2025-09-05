@@ -2,7 +2,7 @@
   export let name = '';
 </script>
 
-{#if name === 'queen'}
+{#if name === 'piece'}
   <svg class="crown-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve" aria-label="Queen">
     <g>
       <polygon style="fill:#FFC36E;" points="342,330 169,330 239,174 273,174  "/>

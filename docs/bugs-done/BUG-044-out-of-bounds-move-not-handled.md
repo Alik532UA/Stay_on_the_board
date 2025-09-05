@@ -58,7 +58,7 @@ if (moveResult.success) {
 
 ```typescript
 // 1. Перевірка виходу за межі дошки
-if (!figure.isValidPosition(newPosition.row, newPosition.col)) {
+if (!piece.isValidPosition(newPosition.row, newPosition.col)) {
   console.log('❌ performMove: вихід за межі дошки');
   return { success: false, reason: 'out_of_bounds' };
 }
