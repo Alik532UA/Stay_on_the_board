@@ -28,9 +28,14 @@
       <h2 class="modal-title" id="voice-settings-title">{$_('voiceSettings.title')}</h2>
     </div>
     <div class="modal-body">
-      <VoiceSettings />
-      <hr class="divider"/>
-      <VoiceList />
+      <div class="voice-settings-container">
+        <VoiceSettings />
+      </div>
+      <hr class="divider-h"/>
+      <div class="divider-v"></div>
+      <div class="voice-list-container">
+        <VoiceList />
+      </div>
     </div>
     <div class="modal-footer">
       <button class="modal-btn-generic primary" onclick={close} data-testid="voice-settings-save-footer-btn">{$_('common.save')}</button>
@@ -54,8 +59,8 @@
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     border-radius: 18px;
-    max-width: 500px;
-    width: 90vw;
+    max-width: 90vw;
+    width: auto;
     color: #fff;
     animation: modalFadeIn 0.3s ease-out forwards;
   }
@@ -77,7 +82,40 @@
     padding: 24px;
     max-height: 60vh;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }
+
+  .voice-settings-container,
+  .voice-list-container {
+    min-width: 300px;
+  }
+
+  .divider-h {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 20px 0;
+  }
+
+  .divider-v {
+    display: none;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 0 20px;
+  }
+
+  @media (min-width: 801px) {
+    .modal-body {
+      flex-direction: row;
+    }
+    .divider-h {
+      display: none;
+    }
+    .divider-v {
+      display: block;
+    }
+  }
+
   .modal-footer {
     padding: 16px 24px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -97,10 +135,5 @@
     background: #4caf50;
     color: #fff;
     border-color: #388e3c;
-  }
-  .divider {
-    border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 20px 0;
   }
 </style>

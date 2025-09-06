@@ -16,7 +16,8 @@
 <style>
   .page-container {
     width: 95%;
-    max-width: 900px;
+    /* min-width: 150%; */
+    /* max-width: 1600px; */
     margin: 0 auto;
     padding: 1rem;
   }

@@ -60,6 +60,7 @@
     display: flex;
     gap: 10px;
     width: 100%;
+    flex-wrap: wrap;
   }
 
   .button-group button {

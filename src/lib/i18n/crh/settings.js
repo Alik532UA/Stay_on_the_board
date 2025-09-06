@@ -38,5 +38,6 @@ export default {
     shown: "köstermek",
     compact: "qısqartılğan"
   },
-  voiceSettings: "Ses sozlamaları"
+    voiceSettings: "Ses ayarları",
+  voiceList: "Mevcut sesler"
 };

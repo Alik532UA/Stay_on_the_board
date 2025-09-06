@@ -38,5 +38,6 @@ export default {
     shown: "tonen",
     compact: "afgekort"
   },
-  voiceSettings: "Spraakinstellingen"
+  voiceSettings: "Spraakinstellingen",
+  voiceList: "Beschikbare stemmen"
 };
