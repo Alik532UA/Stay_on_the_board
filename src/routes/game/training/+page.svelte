@@ -15,6 +15,8 @@
   import GameInfoWidget from '$lib/components/widgets/GameInfoWidget.svelte';
   import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
   import TimerWidget from '$lib/components/widgets/TimerWidget.svelte';
+  import GameModeWidget from '$lib/components/widgets/GameModeWidget.svelte';
+  
   import { onMount } from 'svelte';
   import { animationService } from '$lib/services/animationService.js';
   import { gameModeService } from '$lib/services/gameModeService';
@@ -42,6 +44,8 @@
     [WIDGETS.SETTINGS_EXPANDER]: SettingsExpanderWidget,
     [WIDGETS.GAME_INFO]: GameInfoWidget,
     [WIDGETS.TIMER]: TimerWidget,
+    [WIDGETS.GAME_MODE]: GameModeWidget,
+    
   };
 
     $: columns = $layoutStore.map(col => ({

@@ -84,10 +84,37 @@ function createGameSettingsStore() {
   // and updating the store via the `set` method.
   const { subscribe, set, update } = writable<GameSettingsState>(defaultGameSettings);
 
+  const syncGameMode = (state: GameSettingsState): GameSettingsState => {
+    if (state.lockSettings) {
+      return state;
+    }
+
+    let newMode: GameModePreset | null = null;
+    if (!state.autoHideBoard) {
+      newMode = 'beginner';
+    } else {
+      if (state.blockModeEnabled) {
+        newMode = 'pro';
+      } else {
+        newMode = 'experienced';
+      }
+    }
+
+    if (newMode && state.gameMode !== newMode) {
+      state.gameMode = newMode;
+    }
+    
+    return state;
+  };
+
   const methods = {
     set, // Expose the set method to allow the persistence service to overwrite the state.
     updateSettings: (newSettings: Partial<GameSettingsState>) => {
-      update(state => ({ ...state, ...newSettings }));
+      update(state => {
+        let updatedState = { ...state, ...newSettings };
+        updatedState = syncGameMode(updatedState);
+        return updatedState;
+      });
     },
     resetSettings: () => {
       // Now reset just sets the defaults, persistence is handled elsewhere.
@@ -133,10 +160,20 @@ function createGameSettingsStore() {
         return newSettings as GameSettingsState;
       });
     },
-    toggleAutoHideBoard: () => update(state => ({ ...state, autoHideBoard: !state.autoHideBoard })),
+    toggleAutoHideBoard: () => {
+        update(state => {
+            let updatedState = { ...state, autoHideBoard: !state.autoHideBoard };
+            updatedState = syncGameMode(updatedState);
+            return updatedState;
+        });
+    },
     setGameInfoWidgetState: (newState: 'hidden' | 'shown' | 'compact') => update(state => ({ ...state, showGameInfoWidget: newState })),
     toggleBlockMode: () => {
-      update(state => ({ ...state, blockModeEnabled: !state.blockModeEnabled }));
+      update(state => {
+        let updatedState = { ...state, blockModeEnabled: !state.blockModeEnabled };
+        updatedState = syncGameMode(updatedState);
+        return updatedState;
+      });
       boardStore.resetCellVisitCounts();
       availableMovesService.updateAvailableMoves();
     },

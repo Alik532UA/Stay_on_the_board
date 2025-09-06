@@ -29,7 +29,7 @@
 </script>
 
 {#each faqItems as item, i}
-  <details class="faq-item">
+  <details class="faq-item" open={i === 0}>
     <summary>
       {$_(item.q)}
       <span class="faq-arrow" aria-hidden="true">
