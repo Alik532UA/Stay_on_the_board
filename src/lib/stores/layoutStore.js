@@ -29,7 +29,7 @@ const defaultLayout = [
   },
   {
     id: 'column-3',
-    widgets: [WIDGETS.GAME_MODE, WIDGETS.TIMER, WIDGETS.SETTINGS_EXPANDER],
+    widgets: [WIDGETS.TIMER, WIDGETS.GAME_MODE, WIDGETS.SETTINGS_EXPANDER],
   },
 ];
 

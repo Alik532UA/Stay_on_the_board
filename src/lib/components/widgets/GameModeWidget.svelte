@@ -9,14 +9,14 @@
   $: activeMode = $gameModeStore.activeMode;
   $: isCompetitiveMode = activeMode === 'timed' || activeMode === 'local' || activeMode === 'online';
 
-  function handlePresetClick(preset: 'beginner' | 'experienced' | 'pro') {
+  async function handlePresetClick(preset: 'beginner' | 'experienced' | 'pro' | 'timed') {
     userActionService.setGameModePreset(preset);
-    uiStateStore.update(s => ({ ...s, settingsMode: 'default' }));
-  }
-
-  function handleTimedModeClick() {
-    userActionService.setGameModePreset('timed');
-    uiStateStore.update(s => ({ ...s, settingsMode: 'competitive' }));
+    if (preset === 'timed') {
+        uiStateStore.update(s => ({ ...s, settingsMode: 'competitive' }));
+    } else {
+        uiStateStore.update(s => ({ ...s, settingsMode: 'default' }));
+    }
+    await userActionService.requestRestart();
   }
 
   function fitTextAction(node: HTMLElement, dependency: any) {
@@ -62,7 +62,7 @@
     <button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'beginner'} on:click={() => handlePresetClick('beginner')}>{$_('gameModes.beginner')}</button>
     <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'experienced'} on:click={() => handlePresetClick('experienced')}>{$_('gameModes.experienced')}</button>
     <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'pro'} on:click={() => handlePresetClick('pro')}>{$_('gameModes.pro')}</button>
-    <button data-testid="settings-expander-game-mode-timed-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'timed'} on:click={handleTimedModeClick}>{$_('gameModes.timed')}</button>
+    <button data-testid="settings-expander-game-mode-timed-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'timed'} on:click={() => handlePresetClick('timed')}>{$_('gameModes.timed')}</button>
   </div>
   <div class="description" data-testid="game-mode-description">
     {#if $gameSettingsStore.gameMode === 'beginner'}
