@@ -1,68 +1,9 @@
 <script>
-  import { onMount } from 'svelte';
-  import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
-  import { loadAndGetVoices, filterVoicesByLang, resetVoicesPromise } from '$lib/speech.js';
-  import { locale, _ } from 'svelte-i18n';
-  import { get } from 'svelte/store';
-  import { logService } from '$lib/services/logService.js';
-  import ToggleButton from './ToggleButton.svelte';
+  import { _ } from 'svelte-i18n';
+  import VoiceSettings from './VoiceSettings.svelte';
+  import VoiceList from './VoiceList.svelte';
 
   export let close = () => {};
-
-  let showDetails = false;
-  let isLoading = true;
-  /** @type {SpeechSynthesisVoice[]} */
-  let availableVoices = [];
-  /** @type {string} */
-  let selectedVoiceURI = get(gameSettingsStore).selectedVoiceURI ?? '';
-
-  const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isEdge = typeof window !== 'undefined' && navigator.userAgent.includes("Edg/");
-
-  onMount(async () => {
-    const currentLocale = get(locale) || 'uk';
-    try {
-      const allVoices = await loadAndGetVoices();
-      let mainVoices = filterVoicesByLang(allVoices, currentLocale);
-      if (currentLocale !== 'en') {
-        const enVoices = filterVoicesByLang(allVoices, 'en');
-        const mainVoiceURIs = new Set(mainVoices.map(v => v.voiceURI));
-        const onlyEn = enVoices.filter(v => !mainVoiceURIs.has(v.voiceURI));
-        availableVoices = [...mainVoices, ...onlyEn];
-      } else {
-        availableVoices = mainVoices;
-      }
-    } catch (error) {
-      logService.ui("Помилка завантаження голосів:", error);
-    }
-    if (selectedVoiceURI == null) selectedVoiceURI = '';
-    isLoading = false;
-  });
-
-  function selectVoice() {
-    gameSettingsStore.updateSettings({ selectedVoiceURI: String(selectedVoiceURI ?? '') });
-  }
-
-  async function recheckVoices() {
-    isLoading = true;
-    resetVoicesPromise();
-    const currentLocale = get(locale) || 'uk';
-    try {
-      const allVoices = await loadAndGetVoices();
-      let mainVoices = filterVoicesByLang(allVoices, currentLocale);
-      if (currentLocale !== 'en') {
-        const enVoices = filterVoicesByLang(allVoices, 'en');
-        const mainVoiceURIs = new Set(mainVoices.map(v => v.voiceURI));
-        const onlyEn = enVoices.filter(v => !mainVoiceURIs.has(v.voiceURI));
-        availableVoices = [...mainVoices, ...onlyEn];
-      } else {
-        availableVoices = mainVoices;
-      }
-    } catch (error) {
-      logService.ui("Помилка повторного завантаження голосів:", error);
-    }
-    isLoading = false;
-  }
 </script>
 
 <div 
@@ -85,112 +26,19 @@
   >
     <div class="modal-header">
       <h2 class="modal-title" id="voice-settings-title">{$_('voiceSettings.title')}</h2>
-      <button class="modal-close" onclick={close} data-testid="voice-settings-close-header-btn">&times;</button>
     </div>
     <div class="modal-body">
-      <div class="settings-section">
-        <span class="settings-label">{$_('voiceSettings.speed')}</span>
-        <div class="button-group">
-          <button class:active={$gameSettingsStore.speechRate === 1} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1 })} data-testid="speech-rate-1-btn">x1</button>
-          <button class:active={$gameSettingsStore.speechRate === 1.2} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.2 })} data-testid="speech-rate-1.2-btn">x1.2</button>
-          <button class:active={$gameSettingsStore.speechRate === 1.4} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.4 })} data-testid="speech-rate-1.4-btn">x1.4</button>
-          <button class:active={$gameSettingsStore.speechRate === 1.6} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.6 })} data-testid="speech-rate-1.6-btn">x1.6</button>
-          <button class:active={$gameSettingsStore.speechRate === 1.8} onclick={() => gameSettingsStore.updateSettings({ speechRate: 1.8 })} data-testid="speech-rate-1.8-btn">x1.8</button>
-          <button class:active={$gameSettingsStore.speechRate === 2} onclick={() => gameSettingsStore.updateSettings({ speechRate: 2 })} data-testid="speech-rate-2-btn">x2</button>
-        </div>
+      <div class="voice-settings-container">
+        <VoiceSettings />
       </div>
-      <div class="settings-section">
-        <span class="settings-label">{$_('voiceSettings.order')}</span>
-        <div class="button-group">
-          <button class:active={$gameSettingsStore.speechOrder === 'dist_dir'} onclick={() => gameSettingsStore.updateSettings({ speechOrder: 'dist_dir' })} data-testid="speech-order-dist-dir-btn">{$_('voiceSettings.dist_dir')}</button>
-          <button class:active={$gameSettingsStore.speechOrder === 'dir_dist'} onclick={() => gameSettingsStore.updateSettings({ speechOrder: 'dir_dist' })} data-testid="speech-order-dir-dist-btn">{$_('voiceSettings.dir_dist')}</button>
-        </div>
+      <hr class="divider-h"/>
+      <div class="divider-v"></div>
+      <div class="voice-list-container">
+        <VoiceList />
       </div>
-      <div class="settings-section">
-        <ToggleButton 
-          label={$_('voiceSettings.shortSpeech')} 
-          checked={$gameSettingsStore.shortSpeech} 
-          on:toggle={() => gameSettingsStore.updateSettings({ shortSpeech: !$gameSettingsStore.shortSpeech })}
-          dataTestId="short-speech-toggle-btn"
-        />
-      </div>
-
-      <div class="settings-section">
-        <span class="settings-label">{$_('voiceSettings.speakFor')}</span>
-        <div class="button-group">
-          <button class:active={$gameSettingsStore.speechFor.player} onclick={() => gameSettingsStore.updateSettings({ speechFor: { ...$gameSettingsStore.speechFor, player: !$gameSettingsStore.speechFor.player } })} data-testid="speech-for-player-btn">{$_('voiceSettings.player')}</button>
-          <button class:active={$gameSettingsStore.speechFor.computer} onclick={() => gameSettingsStore.updateSettings({ speechFor: { ...$gameSettingsStore.speechFor, computer: !$gameSettingsStore.speechFor.computer } })} data-testid="speech-for-computer-btn">{$_('voiceSettings.computer')}</button>
-        </div>
-      </div>
-
-      <hr class="divider"/>
-
-      {#if isLoading}
-        <div class="loader-container">
-          <div class="loading-spinner"></div>
-          <p>{$_('voiceSettings.loading')}</p>
-        </div>
-      {:else if availableVoices.length > 0}
-        <div class="voice-list" role="radiogroup" aria-labelledby="voice-settings-title">
-          {#each availableVoices as voice (voice.voiceURI)}
-            <label class="voice-option">
-              <input 
-                type="radio" 
-                name="voice" 
-                value={voice.voiceURI} 
-                bind:group={selectedVoiceURI} 
-                onchange={selectVoice} 
-              />
-              <span class="voice-name">{voice.name} ({voice.lang})</span>
-            </label>
-          {/each}
-        </div>
-        {#if isIOS && selectedVoiceURI}
-          <div class="ios-warning">
-            <p><strong>{$_('voiceSettings.iosWarning')}</strong></p>
-          </div>
-        {/if}
-      {:else}
-        <div class="no-voices-container">
-          <p class="no-voices-message">
-            {$_('voiceSettings.noVoices')}
-          </p>
-          {#if isEdge}
-            <div class="edge-fix-instructions">
-              <h4>{$_('voiceSettings.edgeFixTitle')}</h4>
-              <ol class="edge-fix-steps">
-                <li>{$_('voiceSettings.edgeFixStep1')}</li>
-                <li>{$_('voiceSettings.edgeFixStep2')}</li>
-                <li>{$_('voiceSettings.edgeFixStep3')}</li>
-                <li>{$_('voiceSettings.edgeFixStep4')}</li>
-              </ol>
-              <p>{$_('voiceSettings.edgeFixStep5')}</p>
-              <button class="modal-btn-generic primary" onclick={recheckVoices} data-testid="voice-settings-recheck-btn">
-                {$_('voiceSettings.checkAgainButton')}
-              </button>
-            </div>
-            <button class="details-button" onclick={() => showDetails = !showDetails} data-testid="voice-settings-edge-details-btn">
-              {showDetails ? $_('voiceSettings.hideDetailsButton') : $_('voiceSettings.whyIsThisNeededTitle')}
-            </button>
-          {:else}
-            <button class="details-button" onclick={() => showDetails = !showDetails} data-testid="voice-settings-general-details-btn">
-              {showDetails ? $_('voiceSettings.hideDetailsButton') : $_('voiceSettings.whyButton')}
-            </button>
-          {/if}
-          {#if showDetails}
-            <div class="details-text">
-              <p>{$_('voiceSettings.recommendationsContent')}</p>
-              <ul>
-                <li>{$_('voiceSettings.platformEdge')}</li>
-                <li>{$_('voiceSettings.platformAndroid')}</li>
-              </ul>
-            </div>
-          {/if}
-        </div>
-      {/if}
     </div>
     <div class="modal-footer">
-      <button class="modal-btn-generic primary" onclick={close} data-testid="voice-settings-close-footer-btn">{$_('voiceSettings.close')}</button>
+      <button class="modal-btn-generic primary" onclick={close} data-testid="voice-settings-save-footer-btn">{$_('common.save')}</button>
     </div>
   </div>
 </div>
@@ -211,8 +59,8 @@
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     border-radius: 18px;
-    max-width: 500px;
-    width: 90vw;
+    max-width: 90vw;
+    width: auto;
     color: #fff;
     animation: modalFadeIn 0.3s ease-out forwards;
   }
@@ -229,23 +77,45 @@
     font-weight: 700;
     margin: 0;
   }
-  .modal-close {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 2em;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-  }
-  .modal-close:hover {
-    opacity: 1;
-  }
+  
   .modal-body {
     padding: 24px;
     max-height: 60vh;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }
+
+  .voice-settings-container,
+  .voice-list-container {
+    min-width: 300px;
+  }
+
+  .divider-h {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 20px 0;
+  }
+
+  .divider-v {
+    display: none;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 0 20px;
+  }
+
+  @media (min-width: 801px) {
+    .modal-body {
+      flex-direction: row;
+    }
+    .divider-h {
+      display: none;
+    }
+    .divider-v {
+      display: block;
+    }
+  }
+
   .modal-footer {
     padding: 16px 24px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -266,196 +136,4 @@
     color: #fff;
     border-color: #388e3c;
   }
-  .loader-container {
-    text-align: center;
-    padding: 2em;
-  }
-  .loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid rgba(255,255,255,0.3);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1em;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .voice-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .voice-option {
-    display: flex;
-    align-items: center;
-    margin: 0;
-    padding: 16px;
-    border-radius: 16px;
-    background: rgba(255,255,255,0.07);
-    cursor: pointer;
-    transition: background 0.2s;
-    font-size: 1.08em;
-    gap: 16px;
-  }
-  .voice-option:hover {
-    background: rgba(255,255,255,0.13);
-  }
-  .voice-option input[type="radio"] {
-    margin-right: 16px;
-    accent-color: #ff9800;
-    width: 22px;
-    height: 22px;
-  }
-  .voice-name {
-    font-size: 1em;
-    line-height: 1.3;
-    display: block;
-  }
-  .no-voices-message {
-    text-align: center;
-    padding: 1em;
-    color: #ccc;
-  }
-  .no-voices-container {
-    text-align: center;
-    padding: 1em 0;
-  }
-
-  .details-button {
-    background: none;
-    border: none;
-    color: var(--text-accent, #ffbe0b);
-    text-decoration: underline;
-    cursor: pointer;
-    margin-top: 16px;
-    font-size: 0.95em;
-    padding: 4px 8px;
-    transition: color 0.2s;
-  }
-
-  .details-button:hover {
-    color: #fff;
-  }
-
-  .details-text {
-    margin-top: 20px;
-    padding: 16px;
-    background: rgba(0, 0, 0, 0.25);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    text-align: left;
-    line-height: 1.6;
-    animation: fadeIn 0.4s ease-out forwards;
-  }
-
-
-
-  .details-text p, .details-text ul {
-    margin-bottom: 12px;
-    color: var(--text-secondary, #ccc);
-  }
-
-  .details-text ul {
-    padding-left: 20px;
-    margin-bottom: 0;
-  }
-
-  .details-text li {
-    margin-bottom: 8px;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .ios-warning {
-    margin-top: 20px;
-    padding: 12px 16px;
-    background: rgba(255, 186, 11, 0.15); /* Жовтуватий фон */
-    border: 1px solid rgba(255, 186, 11, 0.3);
-    border-radius: 8px;
-    font-size: 0.9em;
-    line-height: 1.5;
-    color: #ffbe0b; /* Жовтий текст */
-  }
-
-  .ios-warning p {
-    margin: 0;
-  }
-
-  /* Додаю стилі для edge-fix-instructions */
-  .edge-fix-instructions {
-    margin-top: 20px;
-    padding: 16px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    text-align: left;
-  }
-  .edge-fix-instructions h4 {
-    margin-top: 0;
-    color: var(--text-accent, #ffbe0b);
-  }
-  .edge-fix-instructions ol {
-    padding-left: 20px;
-    margin-bottom: 12px;
-  }
-  .edge-fix-instructions .edge-fix-steps li {
-    white-space: pre-line;
-  }
-  .edge-fix-instructions li {
-    margin-bottom: 8px;
-    line-height: 1.5;
-  }
-  .edge-fix-instructions p {
-    font-size: 0.9em;
-    opacity: 0.8;
-  }
-  .edge-fix-instructions button {
-    width: 100%;
-    margin-top: 16px;
-  }
-
-  .settings-section {
-    margin-bottom: 20px;
-  }
-
-  .settings-label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 8px;
-  }
-
-  .button-group {
-    display: flex;
-    gap: 10px;
-  }
-
-  .button-group button {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-
-  .button-group button.active {
-    background-color: var(--text-accent, #ffbe0b);
-    color: #000;
-    font-weight: bold;
-  }
-
-  .divider {
-    border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 20px 0;
-  }
-</style> 
+</style>

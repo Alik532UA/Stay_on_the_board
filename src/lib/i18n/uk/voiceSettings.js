@@ -27,5 +27,7 @@ export default {
   shortSpeech: 'Скорочена озвучка',
   speakFor: 'Озвучувати',
   player: 'Хід гравця',
-  computer: 'Хід комп\'ютера'
-}; 
+  computer: 'Хід комп\'ютера',
+  testVoice: "Тест голосу",
+  testPhrase: "Раді бачити тебе в грі"
+};

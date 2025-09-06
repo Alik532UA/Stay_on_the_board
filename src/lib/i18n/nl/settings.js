@@ -37,5 +37,7 @@ export default {
     hidden: "verbergen",
     shown: "tonen",
     compact: "afgekort"
-  }
+  },
+  voiceSettings: "Spraakinstellingen",
+  voiceList: "Beschikbare stemmen"
 };

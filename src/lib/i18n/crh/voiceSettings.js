@@ -20,12 +20,14 @@ export default {
   close: "Qapat",
   volume: "Ses",
   volumeLabel: "Ses",
-  speed: 'Speed',
-  order: 'Order',
-  dir_dist: 'Direction, distance',
-  dist_dir: 'Distance, direction',
-  shortSpeech: 'Short speech',
-  speakFor: 'Speak for',
-  player: 'Player move',
-  computer: 'Computer move'
-}; 
+  speed: 'Tezlik',
+  order: 'Sıra',
+  dir_dist: 'Yön, mesafe',
+  dist_dir: 'Mesafe, yön',
+  shortSpeech: 'Qısqa nutuq',
+  speakFor: 'İçün laf et',
+  player: 'Oyuncı alımı',
+  computer: 'Kompyuter alımı',
+  testVoice: "Ses testi",
+  testPhrase: "Oyunda sizni körgenge şadmız"
+};

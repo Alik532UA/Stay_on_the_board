@@ -1,3 +1,4 @@
 export default {
-  loading: "Laden..."
+  loading: "Laden...",
+  save: "Opslaan"
 };
