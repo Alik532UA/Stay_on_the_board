@@ -40,7 +40,7 @@ export async function enableTestMode(page: Page) {
 export async function startNewGame(page: Page, mode: GameMode = GameMode.Beginner) {
   await page.goto('/');
   await enableTestMode(page);
-  await page.getByTestId('training-btn').click();
+  await page.getByTestId('virtual-player-btn').click();
 
   await page.getByTestId(mode).click();
 
@@ -48,7 +48,7 @@ export async function startNewGame(page: Page, mode: GameMode = GameMode.Beginne
     await page.getByTestId('faq-modal-modal.ok-btn').click();
   }
 
-  await page.waitForURL('**/game/training');
+  await page.waitForURL('**/game/virtual-player');
   await expect(page.locator('.direction-controls-panel')).toBeVisible();
 }
 

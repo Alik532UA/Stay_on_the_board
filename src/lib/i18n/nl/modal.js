@@ -3,7 +3,7 @@ export default {
   mainMenu: "Hoofdmenu",
   ok: "OK",
   resetScoreTitle: "Score resetten?",
-  resetScoreContent: "Het wijzigen van de bordgrootte zal je huidige score en strafpunten resetten. Weet je zeker dat je wilt doorgaan?",
+  boardResizeContent: "Het wijzigen van de bordgrootte zal je huidige score en strafpunten resetten. Weet je zeker dat je wilt doorgaan?",
   resetScoreConfirm: "Ja, grootte wijzigen",
   resetScoreCancel: "Nee, blijven",
     gameOverTitle: 'Spel voorbij!',

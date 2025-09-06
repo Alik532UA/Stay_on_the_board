@@ -3,7 +3,7 @@ export default {
   mainMenu: "Ana Menü",
   ok: "OK",
   resetScoreTitle: "Esapnı sıfırla?",
-  resetScoreContent: "Tahta ölçüsini deñiştirmek, mevcut esabıñıznı ve ceza ballarıñıznı sıfırlaycaq. Devam etmek isteysiñizmi?",
+  boardResizeContent: "Tahta ölçüsini deñiştirmek, mevcut esabıñıznı ve ceza ballarıñıznı sıfırlaycaq. Devam etmek isteysiñizmi?",
   resetScoreConfirm: "Ebet, ölçüni deñiştir",
   resetScoreCancel: "Hayır, qal",
   gameOverTitle: 'Oyun bitti!',

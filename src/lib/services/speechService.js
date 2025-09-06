@@ -184,7 +184,6 @@ export function speakText(textToSpeak, lang, voiceURI) {
 
 /**
  * Озвучує тестову фразу.
- * @param {string} phrase
  */
 export function speakTestPhrase() {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -216,7 +215,7 @@ export function speakTestPhrase() {
   const langCode = voiceLang.split('-')[0]; // e.g., 'en'
 
   const translations = langCode in speechTranslations
-    ? speechTranslations[langCode]
+    ? speechTranslations[/** @type {keyof typeof speechTranslations} */ (langCode)]
     : speechTranslations['en']; // Fallback to English
 
   const phrase = translations.testPhrase;

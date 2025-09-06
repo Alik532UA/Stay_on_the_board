@@ -116,9 +116,16 @@ export function closeModal() {
   }
 }
 
+export function closeAllModals() {
+  logService.modal(`[ModalStore] closeAllModals called. Clearing stack of size ${modalStack.length}.`);
+  modalStack.length = 0;
+  set({ ...initialState });
+}
+
 export const modalStore = {
   subscribe,
   closeModal,
   showModal,
-  showModalAsReplacement
+  showModalAsReplacement,
+  closeAllModals
 };
