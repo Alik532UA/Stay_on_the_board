@@ -1,7 +1,7 @@
 export default {
   title: "Sıkça Sorulan Sorular",
-  q1: "Oyun amacı nedir?",
-  a1: "Ana amaç bilgisayarı yenmek değil, hafızanızı ve hayal gücünüzü geliştirmektir. Ortak taşı tahtada mümkün olduğunca uzun süre tutmalı, sırayla hamle yapmalı ve her hamle için puan kazanmalısınız.",
+  q1: "Antrenman amacı nedir?",
+  a1: "Hafızanızı ve hayal gücünüzü geliştirmektir. Ortak taşı tahtada mümkün olduğunca uzun süre tutmalı, sırayla hamle yapmalı ve her hamle için puan kazanmalısınız.",
   q8: "Neden sadece bir taş var? Bilgisayarın taşı nerede?",
   a8: "Bu oyunda sadece bir taş var ve bu taş hem sizin hem de bilgisayar içindir. Siz onu kendi hücrenize, bilgisayar ise yeni pozisyonundan kendi hücresine taşır. Oyun, tek bir taşı tahtada mümkün olduğunca uzun süre tutmak üzerinedir.",
   q7: "Vezir nasıl kontrol edilir?",

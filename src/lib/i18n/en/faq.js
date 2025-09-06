@@ -1,7 +1,7 @@
 export default {
   title: "Frequently Asked Questions",
-  q1: "What is the goal of the game?",
-  a1: "The main goal is not to defeat the computer, but to train your memory and imagination. You should keep the shared piece on the board as long as possible, taking turns and earning points for each move.",
+  q1: "What is the goal of the training?",
+  a1: "To train your memory and imagination. You should keep the shared piece on the board as long as possible, taking turns and earning points for each move.",
   q8: "Why is there only one piece? Where is the computer's piece?",
   a8: "In this game, there is only one piece, and it is shared between you and the computer. You move it to your chosen cell, and the computer moves it from its new position to its own. The game is about keeping a single piece on the board as long as possible.",
   q7: "How do I control the piece?",

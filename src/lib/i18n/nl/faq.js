@@ -1,7 +1,7 @@
 export default {
   title: "Veelgestelde Vragen",
-  q1: "Wat is het doel van het spel?",
-  a1: "Het belangrijkste doel is niet om de computer te verslaan, maar om je geheugen en verbeelding te trainen. Je moet het gedeelde stuk zo lang mogelijk op het bord houden, om de beurt bewegen en punten verdienen voor elke zet.",
+  q1: "Wat is het doel van de training?",
+  a1: "Om je geheugen en verbeelding te trainen. Je moet het gedeelde stuk zo lang mogelijk op het bord houden, om de beurt bewegen en punten verdienen voor elke zet.",
   q8: "Waarom is er maar één stuk? Waar is het stuk van de computer?",
   a8: "In dit spel is er maar één stuk, dat gedeeld wordt tussen jou en de computer. Jij verplaatst het naar jouw vakje, de computer vanaf zijn nieuwe positie naar het zijne. Het spel draait om het zo lang mogelijk op het bord houden van één stuk.",
   q7: "Hoe bestuur ik de dame?",
