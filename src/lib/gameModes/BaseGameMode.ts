@@ -20,6 +20,7 @@ import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
+import { voiceControlService } from '$lib/services/voiceControlService';
 
 
 export abstract class BaseGameMode implements IGameMode {
@@ -175,6 +176,15 @@ export abstract class BaseGameMode implements IGameMode {
       uiStateStore.update(s => s ? ({ ...s, isComputerMoveInProgress: false }) : null);
       await this.handleNoMoves('computer');
     }
+
+    logService.GAME_MODE('triggerComputerMove: Checking voiceMoveRequested', get(uiStateStore).voiceMoveRequested);
+    if (get(uiStateStore).voiceMoveRequested) {
+        setTimeout(() => {
+            voiceControlService.startListening();
+            uiStateStore.update(s => ({ ...s, voiceMoveRequested: false }));
+        }, 100);
+    }
+
     await tick();
   }
 }

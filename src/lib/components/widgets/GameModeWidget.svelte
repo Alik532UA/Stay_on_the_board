@@ -55,7 +55,6 @@
   }
 </script>
 
-{#if !isCompetitiveMode}
 <div class="game-mode-widget">
   <h3 class="widget-title">{$_('gameModes.title')}</h3>
   <div class="settings-expander__game-mode-row" use:fitTextAction={$_('gameModes.beginner')}>
@@ -76,7 +75,6 @@
     {/if}
   </div>
 </div>
-{/if}
 
 <style>
   .game-mode-widget {

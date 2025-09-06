@@ -11,5 +11,7 @@ export default {
   selectDistance: "Mesafeni sayla",
   confirm: "Tasdiqla",
   noMovesTitle: "Areket yoq",
-  selectDirectionAndDistance: "Yön ve mesafe seçin"
+  selectDirectionAndDistance: "Yön ve mesafe seçin",
+  voiceCommand: "Ses",
+  voiceCommandTitle: "Sesli komanda"
 }; 
