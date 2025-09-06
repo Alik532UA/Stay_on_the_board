@@ -32,7 +32,7 @@ export class TrainingGameMode extends BaseGameMode {
     ];
   }
 
-  getModeName(): 'training' | 'local' | 'timed' | 'online' {
+  getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player' {
     return 'training';
   }
 

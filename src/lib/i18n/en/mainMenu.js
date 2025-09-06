@@ -41,6 +41,6 @@ export default {
   gameModeModal: {
     title: "Select game mode"
   },
-  dragAndDropTest: "Drag & Drop Test",
+  dragAndDropTest: "test",
   loadingTranslations: "Loading translations..."
 };

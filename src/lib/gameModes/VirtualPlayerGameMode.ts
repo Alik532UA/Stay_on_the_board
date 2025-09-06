@@ -18,7 +18,6 @@ import { timerStore } from '$lib/stores/timerStore';
 import { endGameService } from '$lib/services/endGameService';
 
 export class VirtualPlayerGameMode extends TrainingGameMode {
-  private gameDuration: number;
 
   constructor() {
     super();
@@ -42,8 +41,8 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
     ];
   }
 
-    getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player' {
-    return 'training';
+    getModeName(): 'virtual-player' {
+    return 'virtual-player';
   }
 
   async handlePlayerMove(direction: any, distance: any): Promise<void> {

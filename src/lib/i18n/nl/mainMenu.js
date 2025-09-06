@@ -41,6 +41,6 @@ export default {
   gameModeModal: {
     title: "Selecteer spelmodus"
   },
-  dragAndDropTest: "Drag & Drop Test",
+  dragAndDropTest: "test",
   loadingTranslations: "Vertalingen laden..."
 };

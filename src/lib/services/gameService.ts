@@ -66,8 +66,9 @@ export const gameService = {
       selectedDirection: null,
       selectedDistance: null,
       isFirstMove: true,
-      showBoardHiddenInfo: false, // Add this line
+      showBoardHiddenInfo: false,
       intendedGameType: null, // Додано для відповідності UiState
+      settingsMode: 'default', // Додано для відповідності UiState
       testModeOverrides: existingUiState?.testModeOverrides
     };
 

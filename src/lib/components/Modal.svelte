@@ -323,7 +323,9 @@
   filter: drop-shadow(0 2px 8px #ffeb3b88);
 }
 .modal-window {
-  background: var(--bg-secondary);
+  position: relative;
+  z-index: 1;
+  background: transparent;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -338,6 +340,18 @@
   transform: scale(0.95);
   opacity: 0;
   animation: modalFadeIn 0.3s ease-out forwards;
+}
+.modal-window::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-secondary);
+  opacity: 0.5;
+  z-index: -1;
+  border-radius: 24px;
 }
 @keyframes modalFadeIn {
   to {
