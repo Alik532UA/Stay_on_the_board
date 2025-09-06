@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount, onDestroy } from 'svelte';
   import { appSettingsStore } from '../stores/appSettingsStore.js';
   import { gameSettingsStore, type GameSettingsState } from '../stores/gameSettingsStore.js';
   import { _ } from 'svelte-i18n';
@@ -18,6 +19,38 @@
   $: settings = $appSettingsStore;
   $: gameSettings = $gameSettingsStore;
 
+  let voiceCardEl: HTMLDivElement;
+  let voiceListCardEl: HTMLDivElement;
+  let resizeObserver: ResizeObserver;
+
+  onMount(() => {
+    if (!voiceCardEl || !voiceListCardEl) return;
+
+    const setVoiceListHeight = () => {
+      const height = voiceCardEl.offsetHeight;
+      if (height > 0) {
+        // Ensure we don't set height to 0 if element is hidden
+        voiceListCardEl.style.height = `${height}px`;
+        logService.ui('Adjusting VoiceListCard height', { newHeight: height });
+      }
+    };
+
+    // Set initial height after a delay to ensure DOM is fully rendered
+    setTimeout(() => {
+      setVoiceListHeight();
+
+      // Set up observer to handle resize changes
+      resizeObserver = new ResizeObserver(setVoiceListHeight);
+      resizeObserver.observe(voiceCardEl);
+    }, 500);
+  });
+
+  onDestroy(() => {
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+    }
+  });
+
   function handleClearAll() {
     clearCache({ keepAppearance: false });
   }
@@ -26,14 +59,14 @@
     clearCache({ keepAppearance: true });
   }
 
-    function selectLang(lang: string) {
+  function selectLang(lang: string) {
     logService.ui(`Зміна мови: ${lang}`);
     appSettingsStore.updateSettings({ language: lang });
     localStorage.setItem('language', lang);
     locale.set(lang);
   }
 
-    function selectTheme(style: string, theme: string) {
+  function selectTheme(style: string, theme: string) {
     logService.ui(`Зміна теми: ${style}, ${theme}`);
     appSettingsStore.updateSettings({ style, theme });
   }
@@ -54,7 +87,12 @@
         <span class="settings-label" data-testid="settings-page-language-label">{$_('settings.language')}</span>
         <div class="language-selector" data-testid="settings-page-language-selector">
           {#each languages as lang}
-            <button class="language-button" class:active={settings.language === lang.code} on:click={() => selectLang(lang.code)} data-testid={`settings-page-language-button-${lang.code}`}>
+            <button
+              class="language-button"
+              class:active={settings.language === lang.code}
+              on:click={() => selectLang(lang.code)}
+              data-testid={`settings-page-language-button-${lang.code}`}
+            >
               {@html lang.svg}
             </button>
           {/each}
@@ -63,34 +101,58 @@
       <hr class="settings-divider" data-testid="settings-page-divider-1" />
       <div class="theme-selector" data-testid="settings-page-theme-selector">
         <div class="theme-style-row" data-style="purple" data-testid="settings-page-theme-row-purple">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('purple', 'light')} data-testid="settings-page-theme-button-purple-light">☀️</button>
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('purple', 'light')} data-testid="settings-page-theme-button-purple-light"
+            >☀️</button
+          >
           <span class="theme-name" data-testid="settings-page-theme-name-purple">{$_('mainMenu.themeName.purple')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('purple', 'dark')} data-testid="settings-page-theme-button-purple-dark">🌙</button>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('purple', 'dark')} data-testid="settings-page-theme-button-purple-dark"
+            >🌙</button
+          >
         </div>
         <div class="theme-style-row" data-style="green" data-testid="settings-page-theme-row-green">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('green', 'light')} data-testid="settings-page-theme-button-green-light">☀️</button>
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('green', 'light')} data-testid="settings-page-theme-button-green-light"
+            >☀️</button
+          >
           <span class="theme-name" data-testid="settings-page-theme-name-green">{$_('mainMenu.themeName.green')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('green', 'dark')} data-testid="settings-page-theme-button-green-dark">🌙</button>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('green', 'dark')} data-testid="settings-page-theme-button-green-dark"
+            >🌙</button
+          >
         </div>
         <div class="theme-style-row" data-style="blue" data-testid="settings-page-theme-row-blue">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('blue', 'light')} data-testid="settings-page-theme-button-blue-light">☀️</button>
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('blue', 'light')} data-testid="settings-page-theme-button-blue-light"
+            >☀️</button
+          >
           <span class="theme-name" data-testid="settings-page-theme-name-blue">{$_('mainMenu.themeName.blue')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('blue', 'dark')} data-testid="settings-page-theme-button-blue-dark">🌙</button>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('blue', 'dark')} data-testid="settings-page-theme-button-blue-dark"
+            >🌙</button
+          >
         </div>
         <div class="theme-style-row" data-style="gray" data-testid="settings-page-theme-row-gray">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('gray', 'light')} data-testid="settings-page-theme-button-gray-light">☀️</button>
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('gray', 'light')} data-testid="settings-page-theme-button-gray-light"
+            >☀️</button
+          >
           <span class="theme-name" data-testid="settings-page-theme-name-gray">{$_('mainMenu.themeName.gray')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('gray', 'dark')} data-testid="settings-page-theme-button-gray-dark">🌙</button>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('gray', 'dark')} data-testid="settings-page-theme-button-gray-dark"
+            >🌙</button
+          >
         </div>
         <div class="theme-style-row" data-style="orange" data-testid="settings-page-theme-row-orange">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('orange', 'light')} data-testid="settings-page-theme-button-orange-light">☀️</button>
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('orange', 'light')} data-testid="settings-page-theme-button-orange-light"
+            >☀️</button
+          >
           <span class="theme-name" data-testid="settings-page-theme-name-orange">{$_('mainMenu.themeName.orange')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('orange', 'dark')} data-testid="settings-page-theme-button-orange-dark">🌙</button>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('orange', 'dark')} data-testid="settings-page-theme-button-orange-dark"
+            >🌙</button
+          >
         </div>
         <div class="theme-style-row" data-style="wood" data-testid="settings-page-theme-row-wood">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('wood', 'light')} data-testid="settings-page-theme-button-wood-light">☀️</button>
+          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('wood', 'light')} data-testid="settings-page-theme-button-wood-light"
+            >☀️</button
+          >
           <span class="theme-name" data-testid="settings-page-theme-name-wood">{$_('mainMenu.themeName.wood')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('wood', 'dark')} data-testid="settings-page-theme-button-wood-dark">🌙</button>
+          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('wood', 'dark')} data-testid="settings-page-theme-button-wood-dark"
+            >🌙</button
+          >
         </div>
       </div>
     </div>
@@ -154,7 +216,12 @@
       </div>
       <hr class="settings-divider" data-testid="settings-page-divider-4" />
       <div class="settings-actions" data-testid="settings-page-actions">
-        <button class="settings-reset-button" on:click={resetSettings} use:customTooltip={$_('settings.resetHint')} data-testid="settings-page-reset-button">
+        <button
+          class="settings-reset-button"
+          on:click={resetSettings}
+          use:customTooltip={$_('settings.resetHint')}
+          data-testid="settings-page-reset-button"
+        >
           <span>{$_('settings.reset')}</span>
         </button>
         <button data-testid="clear-cache-keep-appearance-btn" class="settings-reset-button" on:click={handleKeepAppearance}>
@@ -167,13 +234,13 @@
     </div>
   </div>
   <div class="grid-column" data-testid="settings-column-voice">
-    <div class="settings-card" data-testid="settings-card-voice">
+    <div bind:this={voiceCardEl} class="settings-card" data-testid="settings-card-voice">
       <span class="settings-label">{$_('settings.voiceSettings')}</span>
       <VoiceSettings />
     </div>
   </div>
   <div class="grid-column" data-testid="settings-column-voice-list">
-    <div class="settings-card" data-testid="settings-card-voice-list">
+    <div bind:this={voiceListCardEl} class="settings-card" data-testid="settings-card-voice-list">
       <span class="settings-label">{$_('settings.voiceList')}</span>
       <div class="voice-list-wrapper">
         <VoiceList />
@@ -206,6 +273,7 @@
     flex-direction: column;
     gap: 16px;
     min-width: 0;
+    min-height: 0;
   }
 
   .settings-card {
@@ -354,5 +422,9 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+  }
+
+  [data-testid='settings-column-voice'] > .settings-card {
+    flex-grow: 0;
   }
 </style>

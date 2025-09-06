@@ -1,22 +1,8 @@
-відкрите вікно: data-testid="arrow-key-hint-modal"
-
-натискаю [Enter]
-Актуальний результат: нічого не відбувається
-Очікуваний результат: закрвивається модальне вікно data-testid="arrow-key-hint-modal", модальне вікно data-testid="arrow-key-hint-modal" переховлює гарячі клавіши, і не пускає їх в гру під модальним вікном
-
-натискаю RBM на модальному вінкі, а потім [Enter]
-Актуальний результат: відкривається data-testid="confirm-move-hint-modal" тому що гарячі клавіши спрацьовують на гру, а не на модальне вікно data-testid="arrow-key-hint-modal"
-Очікуваний результат: закрвивається модальне вікно data-testid="arrow-key-hint-modal", модальне вікно data-testid="arrow-key-hint-modal" переховлює гарячі клавіши, і не пускає їх в гру під модальним вікном
-
-[Space]
-Актуальний результат: поки утримую [Space] відкривається data-testid="confirm-move-hint-modal" тому що гарячі клавіши спрацьовують на гру, а не на модальне вікно data-testid="arrow-key-hint-modal", а коли відпускаю [Space], то data-testid="confirm-move-hint-modal" закривається і на екрані залишається data-testid="arrow-key-hint-modal"
-Очікуваний результат: закрвивається модальне вікно data-testid="arrow-key-hint-modal", модальне вікно data-testid="arrow-key-hint-modal" переховлює гарячі клавіши, і не пускає їх в гру під модальним вікном
-
-натискаю [Enter]
-Актуальний результат та Очікуваний результат: закрвивається модальне вікно data-testid="arrow-key-hint-modal", модальне вікно data-testid="arrow-key-hint-modal" переховлює гарячі клавіши, і не пускає їх в гру під модальним вікном
-
-натискаю [ESC]
-Актуальний результат та Очікуваний результат: закрвивається модальне вікно data-testid="arrow-key-hint-modal", модальне вікно data-testid="arrow-key-hint-modal" переховлює гарячі клавіши, і не пускає їх в гру під модальним вікном
+нічого не помінялось
+або ти робиш виправлення, або ми прощаємось з тобою
+Stay_on_the_board/settings
+data-testid="settings-card-voice-list" занадто високий
+data-testid="settings-card-voice-list" треба обмежети по висоті і зробити внутрішній скрол, висота повинна бути не більше елемента data-testid="settings-card-voice"
 
 ---
 

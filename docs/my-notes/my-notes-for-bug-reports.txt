@@ -6378,7 +6378,13 @@ Stay_on_the_board/settings
 проаналізуй код
 від чого залежить висота class="setup-grid s-Twm6pjhj-ond"?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="settings-card-voice-list" занадто високий
+data-testid="settings-card-voice-list" треба обмежети по висоті, до елемента data-testid="settings-card-voice"
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+нічого не помінялось
+або ти робиш виправлення, або ми прощаємось з тобою
+data-testid="settings-card-voice-list" занадто високий
+data-testid="settings-card-voice-list" треба обмежети по висоті, не більше елемента data-testid="settings-card-voice"
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
