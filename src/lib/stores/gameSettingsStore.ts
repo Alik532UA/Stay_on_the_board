@@ -85,7 +85,7 @@ function createGameSettingsStore() {
   const { subscribe, set, update } = writable<GameSettingsState>(defaultGameSettings);
 
   const syncGameMode = (state: GameSettingsState): GameSettingsState => {
-    if (state.lockSettings) {
+    if (state.lockSettings || state.gameMode === 'timed') {
       return state;
     }
 
@@ -218,6 +218,7 @@ function createGameSettingsStore() {
                 showGameInfoWidget: 'compact',
             },
             timed: {
+                gameMode: 'timed',
                 autoHideBoard: true,
                 blockModeEnabled: true,
                 speechEnabled: false,

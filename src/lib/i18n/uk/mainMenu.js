@@ -2,6 +2,7 @@ export default {
   title: "Залишитися на дошці",
   menu: "Меню",
   training: "Тренування",
+  virtualPlayer: "Грати",
   timedGame: "Гра на час",
   localGame: "Локальна гра",
   playOnline: "Грати онлайн",
@@ -38,7 +39,7 @@ export default {
     keepAppearance: "Очистити кеш, крім теми та мови"
   },
   gameModeModal: {
-    title: "Вибір складності гри"
+    title: "Вибір режиму гри"
   },
   dragAndDropTest: "Тест перетягування",
   loadingTranslations: "Завантаження перекладу..."

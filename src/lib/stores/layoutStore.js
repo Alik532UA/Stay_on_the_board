@@ -25,11 +25,11 @@ const defaultLayout = [
   },
   {
     id: 'column-2',
-    widgets: [WIDGETS.TIMER, WIDGETS.CONTROLS_PANEL],
+    widgets: [WIDGETS.CONTROLS_PANEL],
   },
   {
     id: 'column-3',
-    widgets: [WIDGETS.GAME_MODE, WIDGETS.SETTINGS_EXPANDER],
+    widgets: [WIDGETS.GAME_MODE, WIDGETS.TIMER, WIDGETS.SETTINGS_EXPANDER],
   },
 ];
 

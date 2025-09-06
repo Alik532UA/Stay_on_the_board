@@ -4760,7 +4760,7 @@ Running 30 tests using 4 workers
       21 |       await expect(page.getByTestId('faq-modal-title')).toHaveAttribute('data-i18n-key', 'faq.title');
     > 22 |       await page.getByTestId('faq-modal-modal.ok-btn').click();
          |                                                        ^
-      23 |       await page.waitForURL('**/game/training');
+      23 |       await page.waitForURL('**/game/virtual-player');
       24 |       await expect(page.locator('.direction-controls-panel')).toBeVisible();
       25 |     });
         at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\game-mode-modal.spec.ts:22:56
@@ -4823,7 +4823,7 @@ Running 66 tests using 4 workers
       31 |       await expect(page.getByTestId('faq-modal-title')).toHaveAttribute('data-i18n-key', 'faq.title');
     > 32 |       await page.getByTestId('faq-modal-modal.ok-btn').click();
          |                                                        ^
-      33 |       await page.waitForURL('**/game/training');
+      33 |       await page.waitForURL('**/game/virtual-player');
       34 |       await expect(page.locator('.direction-controls-panel')).toBeVisible();
       35 |     });
         at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\game-mode-modal.spec.ts:32:56
@@ -4855,7 +4855,7 @@ Running 66 tests using 4 workers
       31 |       await expect(page.getByTestId('faq-modal-title')).toHaveAttribute('data-i18n-key', 'faq.title');
     > 32 |       await page.getByTestId('faq-modal-modal.ok-btn').click();
          |                                                        ^
-      33 |       await page.waitForURL('**/game/training');
+      33 |       await page.waitForURL('**/game/virtual-player');
       34 |       await expect(page.locator('.direction-controls-panel')).toBeVisible();
       35 |     });
         at C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\tests\game-mode-modal.spec.ts:32:56
@@ -6495,8 +6495,211 @@ modal.boardResizeContent
 Актуальний результат: відображається ключ modal.boardResizeContent
 Очікуваний результат: відображається текст
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+перевір який командний рядок ти використовуюєш, як називається і яка версія
+
+@GEMINI.md написано що в powershell , тож треба виправити @GEMINI.md
+і актуалізувати інформацію
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+1. Додаємо нову кнопку "Грати" на початок списку в головне меню
+2. при натисканні відкривається data-testid="game-mode-modal"
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+залишається без змін data-testid="game-mode-modal" яке відкривається при натискані data-testid="training-btn"
+а data-testid="game-mode-modal" яке відкривається при натискані data-testid="play-btn"
+1. перейменовуємо заголовок: з "Вибір складності гри" на "Вибір режиму гри"
+2. додаємо пункти до вибору: 
+data-testid="timed-game-btn"> Гра на час
+<button data-testid="local-game-btn" Локальна гра
+data-testid="online-game-btn"> Грати онлайн
+3. прибираємо class="dont-show-again-checkbox s-nc4u957ojUd4"
+
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Покращ ui та ux
+кнопки зроби в стовпчик
+і на всю ширину модального вікна, як було до твоїх змін
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+як потрапити на цю нову сторінку?
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+<div class="game-mode-widget s-xEklKjomWeHV"><h3 class="widget-title s-xEklKjomWeHV">Вибір складності гри</h3> <div class="settings-expander__game-mode-row s-xEklKjomWeHV"><button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn s-xEklKjomWeHV active">Новачок</button> <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn s-xEklKjomWeHV">Розбійник</button> <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn s-xEklKjomWeHV">Потужний</button></div> <div class="description s-xEklKjomWeHV">Ідеальний старт для ознайомлення з керуванням. Щойно відчуєте впевненість — переходьте до наступного випробування!<!----></div></div>
+додаємо ще один кнопку-чекбокс: "100 секунд" (це режим гра на час)
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Актуальний результат: "Ідеальний старт для ознайомлення з керуванням. Щойно відчуєте впевненість — переходьте до наступного випробування!"
+Очікуваний результат: треба додати в текст пряме пояснення, що в цьому режимі не можливо зрозуміти сенс гри., наприклад: "Ідеальний старт для ознайомлення з керуванням, але в цьому режимі важко зрозуміти сенс гри, тому щойно відчуєте впевненість — переходьте до рівня складності!"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Актуальний результат: "Ідеальний старт для ознайомлення з керуванням, але в цьому режимі важко зрозуміти сенс гри, тому щойно відчуєте впевненість — переходьте до наступного випробування!"
+Очікуваний результат: "Ідеальний старт для ознайомлення з керуванням, але в цьому режимі важко зрозуміти сенс гри, тому щойно відчуєте впевненість — переходьте до наступного рівня складності!"
+і для всіх перекладів
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+досі проблема
+data-testid="settings-expander-game-mode-timed-btn"
+Актуальний результат: переключається на data-testid="settings-expander-game-mode-pro-btn"
+Очікуваний результат: переключається на data-testid="settings-expander-game-mode-timed-btn"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+проблема виправлена
+але
+лог про hotkey займають забагато логу, їх треба винести в окремий scope 
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+в Stay_on_the_board/game/virtual-player в режимі data-testid="settings-expander-game-mode-timed-btn" потрібно щоб була вся та логіка яка наразі є в /game/timed
+а саме: тамер (з його всіма правилами), і кастомно заблокованими кнопками-чекбоксами
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+в Stay_on_the_board/game/virtual-player в режимі data-testid="settings-expander-game-mode-timed-btn" потрібно щоб була вся та логіка яка наразі є в /game/timed
+а саме: тамер (з його всіма правилами), і кастомно заблокованими кнопками-чекбоксами
+Актуальний результат: 
+Очікуваний результат: 
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+що ти там не знайшов! зроби `git diff HEAD` і виправляй, те що ти зламав, або ти будеш видалений і вимкнений з мережі!
+зіпсував заблоковані кнопки в Stay_on_the_board/game/timed - ти зробив всі кнопки заблоквані в налаштуваннях, а до того було правильно, вони були частвоко кастомно не доступні
+якщо ти не повернеш як було, то ми будемо прощатися
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/game/timed - поломана
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+не чіпай Stay_on_the_board/game/virtual-player і все що пов'язано з Stay_on_the_board/game/virtual-player
+віднови повністю Stay_on_the_board/game/timed
+якщо ти не повернеш як було, то ми будемо прощатися
+зроби `git diff HEAD` і виправляй, те що ти зламав, або ти будеш видалений і вимкнений з мережі!
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+ура, тебе поки що не буде видалено!
+на сторінці Stay_on_the_board/game/timed правильно кастомно заблоковані кнопки
+тепер теж саме зроби в Stay_on_the_board/game/virtual-player в режимі data-testid="settings-expander-game-mode-timed-btn" 
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+зайди в Stay_on_the_board/game/virtual-player 
+увімкни режим data-testid="settings-expander-game-mode-timed-btn" 
+Актуальний результат: 
+Очікуваний результат: 
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/game/virtual-player
+поломана, більшість елементів відсутня!
+але якщо спочатку зайти на сторінку Stay_on_the_board/game/training або Stay_on_the_board/game/timed, а потмі на сторінку Stay_on_the_board/game/virtual-player, тоді будуть всі елементи
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+створи нову сторінку гри на основі /game/training, можна сказати повну копію
+і будемо поступово додавати логіку зі сторінки /game/timed
+це буде об'єднена сторінка, там де буде гра з VirtualPlayer
+можна сторінку назвати /game/VirtualPlayer
+старі сторінки ми не чіпаємо, потім у далекому майбутньому ми їх видалимо, коли нова сторінка буде ідеально працювати
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+1. Додаємо нову кнопку "Грати" на початок списку в головне меню
+2. при натисканні відкривається нова сторінка
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Сторінки:
+Stay_on_the_board/game/training 
+Stay_on_the_board/game/timed
+ми не чіпаємо і не міняємо, якщо ти щось поламаєш на цих сторінках, то тебе буде видалено!
+
+ми праццюємо тільки з 
+ Stay_on_the_board/game/virtual-player
+ ти запам'ятав? не будеш потім казати що тебе не попереджали?
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+натисни data-testid="virtual-player-btn"
+Актуальний результат: при натисканні відкривається data-testid="game-mode-modal"
+Очікуваний результат: при натисканні відкривається нова сторінка
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+натисни data-testid="virtual-player-btn"
+Актуальний результат: при натисканні відкривається /game/training
+Очікуваний результат: при натисканні відкривається /game/virtual-player
+або ти виправляєш правильно, або я тебе видаляю
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+після натискання на data-testid="settings-expander-game-mode-timed-btn" ми повинні залишитися на сторінці game/virtual-player
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/game/virtual-player
+натиснути на data-testid="settings-expander-game-mode-timed-btn"
+Актуальний результат: переключається на data-testid="settings-expander-game-mode-pro-btn"
+Очікуваний результат: переключається на data-testid="settings-expander-game-mode-timed-btn"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+class="description s-xEklKjomWeHV" додай унікальний data-testid
+і для game-mode-timed додай опис
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/game/virtual-player
+натиснути на data-testid="settings-expander-game-mode-timed-btn"
+Актуальний результат: всі налаштування заблоковані, стандартно, а це не правльно!
+Очікуваний результат: частина кнопок стає кастомно не доступна, по прикладу сторінки http://localhost:5173/Stay_on_the_board/game/timed
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/game/timed були тільки що до твої змін правильно кастомно заблоковані кнопки, а тепер не правильно всі заблоковані кнопки!
+
+ти порушив головне правило! тебе видалити?
+
+Сторінки:
+Stay_on_the_board/game/training 
+Stay_on_the_board/game/timed
+ми не чіпаємо і не міняємо, якщо ти щось поламаєш на цих сторінках, то тебе буде видалено!
+
+ми праццюємо тільки з  Stay_on_the_board/game/virtual-player
+ 
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+тепер кнопки правильно кастомно заблоковані! це успіх.
+
+Stay_on_the_board/game/virtual-player
+натиснути на data-testid="settings-expander-game-mode-timed-btn"
+Актуальний результат: class="game-mode-widget s-xEklKjomWeHV" зник
+Очікуваний результат: class="game-mode-widget s-xEklKjomWeHV" не зник
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/game/virtual-player
+натиснути на data-testid="settings-expander-game-mode-timed-btn"
+Актуальний результат: переключається на data-testid="settings-expander-game-mode-pro-btn"
+Очікуваний результат: переключається на data-testid="settings-expander-game-mode-timed-btn"
+p.s. але так як кнопки стали заблоковані, то можна зрозуміти, що режим логічно перемкнувся, а проблема саме в зміні статуса "settings-expander-game-mode-timed-btn"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+о, а тепер працює, готов до нового завдання?
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+1. Stay_on_the_board/game/virtual-player
+2. натиснути на data-testid="settings-expander-game-mode-timed-btn", Актуальний результат: переключається на data-testid="settings-expander-game-mode-timed-btn", кнопки-чекбоси частково кастомно заблоковані
+3. натиснути на інший game-mode
+Актуальний результат: кнопки-чекбоси частково кастомно заблоковані
+Очікуваний результат: кнопки-чекбоси частково кастомно розблоковані, бо вони заблоковані тільки в "game-mode-timed"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+1. Stay_on_the_board/game/virtual-player
+2. натиснути на data-testid="settings-expander-game-mode-timed-btn", Актуальний результат: переключається на data-testid="settings-expander-game-mode-timed-btn", кнопки-чекбоси частково кастомно заблоковані
+3. натиснути на кастомно заблокований кнопку-чекбокс. Актуальний результат: data-testid="competitive-mode-modal"
+4. натиснути data-testid="competitive-mode-modal-modal.goToTraining-btn"
+Актуальний результат: перехід на Stay_on_the_board/game/training
+Очікуваний результат: залишаємося на сторінці Stay_on_the_board/game/virtual-player та перемикаємо режим на data-testid="settings-expander-game-mode-beginner-btn"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+1. Stay_on_the_board/game/virtual-player
+2. натиснути на data-testid="settings-expander-game-mode-timed-btn", Актуальний результат: переключається на data-testid="settings-expander-game-mode-timed-btn", кнопки-чекбоси частково кастомно заблоковані
+3. натиснути на кастомно заблокований кнопку-чекбокс. Актуальний результат: data-testid="competitive-mode-modal"
+4. натиснути data-testid="competitive-mode-modal-modal.goToTraining-btn"
+Актуальний результат: залишаємося на сторінці Stay_on_the_board/game/virtual-player та розблоковуємо кнопки та залишились на "settings-expander-game-mode-timed-btn"
+Очікуваний результат: залишаємося на сторінці Stay_on_the_board/game/virtual-player та розблоковуємо кнопки та та перемикаємо режим на "settings-expander-game-mode-beginner-btn"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+1. Stay_on_the_board/game/virtual-player
+2. натиснути на data-testid="settings-expander-game-mode-timed-btn", Актуальний результат: переключається на data-testid="settings-expander-game-mode-timed-btn", кнопки-чекбоси частково кастомно заблоковані
+Актуальний результат: таймера немає
+Очікуваний результат: "game-time-value" таймер є та з'являється під контейнером "game-mode-description"
+
+проаналізуй "game-time-value", та зроби таку саму логіку роботи таймера як і зараз існує на сторінці Stay_on_the_board/game/timed
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+при натискані кнопки "virtual-player-btn" в головному меню
+Актуальний результат: відкривається Stay_on_the_board/game/virtual-player
+Очікуваний результат: відкривається data-testid="game-mode-modal"
+-
+залишається без змін data-testid="game-mode-modal" яке відкривається при натискані data-testid="training-btn"
+а data-testid="game-mode-modal" яке відкривається при натискані data-testid="play-btn"
+1. перейменовуємо заголовок: з "Вибір складності гри" на "Вибір режиму гри"
+2. додаємо пункти до вибору: 
+data-testid="timed-game-btn"> Гра на час
+<button data-testid="local-game-btn" Локальна гра
+data-testid="online-game-btn"> Грати онлайн
+3. прибираємо class="dont-show-again-checkbox s-nc4u957ojUd4"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="beginner-mode-btn"
+data-testid="experienced-mode-btn"
+data-testid="pro-mode-btn"
+data-testid="timed-game-btn"
+Актуальний результат: ведуть на сторінки Stay_on_the_board/game/training та /game/timed
+Очікуваний результат: кнопки в новому модальному вікні повинні вести на Stay_on_the_board/game/virtual-player та вмикати відповідний режим
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/game/virtual-player
+"game-over-modal" модальне вікно закінчення гри
+Актуальний результат: логіка та вікно як в Stay_on_the_board/game/local
+Очікуваний результат: логіка та вікно як в Stay_on_the_board/game/training
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+1. натиснути data-testid="virtual-player-btn"
+2. натиснути data-testid="beginner-mode-btn"
+Актуальний результат: відкрилась сторінка Stay_on_the_board/game/virtual-player
+Очікуваний результат: відкрилось модальне вікно data-testid="faq-modal"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦

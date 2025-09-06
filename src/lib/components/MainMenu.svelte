@@ -100,6 +100,27 @@
     navigateTo('/drag-and-drop-test');
     showDevMenu = false;
   }
+  function handlePlayVirtualPlayer() {
+    hotkeyService.popContext();
+    logService.action(`Click: "Гра проти віртуального гравця" (MainMenu)`);
+    import('./GameModeModal.svelte').then(module => {
+      const GameModeModal = module.default;
+      modalStore.showModal({
+        titleKey: 'mainMenu.gameModeModal.title',
+        dataTestId: 'game-mode-modal',
+        component: GameModeModal,
+        props: { extended: true },
+        buttons: [
+          {
+            textKey: 'modal.close',
+            onClick: () => modalStore.closeModal(),
+            dataTestId: 'modal-btn-modal.close',
+            hotKey: 'ESC'
+          }
+        ]
+      });
+    });
+  }
   function handlePlayVsComputer() {
     hotkeyService.popContext();
     logService.action(`Click: "Гра проти комп'ютера" (MainMenu)`);
@@ -116,6 +137,7 @@
             titleKey: 'mainMenu.gameModeModal.title',
             dataTestId: 'game-mode-modal',
             component: GameModeModal,
+            props: { extended: false },
             buttons: [
               {
                 textKey: 'modal.close',
@@ -270,6 +292,7 @@
       </div>
     {/if}
     <div id="main-menu-buttons" bind:this={mainMenuButtonsNode}>
+      <button class="modal-button secondary" onclick={handlePlayVirtualPlayer} data-testid="virtual-player-btn">{$_('mainMenu.virtualPlayer')}</button>
       <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="training-btn">{$_('mainMenu.training')}</button>
       <button class="modal-button secondary" onclick={() => { uiStateStore.update(s => ({ ...s, intendedGameType: 'timed' })); navigateTo('/game/timed'); }} data-testid="timed-game-btn">{$_('mainMenu.timedGame')}</button>
       <button

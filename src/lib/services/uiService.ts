@@ -25,6 +25,10 @@ export function navigateToGame() {
       targetPath = '/game/timed';
       modeToInitialize = gameMode || 'timed';
       break;
+    case 'virtual-player':
+      targetPath = '/game/virtual-player';
+      modeToInitialize = gameMode || 'virtual-player';
+      break;
     default:
       targetPath = '/game/training';
       modeToInitialize = 'training';

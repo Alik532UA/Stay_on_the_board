@@ -4,9 +4,20 @@
   import { userActionService } from '$lib/services/userActionService.js';
   import { _ } from 'svelte-i18n';
   import { tick } from 'svelte';
+  import { uiStateStore } from '$lib/stores/uiStateStore.js';
 
   $: activeMode = $gameModeStore.activeMode;
   $: isCompetitiveMode = activeMode === 'timed' || activeMode === 'local' || activeMode === 'online';
+
+  function handlePresetClick(preset: 'beginner' | 'experienced' | 'pro') {
+    userActionService.setGameModePreset(preset);
+    uiStateStore.update(s => ({ ...s, settingsMode: 'default' }));
+  }
+
+  function handleTimedModeClick() {
+    userActionService.setGameModePreset('timed');
+    uiStateStore.update(s => ({ ...s, settingsMode: 'competitive' }));
+  }
 
   function fitTextAction(node: HTMLElement, dependency: any) {
     const buttons = Array.from(node.querySelectorAll('.settings-expander__row-btn')) as HTMLElement[];
@@ -48,17 +59,20 @@
 <div class="game-mode-widget">
   <h3 class="widget-title">{$_('gameModes.title')}</h3>
   <div class="settings-expander__game-mode-row" use:fitTextAction={$_('gameModes.beginner')}>
-    <button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'beginner'} on:click={() => userActionService.setGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
-    <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'experienced'} on:click={() => userActionService.setGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
-    <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'pro'} on:click={() => userActionService.setGameModePreset('pro')}>{$_('gameModes.pro')}</button>
+    <button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'beginner'} on:click={() => handlePresetClick('beginner')}>{$_('gameModes.beginner')}</button>
+    <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'experienced'} on:click={() => handlePresetClick('experienced')}>{$_('gameModes.experienced')}</button>
+    <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'pro'} on:click={() => handlePresetClick('pro')}>{$_('gameModes.pro')}</button>
+    <button data-testid="settings-expander-game-mode-timed-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'timed'} on:click={handleTimedModeClick}>{$_('gameModes.timed')}</button>
   </div>
-  <div class="description">
+  <div class="description" data-testid="game-mode-description">
     {#if $gameSettingsStore.gameMode === 'beginner'}
       {$_('gameModes.description.beginner')}
     {:else if $gameSettingsStore.gameMode === 'experienced'}
       {$_('gameModes.description.experienced')}
     {:else if $gameSettingsStore.gameMode === 'pro'}
       {$_('gameModes.description.pro')}
+    {:else if $gameSettingsStore.gameMode === 'timed'}
+      {$_('gameModes.description.timed')}
     {/if}
   </div>
 </div>
@@ -86,7 +100,7 @@
   }
   .settings-expander__game-mode-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
   }
   .settings-expander__row-btn {

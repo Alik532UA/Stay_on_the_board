@@ -8,7 +8,7 @@ import { gameModeService } from './gameModeService';
 import { logService } from './logService.js';
 import type { Direction } from '$lib/utils/gameUtils';
 import { navigationService } from './navigationService';
-import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
+import { gameSettingsStore, type GameModePreset } from '$lib/stores/gameSettingsStore.js';
 import { endGameService } from './endGameService';
 import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService.js';
 import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
@@ -203,7 +203,7 @@ export const userActionService = {
     gameSettingsStore.resetKeybindings();
   },
 
-  setGameModePreset(preset: 'beginner' | 'experienced' | 'pro'): void {
+  setGameModePreset(preset: GameModePreset): void {
     // НАВІЩО (Архітектурне виправлення): Ця функція тепер відповідає ТІЛЬКИ за оновлення
     // налаштувань (SSoT) через виклик атомарного методу в сторі. Ініціалізація гри (SoC)
     // повністю делегована відповідній ігровій сторінці.
