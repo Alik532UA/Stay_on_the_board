@@ -2,6 +2,7 @@ export default {
   title: "Stay on the Board",
   menu: "Menu",
   training: "Training",
+  virtualPlayer: "Play",
   timedGame: "Timed game",
   localGame: "Local Game",
   playOnline: "Play Online",
@@ -38,8 +39,8 @@ export default {
     keepAppearance: "Clear cache, except theme and language"
   },
   gameModeModal: {
-    title: "Select game difficulty"
+    title: "Select game mode"
   },
-  dragAndDropTest: "Drag & Drop Test",
+  dragAndDropTest: "test",
   loadingTranslations: "Loading translations..."
 };

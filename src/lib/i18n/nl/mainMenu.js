@@ -2,6 +2,7 @@ export default {
   title: "Blijf op het bord",
   menu: "Menu",
   training: "Training",
+  virtualPlayer: "Spelen",
   timedGame: "Spel tegen de klok",
   localGame: "Lokaal spel",
   playOnline: "Online spelen",
@@ -38,8 +39,8 @@ export default {
     keepAppearance: "Cache wissen, behalve thema en taal"
   },
   gameModeModal: {
-    title: "Selecteer spelmoeilijkheid"
+    title: "Selecteer spelmodus"
   },
-  dragAndDropTest: "Drag & Drop Test",
+  dragAndDropTest: "test",
   loadingTranslations: "Vertalingen laden..."
 };

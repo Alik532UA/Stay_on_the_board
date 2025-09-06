@@ -6,6 +6,7 @@
   import { modalStore } from '$lib/stores/modalStore.js';
   import { _ } from 'svelte-i18n';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
+  import { uiStateStore } from '$lib/stores/uiStateStore.js';
   import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
   import SvgIcons from '../SvgIcons.svelte';
   import { get } from 'svelte/store';
@@ -108,16 +109,29 @@
   $: speechEnabled = $gameSettingsStore.speechEnabled;
 
   $: activeMode = $gameModeStore.activeMode;
-  $: isCompetitiveMode = activeMode === 'timed' || activeMode === 'local' || activeMode === 'online';
+  $: isCompetitiveMode = ($gameModeStore.activeMode === 'timed' || $gameModeStore.activeMode === 'local' || $gameModeStore.activeMode === 'online') || $uiStateStore.settingsMode === 'competitive';
 
   function showCompetitiveModeModal() {
+    const activeMode = get(gameModeStore).activeMode;
+
+    const goToTrainingOnClick = () => {
+      modalStore.closeModal();
+      if (activeMode === 'virtual-player') {
+        userActionService.setGameModePreset('beginner');
+        uiStateStore.update(s => ({ ...s, settingsMode: 'default' }));
+      } else {
+        gameModeService.initializeGameMode('training');
+        goto(`${base}/game/training`);
+      }
+    };
+
     logService.action('Click: on a locked setting in competitive mode (SettingsExpanderWidget)');
     modalStore.showModal({
       titleKey: 'modal.competitiveModeLockTitle',
       dataTestId: 'competitive-mode-modal', // Added dataTestId
       contentKey: 'modal.competitiveModeLockContent',
       buttons: [
-        { textKey: 'modal.goToTraining', primary: true, onClick: () => { modalStore.closeModal(); gameModeService.initializeGameMode('training'); goto(`${base}/game/training`); } },
+        { textKey: 'modal.goToTraining', primary: true, onClick: goToTrainingOnClick },
         { textKey: 'modal.stay', onClick: modalStore.closeModal }
       ],
       closeOnOverlayClick: true,

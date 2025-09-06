@@ -26,7 +26,7 @@ export abstract class BaseGameMode implements IGameMode {
   public turnDuration: number = 0;
   public gameDuration: number = 0;
 
-  abstract getModeName(): 'training' | 'local' | 'timed' | 'online';
+  abstract getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player';
   abstract initialize(options?: { newSize?: number }): void;
   abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
   abstract getPlayersConfiguration(): Player[];

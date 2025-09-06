@@ -13,6 +13,15 @@ export async function initializeVoices() {
     try {
         const allVoices = await loadAndGetVoices();
         let mainVoices = filterVoicesByLang(allVoices, currentLocale);
+
+        if (currentLocale === 'nl') {
+            mainVoices.sort((a, b) => {
+                if (a.lang === 'nl-NL' && b.lang !== 'nl-NL') return -1;
+                if (a.lang !== 'nl-NL' && b.lang === 'nl-NL') return 1;
+                return a.name.localeCompare(b.name);
+            });
+        }
+
         if (currentLocale !== 'en') {
             const enVoices = filterVoicesByLang(allVoices, 'en');
             const mainVoiceURIs = new Set(mainVoices.map(v => v.voiceURI));

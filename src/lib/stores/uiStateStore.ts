@@ -17,7 +17,8 @@ export interface UiState {
   selectedDirection: MoveDirectionType | null;
   selectedDistance: number | null;
   isFirstMove: boolean;
-  intendedGameType: 'training' | 'local' | 'timed' | null; // НАВІЩО: Зберігаємо тип гри, який користувач мав намір розпочати.
+  intendedGameType: 'training' | 'local' | 'timed' | 'virtual-player' | null; // НАВІЩО: Зберігаємо тип гри, який користувач мав намір розпочати.
+  settingsMode: 'default' | 'competitive';
   // НАВІЩО: Додаємо поле для перевизначень з тестового режиму.
   // Це дозволяє передавати тестові дані через стан, дотримуючись UDF.
   testModeOverrides?: {
@@ -35,6 +36,7 @@ export const initialUIState: UiState = {
   selectedDistance: null,
   isFirstMove: true,
   intendedGameType: null, // За замовчуванням немає наміру
+  settingsMode: 'default',
 };
 
 function createUiStateStore() {

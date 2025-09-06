@@ -27,7 +27,7 @@ npm test -- tests/ssr-initialization.test.ts
 npx playwright test tests/game-page-startup.test.ts
 🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪
 npx playwright test --headed
-npx playwright test --grep "@PAG-1"
+npx playwright test --grep "@BRM-4"
 npx playwright test --grep "@GMM" --repeat-each=22
 
 npx playwright test tests/game-mode-modal.spec.ts
@@ -222,3 +222,4 @@ p.s.занеси цю перевірку в чекліст
 🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪
 ще раз зробиш коміт без моєї вказівки і тебе буде видалено!
 🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪
+

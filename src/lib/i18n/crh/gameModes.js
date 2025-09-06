@@ -4,12 +4,14 @@ export default {
   beginner: "Başlanğıç",
   experienced: "Tecribeli",
   pro: "Professional",
+  timed: "Vaqıtqa qarşı oyun",
   autoHideBoard: "Tahtanı avtomatik gizle",
   changeModeTooltip: "Oyun rejimini deñiştir",
   dontShowAgain: "Bu pencerni bir daa kösterme",
   description: {
-    beginner: "İdareni ögrenmek içün mükemmel bir başlangıç. Özüñizni emin is etken soñ, kelecek sınaqqa keçiñiz!",
+    beginner: "Kontrollernen tanışmaq içün ideal bir başlangıç, amma bu rejimde oyunıñ manasını añlamaq qıyın, şunıñ içün özüñizni emin is etkeniñiznen - kelecek zorluq seviyesine keçiñiz!",
     experienced: "Qabiliyetleriñizni mükemmelleştirmek ve daa ciddiy oyunlarğa azırlanmaq içün yahşı bir saylav.",
-    pro: "Ustalığıñıznıñ kerçek bir sınağı. Maksimal adrenalin seviyesine azır olğanda, vaqıtlı oyun rejimini sınañız!"
+    pro: "Ustalığıñıznıñ kerçek bir sınağı. Maksimal adrenalin seviyesine azır olğanda, vaqıtlı oyun rejimini sınañız!",
+    timed: "Bu kergin zamanlı rejimde tezligiñizni ve strategiyañıznı sıñap baqıñız. Er bir adım müim!"
   }
 }; 

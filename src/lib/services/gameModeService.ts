@@ -6,6 +6,7 @@ import { BaseGameMode } from '$lib/gameModes/BaseGameMode';
 import { TrainingGameMode } from '$lib/gameModes/TrainingGameMode';
 import { LocalGameMode } from '$lib/gameModes/LocalGameMode';
 import { TimedGameMode } from '$lib/gameModes/TimedGameMode';
+import { VirtualPlayerGameMode } from '$lib/gameModes/VirtualPlayerGameMode';
 import { logService } from './logService';
 import { timerStore } from '$lib/stores/timerStore';
 
@@ -16,6 +17,7 @@ class GameModeService {
     this.registerMode('training', new TrainingGameMode());
     this.registerMode('local', new LocalGameMode());
     this.registerMode('timed', new TimedGameMode());
+    this.registerMode('virtual-player', new VirtualPlayerGameMode());
   }
 
   private registerMode(name: string, mode: BaseGameMode) {
