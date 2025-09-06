@@ -37,5 +37,6 @@ export default {
     hidden: "hide",
     shown: "show",
     compact: "abbreviated"
-  }
+  },
+  voiceSettings: "Voice Settings"
 };

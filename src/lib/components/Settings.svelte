@@ -12,6 +12,8 @@
   import { clearCache } from '$lib/utils/cacheManager.js';
   import { gameModeService } from '$lib/services/gameModeService';
   import { userActionService } from '$lib/services/userActionService';
+  import VoiceSettings from './VoiceSettings.svelte';
+  import VoiceList from './VoiceList.svelte';
 
   $: settings = $appSettingsStore;
   $: gameSettings = $gameSettingsStore;
@@ -46,7 +48,7 @@
 </script>
 
 <div class="setup-grid">
-  <div class="grid-column">
+  <div class="grid-column" data-testid="settings-column-appearance">
     <div class="settings-card">
       <div class="settings-group" data-testid="settings-page-language-group">
         <span class="settings-label" data-testid="settings-page-language-label">{$_('settings.language')}</span>
@@ -93,7 +95,7 @@
       </div>
     </div>
   </div>
-  <div class="grid-column">
+  <div class="grid-column" data-testid="settings-column-game">
     <div class="settings-card">
       <div class="settings-section" data-testid="settings-page-game-mode-section">
         <span class="settings-label" data-testid="settings-page-game-mode-label">{$_('settings.gameMode')}</span>
@@ -164,12 +166,21 @@
       </div>
     </div>
   </div>
+  <div class="grid-column" data-testid="settings-column-voice">
+    <div class="settings-card">
+      <span class="settings-label">{$_('settings.voiceSettings')}</span>
+      <hr class="settings-divider" />
+      <VoiceSettings />
+      <hr class="settings-divider" />
+      <VoiceList />
+    </div>
+  </div>
 </div>
 
 <style>
   .setup-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 24px;
     align-items: start;
   }
@@ -178,6 +189,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-width: 0;
   }
 
   .settings-card {
@@ -189,6 +201,12 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+  }
+
+  @media (max-width: 1200px) {
+    .setup-grid {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
   @media (max-width: 800px) {
