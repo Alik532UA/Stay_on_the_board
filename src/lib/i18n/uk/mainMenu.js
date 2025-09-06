@@ -38,7 +38,7 @@ export default {
     keepAppearance: "Очистити кеш, крім теми та мови"
   },
   gameModeModal: {
-    title: "Вибір режиму гри"
+    title: "Вибір складності гри"
   },
   dragAndDropTest: "Тест перетягування",
   loadingTranslations: "Завантаження перекладу..."
