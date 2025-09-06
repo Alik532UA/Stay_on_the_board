@@ -1,62 +1,154 @@
-стало краще! тепер голос міняється, але налаштування швидкості голосу ігноруються
-fix
-
----
-
-**Ключова вимога:** Твоє рішення має бути комплексним. Не роби поверхневих виправлень ("латок" чи "костилів").
-**Реалізуй системне виправлення**, яке усуває корінь проблеми та відповідає цільовій архітектурі проєкту.
-при виправленні використовуй принципи:
-1.  **SSoT (Single Source of Truth):** Чи є єдине джерело правди для кожного елемента стану?
-2.  **UDF (Unidirectional Data Flow):** Чи є потік даних односпрямованим та передбачуваним?
-3.  **SoC (Separation of Concerns):** Наскільки добре розділені відповідальності (стан, логіка, UI)?
-4.  **Композиція:** Чи ефективно використовуються компоненти для побудови UI?
-5.  **Чистота та Побічні ефекти:** Наскільки добре ізольовані "нечисті" операції (API, DOM, таймери)?
-6.  **DRY (Don't Repeat Yourself):** Чи є дублювання коду, яке можна усунути?
-7.  **Простота та Читабельність (KISS):** Чи є надмірно складні рішення? Наскільки код зрозумілий (якість іменування)?
-8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
-9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
-
----
-
-**Відладка (Дебагінг):**
-    *   **Використовуй `logService`:** Замість `console.log` завжди використовуй централізований `logService`.
-    *   **Доповнюй логи для аналізу:** Якщо поточний рівень логування не дозволяє діагностувати описану проблему, додай нові виклики logService у відповідних місцях коду. Мета — забезпечити, щоб майбутні логи містили всю інформацію, яка дозволить мені самостійно проаналізувати, чи вирішено проблему, і що саме потребує виправлення.
-    *   **Фокусуйся на проблемі:** Під час виправлення багу, **тимчасово відредагуй файл `src/lib/services/logService.js`**. Зміни булеві прапорці в об'єкті `logConfig`, щоб увімкнути лише ті групи логів, які стосуються проблеми (наприклад, `score`), а решту вимкнути. Це допоможе усунути інформаційний шум.
-    *   **Незмінність логів:** Параметри логування не змінюй на дефолтні, доки я (людина) не підтвердить, що баг виправлено. При порушені цього правила AI буде вимкнено та видалено.
-**Верифікація:** Переконайся, що проблема вирішена і не з'явилися нові баги в суміжних частинах системи.
-
----
-
-при потребі:
-1. вимкни зайві логи
-2. увімкни потрібні логи
-3. допиши потрібні логи
-
----
-
-при натискані кнопок швидкості, нічого в лог не записується!
-або виправляй, або прощаємось
+попередня задача вирішена
+нова задача діагональні ходи не правильно обробляються
 
 client:733 [vite] connecting...
 client:827 [vite] connected.
-logService.js:145 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+logService.js:149 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
 init.js:31 ✅ i18n initialized successfully
-logService.js:112 [UI] [layout] afterNavigate: hiding tooltip
-logService.js:112 [UI] [Speech] 'voiceschanged' event fired. Loaded 325 voices.
-logService.js:112 [UI] [Speech] Fallback check loaded 325 voices.
-logService.js:112 [UI] [Speech] Voices already loaded: 325
-logService.js:112 [UI] [Speech] Filtering for langCode: "uk". Total voices: 325
-logService.js:112 [UI] [Speech] Found 2 voices for "uk".
-logService.js:112 [UI] [Speech] Filtering for langCode: "en". Total voices: 325
-logService.js:112 [UI] [Speech] Found 50 voices for "en".
-logService.js:112 [UI] Default voice reactively selected: Microsoft Ostap Online (Natural) - Ukrainian (Ukraine)
-logService.js:112 [UI] [layout] afterNavigate: hiding tooltip
-logService.js:110 [UI] Adjusting VoiceListCard height {newHeight: 686}
-logService.js:110 [UI] Adjusting VoiceListCard height {newHeight: 686}
-logService.js:112 [SPEECH] [Speech] Applying speechRate in speakTestPhrase: 1.2000000476837158
-logService.js:112 [SPEECH] [Speech] Found and set requested voice for test: Microsoft Ostap Online (Natural) - Ukrainian (Ukraine)
-logService.js:112 [SPEECH] [Speech] Cancelling previous speech and queuing test utterance "Раді бачити тебе в грі" with lang: uk-UA
-logService.js:112 [UI] [Speech] 'voiceschanged' event fired. Loaded 325 voices.
-logService.js:112 [SPEECH] [Speech] Applying speechRate in speakTestPhrase: 1.2000000476837158
-logService.js:112 [SPEECH] [Speech] Found and set requested voice for test: Microsoft Ostap Online (Natural) - Ukrainian (Ukraine)
-logService.js:112 [SPEECH] [Speech] Cancelling previous speech and queuing test utterance "Раді бачити тебе в грі" with lang: uk-UA
+logService.js:115 [GAME_MODE] Game mode initialized: virtual-player (from preset: virtual-player)
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Один верх.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: up 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'up', distance: 1, playerIndex: 0}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:115 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:113 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'down-left', distance: 2, row: 2, col: 0, isPenalty: false}
+logService.js:115 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down-left', distance: 2, playerIndex: 1}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:113 [GAME_MODE] triggerComputerMove: Checking voiceMoveRequested true
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Один верх.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: up 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'up', distance: 1, playerIndex: 0}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:115 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:113 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'up', distance: 1, row: 0, col: 0, isPenalty: false}
+logService.js:115 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'up', distance: 1, playerIndex: 1}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:113 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:113 [GAME_MODE] triggerComputerMove: Checking voiceMoveRequested true
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Один праворуч.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: right 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'right', distance: 1, playerIndex: 0}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:115 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:113 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'down', distance: 1, row: 1, col: 1, isPenalty: false}
+logService.js:115 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down', distance: 1, playerIndex: 1}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:113 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:113 [GAME_MODE] triggerComputerMove: Checking voiceMoveRequested true
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Один вниз.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: down 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down', distance: 1, playerIndex: 0}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:115 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:113 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'right', distance: 1, row: 2, col: 2, isPenalty: false}
+logService.js:115 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'right', distance: 1, playerIndex: 1}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:113 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:113 [GAME_MODE] triggerComputerMove: Checking voiceMoveRequested true
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Все.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed "no moves" command.
+logService.js:113 [GAME_MODE] [noMovesService] dispatchNoMovesEvent called {playerType: 'human'}
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [LOGIC_MOVE] [userActionService] Input locked: isComputerMoveInProgress=true
+logService.js:115 [GAME_MODE] [VirtualPlayerGameMode] continueAfterNoMoves called
+logService.js:113 [LOGIC_MOVE] State of uiStateStore BEFORE continueAfterNoMoves: {isComputerMoveInProgress: false, isGameOver: false, gameOverReasonKey: null, gameOverReasonValues: null, selectedDirection: null, …}
+logService.js:113 [LOGIC_MOVE] Set current player to human after continuing game. {humanPlayerIndex: 0}
+logService.js:113 [LOGIC_MOVE] State of uiStateStore AFTER continueAfterNoMoves: {isComputerMoveInProgress: false, isGameOver: false, gameOverReasonKey: null, gameOverReasonValues: null, selectedDirection: null, …}
+logService.js:115 [LOGIC_MOVE] CommandService: Handling CloseModal event
+logService.js:115 [LOGIC_MOVE] [userActionService] Input unlocked: isMoveInProgress=false
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: По діагоналі вверх вліво один.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: up 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'up', distance: 1, playerIndex: 0}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:115 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:113 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'up-left', distance: 1, row: 0, col: 1, isPenalty: false}
+logService.js:115 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'up-left', distance: 1, playerIndex: 1}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:113 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:113 [GAME_MODE] triggerComputerMove: Checking voiceMoveRequested true
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: По діагоналі вниз вліво один.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: down 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down', distance: 1, playerIndex: 0}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:115 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:113 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'down', distance: 1, row: 2, col: 1, isPenalty: false}
+logService.js:115 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down', distance: 1, playerIndex: 1}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:113 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:113 [GAME_MODE] triggerComputerMove: Checking voiceMoveRequested true
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Speech recognition error: no-speech
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Верх вправо.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: up 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'up', distance: 1, playerIndex: 0}
+logService.js:115 [LOGIC_MOVE] performMove: хід на заблоковану клітинку
+logService.js:115 [GAME_MODE] [endGameService] endGame called with reason: 'modal.gameOverReasonBlocked'
+logService.js:113 [GAME_MODE] [scoreService] determineWinner called {losingPlayerIndex: 0}
+logService.js:113 [LOGIC_MOVE] CommandService: Handling GameOver event {scores: Array(2), winners: Array(1), reasonKey: 'modal.gameOverReasonBlocked', reasonValues: null, finalScoreDetails: {…}, …}
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
