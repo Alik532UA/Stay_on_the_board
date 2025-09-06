@@ -38,7 +38,7 @@ const defaultConfig = {
           [LOG_GROUPS.INIT]: false,
           [LOG_GROUPS.ACTION]: false,
           [LOG_GROUPS.GAME_MODE]: false,
-          [LOG_GROUPS.SPEECH]: false,
+          [LOG_GROUPS.SPEECH]: true,
           [LOG_GROUPS.TEST_MODE]: false,
           [LOG_GROUPS.MODAL]: false,
           [LOG_GROUPS.ERROR]: true, // Errors should always be logged

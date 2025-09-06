@@ -1,11 +1,16 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
   import { availableVoices, isLoading, initializeVoices } from '$lib/stores/voiceStore.js';
   import { _ } from 'svelte-i18n';
   import { get } from 'svelte/store';
+  import { speakTestPhrase } from '$lib/services/speechService.js';
 
-  let selectedVoiceURI = get(gameSettingsStore).selectedVoiceURI ?? '';
+  let selectedVoiceURI = '';
+
+  const unsubscribe = gameSettingsStore.subscribe(settings => {
+    selectedVoiceURI = settings.selectedVoiceURI ?? '';
+  });
 
   onMount(() => {
     if (get(availableVoices).length === 0) {
@@ -13,8 +18,15 @@
     }
   });
 
-  function selectVoice() {
-    gameSettingsStore.updateSettings({ selectedVoiceURI: String(selectedVoiceURI ?? '') });
+  onDestroy(() => {
+      if (unsubscribe) {
+          unsubscribe();
+      }
+  });
+
+  function selectVoice(uri) {
+    gameSettingsStore.updateSettings({ selectedVoiceURI: uri });
+    speakTestPhrase();
   }
 </script>
 
@@ -24,18 +36,14 @@
         <p>{$_('voiceSettings.loading')}</p>
     </div>
 {:else if $availableVoices.length > 0}
-    <div class="voice-list" data-testid="voice-list">
+    <div class="voice-list button-group" data-testid="voice-list">
         {#each $availableVoices as voice (voice.voiceURI)}
-        <label class="voice-option">
-            <input 
-            type="radio" 
-            name="voice" 
-            value={voice.voiceURI} 
-            bind:group={selectedVoiceURI} 
-            onchange={selectVoice} 
-            />
-            <span class="voice-name">{voice.name} ({voice.lang})</span>
-        </label>
+            <button 
+                class:active={selectedVoiceURI === voice.voiceURI}
+                on:click={() => selectVoice(voice.voiceURI)}
+            >
+                {voice.name} ({voice.lang})
+            </button>
         {/each}
     </div>
 {:else}
@@ -47,6 +55,37 @@
 {/if}
 
 <style>
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .button-group button {
+    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    text-align: left;
+    font-size: 1em;
+    line-height: 1.3;
+  }
+
+  .button-group button:hover {
+      border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .button-group button.active {
+    background-color: var(--text-accent, #ffbe0b);
+    border-color: var(--text-accent, #ffbe0b);
+    color: #000;
+    font-weight: bold;
+  }
+
   .loader-container {
     text-align: center;
     padding: 2em;
@@ -61,40 +100,7 @@
     margin: 0 auto 1em;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .voice-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    overflow-y: auto;
-    padding-right: 10px;
-    min-height: 0;
-  }
-  .voice-option {
-    display: flex;
-    align-items: center;
-    margin: 0;
-    padding: 16px;
-    border-radius: 16px;
-    background: rgba(255,255,255,0.07);
-    cursor: pointer;
-    transition: background 0.2s;
-    font-size: 1.08em;
-    gap: 16px;
-  }
-  .voice-option:hover {
-    background: rgba(255,255,255,0.13);
-  }
-  .voice-option input[type="radio"] {
-    margin-right: 16px;
-    accent-color: #ff9800;
-    width: 22px;
-    height: 22px;
-  }
-  .voice-name {
-    font-size: 1em;
-    line-height: 1.3;
-    display: block;
-  }
+  
   .no-voices-message {
     text-align: center;
     padding: 1em;
@@ -103,5 +109,13 @@
   .no-voices-container {
     text-align: center;
     padding: 1em 0;
+  }
+
+  .voice-list {
+    overflow-y: auto;
+    padding-right: 10px;
+    min-height: 0;
+    width: 95%;
+    margin: 0 auto;
   }
 </style>
