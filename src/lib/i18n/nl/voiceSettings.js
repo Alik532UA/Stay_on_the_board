@@ -20,12 +20,14 @@ export default {
   close: "Sluiten",
   volume: "Volume",
   volumeLabel: "Volume",
-  speed: 'Speed',
-  order: 'Order',
-  dir_dist: 'Direction, distance',
-  dist_dir: 'Distance, direction',
-  shortSpeech: 'Short speech',
-  speakFor: 'Speak for',
-  player: 'Player move',
-  computer: 'Computer move'
-}; 
+  speed: 'Snelheid',
+  order: 'Volgorde',
+  dir_dist: 'Richting, afstand',
+  dist_dir: 'Afstand, richting',
+  shortSpeech: 'Korte spraak',
+  speakFor: 'Spreek voor',
+  player: 'Spelerszet',
+  computer: 'Computerzet',
+  testVoice: "Test Stem",
+  testPhrase: "Blij je te zien in het spel"
+};

@@ -1,3 +1,4 @@
 export default {
-  loading: "Yükleniyor..."
+  loading: "Yükleniyor...",
+  save: "Saqla"
 };

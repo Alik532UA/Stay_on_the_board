@@ -6224,16 +6224,176 @@ data-testid="game-widgets-container"
 створи скріпт який прод версію (чи краще її назвати preview ?)
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 data-testid="voice-settings-modal"
+---
 data-testid="voice-settings-close-footer-btn"
 текст кнопки:
 Актуальний результат: "Закрити"
 Очікуваний результат: "Зберегти"
-
-Актуальний результат: є data-testid="voice-settings-close-header-btn"
-Очікуваний результат: немає data-testid="voice-settings-close-header-btn"
-
+---
+data-testid="voice-settings-close-header-btn"
+Актуальний результат: є 
+Очікуваний результат: немає
+---
+1.
 <div class="button-group s-7FFAMHOBqq-b"><button data-testid="speech-for-player-btn" class="s-7FFAMHOBqq-b">Хід гравця</button> <button data-testid="speech-for-computer-btn" class="s-7FFAMHOBqq-b active">Хід комп'ютера</button></div>
+2.
+<div class="button-group s-7FFAMHOBqq-b"><button data-testid="speech-rate-1-btn" class="s-7FFAMHOBqq-b">x1</button> <button data-testid="speech-rate-1.2-btn" class="s-7FFAMHOBqq-b">x1.2</button> <button data-testid="speech-rate-1.4-btn" class="s-7FFAMHOBqq-b active">x1.4</button> <button data-testid="speech-rate-1.6-btn" class="s-7FFAMHOBqq-b">x1.6</button> <button data-testid="speech-rate-1.8-btn" class="s-7FFAMHOBqq-b">x1.8</button> <button data-testid="speech-rate-2-btn" class="s-7FFAMHOBqq-b">x2</button></div>
+3. 
+<div class="button-group s-7FFAMHOBqq-b"><button data-testid="speech-order-dist-dir-btn" class="s-7FFAMHOBqq-b active">Відстань, напрямок</button> <button data-testid="speech-order-dir-dist-btn" class="s-7FFAMHOBqq-b">Напрямок, відстань</button></div>
 
+Актуальний результат: НЕ на всю ширину модального вікна
+Очікуваний результат: на всю ширину модального вікна
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+ті налаштування які у нас є в data-testid="voice-settings-modal"
+Треба це продублювати в Stay_on_the_board/settings
+Актуальний результат: дві колонки class="grid-column s-Twm6pjhj-ond"
+Очікуваний результат: три колонки class="grid-column s-Twm6pjhj-ond"
+треття колонка для "налаштування озвучки"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+налаштування озучки в грі та в Stay_on_the_board/settings це одні і ті самі налаштування, треба перевірити, що ми не дублюємо логіку, 
+інтерфейс дублюється, а логіка та сама
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+додати кнопку тест голосу:
+"Текст голосу"
+при натисканні озвучіється фраза: "Раді бачити тебе в грі"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+class="grid-column s-Twm6pjhj-ond"
+треба кожній колонці додати унікальний data-testid
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+class="voice-list s-7FFAMHOBqq-b"
+1. треба додати унікальний data-testid
+2. треба додати четверту колонку  до data-testid="settings-column-voice"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="settings-column-appearance"
+data-testid="settings-column-game"
+data-testid="settings-column-voice"
+Актуальний результат: мають різну ширину
+Очікуваний результат: мають однакову ширину (так як це зроблено в Stay_on_the_board/game/training)
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="settings-column-appearance"
+data-testid="settings-column-game"
+data-testid="settings-column-voice"
+data-testid="settings-column-voice-list"
+Актуальний результат: занадто вузькі і всі елементи не поміцщаються в колонку
+Очікуваний результат: мають однакову ширину, і всі елементи поміцщаються в колонку
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+голос за замовчуванням
+Актуальний результат: немає
+Очікуваний результат: перший зі списку
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+коли вікно вузьке, то працює правильно, а саме всі колонки відобажаються в список
+коли вікно широке, досі є нова проблема 
+Актуальний результат: 
+дві колонки по горизонталі, а третя колонка нижче
+data-testid="settings-column-appearance"
+data-testid="settings-column-game"
+data-testid="settings-column-voice"
+data-testid="settings-column-voice-list"
+Очікуваний результат: 
+дві колонки по горизонталі
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="voice-settings-modal" (і в грі і в налаштуваннях)
+зробити data-testid="voice-list" в окрему колонку
+Актуальний результат: 
+для телефоної версії: вертикальне розтошування колонок
+для ком'ютерної версії: вертикальне розтошування колонок
+Очікуваний результат: 
+для телефоної версії: вертикальне розтошування колонок
+для ком'ютерної версії: горизонтальне розтошування колонок
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="voice-list"
+Актуальний результат: дивна висота, не зрозуміла логіка висоти елемента
+Очікуваний результат: на висоту батьківського елементу
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+для комп'ютерної версії, коли є можливість помістити всі колокнки по горизонталі, тоді
+Актуальний результат: 
+дві колонки по горизонталі, а ще дві перенесені на наступний рядок
+data-testid="settings-column-appearance"
+data-testid="settings-column-game"
+data-testid="settings-column-voice"
+data-testid="settings-column-voice-list"
+Очікуваний результат: 
+колонки по горизонталі
+---
+іншими словами:
+наразі у нас градація тільки на два етапа, на комп'ютерну версію та на телефону, а треба на три
+на комп'ютерну широку == всі колонки поміщаються на монітор по горизонталі
+на комп'ютерну вузьку == по дві колонки в ряд (так як зараз, це вже працює)
+і телефону == всі колонки по горизонталі (так як зараз, це вже працює)
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+досі проблема
+на комп'ютерну широку == всі колонки поміщаються на монітор по горизонталі
+Stay_on_the_board/settings
+data-testid="settings-column-appearance"
+data-testid="settings-column-game"
+data-testid="settings-column-voice"
+data-testid="settings-column-voice-list"
+Актуальний результат: колонки занадто вузькі і не всі елементи поміцщаються в колонку по ширині
+Очікуваний результат: колонки мають однакову ширину, і всі елементи поміцщаються в колонку по ширині
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="voice-list"
+Актуальний результат: немає свого контейнеру зі скролом і розтягує батьківський елемент
+Очікуваний результат: має свій контейнер зі скролом і не розтягує батьківський елемент
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+де змінити значення коли іде перехід в 
+на комп'ютерну вузьку == по дві колонки в ряд
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="settings-page-actions"
+прибрати top margin
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/settings
+data-testid="voice-list"
+Актуальний результат: дивна висота, не зрозуміла логіка висоти елемента
+Очікуваний результат: на висоту батьківського елементу, але не збільшувати не впливати на висоту батьківського елементу
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+проблема: останні зміни повпливали на висоту батьківського елементу (data-testid="settings-column-voice-list")
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/settings
+висота колонок (class="setup-grid s-Twm6pjhj-ond")
+Актуальний результат: перевіряється висота дочірніх елементів
+Очікуваний результат: треба ігнорувати дочірні елементи колонки data-testid="settings-column-voice-list"  class="settings-card s-Twm6pjhj-ond"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/settings
+
+1.
+data-testid="settings-column-voice"
+прибрати <hr class="settings-divider s-Twm6pjhj-ond">
+
+2. 
+data-testid="settings-column-voice-list"
+<hr class="settings-divider s-Twm6pjhj-ond">
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/settings
+data-testid="settings-column-voice-list"
+прибрати <hr class="settings-divider s-Twm6pjhj-ond">
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/settings
+ додати кожному class="settings-card" унікальний data-testid
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+ти додав лише до одного, а я просив до всіх
+або ти робиш, або ми прощаємось з тобою
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/settings
+проаналізуй код
+від чого залежить висота class="setup-grid s-Twm6pjhj-ond"?
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="settings-card-voice-list" занадто високий
+data-testid="settings-card-voice-list" треба обмежети по висоті, до елемента data-testid="settings-card-voice"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+нічого не помінялось
+або ти робиш виправлення, або ми прощаємось з тобою
+data-testid="settings-card-voice-list" занадто високий
+data-testid="settings-card-voice-list" треба обмежети по висоті, не більше елемента data-testid="settings-card-voice"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦

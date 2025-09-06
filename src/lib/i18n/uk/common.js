@@ -1,3 +1,4 @@
 export default {
-  loading: "Завантаження..."
+  loading: "Завантаження...",
+  save: "Зберегти"
 };

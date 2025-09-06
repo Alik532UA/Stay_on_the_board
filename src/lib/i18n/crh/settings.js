@@ -37,5 +37,7 @@ export default {
     hidden: "saqlamaq",
     shown: "köstermek",
     compact: "qısqartılğan"
-  }
+  },
+    voiceSettings: "Ses ayarları",
+  voiceList: "Mevcut sesler"
 };

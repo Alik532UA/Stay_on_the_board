@@ -37,5 +37,7 @@ export default {
     hidden: "сховати",
     shown: "показати",
     compact: "скорочено"
-  }
+  },
+  voiceSettings: "Налаштування голосу",
+  voiceList: "Доступні голоси"
 };
