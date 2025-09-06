@@ -26,6 +26,7 @@
   aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
   on:contextmenu={onCellRightClick}
   role="gridcell"
+  data-testid="board-cell"
   tabindex="0"
 >
   {#if blocked}
