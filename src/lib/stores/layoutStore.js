@@ -14,6 +14,7 @@ export const WIDGETS = {
   GAME_INFO: 'game-info-widget',
   PLAYER_TURN_INDICATOR: 'player-turn-indicator',
   TIMER: 'timer-widget',
+  GAME_MODE: 'game-mode-widget',
 };
 
 // Структура макета за замовчуванням
@@ -28,7 +29,7 @@ const defaultLayout = [
   },
   {
     id: 'column-3',
-    widgets: [WIDGETS.SETTINGS_EXPANDER],
+    widgets: [WIDGETS.GAME_MODE, WIDGETS.SETTINGS_EXPANDER],
   },
 ];
 
@@ -73,4 +74,4 @@ export const layoutStore = {
     set(defaultLayout);
     saveLayout(defaultLayout);
   },
-}; 
+};

@@ -31,8 +31,8 @@
 
   // --- Derived стор для генерації повідомлень ---
   const displayMessage = derived(
-    [playerStore, isGameOver, isFirstMove, lastComputerMove, lastPlayerMove, isPlayerTurn, _, isCompact],
-    ([$playerStore, $isGameOver, $isFirstMove, $lastComputerMove, $lastPlayerMove, $isPlayerTurn, $_, $isCompact]) => {
+    [playerStore, isGameOver, isFirstMove, lastComputerMove, lastPlayerMove, isPlayerTurn, _, isCompact, gameSettingsStore],
+    ([$playerStore, $isGameOver, $isFirstMove, $lastComputerMove, $lastPlayerMove, $isPlayerTurn, $_, $isCompact, $gameSettings]) => {
       logService.ui('GameInfoWidget: displayMessage re-evaluating', {
         isGameOver: $isGameOver,
         isFirstMove: $isFirstMove,
@@ -54,18 +54,27 @@
           return {
             type: 'STRUCTURED',
             lines: [
-              { type: 'line', parts: [{ type: 'text', content: 'Гра почалась!' }] },
+              { type: 'line', parts: [{ type: 'text', content: $_('gameBoard.gameInfo.firstMove') }] },
               {
                 type: 'line',
                 parts: [
                   { type: 'player', name: currentPlayer.name, style: getPlayerNameStyle($playerStore.players, currentPlayer.name) },
-                  { type: 'text', content: ', ваша черга робити хід' }
+                  { type: 'text', content: ', ' + $_('gameBoard.gameInfo.yourTurnToMakeAMove').toLowerCase() }
                 ]
               }
             ]
           };
         }
-        return { type: 'SIMPLE', content: $_('gameBoard.gameInfo.firstMove') };
+
+        let message = `${$_('gameBoard.gameInfo.firstMove')}
+`;
+        if ($gameSettings.gameMode !== 'beginner') {
+          message += `${$_('gameBoard.gameInfo.rememberPieceLocation')}
+`;
+        }
+        message += $_('gameBoard.gameInfo.yourTurnToMakeAMove');
+
+        return { type: 'SIMPLE', content: message };
       }
       
       if ($lastComputerMove) {

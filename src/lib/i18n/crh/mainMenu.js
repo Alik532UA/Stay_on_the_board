@@ -38,7 +38,7 @@ export default {
     keepAppearance: "Keşni temizle, tema ve tilden ğayrı"
   },
   gameModeModal: {
-    title: "Oyun rejimini saylav"
+    title: "Oyun zorluq seviyesini seçiñiz"
   },
   dragAndDropTest: "Süyrep Taşuv Testi",
   loadingTranslations: "Tercimeler yükleniyor..."

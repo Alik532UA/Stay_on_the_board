@@ -24,6 +24,8 @@ import common from './nl/common.js';
 import testMode from './nl/testMode.js';
 import dndTest from './nl/dndTest.js';
 
+import trainingHelp from './nl/trainingHelp.js';
+
 export default {
   dndTest,
   testMode,
@@ -49,5 +51,6 @@ export default {
   replay,
   faq,
   gameModes,
-  newWidget
+  newWidget,
+  trainingHelp
 };

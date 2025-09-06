@@ -8,8 +8,7 @@ export default {
   scoreLabel: "Score",
   cashOut: "Nieuw spel starten",
   cashOutTooltip: "Punten innen en een nieuw spel starten",
-  cashOutLocal: `Spel vroeg
-beëindigen`,
+  cashOutLocal: `Spel vroeg\nbeëindigen`,
   tutorialTitle: "",
   tutorialContent: "Je doel is om beurten het gedeelde stuk te verplaatsen zonder van het bord te gaan. Verberg het stuk of het bord in de instellingen om meer punten te verdienen voor elke zet!",
   info: "Instructies",
@@ -20,6 +19,7 @@ beëindigen`,
   gameInfo: {
     gameStarted: "Spel gestart!\nDoe je zet",
     firstMove: "Spel gestart!\nJouw beurt om een zet te doen",
+    rememberPieceLocation: "Onthoud waar het stuk is!",
     gameResumed: "Spel hervat, het stuk staat op dezelfde positie als voor de pauze.\nJouw beurt om te zetten",
     playerTurn: "Jouw beurt om een zet te doen",
     computerTurn: "Computer denkt na...",
@@ -42,4 +42,4 @@ beëindigen`,
     down: "omlaag",
     downRight: "diagonaal naar beneden-rechts"
   }
-}; 
+};

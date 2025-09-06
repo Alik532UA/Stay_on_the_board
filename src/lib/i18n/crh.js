@@ -24,6 +24,8 @@ import common from './crh/common.js';
 import testMode from './crh/testMode.js';
 import dndTest from './crh/dndTest.js';
 
+import trainingHelp from './crh/trainingHelp.js';
+
 export default {
   dndTest,
   testMode,
@@ -49,5 +51,6 @@ export default {
   replay,
   faq,
   gameModes,
-  newWidget
+  newWidget,
+  trainingHelp
 };
