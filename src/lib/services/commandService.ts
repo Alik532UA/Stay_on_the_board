@@ -1,10 +1,7 @@
-/**
- * @file This service subscribes to the gameEventBus and executes commands (side effects).
- * It acts as the bridge between decoupled game logic and the actual side effect implementations.
- */
 import { gameEventBus } from './gameEventBus';
 import { sideEffectService } from './sideEffectService';
 import { logService } from './logService';
+import { userActionService } from './userActionService';
 
 class CommandService {
   constructor() {
@@ -16,6 +13,9 @@ class CommandService {
     gameEventBus.subscribe('CloseModal', () => this.handleCloseModal());
     gameEventBus.subscribe('ShowModal', (payload) => this.handleShowModal(payload));
     gameEventBus.subscribe('SpeakMove', (payload) => this.handleSpeakMove(payload));
+    gameEventBus.subscribe('ReplayGame', () => this.handleReplayGame());
+    gameEventBus.subscribe('RequestReplay', () => this.handleRequestReplay());
+    gameEventBus.subscribe('BoardResizeConfirmed', (payload) => this.handleBoardResizeConfirmed(payload));
   }
 
   private handleGameOver(payload: any) {
@@ -47,6 +47,21 @@ class CommandService {
       type: 'speak',
       payload: payload
     });
+  }
+
+  private handleReplayGame() {
+    logService.logicMove('CommandService: Handling ReplayGame event');
+    userActionService.requestRestart();
+  }
+
+  private handleRequestReplay() {
+    logService.logicMove('CommandService: Handling RequestReplay event');
+    userActionService.requestReplay();
+  }
+
+  private handleBoardResizeConfirmed(payload: any) {
+    logService.logicMove('CommandService: Handling BoardResizeConfirmed event', payload);
+    userActionService.requestRestartWithSize(payload.newSize);
   }
 }
 

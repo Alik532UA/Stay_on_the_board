@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { startNewGame, makeFirstMove, GameMode } from './utils';
 
-test.describe('Модальне вікно підтвердження зміни розміру дошки', () => {
+test.describe('Модальне вікно підтвердження зміни розміру дошки', { tag: '@BRM' }, () => {
   test.beforeEach(async ({ page }) => {
     await startNewGame(page);
   });
@@ -38,6 +38,40 @@ test.describe('Модальне вікно підтвердження зміни
       await page.getByTestId('increase-board-size-btn').click();
       await expect(page.getByTestId('board-resize-confirm-modal')).toBeVisible();
       await expect(page.getByTestId('board-resize-confirm-modal-title')).toHaveAttribute('data-i18n-key', 'modal.resetScoreTitle');
+    });
+  });
+
+  test('4. Кнопки "Так" та "Ні" працюють коректно і розмір дошки змінюється', { tag: ['@BRM-4'] }, async ({ page }) => {
+    let initialCellCount: number;
+    let initialScore: string | null;
+
+    await test.step('Етап 1: Робимо хід, щоб рахунок не був 0', async () => {
+      await makeFirstMove(page);
+      initialCellCount = await page.getByTestId('board-cell').count();
+      initialScore = await page.getByTestId('score-value').textContent();
+    });
+
+    await test.step('Етап 2: Натискаємо "Ні" і перевіряємо, що вікно закрилося, а дані не змінилися', async () => {
+      await page.getByTestId('increase-board-size-btn').click();
+      await expect(page.getByTestId('board-resize-confirm-modal')).toBeVisible();
+      await page.getByTestId('board-resize-cancel-btn').click();
+      await expect(page.getByTestId('board-resize-confirm-modal')).not.toBeVisible();
+
+      const currentCellCount = await page.getByTestId('board-cell').count();
+      const currentScore = await page.getByTestId('score-value').textContent();
+
+      expect(currentCellCount).toBe(initialCellCount);
+      expect(currentScore).toBe(initialScore);
+    });
+
+    await test.step('Етап 3: Натискаємо "Так" і перевіряємо, що розмір дошки змінився', async () => {
+      await page.getByTestId('increase-board-size-btn').click();
+      await expect(page.getByTestId('board-resize-confirm-modal')).toBeVisible();
+      await page.getByTestId('board-resize-confirm-btn').click();
+      await expect(page.getByTestId('board-resize-confirm-modal')).not.toBeVisible();
+      
+      const finalCellCount = await page.getByTestId('board-cell').count();
+      expect(finalCellCount).toBeGreaterThan(initialCellCount);
     });
   });
 });
