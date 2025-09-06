@@ -13,7 +13,8 @@ export default {
     'right': 'rechts',
     'up-left': 'diagonaal omhoog-links',
     'up-right': 'diagonaal omhoog-rechts',
-    'down-left': 'diagonaal omlaag-links',
-    'down-right': 'diagonaal omlaag-rechts'
-  }
+    'down-left': 'diagonaal naar linksonder',
+    'down-right': 'diagonaal naar rechtsonder'
+  },
+  testPhrase: "Blij je te zien in het spel"
 };

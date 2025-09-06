@@ -15,5 +15,6 @@ export default {
     'up-right': 'diagonally up-right',
     'down-left': 'diagonally down-left',
     'down-right': 'diagonally down-right'
-  }
+  },
+  testPhrase: "Glad to see you in the game"
 };

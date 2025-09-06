@@ -81,7 +81,6 @@
   .modal-body {
     padding: 24px;
     max-height: 60vh;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
   }
@@ -89,6 +88,9 @@
   .voice-settings-container,
   .voice-list-container {
     min-width: 300px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
   }
 
   .divider-h {

@@ -13,7 +13,8 @@ export default {
     'right': 'sağğa',
     'up-left': 'diagonal yuqarı-solğa',
     'up-right': 'diagonal yuqarı-sağğa',
-    'down-left': 'diagonal aşağı-solğa',
-    'down-right': 'diagonal aşağı-sağğa'
-  }
+    'down-left': 'diagonal boyunca töben-solğa',
+    'down-right': 'diagonal boyunca töben-oñğa'
+  },
+  testPhrase: "Oyunda sizni körgenge şadmız"
 };
