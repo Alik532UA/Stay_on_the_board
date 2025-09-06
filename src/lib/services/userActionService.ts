@@ -104,7 +104,11 @@ export const userActionService = {
 
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
-    const activeMode = get(gameModeStore).activeMode;
+    // IMPORTANT: DO NOT CHANGE THIS TO use gameModeStore.
+    // This is the single source of truth for the selected game mode preset.
+    // It ensures that when a user selects a new mode, we initialize the correct one,
+    // not the one that is currently active.
+    const activeMode = get(gameSettingsStore).gameMode;
     if (activeMode) {
       gameModeService.initializeGameMode(activeMode);
     } else {

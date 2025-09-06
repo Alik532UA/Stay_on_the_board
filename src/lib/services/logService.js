@@ -18,6 +18,7 @@ const LOG_GROUPS = {
   ACTION: 'action',     // Для дій користувача (кліки, хоткеї)
   GAME_MODE: 'game_mode', // Для логіки ігрових режимів
   SPEECH: 'speech',      // Для логів, пов'язаних з озвученням
+  VOICE_CONTROL: 'voice_control', // Для логів, пов'язаних з голосовим керуванням
   TEST_MODE: 'test_mode', // Для логів, пов'язаних з тестовим режимом
   MODAL: 'modal',       // Для логіки модальних вікон
   ERROR: 'error'        // Для логів помилок
@@ -27,18 +28,19 @@ const LOG_GROUPS = {
 const defaultConfig = {
           [LOG_GROUPS.STATE]: false,
           [LOG_GROUPS.PIECE]: false,
-          [LOG_GROUPS.LOGIC_MOVE]: false,
+          [LOG_GROUPS.LOGIC_MOVE]: true,
           [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: false,
           [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
           [LOG_GROUPS.LOGIC_TIME]: false,
           [LOG_GROUPS.SCORE]: false,
-          [LOG_GROUPS.UI]: true, 
+          [LOG_GROUPS.UI]: false, 
           [LOG_GROUPS.TOOLTIP]: false,
           [LOG_GROUPS.ANIMATION]: false,
           [LOG_GROUPS.INIT]: false,
           [LOG_GROUPS.ACTION]: false,
-          [LOG_GROUPS.GAME_MODE]: false,
-          [LOG_GROUPS.SPEECH]: true,
+          [LOG_GROUPS.GAME_MODE]: true,
+          [LOG_GROUPS.SPEECH]: false,
+          [LOG_GROUPS.VOICE_CONTROL]: true,
           [LOG_GROUPS.TEST_MODE]: false,
           [LOG_GROUPS.MODAL]: false,
           [LOG_GROUPS.ERROR]: true, // Errors should always be logged
@@ -92,6 +94,7 @@ const styles = {
   [LOG_GROUPS.GAME_MODE]: 'color: #FF5722; font-weight: bold;', // Deep Orange
   [LOG_GROUPS.ACTION]: 'color: #FFEB3B; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;', // Yellow on dark
   [LOG_GROUPS.SPEECH]: 'color: #8E44AD; font-weight: bold;', // Purple
+  [LOG_GROUPS.VOICE_CONTROL]: 'color: #00E676; font-weight: bold;', // Green A400
   [LOG_GROUPS.TEST_MODE]: 'color: #FBC02D; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;', // Yellow on dark
   [LOG_GROUPS.MODAL]: 'color: #673AB7; font-weight: bold;', // Deep Purple
   [LOG_GROUPS.ERROR]: 'color: #F44336; font-weight: bold;', // Red
@@ -130,6 +133,7 @@ export const logService = {
   action: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.ACTION, message, ...data),
   GAME_MODE: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.GAME_MODE, message, ...data),
   speech: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.SPEECH, message, ...data),
+  voiceControl: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.VOICE_CONTROL, message, ...data),
   testMode: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.TEST_MODE, message, ...data),
   modal: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.MODAL, message, ...data),
   error: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.ERROR, message, ...data),

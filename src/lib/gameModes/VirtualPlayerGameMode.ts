@@ -21,13 +21,11 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
 
   constructor() {
     super();
-    this.gameDuration = 100;
   }
 
   initialize(options: { newSize?: number } = {}): void {
     timeService.stopGameTimer();
     super.initialize(options);
-    timerStore.setRemainingTime(this.gameDuration);
     gameSettingsStore.updateSettings({
       speechRate: 1.6,
       shortSpeech: true,
@@ -46,23 +44,7 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
     return 'virtual-player';
   }
 
-  async handlePlayerMove(direction: any, distance: any): Promise<void> {
-    const state = get(uiStateStore);
-    if (state?.isFirstMove) {
-      this.startGameTimer();
-    } else {
-      this.resumeTimers();
-    }
-    await super.handlePlayerMove(direction, distance);
-  }
-
-  protected startGameTimer(): void {
-    if (this.gameDuration > 0) {
-      timeService.startGameTimer(this.gameDuration, () => {
-        endGameService.endGame('modal.gameOverReasonTimeUp');
-      });
-    }
-  }
+  
 
   protected async advanceToNextPlayer(): Promise<void> {
     logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');

@@ -66,6 +66,8 @@ export const gameService = {
       selectedDirection: null,
       selectedDistance: null,
       isFirstMove: true,
+      isListening: false,
+      voiceMoveRequested: false,
       showBoardHiddenInfo: false,
       intendedGameType: null, // Додано для відповідності UiState
       settingsMode: 'default', // Додано для відповідності UiState

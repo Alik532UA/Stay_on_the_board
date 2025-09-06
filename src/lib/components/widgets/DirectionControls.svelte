@@ -24,6 +24,9 @@
   export let centerInfoProps: any = {};
   export let isConfirmDisabled: boolean = false;
   
+  import { uiStateStore } from '$lib/stores/uiStateStore.js';
+  import { voiceControlService } from '$lib/services/voiceControlService.js';
+
   const dispatch = createEventDispatcher();
 
   
@@ -80,8 +83,13 @@
     dispatch('confirm');
   }
   function handleNoMoves() {
-    logService.action('Click: "Ходів немає" (DirectionControls)');
+    logService.action(`Click: "Ходів немає" (DirectionControls)`);
     dispatch('noMoves');
+  }
+
+  function handleVoiceCommand() {
+    logService.action(`Click: "Голосова команда" (DirectionControls)`);
+    voiceControlService.toggleListening();
   }
 </script>
 
@@ -130,6 +138,10 @@
         {$_('gameControls.noMovesTitle')}
       </button>
     {/if}
+    <button class="voice-btn" on:click={handleVoiceCommand} use:customTooltip={$_('gameControls.voiceCommandTitle')} data-testid="voice-command-btn" class:active={$uiStateStore.isListening}>
+        <SvgIcons name="microphone" />
+        {$_('gameControls.voiceCommand')}
+    </button>
   </div>
 </div>
 
@@ -253,7 +265,7 @@
   align-items: center;
   margin-top: 18px;
 }
-.confirm-btn, .no-moves-btn {
+.confirm-btn, .no-moves-btn, .voice-btn {
   background: #43a047cc;
   color: #fff;
   border: none;
@@ -284,5 +296,17 @@
 .no-moves-btn:hover {
   background: #f57c00;
   transform: scale(1.02);
+}
+.voice-btn {
+    background: #00bcd4;
+    color: #fff;
+}
+.voice-btn:hover {
+    background: #0097a7;
+    transform: scale(1.02);
+}
+.voice-btn.active {
+    background: #ffeb3b;
+    color: #000;
 }
 </style>
