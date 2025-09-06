@@ -38,7 +38,7 @@ export default {
     keepAppearance: "Cache wissen, behalve thema en taal"
   },
   gameModeModal: {
-    title: "Spelmoduskeuze"
+    title: "Selecteer spelmoeilijkheid"
   },
   dragAndDropTest: "Drag & Drop Test",
   loadingTranslations: "Vertalingen laden..."

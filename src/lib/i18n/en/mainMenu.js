@@ -38,7 +38,7 @@ export default {
     keepAppearance: "Clear cache, except theme and language"
   },
   gameModeModal: {
-    title: "Select game mode"
+    title: "Select game difficulty"
   },
   dragAndDropTest: "Drag & Drop Test",
   loadingTranslations: "Loading translations..."

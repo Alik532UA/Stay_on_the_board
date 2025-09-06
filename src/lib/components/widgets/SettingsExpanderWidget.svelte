@@ -20,10 +20,12 @@
   import { customTooltip } from '$lib/actions/customTooltip.js';
   import { gameModeService } from '$lib/services/gameModeService';
   import { boardStore } from '$lib/stores/boardStore';
+  import { layoutUpdateStore } from '$lib/stores/layoutUpdateStore.js';
+  import { dev } from '$app/environment';
 
   let expanderRef: HTMLDetailsElement;
   let summaryRef: HTMLElement;
-  let isOpen = true;
+  let isOpen = dev;
   let contentRef: HTMLDivElement;
   let contentHeight = 0;
   async function toggleExpander() {
@@ -32,6 +34,7 @@
       return;
     }
     isOpen = !isOpen;
+    setTimeout(() => layoutUpdateStore.update(n => n + 1), 500);
   }
   let isHorizontalLayout = true;
 
@@ -74,9 +77,16 @@
     };
   }
 
+  
+
   onMount(() => {
     updateLayoutMode();
     window.addEventListener('resize', updateLayoutMode);
+
+    if (isOpen) {
+        setTimeout(() => layoutUpdateStore.update(n => n + 1), 500);
+    }
+
     return () => {
       window.removeEventListener('resize', updateLayoutMode);
     };
@@ -207,14 +217,7 @@
     <span class="settings-expander__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
   </div>
   <div class="settings-expander__content" bind:this={contentRef} style="max-height: {contentHeight}px; opacity: {isOpen ? 1 : 0};">
-    {#if !isCompetitiveMode}
-    <div class="settings-expander__game-mode-row" use:fitTextAction={$_('gameModes.beginner')}>
-      <button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'beginner'} on:click={() => userActionService.setGameModePreset('beginner')}>{$_('gameModes.beginner')}</button>
-      <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'experienced'} on:click={() => userActionService.setGameModePreset('experienced')}>{$_('gameModes.experienced')}</button>
-      <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'pro'} on:click={() => userActionService.setGameModePreset('pro')}>{$_('gameModes.pro')}</button>
-    </div>
-    <hr class="settings-expander__divider" />
-    {/if}
+    
     <div class="settings-expander__setting-item">
       <span class="settings-expander__label">{$_('settings.boardSize')}</span>
       <div class="settings-expander__size-adjuster">
@@ -509,12 +512,7 @@
     padding: 0 0 0 12px;
     gap: 12px;
   }
-  .settings-expander__game-mode-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 8px;
-  }
+  
   .settings-expander__row-btn {
     background: var(--control-bg);
     color: var(--text-primary);

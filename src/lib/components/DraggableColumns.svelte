@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
   import { slide } from 'svelte/transition';
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
-  import { onMount } from 'svelte';
   import { _ } from 'svelte-i18n';
+  import { layoutUpdateStore } from '$lib/stores/layoutUpdateStore.js';
 
   export let columns: { id: string, label: string, items: { id: string, label: string, props?: any }[] }[];
   export let itemContent: (item: any) => any = item => item.label;
@@ -21,15 +21,32 @@
   let dropIndex: number | null = null;
   let colRefs: HTMLUListElement[] = [];
   let isHorizontalLayout = true;
+  let containerRef: HTMLDivElement;
+  let marginTop = '0';
 
   function updateLayoutMode() {
     isHorizontalLayout = window.innerWidth > 1270;
+    tick().then(() => {
+      if (isHorizontalLayout && containerRef) {
+        const contentHeight = containerRef.offsetHeight;
+        const windowHeight = window.innerHeight;
+        if (contentHeight < windowHeight) {
+          marginTop = `${(windowHeight - contentHeight) / 2}px`;
+        } else {
+          marginTop = '2vh';
+        }
+      } else {
+        marginTop = '0';
+      }
+    });
   }
+
   onMount(() => {
-    updateLayoutMode();
     window.addEventListener('resize', updateLayoutMode);
     return () => window.removeEventListener('resize', updateLayoutMode);
   });
+
+  $: $layoutUpdateStore, updateLayoutMode();
 
   function handlePointerDown(e: PointerEvent, item: { id: string, label: string }, colId: string) {
     dragging = item;
@@ -174,7 +191,7 @@
   }
 </style>
 
-<div class="dnd-columns-container {class_name}" style="margin-top: {isHorizontalLayout ? '7vh' : '0'};" data-testid="game-widgets-container">
+<div bind:this={containerRef} class="dnd-columns-container {class_name}" style="margin-top: {marginTop};" data-testid="game-widgets-container">
   {#each columns as col, i}
     <ul
       bind:this={colRefs[i]}
