@@ -41,6 +41,6 @@ export default {
   gameModeModal: {
     title: "Вибір режиму гри"
   },
-  dragAndDropTest: "Тест перетягування",
+  dragAndDropTest: "test",
   loadingTranslations: "Завантаження перекладу..."
 }; 

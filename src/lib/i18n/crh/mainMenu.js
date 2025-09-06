@@ -41,6 +41,6 @@ export default {
   gameModeModal: {
     title: "Oyun rejimini seçiñiz"
   },
-  dragAndDropTest: "Süyrep Taşuv Testi",
+  dragAndDropTest: "test",
   loadingTranslations: "Tercimeler yükleniyor..."
 };

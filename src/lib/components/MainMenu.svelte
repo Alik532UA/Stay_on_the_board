@@ -97,7 +97,7 @@
   }
   function handleDevMenuBtn() {
     logService.action('Click: "Drag and Drop Test" (MainMenu)');
-    navigateTo('/drag-and-drop-test');
+    navigateTo('/test');
     showDevMenu = false;
   }
   function handlePlayVirtualPlayer() {
@@ -218,12 +218,19 @@
     {/if}
 
     {#if showDevMenu}
-      <div class="dev-menu" role="dialog" tabindex="0" onclick={(e) => { e.stopPropagation(); }} onkeydown={(e) => (e.key === 'Escape') && (showDevMenu = false)}>
+      <div class="dev-menu" data-testid="dev-menu" role="dialog" tabindex="0" onclick={(e) => { e.stopPropagation(); }} onkeydown={(e) => (e.key === 'Escape') && (showDevMenu = false)}>
         <h3>dev</h3>
         <button class="modal-button secondary" onclick={handleDevMenuBtn} data-testid="dev-menu-dnd-btn">
           {$_('mainMenu.dragAndDropTest')}
         </button>
-        <!-- Сюди можна додавати нові dev-кнопки -->
+        <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="training-btn">{$_('mainMenu.training')}</button>
+        <button class="modal-button secondary" onclick={() => { uiStateStore.update(s => ({ ...s, intendedGameType: 'timed' })); navigateTo('/game/timed'); }} data-testid="timed-game-btn">{$_('mainMenu.timedGame')}</button>
+        <button
+          class="modal-button secondary"
+          class:pseudo-disabled={!import.meta.env.DEV}
+          onclick={import.meta.env.DEV ? handleLocalGame : openWipNotice}
+          data-testid="local-game-btn">{$_('mainMenu.localGame')}</button>
+        <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice} data-testid="online-game-btn">{$_('mainMenu.playOnline')}</button>
       </div>
     {/if}
 
@@ -292,15 +299,7 @@
       </div>
     {/if}
     <div id="main-menu-buttons" bind:this={mainMenuButtonsNode}>
-      <button class="modal-button secondary" onclick={handlePlayVirtualPlayer} data-testid="virtual-player-btn">{$_('mainMenu.virtualPlayer')}</button>
-      <button class="modal-button secondary" onclick={handlePlayVsComputer} data-testid="training-btn">{$_('mainMenu.training')}</button>
-      <button class="modal-button secondary" onclick={() => { uiStateStore.update(s => ({ ...s, intendedGameType: 'timed' })); navigateTo('/game/timed'); }} data-testid="timed-game-btn">{$_('mainMenu.timedGame')}</button>
-      <button
-        class="modal-button secondary"
-        class:pseudo-disabled={!import.meta.env.DEV}
-        onclick={import.meta.env.DEV ? handleLocalGame : openWipNotice}
-        data-testid="local-game-btn">{$_('mainMenu.localGame')}</button>
-      <button class="modal-button secondary pseudo-disabled" onclick={openWipNotice} data-testid="online-game-btn">{$_('mainMenu.playOnline')}</button>
+      <button class="modal-button secondary play-button ripple" style="padding: 32px;" onclick={handlePlayVirtualPlayer} data-testid="virtual-player-btn">{$_('mainMenu.virtualPlayer')}</button>
       <button class="modal-button secondary" onclick={() => navigateTo('/settings')} data-testid="settings-btn">{$_('mainMenu.settings')}</button>
       <button class="modal-button secondary" onclick={handleControls} data-testid="controls-btn">{$_('mainMenu.controls')}</button>
       <button class="modal-button secondary" onclick={handleRules} data-testid="rules-btn">{$_('mainMenu.rules')}</button>
@@ -311,6 +310,39 @@
 </main>
 
 <style>
+  @keyframes ripple {
+    from {
+      width: 0;
+      height: 0;
+      opacity: 1;
+    }
+    to {
+      width: 300px;
+      height: 300px;
+      opacity: 0;
+    }
+  }
+
+  #main-menu-buttons .play-button {
+    margin-bottom: 24px;
+    position: relative; /* Needed for the pseudo-element */
+    overflow: hidden;   /* Clips the ripple effect */
+  }
+
+  #main-menu-buttons .play-button.ripple::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation: ripple 7s infinite linear;
+    background-color: rgba(255, 255, 255, 0.11);
+    filter: blur(33px);
+  }
   .wip-close-btn {
     width: 32px;
     height: 32px;

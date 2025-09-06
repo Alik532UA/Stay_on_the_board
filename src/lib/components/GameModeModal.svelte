@@ -12,6 +12,18 @@
   import { uiStateStore } from '$lib/stores/uiStateStore';
   import type { GameModePreset } from '$lib/stores/gameSettingsStore';
 
+  let showWipNotice = false; // Add this line
+
+  function openWipNotice() {
+    logService.action('Click: "Play Online (WIP)" (GameModeModal)');
+    showWipNotice = true;
+  }
+
+  function closeWipNotice() {
+    logService.action('Click: "Закрити WIP notice" (GameModeModal)');
+    showWipNotice = false;
+  }
+
   export let scope: string;
   export let extended = false;
   let buttonsNode: HTMLElement;
@@ -89,28 +101,41 @@
 </script>
 
 <div class="game-mode-buttons" bind:this={buttonsNode}>
-  <button class="modal-btn-generic green-btn" on:click={() => selectMode('beginner')} data-testid="beginner-mode-btn">
+  <button class="modal-btn-generic green-btn" onclick={() => selectMode('beginner')} data-testid="beginner-mode-btn">
     {$_('gameModes.beginner')}
   </button>
-  <button class="modal-btn-generic blue-btn" on:click={() => selectMode('experienced')} data-testid="experienced-mode-btn">
+  <button class="modal-btn-generic blue-btn" onclick={() => selectMode('experienced')} data-testid="experienced-mode-btn">
     {$_('gameModes.experienced')}
   </button>
-  <button class="modal-btn-generic danger-btn" on:click={() => selectMode('pro')} data-testid="pro-mode-btn">
+  <button class="modal-btn-generic danger-btn" onclick={() => selectMode('pro')} data-testid="pro-mode-btn">
     {$_('gameModes.pro')}
   </button>
   {#if extended}
     <hr class="divider" />
-    <button class="modal-btn-generic" on:click={() => selectMode('timed')} data-testid="timed-game-btn">
+    <button class="modal-btn-generic" onclick={() => selectMode('timed')} data-testid="timed-game-btn">
       {$_('mainMenu.timedGame')}
     </button>
-    <button class="modal-btn-generic" on:click={() => { uiStateStore.update(s => ({ ...s, intendedGameType: 'local' })); goto(`${base}/local-setup`); modalStore.closeModal(); }} data-testid="local-game-btn">
+    <button class="modal-btn-generic" class:locked-setting={true} onclick={openWipNotice} data-testid="local-game-btn">
       {$_('mainMenu.localGame')}
     </button>
-    <button class="modal-btn-generic" disabled data-testid="online-game-btn">
+    <button class="modal-btn-generic" class:locked-setting={true} onclick={openWipNotice} data-testid="online-game-btn">
       {$_('mainMenu.playOnline')}
     </button>
   {/if}
 </div>
+
+{#if showWipNotice}
+  <div class="wip-notice-overlay" role="dialog" tabindex="0" onclick={(e) => { e.stopPropagation(); }} onkeydown={(e) => (e.key === 'Escape') && closeWipNotice()}>
+    <div class="wip-notice-content">
+      <button class="wip-close-btn" onclick={closeWipNotice} data-testid="wip-notice-close-btn">×</button>
+      <h3>{$_('mainMenu.wipNotice.title')}</h3>
+      <p>{$_('mainMenu.wipNotice.description')}</p>
+      <button class="wip-donate-btn" onclick={() => { /* handleDonate logic here if needed */ closeWipNotice(); }} data-testid="wip-notice-donate-btn">
+        {$_('mainMenu.donate')}
+      </button>
+    </div>
+  </div>
+{/if}
 
 {#if !extended}
   <DontShowAgainCheckbox tid="game-mode-modal-dont-show-again-switch" {scope} />
@@ -127,5 +152,70 @@
     border: none;
     border-top: 1px solid var(--border-color);
     margin: 0;
+  }
+
+  .wip-notice-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000; /* Ensure it's above other modals */
+    width: 90vw;
+    max-width: 400px;
+  }
+  .wip-notice-content {
+    position: relative;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 28px 32px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .wip-notice-content h3 {
+    font-size: 1.4em;
+    margin: 0 0 12px 0;
+    color: var(--text-accent);
+  }
+  .wip-notice-content p {
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+    font-size: 1.05em;
+  }
+  .wip-donate-btn {
+    background: var(--warning-action-bg);
+    color: var(--warning-action-text);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 32px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: all 0.2s ease;
+  }
+  .wip-donate-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px var(--warning-action-bg);
+  }
+  .wip-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 2em;
+    color: var(--text-primary);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .wip-close-btn:hover {
+    opacity: 1;
+  }
+
+  .locked-setting {
+    opacity: 0.2;
+    cursor: help;
   }
 </style>
