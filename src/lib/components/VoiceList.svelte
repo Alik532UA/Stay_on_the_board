@@ -65,9 +65,9 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    max-height: 30vh;
     overflow-y: auto;
     padding-right: 10px;
+    min-height: 0;
   }
   .voice-option {
     display: flex;

@@ -11,7 +11,7 @@
   import { logService } from '$lib/services/logService.js';
   import { clearCache } from '$lib/utils/cacheManager.js';
   import { gameModeService } from '$lib/services/gameModeService';
-  import { userActionService } from '$lib/services/userActionService';
+  import { userActionService } from '$lib/services/userActionService.js';
   import VoiceSettings from './VoiceSettings.svelte';
   import VoiceList from './VoiceList.svelte';
 
@@ -49,7 +49,7 @@
 
 <div class="setup-grid">
   <div class="grid-column" data-testid="settings-column-appearance">
-    <div class="settings-card">
+    <div class="settings-card" data-testid="settings-card-appearance">
       <div class="settings-group" data-testid="settings-page-language-group">
         <span class="settings-label" data-testid="settings-page-language-label">{$_('settings.language')}</span>
         <div class="language-selector" data-testid="settings-page-language-selector">
@@ -96,7 +96,7 @@
     </div>
   </div>
   <div class="grid-column" data-testid="settings-column-game">
-    <div class="settings-card">
+    <div class="settings-card" data-testid="settings-card-game">
       <div class="settings-section" data-testid="settings-page-game-mode-section">
         <span class="settings-label" data-testid="settings-page-game-mode-label">{$_('settings.gameMode')}</span>
         <div class="settings-button-group" data-testid="settings-page-game-mode-group">
@@ -167,12 +167,17 @@
     </div>
   </div>
   <div class="grid-column" data-testid="settings-column-voice">
-    <div class="settings-card">
+    <div class="settings-card" data-testid="settings-card-voice">
       <span class="settings-label">{$_('settings.voiceSettings')}</span>
-      <hr class="settings-divider" />
       <VoiceSettings />
-      <hr class="settings-divider" />
-      <VoiceList />
+    </div>
+  </div>
+  <div class="grid-column" data-testid="settings-column-voice-list">
+    <div class="settings-card" data-testid="settings-card-voice-list">
+      <span class="settings-label">{$_('settings.voiceList')}</span>
+      <div class="voice-list-wrapper">
+        <VoiceList />
+      </div>
     </div>
   </div>
 </div>
@@ -180,9 +185,20 @@
 <style>
   .setup-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
     gap: 24px;
-    align-items: start;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 768px) {
+    .setup-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1600px) {
+    .setup-grid {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
   }
 
   .grid-column {
@@ -201,19 +217,9 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    flex-grow: 1;
   }
 
-  @media (max-width: 1200px) {
-    .setup-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  @media (max-width: 800px) {
-    .setup-grid {
-      grid-template-columns: 1fr;
-    }
-  }
   .settings-group {
     display: flex;
     align-items: center;
@@ -234,7 +240,6 @@
     gap: 12px;
   }
   .settings-actions {
-    margin-top: 16px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -244,7 +249,7 @@
     color: #fff;
   }
   .settings-reset-button.danger:hover {
-    background: #a40e26; /* Темніший відтінок червоного для hover */
+    background: #a40e26;
   }
   .settings-reset-button {
     background: var(--control-bg);
@@ -311,21 +316,14 @@
   }
   .settings-button-group {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 8px;
     width: 100%;
   }
 
   .game-mode-buttons {
     display: flex;
-    flex: 1;
     gap: 8px;
-  }
-
-  @media (max-width: 480px) {
-    .settings-button-group {
-      flex-direction: column;
-    }
   }
 
   .settings-group-button {
@@ -348,5 +346,13 @@
     background: var(--control-selected);
     color: var(--button-text-color, #fff);
     border-color: var(--control-selected);
+  }
+
+  .voice-list-wrapper {
+    flex-grow: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
   }
 </style>

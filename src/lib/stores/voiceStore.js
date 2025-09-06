@@ -2,6 +2,7 @@ import { writable, get } from 'svelte/store';
 import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService.js';
 import { locale } from 'svelte-i18n';
 import { logService } from '$lib/services/logService.js';
+import { gameSettingsStore } from './gameSettingsStore.ts';
 
 export const availableVoices = writable([]);
 export const isLoading = writable(true);
@@ -24,5 +25,14 @@ export async function initializeVoices() {
         logService.ui("Помилка завантаження голосів:", error);
         availableVoices.set([]);
     }
+
+    const settings = get(gameSettingsStore);
+    const voices = get(availableVoices);
+
+    if (!settings.selectedVoiceURI && voices.length > 0) {
+        gameSettingsStore.updateSettings({ selectedVoiceURI: voices[0].voiceURI });
+        logService.ui(`Default voice automatically selected: ${voices[0].name}`);
+    }
+
     isLoading.set(false);
 }

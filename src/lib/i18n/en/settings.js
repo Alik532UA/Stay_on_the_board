@@ -38,5 +38,6 @@ export default {
     shown: "show",
     compact: "abbreviated"
   },
-  voiceSettings: "Voice Settings"
+  voiceSettings: "Voice Settings",
+  voiceList: "Available Voices"
 };

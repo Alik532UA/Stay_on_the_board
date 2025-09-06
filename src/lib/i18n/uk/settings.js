@@ -38,5 +38,6 @@ export default {
     shown: "показати",
     compact: "скорочено"
   },
-  voiceSettings: "Налаштування озвучки"
+  voiceSettings: "Налаштування голосу",
+  voiceList: "Доступні голоси"
 };
