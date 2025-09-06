@@ -27,5 +27,7 @@ export default {
   shortSpeech: 'Short speech',
   speakFor: 'Speak for',
   player: 'Player move',
-  computer: 'Computer move'
-}; 
+  computer: 'Computer move',
+  testVoice: "Test Voice",
+  testPhrase: "Glad to see you in the game"
+};

@@ -6224,16 +6224,58 @@ data-testid="game-widgets-container"
 створи скріпт який прод версію (чи краще її назвати preview ?)
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 data-testid="voice-settings-modal"
+---
 data-testid="voice-settings-close-footer-btn"
 текст кнопки:
 Актуальний результат: "Закрити"
 Очікуваний результат: "Зберегти"
-
-Актуальний результат: є data-testid="voice-settings-close-header-btn"
-Очікуваний результат: немає data-testid="voice-settings-close-header-btn"
-
+---
+data-testid="voice-settings-close-header-btn"
+Актуальний результат: є 
+Очікуваний результат: немає
+---
+1.
 <div class="button-group s-7FFAMHOBqq-b"><button data-testid="speech-for-player-btn" class="s-7FFAMHOBqq-b">Хід гравця</button> <button data-testid="speech-for-computer-btn" class="s-7FFAMHOBqq-b active">Хід комп'ютера</button></div>
+2.
+<div class="button-group s-7FFAMHOBqq-b"><button data-testid="speech-rate-1-btn" class="s-7FFAMHOBqq-b">x1</button> <button data-testid="speech-rate-1.2-btn" class="s-7FFAMHOBqq-b">x1.2</button> <button data-testid="speech-rate-1.4-btn" class="s-7FFAMHOBqq-b active">x1.4</button> <button data-testid="speech-rate-1.6-btn" class="s-7FFAMHOBqq-b">x1.6</button> <button data-testid="speech-rate-1.8-btn" class="s-7FFAMHOBqq-b">x1.8</button> <button data-testid="speech-rate-2-btn" class="s-7FFAMHOBqq-b">x2</button></div>
+3. 
+<div class="button-group s-7FFAMHOBqq-b"><button data-testid="speech-order-dist-dir-btn" class="s-7FFAMHOBqq-b active">Відстань, напрямок</button> <button data-testid="speech-order-dir-dist-btn" class="s-7FFAMHOBqq-b">Напрямок, відстань</button></div>
 
+Актуальний результат: НЕ на всю ширину модального вікна
+Очікуваний результат: на всю ширину модального вікна
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+ті налаштування які у нас є в data-testid="voice-settings-modal"
+Треба це продублювати в Stay_on_the_board/settings
+Актуальний результат: дві колонки class="grid-column s-Twm6pjhj-ond"
+Очікуваний результат: три колонки class="grid-column s-Twm6pjhj-ond"
+треття колонка для "налаштування озвучки"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+налаштування озучки в грі та в Stay_on_the_board/settings це одні і ті самі налаштування, треба перевірити, що ми не дублюємо логіку, 
+інтерфейс дублюється, а логіка та сама
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+додати кнопку тест голосу:
+"Текст голосу"
+при натисканні озвучіється фраза: "Раді бачити тебе в грі"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+class="grid-column s-Twm6pjhj-ond"
+треба кожній колонці додати унікальний data-testid
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+class="voice-list s-7FFAMHOBqq-b"
+1. треба додати унікальний data-testid
+2. треба додати четверту колонку  до data-testid="settings-column-voice"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="settings-column-appearance"
+data-testid="settings-column-game"
+data-testid="settings-column-voice"
+Актуальний результат: мають різну ширину
+Очікуваний результат: мають однакову ширину
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦

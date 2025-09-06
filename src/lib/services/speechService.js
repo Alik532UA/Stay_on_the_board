@@ -88,7 +88,7 @@ export function filterVoicesByLang(voiceList, langCode) {
 /**
  * Озвучує ігровий хід.
  * @param {{direction: import('../models/Piece').MoveDirectionType, distance: number}} move
- * @param {string} lang - Мова інтерфейсу (для вибору голосу)
+ * @param {string} lang
  * @param {string | null} voiceURI
  */
 export function speakMove(move, lang, voiceURI) {
@@ -176,4 +176,39 @@ export function speakText(textToSpeak, lang, voiceURI) {
   logService.speech(`[Speech] Queuing utterance "${textToSpeak}" with lang: ${utterance.lang}`);
   window.speechSynthesis.speak(utterance);
   logService.speech(`[Speech] Utterance queued. Current speaking state: ${window.speechSynthesis.speaking}.`);
+}
+
+/**
+ * Озвучує тестову фразу.
+ * @param {string} phrase
+ */
+export function speakTestPhrase(phrase) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window) || !phrase) return;
+
+  const settings = get(gameSettingsStore);
+  const allVoices = speechSynthesis.getVoices();
+  if (allVoices.length === 0) {
+    logService.ui('[Speech] speakTestPhrase called, but no voices are available.');
+    loadAndGetVoices();
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(phrase);
+  utterance.rate = settings.speechRate || 1.0;
+  utterance.pitch = 1.0;
+
+  let selectedVoice = null;
+  if (settings.selectedVoiceURI) {
+    selectedVoice = allVoices.find(v => v.voiceURI === settings.selectedVoiceURI);
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+      utterance.lang = selectedVoice.lang;
+      logService.speech(`[Speech] Found and set requested voice for test: ${selectedVoice.name}`);
+    } else {
+      logService.speech(`[Speech] Voice with URI "${settings.selectedVoiceURI}" not found for test. Using default.`);
+    }
+  }
+
+  logService.speech(`[Speech] Queuing test utterance "${phrase}" with lang: ${utterance.lang}`);
+  window.speechSynthesis.speak(utterance);
 }

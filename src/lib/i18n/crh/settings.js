@@ -37,5 +37,6 @@ export default {
     hidden: "saqlamaq",
     shown: "köstermek",
     compact: "qısqartılğan"
-  }
+  },
+  voiceSettings: "Ses sozlamaları"
 };
