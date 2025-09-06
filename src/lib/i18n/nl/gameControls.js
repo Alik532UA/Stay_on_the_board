@@ -11,5 +11,7 @@ export default {
   selectDistance: "Selecteer Afstand",
   confirm: "Bevestig",
   noMovesTitle: "Geen Zetten",
-  selectDirectionAndDistance: "Kies richting en afstand"
+  selectDirectionAndDistance: "Kies richting en afstand",
+  voiceCommand: "Stem",
+  voiceCommandTitle: "Spraakopdracht"
 }; 

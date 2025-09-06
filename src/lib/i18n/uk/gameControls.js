@@ -11,5 +11,7 @@ export default {
   selectDistance: "Оберіть відстань",
   confirm: "Підтвердити",
   noMovesTitle: "Ходів немає",
-  selectDirectionAndDistance: "Оберіть напрямок та відстань"
+  selectDirectionAndDistance: "Оберіть напрямок та відстань",
+  voiceCommand: "Голос",
+  voiceCommandTitle: "Голосова команда"
 }; 

@@ -17,6 +17,8 @@ export interface UiState {
   selectedDirection: MoveDirectionType | null;
   selectedDistance: number | null;
   isFirstMove: boolean;
+  isListening: boolean;
+  voiceMoveRequested: boolean;
   intendedGameType: 'training' | 'local' | 'timed' | 'virtual-player' | null; // НАВІЩО: Зберігаємо тип гри, який користувач мав намір розпочати.
   settingsMode: 'default' | 'competitive';
   // НАВІЩО: Додаємо поле для перевизначень з тестового режиму.
@@ -35,6 +37,8 @@ export const initialUIState: UiState = {
   selectedDirection: null,
   selectedDistance: null,
   isFirstMove: true,
+  isListening: false,
+  voiceMoveRequested: false,
   intendedGameType: null, // За замовчуванням немає наміру
   settingsMode: 'default',
 };
