@@ -26,13 +26,24 @@ export async function initializeVoices() {
         availableVoices.set([]);
     }
 
-    const settings = get(gameSettingsStore);
-    const voices = get(availableVoices);
-
-    if (!settings.selectedVoiceURI && voices.length > 0) {
-        gameSettingsStore.updateSettings({ selectedVoiceURI: voices[0].voiceURI });
-        logService.ui(`Default voice automatically selected: ${voices[0].name}`);
-    }
-
-    isLoading.set(false);
+        isLoading.set(false);
 }
+
+availableVoices.subscribe(voices => {
+    // Ensure we have a non-empty array to avoid errors
+    if (Array.isArray(voices) && voices.length > 0) {
+        const settings = get(gameSettingsStore);
+        // Only set the default if one isn't already set.
+        if (!settings.selectedVoiceURI) {
+            gameSettingsStore.updateSettings({ selectedVoiceURI: voices[0].voiceURI });
+            logService.ui(`Default voice reactively selected: ${voices[0].name}`);
+        }
+    }
+});
+
+locale.subscribe(newLocale => {
+  if (newLocale) {
+    logService.ui(`Locale changed to ${newLocale}, re-initializing voices.`);
+    initializeVoices();
+  }
+});

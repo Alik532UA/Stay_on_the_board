@@ -157,23 +157,27 @@ export function speakText(textToSpeak, lang, voiceURI) {
   const utterance = new SpeechSynthesisUtterance(textToSpeak);
   utterance.rate = settings.speechRate || 1.0;
   utterance.pitch = 1.0;
+  logService.speech(`[Speech] Applying speechRate in speakText: ${utterance.rate}`);
   
+  const voiceToUseURI = voiceURI || settings.selectedVoiceURI;
   let selectedVoice = null;
-  if (voiceURI) {
-    selectedVoice = allVoices.find(v => v.voiceURI === voiceURI);
+
+  if (voiceToUseURI) {
+    selectedVoice = allVoices.find(v => v.voiceURI === voiceToUseURI);
     if (selectedVoice) {
       utterance.voice = selectedVoice;
       utterance.lang = selectedVoice.lang;
       logService.speech(`[Speech] Found and set requested voice: ${selectedVoice.name}`);
     } else {
-      logService.speech(`[Speech] Voice with URI "${voiceURI}" not found. Using default for lang "${lang}".`);
+      logService.speech(`[Speech] Voice with URI "${voiceToUseURI}" not found. Using default for lang "${lang}".`);
       utterance.lang = lang;
     }
   } else {
     utterance.lang = lang;
   }
 
-  logService.speech(`[Speech] Queuing utterance "${textToSpeak}" with lang: ${utterance.lang}`);
+  logService.speech(`[Speech] Cancelling previous speech and queuing utterance "${textToSpeak}" with lang: ${utterance.lang}`);
+  window.speechSynthesis.cancel();
   window.speechSynthesis.speak(utterance);
   logService.speech(`[Speech] Utterance queued. Current speaking state: ${window.speechSynthesis.speaking}.`);
 }
@@ -182,8 +186,8 @@ export function speakText(textToSpeak, lang, voiceURI) {
  * Озвучує тестову фразу.
  * @param {string} phrase
  */
-export function speakTestPhrase(phrase) {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window) || !phrase) return;
+export function speakTestPhrase() {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
   const settings = get(gameSettingsStore);
   const allVoices = speechSynthesis.getVoices();
@@ -193,22 +197,43 @@ export function speakTestPhrase(phrase) {
     return;
   }
 
+  let voiceToUse = null;
+  if (settings.selectedVoiceURI) {
+    voiceToUse = allVoices.find(v => v.voiceURI === settings.selectedVoiceURI);
+  }
+
+  // Fallback to the first available voice if none is selected or found
+  if (!voiceToUse && allVoices.length > 0) {
+      voiceToUse = allVoices[0];
+  }
+  
+  if (!voiceToUse) {
+      logService.speech('[Speech] No voice available to determine language for test phrase.');
+      return;
+  }
+
+  const voiceLang = voiceToUse.lang; // e.g., 'en-US'
+  const langCode = voiceLang.split('-')[0]; // e.g., 'en'
+
+  const translations = langCode in speechTranslations
+    ? speechTranslations[langCode]
+    : speechTranslations['en']; // Fallback to English
+
+  const phrase = translations.testPhrase;
+  
+  if (!phrase) {
+      logService.error(`[Speech] No test phrase found for langCode: ${langCode}`);
+      return;
+  }
+
   const utterance = new SpeechSynthesisUtterance(phrase);
   utterance.rate = settings.speechRate || 1.0;
   utterance.pitch = 1.0;
+  utterance.voice = voiceToUse;
+  utterance.lang = voiceToUse.lang;
+  logService.speech(`[Speech] Applying speechRate in speakTestPhrase: ${utterance.rate}`);
 
-  let selectedVoice = null;
-  if (settings.selectedVoiceURI) {
-    selectedVoice = allVoices.find(v => v.voiceURI === settings.selectedVoiceURI);
-    if (selectedVoice) {
-      utterance.voice = selectedVoice;
-      utterance.lang = selectedVoice.lang;
-      logService.speech(`[Speech] Found and set requested voice for test: ${selectedVoice.name}`);
-    } else {
-      logService.speech(`[Speech] Voice with URI "${settings.selectedVoiceURI}" not found for test. Using default.`);
-    }
-  }
-
-  logService.speech(`[Speech] Queuing test utterance "${phrase}" with lang: ${utterance.lang}`);
+  logService.speech(`[Speech] Cancelling previous speech and queuing test utterance "${phrase}" with lang: ${utterance.lang}`);
+  window.speechSynthesis.cancel();
   window.speechSynthesis.speak(utterance);
 }
