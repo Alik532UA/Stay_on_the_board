@@ -18,6 +18,7 @@ export class TimedGameMode extends TrainingGameMode {
   }
 
   initialize(options: { newSize?: number } = {}): void {
+    timeService.stopGameTimer();
     super.initialize(options);
     timerStore.setRemainingTime(this.gameDuration);
     gameSettingsStore.updateSettings({
