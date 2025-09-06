@@ -2,6 +2,7 @@ export default {
   title: "Tahtada qalmaq",
   menu: "Menü",
   training: "İdman",
+  virtualPlayer: "Oyna",
   timedGame: "Vaqıtqa qarşı oyun",
   localGame: "Mahalliy oyun",
   playOnline: "Onlayn oyna",
@@ -38,7 +39,7 @@ export default {
     keepAppearance: "Keşni temizle, tema ve tilden ğayrı"
   },
   gameModeModal: {
-    title: "Oyun zorluq seviyesini seçiñiz"
+    title: "Oyun rejimini seçiñiz"
   },
   dragAndDropTest: "Süyrep Taşuv Testi",
   loadingTranslations: "Tercimeler yükleniyor..."
