@@ -6223,6 +6223,17 @@ data-testid="game-widgets-container"
 у мене є скріпт який запускає dev версію - @scripts/dev.ps1
 створи скріпт який прод версію (чи краще її назвати preview ?)
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="voice-settings-modal"
+data-testid="voice-settings-close-footer-btn"
+текст кнопки:
+Актуальний результат: "Закрити"
+Очікуваний результат: "Зберегти"
+
+Актуальний результат: є data-testid="voice-settings-close-header-btn"
+Очікуваний результат: немає data-testid="voice-settings-close-header-btn"
+
+<div class="button-group s-7FFAMHOBqq-b"><button data-testid="speech-for-player-btn" class="s-7FFAMHOBqq-b">Хід гравця</button> <button data-testid="speech-for-computer-btn" class="s-7FFAMHOBqq-b active">Хід комп'ютера</button></div>
+
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
