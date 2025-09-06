@@ -24,6 +24,9 @@
       }
   });
 
+  /**
+   * @param {string} uri
+   */
   function selectVoice(uri) {
     gameSettingsStore.updateSettings({ selectedVoiceURI: uri });
     speakTestPhrase();
@@ -39,8 +42,10 @@
     <div class="voice-list button-group" data-testid="voice-list">
         {#each $availableVoices as voice (voice.voiceURI)}
             <button 
+                class="voice-selection-button"
                 class:active={selectedVoiceURI === voice.voiceURI}
                 on:click={() => selectVoice(voice.voiceURI)}
+                data-testid="voice-selection-button-{voice.voiceURI}"
             >
                 {voice.name} ({voice.lang})
             </button>
@@ -62,24 +67,25 @@
     width: 100%;
   }
 
-  .button-group button {
+  .voice-selection-button {
     background-color: rgba(255, 255, 255, 0.07);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
-    padding: 16px;
+    padding: 8px 16px;
     border-radius: 12px;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
     text-align: left;
     font-size: 1em;
     line-height: 1.3;
+    flex-shrink: 0;
   }
 
-  .button-group button:hover {
+  .voice-selection-button:hover {
       border-color: rgba(255, 255, 255, 0.5);
   }
 
-  .button-group button.active {
+  .voice-selection-button.active {
     background-color: var(--text-accent, #ffbe0b);
     border-color: var(--text-accent, #ffbe0b);
     color: #000;
