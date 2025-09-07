@@ -3,6 +3,7 @@ import { writable, get } from 'svelte/store';
 import { logService } from '$lib/services/logService.js';
 import { _ } from 'svelte-i18n';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
+import { playerStore } from '$lib/stores/playerStore.js';
 
 // Прямий імпорт усіх необхідних перекладів
 import ukTranslations from '$lib/i18n/uk/speech.js';
@@ -90,18 +91,38 @@ export function filterVoicesByLang(voiceList, langCode) {
  * @param {{direction: import('../models/Piece').MoveDirectionType, distance: number}} move
  * @param {string} lang
  * @param {string | null} voiceURI
+ * @param {() => void} [onEndCallback]
  */
-export function speakMove(move, lang, voiceURI) {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window) || !move) return;
+export function speakMove(move, lang, voiceURI, onEndCallback) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window) || !move) {
+    if (onEndCallback) onEndCallback();
+    return;
+  }
+
+  const settings = get(gameSettingsStore);
+  const playerState = get(playerStore);
+  const currentPlayer = playerState.players[playerState.currentPlayerIndex];
+
+  const shouldSpeak = settings.speechEnabled && currentPlayer &&
+                      (currentPlayer.isComputer ? settings.speechFor.computer : settings.speechFor.player);
+
+  if (!shouldSpeak) {
+    logService.speech('[Speech] speakMove: Speech is disabled for the current move. Executing callback directly.');
+    if (onEndCallback) {
+      // Невелика затримка, щоб імітувати асинхронну природу озвучення та уникнути
+      // можливих race conditions з іншими оновленнями стану.
+      setTimeout(() => onEndCallback(), 100);
+    }
+    return;
+  }
 
   const allVoices = speechSynthesis.getVoices();
   if (allVoices.length === 0) {
     logService.ui('[Speech] speakMove called, but no voices are available.');
     loadAndGetVoices();
+    if (onEndCallback) onEndCallback(); // Call callback if voices can't be loaded
     return;
   }
-
-  const settings = get(gameSettingsStore);
 
   const selectedVoice = voiceURI ? allVoices.find(v => v.voiceURI === voiceURI) : null;
   const availableVoices = filterVoicesByLang(allVoices, lang);
@@ -132,7 +153,7 @@ export function speakMove(move, lang, voiceURI) {
   
   logService.speech(`[Speech] Generating text for "${actualLangCode}": "${textToSpeak}"`);
 
-  speakText(textToSpeak, voiceLang, voiceURI);
+  speakText(textToSpeak, voiceLang, voiceURI, onEndCallback);
 }
 
 /**
@@ -140,8 +161,9 @@ export function speakMove(move, lang, voiceURI) {
  * @param {string} textToSpeak
  * @param {string} lang
  * @param {string | null} voiceURI
+ * @param {() => void} [onEndCallback]
  */
-export function speakText(textToSpeak, lang, voiceURI) {
+export function speakText(textToSpeak, lang, voiceURI, onEndCallback) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window) || !textToSpeak) return;
   
   logService.speech(`[Speech] speakText called. Current speaking state: ${window.speechSynthesis.speaking}. Queued text: "${textToSpeak}"`);
@@ -159,6 +181,10 @@ export function speakText(textToSpeak, lang, voiceURI) {
   utterance.pitch = 1.0;
   logService.speech(`[Speech] Applying speechRate in speakText: ${utterance.rate}`);
   
+  if (onEndCallback) {
+    utterance.onend = onEndCallback;
+  }
+
   const voiceToUseURI = voiceURI || settings.selectedVoiceURI;
   let selectedVoice = null;
 
