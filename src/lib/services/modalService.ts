@@ -2,7 +2,9 @@ import { modalStore, type ModalState } from '$lib/stores/modalStore';
 import { navigationService } from './navigationService';
 import { gameEventBus } from './gameEventBus';
 import { get } from 'svelte/store';
-import { _ } from 'svelte-i18n';
+import { _, locale } from 'svelte-i18n';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+import { speakText } from './speechService';
 
 function showGameOverModal(payload: any) {
   const { reasonKey, reasonValues, finalScoreDetails, winners, gameType } = payload;
@@ -20,6 +22,13 @@ function showGameOverModal(payload: any) {
     // For local games, show player scores
     titleKey = winners && winners.length === 1 ? 'modal.winnerTitle' : 'modal.drawTitle';
     content.playerScores = payload.scores.map((s: any) => ({ ...s, isWinner: winners.some((w: any) => w.id === s.playerId) }));
+  }
+
+  if (get(gameSettingsStore).speakModalTitles) {
+    const title = get(_)(titleKey, { values: { winners: winners.map((w: any) => w.name).join(', ') } });
+    const lang = get(locale) || 'uk';
+    const voiceURI = get(gameSettingsStore).selectedVoiceURI;
+    speakText(title, lang, voiceURI, undefined);
   }
 
   modalStore.showModal({

@@ -29,5 +29,6 @@ export default {
   player: 'Oyuncı alımı',
   computer: 'Kompyuter alımı',
   testVoice: "Ses testi",
-  testPhrase: "Oyunda sizni körgenge şadmız"
+  testPhrase: "Oyunda sizni körgenge şadmız",
+  speakModalTitles: 'Модаль пенджерелерини сеслендирюв'
 };
