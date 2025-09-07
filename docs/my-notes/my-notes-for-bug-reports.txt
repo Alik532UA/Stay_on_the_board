@@ -6986,7 +6986,9 @@ logService.js:115 [VOICE_CONTROL] [VoiceControlService] Failed to parse command:
 Актуальний результат: нічого не відбувається
 Очікуваний результат: автоматично повторно запускається голосовий ввід, і так 5 разів, а якщо 5 підрят невдалих, тоді вже перестає автоматично запускатися голосовий ввід
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-<div class="button-group s-vMP96sLXzKWL"><button data-testid="speech-for-player-btn" class="s-vMP96sLXzKWL">Хід гравця</button> <button data-testid="speech-for-computer-btn" class="s-vMP96sLXzKWL active">Хід комп'ютера</button></div>
+нова задача:
+контейнер: <div class="button-group s-vMP96sLXzKWL"><button data-testid="speech-for-player-btn" class="s-vMP96sLXzKWL">Хід гравця</button> <button data-testid="speech-for-computer-btn" class="s-vMP96sLXzKWL active">Хід комп'ютера</button></div>
+що зробити:
 треба додати ще одну кнопку-чекбокс: "озвучування модальних вікон"
 якщо кнопка-чекбокс ON, тоді title певних модальних вікон озвучуються: "opponent-trapped-modal-header" "game-over-modal-header" "player-no-moves-modal-header"
 за замовчуванням кнопка-чекбокс ON

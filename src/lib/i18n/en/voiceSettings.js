@@ -29,5 +29,6 @@ export default {
   player: 'Player move',
   computer: 'Computer move',
   testVoice: "Test Voice",
-  testPhrase: "Glad to see you in the game"
+  testPhrase: "Glad to see you in the game",
+  speakModalTitles: 'Speak modal windows'
 };
