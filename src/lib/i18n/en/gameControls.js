@@ -13,5 +13,6 @@ export default {
   noMovesTitle: "No Moves",
   selectDirectionAndDistance: "Select direction and distance",
   voiceCommand: "Voice Control (beta)",
-  voiceCommandTitle: "Voice Command"
+  voiceCommandTitle: "Voice Command",
+  voiceCommandNotSupported: "Voice command is not supported in your browser"
 }; 

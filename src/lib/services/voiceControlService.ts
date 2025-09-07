@@ -10,6 +10,12 @@ class VoiceControlService {
   private consecutiveFailedAttempts = 0;
   private readonly MAX_FAILED_ATTEMPTS = 5;
 
+  private audioContext: AudioContext | null = null;
+  private analyser: AnalyserNode | null = null;
+  private mediaStreamSource: MediaStreamAudioSourceNode | null = null;
+  private dataArray: Uint8Array | null = null;
+  private animationFrameId: number | null = null;
+
   constructor() {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -23,25 +29,40 @@ class VoiceControlService {
       this.recognition.onresult = this.handleResult.bind(this);
       this.recognition.onerror = this.handleError.bind(this);
       this.recognition.onend = this.handleEnd.bind(this);
+      this.recognition.onstart = this.handleStart.bind(this); // Add this
+    } else {
+      logService.voiceControl('[VoiceControlService] SpeechRecognition API not supported.');
     }
   }
 
+  public get isApiSupported(): boolean {
+    return this.isSupported;
+  }
+
   public startListening() {
-    if (!this.isSupported || get(uiStateStore).isListening) return;
+    if (!this.isSupported) {
+      logService.voiceControl('[VoiceControlService] Attempted to start listening, but API is not supported.');
+      return;
+    }
+    if (get(uiStateStore).isListening) {
+      logService.voiceControl('[VoiceControlService] Already listening.');
+      return;
+    }
     try {
+      logService.voiceControl('[VoiceControlService] Calling recognition.start()');
       this.recognition.start();
-      uiStateStore.update(s => ({ ...s, isListening: true }));
-      logService.voiceControl('[VoiceControlService] Started listening.');
+      // isListening is set to true in handleStart
     } catch (error) {
-      logService.voiceControl('[VoiceControlService] Error starting recognition:', error);
+      logService.voiceControl('[VoiceControlService] Error calling recognition.start():', error);
+      uiStateStore.update(s => ({ ...s, isListening: false }));
     }
   }
 
   public stopListening() {
     if (!this.isSupported || !get(uiStateStore).isListening) return;
+    logService.voiceControl('[VoiceControlService] Calling recognition.stop()');
     this.recognition.stop();
-    uiStateStore.update(s => ({ ...s, isListening: false }));
-    logService.voiceControl('[VoiceControlService] Stopped listening.');
+    // isListening is set to false in handleEnd
   }
 
   public toggleListening() {
@@ -52,20 +73,81 @@ class VoiceControlService {
     }
   }
 
+  private handleStart() {
+    uiStateStore.update(s => ({ ...s, isListening: true }));
+    logService.voiceControl('[VoiceControlService] Event: recognition started.');
+    this.initAudioAnalysis();
+  }
+
   private handleResult(event: any) {
     const transcript = event.results[0][0].transcript.trim();
     voiceControlStore.setTranscript(transcript);
-    logService.voiceControl(`[VoiceControlService] Recognized text: ${transcript}`);
+    logService.voiceControl(`[VoiceControlService] Event: result received. Transcript: ${transcript}`);
     this.parseCommand(transcript);
   }
 
   private handleError(event: any) {
-    logService.voiceControl(`[VoiceControlService] Speech recognition error: ${event.error}`);
+    logService.voiceControl(`[VoiceControlService] Event: error. Error event:`, event);
+    // We might get an error and an end event, so we handle isListening in handleEnd
   }
 
   private handleEnd() {
     uiStateStore.update(s => ({ ...s, isListening: false }));
-    logService.voiceControl('[VoiceControlService] Listening ended.');
+    logService.voiceControl('[VoiceControlService] Event: recognition ended.');
+    this.stopAudioAnalysis();
+  }
+
+  private async initAudioAnalysis() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.audioContext = new AudioContext();
+      this.analyser = this.audioContext.createAnalyser();
+      this.mediaStreamSource = this.audioContext.createMediaStreamSource(stream);
+      this.mediaStreamSource.connect(this.analyser);
+      this.analyser.fftSize = 256;
+      const bufferLength = this.analyser.frequencyBinCount;
+      this.dataArray = new Uint8Array(bufferLength);
+
+      this.updateVolume();
+      logService.voiceControl('[VoiceControlService] Audio analysis initialized.');
+    } catch (err) {
+      logService.voiceControl('[VoiceControlService] Error initializing audio analysis:', err);
+      voiceControlStore.setVolume(0);
+    }
+  }
+
+  private stopAudioAnalysis() {
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+    if (this.mediaStreamSource) {
+      this.mediaStreamSource.mediaStream.getTracks().forEach(track => track.stop());
+      this.mediaStreamSource.disconnect();
+      this.mediaStreamSource = null;
+    }
+    if (this.audioContext) {
+      this.audioContext.close();
+      this.audioContext = null;
+    }
+    this.analyser = null;
+    this.dataArray = null;
+    voiceControlStore.setVolume(0);
+    logService.voiceControl('[VoiceControlService] Audio analysis stopped.');
+  }
+
+  private updateVolume = () => {
+    if (!this.analyser || !this.dataArray) return;
+
+    this.analyser.getByteFrequencyData(this.dataArray as any);
+    let sum = 0;
+    for (const amplitude of this.dataArray) {
+      sum += amplitude * amplitude;
+    }
+    const volume = Math.sqrt(sum / this.dataArray.length) / 100; // Normalize to a 0-1 range (approx)
+    voiceControlStore.setVolume(volume);
+
+    this.animationFrameId = requestAnimationFrame(this.updateVolume);
   }
 
   private parseCommand(command: string) {
