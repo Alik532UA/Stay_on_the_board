@@ -40,17 +40,15 @@ class VoiceControlService {
     return this.isSupported;
   }
 
-  public async startListening() {
-    if (!this.isSupported || get(uiStateStore).isListening) {
+  public startListening() {
+    if (!this.isSupported) {
+      logService.voiceControl('[VoiceControlService] Attempted to start listening, but API is not supported.');
       return;
     }
-
-    // Suspend AudioContext before starting recognition to avoid conflicts on iOS
-    if (this.audioContext && this.audioContext.state === 'running') {
-      await this.audioContext.suspend();
-      logService.voiceControl('[VoiceControlService] AudioContext suspended.');
+    if (get(uiStateStore).isListening) {
+      logService.voiceControl('[VoiceControlService] Already listening.');
+      return;
     }
-
     try {
       logService.voiceControl('[VoiceControlService] Calling recognition.start()');
       this.processingResult = false; // Reset flag on start
@@ -60,11 +58,6 @@ class VoiceControlService {
       logService.voiceControl('[VoiceControlService] Error calling recognition.start():', error);
       voiceControlStore.setError(error);
       uiStateStore.update(s => ({ ...s, isListening: false }));
-      // If start fails, resume context immediately
-      if (this.audioContext && this.audioContext.state === 'suspended') {
-        await this.audioContext.resume();
-        logService.voiceControl('[VoiceControlService] AudioContext resumed after start error.');
-      }
     }
   }
 
@@ -73,7 +66,7 @@ class VoiceControlService {
     logService.voiceControl('[VoiceControlService] Calling recognition.stop()');
     this.processingResult = true; // Prevent restart on manual stop
     this.recognition.stop();
-    // isListening is set to false in handleEnd, where audio context will also be resumed
+    // isListening is set to false in handleEnd
   }
 
   public toggleListening() {
@@ -87,7 +80,7 @@ class VoiceControlService {
   private handleStart() {
     uiStateStore.update(s => ({ ...s, isListening: true }));
     logService.voiceControl('[VoiceControlService] Event: recognition started.');
-    this.initAudioAnalysis(); // This will now create or just connect the audio analysis
+    this.initAudioAnalysis();
   }
 
   private handleResult(event: any) {
@@ -101,22 +94,17 @@ class VoiceControlService {
 
   private handleError(event: any) {
     logService.voiceControl(`[VoiceControlService] Event: error. Error event:`, event.error);
-    voiceControlStore.setError(event);
+    voiceControlStore.setError(event); // Store the full error object
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
         this.processingResult = true; // Permanent error, don't restart
     }
     // For 'no-speech', processingResult remains false, so handleEnd will restart it.
   }
 
-  private async handleEnd() {
+  private handleEnd() {
     uiStateStore.update(s => ({ ...s, isListening: false }));
     logService.voiceControl('[VoiceControlService] Event: recognition ended.');
-
-    // Resume AudioContext after recognition has ended
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      await this.audioContext.resume();
-      logService.voiceControl('[VoiceControlService] AudioContext resumed.');
-    }
+    this.stopAudioAnalysis();
 
     // If recognition ended without processing a result (e.g., 'no-speech' error or timeout)
     // and it wasn't manually stopped, then restart.
@@ -131,9 +119,6 @@ class VoiceControlService {
   }
 
   private async initAudioAnalysis() {
-    // Only initialize if it hasn't been done before
-    if (this.audioContext) return;
-
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.audioContext = new AudioContext();
@@ -153,23 +138,28 @@ class VoiceControlService {
     }
   }
 
-  // This function is now effectively deprecated as we don't want to stop the context anymore
   private stopAudioAnalysis() {
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
-    // We no longer close the audio context or stop the media stream tracks 
-    // to allow for suspend/resume and prevent conflicts.
-    // The stream will be stopped when the user navigates away or closes the tab.
-    logService.voiceControl('[VoiceControlService] Audio analysis animation stopped.');
+    if (this.mediaStreamSource) {
+      this.mediaStreamSource.mediaStream.getTracks().forEach(track => track.stop());
+      this.mediaStreamSource.disconnect();
+      this.mediaStreamSource = null;
+    }
+    if (this.audioContext) {
+      this.audioContext.close();
+      this.audioContext = null;
+    }
+    this.analyser = null;
+    this.dataArray = null;
+    voiceControlStore.setVolume(0);
+    logService.voiceControl('[VoiceControlService] Audio analysis stopped.');
   }
 
   private updateVolume = () => {
-    if (!this.analyser || !this.dataArray || this.audioContext?.state === 'suspended') {
-        this.animationFrameId = requestAnimationFrame(this.updateVolume);
-        return;
-    };
+    if (!this.analyser || !this.dataArray) return;
 
     this.analyser.getByteFrequencyData(this.dataArray as any);
     let sum = 0;

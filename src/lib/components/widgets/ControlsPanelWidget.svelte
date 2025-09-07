@@ -174,8 +174,8 @@
       <p>Recognized Text:</p>
       <pre id="voice-transcript">{$voiceControlStore.lastTranscript || 'No speech detected yet.'}</pre>
       {#if $voiceControlStore.recognitionError}
-        <p>Recognition Error:</p>
-        <pre>{$voiceControlStore.recognitionError}</pre>
+        <p>Recognition Error Details:</p>
+        <pre>{JSON.stringify($voiceControlStore.recognitionError, null, 2)}</pre>
       {/if}
     </div>
   {/if}

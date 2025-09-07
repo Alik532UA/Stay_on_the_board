@@ -1,10 +1,11 @@
 
+
 import { writable } from 'svelte/store';
 
 type VoiceControlState = {
   lastTranscript: string;
   volume: number;
-  recognitionError: string | null;
+  recognitionError: any | null; // Changed to any to store the full error object
 };
 
 function createVoiceControlStore() {
@@ -23,8 +24,8 @@ function createVoiceControlStore() {
       update(state => ({ ...state, volume }));
     },
     setError: (error: any) => {
-        const errorMessage = error ? (error.error || 'Unknown error') : null;
-        update(state => ({ ...state, recognitionError: errorMessage }));
+        // Store the full error event object for better debugging
+        update(state => ({ ...state, recognitionError: error }));
     },
     reset: () => {
       set({ lastTranscript: '', volume: 0, recognitionError: null });
@@ -33,3 +34,4 @@ function createVoiceControlStore() {
 }
 
 export const voiceControlStore = createVoiceControlStore();
+
