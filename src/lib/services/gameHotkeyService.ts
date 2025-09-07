@@ -17,7 +17,7 @@ function showKeyConflictModal(key: string, actions: KeybindingAction[]) {
     modalStore.showModal({
         titleKey: 'modal.keyConflictTitle',
         contentKey: 'modal.keyConflictContent',
-        contentPayload: { key },
+        content: { key },
         buttons: actions.map(action => ({
             text: t(`gameControls.${action}`), // Dynamically get button text from translations
             primary: true,

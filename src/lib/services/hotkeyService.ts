@@ -23,6 +23,8 @@ function handleKeydown(event: KeyboardEvent) {
             const hotkey = contextHotkeys.get(event.code); // ЗМІНЕНО: з event.key на event.code
             if (hotkey && (!hotkey.condition || hotkey.condition())) {
                 logService.action(`[hotkeyService] Executing hotkey '${event.code}' from context '${context}'`);
+                event.preventDefault();
+                event.stopPropagation();
                 hotkey.action(event);
                 // Stop after finding and executing the first matching hotkey
                 return;
@@ -35,7 +37,7 @@ function handleKeydown(event: KeyboardEvent) {
 function setup() {
     if (typeof window !== 'undefined') {
         logService.init('[hotkeyService] Setting up global keydown listener.');
-        window.addEventListener('keydown', handleKeydown);
+        window.addEventListener('keydown', handleKeydown, true);
     }
 }
 
