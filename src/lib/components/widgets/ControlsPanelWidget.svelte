@@ -173,6 +173,10 @@
       <button class="copy-logs-btn" on:click={copyLogs}>Copy</button>
       <p>Recognized Text:</p>
       <pre id="voice-transcript">{$voiceControlStore.lastTranscript || 'No speech detected yet.'}</pre>
+      {#if $voiceControlStore.recognitionError}
+        <p>Recognition Error:</p>
+        <pre>{$voiceControlStore.recognitionError}</pre>
+      {/if}
     </div>
   {/if}
 </div>
