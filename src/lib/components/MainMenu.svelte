@@ -41,12 +41,56 @@
     appSettingsStore.init();
   });
 
+  $: if (!$isLoading && mainMenuButtonsNode) {
+    const buttons = getFocusableButtons();
+    if (buttons.length > 0) {
+        buttons[0].focus();
+    }
+  }
+
   onDestroy(() => {
     hotkeyService.popContext();
   });
 
+  function getFocusableButtons() {
+    if (!mainMenuButtonsNode) return [];
+    return Array.from(mainMenuButtonsNode.querySelectorAll('button'));
+  }
+
+  function handleMenuKeyDown(event: KeyboardEvent) {
+    logService.action(`[MainMenu] handleMenuKeyDown fired with key: ${event.key}`);
+    const buttons = getFocusableButtons();
+    if (buttons.length === 0) {
+        logService.action(`[MainMenu] No buttons found.`);
+        return;
+    }
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        const currentIndex = buttons.findIndex(btn => btn === document.activeElement);
+        logService.action(`[MainMenu] Current focused index: ${currentIndex}`);
+        let nextIndex = currentIndex;
+
+        if (event.key === 'ArrowDown') {
+            nextIndex = (currentIndex + 1) % buttons.length;
+        } else { // ArrowUp
+            nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+        }
+        
+        logService.action(`[MainMenu] Focusing next index: ${nextIndex}`);
+        buttons[nextIndex].focus();
+    } else if (event.key === 'Enter' || event.key === ' ' || event.code === 'NumpadEnter') {
+        event.preventDefault();
+        const focusedButton = document.activeElement as HTMLElement;
+        if (buttons.includes(focusedButton as HTMLButtonElement)) {
+            logService.action(`[MainMenu] Clicking focused button:`, focusedButton);
+            focusedButton.click();
+        }
+    }
+  }
+
   $: if (mainMenuButtonsNode) {
-    const buttons = Array.from(mainMenuButtonsNode.querySelectorAll('button'));
+    const buttons = getFocusableButtons();
     buttons.forEach((btn, index) => {
         if (index < 9) { // Only register for the first 9 buttons (1-9)
             const key = `Digit${index + 1}`;
@@ -298,7 +342,7 @@
         </span>
       </div>
     {/if}
-    <div id="main-menu-buttons" bind:this={mainMenuButtonsNode}>
+    <div id="main-menu-buttons" bind:this={mainMenuButtonsNode} onkeydown={handleMenuKeyDown} tabindex="-1">
       <button class="modal-button secondary play-button ripple" style="padding: 32px;" onclick={handlePlayVirtualPlayer} data-testid="virtual-player-btn">{$_('mainMenu.virtualPlayer')}</button>
       <button class="modal-button secondary" onclick={() => navigateTo('/settings')} data-testid="settings-btn">{$_('mainMenu.settings')}</button>
       <button class="modal-button secondary" onclick={handleControls} data-testid="controls-btn">{$_('mainMenu.controls')}</button>
