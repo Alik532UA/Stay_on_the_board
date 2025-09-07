@@ -9,6 +9,7 @@ class VoiceControlService {
   private isSupported = false;
   private consecutiveFailedAttempts = 0;
   private readonly MAX_FAILED_ATTEMPTS = 5;
+  private processingResult = false; // Flag to prevent restart on manual stop or result
 
   private audioContext: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
@@ -29,7 +30,7 @@ class VoiceControlService {
       this.recognition.onresult = this.handleResult.bind(this);
       this.recognition.onerror = this.handleError.bind(this);
       this.recognition.onend = this.handleEnd.bind(this);
-      this.recognition.onstart = this.handleStart.bind(this); // Add this
+      this.recognition.onstart = this.handleStart.bind(this);
     } else {
       logService.voiceControl('[VoiceControlService] SpeechRecognition API not supported.');
     }
@@ -50,6 +51,7 @@ class VoiceControlService {
     }
     try {
       logService.voiceControl('[VoiceControlService] Calling recognition.start()');
+      this.processingResult = false; // Reset flag on start
       this.recognition.start();
       // isListening is set to true in handleStart
     } catch (error) {
@@ -61,6 +63,7 @@ class VoiceControlService {
   public stopListening() {
     if (!this.isSupported || !get(uiStateStore).isListening) return;
     logService.voiceControl('[VoiceControlService] Calling recognition.stop()');
+    this.processingResult = true; // Prevent restart on manual stop
     this.recognition.stop();
     // isListening is set to false in handleEnd
   }
@@ -80,6 +83,7 @@ class VoiceControlService {
   }
 
   private handleResult(event: any) {
+    this.processingResult = true; // We are processing a result, don't restart
     const transcript = event.results[0][0].transcript.trim();
     voiceControlStore.setTranscript(transcript);
     logService.voiceControl(`[VoiceControlService] Event: result received. Transcript: ${transcript}`);
@@ -87,14 +91,29 @@ class VoiceControlService {
   }
 
   private handleError(event: any) {
-    logService.voiceControl(`[VoiceControlService] Event: error. Error event:`, event);
-    // We might get an error and an end event, so we handle isListening in handleEnd
+    logService.voiceControl(`[VoiceControlService] Event: error. Error event:`, event.error);
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        this.processingResult = true; // Permanent error, don't restart
+    }
+    // For 'no-speech', processingResult remains false, so handleEnd will restart it.
   }
 
   private handleEnd() {
     uiStateStore.update(s => ({ ...s, isListening: false }));
     logService.voiceControl('[VoiceControlService] Event: recognition ended.');
     this.stopAudioAnalysis();
+
+    // If recognition ended without processing a result (e.g., 'no-speech' error or timeout)
+    // and it wasn't manually stopped, then restart.
+    if (!this.processingResult) {
+        logService.voiceControl('[VoiceControlService] Recognition ended unexpectedly, restarting...');
+        setTimeout(() => {
+            // Check if user hasn't manually stopped it in the meantime
+            if (!get(uiStateStore).isListening) {
+                this.startListening();
+            }
+        }, 500); // A slightly longer delay might be safer on mobile
+    }
   }
 
   private async initAudioAnalysis() {
