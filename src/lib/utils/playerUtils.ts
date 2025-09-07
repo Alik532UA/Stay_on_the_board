@@ -3,8 +3,7 @@
 export const generateId = () => Date.now() + Math.random();
 
 const availableColors = [
-  '#e63946', '#457b9d', '#2a9d8f', '#f4a261',
-  '#e76f51', '#9b5de5', '#f15bb5', '#00bbf9'
+  '#00bbf9', '#f4a261',  '#9b5de5', '#e76f51', '#457b9d', '#f15bb5', '#2a9d8f', '#e63946'
 ];
 
 const getRandomColor = () => availableColors[Math.floor(Math.random() * availableColors.length)];
