@@ -8,9 +8,29 @@
   import { get } from 'svelte/store';
   import { testModeStore } from '$lib/stores/testModeStore';
   import { gameService } from '$lib/services/gameService';
+  import { getRandomUnusedColor } from '$lib/utils/playerUtils';
+  import type { Player } from '$lib/models/player';
 
   onMount(() => {
-    gameService.initializeNewGame();
+    const playerNames = ['den', 'Khaaaa', 'Destroyter94', 'MrGrom'];
+    const usedColors: string[] = [];
+    const players: Player[] = playerNames.map((name, index) => {
+      const color = getRandomUnusedColor(usedColors);
+      usedColors.push(color);
+      return {
+        id: index + 1,
+        type: 'human',
+        name,
+        score: 0,
+        color,
+        isComputer: false,
+        penaltyPoints: 0,
+        bonusPoints: 0,
+        bonusHistory: [] as any[]
+      };
+    });
+
+    gameService.initializeNewGame({ players });
   });
 </script>
 
