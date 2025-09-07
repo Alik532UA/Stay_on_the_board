@@ -40,8 +40,8 @@ export class OnlineGameMode extends BaseGameMode {
 
   getPlayersConfiguration(): Player[] {
     return [
-      { id: 1, type: 'human', name: 'You', score: 0, color: '#e63946', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
-      { id: 2, type: 'human', name: 'Opponent', score: 0, color: '#457b9d', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
+      { id: 1, type: 'human', name: 'You', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
+      { id: 2, type: 'human', name: 'Opponent', score: 0, color: '#ffffff', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
     ];
   }
 
