@@ -7089,5 +7089,12 @@ p.s. на інших пристроях працює
 "всередині тієї ж панелі налагодження, де ми показували помилки." це де?
 ти маєш на увазі "voice-debug-panel" ?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+edge windows 11
+--- General Logs ---
+[UI] GameInfoWidget: displayMessage re-evaluating {"isGameOver":false,"isFirstMove":true,"lastComputerMove":null,"lastPlayerMove":null,"isPlayerTurn":true,"isCompact":true}
+[SPEECH] [Speech] Applying speechRate in speakTestPhrase: 1.600000023841858 
+[SPEECH] [Speech] Cancelling previous speech and queuing test utterance "Раді бачити тебе в грі" with lang: uk-UA 
+
+android chrome
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
