@@ -14,5 +14,13 @@ export default {
   selectDirectionAndDistance: "Yön ve mesafe seçin",
   voiceCommand: "Sesnen idare (beta)",
   voiceCommandTitle: "Sesli komanda",
-  voiceCommandNotSupported: "Sesli komanda brauzeriñizde desteklenmey"
+  voiceCommandNotSupported: "Sesli komanda brauzeriñizde desteklenmey",
+  'up-left': 'Yuqarı-solğa',
+  'up': 'Yuqarı',
+  'up-right': 'Yuqarı-sağğa',
+  'left': 'Solğa',
+  'right': 'Sağğa',
+  'down-left': 'Aşağı-solğa',
+  'down': 'Aşağı',
+  'down-right': 'Aşağı-sağğa'
 }; 

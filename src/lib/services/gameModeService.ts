@@ -49,9 +49,9 @@ class GameModeService {
       if (applyPresetSettings && name && ['beginner', 'experienced', 'pro', 'timed', 'local', 'online'].includes(name)) {
         gameSettingsStore.applyPreset(name as any);
       }
+      mode.initialize();
       gameStore.setMode(mode);
       gameModeStore.setActiveMode(implementationName); // Store the implementation name
-      mode.initialize();
       logService.GAME_MODE(`Game mode initialized: ${implementationName} (from preset: ${name})`);
     } else {
       logService.GAME_MODE(`Unknown game mode or preset: ${name}`);

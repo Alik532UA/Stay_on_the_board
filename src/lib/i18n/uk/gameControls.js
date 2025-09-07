@@ -14,5 +14,13 @@ export default {
   selectDirectionAndDistance: "Оберіть напрямок та відстань",
   voiceCommand: "Керування голосом (beta)",
   voiceCommandTitle: "Голосова команда",
-  voiceCommandNotSupported: "Голосове керування не підтримується у вашому браузері"
+  voiceCommandNotSupported: "Голосове керування не підтримується у вашому браузері",
+  'up-left': 'Вгору-вліво',
+  'up': 'Вгору',
+  'up-right': 'Вгору-вправо',
+  'left': 'Вліво',
+  'right': 'Вправо',
+  'down-left': 'Вниз-вліво',
+  'down': 'Вниз',
+  'down-right': 'Вниз-вправо'
 }; 
