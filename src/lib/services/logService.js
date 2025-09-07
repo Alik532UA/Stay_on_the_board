@@ -1,4 +1,6 @@
 // file: src/lib/services/logService.js
+import { debugLogStore } from '../stores/debugLogStore.js';
+
 const isBrowser = typeof window !== 'undefined';
 const isDev = import.meta.env.DEV;
 
@@ -33,20 +35,37 @@ const defaultConfig = {
           [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
           [LOG_GROUPS.LOGIC_TIME]: false,
           [LOG_GROUPS.SCORE]: false,
-          [LOG_GROUPS.UI]: false, 
+          [LOG_GROUPS.UI]: true, 
           [LOG_GROUPS.TOOLTIP]: false,
           [LOG_GROUPS.ANIMATION]: false,
-          [LOG_GROUPS.INIT]: false,
+          [LOG_GROUPS.INIT]: true,
           [LOG_GROUPS.ACTION]: false,
           [LOG_GROUPS.GAME_MODE]: true,
-          [LOG_GROUPS.SPEECH]: false,
+          [LOG_GROUPS.SPEECH]: true,
           [LOG_GROUPS.VOICE_CONTROL]: true,
           [LOG_GROUPS.TEST_MODE]: false,
-          [LOG_GROUPS.MODAL]: false,
+          [LOG_GROUPS.MODAL]: true,
           [LOG_GROUPS.ERROR]: true, // Errors should always be logged
         };
 
 const STORAGE_KEY = 'logConfig';
+
+/**
+ * @param {any[]} data
+ * @returns {string}
+ */
+function formatDataForDisplay(data) {
+  return data.map(item => {
+    if (typeof item === 'object' && item !== null) {
+      try {
+        return JSON.stringify(item);
+      } catch (e) {
+        return '[Unserializable Object]';
+      }
+    }
+    return String(item);
+  }).join(' ');
+}
 
 /**
  * Завантажує конфігурацію з localStorage або повертає стандартну.
@@ -114,6 +133,9 @@ function log(group, message, ...data) {
     } else {
       console.log(`%c[${group.toUpperCase()}]%c ${message}`, style, 'color: inherit;');
     }
+    // Add to the on-screen debug store
+    const displayMessage = `[${group.toUpperCase()}] ${message} ${formatDataForDisplay(data)}`;
+    debugLogStore.add(displayMessage);
   }
 }
 
@@ -146,5 +168,8 @@ if (isBrowser && isDev) {
     saveConfig(logConfig);
     console.log('Log levels updated:', logConfig);
   };
+  (/** @type {any} */ (window)).getLogConfig = () => {
+    return logConfig;
+  }
   console.log('Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.');
 }
