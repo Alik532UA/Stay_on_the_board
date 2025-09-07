@@ -1,7 +1,7 @@
 {
   "name": "stay-on-the-board",
   "private": true,
-  "version": "0.4.412",
+  "version": "0.4.413",
   "type": "module",
   "scripts": {
     "test": "playwright test",

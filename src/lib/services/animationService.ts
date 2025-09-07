@@ -4,6 +4,7 @@ import { animationStore } from '$lib/stores/animationStore';
 import { logService } from './logService';
 import { gameModeStore } from '$lib/stores/gameModeStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+import { uiStateStore } from '$lib/stores/uiStateStore';
 import { animationConfig, type AnimationConfigMode, type AnimationConfigPreset } from '$lib/config/animationConfig';
 import { gameEventBus } from './gameEventBus';
 
@@ -43,10 +44,13 @@ function createAnimationService() {
 
     const activeMode = get(gameModeStore).activeMode as AnimationConfigMode;
     const currentPreset = get(gameSettingsStore).gameMode as AnimationConfigPreset | null;
+    const isListening = get(uiStateStore).isListening;
 
     let pauseValues = { player: 100, computer: 100 }; // Default values
 
-    if (activeMode === 'training') {
+    if (isListening) {
+      pauseValues = { player: 30, computer: 30 };
+    } else if (activeMode === 'training') {
       if (currentPreset && animationConfig.training[currentPreset]) {
         pauseValues = animationConfig.training[currentPreset];
       }
