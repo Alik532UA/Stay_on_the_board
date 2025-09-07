@@ -16,9 +16,9 @@ function showGameOverModal(payload: any) {
     scoreDetails: finalScoreDetails
   };
 
-  if (gameType === 'training' || gameType === 'virtual-player' || gameType === 'timed') {
+  if (gameType === 'training' || gameType === 'virtual-player') {
     titleKey = 'modal.trainingOverTitle';
-  } else {
+  } else if (gameType === 'local') {
     // For local games, show player scores
     titleKey = winners && winners.length === 1 ? 'modal.winnerTitle' : 'modal.drawTitle';
     content.playerScores = payload.scores.map((s: any) => ({ ...s, isWinner: winners.some((w: any) => w.id === s.playerId) }));
