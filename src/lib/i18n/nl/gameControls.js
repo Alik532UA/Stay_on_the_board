@@ -14,5 +14,13 @@ export default {
   selectDirectionAndDistance: "Kies richting en afstand",
   voiceCommand: "Spraakbesturing (beta)",
   voiceCommandTitle: "Spraakopdracht",
-  voiceCommandNotSupported: "Spraakopdracht wordt niet ondersteund in uw browser"
+  voiceCommandNotSupported: "Spraakopdracht wordt niet ondersteund in uw browser",
+  'up-left': 'Omhoog-links',
+  'up': 'Omhoog',
+  'up-right': 'Omhoog-rechts',
+  'left': 'Links',
+  'right': 'Rechts',
+  'down-left': 'Omlaag-links',
+  'down': 'Omlaag',
+  'down-right': 'Omlaag-rechts'
 }; 
