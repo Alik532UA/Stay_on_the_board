@@ -6995,7 +6995,33 @@ logService.js:115 [VOICE_CONTROL] [VoiceControlService] Failed to parse command:
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 треба зробити, що коли вмикаєш режим режим "voice-command-btn", тоді тимчасово поки режим увімкнено, то значення  ```player: 30, computer: 30,```
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/game/virtual-player
+режим game-mode-timed
+"game-over-modal" модальне вікно закінчення гри
+Актуальний результат: логіка та вікно як в Stay_on_the_board/game/local
+Очікуваний результат: логіка та вікно як в Stay_on_the_board/game/training
+
+p.s. але в режимах працює правильно:
+
+
+проблема тільки в режим game-mode-timed
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/game/virtual-player
+"game-over-modal" модальне вікно закінчення гри
+Актуальний результат: 
+"beginner-mode-btn" - title: trainingOverTitle: 'Тренування завершено!',
+"experienced-mode-btn" - title: trainingOverTitle: 'Тренування завершено!',
+"pro-mode-btn" - title: trainingOverTitle: 'Тренування завершено!',
+"game-mode-timed-btn" - title: trainingOverTitle: 'Тренування завершено!',
+
+Очікуваний результат: 
+
+"beginner-mode-btn" - title: trainingOverTitle: 'Тренування завершено!',
+"experienced-mode-btn" - title: trainingOverTitle: 'Тренування завершено!',
+"pro-mode-btn" - title: trainingOverTitle: 'Тренування завершено!',
+"game-mode-timed-btn" - title: gameOverTitle: 'Гру завершено!',
+  
+це відноситься тільки до сторінки Stay_on_the_board/game/virtual-player
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
