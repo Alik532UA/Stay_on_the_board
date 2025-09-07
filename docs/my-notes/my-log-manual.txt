@@ -1,0 +1,117 @@
+client:733 [vite] connecting...
+client:827 [vite] connected.
+logService.js:149 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+init.js:31 ✅ i18n initialized successfully
+logService.js:115 [GAME_MODE] Game mode initialized: virtual-player (from preset: virtual-player)
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Внесу один.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Failed to parse command: Внесу один.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Один вниз.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: down 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down', distance: 1, playerIndex: 0}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:115 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:113 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'left', distance: 1, row: 1, col: 0, isPenalty: false}
+logService.js:115 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'left', distance: 1, playerIndex: 1}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:113 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Внесу один.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Failed to parse command: Внесу один.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Один вниз.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: down 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down', distance: 1, playerIndex: 0}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:115 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:113 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'down', distance: 1, row: 3, col: 0, isPenalty: false}
+logService.js:115 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down', distance: 1, playerIndex: 1}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:113 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Один вправа.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Failed to parse command: Один вправа.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+client:810 [vite] hot updated: /src/lib/components/VoiceList.svelte
+client:810 [vite] hot updated: /src/lib/components/VoiceSettings.svelte
+client:810 [vite] hot updated: /src/lib/components/ModalManager.svelte
+client:810 [vite] hot updated: /src/routes/game/+layout.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/ScorePanelWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/GameModeWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/ControlsPanelWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/SettingsExpanderWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/GameModeModal.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/DirectionControls.svelte
+client:810 [vite] hot updated: /src/routes/game/virtual-player/+page.svelte
+logService.js:115 [GAME_MODE] Game layout is being destroyed, cleaning up game mode.
+logService.js:115 [GAME_MODE] [VirtualPlayerGameMode] cleanup called
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Праворуч один.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: right 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'right', distance: 1, playerIndex: 0}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:115 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:113 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'up-right', distance: 1, row: 2, col: 2, isPenalty: false}
+logService.js:115 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'up-right', distance: 1, playerIndex: 1}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:113 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+client:810 [vite] hot updated: /src/routes/game/+layout.svelte
+client:810 [vite] hot updated: /src/lib/components/ModalManager.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/ScorePanelWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/GameModeWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/ControlsPanelWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/SettingsExpanderWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/GameModeModal.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/DirectionControls.svelte
+client:810 [vite] hot updated: /src/routes/game/virtual-player/+page.svelte
+logService.js:115 [GAME_MODE] Game layout is being destroyed, cleaning up game mode.
+logService.js:115 [GAME_MODE] [VirtualPlayerGameMode] cleanup called
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: По діагоналі вверх права.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Incomplete diagonal command: По діагоналі вверх права.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+client:810 [vite] hot updated: /src/routes/game/+layout.svelte
+client:810 [vite] hot updated: /src/routes/game/virtual-player/+page.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/SettingsExpanderWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/ModalManager.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/ScorePanelWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/GameModeWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/ControlsPanelWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/GameModeModal.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/DirectionControls.svelte
+logService.js:115 [GAME_MODE] Game layout is being destroyed, cleaning up game mode.
+logService.js:115 [GAME_MODE] [VirtualPlayerGameMode] cleanup called

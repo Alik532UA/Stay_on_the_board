@@ -75,26 +75,26 @@ class VoiceControlService {
         nl: []
     };
 
-    const directions: { [key: string]: { [key: string]: string } } = {
+    const directionRegex: { [key: string]: { [key: string]: RegExp } } = {
         uk: {
-            'вгору-вліво': 'up-left', 'вверх-вліво': 'up-left', 'верх вліво': 'up-left',
-            'вгору-вправо': 'up-right', 'вверх-вправо': 'up-right', 'верх вправо': 'up-right',
-            'вниз-вліво': 'down-left', 'вниз вліво': 'down-left',
-            'вниз-вправо': 'down-right', 'вниз вправо': 'down-right',
-            'вгору': 'up', 'вверх': 'up', 'верх': 'up',
-            'вниз': 'down',
-            'вліво': 'left', 'ліво': 'left', 'ліворуч': 'left',
-            'вправо': 'right', 'право': 'right', 'праворуч': 'right',
+            'up-left': /(вгору|вверх|верх)[ -]вліво/,
+            'up-right': /(вгору|вверх|верх)[ -]вправо/,
+            'down-left': /вниз[ -]вліво/,
+            'down-right': /вниз[ -]вправо/,
+            'up': /в?гору|в?верх|верх/,
+            'down': /в?низ|внес/,
+            'left': /в?ліво?a?|ліворуч/,
+            'right': /в?право?a?|праворуч/,
         },
         en: {
-            'up-left': 'up-left',
-            'up-right': 'up-right',
-            'down-left': 'down-left',
-            'down-right': 'down-right',
-            'up': 'up',
-            'down': 'down',
-            'left': 'left',
-            'right': 'right',
+            'up-left': /up[ -]?left/,
+            'up-right': /up[ -]?right/,
+            'down-left': /down[ -]?left/,
+            'down-right': /down[ -]?right/,
+            'up': /up/,
+            'down': /down/,
+            'left': /left/,
+            'right': /right/,
         },
         crh: {}, 
         nl: {}
@@ -124,12 +124,10 @@ class VoiceControlService {
         }
     }
 
-    const current_directions = directions[lang] || {};
-    const sorted_directions = Object.keys(current_directions).sort((a, b) => b.length - a.length);
-
-    for (const dir_word of sorted_directions) {
-        if (command_lower.includes(dir_word)) {
-            found_direction = current_directions[dir_word];
+    const current_directions = directionRegex[lang] || {};
+    for (const dir in current_directions) {
+        if (current_directions[dir].test(command_lower)) {
+            found_direction = dir;
             break;
         }
     }

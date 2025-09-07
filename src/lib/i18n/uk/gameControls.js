@@ -12,6 +12,6 @@ export default {
   confirm: "Підтвердити",
   noMovesTitle: "Ходів немає",
   selectDirectionAndDistance: "Оберіть напрямок та відстань",
-  voiceCommand: "Голос",
+  voiceCommand: "Керування голосом (beta)",
   voiceCommandTitle: "Голосова команда"
 }; 

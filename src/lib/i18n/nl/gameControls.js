@@ -12,6 +12,6 @@ export default {
   confirm: "Bevestig",
   noMovesTitle: "Geen Zetten",
   selectDirectionAndDistance: "Kies richting en afstand",
-  voiceCommand: "Stem",
+  voiceCommand: "Spraakbesturing (beta)",
   voiceCommandTitle: "Spraakopdracht"
 }; 

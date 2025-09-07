@@ -22,7 +22,6 @@ import { scoreStore } from '$lib/stores/scoreStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
 import { voiceControlService } from '$lib/services/voiceControlService';
 
-
 export abstract class BaseGameMode implements IGameMode {
   public turnDuration: number = 0;
   public gameDuration: number = 0;
@@ -47,7 +46,7 @@ export abstract class BaseGameMode implements IGameMode {
     await noMovesService.claimNoMoves();
   }
 
-  async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
+  async handlePlayerMove(direction: MoveDirectionType, distance: number, onEndCallback?: () => void): Promise<void> {
     const boardState = get(boardStore);
     const playerState = get(playerStore);
     const scoreState = get(scoreStore);
@@ -56,7 +55,7 @@ export abstract class BaseGameMode implements IGameMode {
 
     const combinedState = { ...boardState, ...playerState, ...scoreState, ...uiState };
 
-    const moveResult = gameLogicService.performMove(direction, distance, playerState!.currentPlayerIndex, combinedState, settings);
+    const moveResult = gameLogicService.performMove(direction, distance, playerState!.currentPlayerIndex, combinedState, settings, onEndCallback);
 
     if (moveResult.success) {
       boardStore.update(s => s ? ({ ...s, ...moveResult.changes.boardState }) : null);
@@ -167,7 +166,19 @@ export abstract class BaseGameMode implements IGameMode {
     if (computerMove) {
       logService.GAME_MODE('triggerComputerMove: Комп\'ютер має хід, виконуємо...');
       const { direction, distance } = computerMove;
-      await this.handlePlayerMove(direction, distance);
+      
+      // ЧОМУ: Консолідуємо логіку ввімкнення голосового керування.
+      // Замість дублювання логіки та передчасного виклику, ми завжди використовуємо
+      // onEndCallback, який спрацьовує після завершення анімації ходу комп'ютера.
+      // Це гарантує, що розпізнавання мови не конфліктує з іншими UI-процесами.
+      // Прапор voiceMoveRequested скидається тут, оскільки його призначення виконано.
+      const onEndCallback = get(uiStateStore).voiceMoveRequested ? () => {
+        logService.voiceControl('[triggerComputerMove] onEndCallback: Re-enabling voice control.');
+        voiceControlService.startListening();
+        uiStateStore.update(s => ({ ...s, voiceMoveRequested: false }));
+      } : undefined;
+
+      await this.handlePlayerMove(direction, distance, onEndCallback);
       // Set to false after successful move
       uiStateStore.update(s => s ? ({ ...s, isComputerMoveInProgress: false }) : null);
     } else {
@@ -177,13 +188,9 @@ export abstract class BaseGameMode implements IGameMode {
       await this.handleNoMoves('computer');
     }
 
-    logService.GAME_MODE('triggerComputerMove: Checking voiceMoveRequested', get(uiStateStore).voiceMoveRequested);
-    if (get(uiStateStore).voiceMoveRequested) {
-        setTimeout(() => {
-            voiceControlService.startListening();
-            uiStateStore.update(s => ({ ...s, voiceMoveRequested: false }));
-        }, 100);
-    }
+    // ВИДАЛЕНО: Цей блок викликав startListening() передчасно, до завершення анімації,
+    // що призводило до негайного припинення розпізнавання.
+    // if (get(uiStateStore).voiceMoveRequested) { ... }
 
     await tick();
   }

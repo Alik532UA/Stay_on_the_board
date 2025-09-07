@@ -6887,7 +6887,114 @@ Stay_on_the_board/game/virtual-player
 2. зроби хід голосом
 3. VirtualPlayer зробив хід
 Актуальний результат: голосовий ввід автоматично НЕ увімкнувся
-Очікуваний результат: голосовий ввід автоматично увімкнувся
+Очікуваний результат: голосовий ввід автоматично увімкнувся, а якщо є озвучка ходу від системи, то  автоматично увімкнувся після озвучки ходу від системи
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="voice-command-btn"
+текст
+Актуальний результат: "Голос"
+Очікуваний результат: "Керування голосом (beta)"
+
+колір коли записує
+Актуальний результат: жовтий
+Очікуваний результат: червоний
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+коли система чує слово "діагоналі" чи "діагональ"
+Актуальний результат: немає ніякої логіки
+Очікуваний результат: гарантовано очікує озвучування двох напрямків, тобто якщо система чує "діагональ вверх", то нічого не робить, а ігнорує цей запит, то не було вказано другий напрямок, а якщо чує "діагональ вверх праворуч" тоді обробляє цей хід
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+якщо увімкнена озвучна ходів комп'ютера, тоді автозапуск голосового вводу треба запускати не після ходу комп'ютера, а після озвучки ходу комп'ютера
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+коли система чує слово "діагоналі" чи "діагональ"
+Актуальний результат: немає ніякої логіки
+Очікуваний результат: гарантовано очікує озвучування двох напрямків, тобто якщо система чує "діагональ вверх", то нічого не робить, а ігнорує цей запит, то не було вказано другий напрямок, а якщо чує "діагональ вверх праворуч" тоді обробляє цей хід
+
+client:733 [vite] connecting...
+client:827 [vite] connected.
+logService.js:149 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+init.js:31 ✅ i18n initialized successfully
+logService.js:115 [GAME_MODE] Game mode initialized: virtual-player (from preset: virtual-player)
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Діана aль.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Failed to parse command: Діана aль.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Діагональ вниз вправо.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Incomplete diagonal command: Діагональ вниз вправо.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+client:810 [vite] hot updated: /src/lib/components/VoiceList.svelte
+client:810 [vite] hot updated: /src/lib/components/VoiceSettings.svelte
+client:810 [vite] hot updated: /src/lib/components/ModalManager.svelte
+client:810 [vite] hot updated: /src/routes/game/+layout.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/ScorePanelWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/GameModeWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/ControlsPanelWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/SettingsExpanderWidget.svelte
+client:810 [vite] hot updated: /src/lib/components/GameModeModal.svelte
+client:810 [vite] hot updated: /src/lib/components/widgets/DirectionControls.svelte
+client:810 [vite] hot updated: /src/routes/game/virtual-player/+page.svelte
+logService.js:115 [GAME_MODE] Game layout is being destroyed, cleaning up game mode.
+logService.js:115 [GAME_MODE] [VirtualPlayerGameMode] cleanup called
+logService.js:115 [GAME_MODE] Game mode initialized: virtual-player (from preset: virtual-player)
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+іноді розпізнається звук з помарками
+напраклад 
+замість "право" система чує "права" або "вправа"
+замість "вліво" система чує "в ліво" або "в ліва" або "ліва"
+замість "вгору" система чує "в гору"
+замість "вниз" система чує "в низ" або "низ"
+ці всі випадки потрібно прописати чи можна щоб система перевіряла співпадіння по регулярному виразу і прописати так, що може бути помилка (або відстуність, або присутність) в будь якому символі? як краще вирішити цю проблему?
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+регулярні вирази повинні також реагувати на відсутність першої чи останьої літери:
+замість "вгору" система чує "гору"
+замість "вниз" система чує "низ"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+1. натиснув data-testid="voice-command-btn"
+2. зроби хід голосом
+3. VirtualPlayer зробив хід
+Актуальний результат: 
+якщо озвучка ходу OFF, голосовий ввід автоматично НЕ увімкнувся, після ходу комп'ютера
+якщо озвучка ходу ON, тоді автоматично увімкнувся після озвучки ходу від системи
+Очікуваний результат:
+якщо озвучка ходу OFF, тоді голосовий ввід автоматично увімкнувся, після ходу комп'ютера
+якщо озвучка ходу ON, тоді автоматично увімкнувся після озвучки ходу від системи
+
+лог
+client:733 [vite] connecting...
+client:827 [vite] connected.
+logService.js:149 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+init.js:31 ✅ i18n initialized successfully
+logService.js:115 [GAME_MODE] Game mode initialized: virtual-player (from preset: virtual-player)
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Вниз один.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: down 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down', distance: 1, playerIndex: 0}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:115 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:113 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'down', distance: 1, row: 2, col: 2, isPenalty: false}
+logService.js:115 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:113 [LOGIC_MOVE] performMove: початок з параметрами: {direction: 'down', distance: 1, playerIndex: 1}
+logService.js:115 [LOGIC_MOVE] performMove: завершено успішно
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+виставити data-testid="auto-hide-board-toggle" == OFF
+виставити data-testid="block-mode-toggle" == ON
+натиснути data-testid="play-again-btn"
+
+Актуальний результат: скидає налаштування гри до замовчування
+Очікуваний результат: не скидає налаштування до замовчування
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
