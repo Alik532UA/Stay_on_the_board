@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 import { uiStateStore } from '$lib/stores/uiStateStore';
 import { userActionService } from './userActionService';
 import { logService } from './logService';
+import { voiceControlStore } from '$lib/stores/voiceControlStore';
 
 class VoiceControlService {
   private recognition: any | null = null;
@@ -53,6 +54,7 @@ class VoiceControlService {
 
   private handleResult(event: any) {
     const transcript = event.results[0][0].transcript.trim();
+    voiceControlStore.setTranscript(transcript);
     logService.voiceControl(`[VoiceControlService] Recognized text: ${transcript}`);
     this.parseCommand(transcript);
   }

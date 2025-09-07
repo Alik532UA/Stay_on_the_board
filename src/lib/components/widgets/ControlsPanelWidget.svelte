@@ -10,6 +10,11 @@
   import { getCenterInfoState } from '$lib/utils/centerInfoUtil';
   import { logService } from '$lib/services/logService.js';
   import { uiStateStore } from '$lib/stores/uiStateStore';
+  import { voiceControlStore } from '$lib/stores/voiceControlStore';
+
+  let showDebug = false;
+  let clickCount = 0;
+  let clickTimer: NodeJS.Timeout;
 
   $: selectedDirection = $uiStateStore?.selectedDirection;
   $: selectedDistance = $uiStateStore?.selectedDistance;
@@ -64,6 +69,18 @@
     }
     userActionService.confirmMove();
   }
+
+  function handleLabelClick() {
+    clearTimeout(clickTimer);
+    clickCount++;
+    if (clickCount === 3) {
+      showDebug = !showDebug;
+      clickCount = 0;
+    }
+    clickTimer = setTimeout(() => {
+      clickCount = 0;
+    }, 1000);
+  }
 </script>
 
 <style>
@@ -89,12 +106,23 @@
     font-weight: 500;
     margin-bottom: 6px;
     color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .debug-panel {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    font-family: monospace;
   }
 </style>
 
 {#if $uiStateStore}
 <div class="game-controls-panel" data-testid="controls-panel">
-  <div class="select-direction-label">{$_('gameControls.selectDirectionAndDistance')}</div>
+  <div class="select-direction-label" on:click={handleLabelClick} on:keydown={handleLabelClick} role="button" tabindex="0">{$_('gameControls.selectDirectionAndDistance')}</div>
   <DirectionControls
     availableDirections={[
       'up-left', 'up', 'up-right',
@@ -115,5 +143,11 @@
     on:confirm={handleConfirm}
     on:noMoves={handleNoMoves}
   />
+  {#if showDebug}
+    <div class="debug-panel" data-testid="voice-debug-panel">
+      <p>Recognized Text:</p>
+      <pre>{$voiceControlStore.lastTranscript || 'No speech detected yet.'}</pre>
+    </div>
+  {/if}
 </div>
 {/if}
