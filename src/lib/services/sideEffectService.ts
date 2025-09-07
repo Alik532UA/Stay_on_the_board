@@ -9,7 +9,7 @@ import type { MoveDirectionType } from '$lib/models/Piece';
 export type SideEffect =
   | { type: 'navigate'; payload: string }
   | { type: 'speak'; payload: { text: string; lang: string; voiceURI: string | null } }
-  | { type: 'speak_move'; payload: { move: { direction: MoveDirectionType; distance: number }; lang: string; voiceURI: string | null } }
+  | { type: 'speak_move'; payload: { move: { direction: MoveDirectionType; distance: number }; lang: string; voiceURI: string | null, onEndCallback?: () => void } }
   | { type: 'localStorage_set'; payload: { key: string; value: any } }
   | { type: 'ui/showGameOverModal'; payload: any }
   | { type: 'ui/closeModal' }
@@ -27,7 +27,7 @@ class SideEffectService {
         break;
       case 'speak_move':
         logService.speech('[SideEffectService] Received speak_move effect', effect.payload);
-        speakMove(effect.payload.move, effect.payload.lang, effect.payload.voiceURI);
+        speakMove(effect.payload.move, effect.payload.lang, effect.payload.voiceURI, effect.payload.onEndCallback);
         break;
       case 'localStorage_set':
         localStorage.setItem(effect.payload.key, JSON.stringify(effect.payload.value));

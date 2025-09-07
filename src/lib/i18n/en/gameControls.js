@@ -12,6 +12,6 @@ export default {
   confirm: "Confirm",
   noMovesTitle: "No Moves",
   selectDirectionAndDistance: "Select direction and distance",
-  voiceCommand: "Voice",
+  voiceCommand: "Voice Control (beta)",
   voiceCommandTitle: "Voice Command"
 }; 

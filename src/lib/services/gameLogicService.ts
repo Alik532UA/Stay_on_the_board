@@ -16,7 +16,8 @@ export function performMove(
   distance: number,
   playerIndex: number,
   currentState: any, // Combined state
-  settings: any
+  settings: any,
+  onEndCallback?: () => void
 ) {
   logService.state('Logical Position (at move start)', { row: currentState.playerRow, col: currentState.playerCol });
   logService.logicMove('performMove: початок з параметрами:', { direction, distance, playerIndex });
@@ -67,13 +68,16 @@ export function performMove(
                       ((currentPlayer.isComputer && settings.speechFor.computer) || 
                       (!currentPlayer.isComputer && settings.speechFor.player));
 
-  if (shouldSpeak) {
+  // Якщо потрібно озвучити хід, АБО якщо є callback, який потрібно виконати в кінці ходу,
+  // ми створюємо побічний ефект. speechService сам вирішить, чи потрібно говорити.
+  if (shouldSpeak || onEndCallback) {
     sideEffects.push({
       type: 'speak_move',
       payload: {
         move: { direction, distance },
         lang: (get(appSettingsStore) as AppSettingsState).language || 'uk',
-        voiceURI: settings.selectedVoiceURI
+        voiceURI: settings.selectedVoiceURI,
+        onEndCallback
       }
     });
   }

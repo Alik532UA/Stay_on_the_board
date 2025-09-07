@@ -306,7 +306,7 @@
     transform: scale(1.02);
 }
 .voice-btn.active {
-    background: #ffeb3b;
-    color: #000;
+    background: #e53935;
+    color: #fff;
 }
 </style>
