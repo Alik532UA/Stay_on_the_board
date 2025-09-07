@@ -11,6 +11,7 @@
   import { logService } from '$lib/services/logService.js';
   import { uiStateStore } from '$lib/stores/uiStateStore';
   import { voiceControlStore } from '$lib/stores/voiceControlStore';
+  import { debugLogStore } from '$lib/stores/debugLogStore.js';
 
   let showDebug = false;
   let clickCount = 0;
@@ -83,13 +84,29 @@
   }
 
   function copyLogs() {
-    const transcript = document.getElementById('voice-transcript');
-    if (transcript) {
-      navigator.clipboard.writeText(transcript.innerText);
-      logService.ui('[ControlsPanelWidget] Copied voice transcript to clipboard.');
-    }
+    const voiceTranscript = document.getElementById('voice-transcript')?.innerText || '';
+    const recognitionError = document.getElementById('recognition-error')?.innerText || '';
+    const generalLogs = document.getElementById('general-logs')?.innerText || '';
+
+    const fullLog = `---
+Voice Transcript ---
+${voiceTranscript}
+
+--- Recognition Error ---
+${recognitionError}
+
+--- General Logs ---
+${generalLogs}`;
+
+    navigator.clipboard.writeText(fullLog);
+    logService.ui('[ControlsPanelWidget] Copied full debug log to clipboard.');
+  }
+
+  function clearLogs() {
+    debugLogStore.clear();
   }
 </script>
+
 
 <style>
   .game-controls-panel {
@@ -121,17 +138,26 @@
     width: 100%;
     margin-top: 10px;
     padding: 10px;
-    background-color: #333;
-    color: white;
-    border-radius: 5px;
+    background-color: #2c2c2c; /* Slightly lighter dark */
+    color: #f0f0f0; /* Lighter text */
+    border-radius: 8px; /* Softer corners */
     font-family: monospace;
     position: relative;
+    border: 1px solid #444;
+    max-height: 400px; /* Limit height */
+    overflow-y: auto; /* Allow scrolling */
+    font-size: 0.85em;
   }
 
-  .copy-logs-btn {
+  .debug-controls {
     position: absolute;
     top: 5px;
     right: 5px;
+    display: flex;
+    gap: 5px;
+  }
+
+  .debug-btn {
     background: #555;
     border: none;
     color: white;
@@ -140,8 +166,25 @@
     cursor: pointer;
   }
 
-  .copy-logs-btn:hover {
+  .debug-btn:hover {
     background: #777;
+  }
+
+  .logs-container {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #555;
+    white-space: pre-wrap; /* Wrap long log lines */
+    word-break: break-all; /* Break long words */
+  }
+
+  .log-entry {
+    padding: 2px 0;
+    border-bottom: 1px dotted #444;
+  }
+
+  .log-entry:last-child {
+    border-bottom: none;
   }
 </style>
 
@@ -170,13 +213,22 @@
   />
   {#if showDebug}
     <div class="debug-panel" data-testid="voice-debug-panel">
-      <button class="copy-logs-btn" on:click={copyLogs}>Copy</button>
+      <div class="debug-controls">
+        <button class="debug-btn" on:click={copyLogs}>Copy</button>
+        <button class="debug-btn" on:click={clearLogs}>Clear</button>
+      </div>
       <p>Recognized Text:</p>
       <pre id="voice-transcript">{$voiceControlStore.lastTranscript || 'No speech detected yet.'}</pre>
       {#if $voiceControlStore.recognitionError}
         <p>Recognition Error Details:</p>
-        <pre>{JSON.stringify($voiceControlStore.recognitionError, null, 2)}</pre>
+        <pre id="recognition-error">{JSON.stringify($voiceControlStore.recognitionError, null, 2)}</pre>
       {/if}
+      <p>--- General Logs ---</p>
+      <div id="general-logs" class="logs-container">
+        {#each $debugLogStore as log, i (i)}
+          <div class="log-entry">{log}</div>
+        {/each}
+      </div>
     </div>
   {/if}
 </div>
