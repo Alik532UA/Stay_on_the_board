@@ -39,6 +39,14 @@
   />
 </div>
 <div class="settings-section">
+  <ToggleButton 
+    label={$_('voiceSettings.speakModalTitles')} 
+    checked={$gameSettingsStore.speakModalTitles} 
+    on:toggle={() => { logService.ui('Speak modal titles toggled'); gameSettingsStore.updateSettings({ speakModalTitles: !$gameSettingsStore.speakModalTitles }); }}
+    dataTestId="speak-modal-titles-toggle-btn"
+  />
+</div>
+<div class="settings-section">
   <span class="settings-label">{$_('voiceSettings.speakFor')}</span>
   <div class="button-group">
     <button class:active={$gameSettingsStore.speechFor.player} onclick={() => { logService.ui('Speak for player toggled'); gameSettingsStore.updateSettings({ speechFor: { ...$gameSettingsStore.speechFor, player: !$gameSettingsStore.speechFor.player } }); }} data-testid="speech-for-player-btn">{$_('voiceSettings.player')}</button>

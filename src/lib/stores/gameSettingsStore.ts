@@ -36,6 +36,7 @@ export type GameSettingsState = {
   speechOrder: 'dir_dist' | 'dist_dir';
   shortSpeech: boolean;
   speechFor: { player: boolean; computer: boolean };
+  speakModalTitles: boolean;
 };
 
 const isBrowser = typeof window !== 'undefined';
@@ -76,6 +77,7 @@ export const defaultGameSettings: GameSettingsState = {
     speechOrder: 'dist_dir',
     shortSpeech: true,
     speechFor: { player: false, computer: true },
+    speakModalTitles: true,
 };
 
 function createGameSettingsStore() {

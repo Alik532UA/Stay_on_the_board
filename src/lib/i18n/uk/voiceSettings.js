@@ -29,5 +29,6 @@ export default {
   player: 'Хід гравця',
   computer: 'Хід комп\'ютера',
   testVoice: "Тест голосу",
-  testPhrase: "Раді бачити тебе в грі"
+  testPhrase: "Раді бачити тебе в грі",
+  speakModalTitles: 'Озвучування модальних вікон'
 };

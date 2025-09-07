@@ -29,5 +29,6 @@ export default {
   player: 'Spelerszet',
   computer: 'Computerzet',
   testVoice: "Test Stem",
-  testPhrase: "Blij je te zien in het spel"
+  testPhrase: "Blij je te zien in het spel",
+  speakModalTitles: 'Spreek modale vensters uit'
 };
