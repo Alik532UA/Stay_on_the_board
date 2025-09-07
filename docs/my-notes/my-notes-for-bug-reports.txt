@@ -7096,23 +7096,38 @@ dev
 [SPEECH] [Speech] Applying speechRate in speakTestPhrase: 1.600000023841858 
 [SPEECH] [Speech] Cancelling previous speech and queuing test utterance "Раді бачити тебе в грі" with lang: uk-UA 
 
-edge windows 11
-prod
-лог не записався
-
 android chrome
 prod
-лог не записався
+--- General Logs ---
+[UI] GameInfoWidget: displayMessage re-evaluating {"isGameOver":false,"isFirstMove":true,"lastComputerMove":null,"lastPlayerMove":null,"isPlayerTurn":true,"isCompact":false}
+[SPEECH] [Speech] Applying speechRate in speakTestPhrase: 1.600000023841858 
+[SPEECH] [Speech] Cancelling previous speech and queuing test utterance "Glad to see you in the game" with lang: uk_UA
 
-на проді не пишеться лог
-чи інша проблема?
+різниця в "uk-UA" та "uk_UA" 
+будемо перевіряти на два значення?
+будемо використовувати регулярний вираз?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 не не спрацює, бо прод на github pages і коли я введу https://alik532ua.github.io/Stay_on_the_board/game/virtual-player?debug=true  то буде переадресація на https://alik532ua.github.io/Stay_on_the_board
 
 тому треба запускати запис логу коли ми відкриваємо "voice-debug-panel"
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+```
+Microsoft Colette Online (Natural) - Dutch (Netherlands) (nl-NL)
+Microsoft Fenna Online (Natural) - Dutch (Netherlands) (nl-NL)
+Microsoft Maarten Online (Natural) - Dutch (Netherlands) (nl-NL)
+Microsoft Arnaud Online (Natural) - Dutch (Belgium) (nl-BE)
+Microsoft Dena Online (Natural) - Dutch (Belgium) (nl-BE)
+Microsoft David - English (United States) (en-US)
+Microsoft Mark - English (United States) (en-US)
+```
+
+тепер коли ми аналізуємо тільки перші два символи, то як нам для "nl" зробити щоб пріоритет залишився "nl-NL" вище ніж "nl-BE" ?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+'crh-UA'
+а тут перед - 3 символи , наш алгоритм буде працювати? бо у нас закодовано hardcode два символи
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+ треба щоб пріоритет залишився "nl-NL" вище ніж "nl-BE" ?
+ ця проблема теж не зв'явиться від запропонованого тобою алгоритму?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦

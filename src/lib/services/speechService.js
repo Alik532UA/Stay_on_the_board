@@ -80,9 +80,29 @@ loadAndGetVoices();
  */
 export function filterVoicesByLang(voiceList, langCode) {
   if (!voiceList) return [];
-  logService.ui(`[Speech] Filtering for langCode: "${langCode}". Total voices: ${voiceList.length}`);
-  const filtered = voiceList.filter(voice => voice.lang.startsWith(langCode));
-  logService.ui(`[Speech] Found ${filtered.length} voices for "${langCode}".`);
+
+  const preferredDialects = {
+    nl: 'nl-NL',
+    en: 'en-US',
+    uk: 'uk-UA',
+    crh: 'crh-UA'
+  };
+
+  const preferredLang = preferredDialects[langCode];
+  
+  logService.ui(`[Speech] Filtering for langCode: "${langCode}". Preferred dialect: "${preferredLang}". Total voices: ${voiceList.length}`);
+
+  if (preferredLang) {
+    const preferredVoices = voiceList.filter(voice => voice.lang.replace('_', '-') === preferredLang);
+    if (preferredVoices.length > 0) {
+      logService.ui(`[Speech] Found ${preferredVoices.length} voices with preferred dialect "${preferredLang}".`);
+      return preferredVoices;
+    }
+  }
+
+  // Fallback to matching the base language code
+  const filtered = voiceList.filter(voice => voice.lang.split(/[-_]/)[0].toLowerCase() === langCode);
+  logService.ui(`[Speech] No preferred dialect found. Found ${filtered.length} voices matching base lang "${langCode}".`);
   return filtered;
 }
 
@@ -129,7 +149,7 @@ export function speakMove(move, lang, voiceURI, onEndCallback) {
   let voiceToUse = selectedVoice || availableVoices[0] || null;
   
   const voiceLang = voiceToUse ? voiceToUse.lang : 'en-US';
-  const actualLangCode = voiceLang.split('-')[0];
+  const actualLangCode = voiceLang.split(/[-_]/)[0].toLowerCase();
   logService.speech(`[Speech] Determined language for speech: ${actualLangCode} (based on voice lang: ${voiceLang})`);
 
   const translations = actualLangCode in speechTranslations
@@ -238,7 +258,7 @@ export function speakTestPhrase() {
   }
 
   const voiceLang = voiceToUse.lang; // e.g., 'en-US'
-  const langCode = voiceLang.split('-')[0]; // e.g., 'en'
+  const langCode = voiceLang.split(/[-_]/)[0].toLowerCase(); // e.g., 'en'
 
   const translations = langCode in speechTranslations
     ? speechTranslations[/** @type {keyof typeof speechTranslations} */ (langCode)]
