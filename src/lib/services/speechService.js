@@ -88,7 +88,7 @@ export function filterVoicesByLang(voiceList, langCode) {
     crh: 'crh-UA'
   };
 
-  const preferredLang = preferredDialects[langCode];
+  const preferredLang = preferredDialects[/** @type {keyof typeof preferredDialects} */ (langCode)];
   
   logService.ui(`[Speech] Filtering for langCode: "${langCode}". Preferred dialect: "${preferredLang}". Total voices: ${voiceList.length}`);
 
