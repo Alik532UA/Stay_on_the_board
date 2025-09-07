@@ -13,5 +13,6 @@ export default {
   noMovesTitle: "Areket yoq",
   selectDirectionAndDistance: "Yön ve mesafe seçin",
   voiceCommand: "Sesnen idare (beta)",
-  voiceCommandTitle: "Sesli komanda"
+  voiceCommandTitle: "Sesli komanda",
+  voiceCommandNotSupported: "Sesli komanda brauzeriñizde desteklenmey"
 }; 
