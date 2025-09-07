@@ -33,9 +33,12 @@
   const isVoiceSupported = voiceControlService.isApiSupported;
   const voiceButtonTooltip = isVoiceSupported ? $_('gameControls.voiceCommandTitle') : $_('gameControls.voiceCommandNotSupported');
 
+  let isIos = false;
+
   $: voiceButtonStyle = `box-shadow: 0 0 0 ${$voiceControlStore.volume * 20}px rgba(229, 57, 53, ${Math.min($voiceControlStore.volume * 2, 1)});`;
 
   onMount(() => {
+    isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     // Direction hotkeys
     availableDirections.forEach(dir => {
       if (dir) {
@@ -142,10 +145,12 @@
         {$_('gameControls.noMovesTitle')}
       </button>
     {/if}
+    {#if !isIos}
     <button class="voice-btn" on:click={handleVoiceCommand} use:customTooltip={voiceButtonTooltip} data-testid="voice-command-btn" class:active={$uiStateStore.isListening} disabled={!isVoiceSupported} style={$uiStateStore.isListening ? voiceButtonStyle : ''}>
         <SvgIcons name="microphone" />
         {$_('gameControls.voiceCommand')}
     </button>
+    {/if}
   </div>
 </div>
 
