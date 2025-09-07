@@ -54,8 +54,8 @@ export const defaultGameSettings: GameSettingsState = {
     keybindings: {
         'up-left': ['Numpad7', 'KeyQ'], 'up': ['Numpad8', 'KeyW'], 'up-right': ['Numpad9', 'KeyE'],
         'left': ['Numpad4', 'KeyA'], 'right': ['Numpad6', 'KeyD'],
-        'down-left': ['Numpad1', 'KeyZ'], 'down': ['Numpad2', 'KeyX'], 'down-right': ['Numpad3', 'KeyC'],
-        'confirm': ['Numpad5', 'Enter', 'Space'], 'no-moves': ['NumpadDecimal', 'Backspace'],
+        'down-left': ['Numpad1', 'KeyZ'], 'down': ['Numpad2', 'KeyX', 'KeyS'], 'down-right': ['Numpad3', 'KeyC'],
+        'confirm': ['Numpad5', 'Enter', 'Space', 'NumpadEnter', 'KeyS'], 'no-moves': ['NumpadDecimal', 'Backspace'],
         'distance-1': ['Digit1'], 'distance-2': ['Digit2'], 'distance-3': ['Digit3'],
         'distance-4': ['Digit4'], 'distance-5': ['Digit5'], 'distance-6': ['Digit6'],
         'distance-7': ['Digit7'], 'distance-8': ['Digit8'],
@@ -182,6 +182,7 @@ function createGameSettingsStore() {
     toggleSpeech: () => update(state => ({ ...state, speechEnabled: !state.speechEnabled })),
     
     applyPreset: (preset: GameModePreset) => {
+        logService.GAME_MODE(`[GameSettingsStore] Applying preset: "${preset}"`);
         const presets: Record<GameModePreset, Partial<GameSettingsState>> = {
             beginner: { 
                 gameMode: 'beginner', 
