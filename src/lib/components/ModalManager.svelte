@@ -4,7 +4,9 @@
   import { userActionService } from '$lib/services/userActionService';
   import { get } from 'svelte/store';
   import { modalStore } from '$lib/stores/modalStore';
-  import { _ } from 'svelte-i18n';
+  import { _, locale } from 'svelte-i18n';
+  import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+  import { speakText } from '$lib/services/speechService.js';
 
   onMount(() => {
   	const unsubscribe = gameEventBus.subscribe('ShowNoMovesModal', (payload) => {
@@ -12,6 +14,13 @@
   		const titleKey = playerType === 'human' ? 'modal.playerNoMovesTitle' : 'modal.computerNoMovesTitle';
   		const contentKey = playerType === 'human' ? 'modal.playerNoMovesContent' : 'modal.computerNoMovesContent';
  
+        if (get(gameSettingsStore).speakModalTitles) {
+            const title = get(_)(titleKey);
+            const lang = get(locale) || 'uk';
+            const voiceURI = get(gameSettingsStore).selectedVoiceURI;
+            speakText(title, lang, voiceURI, undefined);
+        }
+
   		modalStore.showModal({
   			titleKey,
   			content: {
