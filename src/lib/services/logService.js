@@ -3,6 +3,7 @@ import { debugLogStore } from '../stores/debugLogStore.js';
 
 const isBrowser = typeof window !== 'undefined';
 const isDev = import.meta.env.DEV;
+let isForceEnabled = false; // Цей прапорець дозволить примусово вмикати логи
 
 // 1. Визначення груп логування
 const LOG_GROUPS = {
@@ -126,7 +127,8 @@ const styles = {
  * @param {any[]} data
  */
 function log(group, message, ...data) {
-  if (isDev && logConfig[group]) {
+  // Логи працюють в режимі розробки АБО якщо їх увімкнули примусово
+  if ((isDev || isForceEnabled) && logConfig[group]) {
     const style = styles[group] || '';
     if (data.length > 0) {
       console.log(`%c[${group.toUpperCase()}]%c ${message}`, style, 'color: inherit;', ...data);
@@ -159,6 +161,13 @@ export const logService = {
   testMode: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.TEST_MODE, message, ...data),
   modal: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.MODAL, message, ...data),
   error: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.ERROR, message, ...data),
+  forceEnableLogging: () => {
+    if (!isForceEnabled) {
+        isForceEnabled = true;
+        console.log('Logging has been force-enabled for this session.');
+        debugLogStore.add('[INFO] Logging has been force-enabled for this session.');
+    }
+  }
 };
 
 // 5. Глобальний контролер для зручності розробника-людини
