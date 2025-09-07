@@ -16,7 +16,7 @@ function showGameOverModal(payload: any) {
     scoreDetails: finalScoreDetails
   };
 
-  if (gameType === 'training' || gameType === 'virtual-player') {
+  if (gameType === 'training' || gameType === 'virtual-player' || gameType === 'timed') {
     titleKey = 'modal.trainingOverTitle';
   } else {
     // For local games, show player scores
