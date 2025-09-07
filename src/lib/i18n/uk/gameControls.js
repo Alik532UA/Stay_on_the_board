@@ -13,5 +13,6 @@ export default {
   noMovesTitle: "Ходів немає",
   selectDirectionAndDistance: "Оберіть напрямок та відстань",
   voiceCommand: "Керування голосом (beta)",
-  voiceCommandTitle: "Голосова команда"
+  voiceCommandTitle: "Голосова команда",
+  voiceCommandNotSupported: "Голосове керування не підтримується у вашому браузері"
 }; 

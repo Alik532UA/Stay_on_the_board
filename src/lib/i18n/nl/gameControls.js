@@ -13,5 +13,6 @@ export default {
   noMovesTitle: "Geen Zetten",
   selectDirectionAndDistance: "Kies richting en afstand",
   voiceCommand: "Spraakbesturing (beta)",
-  voiceCommandTitle: "Spraakopdracht"
+  voiceCommandTitle: "Spraakopdracht",
+  voiceCommandNotSupported: "Spraakopdracht wordt niet ondersteund in uw browser"
 }; 

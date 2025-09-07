@@ -3,11 +3,13 @@ import { writable } from 'svelte/store';
 
 type VoiceControlState = {
   lastTranscript: string;
+  volume: number;
 };
 
 function createVoiceControlStore() {
   const { subscribe, set, update } = writable<VoiceControlState>({
     lastTranscript: '',
+    volume: 0,
   });
 
   return {
@@ -15,8 +17,11 @@ function createVoiceControlStore() {
     setTranscript: (transcript: string) => {
       update(state => ({ ...state, lastTranscript: transcript }));
     },
+    setVolume: (volume: number) => {
+      update(state => ({ ...state, volume }));
+    },
     reset: () => {
-      set({ lastTranscript: '' });
+      set({ lastTranscript: '', volume: 0 });
     }
   };
 }
