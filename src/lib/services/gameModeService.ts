@@ -24,7 +24,7 @@ class GameModeService {
     this.modes.set(name, mode);
   }
 
-  public initializeGameMode(modeName: string | null = null) {
+  public initializeGameMode(modeName: string | null = null, applyPresetSettings: boolean = true) {
     const name = modeName || get(gameSettingsStore).gameMode;
 
     // НАВІЩО (Архітектурне рішення): Створюємо мапінг між назвами пресетів (зберігаються в налаштуваннях)
@@ -46,7 +46,7 @@ class GameModeService {
 
     if (mode) {
       timerStore.reset();
-      if (name && ['beginner', 'experienced', 'pro', 'timed', 'local', 'online'].includes(name)) {
+      if (applyPresetSettings && name && ['beginner', 'experienced', 'pro', 'timed', 'local', 'online'].includes(name)) {
         gameSettingsStore.applyPreset(name as any);
       }
       gameStore.setMode(mode);

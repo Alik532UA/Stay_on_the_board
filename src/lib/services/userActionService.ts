@@ -110,7 +110,7 @@ export const userActionService = {
     // not the one that is currently active.
     const activeMode = get(gameSettingsStore).gameMode;
     if (activeMode) {
-      gameModeService.initializeGameMode(activeMode);
+      gameModeService.initializeGameMode(activeMode, false);
     } else {
       // Fallback, though a mode should always be active when this is called.
       logService.state('ERROR: [userActionService] requestRestart called without an active game mode.');
