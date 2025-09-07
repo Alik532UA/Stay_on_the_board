@@ -1,161 +1,23 @@
-або ти дописуєш логи і аналізуєш і вирішуєш проблему, або я тебе видаляю і вимикаю
-
-проблема залишилась
-1. натиснув data-testid="voice-command-btn"
-2. зроби хід голосом
-3. VirtualPlayer зробив хід
-Актуальний результат: 
-якщо "speech-toggle" == OFF, тоді після ходу комп'ютера голосовий ввід автоматично НЕ увімкнувся, 
-якщо "speech-toggle" == ON, тоді автоматично увімкнувся після озвучки ходу від системи (працює правильно, не треба виправляти)
-Очікуваний результат:
-якщо "speech-toggle" == OFF, тоді після ходу комп'ютера голосовий ввід автоматично увімкнувся, 
-якщо "speech-toggle" == ON, тоді автоматично увімкнувся після озвучки ходу від системи (працює правильно, не треба виправляти)
-
----
-
-**Ключова вимога:** Твоє рішення має бути комплексним. Не роби поверхневих виправлень ("латок" чи "костилів").
-**Реалізуй системне виправлення**, яке усуває корінь проблеми та відповідає цільовій архітектурі проєкту.
-при виправленні використовуй принципи:
-1.  **SSoT (Single Source of Truth):** Чи є єдине джерело правди для кожного елемента стану?
-2.  **UDF (Unidirectional Data Flow):** Чи є потік даних односпрямованим та передбачуваним?
-3.  **SoC (Separation of Concerns):** Наскільки добре розділені відповідальності (стан, логіка, UI)?
-4.  **Композиція:** Чи ефективно використовуються компоненти для побудови UI?
-5.  **Чистота та Побічні ефекти:** Наскільки добре ізольовані "нечисті" операції (API, DOM, таймери)?
-6.  **DRY (Don't Repeat Yourself):** Чи є дублювання коду, яке можна усунути?
-7.  **Простота та Читабельність (KISS):** Чи є надмірно складні рішення? Наскільки код зрозумілий (якість іменування)?
-8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
-9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
-
----
-
-**Відладка (Дебагінг):**
-    *   **Використовуй `logService`:** Замість `console.log` завжди використовуй централізований `logService`.
-    *   **Доповнюй логи для аналізу:** Якщо поточний рівень логування не дозволяє діагностувати описану проблему, додай нові виклики logService у відповідних місцях коду. Мета — забезпечити, щоб майбутні логи містили всю інформацію, яка дозволить мені самостійно проаналізувати, чи вирішено проблему, і що саме потребує виправлення.
-    *   **Фокусуйся на проблемі:** Під час виправлення багу, **тимчасово відредагуй файл `src/lib/services/logService.js`**. Зміни булеві прапорці в об'єкті `logConfig`, щоб увімкнути лише ті групи логів, які стосуються проблеми (наприклад, `score`), а решту вимкнути. Це допоможе усунути інформаційний шум.
-    *   **Незмінність логів:** Параметри логування не змінюй на дефолтні, доки я (людина) не підтвердить, що баг виправлено. При порушені цього правила AI буде вимкнено та видалено.
-**Верифікація:** Переконайся, що проблема вирішена і не з'явилися нові баги в суміжних частинах системи.
-
----
-
-при потребі:
-1. вимкни зайві логи
-2. увімкни потрібні логи
-3. допиши потрібні логи
-
-
----
-
-лог:
-client:733 [vite] connecting...
-client:827 [vite] connected.
-logService.js:149 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
-init.js:31 ✅ i18n initialized successfully
-logService.js:115 [GAME_MODE] Game mode initialized: virtual-player (from preset: virtual-player)
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Вниз.
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: down 1
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
-logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
-logService.js:115 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
-logService.js:115 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
-logService.js:115 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
-logService.js:113 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'down-left', distance: 2, row: 3, col: 0, isPenalty: false}
-logService.js:115 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
-logService.js:113 [GAME_MODE] [BaseGameMode] Executing side effects for move... [{…}]
-speechService.js:102  Uncaught (in promise) ReferenceError: playerStore is not defined
-    at speakMove (speechService.js:102:27)
-    at SideEffectService.execute (sideEffectService.ts:30:9)
-    at BaseGameMode.ts:86:80
-    at Array.forEach (<anonymous>)
-    at VirtualPlayerGameMode.onPlayerMoveSuccess (BaseGameMode.ts:86:30)
-    at VirtualPlayerGameMode.handlePlayerMove (BaseGameMode.ts:72:18)
-    at async VirtualPlayerGameMode.triggerComputerMove (BaseGameMode.ts:181:7)
-    at async VirtualPlayerGameMode.advanceToNextPlayer (VirtualPlayerGameMode.ts:63:7)
-    at async VirtualPlayerGameMode.onPlayerMoveSuccess (BaseGameMode.ts:89:5)
-    at async VirtualPlayerGameMode.handlePlayerMove (BaseGameMode.ts:72:7)
-speakMove @ speechService.js:102
-execute @ sideEffectService.ts:30
-(anonymous) @ BaseGameMode.ts:86
-onPlayerMoveSuccess @ BaseGameMode.ts:86
-handlePlayerMove @ BaseGameMode.ts:72
-await in handlePlayerMove
-triggerComputerMove @ BaseGameMode.ts:181
-advanceToNextPlayer @ VirtualPlayerGameMode.ts:63
-onPlayerMoveSuccess @ BaseGameMode.ts:89
-handlePlayerMove @ BaseGameMode.ts:72
-await in handlePlayerMove
-executeMove @ userActionService.ts:68
-parseCommand @ voiceControlService.ts:153
-handleResult @ voiceControlService.ts:55
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
-
-
-
-або ти дописуєш логи і аналізуєш і вирішуєш проблему, або я тебе видаляю і вимикаю
-
-
 
 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩
 
-зроби `git diff HEAD` та проаналізуй, щоб правильно виправити проблему
+на 80% працює добре, але продовжуємо виправляти маленькі ньюанси
+треба твій аналіз, чому це не спрацювало?
 
-speechService.js:102  Uncaught (in promise) ReferenceError: playerStore is not defined
-    at speakMove (speechService.js:102:27)
-    at SideEffectService.execute (sideEffectService.ts:30:9)
-    at BaseGameMode.ts:86:80
-    at Array.forEach (<anonymous>)
-    at VirtualPlayerGameMode.onPlayerMoveSuccess (BaseGameMode.ts:86:30)
-    at VirtualPlayerGameMode.handlePlayerMove (BaseGameMode.ts:72:18)
-    at async VirtualPlayerGameMode.triggerComputerMove (BaseGameMode.ts:181:7)
-    at async VirtualPlayerGameMode.advanceToNextPlayer (VirtualPlayerGameMode.ts:63:7)
-    at async VirtualPlayerGameMode.onPlayerMoveSuccess (BaseGameMode.ts:89:5)
-    at async VirtualPlayerGameMode.handlePlayerMove (BaseGameMode.ts:72:7)
-speakMove @ speechService.js:102
-execute @ sideEffectService.ts:30
-(anonymous) @ BaseGameMode.ts:86
-onPlayerMoveSuccess @ BaseGameMode.ts:86
-handlePlayerMove @ BaseGameMode.ts:72
-await in handlePlayerMove
-triggerComputerMove @ BaseGameMode.ts:181
-advanceToNextPlayer @ VirtualPlayerGameMode.ts:63
-onPlayerMoveSuccess @ BaseGameMode.ts:89
-handlePlayerMove @ BaseGameMode.ts:72
-await in handlePlayerMove
-executeMove @ userActionService.ts:68
-parseCommand @ voiceControlService.ts:153
-handleResult @ voiceControlService.ts:55
-
----
-
-**Ключова вимога:** Твоє рішення має бути комплексним. Не роби поверхневих виправлень ("латок" чи "костилів").
-**Реалізуй системне виправлення**, яке усуває корінь проблеми та відповідає цільовій архітектурі проєкту.
-при виправленні використовуй принципи:
-1.  **SSoT (Single Source of Truth):** Чи є єдине джерело правди для кожного елемента стану?
-2.  **UDF (Unidirectional Data Flow):** Чи є потік даних односпрямованим та передбачуваним?
-3.  **SoC (Separation of Concerns):** Наскільки добре розділені відповідальності (стан, логіка, UI)?
-4.  **Композиція:** Чи ефективно використовуються компоненти для побудови UI?
-5.  **Чистота та Побічні ефекти:** Наскільки добре ізольовані "нечисті" операції (API, DOM, таймери)?
-6.  **DRY (Don't Repeat Yourself):** Чи є дублювання коду, яке можна усунути?
-7.  **Простота та Читабельність (KISS):** Чи є надмірно складні рішення? Наскільки код зрозумілий (якість іменування)?
-8.  **Продуктивність:** Чи є потенційні проблеми зі швидкістю (зайві обчислення, перерендери)?
-9.  **Документація та Коментарі:** Чи коментарі пояснюють *навіщо*, а не *що*?
-
----
-
-**Відладка (Дебагінг):**
-    *   **Використовуй `logService`:** Замість `console.log` завжди використовуй централізований `logService`.
-    *   **Доповнюй логи для аналізу:** Якщо поточний рівень логування не дозволяє діагностувати описану проблему, додай нові виклики logService у відповідних місцях коду. Мета — забезпечити, щоб майбутні логи містили всю інформацію, яка дозволить мені самостійно проаналізувати, чи вирішено проблему, і що саме потребує виправлення.
-    *   **Фокусуйся на проблемі:** Під час виправлення багу, **тимчасово відредагуй файл `src/lib/services/logService.js`**. Зміни булеві прапорці в об'єкті `logConfig`, щоб увімкнути лише ті групи логів, які стосуються проблеми (наприклад, `score`), а решту вимкнути. Це допоможе усунути інформаційний шум.
-    *   **Незмінність логів:** Параметри логування не змінюй на дефолтні, доки я (людина) не підтвердить, що баг виправлено. При порушені цього правила AI буде вимкнено та видалено.
-**Верифікація:** Переконайся, що проблема вирішена і не з'явилися нові баги в суміжних частинах системи.
-
----
-
-при потребі:
-1. вимкни зайві логи
-2. увімкни потрібні логи
-3. допиши потрібні логи
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Діагоналі вверх ліва.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Failed to parse command: Діагоналі вверх ліва.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
 
 
----
+яка у нас пауза між ходами у візуальної дошки? яке значення треба міняти, щоб зробити паузу більше чи меншу?
+пауза не жорстко закодована, а для кожного режиму індивідуальна!
+/game/training // mode-beginner - 1000 : 300
+/game/training // mode-experienced - 300 : 100
+/game/training // mode-pro - 50 : 50
+/game/timed - 50 : 50
+/game/local - 50 : 50
+/game/online - 50 : 50
+
+треба зробити, що коли вмикаєш режим режим "voice-command-btn", тоді тимчасово поки режим увімкнено, то значення  ```player: 30, computer: 30,```

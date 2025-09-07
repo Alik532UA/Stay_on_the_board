@@ -6907,36 +6907,21 @@ data-testid="voice-command-btn"
 коли система чує слово "діагоналі" чи "діагональ"
 Актуальний результат: немає ніякої логіки
 Очікуваний результат: гарантовано очікує озвучування двох напрямків, тобто якщо система чує "діагональ вверх", то нічого не робить, а ігнорує цей запит, то не було вказано другий напрямок, а якщо чує "діагональ вверх праворуч" тоді обробляє цей хід
+тобто треба переробити алгоритм: першочергово ОБОВ'ЯЗКОВО перевіряти запсаний текст на слова "діагоналі" чи "діагональ", а якщо цих слів не знайдено, то тоді вже як зараз
+перевіряти за дапомогою регулярних виразів, так як це зараз реалізовано
 
+log:
 client:733 [vite] connecting...
 client:827 [vite] connected.
 logService.js:149 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
 init.js:31 ✅ i18n initialized successfully
 logService.js:115 [GAME_MODE] Game mode initialized: virtual-player (from preset: virtual-player)
 logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Діана aль.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Діагональ вправо вниз.
 logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Failed to parse command: Діана aль.
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Started listening.
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Діагональ вниз вправо.
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Incomplete diagonal command: Діагональ вниз вправо.
-logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
-client:810 [vite] hot updated: /src/lib/components/VoiceList.svelte
-client:810 [vite] hot updated: /src/lib/components/VoiceSettings.svelte
-client:810 [vite] hot updated: /src/lib/components/ModalManager.svelte
-client:810 [vite] hot updated: /src/routes/game/+layout.svelte
-client:810 [vite] hot updated: /src/lib/components/widgets/ScorePanelWidget.svelte
-client:810 [vite] hot updated: /src/lib/components/widgets/GameModeWidget.svelte
-client:810 [vite] hot updated: /src/lib/components/widgets/ControlsPanelWidget.svelte
-client:810 [vite] hot updated: /src/lib/components/widgets/SettingsExpanderWidget.svelte
-client:810 [vite] hot updated: /src/lib/components/GameModeModal.svelte
-client:810 [vite] hot updated: /src/lib/components/widgets/DirectionControls.svelte
-client:810 [vite] hot updated: /src/routes/game/virtual-player/+page.svelte
-logService.js:115 [GAME_MODE] Game layout is being destroyed, cleaning up game mode.
-logService.js:115 [GAME_MODE] [VirtualPlayerGameMode] cleanup called
-logService.js:115 [GAME_MODE] Game mode initialized: virtual-player (from preset: virtual-player)
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsed command: down 1
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] voiceMoveRequested set to true
+logService.js:115 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 іноді розпізнається звук з помарками
@@ -6994,8 +6979,19 @@ logService.js:115 [VOICE_CONTROL] [VoiceControlService] Listening ended.
 Актуальний результат: скидає налаштування гри до замовчування
 Очікуваний результат: не скидає налаштування до замовчування
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+коли невдалий голосовий запит
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Recognized text: Невдалий запит.
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Parsing command with lang: uk
+logService.js:115 [VOICE_CONTROL] [VoiceControlService] Failed to parse command: Невдалий запит.
+Актуальний результат: нічого не відбувається
+Очікуваний результат: автоматично повторно запускається голосовий ввід, і так 5 разів, а якщо 5 підрят невдалих, тоді вже перестає автоматично запускатися голосовий ввід
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+<div class="button-group s-vMP96sLXzKWL"><button data-testid="speech-for-player-btn" class="s-vMP96sLXzKWL">Хід гравця</button> <button data-testid="speech-for-computer-btn" class="s-vMP96sLXzKWL active">Хід комп'ютера</button></div>
+треба додати ще одну кнопку-чекбокс: "озвучування модальних вікон"
+якщо кнопка-чекбокс ON, тоді title певних модальних вікон озвучуються: "opponent-trapped-modal-header" "game-over-modal-header" "player-no-moves-modal-header"
+за замовчуванням кнопка-чекбокс ON
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+треба зробити, що коли вмикаєш режим режим "voice-command-btn", тоді тимчасово поки режим увімкнено, то значення  ```player: 30, computer: 30,```
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
