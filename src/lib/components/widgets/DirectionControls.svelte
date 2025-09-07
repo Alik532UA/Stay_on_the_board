@@ -26,10 +26,14 @@
   
   import { uiStateStore } from '$lib/stores/uiStateStore.js';
   import { voiceControlService } from '$lib/services/voiceControlService.js';
+  import { voiceControlStore } from '$lib/stores/voiceControlStore';
 
   const dispatch = createEventDispatcher();
 
-  
+  const isVoiceSupported = voiceControlService.isApiSupported;
+  const voiceButtonTooltip = isVoiceSupported ? $_('gameControls.voiceCommandTitle') : $_('gameControls.voiceCommandNotSupported');
+
+  $: voiceButtonStyle = `box-shadow: 0 0 0 ${$voiceControlStore.volume * 20}px rgba(229, 57, 53, ${Math.min($voiceControlStore.volume * 2, 1)});`;
 
   onMount(() => {
     // Direction hotkeys
@@ -138,7 +142,7 @@
         {$_('gameControls.noMovesTitle')}
       </button>
     {/if}
-    <button class="voice-btn" on:click={handleVoiceCommand} use:customTooltip={$_('gameControls.voiceCommandTitle')} data-testid="voice-command-btn" class:active={$uiStateStore.isListening}>
+    <button class="voice-btn" on:click={handleVoiceCommand} use:customTooltip={voiceButtonTooltip} data-testid="voice-command-btn" class:active={$uiStateStore.isListening} disabled={!isVoiceSupported} style={$uiStateStore.isListening ? voiceButtonStyle : ''}>
         <SvgIcons name="microphone" />
         {$_('gameControls.voiceCommand')}
     </button>
@@ -308,5 +312,27 @@
 .voice-btn.active {
     background: #e53935;
     color: #fff;
+}
+
+.voice-btn:disabled {
+  background: #757575;
+  cursor: not-allowed;
+}
+
+.voice-btn:disabled:hover {
+  background: #757575;
+  transform: none;
+}
+
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(229, 57, 53, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(229, 57, 53, 0);
+  }
 }
 </style>

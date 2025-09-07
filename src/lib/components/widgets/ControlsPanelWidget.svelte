@@ -81,6 +81,14 @@
       clickCount = 0;
     }, 1000);
   }
+
+  function copyLogs() {
+    const transcript = document.getElementById('voice-transcript');
+    if (transcript) {
+      navigator.clipboard.writeText(transcript.innerText);
+      logService.ui('[ControlsPanelWidget] Copied voice transcript to clipboard.');
+    }
+  }
 </script>
 
 <style>
@@ -117,6 +125,23 @@
     color: white;
     border-radius: 5px;
     font-family: monospace;
+    position: relative;
+  }
+
+  .copy-logs-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #555;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .copy-logs-btn:hover {
+    background: #777;
   }
 </style>
 
@@ -145,8 +170,9 @@
   />
   {#if showDebug}
     <div class="debug-panel" data-testid="voice-debug-panel">
+      <button class="copy-logs-btn" on:click={copyLogs}>Copy</button>
       <p>Recognized Text:</p>
-      <pre>{$voiceControlStore.lastTranscript || 'No speech detected yet.'}</pre>
+      <pre id="voice-transcript">{$voiceControlStore.lastTranscript || 'No speech detected yet.'}</pre>
     </div>
   {/if}
 </div>
