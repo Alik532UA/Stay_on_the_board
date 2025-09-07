@@ -28,9 +28,16 @@
 
   onMount(() => {
     const boardState = get(boardStore);
+    // Only initialize if there is no game in progress.
     if (!boardState || boardState.moveHistory.length <= 1) {
-        logService.init('[VirtualPlayerPage] onMount: No active game found, initializing "virtual-player" mode.');
-        gameModeService.initializeGameMode('virtual-player');
+        const settings = get(gameSettingsStore);
+        const selectedMode = settings.gameMode;
+        
+        logService.init(`[VirtualPlayerPage] onMount: No active game. Initializing mode from settings: "${selectedMode}"`);
+        
+        // Use the mode from settings, but have a fallback just in case.
+        gameModeService.initializeGameMode(selectedMode || 'virtual-player');
+
     } else {
         logService.init('[VirtualPlayerPage] onMount: Active game found, not re-initializing.');
     }

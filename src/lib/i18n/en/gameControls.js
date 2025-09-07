@@ -14,5 +14,13 @@ export default {
   selectDirectionAndDistance: "Select direction and distance",
   voiceCommand: "Voice Control (beta)",
   voiceCommandTitle: "Voice Command",
-  voiceCommandNotSupported: "Voice command is not supported in your browser"
+  voiceCommandNotSupported: "Voice command is not supported in your browser",
+  'up-left': 'Up-Left',
+  'up': 'Up',
+  'up-right': 'Up-Right',
+  'left': 'Left',
+  'right': 'Right',
+  'down-left': 'Down-Left',
+  'down': 'Down',
+  'down-right': 'Down-Right'
 }; 
