@@ -17,6 +17,8 @@ import { uiStateStore } from '$lib/stores/uiStateStore';
 import { timerStore } from '$lib/stores/timerStore';
 import { endGameService } from '$lib/services/endGameService';
 
+import { voiceControlService } from '$lib/services/voiceControlService';
+
 export class VirtualPlayerGameMode extends TrainingGameMode {
 
   constructor() {
@@ -61,6 +63,12 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
       await this.triggerComputerMove();
     } else {
       this.startTurn();
+      // ВИДАЛЕНО: Ця логіка дублювала логіку в onEndCallback у BaseGameMode
+      // і викликалася передчасно, що призводило до конфліктів.
+      // if (get(uiStateStore).voiceMoveRequested) {
+      //   logService.GAME_MODE('advanceToNextPlayer: Повторне ввімкнення голосового керування.');
+      //   voiceControlService.startListening();
+      // }
     }
   }
 

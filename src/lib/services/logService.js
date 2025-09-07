@@ -28,7 +28,7 @@ const LOG_GROUPS = {
 const defaultConfig = {
           [LOG_GROUPS.STATE]: false,
           [LOG_GROUPS.PIECE]: false,
-          [LOG_GROUPS.LOGIC_MOVE]: true,
+          [LOG_GROUPS.LOGIC_MOVE]: false,
           [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: false,
           [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
           [LOG_GROUPS.LOGIC_TIME]: false,

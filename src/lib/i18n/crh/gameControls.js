@@ -12,6 +12,6 @@ export default {
   confirm: "Tasdiqla",
   noMovesTitle: "Areket yoq",
   selectDirectionAndDistance: "Yön ve mesafe seçin",
-  voiceCommand: "Ses",
+  voiceCommand: "Sesnen idare (beta)",
   voiceCommandTitle: "Sesli komanda"
 }; 
