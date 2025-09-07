@@ -77,6 +77,9 @@
     if (clickCount === 3) {
       showDebug = !showDebug;
       clickCount = 0;
+      if (showDebug) {
+        logService.forceEnableLogging();
+      }
     }
     clickTimer = setTimeout(() => {
       clickCount = 0;
