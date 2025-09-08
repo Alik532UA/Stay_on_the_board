@@ -71,6 +71,7 @@ export const gameService = {
       showBoardHiddenInfo: false,
       intendedGameType: null, // Додано для відповідності UiState
       settingsMode: 'default', // Додано для відповідності UiState
+      isSettingsExpanderOpen: false,
       testModeOverrides: existingUiState?.testModeOverrides
     };
 

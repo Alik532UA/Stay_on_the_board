@@ -26,9 +26,14 @@
 
   let expanderRef: HTMLDetailsElement;
   let summaryRef: HTMLElement;
-  let isOpen = dev;
+  let isOpen = dev; // Local state for this component
+
   let contentRef: HTMLDivElement;
   let contentHeight = 0;
+
+  // Update the global store whenever the local state changes
+  $: uiStateStore.update(s => ({ ...s, isSettingsExpanderOpen: isOpen }));
+
   async function toggleExpander() {
     logService.action('Click: "Розгорнути/Згорнути налаштування" (SettingsExpanderWidget)');
     if ($gameSettingsStore.lockSettings) {
