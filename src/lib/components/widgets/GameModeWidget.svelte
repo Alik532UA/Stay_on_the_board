@@ -63,7 +63,7 @@
     <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'pro'} on:click={() => handlePresetClick('pro')}>{$_('gameModes.pro')}</button>
     <button data-testid="settings-expander-game-mode-timed-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'timed'} on:click={() => handlePresetClick('timed')}>{$_('gameModes.timed')}</button>
   </div>
-  <div class="description" data-testid="game-mode-description">
+  <div class="description" data-testid="game-mode-description" class:settings-expander-closed={!$uiStateStore.isSettingsExpanderOpen}>
     {#if $gameSettingsStore.gameMode === 'beginner'}
       {$_('gameModes.description.beginner')}
     {:else if $gameSettingsStore.gameMode === 'experienced'}
@@ -140,5 +140,9 @@
     text-align: center;
     font-size: 0.9em;
     color: var(--text-secondary);
+    transition: font-size 0.3s ease;
+  }
+  .description.settings-expander-closed {
+    font-size: 18px;
   }
 </style>
