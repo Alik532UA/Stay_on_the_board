@@ -7,6 +7,7 @@
 // src/lib/stores/uiStateStore.ts
 import { writable } from 'svelte/store';
 import type { MoveDirectionType } from '$lib/models/Piece';
+import { dev } from '$app/environment';
 
 export interface UiState {
   showBoardHiddenInfo: boolean;
@@ -21,6 +22,7 @@ export interface UiState {
   voiceMoveRequested: boolean;
   intendedGameType: 'training' | 'local' | 'timed' | 'virtual-player' | null; // НАВІЩО: Зберігаємо тип гри, який користувач мав намір розпочати.
   settingsMode: 'default' | 'competitive';
+  isSettingsExpanderOpen: boolean;
   // НАВІЩО: Додаємо поле для перевизначень з тестового режиму.
   // Це дозволяє передавати тестові дані через стан, дотримуючись UDF.
   testModeOverrides?: {
@@ -41,6 +43,7 @@ export const initialUIState: UiState = {
   voiceMoveRequested: false,
   intendedGameType: null, // За замовчуванням немає наміру
   settingsMode: 'default',
+  isSettingsExpanderOpen: dev,
 };
 
 function createUiStateStore() {
