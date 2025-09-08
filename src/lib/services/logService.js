@@ -3,7 +3,12 @@ import { debugLogStore } from '../stores/debugLogStore.js';
 
 const isBrowser = typeof window !== 'undefined';
 const isDev = import.meta.env.DEV;
-let isForceEnabled = false; // Цей прапорець дозволить примусово вмикати логи
+let isForceEnabled = false; // This flag will allow forcing logs
+
+// Check localStorage to force logs on production
+if (isBrowser && localStorage.getItem('force-logging') === 'true') {
+    isForceEnabled = true;
+}
 
 // 1. Визначення груп логування
 const LOG_GROUPS = {
@@ -170,15 +175,39 @@ export const logService = {
   }
 };
 
-// 5. Глобальний контролер для зручності розробника-людини
-if (isBrowser && isDev) {
-  (/** @type {any} */ (window)).setLogLevels = (/** @type {Record<string, boolean>} */ newConfig) => {
-    logConfig = { ...logConfig, ...newConfig };
-    saveConfig(logConfig);
-    console.log('Log levels updated:', logConfig);
-  };
-  (/** @type {any} */ (window)).getLogConfig = () => {
-    return logConfig;
-  }
-  console.log('Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.');
+// 5. Глобальний контролер для зручності розробника
+function initializeDeveloperTools() {
+    if (!isBrowser) return;
+
+    (/** @type {any} */ (window)).setLogLevels = (/** @type {Record<string, boolean>} */ newConfig) => {
+        logConfig = { ...logConfig, ...newConfig };
+        saveConfig(logConfig);
+        console.log('Log levels updated:', logConfig);
+    };
+
+    (/** @type {any} */ (window)).getLogConfig = () => {
+        return logConfig;
+    };
+
+    console.log('Log service developer tools initialized. Use window.setLogLevels({ groupName: boolean }) to configure.');
+}
+
+// Expose developer tools in dev mode OR if force enabled
+if (isDev || isForceEnabled) {
+    initializeDeveloperTools();
+}
+
+// Global function to enable logging in production
+if (isBrowser) {
+    (/** @type {any} */ (window)).enableProdLogging = () => {
+        if (isForceEnabled) {
+            console.log('Logging is already enabled.');
+            return;
+        }
+        localStorage.setItem('force-logging', 'true');
+        isForceEnabled = true;
+        initializeDeveloperTools();
+        console.log('Production logging enabled. Refresh the page for full effect. Use setLogLevels({...}) to configure.');
+        debugLogStore.add('[INFO] Production logging enabled.');
+    };
 }
