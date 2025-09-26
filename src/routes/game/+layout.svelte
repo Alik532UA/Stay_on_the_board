@@ -15,6 +15,9 @@
   import { onMount, onDestroy } from 'svelte';
   import PlayerColorProvider from '$lib/components/PlayerColorProvider.svelte';
   import hotkeyService from '$lib/services/hotkeyService';
+  import { gameStore } from '$lib/stores/gameStore';
+  import { uiStateStore } from '$lib/stores/uiStateStore';
+  import { boardStore } from '$lib/stores/boardStore';
   
     import { initializeGameHotkeys, cleanupGameHotkeys, registerGameAction } from '$lib/services/gameHotkeyService';
   import { testModeStore } from '$lib/stores/testModeStore'; // <-- ДОДАНО: Імпорт правильного стору
@@ -28,6 +31,9 @@
     if (activeGameMode) {
       activeGameMode.cleanup();
     }
+    gameStore.reset();
+    uiStateStore.reset();
+    boardStore.reset();
     hotkeyService.popContext();
     cleanupGameHotkeys();
   });

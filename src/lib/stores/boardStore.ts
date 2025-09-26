@@ -27,6 +27,7 @@ function createBoardStore() {
     subscribe,
     set,
     update,
+    reset: () => set(null),
     // НАВІЩО: Інкапсулюємо логіку мутації безпосередньо тут
     movePlayer: (row: number, col: number) => {
       logService.piece(`(boardStore) movePlayer to [${row}, ${col}]`);
