@@ -53,6 +53,7 @@ function createUiStateStore() {
     subscribe,
     set,
     update,
+    reset: () => set(initialUIState),
     setGameOver: (reasonKey: string, reasonValues: Record<string, any> | null = null) => {
       update(state => {
         if (!state) return null;

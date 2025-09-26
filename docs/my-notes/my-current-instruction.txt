@@ -1,9 +1,13 @@
-досі проблема є
-1. зайти в гру
-2. натиснути data-testid="settings-expander-summary" (без різниці чи рогорнути чи згорнути налаштування), актуальний результат: фокус на цьому елементів
-3. натиснути [NumPad Enter] або [Enter] або [Space]
-Актуальний результат: спрацювує і hotkey **Підтвердити хід** і спрацьовує рогорнути чи згорнути налаштування (бо фокус на цьому елементі)
-Очікуваний результат: спрацювує тільки hotkey **Підтвердити хід**, і НЕ трігерить рогорнути чи згорнути налаштування
+кроки відтворення:
+1. зайти в гру (virtual-player-btn) . Результат: game-info-panel пише: "Гра почалась! Ваша черга робити хід"
+2. зробити хочаб один хід
+3. Завершити гру
+4. Натиснути "game-over-main-menu-btn"
+5. зайти в гру (virtual-player-btn)
+Актуальний результат: game-info-panel пише "Гра завершена"
+Очікуваний результат: game-info-panel пише: "Гра почалась!
+Ваша черга робити хід
+"
 
 ---
 
@@ -41,33 +45,60 @@
 
 client:733 [vite] connecting...
 client:827 [vite] connected.
-logService.js:183 Log service initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
-logService.js:136 [INIT] [hotkeyService] Setting up global keydown listener.
+logService.js:192 Log service developer tools initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+logService.js:141 [INIT] [hotkeyService] Setting up global keydown listener.
 init.js:31 ✅ i18n initialized successfully
-logService.js:136 [INIT] Initializing Test Mode Sync Service...
-logService.js:134 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 {stack: Array(0)}
-logService.js:134 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. {initialState: {…}}
-logService.js:136 [UI] [layout] afterNavigate: hiding tooltip
-logService.js:136 [UI] [Speech] 'voiceschanged' event fired. Loaded 325 voices.
-logService.js:134 [MODAL] [ModalStore] showModal called. New modal: 'game-mode-modal'. Stack size: 0 {newState: {…}, stack: Array(0)}
-logService.js:136 [UI] [Speech] Fallback check loaded 325 voices.
-logService.js:136 [MODAL] [GameModeModal] selectMode called with: timed
-logService.js:134 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 {stack: Array(0)}
-logService.js:134 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. {initialState: {…}}
-logService.js:136 [UI] Locale changed to uk, re-initializing voices.
-logService.js:136 [UI] [Speech] Filtering for langCode: "uk". Preferred dialect: "uk-UA". Total voices: 325
-logService.js:136 [UI] [Speech] Found 2 voices with preferred dialect "uk-UA".
-logService.js:136 [UI] [Speech] Filtering for langCode: "en". Preferred dialect: "en-US". Total voices: 325
-logService.js:136 [UI] [Speech] Found 20 voices with preferred dialect "en-US".
-logService.js:136 [UI] Default voice reactively selected: Microsoft Ostap Online (Natural) - Ukrainian (Ukraine)
-logService.js:134 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: null, selectedDistance: null, isConfirmButtonDisabled: true}
-logService.js:134 [UI] [centerInfoUtil] Calculating state {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: false, …}
-logService.js:136 [INIT] [VirtualPlayerPage] onMount: No active game found, initializing "virtual-player" mode.
-logService.js:134 [INIT] [GameService] initializeNewGame: Створення нового ігрового стану... {size: undefined, players: Array(2)}
-logService.js:136 [GAME_MODE] Game mode initialized: virtual-player (from preset: virtual-player)
-logService.js:134 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
-logService.js:136 [INIT] [gameHotkeyService] Initializing game hotkeys.
-logService.js:134 [UI] [centerInfoUtil] Calculating state {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
-logService.js:134 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 {stack: Array(0)}
-logService.js:134 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. {initialState: {…}}
-logService.js:136 [UI] [layout] afterNavigate: hiding tooltip
+logService.js:141 [INIT] Initializing Test Mode Sync Service...
+logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 Object
+logService.js:139 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. Object
+logService.js:139 [MODAL] [ModalStore] showModal called. New modal: 'game-mode-modal'. Stack size: 0 {newState: {…}, stack: Array(0)}
+logService.js:141 [MODAL] [GameModeModal] selectMode called with: beginner
+logService.js:141 [GAME_MODE] [GameSettingsStore] Applying preset: "beginner"
+logService.js:141 [MODAL] [GameModeModal] Beginner mode selected. Showing FAQ modal.
+logService.js:139 [MODAL] [ModalStore] showModal called. New modal: 'faq-modal'. Stack size: 1 {newState: {…}, stack: Array(1)}
+logService.js:141 [MODAL] [FAQModal] Component has been mounted.
+logService.js:141 [MODAL] [FAQModal] OK button clicked. Closing modal and navigating to game.
+logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 1 {stack: Array(1)}
+logService.js:139 [MODAL] [ModalStore] Popped 'game-mode-modal' from stack. Restoring previous state. {previousState: {…}}
+logService.js:141 [MODAL] [FAQModal] Component is being destroyed.
+logService.js:141 [INIT] [VirtualPlayerPage] onMount: No active game. Initializing mode from settings: "beginner"
+logService.js:141 [GAME_MODE] [GameSettingsStore] Applying preset: "beginner"
+logService.js:139 [INIT] [GameService] initializeNewGame: Створення нового ігрового стану... {size: undefined, players: Array(2)}
+logService.js:141 [GAME_MODE] Game mode initialized: training (from preset: beginner)
+logService.js:141 [INIT] [gameHotkeyService] Initializing game hotkeys.
+logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 {stack: Array(0)}
+logService.js:139 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. {initialState: {…}}
+logService.js:141 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:141 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
+logService.js:141 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
+logService.js:141 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
+logService.js:139 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'left', distance: 1, row: 2, col: 1, isPenalty: false}
+logService.js:141 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
+logService.js:141 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
+logService.js:141 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
+logService.js:141 [GAME_MODE] [endGameService] endGame called with reason: 'modal.gameOverReasonCashOut'
+logService.js:139 [GAME_MODE] [scoreService] determineWinner called {losingPlayerIndex: 0}
+logService.js:139 [MODAL] [ModalStore] showModal called. New modal: 'game-over-modal'. Stack size: 0 {newState: {…}, stack: Array(0)}
+logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 {stack: Array(0)}
+logService.js:139 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. {initialState: {…}}
+logService.js:141 [INIT] [game/+layout] onDestroy called.
+logService.js:141 [GAME_MODE] Game layout is being destroyed, cleaning up game mode.
+logService.js:141 [GAME_MODE] [TrainingGameMode] cleanup called
+logService.js:141 [INIT] [gameHotkeyService] Cleaning up game hotkeys.
+logService.js:141 [GAME_MODE] [TrainingGameMode] cleanup called
+logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 {stack: Array(0)}
+logService.js:139 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. {initialState: {…}}
+logService.js:139 [MODAL] [ModalStore] showModal called. New modal: 'game-mode-modal'. Stack size: 0 {newState: {…}, stack: Array(0)}
+logService.js:141 [MODAL] [GameModeModal] selectMode called with: beginner
+logService.js:141 [GAME_MODE] [GameSettingsStore] Applying preset: "beginner"
+logService.js:141 [MODAL] [GameModeModal] Beginner mode selected. Showing FAQ modal.
+logService.js:139 [MODAL] [ModalStore] showModal called. New modal: 'faq-modal'. Stack size: 1 {newState: {…}, stack: Array(1)}
+logService.js:141 [MODAL] [FAQModal] Component has been mounted.
+logService.js:141 [MODAL] [FAQModal] OK button clicked. Closing modal and navigating to game.
+logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 1 {stack: Array(1)}
+logService.js:139 [MODAL] [ModalStore] Popped 'game-mode-modal' from stack. Restoring previous state. {previousState: {…}}
+logService.js:141 [MODAL] [FAQModal] Component is being destroyed.
+logService.js:141 [INIT] [VirtualPlayerPage] onMount: Active game found, not re-initializing.
+logService.js:141 [INIT] [gameHotkeyService] Initializing game hotkeys.
+logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 {stack: Array(0)}
+logService.js:139 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. {initialState: {…}}
