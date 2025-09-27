@@ -34,18 +34,18 @@ const LOG_GROUPS = {
 
 // 2. Конфігурація
 const defaultConfig = {
-          [LOG_GROUPS.STATE]: false,
+          [LOG_GROUPS.STATE]: true,
           [LOG_GROUPS.PIECE]: false,
           [LOG_GROUPS.LOGIC_MOVE]: false,
           [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: false,
           [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
           [LOG_GROUPS.LOGIC_TIME]: false,
           [LOG_GROUPS.SCORE]: false,
-          [LOG_GROUPS.UI]: false, 
+          [LOG_GROUPS.UI]: true, 
           [LOG_GROUPS.TOOLTIP]: false,
           [LOG_GROUPS.ANIMATION]: false,
           [LOG_GROUPS.INIT]: true,
-          [LOG_GROUPS.ACTION]: false,
+          [LOG_GROUPS.ACTION]: true,
           [LOG_GROUPS.GAME_MODE]: true,
           [LOG_GROUPS.SPEECH]: false,
           [LOG_GROUPS.VOICE_CONTROL]: false,

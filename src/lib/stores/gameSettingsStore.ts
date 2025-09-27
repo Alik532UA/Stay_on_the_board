@@ -112,6 +112,7 @@ function createGameSettingsStore() {
   const methods = {
     set, // Expose the set method to allow the persistence service to overwrite the state.
     updateSettings: (newSettings: Partial<GameSettingsState>) => {
+      logService.state('[GameSettingsStore] updateSettings called with:', newSettings);
       update(state => {
         let updatedState = { ...state, ...newSettings };
         updatedState = syncGameMode(updatedState);
@@ -127,6 +128,7 @@ function createGameSettingsStore() {
       update(state => ({ ...state, keybindings: defaultGameSettings.keybindings }));
     },
     toggleShowBoard: (forceState?: boolean) => {
+      logService.state('[GameSettingsStore] toggleShowBoard called', { forceState });
       update(state => {
         if (typeof forceState === 'boolean') {
           const newSettings: Partial<GameSettingsState> = { ...state, showBoard: forceState };
@@ -151,8 +153,12 @@ function createGameSettingsStore() {
         };
       });
     },
-    toggleShowMoves: () => update(state => ({ ...state, showMoves: !state.showMoves })),
+    toggleShowMoves: () => {
+      logService.state('[GameSettingsStore] toggleShowMoves called');
+      update(state => ({ ...state, showMoves: !state.showMoves }))
+    },
     toggleShowPiece: () => {
+      logService.state('[GameSettingsStore] toggleShowPiece called');
       update(state => {
         const newShowPieceState = !state.showPiece;
         const newSettings: Partial<GameSettingsState> = { ...state, showPiece: newShowPieceState };

@@ -18,6 +18,7 @@
   import { gameStore } from '$lib/stores/gameStore';
   import { uiStateStore } from '$lib/stores/uiStateStore';
   import { boardStore } from '$lib/stores/boardStore';
+  import { enableAllGameCheckboxesIfNeeded } from '$lib/utils/uiUtils.js';
   
     import { initializeGameHotkeys, cleanupGameHotkeys, registerGameAction } from '$lib/services/gameHotkeyService';
   import { testModeStore } from '$lib/stores/testModeStore'; // <-- ДОДАНО: Імпорт правильного стору
@@ -39,6 +40,13 @@
   });
  
   onMount(() => {
+    const moveHistory = get(boardStore).moveHistory;
+    logService.init(`[GameLayout] onMount. moveHistory.length is ${moveHistory.length}.`);
+    if (moveHistory.length <= 1) {
+      logService.init('[GameLayout] onMount: Applying initial settings for new game.');
+      enableAllGameCheckboxesIfNeeded();
+    }
+
     hotkeyService.pushContext('game');
     initializeGameHotkeys();
 
