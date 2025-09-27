@@ -263,7 +263,10 @@
           data-testid="settings-expander-visibility-btn-{$_('settings.visibility.hidden') === label ? 'hidden' : $_('settings.visibility.boardOnly') === label ? 'boardOnly' : $_('settings.visibility.withPiece') === label ? 'withPiece' : 'withMoves'}"
           class="settings-expander__row-btn"
           class:active={getIsActive(i)}
-          on:click={() => isCompetitiveMode ? showCompetitiveModeModal() : toggleFunctions[i]()}
+          on:click={() => {
+            logService.action(`Click: on visibility button ${label} (SettingsExpanderWidget)`);
+            isCompetitiveMode ? showCompetitiveModeModal() : toggleFunctions[i]()
+          }}
         >
           <SvgIcons name={icons[i]} />
           {label}
