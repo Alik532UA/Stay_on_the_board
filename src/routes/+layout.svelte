@@ -72,13 +72,6 @@
     // 5. Initialize other services and stores
     initializeTestModeSync();
 
-    // 6. Subscribe to UI state changes
-    const unsubscribeUiState = uiStateStore.subscribe(state => {
-      if (state && state.isFirstMove) {
-        gameSettingsStore.updateSettings({ showBoard: true, showPiece: true, showMoves: true });
-      }
-    });
-
     // 7. Check for app updates
     checkForUpdates();
 
@@ -107,7 +100,6 @@
     // Cleanup subscriptions on component destroy
     return () => {
       unsubscribeGameSettings();
-      unsubscribeUiState();
     };
   });
 
