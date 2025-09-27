@@ -1,13 +1,20 @@
-кроки відтворення:
-1. зайти в гру (virtual-player-btn) . Результат: game-info-panel пише: "Гра почалась! Ваша черга робити хід"
-2. зробити хочаб один хід
-3. Завершити гру
-4. Натиснути "game-over-main-menu-btn"
-5. зайти в гру (virtual-player-btn)
-Актуальний результат: game-info-panel пише "Гра завершена"
-Очікуваний результат: game-info-panel пише: "Гра почалась!
-Ваша черга робити хід
-"
+проблема залишилась
+
+Не треба поспішати! Роби якісно та зроби глибокий аналіз.
+Це завдання частина змагання AI, хто переможе по якості той проходить далі, а хто програє того виключають.
+
+Кроки відтворення баги:
+1. зайти в гру
+2. вимкнути data-testid="settings-expander-visibility-btn-withPiece"
+3. вибрати напрямок руху
+Актуальний результат: "settings-expander-visibility-btn-withPiece" та "settings-expander-visibility-btn-withMoves" увімкнулися
+Очікуваний результат: "settings-expander-visibility-btn-withPiece" та "settings-expander-visibility-btn-withMoves" не змінилися
+
+інформація:  "силою" включалися кнопки, бо там є логіка першого ходу, коли користувач вибирає напрямок, то чогось знову запускається перевірка "чи це є перших хід" в грі і тому кнопки автоматично вмикаються. Але ця логіка повинна перевіряти чи є це перший хід до того як користувач вибрав напрямок (скоріш за все це так і працює). А коли користувач вибирає напрямок чи відстань, то не треба автоматично включати "settings-expander-visibility-btn-withPiece" та "settings-expander-visibility-btn-withMoves"
+
+Проведи аналіз. Поясни як наразі працює алгоритм. На яких етапах запускається подія "перший хід". Задай мені уточнюючі питання з варіантами відповіді, для того щоб якісно виправити проблему.
+
+Логіку що треба включати включати "settings-expander-visibility-btn-boardOnly" "settings-expander-visibility-btn-withPiece" та "settings-expander-visibility-btn-withMoves" під час першого ходу треба залишити як є, бо це правильно, щоб користувач знав звідки починається гра. Але не треба тригерити цю логіку в ніших місця, наприклад коли користувач вибирає напрямок чи відстань тощо
 
 ---
 
@@ -43,62 +50,244 @@
 
 ---
 
-client:733 [vite] connecting...
-client:827 [vite] connected.
-logService.js:192 Log service developer tools initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
-logService.js:141 [INIT] [hotkeyService] Setting up global keydown listener.
-init.js:31 ✅ i18n initialized successfully
-logService.js:141 [INIT] Initializing Test Mode Sync Service...
-logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 Object
-logService.js:139 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. Object
-logService.js:139 [MODAL] [ModalStore] showModal called. New modal: 'game-mode-modal'. Stack size: 0 {newState: {…}, stack: Array(0)}
-logService.js:141 [MODAL] [GameModeModal] selectMode called with: beginner
-logService.js:141 [GAME_MODE] [GameSettingsStore] Applying preset: "beginner"
-logService.js:141 [MODAL] [GameModeModal] Beginner mode selected. Showing FAQ modal.
-logService.js:139 [MODAL] [ModalStore] showModal called. New modal: 'faq-modal'. Stack size: 1 {newState: {…}, stack: Array(1)}
-logService.js:141 [MODAL] [FAQModal] Component has been mounted.
-logService.js:141 [MODAL] [FAQModal] OK button clicked. Closing modal and navigating to game.
-logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 1 {stack: Array(1)}
-logService.js:139 [MODAL] [ModalStore] Popped 'game-mode-modal' from stack. Restoring previous state. {previousState: {…}}
-logService.js:141 [MODAL] [FAQModal] Component is being destroyed.
-logService.js:141 [INIT] [VirtualPlayerPage] onMount: No active game. Initializing mode from settings: "beginner"
-logService.js:141 [GAME_MODE] [GameSettingsStore] Applying preset: "beginner"
-logService.js:139 [INIT] [GameService] initializeNewGame: Створення нового ігрового стану... {size: undefined, players: Array(2)}
-logService.js:141 [GAME_MODE] Game mode initialized: training (from preset: beginner)
-logService.js:141 [INIT] [gameHotkeyService] Initializing game hotkeys.
+
+---
+
+Не треба поспішати! Роби якісно та зроби глибокий аналіз.
+Це завдання частина змагання AI, хто переможе по якості той проходить далі, а хто програє того виключають.
+
+---
+
+ [vite] connecting...
+ [vite] connected.
+ Log service developer tools initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+ [INIT] [hotkeyService] Setting up global keydown listener.
+ [UI] [Speech] 'voiceschanged' event fired. Loaded 325 voices.
+ [UI] Locale changed to uk, re-initializing voices.
+ ✅ i18n initialized successfully
+ [INIT] Initializing Test Mode Sync Service...
+ [STATE] [GameSettingsStore] updateSettings called with: {showBoard: true, showPiece: true, showMoves: true}
+ [ACTION] [hotkeyService] Registering hotkey '[' for context 'global'
+ [ACTION] [hotkeyService] Registering hotkey 't' for context 'global'
+ [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: null, selectedDistance: null, isConfirmButtonDisabled: true}
+ [UI] [centerInfoUtil] Calculating state {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: false, …}
+ [STATE] [GameSettingsStore] updateSettings called with: {showBoard: true, showPiece: true, showMoves: true}
+ [ACTION] [hotkeyService] Registering hotkey 'KeyI' for context 'global'
+ [ACTION] [hotkeyService] Registering hotkey 'Escape' for context 'global'
+ [ACTION] [gameHotkeyService] Registering game action handler: up-left
+ [ACTION] [gameHotkeyService] Registering game action handler: up
+ [ACTION] [gameHotkeyService] Registering game action handler: up-right
+ [ACTION] [gameHotkeyService] Registering game action handler: left
+ [ACTION] [gameHotkeyService] Registering game action handler: right
+ [ACTION] [gameHotkeyService] Registering game action handler: down-left
+ [ACTION] [gameHotkeyService] Registering game action handler: down
+ [ACTION] [gameHotkeyService] Registering game action handler: down-right
+ [ACTION] [gameHotkeyService] Registering game action handler: confirm
+ [ACTION] [gameHotkeyService] Registering game action handler: no-moves
+ [ACTION] [hotkeyService] Registering hotkey 'KeyR' for context 'global'
+ [INIT] [VirtualPlayerPage] onMount: No active game. Initializing mode from settings: "beginner"
+ [GAME_MODE] [GameSettingsStore] Applying preset: "beginner"
+ [STATE] [GameSettingsStore] updateSettings called with: {gameMode: 'beginner', blockModeEnabled: false, autoHideBoard: false, speechEnabled: false, rememberGameMode: true, …}
+ [INIT] [GameService] initializeNewGame: Створення нового ігрового стану... {size: undefined, players: Array(2)}
+ [STATE] [GameSettingsStore] updateSettings called with: {showBoard: true, showPiece: true, showMoves: true}
+ [STATE] [GameSettingsStore] updateSettings called with: {showBoard: true, showPiece: true, showMoves: true}
+ [GAME_MODE] Game mode initialized: training (from preset: beginner)
+ [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+ [INIT] [GameLayout] onMount. moveHistory.length is 1.
+ [INIT] [GameLayout] onMount: Applying initial settings for new game.
+ [UI] enableAllGameCheckboxesIfNeeded called
+ [ACTION] [hotkeyService] Pushing new context: 'game'
+ [INIT] [gameHotkeyService] Initializing game hotkeys.
+ [ACTION] [gameHotkeyService] Game settings changed, re-registering all hotkeys.
+ [ACTION] [hotkeyService] Unregistering all hotkeys for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad7' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyQ' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad8' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyW' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad9' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyE' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad4' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyA' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad6' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyD' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad1' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyZ' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad2' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyX' for context 'game'
+ [ACTION] [gameHotkeyService] Registering 'KeyS' to conflict resolution modal for actions: down, confirm
+ [ACTION] [hotkeyService] Registering hotkey 'KeyS' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad3' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyC' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad5' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Enter' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Space' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'NumpadEnter' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'NumpadDecimal' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Backspace' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'ArrowUp' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'ArrowDown' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'ArrowLeft' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'ArrowRight' for context 'game'
+ [ACTION] [gameHotkeyService] Registering game action handler: auto-hide-board
+ [ACTION] [gameHotkeyService] Registering game action handler: toggle-block-mode
+ [ACTION] [gameHotkeyService] Registering game action handler: toggle-board
+ [ACTION] [gameHotkeyService] Registering game action handler: increase-board
+ [ACTION] [gameHotkeyService] Registering game action handler: decrease-board
+ [ACTION] [gameHotkeyService] Registering game action handler: toggle-speech
+ [UI] [centerInfoUtil] Calculating state {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+ [ACTION] [gameHotkeyService] Registering game action handler: distance-1
+ [ACTION] [gameHotkeyService] Registering game action handler: distance-2
+ [ACTION] [gameHotkeyService] Registering game action handler: distance-3
+ [UI] [Speech] Filtering for langCode: "uk". Preferred dialect: "uk-UA". Total voices: 325
+ [UI] [Speech] Found 2 voices with preferred dialect "uk-UA".
+ [UI] [Speech] Filtering for langCode: "en". Preferred dialect: "en-US". Total voices: 325
+ [UI] [Speech] Found 20 voices with preferred dialect "en-US".
+ [STATE] [GameSettingsStore] updateSettings called with: {selectedVoiceURI: 'Microsoft Ostap Online (Natural) - Ukrainian (Ukraine)'}
+ [UI] Default voice reactively selected: Microsoft Ostap Online (Natural) - Ukrainian (Ukraine)
+ [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+ [ACTION] [gameHotkeyService] Game settings changed, re-registering all hotkeys.
+ [ACTION] [hotkeyService] Unregistering all hotkeys for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad7' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyQ' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad8' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyW' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad9' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyE' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad4' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyA' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad6' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyD' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad1' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyZ' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad2' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyX' for context 'game'
+ [ACTION] [gameHotkeyService] Registering 'KeyS' to conflict resolution modal for actions: down, confirm
+ [ACTION] [hotkeyService] Registering hotkey 'KeyS' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad3' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyC' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad5' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Enter' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Space' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'NumpadEnter' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'NumpadDecimal' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Backspace' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Digit1' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Digit2' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Digit3' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'NumpadMultiply' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyB' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'NumpadDivide' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyH' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'NumpadAdd' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Equal' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'NumpadSubtract' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Minus' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'KeyV' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'Numpad0' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'ArrowUp' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'ArrowDown' for context 'game'
+ [ACTION] [hotkeyService] Registering hotkey 'ArrowLeft' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'ArrowRight' for context 'game'
 logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 {stack: Array(0)}
 logService.js:139 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. {initialState: {…}}
-logService.js:141 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
-logService.js:141 [GAME_MODE] advanceToNextPlayer: Наступний гравець: ai.
-logService.js:141 [GAME_MODE] advanceToNextPlayer: Запуск ходу комп'ютера.
-logService.js:141 [GAME_MODE] triggerComputerMove: Початок ходу комп'ютера.
-logService.js:139 [GAME_MODE] triggerComputerMove: Результат getComputerMove: {direction: 'left', distance: 1, row: 2, col: 1, isPenalty: false}
-logService.js:141 [GAME_MODE] triggerComputerMove: Комп'ютер має хід, виконуємо...
-logService.js:141 [GAME_MODE] advanceToNextPlayer: Передача ходу наступному гравцю.
-logService.js:141 [GAME_MODE] advanceToNextPlayer: Наступний гравець: human.
-logService.js:141 [GAME_MODE] [endGameService] endGame called with reason: 'modal.gameOverReasonCashOut'
-logService.js:139 [GAME_MODE] [scoreService] determineWinner called {losingPlayerIndex: 0}
-logService.js:139 [MODAL] [ModalStore] showModal called. New modal: 'game-over-modal'. Stack size: 0 {newState: {…}, stack: Array(0)}
-logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 {stack: Array(0)}
-logService.js:139 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. {initialState: {…}}
-logService.js:141 [INIT] [game/+layout] onDestroy called.
-logService.js:141 [GAME_MODE] Game layout is being destroyed, cleaning up game mode.
-logService.js:141 [GAME_MODE] [TrainingGameMode] cleanup called
-logService.js:141 [INIT] [gameHotkeyService] Cleaning up game hotkeys.
-logService.js:141 [GAME_MODE] [TrainingGameMode] cleanup called
-logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 {stack: Array(0)}
-logService.js:139 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. {initialState: {…}}
-logService.js:139 [MODAL] [ModalStore] showModal called. New modal: 'game-mode-modal'. Stack size: 0 {newState: {…}, stack: Array(0)}
-logService.js:141 [MODAL] [GameModeModal] selectMode called with: beginner
-logService.js:141 [GAME_MODE] [GameSettingsStore] Applying preset: "beginner"
-logService.js:141 [MODAL] [GameModeModal] Beginner mode selected. Showing FAQ modal.
-logService.js:139 [MODAL] [ModalStore] showModal called. New modal: 'faq-modal'. Stack size: 1 {newState: {…}, stack: Array(1)}
-logService.js:141 [MODAL] [FAQModal] Component has been mounted.
-logService.js:141 [MODAL] [FAQModal] OK button clicked. Closing modal and navigating to game.
-logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 1 {stack: Array(1)}
-logService.js:139 [MODAL] [ModalStore] Popped 'game-mode-modal' from stack. Restoring previous state. {previousState: {…}}
-logService.js:141 [MODAL] [FAQModal] Component is being destroyed.
-logService.js:141 [INIT] [VirtualPlayerPage] onMount: Active game found, not re-initializing.
-logService.js:141 [INIT] [gameHotkeyService] Initializing game hotkeys.
-logService.js:139 [MODAL] [ModalStore] closeModal called. Stack size before action: 0 {stack: Array(0)}
-logService.js:139 [MODAL] [ModalStore] Stack is empty. Resetting to initial state. {initialState: {…}}
+logService.js:141 [UI] [layout] afterNavigate: hiding tooltip
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:139 [STATE] Saving game settings to localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: 'Microsoft Ostap Online (Natural) - Ukrainian (Ukraine)', blockModeEnabled: false, …}
+logService.js:141 [UI] [Speech] Fallback check loaded 325 voices.
+logService.js:141 [ACTION] Click: on visibility button з фігурою (SettingsExpanderWidget)
+logService.js:139 [STATE] [GameSettingsStore] updateSettings called with: {showPiece: false, showMoves: false}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:141 [ACTION] [gameHotkeyService] Game settings changed, re-registering all hotkeys.
+logService.js:141 [ACTION] [hotkeyService] Unregistering all hotkeys for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad7' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyQ' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad8' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyW' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad9' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyE' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad4' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyA' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad6' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyD' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad1' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyZ' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad2' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyX' for context 'game'
+logService.js:141 [ACTION] [gameHotkeyService] Registering 'KeyS' to conflict resolution modal for actions: down, confirm
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyS' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad3' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyC' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad5' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Enter' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Space' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadEnter' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadDecimal' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Backspace' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Digit1' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Digit2' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Digit3' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadMultiply' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyB' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadDivide' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyH' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadAdd' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Equal' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadSubtract' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Minus' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyV' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad0' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'ArrowUp' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'ArrowDown' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'ArrowLeft' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'ArrowRight' for context 'game'
+logService.js:139 [STATE] Saving game settings to localStorage: {showMoves: false, showBoard: true, speechEnabled: false, selectedVoiceURI: 'Microsoft Ostap Online (Natural) - Ukrainian (Ukraine)', blockModeEnabled: false, …}
+logService.js:141 [ACTION] Click: "Напрямок: up" (DirectionControls)
+logService.js:141 [ACTION] Click: "Напрямок: up" (ControlsPanelWidget)
+logService.js:139 [STATE] [GameSettingsStore] updateSettings called with: {showBoard: true, showPiece: true, showMoves: true}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:141 [ACTION] [gameHotkeyService] Game settings changed, re-registering all hotkeys.
+logService.js:141 [ACTION] [hotkeyService] Unregistering all hotkeys for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad7' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyQ' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad8' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyW' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad9' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyE' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad4' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyA' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad6' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyD' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad1' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyZ' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad2' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyX' for context 'game'
+logService.js:141 [ACTION] [gameHotkeyService] Registering 'KeyS' to conflict resolution modal for actions: down, confirm
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyS' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad3' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyC' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad5' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Enter' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Space' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadEnter' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadDecimal' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Backspace' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Digit1' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Digit2' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Digit3' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadMultiply' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyB' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadDivide' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyH' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadAdd' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Equal' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'NumpadSubtract' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Minus' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'KeyV' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'Numpad0' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'ArrowUp' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'ArrowDown' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'ArrowLeft' for context 'game'
+logService.js:141 [ACTION] [hotkeyService] Registering hotkey 'ArrowRight' for context 'game'
+logService.js:139 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: 'up', selectedDistance: 1, isConfirmButtonDisabled: false}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'up', selectedDistance: 1, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:139 [STATE] Saving game settings to localStorage: {showMoves: true, showBoard: true, speechEnabled: false, selectedVoiceURI: 'Microsoft Ostap Online (Natural) - Ukrainian (Ukraine)', blockModeEnabled: false, …}

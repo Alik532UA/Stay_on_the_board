@@ -10,13 +10,10 @@
   import { animationStore } from '$lib/stores/animationStore.js';
   import { visualPosition, visualCellVisitCounts, currentPlayer, availableMoves } from '$lib/stores/derivedState.ts';
   import { derived, get } from 'svelte/store';
-  import { onMount } from 'svelte';
-  import { uiEffectsStore } from '$lib/stores/uiEffectsStore.js';
   import BoardCell from './BoardCell.svelte';
   import PlayerPiece from './PlayerPiece.svelte';
   import { logService } from '$lib/services/logService.js';
-  import { enableAllGameCheckboxesIfNeeded } from '$lib/utils/uiUtils.ts';
-  import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
+  import { isCellBlocked } from '$lib/utils/boardUtils.ts';
   import { boardStore } from '$lib/stores/boardStore';
   import { uiStateStore } from '$lib/stores/uiStateStore';
   import BoardHiddenInfoWidget from './BoardHiddenInfoWidget.svelte';
@@ -41,48 +38,6 @@
       }
     };
   }
-
-  onMount(() => {
-    let lastRow: number | null = null;
-    let lastCol: number | null = null;
-
-    const unsubscribe = boardStore.subscribe(($boardStore) => {
-      if (!$boardStore) return;
-      const $uiState = get(uiStateStore);
-      if (!$uiState) return;
-
-      if ($uiState.isFirstMove) {
-        lastRow = $boardStore.playerRow;
-        lastCol = $boardStore.playerCol;
-        return;
-      }
-
-      if ($boardStore.moveHistory.length === 1 && $uiState.isFirstMove) {
-        enableAllGameCheckboxesIfNeeded();
-      }
-
-      if (
-        get(gameSettingsStore).autoHideBoard &&
-        get(gameSettingsStore).showBoard &&
-        ($boardStore.playerRow !== lastRow || $boardStore.playerCol !== lastCol) &&
-        $boardStore.moveHistory.length > 1
-      ) {
-        uiEffectsStore.autoHideBoard(0);
-        lastRow = $boardStore.playerRow;
-        lastCol = $boardStore.playerCol;
-      }
-
-      if (
-        $boardStore.moveQueue &&
-        $boardStore.moveQueue.length === 0 &&
-        $boardStore.moveHistory.length > 1 &&
-        !$uiState.isComputerMoveInProgress
-      ) {
-        enableAllGameCheckboxesIfNeeded();
-      }
-    });
-    return unsubscribe;
-  });
 
   const showAvailableMoves = derived(
     [gameSettingsStore, animationStore, currentPlayer],
