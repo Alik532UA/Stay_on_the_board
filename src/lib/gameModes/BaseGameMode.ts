@@ -20,6 +20,7 @@ import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
+import { uiEffectsStore } from '$lib/stores/uiEffectsStore';
 import { voiceControlService } from '$lib/services/voiceControlService';
 
 export abstract class BaseGameMode implements IGameMode {
@@ -79,6 +80,16 @@ export abstract class BaseGameMode implements IGameMode {
   }
 
   protected async onPlayerMoveSuccess(moveResult: any): Promise<void> {
+    const playerState = get(playerStore);
+    const currentPlayer = playerState!.players[playerState!.currentPlayerIndex];
+
+    if (currentPlayer.type === 'human') {
+      const settings = get(gameSettingsStore);
+      if (settings.autoHideBoard) {
+        uiEffectsStore.autoHideBoard(0);
+      }
+    }
+
     uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null, isFirstMove: false }) : null);
     
     if (moveResult.sideEffects && moveResult.sideEffects.length > 0) {
