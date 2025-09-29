@@ -42,9 +42,14 @@
   });
 
   $: if (!$isLoading && mainMenuButtonsNode) {
-    const buttons = getFocusableButtons();
-    if (buttons.length > 0) {
-        buttons[0].focus();
+    const playButton = mainMenuButtonsNode.querySelector('[data-testid="virtual-player-btn"]') as HTMLElement;
+    if (playButton) {
+      playButton.focus();
+    } else {
+      const buttons = getFocusableButtons();
+      if (buttons.length > 0) {
+          buttons[0].focus();
+      }
     }
   }
 
@@ -344,12 +349,12 @@
       </div>
     {/if}
     <div id="main-menu-buttons" bind:this={mainMenuButtonsNode} onkeydown={handleMenuKeyDown} tabindex="-1">
-      <button class="modal-button secondary play-button ripple" style="padding: 32px;" onclick={handlePlayVirtualPlayer} data-testid="virtual-player-btn">{$_('mainMenu.virtualPlayer')}</button>
       <button class="modal-button secondary" onclick={() => navigateTo('/settings')} data-testid="settings-btn">{$_('mainMenu.settings')}</button>
       <button class="modal-button secondary" onclick={handleControls} data-testid="controls-btn">{$_('mainMenu.controls')}</button>
       <button class="modal-button secondary" onclick={handleRules} data-testid="rules-btn">{$_('mainMenu.rules')}</button>
       <button class="modal-button secondary" onclick={handleSupporters} data-testid="supporters-btn">{$_('mainMenu.supporters')}</button>
       <!-- <button class="modal-button danger" onclick={showClearCacheModal} data-testid="clear-cache-btn">{$_('mainMenu.clearCache')}</button> -->
+      <button class="modal-button secondary play-button ripple test-green-button" style="padding: 32px;" onclick={handlePlayVirtualPlayer} data-testid="virtual-player-btn">{$_('mainMenu.virtualPlayer')}</button>
     </div>
   {/if}
 </main>
@@ -449,5 +454,9 @@
     cursor: pointer;
     font-size: 1.1em;
     transition: all 0.2s ease;
+  }
+  #main-menu-buttons .test-green-button {
+    background-color: green !important;
+    margin-top: 24px;
   }
 </style>

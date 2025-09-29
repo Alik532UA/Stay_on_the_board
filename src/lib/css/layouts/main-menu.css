@@ -878,7 +878,7 @@ label[for^="hide-board-checkbox"], label[for^="blocked-mode-checkbox"] {
 .main-menu-title {
   text-align: center;
   /* Адаптивний розмір: min 1.8em, бажаний 8% ширини екрану, max 2.8em */
-  font-size: clamp(1.8em, 8vw, 2.8em); 
+  font-size: clamp(0.1em, 8vw, 2.8em); 
   font-weight: 800;
   color: var(--text-accent);
   margin-bottom: 8px;
