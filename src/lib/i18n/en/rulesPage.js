@@ -1,5 +1,5 @@
 export default {
-  title: "Game Rules 'Stay on the Board'",
+  title: "Game Rules",
   slogan: "The rules are simpler than you think!",
   goalTitle: "Game Goal",
   goalText: "'Stay on the Board' is a strategic endurance game. Players take turns moving a single shared piece. Your goal is to keep it on the board as long as possible and force your opponent to make a mistake.",
@@ -45,5 +45,8 @@ export default {
   proModeStep3: "Enable 'Blocked Cells Mode' to add strategic depth.",
   proModeStep4: 'Use <a href="{controlsLink}" class="inline-link-button">hotkeys</a> to control the game without looking at the screen.',
   proModeConclusion: "Now you can make moves, listen to the computer's response, and keep the entire game situation — the piece's position and blocked cells — only in your mind.",
-  proModeNextLevel: "When the 3x3 board becomes easy, increase the size to 4x4, then 5x5, and so on, gradually increasing the difficulty and training your imagination!"
+  proModeNextLevel: "When the 3x3 board becomes easy, increase the size to 4x4, then 5x5, and so on, gradually increasing the difficulty and training your imagination!",
+  winningAndLosing: "Winning & Losing",
+  gameModes: "Game Modes",
+  specialRules: "Special Rules"
 };

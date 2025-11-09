@@ -1,5 +1,5 @@
 export default {
-  title: "Spelregels 'Blijf op het bord'",
+  title: "Spelregels",
   slogan: "De regels zijn eenvoudiger dan je denkt!",
   goalTitle: "Speldoel",
   goalText: "'Blijf op het bord' is een strategisch uithoudingsspel. Spelers verplaatsen om de beurt één gedeeld stuk. Jouw doel is om het zo lang mogelijk op het bord te houden en je tegenstander tot een fout te dwingen.",
@@ -45,5 +45,8 @@ export default {
   proModeStep3: "Schakel 'Geblokkeerde vakjes-modus' in voor meer strategische diepgang.",
   proModeStep4: 'Gebruik <a href="{controlsLink}" class="inline-link-button">sneltoetsen</a> om het spel te besturen zonder naar het scherm te kijken.',
   proModeConclusion: "Nu kun je zetten doen, luisteren naar de reactie van de computer en de hele spelsituatie — de positie van het stuk en geblokkeerde vakjes — alleen in je hoofd houden.",
-  proModeNextLevel: "Als het 3x3 bord makkelijk wordt, vergroot je het naar 4x4, dan 5x5, enzovoort, en verhoog je geleidelijk de moeilijkheidsgraad en train je je verbeelding!"
+  proModeNextLevel: "Als het 3x3 bord makkelijk wordt, vergroot je het naar 4x4, dan 5x5, enzovoort, en verhoog je geleidelijk de moeilijkheidsgraad en train je je verbeelding!",
+  winningAndLosing: "Winnen & Verliezen",
+  gameModes: "Spelmodi",
+  specialRules: "Speciale Regels"
 }; 
