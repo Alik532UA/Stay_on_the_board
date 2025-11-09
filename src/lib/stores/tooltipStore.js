@@ -8,6 +8,7 @@ import { logService } from '$lib/services/logService.js';
  * @property {number} x
  * @property {number} y
  * @property {ReturnType<typeof setTimeout> | null} timeoutId
+ * @property {HTMLElement | null} ownerNode
  */
 
 /** @type {TooltipState} */
@@ -17,6 +18,7 @@ const initialState = {
   x: 0,
   y: 0,
   timeoutId: null,
+  ownerNode: null,
 };
 
 const { subscribe, update, set } = writable(initialState);
@@ -27,7 +29,7 @@ function cancelScheduledShow() {
       clearTimeout(state.timeoutId);
       logService.tooltip('[tooltipStore] Canceled scheduled show');
     }
-    return { ...state, timeoutId: null };
+    return { ...state, timeoutId: null, ownerNode: null }; // Also clear ownerNode
   });
 }
 
@@ -38,16 +40,23 @@ export const tooltipStore = {
    * @param {number} x
    * @param {number} y
    * @param {number} delay
+   * @param {HTMLElement} ownerNode
    */
-  scheduleShow: (content, x, y, delay) => {
+  scheduleShow: (content, x, y, delay, ownerNode) => {
     cancelScheduledShow(); // Cancel any pending tooltip
     const timeoutId = setTimeout(() => {
-      logService.tooltip('[tooltipStore] setTimeout callback: showing tooltip');
-      update(state => ({ ...state, isVisible: true, content, x, y, timeoutId: null }));
+      logService.tooltip('[tooltipStore] setTimeout callback. Checking owner node...', ownerNode);
+      if (ownerNode && document.body.contains(ownerNode)) {
+        logService.tooltip('[tooltipStore] Owner node is still in DOM. Showing tooltip.');
+        update(state => ({ ...state, isVisible: true, content, x, y, timeoutId: null }));
+      } else {
+        logService.tooltip('[tooltipStore] Owner node is NOT in DOM. Aborting tooltip show.');
+        update(state => ({ ...state, timeoutId: null, ownerNode: null }));
+      }
     }, delay);
     
-    update(state => ({ ...state, timeoutId, content, x, y }));
-    logService.tooltip('[tooltipStore] show scheduled', { content, x, y, delay });
+    update(state => ({ ...state, timeoutId, content, x, y, ownerNode }));
+    logService.tooltip('[tooltipStore] show scheduled', { content, x, y, delay, ownerNode });
   },
   
   /**
@@ -59,8 +68,37 @@ export const tooltipStore = {
   },
 
   hide: () => {
-    logService.tooltip('[tooltipStore] hide called, canceling scheduled show and hiding');
+    logService.tooltip('[tooltipStore] hide called');
     cancelScheduledShow();
     set(initialState);
+  },
+
+  /**
+   * Hides the tooltip only if it is visible and belongs to the specified owner.
+   * @param {HTMLElement} ownerNode 
+   */
+  hideIfOwner: (ownerNode) => {
+    update(state => {
+      if (state.isVisible && state.ownerNode === ownerNode) {
+        logService.tooltip('[tooltipStore] hideIfOwner called for matching owner. Hiding.', ownerNode);
+        return initialState;
+      }
+      return state;
+    });
+  },
+
+  /**
+   * Cancels a scheduled tooltip only if it belongs to the specified owner.
+   * @param {HTMLElement} ownerNode
+   */
+  cancelForOwner: (ownerNode) => {
+    update(state => {
+      if (state.timeoutId && state.ownerNode === ownerNode) {
+        logService.tooltip('[tooltipStore] cancelForOwner called for matching owner. Canceling.', ownerNode);
+        clearTimeout(state.timeoutId);
+        return initialState; // Reset state completely
+      }
+      return state;
+    });
   },
 };
