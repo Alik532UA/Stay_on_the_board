@@ -1,6 +1,7 @@
 import { tooltipStore } from '$lib/stores/tooltipStore.js';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
 import { get } from 'svelte/store';
+import { logService } from '$lib/services/logService.js';
 
 /**
  * @param {string[] | undefined} keys
@@ -48,6 +49,8 @@ export function hotkeyTooltip(node, param) {
   const originalTitle = node.title;
   node.title = '';
 
+  logService.tooltip('hotkeyTooltip action created for node:', node);
+
   /** @param {HotkeyTooltipParam} newParam */
   function updateTooltipContent(newParam) {
     const settings = get(gameSettingsStore);
@@ -66,6 +69,7 @@ export function hotkeyTooltip(node, param) {
     }
     
     tooltipContent = formatHotkeys(keys, title);
+    logService.tooltip('hotkeyTooltip content updated:', tooltipContent);
   }
 
   updateTooltipContent(param);
@@ -89,7 +93,8 @@ export function hotkeyTooltip(node, param) {
   /** @param {MouseEvent} event */
   const mouseOver = (event) => {
     if (tooltipContent) {
-      tooltipStore.scheduleShow(tooltipContent, event.pageX + 10, event.pageY + 10, 700);
+      logService.tooltip('hotkeyTooltip mouseOver: scheduling tooltip show for owner', node);
+      tooltipStore.scheduleShow(tooltipContent, event.pageX + 10, event.pageY + 10, 700, node);
     }
   };
 
@@ -99,6 +104,7 @@ export function hotkeyTooltip(node, param) {
   };
 
   const mouseLeave = () => {
+    logService.tooltip('hotkeyTooltip mouseLeave: hiding tooltip');
     tooltipStore.hide();
   };
 
@@ -115,11 +121,18 @@ export function hotkeyTooltip(node, param) {
       updateTooltipContent(newParam);
     },
     destroy() {
+      logService.tooltip('hotkeyTooltip destroyed for node:', node);
       node.removeEventListener('mouseover', mouseOver);
       node.removeEventListener('mousemove', mouseMove);
       node.removeEventListener('mouseleave', mouseLeave);
       unsubscribe();
       node.title = originalTitle;
+
+      // Cancel any scheduled tooltips for this specific node
+      tooltipStore.cancelForOwner(node);
+
+      // Also attempt to hide any active tooltip if it belongs to this node
+      tooltipStore.hideIfOwner(node);
     }
   };
 }
