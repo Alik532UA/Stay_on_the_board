@@ -25,6 +25,9 @@
 
 <style>
   .floating-back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
     width: 52px;
     height: 52px;
     border-radius: 50%;
@@ -40,7 +43,6 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    margin-right: 1rem;
   }
   .floating-back-btn:hover {
     background: rgba(0, 0, 0, 0.4);

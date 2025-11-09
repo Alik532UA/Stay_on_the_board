@@ -1,5 +1,5 @@
 export default {
-  title: "'Tahtada Qalmaq' Oyun Qaydaları",
+  title: "Oyun Qaydaları",
   slogan: "Qaydalar oylagandan daa añlayışlı!",
   goalTitle: "Oyun Maqsadı",
   goalText: "'Tahtada Qalmaq' — stratejik sabırlılıq oyunıdır. Oyunçılar nöbetleşe bir ortak figuranı areket ettirirler. Maqsadınız — onu mümkün olduğu qadar uzun müddet tahtada saqlamaq ve raqibinizni hata yapmağa zorlamaqtır.",
@@ -45,5 +45,8 @@ export default {
   proModeStep3: "Stratejik çetinlik içün 'Bloklanğan hücreler rejimi'ni açıñız.",
   proModeStep4: 'Ekranga baqmadan oyunnı idare etmek içün <a href="{controlsLink}" class="inline-link-button">qısqa yollar</a> qullanıñız.',
   proModeConclusion: "Endi areket yapıp, kompyuterniñ cevabını eşitip, bütün oyun vaziyetini — taşnıñ pozitsiyası ve bloklanğan hücreler — yalnız başıñızda saqlay alasız.",
-  proModeNextLevel: "3x3 tahta asan olğanda, ölçüsini 4x4, sonra 5x5 ve şunıñ gibi arttırıñız, çetinlikni tedricen arttırıp, hayal gücünüzni terbiye etiñiz!"
+  proModeNextLevel: "3x3 tahta asan olğanda, ölçüsini 4x4, sonra 5x5 ve şunıñ gibi arttırıñız, çetinlikni tedricen arttırıp, hayal gücüñüzni terbiye etiñiz!",
+  winningAndLosing: "Ğalebe ve Mağlübiyet",
+  gameModes: "Oyun Rejimleri",
+  specialRules: "Mahsus Qaydeler"
 }; 
