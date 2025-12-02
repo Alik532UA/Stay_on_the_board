@@ -1,27 +1,31 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
-  import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
-  import { availableVoices, isLoading, initializeVoices } from '$lib/stores/voiceStore.js';
-  import { _ } from 'svelte-i18n';
-  import { get } from 'svelte/store';
-  import { speakTestPhrase } from '$lib/services/speechService.js';
+  import { onMount, onDestroy } from "svelte";
+  import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
+  import {
+    availableVoices,
+    isLoading,
+    initializeVoices,
+  } from "$lib/stores/voiceStore.js";
+  import { _ } from "svelte-i18n";
+  import { get } from "svelte/store";
+  import { speakTestPhrase } from "$lib/services/speechService.js";
 
-  let selectedVoiceURI = '';
+  let selectedVoiceURI = "";
 
-  const unsubscribe = gameSettingsStore.subscribe(settings => {
-    selectedVoiceURI = settings.selectedVoiceURI ?? '';
+  const unsubscribe = gameSettingsStore.subscribe((settings) => {
+    selectedVoiceURI = settings.selectedVoiceURI ?? "";
   });
 
   onMount(() => {
     if (get(availableVoices).length === 0) {
-        initializeVoices();
+      initializeVoices();
     }
   });
 
   onDestroy(() => {
-      if (unsubscribe) {
-          unsubscribe();
-      }
+    if (unsubscribe) {
+      unsubscribe();
+    }
   });
 
   /**
@@ -34,29 +38,29 @@
 </script>
 
 {#if $isLoading}
-    <div class="loader-container">
-        <div class="loading-spinner"></div>
-        <p>{$_('voiceSettings.loading')}</p>
-    </div>
+  <div class="loader-container">
+    <div class="loading-spinner"></div>
+    <p>{$_("voiceSettings.loading")}</p>
+  </div>
 {:else if $availableVoices.length > 0}
-    <div class="voice-list button-group" data-testid="voice-list">
-        {#each $availableVoices as voice (voice.voiceURI)}
-            <button 
-                class="voice-selection-button"
-                class:active={selectedVoiceURI === voice.voiceURI}
-                on:click={() => selectVoice(voice.voiceURI)}
-                data-testid="voice-selection-button-{voice.voiceURI}"
-            >
-                {voice.name} ({voice.lang})
-            </button>
-        {/each}
-    </div>
+  <div class="voice-list button-group" data-testid="voice-list">
+    {#each $availableVoices as voice (voice.voiceURI)}
+      <button
+        class="voice-selection-button"
+        class:active={selectedVoiceURI === voice.voiceURI}
+        on:click={() => selectVoice(voice.voiceURI)}
+        data-testid="voice-selection-button-{voice.voiceURI}"
+      >
+        {voice.name} ({voice.lang})
+      </button>
+    {/each}
+  </div>
 {:else}
-    <div class="no-voices-container">
-        <p class="no-voices-message">
-            {$_('voiceSettings.noVoices')}
-        </p>
-    </div>
+  <div class="no-voices-container">
+    <p class="no-voices-message">
+      {$_("voiceSettings.noVoices")}
+    </p>
+  </div>
 {/if}
 
 <style>
@@ -74,7 +78,9 @@
     padding: 8px 16px;
     border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s;
     text-align: left;
     font-size: 1em;
     line-height: 1.3;
@@ -82,7 +88,7 @@
   }
 
   .voice-selection-button:hover {
-      border-color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.5);
   }
 
   .voice-selection-button.active {
@@ -99,14 +105,18 @@
   .loading-spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid rgba(255,255,255,0.3);
+    border: 4px solid rgba(255, 255, 255, 0.3);
     border-top-color: #fff;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 1em;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   .no-voices-message {
     text-align: center;
     padding: 1em;
@@ -118,8 +128,9 @@
   }
 
   .voice-list {
-    overflow-y: auto;
     padding-right: 10px;
+    padding-bottom: 24px;
+    padding-top: 4px;
     min-height: 0;
     width: 95%;
     margin: 0 auto;

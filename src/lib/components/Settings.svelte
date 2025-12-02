@@ -1,54 +1,60 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { appSettingsStore } from '../stores/appSettingsStore.js';
-  import { gameSettingsStore, type GameSettingsState } from '../stores/gameSettingsStore.js';
-  import { _ } from 'svelte-i18n';
-  import SvgIcons from './SvgIcons.svelte';
-  import { customTooltip } from '$lib/actions/customTooltip.js';
-  import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
-  import { locale } from 'svelte-i18n';
-  import '../css/layouts/main-menu.css';
-  import { languages } from '$lib/constants.js';
-  import { logService } from '$lib/services/logService.js';
-  import { clearCache } from '$lib/utils/cacheManager.js';
-  import { gameModeService } from '$lib/services/gameModeService';
-  import { userActionService } from '$lib/services/userActionService.js';
-  import VoiceSettings from './VoiceSettings.svelte';
-  import VoiceList from './VoiceList.svelte';
+  import { onMount, onDestroy } from "svelte";
+  import { appSettingsStore } from "../stores/appSettingsStore.js";
+  import {
+    gameSettingsStore,
+    type GameSettingsState,
+  } from "../stores/gameSettingsStore.js";
+  import { _ } from "svelte-i18n";
+  import SvgIcons from "./SvgIcons.svelte";
+  import { customTooltip } from "$lib/actions/customTooltip.js";
+  import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
+  import { locale } from "svelte-i18n";
+  import "../css/layouts/main-menu.css";
+  import { languages } from "$lib/constants.js";
+  import { logService } from "$lib/services/logService.js";
+  import { clearCache } from "$lib/utils/cacheManager.js";
+  import { gameModeService } from "$lib/services/gameModeService";
+  import { userActionService } from "$lib/services/userActionService.js";
+  import VoiceSettings from "./VoiceSettings.svelte";
+  import VoiceList from "./VoiceList.svelte";
 
   $: settings = $appSettingsStore;
   $: gameSettings = $gameSettingsStore;
 
-  let voiceCardEl: HTMLDivElement;
-  let voiceListCardEl: HTMLDivElement;
+  let showFade = false;
+  let voiceListWrapper: HTMLDivElement;
+
+  function updateFadeState() {
+    if (!voiceListWrapper) return;
+    const { scrollTop, scrollHeight, clientHeight } = voiceListWrapper;
+    const isScrollable = scrollHeight > clientHeight;
+    const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 1;
+    showFade = isScrollable && !isAtBottom;
+  }
+
+  let mutationObserver: MutationObserver;
   let resizeObserver: ResizeObserver;
 
   onMount(() => {
-    if (!voiceCardEl || !voiceListCardEl) return;
+    if (voiceListWrapper) {
+      // Run the check after the DOM has been updated
+      setTimeout(updateFadeState, 0);
 
-    const setVoiceListHeight = () => {
-      const height = voiceCardEl.offsetHeight;
-      if (height > 0) {
-        // Ensure we don't set height to 0 if element is hidden
-        voiceListCardEl.style.height = `${height}px`;
-        logService.ui('Adjusting VoiceListCard height', { newHeight: height });
-      }
-    };
+      resizeObserver = new ResizeObserver(updateFadeState);
+      resizeObserver.observe(voiceListWrapper);
 
-    // Set initial height after a delay to ensure DOM is fully rendered
-    setTimeout(() => {
-      setVoiceListHeight();
-
-      // Set up observer to handle resize changes
-      resizeObserver = new ResizeObserver(setVoiceListHeight);
-      resizeObserver.observe(voiceCardEl);
-    }, 500);
+      mutationObserver = new MutationObserver(updateFadeState);
+      mutationObserver.observe(voiceListWrapper, {
+        childList: true,
+        subtree: true,
+      });
+    }
   });
 
   onDestroy(() => {
-    if (resizeObserver) {
-      resizeObserver.disconnect();
-    }
+    if (mutationObserver) mutationObserver.disconnect();
+    if (resizeObserver) resizeObserver.disconnect();
   });
 
   function handleClearAll() {
@@ -62,7 +68,7 @@
   function selectLang(lang: string) {
     logService.ui(`Зміна мови: ${lang}`);
     appSettingsStore.updateSettings({ language: lang });
-    localStorage.setItem('language', lang);
+    localStorage.setItem("language", lang);
     locale.set(lang);
   }
 
@@ -84,8 +90,13 @@
   <div class="grid-column" data-testid="settings-column-appearance">
     <div class="settings-card" data-testid="settings-card-appearance">
       <div class="settings-group" data-testid="settings-page-language-group">
-        <span class="settings-label" data-testid="settings-page-language-label">{$_('settings.language')}</span>
-        <div class="language-selector" data-testid="settings-page-language-selector">
+        <span class="settings-label" data-testid="settings-page-language-label"
+          >{$_("settings.language")}</span
+        >
+        <div
+          class="language-selector"
+          data-testid="settings-page-language-selector"
+        >
           {#each languages as lang}
             <button
               class="language-button"
@@ -100,58 +111,130 @@
       </div>
       <hr class="settings-divider" data-testid="settings-page-divider-1" />
       <div class="theme-selector" data-testid="settings-page-theme-selector">
-        <div class="theme-style-row" data-style="purple" data-testid="settings-page-theme-row-purple">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('purple', 'light')} data-testid="settings-page-theme-button-purple-light"
-            >☀️</button
+        <div
+          class="theme-style-row"
+          data-style="purple"
+          data-testid="settings-page-theme-row-purple"
+        >
+          <button
+            class="theme-btn"
+            data-theme="light"
+            on:click={() => selectTheme("purple", "light")}
+            data-testid="settings-page-theme-button-purple-light">☀️</button
           >
-          <span class="theme-name" data-testid="settings-page-theme-name-purple">{$_('mainMenu.themeName.purple')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('purple', 'dark')} data-testid="settings-page-theme-button-purple-dark"
-            >🌙</button
+          <span class="theme-name" data-testid="settings-page-theme-name-purple"
+            >{$_("mainMenu.themeName.purple")}</span
           >
-        </div>
-        <div class="theme-style-row" data-style="green" data-testid="settings-page-theme-row-green">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('green', 'light')} data-testid="settings-page-theme-button-green-light"
-            >☀️</button
-          >
-          <span class="theme-name" data-testid="settings-page-theme-name-green">{$_('mainMenu.themeName.green')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('green', 'dark')} data-testid="settings-page-theme-button-green-dark"
-            >🌙</button
-          >
-        </div>
-        <div class="theme-style-row" data-style="blue" data-testid="settings-page-theme-row-blue">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('blue', 'light')} data-testid="settings-page-theme-button-blue-light"
-            >☀️</button
-          >
-          <span class="theme-name" data-testid="settings-page-theme-name-blue">{$_('mainMenu.themeName.blue')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('blue', 'dark')} data-testid="settings-page-theme-button-blue-dark"
-            >🌙</button
+          <button
+            class="theme-btn"
+            data-theme="dark"
+            on:click={() => selectTheme("purple", "dark")}
+            data-testid="settings-page-theme-button-purple-dark">🌙</button
           >
         </div>
-        <div class="theme-style-row" data-style="gray" data-testid="settings-page-theme-row-gray">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('gray', 'light')} data-testid="settings-page-theme-button-gray-light"
-            >☀️</button
+        <div
+          class="theme-style-row"
+          data-style="green"
+          data-testid="settings-page-theme-row-green"
+        >
+          <button
+            class="theme-btn"
+            data-theme="light"
+            on:click={() => selectTheme("green", "light")}
+            data-testid="settings-page-theme-button-green-light">☀️</button
           >
-          <span class="theme-name" data-testid="settings-page-theme-name-gray">{$_('mainMenu.themeName.gray')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('gray', 'dark')} data-testid="settings-page-theme-button-gray-dark"
-            >🌙</button
+          <span class="theme-name" data-testid="settings-page-theme-name-green"
+            >{$_("mainMenu.themeName.green")}</span
+          >
+          <button
+            class="theme-btn"
+            data-theme="dark"
+            on:click={() => selectTheme("green", "dark")}
+            data-testid="settings-page-theme-button-green-dark">🌙</button
           >
         </div>
-        <div class="theme-style-row" data-style="orange" data-testid="settings-page-theme-row-orange">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('orange', 'light')} data-testid="settings-page-theme-button-orange-light"
-            >☀️</button
+        <div
+          class="theme-style-row"
+          data-style="blue"
+          data-testid="settings-page-theme-row-blue"
+        >
+          <button
+            class="theme-btn"
+            data-theme="light"
+            on:click={() => selectTheme("blue", "light")}
+            data-testid="settings-page-theme-button-blue-light">☀️</button
           >
-          <span class="theme-name" data-testid="settings-page-theme-name-orange">{$_('mainMenu.themeName.orange')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('orange', 'dark')} data-testid="settings-page-theme-button-orange-dark"
-            >🌙</button
+          <span class="theme-name" data-testid="settings-page-theme-name-blue"
+            >{$_("mainMenu.themeName.blue")}</span
+          >
+          <button
+            class="theme-btn"
+            data-theme="dark"
+            on:click={() => selectTheme("blue", "dark")}
+            data-testid="settings-page-theme-button-blue-dark">🌙</button
           >
         </div>
-        <div class="theme-style-row" data-style="wood" data-testid="settings-page-theme-row-wood">
-          <button class="theme-btn" data-theme="light" on:click={() => selectTheme('wood', 'light')} data-testid="settings-page-theme-button-wood-light"
-            >☀️</button
+        <div
+          class="theme-style-row"
+          data-style="gray"
+          data-testid="settings-page-theme-row-gray"
+        >
+          <button
+            class="theme-btn"
+            data-theme="light"
+            on:click={() => selectTheme("gray", "light")}
+            data-testid="settings-page-theme-button-gray-light">☀️</button
           >
-          <span class="theme-name" data-testid="settings-page-theme-name-wood">{$_('mainMenu.themeName.wood')}</span>
-          <button class="theme-btn" data-theme="dark" on:click={() => selectTheme('wood', 'dark')} data-testid="settings-page-theme-button-wood-dark"
-            >🌙</button
+          <span class="theme-name" data-testid="settings-page-theme-name-gray"
+            >{$_("mainMenu.themeName.gray")}</span
+          >
+          <button
+            class="theme-btn"
+            data-theme="dark"
+            on:click={() => selectTheme("gray", "dark")}
+            data-testid="settings-page-theme-button-gray-dark">🌙</button
+          >
+        </div>
+        <div
+          class="theme-style-row"
+          data-style="orange"
+          data-testid="settings-page-theme-row-orange"
+        >
+          <button
+            class="theme-btn"
+            data-theme="light"
+            on:click={() => selectTheme("orange", "light")}
+            data-testid="settings-page-theme-button-orange-light">☀️</button
+          >
+          <span class="theme-name" data-testid="settings-page-theme-name-orange"
+            >{$_("mainMenu.themeName.orange")}</span
+          >
+          <button
+            class="theme-btn"
+            data-theme="dark"
+            on:click={() => selectTheme("orange", "dark")}
+            data-testid="settings-page-theme-button-orange-dark">🌙</button
+          >
+        </div>
+        <div
+          class="theme-style-row"
+          data-style="wood"
+          data-testid="settings-page-theme-row-wood"
+        >
+          <button
+            class="theme-btn"
+            data-theme="light"
+            on:click={() => selectTheme("wood", "light")}
+            data-testid="settings-page-theme-button-wood-light">☀️</button
+          >
+          <span class="theme-name" data-testid="settings-page-theme-name-wood"
+            >{$_("mainMenu.themeName.wood")}</span
+          >
+          <button
+            class="theme-btn"
+            data-theme="dark"
+            on:click={() => selectTheme("wood", "dark")}
+            data-testid="settings-page-theme-button-wood-dark">🌙</button
           >
         </div>
       </div>
@@ -159,59 +242,78 @@
   </div>
   <div class="grid-column" data-testid="settings-column-game">
     <div class="settings-card" data-testid="settings-card-game">
-      <div class="settings-section" data-testid="settings-page-game-mode-section">
-        <span class="settings-label" data-testid="settings-page-game-mode-label">{$_('settings.gameMode')}</span>
-        <div class="settings-button-group" data-testid="settings-page-game-mode-group">
+      <div
+        class="settings-section"
+        data-testid="settings-page-game-mode-section"
+      >
+        <span class="settings-label" data-testid="settings-page-game-mode-label"
+          >{$_("settings.gameMode")}</span
+        >
+        <div
+          class="settings-button-group"
+          data-testid="settings-page-game-mode-group"
+        >
           <button
             class="settings-group-button"
             class:active={!gameSettings.rememberGameMode}
             on:click={() => {
-              gameSettingsStore.updateSettings({ gameMode: null, showGameModeModal: true, rememberGameMode: false });
-              if (typeof window !== 'undefined') {
-                sessionStorage.removeItem('gameMode');
+              gameSettingsStore.updateSettings({
+                gameMode: null,
+                showGameModeModal: true,
+                rememberGameMode: false,
+              });
+              if (typeof window !== "undefined") {
+                sessionStorage.removeItem("gameMode");
               }
             }}
             data-testid="settings-page-game-mode-null"
           >
-            {$_('gameModes.choose')}
+            {$_("gameModes.choose")}
           </button>
           <div class="game-mode-buttons">
             <button
               class="settings-group-button"
-              class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'beginner'}
-              on:click={() => userActionService.setGameModePreset('beginner')}
+              class:active={gameSettings.rememberGameMode &&
+                gameSettings.gameMode === "beginner"}
+              on:click={() => userActionService.setGameModePreset("beginner")}
               data-testid="settings-page-game-mode-beginner"
             >
-              {$_('gameModes.beginner')}
+              {$_("gameModes.beginner")}
             </button>
             <button
               class="settings-group-button"
-              class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'experienced'}
-              on:click={() => userActionService.setGameModePreset('experienced')}
+              class:active={gameSettings.rememberGameMode &&
+                gameSettings.gameMode === "experienced"}
+              on:click={() =>
+                userActionService.setGameModePreset("experienced")}
               data-testid="settings-page-game-mode-experienced"
             >
-              {$_('gameModes.experienced')}
+              {$_("gameModes.experienced")}
             </button>
             <button
               class="settings-group-button"
-              class:active={gameSettings.rememberGameMode && gameSettings.gameMode === 'pro'}
-              on:click={() => userActionService.setGameModePreset('pro')}
+              class:active={gameSettings.rememberGameMode &&
+                gameSettings.gameMode === "pro"}
+              on:click={() => userActionService.setGameModePreset("pro")}
               data-testid="settings-page-game-mode-pro"
             >
-              {$_('gameModes.pro')}
+              {$_("gameModes.pro")}
             </button>
           </div>
         </div>
       </div>
       <hr class="settings-divider" data-testid="settings-page-divider-3" />
-      <div class="settings-option" data-testid="settings-page-difficulty-warning-option">
+      <div
+        class="settings-option"
+        data-testid="settings-page-difficulty-warning-option"
+      >
         <button
           class="settings-toggle-button"
           class:active={gameSettings.showDifficultyWarningModal}
-          on:click={() => toggleSetting('showDifficultyWarningModal')}
+          on:click={() => toggleSetting("showDifficultyWarningModal")}
           data-testid="settings-page-show-difficulty-warning-modal-toggle"
         >
-          {$_('settings.showDifficultyWarningModal')}
+          {$_("settings.showDifficultyWarningModal")}
         </button>
       </div>
       <hr class="settings-divider" data-testid="settings-page-divider-4" />
@@ -219,30 +321,43 @@
         <button
           class="settings-reset-button"
           on:click={resetSettings}
-          use:customTooltip={$_('settings.resetHint')}
+          use:customTooltip={$_("settings.resetHint")}
           data-testid="settings-page-reset-button"
         >
-          <span>{$_('settings.reset')}</span>
+          <span>{$_("settings.reset")}</span>
         </button>
-        <button data-testid="clear-cache-keep-appearance-btn" class="settings-reset-button" on:click={handleKeepAppearance}>
-          <span>{$_('mainMenu.clearCacheModal.keepAppearance')}</span>
+        <button
+          data-testid="clear-cache-keep-appearance-btn"
+          class="settings-reset-button"
+          on:click={handleKeepAppearance}
+        >
+          <span>{$_("mainMenu.clearCacheModal.keepAppearance")}</span>
         </button>
-        <button data-testid="clear-cache-full-clear-btn" class="settings-reset-button danger" on:click={handleClearAll}>
-          <span>{$_('mainMenu.clearCacheModal.fullClear')}</span>
+        <button
+          data-testid="clear-cache-full-clear-btn"
+          class="settings-reset-button danger"
+          on:click={handleClearAll}
+        >
+          <span>{$_("mainMenu.clearCacheModal.fullClear")}</span>
         </button>
       </div>
     </div>
   </div>
   <div class="grid-column" data-testid="settings-column-voice">
-    <div bind:this={voiceCardEl} class="settings-card" data-testid="settings-card-voice">
-      <span class="settings-label">{$_('settings.voiceSettings')}</span>
+    <div class="settings-card" data-testid="settings-card-voice">
+      <span class="settings-label">{$_("settings.voiceSettings")}</span>
       <VoiceSettings />
     </div>
   </div>
   <div class="grid-column" data-testid="settings-column-voice-list">
-    <div bind:this={voiceListCardEl} class="settings-card" data-testid="settings-card-voice-list">
-      <span class="settings-label">{$_('settings.voiceList')}</span>
-      <div class="voice-list-wrapper">
+    <div class="settings-card" data-testid="settings-card-voice-list">
+      <span class="settings-label">{$_("settings.voiceList")}</span>
+      <div
+        class="voice-list-wrapper"
+        class:fade-bottom={showFade}
+        bind:this={voiceListWrapper}
+        on:scroll={updateFadeState}
+      >
         <VoiceList />
       </div>
     </div>
@@ -392,6 +507,7 @@
   .game-mode-buttons {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
   }
 
   .settings-group-button {
@@ -424,7 +540,39 @@
     overflow-y: auto;
   }
 
-  [data-testid='settings-column-voice'] > .settings-card {
-    flex-grow: 0;
+  .voice-list-wrapper.fade-bottom {
+    -webkit-mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
+  }
+
+  .voice-list-wrapper::-webkit-scrollbar {
+    width: 8px;
+  }
+  .voice-list-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+  }
+  .voice-list-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+  }
+  .voice-list-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+  /* 
+    Ensure the 4th column (Voice List) adapts to the height of the row (determined by the 3rd column) 
+    and scrolls internally if needed, rather than expanding the row height.
+  */
+  [data-testid="settings-column-voice-list"] > .settings-card {
+    height: 400px; /* Fixed height for mobile stack */
+  }
+
+  /* Tablet and up (Grid layout) */
+  @media (min-width: 768px) {
+    [data-testid="settings-column-voice-list"] > .settings-card {
+      height: auto;
+      flex-basis: 0; /* Allow it to shrink/grow from 0, filling available space */
+      min-height: 0; /* Allow shrinking below content height to enable internal scrolling */
+    }
   }
 </style>

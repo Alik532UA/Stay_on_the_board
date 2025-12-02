@@ -1,15 +1,51 @@
 <script>
+  import { onMount, onDestroy } from 'svelte';
   import { _ } from 'svelte-i18n';
   import VoiceSettings from './VoiceSettings.svelte';
   import VoiceList from './VoiceList.svelte';
 
   export let close = () => {};
+
+  let showFade = false;
+  let voiceListContainer;
+
+  function updateFadeState() {
+    if (!voiceListContainer) return;
+    const { scrollTop, scrollHeight, clientHeight } = voiceListContainer;
+    const isScrollable = scrollHeight > clientHeight;
+    const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 1;
+    showFade = isScrollable && !isAtBottom;
+  }
+
+  let mutationObserver;
+  let resizeObserver;
+
+  onMount(() => {
+    if (voiceListContainer) {
+      // Run the check after the DOM has been updated
+      setTimeout(updateFadeState, 0);
+
+      resizeObserver = new ResizeObserver(updateFadeState);
+      resizeObserver.observe(voiceListContainer);
+
+      mutationObserver = new MutationObserver(updateFadeState);
+      mutationObserver.observe(voiceListContainer, {
+        childList: true,
+        subtree: true,
+      });
+    }
+  });
+
+  onDestroy(() => {
+    if (mutationObserver) mutationObserver.disconnect();
+    if (resizeObserver) resizeObserver.disconnect();
+  });
 </script>
 
 <div 
   class="modal-overlay" 
-  onclick={close} 
-  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') close(); }}
+  on:click={close} 
+  on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') close(); }}
   role="button"
   tabindex="0"
   aria-label={$_('voiceSettings.close')}
@@ -18,8 +54,8 @@
     class="modal-window"
     data-testid="voice-settings-modal"
     tabindex="0"
-    onclick={(e) => e.stopPropagation()}
-    onkeydown={(e) => { if (e.key === 'Escape') close(); }}
+    on:click={(e) => e.stopPropagation()}
+    on:keydown={(e) => { if (e.key === 'Escape') close(); }}
     role="dialog"
     aria-modal="true"
     aria-labelledby="voice-settings-title"
@@ -33,12 +69,17 @@
       </div>
       <hr class="divider-h"/>
       <div class="divider-v"></div>
-      <div class="voice-list-container">
+      <div 
+        class="voice-list-container"
+        class:fade-bottom={showFade}
+        bind:this={voiceListContainer}
+        on:scroll={updateFadeState}
+      >
         <VoiceList />
       </div>
     </div>
     <div class="modal-footer">
-      <button class="modal-btn-generic primary" onclick={close} data-testid="voice-settings-save-footer-btn">{$_('common.save')}</button>
+      <button class="modal-btn-generic primary" on:click={close} data-testid="voice-settings-save-footer-btn">{$_('common.save')}</button>
     </div>
   </div>
 </div>
@@ -91,6 +132,26 @@
     overflow-y: auto;
     flex: 1;
     min-height: 0;
+  }
+
+  .voice-list-container.fade-bottom {
+    -webkit-mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
+  }
+
+  .voice-list-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  .voice-list-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+  }
+  .voice-list-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+  }
+  .voice-list-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
   }
 
   .divider-h {
