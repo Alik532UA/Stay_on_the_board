@@ -22,6 +22,41 @@
   $: settings = $appSettingsStore;
   $: gameSettings = $gameSettingsStore;
 
+  let showFade = false;
+  let voiceListWrapper: HTMLDivElement;
+
+  function updateFadeState() {
+    if (!voiceListWrapper) return;
+    const { scrollTop, scrollHeight, clientHeight } = voiceListWrapper;
+    const isScrollable = scrollHeight > clientHeight;
+    const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 1;
+    showFade = isScrollable && !isAtBottom;
+  }
+
+  let mutationObserver: MutationObserver;
+  let resizeObserver: ResizeObserver;
+
+  onMount(() => {
+    if (voiceListWrapper) {
+      // Run the check after the DOM has been updated
+      setTimeout(updateFadeState, 0);
+
+      resizeObserver = new ResizeObserver(updateFadeState);
+      resizeObserver.observe(voiceListWrapper);
+
+      mutationObserver = new MutationObserver(updateFadeState);
+      mutationObserver.observe(voiceListWrapper, {
+        childList: true,
+        subtree: true,
+      });
+    }
+  });
+
+  onDestroy(() => {
+    if (mutationObserver) mutationObserver.disconnect();
+    if (resizeObserver) resizeObserver.disconnect();
+  });
+
   function handleClearAll() {
     clearCache({ keepAppearance: false });
   }
@@ -317,7 +352,12 @@
   <div class="grid-column" data-testid="settings-column-voice-list">
     <div class="settings-card" data-testid="settings-card-voice-list">
       <span class="settings-label">{$_("settings.voiceList")}</span>
-      <div class="voice-list-wrapper">
+      <div
+        class="voice-list-wrapper"
+        class:fade-bottom={showFade}
+        bind:this={voiceListWrapper}
+        on:scroll={updateFadeState}
+      >
         <VoiceList />
       </div>
     </div>
@@ -499,6 +539,12 @@
     flex-direction: column;
     overflow-y: auto;
   }
+
+  .voice-list-wrapper.fade-bottom {
+    -webkit-mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
+  }
+
   .voice-list-wrapper::-webkit-scrollbar {
     width: 8px;
   }
