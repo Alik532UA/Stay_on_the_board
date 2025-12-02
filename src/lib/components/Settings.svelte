@@ -392,6 +392,7 @@
   .game-mode-buttons {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
   }
 
   .settings-group-button {
