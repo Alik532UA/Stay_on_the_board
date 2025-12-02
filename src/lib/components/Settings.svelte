@@ -499,12 +499,34 @@
     flex-direction: column;
     overflow-y: auto;
   }
+  .voice-list-wrapper::-webkit-scrollbar {
+    width: 8px;
+  }
+  .voice-list-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+  }
+  .voice-list-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+  }
+  .voice-list-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
   /* 
     Ensure the 4th column (Voice List) adapts to the height of the row (determined by the 3rd column) 
     and scrolls internally if needed, rather than expanding the row height.
   */
   [data-testid="settings-column-voice-list"] > .settings-card {
-    flex-basis: 0; /* Allow it to shrink/grow from 0, filling available space */
-    min-height: 0; /* Allow shrinking below content height to enable internal scrolling */
+    height: 400px; /* Fixed height for mobile stack */
+  }
+
+  /* Tablet and up (Grid layout) */
+  @media (min-width: 768px) {
+    [data-testid="settings-column-voice-list"] > .settings-card {
+      height: auto;
+      flex-basis: 0; /* Allow it to shrink/grow from 0, filling available space */
+      min-height: 0; /* Allow shrinking below content height to enable internal scrolling */
+    }
   }
 </style>
