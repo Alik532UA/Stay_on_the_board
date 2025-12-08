@@ -7,6 +7,7 @@ export default {
   resetScoreConfirm: "Yes, change size",
   resetScoreCancel: "No, stay",
   gameOverTitle: 'Game Over!',
+  drawTitle: 'Draw!',
   trainingOverTitle: 'Training complete!',
   winnerTitle: "{winnerNumber} wins!",
   winnersTitle: "Winners: {winnerNumbers}!",

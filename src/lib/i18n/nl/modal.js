@@ -6,7 +6,8 @@ export default {
   boardResizeContent: "Het wijzigen van de bordgrootte zal je huidige score en strafpunten resetten. Weet je zeker dat je wilt doorgaan?",
   resetScoreConfirm: "Ja, grootte wijzigen",
   resetScoreCancel: "Nee, blijven",
-    gameOverTitle: 'Spel voorbij!',
+  gameOverTitle: 'Spel voorbij!',
+  drawTitle: 'Gelijkspel!',
   trainingOverTitle: 'Training voltooid!',
   winnerTitle: "{winnerNumber} wint!",
   winnersTitle: "Winnaars: {winnerNumbers}!",
@@ -33,7 +34,7 @@ export default {
   gameOverReasonPlayerBlocked: "{playerName} probeerde op een geblokkeerde cel te stappen.",
   gameOverReasonCashOut: "Je hebt besloten het spel te beëindigen en je score te innen.",
   gameOverReasonBonus: "Je hebt besloten het spel te beëindigen en een bonus te claimen.",
-  
+
   scoreDetails: {
     baseScore: "Basisscore:",
     sizeBonus: "Bonus voor bordgrootte:",
