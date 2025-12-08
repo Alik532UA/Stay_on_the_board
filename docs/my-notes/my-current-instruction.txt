@@ -1,18 +1,21 @@
-сторінка Stay_on_the_board/game/local
-(тобто локальна гра)
+Stay_on_the_board/local-setup
+список гравців
+```
+const playerNames = [
+      "den",
+      "brusnikaa",
+      "Khaaaa",
+      "Destroyter94",
+      "MrGrom",
+    ];
+```
 
-@C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\docs\my-notes\my-log.txt
-
-
-після того як таймер завершився і гравець почав нову гру, або якщо змінив розмір дошки 
-(
-data-testid="decrease-board-size-btn"
-data-testid="increase-board-size-btn"
-)
-Актуальний результат: скидаєть до режиму як в Stay_on_the_board/game/virtual-player (тобто два гравці користувач і комп'ютер)
-Очікуваний результат: список гравців не міняється, вже залишається так само як і під час входу в гру Stay_on_the_board/game/local (з параметрами які були виставленні в Stay_on_the_board/local-setup)
-
-іншими словами проблема в тому що перша гра працює правильно, а подальші гри запускаються в режимі virtual-player (тобто один на один проти комп'ютера)
+Stay_on_the_board/game/local (якщо оновити сторінку)
+список гравців
+Актуальний результат: 
+Player 1 (червоний), Player 2 (синій)
+Очікуваний результат: як в playerNames (кольори випадкові не фіксовані)
+зробити так що якщо оновлюється playerNames, то і в Stay_on_the_board/game/local теж новий список (тобто подумати як зробити без дублювання коду)
 
 Твоя мета — максимально точно зрозуміти мої вимоги до задачі.
 Щоб досягти цього, ти повинен ставити мені уточнюючі питання у форматі "питання + варіанти відповідей (A, B, C, D)".

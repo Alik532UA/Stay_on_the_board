@@ -11,6 +11,8 @@ import type { Player } from '$lib/models/player';
 import { availableMovesService } from './availableMovesService';
 import { animationService } from './animationService';
 import { logService } from './logService'; // <-- Додано імпорт
+import { DEFAULT_PLAYER_NAMES } from '$lib/config/defaultPlayers';
+import { getRandomUnusedColor } from '$lib/utils/playerUtils';
 
 export const gameService = {
   initializeNewGame(config: {
@@ -23,11 +25,28 @@ export const gameService = {
     const settings = get(gameSettingsStore);
     const testModeState = get(testModeStore);
     const size = config.size ?? settings.boardSize;
-    
-    const players = config.players ?? [
-      { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
-      { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#ffffff', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
-    ];
+
+    if (!config.players) {
+      const usedColors: string[] = [];
+      // Якщо гравці не передані, використовуємо дефолтний список
+      config.players = DEFAULT_PLAYER_NAMES.map((name, index) => {
+        const color = getRandomUnusedColor(usedColors);
+        usedColors.push(color);
+        return {
+          id: index + 1,
+          type: 'human',
+          name,
+          score: 0,
+          color,
+          isComputer: false,
+          penaltyPoints: 0,
+          bonusPoints: 0,
+          bonusHistory: []
+        };
+      });
+    }
+
+    const players = config.players;
 
     const { row: initialRow, col: initialCol } = getInitialPosition(size, testModeState);
     const board = createEmptyBoard(size);
@@ -89,7 +108,7 @@ export const gameService = {
 
     // Оновлюємо доступні ходи
     availableMovesService.updateAvailableMoves();
-    
+
     // Скидаємо анімації
     animationService.reset();
   }
