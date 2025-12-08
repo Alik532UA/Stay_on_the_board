@@ -14,11 +14,13 @@ import { playerStore } from '$lib/stores/playerStore';
 import { boardStore } from '$lib/stores/boardStore';
 import { DEFAULT_PLAYER_NAMES } from '$lib/config/defaultPlayers';
 import { getRandomUnusedColor } from '$lib/utils/playerUtils';
+import { BASE_TURN_DURATION, DEV_TIME_MULTIPLIER } from '$lib/config/gameConfig';
+import { dev } from '$app/environment';
 
 export class LocalGameMode extends BaseGameMode {
   constructor() {
     super();
-    this.turnDuration = 10;
+    this.turnDuration = dev ? BASE_TURN_DURATION * DEV_TIME_MULTIPLIER : BASE_TURN_DURATION;
   }
 
   initialize(options: { newSize?: number } = {}): void {
