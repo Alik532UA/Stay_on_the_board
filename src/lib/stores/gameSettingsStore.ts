@@ -11,7 +11,7 @@ import { uiStateStore } from './uiStateStore.js';
 import { boardStore } from './boardStore.ts';
 import { availableMovesService } from '../services/availableMovesService.ts';
 
-export type KeybindingAction = 'up'|'down'|'left'|'right'|'up-left'|'up-right'|'down-left'|'down-right'|'confirm'|'no-moves'|'toggle-block-mode'|'toggle-board'|'increase-board'|'decrease-board'|'toggle-speech'|'distance-1'|'distance-2'|'distance-3'|'distance-4'|'distance-5'|'distance-6'|'distance-7'|'distance-8'|'auto-hide-board'|'show-help'|'main-menu';
+export type KeybindingAction = 'up' | 'down' | 'left' | 'right' | 'up-left' | 'up-right' | 'down-left' | 'down-right' | 'confirm' | 'no-moves' | 'toggle-block-mode' | 'toggle-board' | 'increase-board' | 'decrease-board' | 'toggle-speech' | 'distance-1' | 'distance-2' | 'distance-3' | 'distance-4' | 'distance-5' | 'distance-6' | 'distance-7' | 'distance-8' | 'auto-hide-board' | 'show-help' | 'main-menu';
 export type GameModePreset = 'beginner' | 'experienced' | 'pro' | 'timed' | 'local' | 'online';
 
 export type GameSettingsState = {
@@ -42,42 +42,42 @@ export type GameSettingsState = {
 const isBrowser = typeof window !== 'undefined';
 
 export const defaultGameSettings: GameSettingsState = {
-    showMoves: true,
-    showBoard: true,
-    speechEnabled: false,
-    selectedVoiceURI: null,
-    blockModeEnabled: true,
-    showPiece: true,
-    blockOnVisitCount: 0,
-    autoHideBoard: false,
-    boardSize: 4,
-    keybindings: {
-        'up-left': ['Numpad7', 'KeyQ'], 'up': ['Numpad8', 'KeyW'], 'up-right': ['Numpad9', 'KeyE'],
-        'left': ['Numpad4', 'KeyA'], 'right': ['Numpad6', 'KeyD'],
-        'down-left': ['Numpad1', 'KeyZ'], 'down': ['Numpad2', 'KeyX', 'KeyS'], 'down-right': ['Numpad3', 'KeyC'],
-        'confirm': ['Numpad5', 'Enter', 'Space', 'NumpadEnter', 'KeyS'], 'no-moves': ['NumpadDecimal', 'Backspace'],
-        'distance-1': ['Digit1'], 'distance-2': ['Digit2'], 'distance-3': ['Digit3'],
-        'distance-4': ['Digit4'], 'distance-5': ['Digit5'], 'distance-6': ['Digit6'],
-        'distance-7': ['Digit7'], 'distance-8': ['Digit8'],
-        'toggle-block-mode': ['NumpadMultiply', 'KeyB'], 'toggle-board': ['NumpadDivide', 'KeyH'],
-        'increase-board': ['NumpadAdd', 'Equal'], 'decrease-board': ['NumpadSubtract', 'Minus'],
-        'toggle-speech': ['KeyV'],
-        'auto-hide-board': ['Numpad0'],
-        'show-help': ['KeyI'],
-        'main-menu': ['Escape'],
-    },
-    keyConflictResolution: {},
-    gameMode: null,
-    rememberGameMode: false,
-    showGameModeModal: true,
-    showDifficultyWarningModal: true,
-    showGameInfoWidget: 'compact',
-    lockSettings: false,
-    speechRate: 1.2,
-    speechOrder: 'dist_dir',
-    shortSpeech: true,
-    speechFor: { player: false, computer: true },
-    speakModalTitles: true,
+  showMoves: true,
+  showBoard: true,
+  speechEnabled: false,
+  selectedVoiceURI: null,
+  blockModeEnabled: true,
+  showPiece: true,
+  blockOnVisitCount: 0,
+  autoHideBoard: false,
+  boardSize: 4,
+  keybindings: {
+    'up-left': ['Numpad7', 'KeyQ'], 'up': ['Numpad8', 'KeyW'], 'up-right': ['Numpad9', 'KeyE'],
+    'left': ['Numpad4', 'KeyA'], 'right': ['Numpad6', 'KeyD'],
+    'down-left': ['Numpad1', 'KeyZ'], 'down': ['Numpad2', 'KeyX', 'KeyS'], 'down-right': ['Numpad3', 'KeyC'],
+    'confirm': ['Numpad5', 'Enter', 'Space', 'NumpadEnter', 'KeyS'], 'no-moves': ['NumpadDecimal', 'Backspace'],
+    'distance-1': ['Digit1'], 'distance-2': ['Digit2'], 'distance-3': ['Digit3'],
+    'distance-4': ['Digit4'], 'distance-5': ['Digit5'], 'distance-6': ['Digit6'],
+    'distance-7': ['Digit7'], 'distance-8': ['Digit8'],
+    'toggle-block-mode': ['NumpadMultiply', 'KeyB'], 'toggle-board': ['NumpadDivide', 'KeyH'],
+    'increase-board': ['NumpadAdd', 'Equal'], 'decrease-board': ['NumpadSubtract', 'Minus'],
+    'toggle-speech': ['KeyV'],
+    'auto-hide-board': ['Numpad0'],
+    'show-help': ['KeyI'],
+    'main-menu': ['Escape'],
+  },
+  keyConflictResolution: {},
+  gameMode: null,
+  rememberGameMode: false,
+  showGameModeModal: true,
+  showDifficultyWarningModal: true,
+  showGameInfoWidget: 'compact',
+  lockSettings: false,
+  speechRate: 1.2,
+  speechOrder: 'dist_dir',
+  shortSpeech: true,
+  speechFor: { player: false, computer: true },
+  speakModalTitles: true,
 };
 
 function createGameSettingsStore() {
@@ -87,7 +87,7 @@ function createGameSettingsStore() {
   const { subscribe, set, update } = writable<GameSettingsState>(defaultGameSettings);
 
   const syncGameMode = (state: GameSettingsState): GameSettingsState => {
-    if (state.lockSettings || state.gameMode === 'timed') {
+    if (state.lockSettings || state.gameMode === 'timed' || state.gameMode === 'local') {
       return state;
     }
 
@@ -105,7 +105,7 @@ function createGameSettingsStore() {
     if (newMode && state.gameMode !== newMode) {
       state.gameMode = newMode;
     }
-    
+
     return state;
   };
 
@@ -145,11 +145,11 @@ function createGameSettingsStore() {
         const { showBoard } = state;
         const newShowBoard = !showBoard;
 
-        return { 
-          ...state, 
-          showBoard: newShowBoard, 
-          showPiece: newShowBoard, 
-          showMoves: newShowBoard 
+        return {
+          ...state,
+          showBoard: newShowBoard,
+          showPiece: newShowBoard,
+          showMoves: newShowBoard
         };
       });
     },
@@ -169,11 +169,11 @@ function createGameSettingsStore() {
       });
     },
     toggleAutoHideBoard: () => {
-        update(state => {
-            let updatedState = { ...state, autoHideBoard: !state.autoHideBoard };
-            updatedState = syncGameMode(updatedState);
-            return updatedState;
-        });
+      update(state => {
+        let updatedState = { ...state, autoHideBoard: !state.autoHideBoard };
+        updatedState = syncGameMode(updatedState);
+        return updatedState;
+      });
     },
     setGameInfoWidgetState: (newState: 'hidden' | 'shown' | 'compact') => update(state => ({ ...state, showGameInfoWidget: newState })),
     toggleBlockMode: () => {
@@ -186,85 +186,85 @@ function createGameSettingsStore() {
       availableMovesService.updateAvailableMoves();
     },
     toggleSpeech: () => update(state => ({ ...state, speechEnabled: !state.speechEnabled })),
-    
+
     applyPreset: (preset: GameModePreset) => {
-        logService.GAME_MODE(`[GameSettingsStore] Applying preset: "${preset}"`);
-        const presets: Record<GameModePreset, Partial<GameSettingsState>> = {
-            beginner: { 
-                gameMode: 'beginner', 
-                blockModeEnabled: false, 
-                autoHideBoard: false, 
-                speechEnabled: false, 
-                rememberGameMode: true,
-                speechRate: 1,
-                shortSpeech: false,
-                speechFor: { player: true, computer: true },
-                showGameInfoWidget: 'shown',
-                showBoard: true,
-                showPiece: true,
-                showMoves: true,
-            },
-            experienced: { 
-                gameMode: 'experienced', 
-                blockModeEnabled: false, 
-                autoHideBoard: true, 
-                speechEnabled: true, 
-                rememberGameMode: true,
-                speechRate: 1.4,
-                shortSpeech: true,
-                speechFor: { player: false, computer: true },
-                showGameInfoWidget: 'compact',
-            },
-            pro: { 
-                gameMode: 'pro', 
-                blockModeEnabled: true, 
-                autoHideBoard: true, 
-                speechEnabled: true, 
-                rememberGameMode: true,
-                speechRate: 1.6,
-                shortSpeech: true,
-                speechFor: { player: false, computer: true },
-                showGameInfoWidget: 'compact',
-            },
-            timed: {
-                gameMode: 'timed',
-                autoHideBoard: true,
-                blockModeEnabled: true,
-                speechEnabled: false,
-                showGameInfoWidget: 'compact',
-                speechRate: 1.6,
-                shortSpeech: true,
-                speechFor: { player: false, computer: true },
-            },
-            local: {
-                autoHideBoard: true,
-                blockModeEnabled: true,
-                speechEnabled: false,
-                showGameInfoWidget: 'compact',
-                speechRate: 1.6,
-                shortSpeech: true,
-                speechFor: { player: false, computer: true },
-            },
-            online: {
-                autoHideBoard: true,
-                blockModeEnabled: true,
-                speechEnabled: false,
-                showGameInfoWidget: 'compact',
-                speechRate: 1.6,
-                shortSpeech: true,
-                speechFor: { player: false, computer: true },
-            }
-        };
-        
-        const presetSettings = presets[preset];
-        const currentState = get(gameSettingsStore);
-
-        if (presetSettings.blockModeEnabled !== undefined && presetSettings.blockModeEnabled !== currentState.blockModeEnabled) {
-            boardStore.resetCellVisitCounts();
-            availableMovesService.updateAvailableMoves();
+      logService.GAME_MODE(`[GameSettingsStore] Applying preset: "${preset}"`);
+      const presets: Record<GameModePreset, Partial<GameSettingsState>> = {
+        beginner: {
+          gameMode: 'beginner',
+          blockModeEnabled: false,
+          autoHideBoard: false,
+          speechEnabled: false,
+          rememberGameMode: true,
+          speechRate: 1,
+          shortSpeech: false,
+          speechFor: { player: true, computer: true },
+          showGameInfoWidget: 'shown',
+          showBoard: true,
+          showPiece: true,
+          showMoves: true,
+        },
+        experienced: {
+          gameMode: 'experienced',
+          blockModeEnabled: false,
+          autoHideBoard: true,
+          speechEnabled: true,
+          rememberGameMode: true,
+          speechRate: 1.4,
+          shortSpeech: true,
+          speechFor: { player: false, computer: true },
+          showGameInfoWidget: 'compact',
+        },
+        pro: {
+          gameMode: 'pro',
+          blockModeEnabled: true,
+          autoHideBoard: true,
+          speechEnabled: true,
+          rememberGameMode: true,
+          speechRate: 1.6,
+          shortSpeech: true,
+          speechFor: { player: false, computer: true },
+          showGameInfoWidget: 'compact',
+        },
+        timed: {
+          gameMode: 'timed',
+          autoHideBoard: true,
+          blockModeEnabled: true,
+          speechEnabled: false,
+          showGameInfoWidget: 'compact',
+          speechRate: 1.6,
+          shortSpeech: true,
+          speechFor: { player: false, computer: true },
+        },
+        local: {
+          autoHideBoard: true,
+          blockModeEnabled: true,
+          speechEnabled: false,
+          showGameInfoWidget: 'compact',
+          speechRate: 1.6,
+          shortSpeech: true,
+          speechFor: { player: false, computer: true },
+        },
+        online: {
+          autoHideBoard: true,
+          blockModeEnabled: true,
+          speechEnabled: false,
+          showGameInfoWidget: 'compact',
+          speechRate: 1.6,
+          shortSpeech: true,
+          speechFor: { player: false, computer: true },
         }
+      };
 
-        methods.updateSettings(presetSettings);
+      const presetSettings = presets[preset];
+      const currentState = get(gameSettingsStore);
+
+      if (presetSettings.blockModeEnabled !== undefined && presetSettings.blockModeEnabled !== currentState.blockModeEnabled) {
+        boardStore.resetCellVisitCounts();
+        availableMovesService.updateAvailableMoves();
+      }
+
+      methods.updateSettings(presetSettings);
     },
   };
 
