@@ -7,6 +7,7 @@ export default {
   resetScoreConfirm: "Ebet, ölçüni deñiştir",
   resetScoreCancel: "Hayır, qal",
   gameOverTitle: 'Oyun bitti!',
+  drawTitle: 'Beraberlik!',
   trainingOverTitle: 'Talim tamamlandı!',
   winnerTitle: "{winnerNumber} yeñdi!",
   winnersTitle: "Yeñiciler: {winnerNumbers}!",

@@ -7,6 +7,7 @@ export default {
   resetScoreConfirm: "Так, змінити розмір",
   resetScoreCancel: "Ні, залишитися",
   gameOverTitle: 'Гру завершено!',
+  drawTitle: 'Нічия!',
   trainingOverTitle: 'Тренування завершено!',
   winnerTitle: "{winnerNumber} переміг!",
   winnersTitle: "Переможці: {winnerNumbers}!",
