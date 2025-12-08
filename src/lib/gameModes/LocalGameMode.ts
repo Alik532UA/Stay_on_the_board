@@ -12,6 +12,8 @@ import { availableMovesService } from '$lib/services/availableMovesService';
 import { gameService } from '$lib/services/gameService';
 import { playerStore } from '$lib/stores/playerStore';
 import { boardStore } from '$lib/stores/boardStore';
+import { DEFAULT_PLAYER_NAMES } from '$lib/config/defaultPlayers';
+import { getRandomUnusedColor } from '$lib/utils/playerUtils';
 
 export class LocalGameMode extends BaseGameMode {
   constructor() {
@@ -76,10 +78,23 @@ export class LocalGameMode extends BaseGameMode {
         bonusHistory: [] as any[]
       }));
     }
-    return [
-      { id: 1, name: 'Player 1', type: 'human', score: 0, color: '#ff0000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as any[] },
-      { id: 2, name: 'Player 2', type: 'human', score: 0, color: '#0000ff', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as any[] }
-    ];
+    // If no players in store (e.g. F5 refresh), generate default players
+    const usedColors: string[] = [];
+    return DEFAULT_PLAYER_NAMES.map((name, index) => {
+      const color = getRandomUnusedColor(usedColors);
+      usedColors.push(color);
+      return {
+        id: index + 1,
+        name,
+        type: 'human',
+        score: 0,
+        color,
+        isComputer: false,
+        penaltyPoints: 0,
+        bonusPoints: 0,
+        bonusHistory: [] as any[]
+      };
+    });
   }
 
   getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player' {
