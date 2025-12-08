@@ -41,9 +41,9 @@ export const userActionService = {
     } else {
       newDistance = (!selectedDistance || selectedDistance >= maxDist) ? 1 : selectedDistance + 1;
     }
-    
+
     uiStateStore.update(s => s ? ({ ...s, selectedDirection: direction, selectedDistance: newDistance }) : null);
-    
+
     logService.logicMove('setDirection: встановлено напрямок', { dir: direction, newDistance });
   },
 
@@ -62,7 +62,7 @@ export const userActionService = {
   async executeMove(direction: Direction, distance: number): Promise<void> {
     const uiState = get(uiStateStore);
     if (uiState?.isComputerMoveInProgress) return;
-    
+
     const activeGameMode = gameModeService.getCurrentMode();
     if (activeGameMode) {
       await activeGameMode.handlePlayerMove(direction, distance);
@@ -90,8 +90,15 @@ export const userActionService = {
 
     // Якщо гра ще не почалася (рахунок 0), змінюємо розмір дошки без підтвердження.
     // Це дозволяє користувачам вільно налаштовувати дошку перед початком гри.
+    // Якщо гра ще не почалася (рахунок 0), змінюємо розмір дошки без підтвердження.
+    // Це дозволяє користувачам вільно налаштовувати дошку перед початком гри.
     if (score === 0 && scoreState.penaltyPoints === 0) {
-      gameService.initializeNewGame({ size: newSize });
+      const activeGameMode = gameModeService.getCurrentMode();
+      if (activeGameMode) {
+        activeGameMode.restartGame({ newSize });
+      } else {
+        gameService.initializeNewGame({ size: newSize });
+      }
       gameSettingsStore.updateSettings({ boardSize: newSize });
     } else {
       // Якщо гра вже триває, показуємо модальне вікно для підтвердження,
@@ -100,7 +107,7 @@ export const userActionService = {
     }
   },
 
-  
+
 
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
@@ -108,11 +115,13 @@ export const userActionService = {
     // This is the single source of truth for the selected game mode preset.
     // It ensures that when a user selects a new mode, we initialize the correct one,
     // not the one that is currently active.
-    const activeMode = get(gameSettingsStore).gameMode;
+    const activeMode = gameModeService.getCurrentMode();
     if (activeMode) {
-      gameModeService.initializeGameMode(activeMode, false);
+      // Використовуємо restartGame активного режиму, щоб зберегти специфічну логіку
+      // (наприклад, збереження гравців у локальному режимі)
+      activeMode.restartGame();
     } else {
-      // Fallback, though a mode should always be active when this is called.
+      // Fallback
       logService.state('ERROR: [userActionService] requestRestart called without an active game mode.');
       const currentBoardSize = get(boardStore)?.boardSize;
       gameService.initializeNewGame({ size: currentBoardSize });
@@ -123,7 +132,14 @@ export const userActionService = {
     modalStore.closeModal();
     // Ця функція викликається після підтвердження у модальному вікні.
     // Вона перезапускає гру з новим розміром дошки.
-    gameService.initializeNewGame({ size: newSize });
+    // Ця функція викликається після підтвердження у модальному вікні.
+    // Вона перезапускає гру з новим розміром дошки.
+    const activeGameMode = gameModeService.getCurrentMode();
+    if (activeGameMode) {
+      activeGameMode.restartGame({ newSize });
+    } else {
+      gameService.initializeNewGame({ size: newSize });
+    }
     gameSettingsStore.updateSettings({ boardSize: newSize });
   },
 

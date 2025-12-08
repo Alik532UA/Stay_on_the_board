@@ -31,7 +31,7 @@ export class LocalGameMode extends BaseGameMode {
     });
     animationService.initialize();
     this.checkComputerTurn();
-    this.startTurn();
+    // this.startTurn(); // Timer will start after the first move to allow infinite setup time
   }
 
   async continueAfterNoMoves(): Promise<void> {
@@ -40,20 +40,20 @@ export class LocalGameMode extends BaseGameMode {
     if (!boardState) return;
 
     boardStore.update(s => {
-        if (!s) return null;
-        return {
-            ...s,
-            cellVisitCounts: {},
-            moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
-            moveQueue: [],
-        };
+      if (!s) return null;
+      return {
+        ...s,
+        cellVisitCounts: {},
+        moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
+        moveQueue: [],
+      };
     });
     availableMovesService.updateAvailableMoves();
     await this.advanceToNextPlayer();
 
     gameOverStore.resetGameOverState();
     animationService.reset();
-    
+
     await this.checkComputerTurn();
     this.startTurn();
     gameEventBus.dispatch('CloseModal');
@@ -66,15 +66,23 @@ export class LocalGameMode extends BaseGameMode {
   getPlayersConfiguration(): Player[] {
     const playerState = get(playerStore);
     if (playerState) {
-      return playerState.players;
+      // SSoT: Беремо поточних гравців, але ОБОВ'ЯЗКОВО скидаємо їхній рахунок до 0
+      // для нової гри.
+      return playerState.players.map(p => ({
+        ...p,
+        score: 0,
+        penaltyPoints: 0,
+        bonusPoints: 0,
+        bonusHistory: [] as any[]
+      }));
     }
     return [
-      { id: 1, name: 'Player 1', type: 'human', score: 0, color: '#ff0000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
-      { id: 2, name: 'Player 2', type: 'human', score: 0, color: '#0000ff', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
+      { id: 1, name: 'Player 1', type: 'human', score: 0, color: '#ff0000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as any[] },
+      { id: 2, name: 'Player 2', type: 'human', score: 0, color: '#0000ff', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as any[] }
     ];
   }
 
-  getModeName(): 'training' | 'local' | 'timed' | 'online' {
+  getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player' {
     return 'local';
   }
 
@@ -95,22 +103,30 @@ export class LocalGameMode extends BaseGameMode {
     if (!playerState) return;
 
     playerStore.update(s => {
-        if (!s) return null;
-        const newPlayers = [...s.players];
-        const playerToUpdate = { ...newPlayers[s.currentPlayerIndex] };
-        playerToUpdate.bonusPoints += bonusPoints;
-        playerToUpdate.penaltyPoints += penaltyPoints;
-        newPlayers[s.currentPlayerIndex] = playerToUpdate;
-        return { ...s, players: newPlayers };
+      if (!s) return null;
+      const newPlayers = [...s.players];
+      const playerToUpdate = { ...newPlayers[s.currentPlayerIndex] };
+
+      playerToUpdate.bonusPoints += bonusPoints;
+      playerToUpdate.penaltyPoints += penaltyPoints;
+
+      // Local Game Scoring Rule: Score = Bonuses - Penalties
+      playerToUpdate.score = playerToUpdate.bonusPoints - playerToUpdate.penaltyPoints;
+
+      newPlayers[s.currentPlayerIndex] = playerToUpdate;
+      return { ...s, players: newPlayers };
     });
   }
 
   private async checkComputerTurn(): Promise<void> {
+    // Local mode is typically Human vs Human, but keeping this for safety if mixed mode is possible
     const state = get(playerStore);
     if (!state) return;
     const currentPlayer = state.players[state.currentPlayerIndex];
 
-    if (currentPlayer.type === 'ai') {
+    if (currentPlayer.type === 'computer' || currentPlayer.isComputer) {
+      // Note: 'computer' check depends on Player model type literal. Assuming 'computer' or 'ai'.
+      // Player type is 'human' | 'computer' usually.
       await new Promise(resolve => setTimeout(resolve, 1000));
       await this.triggerComputerMove();
     }

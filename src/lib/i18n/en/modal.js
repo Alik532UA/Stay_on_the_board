@@ -9,7 +9,7 @@ export default {
   gameOverTitle: 'Game Over!',
   drawTitle: 'Draw!',
   trainingOverTitle: 'Training complete!',
-  winnerTitle: "{winnerNumber} wins!",
+  winnerTitle: "{winnerName} wins!",
   winnersTitle: "Winners: {winnerNumbers}!",
   computerNoMovesTitle: "Opponent is Trapped!",
   playerNoMovesTitle: "Brilliant Analysis!",

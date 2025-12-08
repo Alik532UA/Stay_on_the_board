@@ -9,7 +9,7 @@ export default {
   gameOverTitle: 'Гру завершено!',
   drawTitle: 'Нічия!',
   trainingOverTitle: 'Тренування завершено!',
-  winnerTitle: "{winnerNumber} переміг!",
+  winnerTitle: "{winnerName} переміг!",
   winnersTitle: "Переможці: {winnerNumbers}!",
   computerNoMovesTitle: "Суперник у пастці!",
   playerNoMovesTitle: "Блискучий аналіз!",

@@ -1,0 +1,117 @@
+client:733 [vite] connecting...
+client:827 [vite] connected.
+logService.js:192 Log service developer tools initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+logService.js:141 [INIT] [hotkeyService] Setting up global keydown listener.
+init.js:31 ✅ i18n initialized successfully
+logService.js:141 [INIT] Initializing Test Mode Sync Service...
+logService.js:139 [INIT] [GameService] initializeNewGame: Створення нового ігрового стану... {players: Array(4)}
+ColorPicker.svelte:29 ColorPicker: value prop changed to #e63946
+ColorPicker.svelte:31 ColorPicker: currentValue updated to #e63946
+ColorPicker.svelte:29 ColorPicker: value prop changed to #9b5de5
+ColorPicker.svelte:31 ColorPicker: currentValue updated to #9b5de5
+ColorPicker.svelte:29 ColorPicker: value prop changed to #f15bb5
+ColorPicker.svelte:31 ColorPicker: currentValue updated to #f15bb5
+ColorPicker.svelte:29 ColorPicker: value prop changed to #e76f51
+ColorPicker.svelte:31 ColorPicker: currentValue updated to #e76f51
+logService.js:141 [UI] [layout] afterNavigate: hiding tooltip
+logService.js:141 [UI] [Speech] 'voiceschanged' event fired. Loaded 325 voices.
+logService.js:141 [UI] [Speech] Fallback check loaded 325 voices.
+logService.js:139 [UI] NavigationService: Navigating to /Stay_on_the_board/game/local
+logService.js:141 [UI] Locale changed to uk, re-initializing voices.
+logService.js:141 [UI] [Speech] Filtering for langCode: "uk". Preferred dialect: "uk-UA". Total voices: 325
+logService.js:141 [UI] [Speech] Found 2 voices with preferred dialect "uk-UA".
+logService.js:141 [UI] [Speech] Filtering for langCode: "en". Preferred dialect: "en-US". Total voices: 325
+logService.js:141 [UI] [Speech] Found 20 voices with preferred dialect "en-US".
+logService.js:141 [UI] Default voice reactively selected: Microsoft Ostap Online (Natural) - Ukrainian (Ukraine)
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:139 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: null, selectedDistance: null, isConfirmButtonDisabled: true}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:141 [INIT] [LocalGamePage] onMount: No active game found, initializing "local" mode.
+logService.js:141 [GAME_MODE] [GameSettingsStore] Applying preset: "local"
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:139 [INIT] [GameService] initializeNewGame: Створення нового ігрового стану... {size: undefined, players: Array(4)}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:141 [GAME_MODE] Game mode initialized: local (from preset: local)
+logService.js:141 [INIT] [GameLayout] onMount. moveHistory.length is 1.
+logService.js:141 [INIT] [GameLayout] onMount: Applying initial settings for new game.
+logService.js:141 [UI] enableAllGameCheckboxesIfNeeded called
+logService.js:141 [INIT] [gameHotkeyService] Initializing game hotkeys.
+logService.js:141 [UI] [layout] afterNavigate: hiding tooltip
+logService.js:139 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: 'left', selectedDistance: 1, isConfirmButtonDisabled: false}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'left', selectedDistance: 1, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:139 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: 'left', selectedDistance: 2, isConfirmButtonDisabled: false}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'left', selectedDistance: 2, lastComputerMove: null, lastPlayerMove: null, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: true, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'left', selectedDistance: 2, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:141 [UI] Автоприховування дошки запущено з затримкою 0ms, forceHide: true
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: null, selectedDistance: null, isConfirmButtonDisabled: true}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:141 [GAME_MODE] [TimeService] Starting turn timer for 10 seconds.
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: 'down', selectedDistance: 1, isConfirmButtonDisabled: false}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'down', selectedDistance: 1, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: 'down', selectedDistance: 2, isConfirmButtonDisabled: false}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'down', selectedDistance: 2, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'down', selectedDistance: 2, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:141 [UI] Автоприховування дошки запущено з затримкою 0ms, forceHide: true
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: null, selectedDistance: null, isConfirmButtonDisabled: true}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:141 [GAME_MODE] [TimeService] Stopping turn timer.
+logService.js:141 [GAME_MODE] [TimeService] Starting turn timer for 10 seconds.
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: null, selectedDistance: null, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: 'left', selectedDistance: 1, isConfirmButtonDisabled: false}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'left', selectedDistance: 1, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] [ControlsPanelWidget] Reactive change detected {selectedDirection: 'left', selectedDistance: 2, isConfirmButtonDisabled: false}
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'left', selectedDistance: 2, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: false, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:141 [GAME_MODE] [endGameService] endGame called with reason: 'modal.gameOverReasonOut'
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: true, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:141 [GAME_MODE] [TimeService] Stopping turn timer.
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'left', selectedDistance: 2, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: true, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [UI] GameInfoWidget: displayMessage re-evaluating {isGameOver: true, isFirstMove: false, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:139 [GAME_MODE] [scoreService] determineWinner called {losingPlayerIndex: 2}
+modalService.ts:42  [svelte-i18n] Message "modal.winnerTitle" has syntax error: The intl string context variable "winnerName" was not provided to the string "{winnerName} переміг!"
+warn @ client.js:3086
+formatMessage @ runtime.js:537
+showGameOverModal @ modalService.ts:42
+execute @ sideEffectService.ts:36
+handleGameOver @ commandService.ts:23
+(anonymous) @ commandService.ts:12
+(anonymous) @ gameEventBus.ts:43
+dispatch @ gameEventBus.ts:43
+endGame @ endGameService.ts:97
+await in endGame
+onPlayerMoveFailure @ BaseGameMode.ts:138
+handlePlayerMove @ BaseGameMode.ts:78
+executeMove @ userActionService.ts:68
+confirmMove @ userActionService.ts:58
+onConfirmClick @ ControlsPanelWidget.svelte:71
+handleCentral @ ControlsPanelWidget.svelte:50
+(anonymous) @ index-client.js:178
+handleCentral @ DirectionControls.svelte:86
+apply @ events.js:342
+(anonymous) @ DirectionControls.svelte:140
+(anonymous) @ events.js:61
+without_reactive_context @ shared.js:44
+target_handler @ events.js:60
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'left', selectedDistance: 2, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}
+logService.js:141 [UI] [Speech] 'voiceschanged' event fired. Loaded 325 voices.
+logService.js:139 [UI] [centerInfoUtil] Calculating state {selectedDirection: 'left', selectedDistance: 2, lastComputerMove: null, lastPlayerMove: {…}, isPlayerTurn: true, …}

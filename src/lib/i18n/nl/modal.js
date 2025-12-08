@@ -9,7 +9,7 @@ export default {
   gameOverTitle: 'Spel voorbij!',
   drawTitle: 'Gelijkspel!',
   trainingOverTitle: 'Training voltooid!',
-  winnerTitle: "{winnerNumber} wint!",
+  winnerTitle: "{winnerName} wint!",
   winnersTitle: "Winnaars: {winnerNumbers}!",
   computerNoMovesTitle: "Tegenstander Zit Vast!",
   playerNoMovesTitle: "Briljante Analyse!",

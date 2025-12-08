@@ -9,9 +9,9 @@ import type { ScoreState } from '$lib/stores/scoreStore';
 import type { UiState } from '$lib/stores/uiStateStore';
 
 export function calculateFinalScore(
-  boardState: BoardState, 
-  playerState: PlayerState, 
-  scoreState: ScoreState, 
+  boardState: BoardState,
+  playerState: PlayerState,
+  scoreState: ScoreState,
   uiState: UiState,
   gameMode: 'local' | 'training' | 'timed' | 'online' | 'virtual-player'
 ): FinalScoreDetails {
@@ -127,12 +127,12 @@ export function calculateMoveScore(
   const isHumanMove = originalPlayer?.type === 'human';
 
   const baseScoreChange = _calculateBaseScore(originalPlayer, settings);
-  
+
   let penaltyResult = { penaltyPoints: 0, penaltyPointsForMove: 0 };
   if (isHumanMove && direction) {
     penaltyResult = _calculateMirrorMovePenalty(currentState, direction, distance, settings);
   }
-  
+
   const startPosition = { row: currentState.playerRow, col: currentState.playerCol };
   const movePath = getMovePath(startPosition, newPosition);
   const jumpedCount = movePath.reduce((count, cell) => {
@@ -159,7 +159,7 @@ export function calculateMoveScore(
   };
 }
 
-export function determineWinner(playerState: PlayerState, reasonKey: string, losingPlayerIndex: number | null = null): { winners: number[], winningPlayerIndex: number } {
+export function determineWinner(playerState: PlayerState, reasonKey: string, losingPlayerIndex: number | null = null): { winners: Player[], winningPlayerIndex: number, loser: Player | null } {
   logService.GAME_MODE('[scoreService] determineWinner called', { losingPlayerIndex });
   const scores = playerState.players.map(p => p.score);
   let maxScore = -Infinity;
@@ -171,13 +171,15 @@ export function determineWinner(playerState: PlayerState, reasonKey: string, los
     }
   }
 
-  const winners: number[] = [];
+  const winners: Player[] = [];
   for (let i = 0; i < scores.length; i++) {
     if (i !== losingPlayerIndex && scores[i] === maxScore) {
-      winners.push(playerState.players[i].id);
+      winners.push(playerState.players[i]);
     }
   }
-  
-  const winningPlayerIndex = winners.length > 0 ? playerState.players.findIndex(p => p.id === winners[0]) : -1;
-  return { winners, winningPlayerIndex };
+
+  const winningPlayerIndex = winners.length > 0 ? playerState.players.findIndex(p => p.id === winners[0].id) : -1;
+  const loser = losingPlayerIndex !== null && losingPlayerIndex >= 0 ? playerState.players[losingPlayerIndex] : null;
+
+  return { winners, winningPlayerIndex, loser };
 }

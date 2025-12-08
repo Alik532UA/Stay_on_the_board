@@ -7,7 +7,7 @@ let isForceEnabled = false; // This flag will allow forcing logs
 
 // Check localStorage to force logs on production
 if (isBrowser && localStorage.getItem('force-logging') === 'true') {
-    isForceEnabled = true;
+  isForceEnabled = true;
 }
 
 // 1. Визначення груп логування
@@ -34,25 +34,25 @@ const LOG_GROUPS = {
 
 // 2. Конфігурація
 const defaultConfig = {
-          [LOG_GROUPS.STATE]: false,
-          [LOG_GROUPS.PIECE]: false,
-          [LOG_GROUPS.LOGIC_MOVE]: false,
-          [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: false,
-          [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
-          [LOG_GROUPS.LOGIC_TIME]: false,
-          [LOG_GROUPS.SCORE]: false,
-          [LOG_GROUPS.UI]: true, // Keep UI for context
-          [LOG_GROUPS.TOOLTIP]: true, // Enable tooltip logs
-          [LOG_GROUPS.ANIMATION]: false,
-          [LOG_GROUPS.INIT]: true, // Keep INIT for context
-          [LOG_GROUPS.ACTION]: false,
-          [LOG_GROUPS.GAME_MODE]: false,
-          [LOG_GROUPS.SPEECH]: false,
-          [LOG_GROUPS.VOICE_CONTROL]: false,
-          [LOG_GROUPS.TEST_MODE]: false,
-          [LOG_GROUPS.MODAL]: false,
-          [LOG_GROUPS.ERROR]: true,
-        };
+  [LOG_GROUPS.STATE]: false,
+  [LOG_GROUPS.PIECE]: false,
+  [LOG_GROUPS.LOGIC_MOVE]: false,
+  [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: false,
+  [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
+  [LOG_GROUPS.LOGIC_TIME]: false,
+  [LOG_GROUPS.SCORE]: false,
+  [LOG_GROUPS.UI]: true,
+  [LOG_GROUPS.TOOLTIP]: false,
+  [LOG_GROUPS.ANIMATION]: false,
+  [LOG_GROUPS.INIT]: true,
+  [LOG_GROUPS.ACTION]: false,
+  [LOG_GROUPS.GAME_MODE]: true,
+  [LOG_GROUPS.SPEECH]: false,
+  [LOG_GROUPS.VOICE_CONTROL]: false,
+  [LOG_GROUPS.TEST_MODE]: false,
+  [LOG_GROUPS.MODAL]: false,
+  [LOG_GROUPS.ERROR]: true,
+};
 
 const STORAGE_KEY = 'logConfig';
 
@@ -168,46 +168,46 @@ export const logService = {
   error: (/** @type {string} */ message, /** @type {any[]} */ ...data) => log(LOG_GROUPS.ERROR, message, ...data),
   forceEnableLogging: () => {
     if (!isForceEnabled) {
-        isForceEnabled = true;
-        console.log('Logging has been force-enabled for this session.');
-        debugLogStore.add('[INFO] Logging has been force-enabled for this session.');
+      isForceEnabled = true;
+      console.log('Logging has been force-enabled for this session.');
+      debugLogStore.add('[INFO] Logging has been force-enabled for this session.');
     }
   }
 };
 
 // 5. Глобальний контролер для зручності розробника
 function initializeDeveloperTools() {
-    if (!isBrowser) return;
+  if (!isBrowser) return;
 
-    (/** @type {any} */ (window)).setLogLevels = (/** @type {Record<string, boolean>} */ newConfig) => {
-        logConfig = { ...logConfig, ...newConfig };
-        saveConfig(logConfig);
-        console.log('Log levels updated:', logConfig);
-    };
+  (/** @type {any} */ (window)).setLogLevels = (/** @type {Record<string, boolean>} */ newConfig) => {
+    logConfig = { ...logConfig, ...newConfig };
+    saveConfig(logConfig);
+    console.log('Log levels updated:', logConfig);
+  };
 
-    (/** @type {any} */ (window)).getLogConfig = () => {
-        return logConfig;
-    };
+  (/** @type {any} */ (window)).getLogConfig = () => {
+    return logConfig;
+  };
 
-    console.log('Log service developer tools initialized. Use window.setLogLevels({ groupName: boolean }) to configure.');
+  console.log('Log service developer tools initialized. Use window.setLogLevels({ groupName: boolean }) to configure.');
 }
 
 // Expose developer tools in dev mode OR if force enabled
 if (isDev || isForceEnabled) {
-    initializeDeveloperTools();
+  initializeDeveloperTools();
 }
 
 // Global function to enable logging in production
 if (isBrowser) {
-    (/** @type {any} */ (window)).enableProdLogging = () => {
-        if (isForceEnabled) {
-            console.log('Logging is already enabled.');
-            return;
-        }
-        localStorage.setItem('force-logging', 'true');
-        isForceEnabled = true;
-        initializeDeveloperTools();
-        console.log('Production logging enabled. Refresh the page for full effect. Use setLogLevels({...}) to configure.');
-        debugLogStore.add('[INFO] Production logging enabled.');
-    };
+  (/** @type {any} */ (window)).enableProdLogging = () => {
+    if (isForceEnabled) {
+      console.log('Logging is already enabled.');
+      return;
+    }
+    localStorage.setItem('force-logging', 'true');
+    isForceEnabled = true;
+    initializeDeveloperTools();
+    console.log('Production logging enabled. Refresh the page for full effect. Use setLogLevels({...}) to configure.');
+    debugLogStore.add('[INFO] Production logging enabled.');
+  };
 }
