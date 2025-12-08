@@ -111,20 +111,38 @@ export const userActionService = {
 
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
-    // IMPORTANT: DO NOT CHANGE THIS TO use gameModeStore.
-    // This is the single source of truth for the selected game mode preset.
-    // It ensures that when a user selects a new mode, we initialize the correct one,
-    // not the one that is currently active.
-    const activeMode = gameModeService.getCurrentMode();
-    if (activeMode) {
-      // Використовуємо restartGame активного режиму, щоб зберегти специфічну логіку
-      // (наприклад, збереження гравців у локальному режимі)
-      activeMode.restartGame();
+    // НАВІЩО (Fix): Ми повинні ініціалізувати режим заново на основі налаштувань.
+    // Якщо користувач змінив пресет (наприклад, з 'beginner' на 'timed'),
+    // це може вимагати зміни класу реалізації (TrainingGameMode -> TimedGameMode).
+    // Поточний activeMode може бути старого типу, тому виклик restartGame() на ньому
+    // не запустить правильну логіку (наприклад, таймер).
+    const currentMode = gameModeService.getCurrentMode();
+    const currentModeName = currentMode?.getModeName();
+
+    if (currentModeName === 'local') {
+      // Якщо ми в локальному режимі, ми завжди перезапускаємо 'local' реалізацію,
+      // АЛЕ з параметром applyPresetSettings = false.
+      // Чому false? Тому що налаштування (experienced/pro/observer) ВЖЕ були застосовані
+      // викликом setGameModePreset (який викликає applyPreset).
+      // Якщо ми передамо true, gameModeService застосує дефолтний пресет 'local',
+      // і ми втратимо вибір користувача (experienced/pro).
+      gameModeService.initializeGameMode('local', false);
     } else {
-      // Fallback
-      logService.state('ERROR: [userActionService] requestRestart called without an active game mode.');
-      const currentBoardSize = get(boardStore)?.boardSize;
-      gameService.initializeNewGame({ size: currentBoardSize });
+      const settings = get(gameSettingsStore);
+      if (settings.gameMode) {
+        // Для virtual-player: якщо обрано 'timed', нам треба змінити клас реалізації.
+        // Тому ми ініціалізуємось за назвою режиму з налаштувань.
+        gameModeService.initializeGameMode(settings.gameMode);
+      } else {
+        // Fallback
+        if (currentMode) {
+          currentMode.restartGame();
+        } else {
+          logService.state('ERROR: [userActionService] requestRestart called without an active game mode or setting.');
+          const currentBoardSize = get(boardStore)?.boardSize;
+          gameService.initializeNewGame({ size: currentBoardSize });
+        }
+      }
     }
   },
 

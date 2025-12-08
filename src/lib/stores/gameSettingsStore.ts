@@ -12,7 +12,7 @@ import { boardStore } from './boardStore.ts';
 import { availableMovesService } from '../services/availableMovesService.ts';
 
 export type KeybindingAction = 'up' | 'down' | 'left' | 'right' | 'up-left' | 'up-right' | 'down-left' | 'down-right' | 'confirm' | 'no-moves' | 'toggle-block-mode' | 'toggle-board' | 'increase-board' | 'decrease-board' | 'toggle-speech' | 'distance-1' | 'distance-2' | 'distance-3' | 'distance-4' | 'distance-5' | 'distance-6' | 'distance-7' | 'distance-8' | 'auto-hide-board' | 'show-help' | 'main-menu';
-export type GameModePreset = 'beginner' | 'experienced' | 'pro' | 'timed' | 'local' | 'online';
+export type GameModePreset = 'beginner' | 'experienced' | 'pro' | 'timed' | 'local' | 'online' | 'observer';
 
 export type GameSettingsState = {
   showMoves: boolean;
@@ -87,7 +87,7 @@ function createGameSettingsStore() {
   const { subscribe, set, update } = writable<GameSettingsState>(defaultGameSettings);
 
   const syncGameMode = (state: GameSettingsState): GameSettingsState => {
-    if (state.lockSettings || state.gameMode === 'timed' || state.gameMode === 'local') {
+    if (state.lockSettings || state.gameMode === 'timed' || state.gameMode === 'local' || state.gameMode === 'observer') {
       return state;
     }
 
@@ -248,6 +248,16 @@ function createGameSettingsStore() {
         online: {
           autoHideBoard: true,
           blockModeEnabled: true,
+          speechEnabled: false,
+          showGameInfoWidget: 'compact',
+          speechRate: 1.6,
+          shortSpeech: true,
+          speechFor: { player: false, computer: true },
+        },
+        observer: {
+          gameMode: 'observer',
+          autoHideBoard: false,
+          blockModeEnabled: false,
           speechEnabled: false,
           showGameInfoWidget: 'compact',
           speechRate: 1.6,
