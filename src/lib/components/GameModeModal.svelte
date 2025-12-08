@@ -24,6 +24,13 @@
     showWipNotice = false;
   }
 
+  function handleLocalGame() {
+    logService.action('Click: "Локальна гра" (GameModeModal)');
+    uiStateStore.update(s => ({ ...s, intendedGameType: 'local' })); // Set intended game type
+    modalStore.closeModal(); // Close the modal
+    goto(`${base}/local-setup`); // Navigate to local-setup
+  }
+
   export let scope: string;
   export let extended = false;
   let buttonsNode: HTMLElement;
@@ -115,7 +122,12 @@
     <button class="modal-btn-generic" onclick={() => selectMode('timed')} data-testid="timed-game-btn">
       {$_('mainMenu.timedGame')}
     </button>
-    <button class="modal-btn-generic" class:locked-setting={true} onclick={openWipNotice} data-testid="local-game-btn">
+    <button
+      class="modal-btn-generic"
+      class:locked-setting={!import.meta.env.DEV}
+      onclick={import.meta.env.DEV ? handleLocalGame : openWipNotice}
+      data-testid="local-game-btn"
+    >
       {$_('mainMenu.localGame')}
     </button>
     <button class="modal-btn-generic" class:locked-setting={true} onclick={openWipNotice} data-testid="online-game-btn">
