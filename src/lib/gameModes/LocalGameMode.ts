@@ -28,6 +28,16 @@ export class LocalGameMode extends BaseGameMode {
       size: options.newSize,
       players: this.getPlayersConfiguration(),
     });
+
+    // Check for 'observer' mode to disable timer
+    const currentSettings = get(gameSettingsStore);
+    if (currentSettings.gameMode === 'observer') {
+      this.turnDuration = 0; // Disable timer
+    } else {
+      // Restore default turn duration if not observer (in case of mode switch)
+      this.turnDuration = dev ? BASE_TURN_DURATION * DEV_TIME_MULTIPLIER : BASE_TURN_DURATION;
+    }
+
     gameSettingsStore.updateSettings({
       speechRate: 1.6,
       shortSpeech: true,
