@@ -9,7 +9,7 @@ export default {
   gameOverTitle: 'Oyun bitti!',
   drawTitle: 'Beraberlik!',
   trainingOverTitle: 'Talim tamamlandı!',
-  winnerTitle: "{winnerNumber} yeñdi!",
+  winnerTitle: "{winnerName} yeñdi!",
   winnersTitle: "Yeñiciler: {winnerNumbers}!",
   computerNoMovesTitle: "Raqip tuzaqqa tüşti!",
   playerNoMovesTitle: "Mükemmel analiz!",

@@ -41,7 +41,7 @@ export const endGameService = {
     const gameType = currentGameMode ? currentGameMode.getModeName() : 'training';
 
     // 4. Розраховуємо фінальний рахунок на основі АКТУАЛЬНОГО стану
-    logService.score('[endGameService] Calculating final score with states:', { 
+    logService.score('[endGameService] Calculating final score with states:', {
       playerScore: playerState.players.find(p => p.type === 'human')?.score,
       noMovesBonus: scoreState.noMovesBonus,
       finishBonus: uiState.gameOverReasonKey === 'modal.gameOverReasonBonus' ? boardState.boardSize : 0,
@@ -51,27 +51,47 @@ export const endGameService = {
     logService.score('[endGameService] Final score calculated:', finalScoreDetails);
 
     // 5. Оновлюємо залежні стори
-    const humanPlayer = playerState.players.find(p => p.type === 'human');
-    if (humanPlayer) {
-      const updatedPlayers = playerState.players.map(p => 
-        p.id === humanPlayer.id ? { ...p, score: finalScoreDetails.totalScore } : p
-      );
-      playerStore.set({ ...playerState, players: updatedPlayers });
-      logService.score(`[endGameService] playerStore updated. New score: ${finalScoreDetails.totalScore}`);
+    // ВАЖЛИВО: Для локальної та онлайн гри ми НЕ перезаписуємо рахунок гравців глобальною сумою.
+    // У цих режимах рахунок кожного гравця ведеться окремо в playerStore (див. LocalGameMode.ts).
+    if (gameType !== 'local' && gameType !== 'online') {
+      const humanPlayer = playerState.players.find(p => p.type === 'human');
+      if (humanPlayer) {
+        const updatedPlayers = playerState.players.map(p =>
+          p.id === humanPlayer.id ? { ...p, score: finalScoreDetails.totalScore } : p
+        );
+        playerStore.set({ ...playerState, players: updatedPlayers });
+        logService.score(`[endGameService] playerStore updated. New score: ${finalScoreDetails.totalScore}`);
+      }
     }
-    
+
     scoreStore.set(initialScoreState);
     logService.score('[endGameService] scoreStore has been reset.');
 
     // 6. Визначаємо переможця і показуємо модальне вікно
     const finalPlayerState = get(playerStore)!;
-    const { winners } = determineWinner(finalPlayerState, reasonKey, playerState.currentPlayerIndex);
-    
+    const { winners, loser } = determineWinner(finalPlayerState, reasonKey, playerState.currentPlayerIndex);
+
+    let finalReasonKey = reasonKey;
+    const finalReasonValues = { ...reasonValues };
+
+    if (gameType === 'local' && loser) {
+      if (reasonKey === 'modal.gameOverReasonOut') {
+        finalReasonKey = 'modal.gameOverReasonPlayerOut';
+      } else if (reasonKey === 'modal.gameOverReasonBlocked') {
+        finalReasonKey = 'modal.gameOverReasonPlayerBlocked';
+      }
+
+      if (finalReasonKey !== reasonKey) {
+        finalReasonValues.playerName = loser.name;
+      }
+    }
+
     const gameOverPayload = {
-      scores: finalPlayerState.players.map((p: Player) => ({ playerId: p.id, score: p.score })),
+      scores: finalPlayerState.players.map((p: Player) => ({ playerId: p.id, score: p.score, name: p.name, color: p.color })),
       winners: winners,
-      reasonKey,
-      reasonValues,
+      loser: loser,
+      reasonKey: finalReasonKey,
+      reasonValues: finalReasonValues,
       finalScoreDetails,
       gameType: gameType,
     };
