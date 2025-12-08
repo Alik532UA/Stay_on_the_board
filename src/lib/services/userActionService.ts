@@ -132,7 +132,54 @@ export const userActionService = {
       if (settings.gameMode) {
         // Для virtual-player: якщо обрано 'timed', нам треба змінити клас реалізації.
         // Тому ми ініціалізуємось за назвою режиму з налаштувань.
-        gameModeService.initializeGameMode(settings.gameMode);
+
+        // Fix: Перевіряємо, чи змінився режим. Якщо ні - ми не застосовуємо пресет наново,
+        // щоб зберегти ручні налаштування користувача (наприклад, Block Mode у Beginner).
+        const targetMode = settings.gameMode;
+        const currentModeName = currentMode?.getModeName(); // We already have this above, but safe to re-check logic flow if needed, or reuse variable.
+        // Note: getModeName return types might not perfectly match presets (e.g. 'training' vs 'beginner').
+        // But initializeGameMode handles the internal mapping. 
+        // We simply want to pass applyPresetSettings=false if we are conceptually "restarting the same thing".
+
+        // Однак, gameSettingsStore.gameMode вже оновлено UI-віджетом перед викликом requestRestart.
+        // Тобто settings.gameMode - це вже "новий" режим.
+        // Але ми не знаємо, чи був він "новим" чи "старим" до кліку.
+        // Чекайте. requestRestart викликається після setGameModePreset (який вже застосував пресет!).
+        // АБО він викликається кнопкою "Почати заново" (де пресет не змінювався).
+
+        // Сценарій 1: Клік на віджет режимів -> setGameModePreset (applied changes) -> requestRestart.
+        // Тут settings.gameMode вже новий. Але ми хочемо застосувати ці нові налаштування (вони щойно обрані).
+        // Сценарій 2: Клік на "Restart" (модалка). setGameModePreset НЕ викликався.
+        // settings.gameMode такий самий, який був під час гри.
+        // Якщо користувач вручну змінив Block Mode, нові налаштування в store відрізняються від пресету.
+        // Якщо ми викличемо initializeGameMode(settings.gameMode), воно застосує пресет і скине Block Mode.
+
+        // ПИТАННЯ: Як розрізнити Сценарій 1 та Сценарій 2?
+        // Відповідь: userActionService.requestRestart не приймає аргументів.
+        // Але ми можемо порівняти, чи відповідають поточні налаштування дефолту пресету? Ні, це складно.
+
+        // Давайте змінимо логіку: initializeGameMode має параметр applyPresetSettings.
+        // Ми повинні передавати true ТІЛЬКИ якщо ми хочемо скинути налаштування.
+        // Коли ми хочемо скинути? Коли юзер явно змінив режим.
+        // Коли юзер тисне "Restart Game" в модалці - він очікує рестарт партії з ТИМИ Ж налаштуваннями?
+        // Зазвичай так. Якщо я грав в "Новачок + Блоки", я хочу рестартнути "Новачок + Блоки".
+
+        // Тобто для звичайного рестарту нам треба applyPresetSettings = false.
+        // Але як бути зі зміною режиму через віджет? Там теж викликається requestRestart.
+        // У GameModeWidget: setGameModePreset -> requestRestart.
+        // setGameModePreset вже викликав applyPreset!
+        // Тобто settings в store ВЖЕ оновлені під новий пресет.
+        // Тому якщо ми викличемо initializeGameMode(..., false) - ми збережемо ці "щойно застосовані" налаштування.
+        // А якщо ми викличемо true - ми застосуємо їх ще раз (що не шкідливо, але зайве).
+
+        // АЛЕ: initializeGameMode всередині робить timerStore.reset() і т.д.
+
+        // Отже, рішення: Завжди викликати з applyPresetSettings = false.
+        // Чому?
+        // 1. Якщо це зміна режиму: setGameModePreset вже застосував пресет. Store оновлено. initializeGameMode(..., false) просто перестворить клас гри.
+        // 2. Якщо це рестарт: Store містить поточні (кастомні) налаштування. initializeGameMode(..., false) збереже їх.
+
+        gameModeService.initializeGameMode(settings.gameMode, false);
       } else {
         // Fallback
         if (currentMode) {
