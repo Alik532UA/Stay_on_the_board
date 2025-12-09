@@ -268,7 +268,7 @@
     gap: 4px;
   }
   .fixed-score {
-    color: #87ceeb; /* Light blue for fixed points */
+    /* Removed hardcoded color for fixed points to use default theme text color */
   }
   .cash-out-btn {
     background: var(--control-selected);
