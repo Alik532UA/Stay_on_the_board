@@ -14,7 +14,6 @@
   import SvgIcons from "./SvgIcons.svelte";
   import { appVersion } from "$lib/stores/versionStore";
   import { currentLanguageFlagSvg } from "$lib/stores/derivedState.ts";
-  import { languages } from "$lib/constants";
   import { modalStore } from "$lib/stores/modalStore";
   import { onMount, onDestroy, tick } from "svelte";
   import { get } from "svelte/store";
@@ -22,6 +21,11 @@
   import { customTooltip } from "$lib/actions/customTooltip.js";
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import { boardStore } from "$lib/stores/boardStore";
+
+  import ThemeDropdown from "./main-menu/ThemeDropdown.svelte";
+  import LanguageDropdown from "./main-menu/LanguageDropdown.svelte";
+  import WipNotice from "./main-menu/WipNotice.svelte";
+  import DevMenu from "./main-menu/DevMenu.svelte";
 
   let showLangDropdown = false;
   let showThemeDropdown = false;
@@ -120,11 +124,6 @@
     });
   }
 
-  function selectLang(lang: string) {
-    logService.action(`Click: "Мова: ${lang}" (MainMenu)`);
-    appSettingsStore.updateSettings({ language: lang });
-    showLangDropdown = false;
-  }
   function toggleLangDropdown() {
     logService.action('Click: "Мова" (MainMenu)');
     showLangDropdown = !showLangDropdown;
@@ -141,12 +140,6 @@
     goto(`${base}${route}`);
   }
 
-  function selectTheme(style: string, theme: string) {
-    logService.action(`Click: "Тема: ${style} ${theme}" (MainMenu)`);
-    appSettingsStore.updateSettings({ style, theme });
-    showThemeDropdown = false;
-  }
-
   function closeDropdowns() {
     logService.action('Click: "Закрити дропдауни" (MainMenu)');
     showThemeDropdown = false;
@@ -159,11 +152,7 @@
     logService.action('Click: "dev version" (MainMenu)');
     showDevMenu = !showDevMenu;
   }
-  function handleDevMenuBtn() {
-    logService.action('Click: "Drag and Drop Test" (MainMenu)');
-    navigateTo("/test");
-    showDevMenu = false;
-  }
+
   function handlePlayVirtualPlayer() {
     hotkeyService.popContext();
     logService.action(`Click: "Гра проти віртуального гравця" (MainMenu)`);
@@ -239,14 +228,9 @@
     logService.action('Click: "Підтримати" (MainMenu)');
     navigateTo("/supporters");
   }
-  function handleDonate() {
-    logService.action('Click: "Donate" (MainMenu)');
-    navigateTo("/supporters");
-  }
-  function handleOverlayClose() {
-    logService.action('Click: "Закрити overlay" (MainMenu)');
-    closeDropdowns();
-  }
+
+  // Derived or handled logic
+  $: isDev = import.meta.env.DEV;
 </script>
 
 <main class="main-menu" data-testid="main-menu-container">
@@ -262,43 +246,26 @@
         data-testid="theme-btn"
       >
         <span class="main-menu-icon-inner">
-          <SvgIcons name="theme" />
+          <SvgIcons name={settings.style} />
         </span>
       </button>
+
       <button
         class="main-menu-icon"
         use:customTooltip={$_("mainMenu.language")}
         aria-label={$_("mainMenu.language")}
         onclick={toggleLangDropdown}
-        data-testid="lang-btn"
+        data-testid="language-btn"
       >
         <span class="main-menu-icon-inner">
           {@html $currentLanguageFlagSvg}
         </span>
       </button>
+
       {#if showLangDropdown}
-        <div
-          class="lang-dropdown main-menu-lang-dropdown"
-          role="dialog"
-          aria-modal="true"
-          tabindex="0"
-          onclick={(e) => {
-            e.stopPropagation();
-          }}
-          onkeydown={(e) => e.key === "Escape" && (showLangDropdown = false)}
-        >
-          {#each languages as lang (lang.code)}
-            <button
-              class="lang-option"
-              onclick={() => selectLang(lang.code)}
-              aria-label={lang.code}
-              data-testid={`lang-option-${lang.code}`}
-            >
-              {@html lang.svg}
-            </button>
-          {/each}
-        </div>
+        <LanguageDropdown onClose={() => (showLangDropdown = false)} />
       {/if}
+
       <button
         class="main-menu-icon"
         use:customTooltip={$_("mainMenu.donate")}
@@ -325,194 +292,26 @@
     {/if}
 
     {#if showDevMenu}
-      <div
-        class="dev-menu"
-        data-testid="dev-menu"
-        role="dialog"
-        tabindex="0"
-        onclick={(e) => {
-          e.stopPropagation();
-        }}
-        onkeydown={(e) => e.key === "Escape" && (showDevMenu = false)}
-      >
-        <h3>dev</h3>
-        <button
-          class="modal-button secondary"
-          onclick={handleDevMenuBtn}
-          data-testid="dev-menu-dnd-btn"
-        >
-          {$_("mainMenu.dragAndDropTest")}
-        </button>
-        <button
-          class="modal-button secondary"
-          onclick={() => navigateTo("/test-main-menu")}
-          data-testid="dev-menu-test-main-menu-btn">Test Main Menu</button
-        >
-        <button
-          class="modal-button secondary"
-          onclick={handlePlayVsComputer}
-          data-testid="training-btn">{$_("mainMenu.training")}</button
-        >
-        <button
-          class="modal-button secondary"
-          onclick={() => {
-            uiStateStore.update((s) => ({ ...s, intendedGameType: "timed" }));
-            navigateTo("/game/timed");
-          }}
-          data-testid="timed-game-btn">{$_("mainMenu.timedGame")}</button
-        >
-        <button
-          class="modal-button secondary"
-          class:pseudo-disabled={!import.meta.env.DEV}
-          onclick={import.meta.env.DEV ? handleLocalGame : openWipNotice}
-          data-testid="local-game-btn">{$_("mainMenu.localGame")}</button
-        >
-        <button
-          class="modal-button secondary pseudo-disabled"
-          onclick={openWipNotice}
-          data-testid="online-game-btn">{$_("mainMenu.playOnline")}</button
-        >
-      </div>
+      <DevMenu
+        onClose={() => (showDevMenu = false)}
+        onOpenWipNotice={openWipNotice}
+        onPlayVsComputer={handlePlayVsComputer}
+        onLocalGame={handleLocalGame}
+      />
     {/if}
 
     {#if showWipNotice}
-      <div
-        class="wip-notice-overlay"
-        role="dialog"
-        tabindex="0"
-        onclick={(e) => {
-          e.stopPropagation();
-        }}
-        onkeydown={(e) => e.key === "Escape" && closeDropdowns()}
-      >
-        <div class="wip-notice-content">
-          <button
-            class="wip-close-btn"
-            onclick={closeDropdowns}
-            data-testid="wip-notice-close-btn">×</button
-          >
-          <h3>{$_("mainMenu.wipNotice.title")}</h3>
-          <p>{$_("mainMenu.wipNotice.description")}</p>
-          <button
-            class="wip-donate-btn"
-            onclick={handleDonate}
-            data-testid="wip-notice-donate-btn"
-          >
-            {$_("mainMenu.donate")}
-          </button>
-        </div>
-      </div>
+      <WipNotice onClose={closeDropdowns} />
     {/if}
 
     {#if showThemeDropdown}
-      <div
-        class="theme-dropdown"
-        role="dialog"
-        tabindex="0"
-        aria-modal="true"
-        aria-label={$_("mainMenu.themeDropdown")}
-        onclick={(e) => {
-          e.stopPropagation();
-        }}
-        onkeydown={(e) => e.key === "Escape" && closeDropdowns()}
-      >
-        <div class="theme-style-row" data-style="purple">
-          <button
-            class="theme-btn"
-            data-theme="light"
-            onclick={() => selectTheme("purple", "light")}
-            data-testid="theme-purple-light-btn">☀️</button
-          >
-          <span class="theme-name">{$_("mainMenu.themeName.purple")}</span>
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            onclick={() => selectTheme("purple", "dark")}
-            data-testid="theme-purple-dark-btn">🌙</button
-          >
-        </div>
-        <div class="theme-style-row" data-style="green">
-          <button
-            class="theme-btn"
-            data-theme="light"
-            onclick={() => selectTheme("green", "light")}
-            data-testid="theme-green-light-btn">☀️</button
-          >
-          <span class="theme-name">{$_("mainMenu.themeName.green")}</span>
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            onclick={() => selectTheme("green", "dark")}
-            data-testid="theme-green-dark-btn">🌙</button
-          >
-        </div>
-        <div class="theme-style-row" data-style="blue">
-          <button
-            class="theme-btn"
-            data-theme="light"
-            onclick={() => selectTheme("blue", "light")}
-            data-testid="theme-blue-light-btn">☀️</button
-          >
-          <span class="theme-name">{$_("mainMenu.themeName.blue")}</span>
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            onclick={() => selectTheme("blue", "dark")}
-            data-testid="theme-blue-dark-btn">🌙</button
-          >
-        </div>
-        <div class="theme-style-row" data-style="gray">
-          <button
-            class="theme-btn"
-            data-theme="light"
-            onclick={() => selectTheme("gray", "light")}
-            data-testid="theme-gray-light-btn">☀️</button
-          >
-          <span class="theme-name">{$_("mainMenu.themeName.gray")}</span>
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            onclick={() => selectTheme("gray", "dark")}
-            data-testid="theme-gray-dark-btn">🌙</button
-          >
-        </div>
-        <div class="theme-style-row" data-style="orange">
-          <button
-            class="theme-btn"
-            data-theme="light"
-            onclick={() => selectTheme("orange", "light")}
-            data-testid="theme-orange-light-btn">☀️</button
-          >
-          <span class="theme-name">{$_("mainMenu.themeName.orange")}</span>
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            onclick={() => selectTheme("orange", "dark")}
-            data-testid="theme-orange-dark-btn">🌙</button
-          >
-        </div>
-        <div class="theme-style-row" data-style="wood">
-          <button
-            class="theme-btn"
-            data-theme="light"
-            onclick={() => selectTheme("wood", "light")}
-            data-testid="theme-wood-light-btn">☀️</button
-          >
-          <span class="theme-name">{$_("mainMenu.themeName.wood")}</span>
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            onclick={() => selectTheme("wood", "dark")}
-            data-testid="theme-wood-dark-btn">🌙</button
-          >
-        </div>
-      </div>
+      <ThemeDropdown onClose={() => (showThemeDropdown = false)} />
     {/if}
 
     <div class="main-menu-title" data-testid="main-menu-title">
       {$_("mainMenu.title")}
     </div>
-    {#if import.meta.env.DEV}
+    {#if isDev}
       <div class="main-menu-subtitle" data-testid="main-menu-subtitle">
         {$_("mainMenu.menu")}
         <span
