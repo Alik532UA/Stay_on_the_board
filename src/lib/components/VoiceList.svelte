@@ -8,7 +8,7 @@
   } from "$lib/stores/voiceStore";
   import { _ } from "svelte-i18n";
   import { get } from "svelte/store";
-  import { speakTestPhrase } from "$lib/services/speechService.js";
+  import { speakTestPhrase } from "$lib/services/speechService";
 
   let selectedVoiceURI = "";
 
@@ -136,4 +136,3 @@
     margin: 0 auto;
   }
 </style>
-

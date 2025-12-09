@@ -4,7 +4,7 @@
  */
 
 import { writable, get } from 'svelte/store';
-import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService.js';
+import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService';
 import { locale } from 'svelte-i18n';
 import { logService } from '$lib/services/logService';
 import { gameSettingsStore } from './gameSettingsStore';

@@ -75,10 +75,21 @@ function _calculateBaseScore(player: Player, settings: GameSettingsState): numbe
   return 1;
 }
 
-function _calculateMirrorMovePenalty(currentState: any, direction: string, distance: number, settings: GameSettingsState): { penaltyPoints: number; penaltyPointsForMove: number } {
+/**
+ * Типізований стан для розрахунку рахунку
+ */
+interface MoveScoreState {
+  players: Player[];
+  lastMove?: { player: number; direction: string; distance: number } | null;
+  playerRow: number;
+  playerCol: number;
+  cellVisitCounts: Record<string, number>;
+}
+
+function _calculateMirrorMovePenalty(currentState: MoveScoreState, direction: string, distance: number, settings: GameSettingsState): { penaltyPoints: number; penaltyPointsForMove: number } {
   let penaltyPoints = 0;
   let penaltyPointsForMove = 0;
-  const humanPlayersCount = currentState.players.filter((p: any) => p.type === 'human').length;
+  const humanPlayersCount = currentState.players.filter((p: Player) => p.type === 'human').length;
   const lastComputerMove = currentState.lastMove;
 
   if (direction && lastComputerMove && lastComputerMove.player !== 0 && !settings.blockModeEnabled) {
@@ -109,7 +120,7 @@ function _calculateJumpBonus(jumpedCount: number, settings: GameSettingsState): 
 }
 
 export function calculateMoveScore(
-  currentState: any,
+  currentState: MoveScoreState,
   newPosition: { row: number; col: number },
   playerIndex: number,
   settings: GameSettingsState,

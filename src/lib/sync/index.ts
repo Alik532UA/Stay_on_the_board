@@ -13,5 +13,4 @@ export type {
 
 export { LocalGameStateSync, localGameStateSync } from './LocalGameStateSync';
 
-// TODO: Додати FirebaseGameStateSync коли буде реалізовано онлайн-режим
-// export { FirebaseGameStateSync } from './FirebaseGameStateSync';
+export { FirebaseGameStateSync, createFirebaseGameStateSync } from './FirebaseGameStateSync';

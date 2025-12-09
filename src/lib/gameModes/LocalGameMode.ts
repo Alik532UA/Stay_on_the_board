@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { BaseGameMode } from './index';
-import type { Player, BonusHistoryItem } from '$lib/models/player';
+import type { Player } from '$lib/models/player';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
@@ -12,8 +12,7 @@ import { availableMovesService } from '$lib/services/availableMovesService';
 import { gameService } from '$lib/services/gameService';
 import { playerStore } from '$lib/stores/playerStore';
 import { boardStore } from '$lib/stores/boardStore';
-import { DEFAULT_PLAYER_NAMES } from '$lib/config/defaultPlayers';
-import { getRandomUnusedColor } from '$lib/utils/playerUtils';
+import { resetPlayerScore, createDefaultLocalPlayers } from '$lib/utils/playerFactory';
 import { BASE_TURN_DURATION, DEV_TIME_MULTIPLIER } from '$lib/config/gameConfig';
 import { dev } from '$app/environment';
 
@@ -69,33 +68,10 @@ export class LocalGameMode extends BaseGameMode {
     if (playerState) {
       // SSoT: Беремо поточних гравців, але ОБОВ'ЯЗКОВО скидаємо їхній рахунок до 0
       // для нової гри.
-      return playerState.players.map(p => ({
-        ...p,
-        score: 0,
-        penaltyPoints: 0,
-        bonusPoints: 0,
-        bonusHistory: [] as BonusHistoryItem[],
-        roundScore: 0
-      }));
+      return playerState.players.map(p => resetPlayerScore(p));
     }
     // If no players in store (e.g. F5 refresh), generate default players
-    const usedColors: string[] = [];
-    return DEFAULT_PLAYER_NAMES.map((name, index) => {
-      const color = getRandomUnusedColor(usedColors);
-      usedColors.push(color);
-      return {
-        id: index + 1,
-        name,
-        type: 'human',
-        score: 0,
-        color,
-        isComputer: false,
-        penaltyPoints: 0,
-        bonusPoints: 0,
-        bonusHistory: [] as BonusHistoryItem[],
-        roundScore: 0
-      };
-    });
+    return createDefaultLocalPlayers();
   }
 
   getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player' {

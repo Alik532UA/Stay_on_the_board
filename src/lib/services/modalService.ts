@@ -5,12 +5,26 @@ import { get } from 'svelte/store';
 import { _, locale } from 'svelte-i18n';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { speakText } from './speechService';
+import type { Player } from '$lib/models/player';
+import type { GameOverPayload, PlayerScoreResult, FinalScoreDetails } from '$lib/stores/gameOverStore';
 
-function showGameOverModal(payload: any) {
+/**
+ * Вміст модального вікна GameOver
+ */
+interface GameOverModalContent {
+  reasonKey: string;
+  reason: string;
+  scoreDetails: FinalScoreDetails;
+  playerScores?: Array<PlayerScoreResult & { playerName: string; playerColor: string; isWinner: boolean; isLoser: boolean }>;
+  winnerName?: string;
+  winnerNumbers?: string;
+}
+
+function showGameOverModal(payload: GameOverPayload) {
   const { reasonKey, reasonValues, finalScoreDetails, winners, gameType } = payload;
 
   let titleKey = 'modal.gameOverTitle';
-  let content: any = {
+  let content: GameOverModalContent = {
     reasonKey: reasonKey,
     reason: get(_)(reasonKey, { values: reasonValues }),
     scoreDetails: finalScoreDetails
@@ -21,12 +35,12 @@ function showGameOverModal(payload: any) {
   } else if (gameType === 'local') {
     // For local games, show player scores
     titleKey = winners && winners.length === 1 ? 'modal.winnerTitle' : 'modal.drawTitle';
-    content.playerScores = payload.scores.map((s: any) => ({
+    content.playerScores = payload.scores.map((s: PlayerScoreResult) => ({
       ...s,
       playerName: s.name,
       playerColor: s.color,
-      isWinner: winners.some((w: any) => w.id === s.playerId),
-      isLoser: payload.loser && payload.loser.id === s.playerId
+      isWinner: winners.some((w: Player) => w.id === s.playerId),
+      isLoser: payload.loser !== null && payload.loser.id === s.playerId
     }));
 
     if (winners && winners.length === 1) {
@@ -34,12 +48,12 @@ function showGameOverModal(payload: any) {
     } else if (winners && winners.length > 1) {
       // Optional: Handle multiple winners in title if needed, currently falls back to 'Draw!' or 'Winners: ...'
       // content.winnerNumbers (plural) is used in 'winnersTitle'.
-      content.winnerNumbers = winners.map((w: any) => w.name).join(', ');
+      content.winnerNumbers = winners.map((w: Player) => w.name).join(', ');
     }
   }
 
   if (get(gameSettingsStore).speakModalTitles) {
-    const speechValues: any = { winners: winners ? winners.map((w: any) => w.name).join(', ') : '' };
+    const speechValues: { winners?: string; winnerName?: string } = { winners: winners ? winners.map((w: Player) => w.name).join(', ') : '' };
     if (winners && winners.length === 1) {
       speechValues.winnerName = winners[0].name;
     }
@@ -52,7 +66,7 @@ function showGameOverModal(payload: any) {
   modalStore.showModal({
     titleKey: titleKey,
     content: content,
-    props: { winners: winners.map((w: any) => w.name).join(', ') },
+    props: { winners: winners.map((w: Player) => w.name).join(', ') },
     closable: false,
     closeOnOverlayClick: false,
     dataTestId: 'game-over-modal',

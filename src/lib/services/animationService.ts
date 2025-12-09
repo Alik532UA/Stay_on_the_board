@@ -11,7 +11,7 @@ import { gameEventBus } from './gameEventBus';
 function createAnimationService() {
   let unsubscribe: (() => void) | null = null;
 
-  function addToAnimationQueue(move: any) {
+  function addToAnimationQueue(move: import('$lib/stores/animationStore').AnimationMove) {
     logService.animation('[AnimationService] addToAnimationQueue:', move);
     animationStore.update(state => {
       const newQueue = [...state.animationQueue, move];
