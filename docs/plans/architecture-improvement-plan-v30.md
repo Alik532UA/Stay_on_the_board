@@ -228,9 +228,9 @@
   - [ ] Створити фабрику для конфігурації гравців
   - [x] ⚠️ **УВАГА:** Тестувати окремо LocalGameMode та VirtualPlayerGameMode
 
-- [ ] **3.2. Видалити TestMainMenu.svelte**
-  - [ ] Об'єднати з `MainMenu.svelte` через параметризацію
-  - [ ] Або видалити, якщо не використовується
+- [x] **3.2. Видалити TestMainMenu.svelte**
+  - [x] Об'єднати з `MainMenu.svelte` через параметризацію (Замінено на MainMenu)
+  - [x] Або видалити, якщо не використовується (Видалено)
 
 ---
 
@@ -245,7 +245,7 @@
 
 - [x] **4.2. Усунення `any` типів**
   - [x] `currentState: any` в `performMove` → створити тип `CombinedGameState`
-  - [ ] `settings: any` → використовувати `GameSettingsState`
+  - [x] `settings: any` → використовувати `GameSettingsState`
   - [x] `scoreChanges: any` → створити тип `ScoreChanges`
 
 ---

@@ -7,7 +7,7 @@ import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { testModeStore } from '$lib/stores/testModeStore';
 import { getInitialPosition } from '$lib/utils/initialPositionUtils';
 import { createEmptyBoard } from '$lib/utils/boardUtils';
-import type { Player } from '$lib/models/player';
+import type { Player, BonusHistoryItem } from '$lib/models/player';
 import { availableMovesService } from './availableMovesService';
 import { animationService } from './animationService';
 import { logService } from './logService'; // <-- Додано імпорт
@@ -41,7 +41,7 @@ export const gameService = {
           isComputer: false,
           penaltyPoints: 0,
           bonusPoints: 0,
-          bonusHistory: []
+          bonusHistory: [] as BonusHistoryItem[]
         };
       });
     }

@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { BaseGameMode } from './BaseGameMode';
-import type { Player } from '$lib/models/player';
+import type { Player, BonusHistoryItem } from '$lib/models/player';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
@@ -27,8 +27,8 @@ export class TrainingGameMode extends BaseGameMode {
 
   getPlayersConfiguration(): Player[] {
     return [
-      { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
-      { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#ffffff', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
+      { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as BonusHistoryItem[] },
+      { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#ffffff', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as BonusHistoryItem[] }
     ];
   }
 
@@ -66,16 +66,16 @@ export class TrainingGameMode extends BaseGameMode {
     logService.logicMove('State of uiStateStore BEFORE continueAfterNoMoves:', get(uiStateStore));
 
     boardStore.update(s => {
-        if (!s) return null;
-        return {
-            ...s,
-            cellVisitCounts: {},
-            moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
-            moveQueue: [],
-        };
+      if (!s) return null;
+      return {
+        ...s,
+        cellVisitCounts: {},
+        moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
+        moveQueue: [],
+      };
     });
     availableMovesService.updateAvailableMoves();
-    
+
     gameOverStore.resetGameOverState();
     animationService.reset();
 

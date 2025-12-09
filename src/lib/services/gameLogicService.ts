@@ -10,13 +10,15 @@ import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { appSettingsStore, type AppSettingsState } from '$lib/stores/appSettingsStore';
+import type { CombinedGameState } from '$lib/models/gameState';
+import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
 
 export function performMove(
   direction: MoveDirectionType,
   distance: number,
   playerIndex: number,
-  currentState: any, // Combined state
-  settings: any,
+  currentState: CombinedGameState,
+  settings: GameSettingsState,
   actualGameMode: 'training' | 'local' | 'timed' | 'online' | 'virtual-player',
   onEndCallback?: () => void
 ) {
@@ -67,7 +69,7 @@ export function performMove(
       playerCol: newPosition.col,
       cellVisitCounts: updatedCellVisitCounts,
       moveQueue: [...currentState.moveQueue, { player: playerIndex + 1, direction, distance, to: newPosition }],
-      moveHistory: [...currentState.moveHistory, { pos: newPosition, blocked: [], visits: updatedCellVisitCounts, blockModeEnabled: settings.blockModeEnabled, lastMove: { direction, distance, player: playerIndex } }],
+      moveHistory: [...currentState.moveHistory, { pos: newPosition, blocked: [] as { row: number; col: number }[], visits: updatedCellVisitCounts, blockModeEnabled: settings.blockModeEnabled, lastMove: { direction, distance, player: playerIndex } }],
     },
     playerState: {
       players: currentState.players.map((p: any, i: number) => i === playerIndex ? { ...p, score: p.score + baseScoreToAdd } : p),

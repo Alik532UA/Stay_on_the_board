@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { BaseGameMode } from './index';
-import type { Player } from '$lib/models/player';
+import type { Player, BonusHistoryItem } from '$lib/models/player';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
@@ -74,7 +74,7 @@ export class LocalGameMode extends BaseGameMode {
         score: 0,
         penaltyPoints: 0,
         bonusPoints: 0,
-        bonusHistory: [] as any[],
+        bonusHistory: [] as BonusHistoryItem[],
         roundScore: 0
       }));
     }
@@ -92,7 +92,7 @@ export class LocalGameMode extends BaseGameMode {
         isComputer: false,
         penaltyPoints: 0,
         bonusPoints: 0,
-        bonusHistory: [] as any[],
+        bonusHistory: [] as BonusHistoryItem[],
         roundScore: 0
       };
     });
