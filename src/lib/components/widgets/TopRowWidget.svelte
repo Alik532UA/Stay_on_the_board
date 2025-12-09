@@ -9,7 +9,7 @@
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
   import { modalService } from '$lib/services/modalService';
-  import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
+  import { columnStyleMode } from '$lib/stores/columnStyleStore';
   import { logService } from '$lib/services/logService.js';
   import { uiStateStore } from '$lib/stores/uiStateStore';
   import hotkeyService from '$lib/services/hotkeyService';
@@ -63,3 +63,4 @@
   {/if}
 
 </div>
+

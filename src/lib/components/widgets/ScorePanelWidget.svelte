@@ -1,7 +1,7 @@
 <script lang="ts">
   import { userActionService } from "$lib/services/userActionService";
   import { modalStore } from "$lib/stores/modalStore";
-  import { replayStore } from "$lib/stores/replayStore.js";
+  import { replayStore } from "$lib/stores/replayStore";
   import { _ } from "svelte-i18n";
   import { customTooltip } from "$lib/actions/customTooltip.js";
   import { playerStore } from "$lib/stores/playerStore";
@@ -332,4 +332,5 @@
     }
   }
 </style>
+
 

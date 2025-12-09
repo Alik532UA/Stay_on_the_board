@@ -7,7 +7,7 @@
   import { debounce } from '$lib/utils/debounce';
 	import { uiStateStore } from '$lib/stores/uiStateStore.js';
 	import { initializeI18n, i18nReady } from '$lib/i18n/init.js';
-	import { appVersion } from '$lib/stores/versionStore.js';
+	import { appVersion } from '$lib/stores/versionStore';
 	import { assets } from '$app/paths';
 	import { onMount, onDestroy } from 'svelte';
 	import { base } from '$app/paths';
@@ -251,5 +251,6 @@
     border-color: #81C784;
   }
 </style>
+
 
 
