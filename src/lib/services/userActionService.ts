@@ -85,13 +85,10 @@ export const userActionService = {
     const scoreState = get(scoreStore);
     if (!boardState || !playerState || !scoreState) return;
 
-    const score = playerState.players.reduce((acc: number, p: any) => acc + p.score, 0);
+    const score = playerState.players.reduce((acc: number, p: { score: number }) => acc + p.score, 0);
     if (newSize === boardState.boardSize) return;
 
-    // Якщо гра ще не почалася (рахунок 0), змінюємо розмір дошки без підтвердження.
-    // Це дозволяє користувачам вільно налаштовувати дошку перед початком гри.
-    // Якщо гра ще не почалася (рахунок 0), змінюємо розмір дошки без підтвердження.
-    // Це дозволяє користувачам вільно налаштовувати дошку перед початком гри.
+    // Якщо гра ще не почалася (рахунок 0), змінюємо розмір дошки без підтвердження
     if (score === 0 && scoreState.penaltyPoints === 0) {
       const activeGameMode = gameModeService.getCurrentMode();
       if (activeGameMode) {
@@ -109,76 +106,28 @@ export const userActionService = {
 
 
 
+  /**
+   * Перезапускає гру з поточними налаштуваннями.
+   * 
+   * ВАЖЛИВО: Завжди викликається з applyPresetSettings=false, тому що:
+   * - При зміні режиму: setGameModePreset вже застосував пресет через applyPreset()
+   * - При рестарті: Store містить кастомні налаштування (Block Mode тощо)
+   * 
+   * Для local-режиму: завжди перезапускає 'local' реалізацію.
+   */
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
-    // НАВІЩО (Fix): Ми повинні ініціалізувати режим заново на основі налаштувань.
-    // Якщо користувач змінив пресет (наприклад, з 'beginner' на 'timed'),
-    // це може вимагати зміни класу реалізації (TrainingGameMode -> TimedGameMode).
-    // Поточний activeMode може бути старого типу, тому виклик restartGame() на ньому
-    // не запустить правильну логіку (наприклад, таймер).
+
     const currentMode = gameModeService.getCurrentMode();
     const currentModeName = currentMode?.getModeName();
 
     if (currentModeName === 'local') {
-      // Якщо ми в локальному режимі, ми завжди перезапускаємо 'local' реалізацію,
-      // АЛЕ з параметром applyPresetSettings = false.
-      // Чому false? Тому що налаштування (experienced/pro/observer) ВЖЕ були застосовані
-      // викликом setGameModePreset (який викликає applyPreset).
-      // Якщо ми передамо true, gameModeService застосує дефолтний пресет 'local',
-      // і ми втратимо вибір користувача (experienced/pro).
+      // Local mode: зберігаємо налаштування (experienced/pro/observer)
       gameModeService.initializeGameMode('local', false);
     } else {
       const settings = get(gameSettingsStore);
       if (settings.gameMode) {
-        // Для virtual-player: якщо обрано 'timed', нам треба змінити клас реалізації.
-        // Тому ми ініціалізуємось за назвою режиму з налаштувань.
-
-        // Fix: Перевіряємо, чи змінився режим. Якщо ні - ми не застосовуємо пресет наново,
-        // щоб зберегти ручні налаштування користувача (наприклад, Block Mode у Beginner).
-        const targetMode = settings.gameMode;
-        const currentModeName = currentMode?.getModeName(); // We already have this above, but safe to re-check logic flow if needed, or reuse variable.
-        // Note: getModeName return types might not perfectly match presets (e.g. 'training' vs 'beginner').
-        // But initializeGameMode handles the internal mapping. 
-        // We simply want to pass applyPresetSettings=false if we are conceptually "restarting the same thing".
-
-        // Однак, gameSettingsStore.gameMode вже оновлено UI-віджетом перед викликом requestRestart.
-        // Тобто settings.gameMode - це вже "новий" режим.
-        // Але ми не знаємо, чи був він "новим" чи "старим" до кліку.
-        // Чекайте. requestRestart викликається після setGameModePreset (який вже застосував пресет!).
-        // АБО він викликається кнопкою "Почати заново" (де пресет не змінювався).
-
-        // Сценарій 1: Клік на віджет режимів -> setGameModePreset (applied changes) -> requestRestart.
-        // Тут settings.gameMode вже новий. Але ми хочемо застосувати ці нові налаштування (вони щойно обрані).
-        // Сценарій 2: Клік на "Restart" (модалка). setGameModePreset НЕ викликався.
-        // settings.gameMode такий самий, який був під час гри.
-        // Якщо користувач вручну змінив Block Mode, нові налаштування в store відрізняються від пресету.
-        // Якщо ми викличемо initializeGameMode(settings.gameMode), воно застосує пресет і скине Block Mode.
-
-        // ПИТАННЯ: Як розрізнити Сценарій 1 та Сценарій 2?
-        // Відповідь: userActionService.requestRestart не приймає аргументів.
-        // Але ми можемо порівняти, чи відповідають поточні налаштування дефолту пресету? Ні, це складно.
-
-        // Давайте змінимо логіку: initializeGameMode має параметр applyPresetSettings.
-        // Ми повинні передавати true ТІЛЬКИ якщо ми хочемо скинути налаштування.
-        // Коли ми хочемо скинути? Коли юзер явно змінив режим.
-        // Коли юзер тисне "Restart Game" в модалці - він очікує рестарт партії з ТИМИ Ж налаштуваннями?
-        // Зазвичай так. Якщо я грав в "Новачок + Блоки", я хочу рестартнути "Новачок + Блоки".
-
-        // Тобто для звичайного рестарту нам треба applyPresetSettings = false.
-        // Але як бути зі зміною режиму через віджет? Там теж викликається requestRestart.
-        // У GameModeWidget: setGameModePreset -> requestRestart.
-        // setGameModePreset вже викликав applyPreset!
-        // Тобто settings в store ВЖЕ оновлені під новий пресет.
-        // Тому якщо ми викличемо initializeGameMode(..., false) - ми збережемо ці "щойно застосовані" налаштування.
-        // А якщо ми викличемо true - ми застосуємо їх ще раз (що не шкідливо, але зайве).
-
-        // АЛЕ: initializeGameMode всередині робить timerStore.reset() і т.д.
-
-        // Отже, рішення: Завжди викликати з applyPresetSettings = false.
-        // Чому?
-        // 1. Якщо це зміна режиму: setGameModePreset вже застосував пресет. Store оновлено. initializeGameMode(..., false) просто перестворить клас гри.
-        // 2. Якщо це рестарт: Store містить поточні (кастомні) налаштування. initializeGameMode(..., false) збереже їх.
-
+        // Virtual-player та інші режими: ініціалізуємось за назвою з налаштувань
         gameModeService.initializeGameMode(settings.gameMode, false);
       } else {
         // Fallback
@@ -193,12 +142,12 @@ export const userActionService = {
     }
   },
 
+  /**
+   * Перезапускає гру з новим розміром дошки.
+   * Викликається після підтвердження у модальному вікні зміни розміру.
+   */
   async requestRestartWithSize(newSize: number): Promise<void> {
     modalStore.closeModal();
-    // Ця функція викликається після підтвердження у модальному вікні.
-    // Вона перезапускає гру з новим розміром дошки.
-    // Ця функція викликається після підтвердження у модальному вікні.
-    // Вона перезапускає гру з новим розміром дошки.
     const activeGameMode = gameModeService.getCurrentMode();
     if (activeGameMode) {
       activeGameMode.restartGame({ newSize });
