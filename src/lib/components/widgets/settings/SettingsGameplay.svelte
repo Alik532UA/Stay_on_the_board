@@ -145,7 +145,7 @@
         >
             {#each [0, 1, 2, 3] as count}
                 <button
-                    data-testid="settings-expander-block-count-btn-{count}"
+                    data-testid="block-count-btn-{count}"
                     class="settings-expander__square-btn"
                     class:active={$gameSettingsStore.blockOnVisitCount ===
                         count}
