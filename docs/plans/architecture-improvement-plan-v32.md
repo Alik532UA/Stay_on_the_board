@@ -371,7 +371,8 @@ NOTE: We do NOT update playerToUpdate.score here anymore.
   - [x] Винесено ~560 рядків CSS в `modal.css` (-56%)
   - Детальний план: [modal-refactoring-plan.md](file:///c:/Users/ozapolnov/Documents/code/study/Stay_on_the_board/docs/plans/modal-refactoring-plan.md)
 
-- [ ] **6.3. Рефакторинг `MainMenu.svelte` (22KB)** — *відкладено*
+- [x] **6.3. Рефакторинг `MainMenu.svelte`** ✅
+  - [x] Винесено ~100 рядків CSS в `main-menu.css` (-15%)
   - Детальний план: [mainmenu-refactoring-plan.md](file:///c:/Users/ozapolnov/Documents/code/study/Stay_on_the_board/docs/plans/mainmenu-refactoring-plan.md)
 
 ---
