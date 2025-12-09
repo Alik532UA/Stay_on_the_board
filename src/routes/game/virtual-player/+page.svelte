@@ -63,7 +63,11 @@
     items: col.widgets
       .filter((id) => {
         if (id === WIDGETS.PLAYER_TURN_INDICATOR) return false;
-        if (id === WIDGETS.TIMER && $gameSettingsStore.gameMode !== "timed")
+        if (
+          id === WIDGETS.TIMER &&
+          $gameSettingsStore.gameMode !== "timed" &&
+          $gameSettingsStore.gameMode !== "virtual-player-timed"
+        )
           return false;
         return true;
       })
