@@ -42,11 +42,11 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
     ];
   }
 
-    getModeName(): 'virtual-player' {
+  getModeName(): 'virtual-player' {
     return 'virtual-player';
   }
 
-  
+
 
   protected async advanceToNextPlayer(): Promise<void> {
     logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
@@ -78,26 +78,12 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
 
   async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
-    const boardState = get(boardStore);
-    if (!boardState) return;
-
     logService.logicMove('State of uiStateStore BEFORE continueAfterNoMoves:', get(uiStateStore));
 
-    boardStore.update(s => {
-        if (!s) return null;
-        return {
-            ...s,
-            cellVisitCounts: {},
-            moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
-            moveQueue: [],
-        };
-    });
-    availableMovesService.updateAvailableMoves();
-    
-    gameOverStore.resetGameOverState();
-    animationService.reset();
+    // Використовуємо спільну логіку з базового класу
+    this.resetBoardForContinuation();
 
-    // Явно повертаємо хід гравцю-людині
+    // Специфічна логіка для virtual-player: повертаємо хід гравцю-людині
     const humanPlayerIndex = get(playerStore)?.players.findIndex(p => p.type === 'human');
     if (humanPlayerIndex !== undefined) {
       playerStore.update(s => s ? { ...s, currentPlayerIndex: humanPlayerIndex } : null);
