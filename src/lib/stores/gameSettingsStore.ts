@@ -92,11 +92,22 @@ function createGameSettingsStore() {
       return state;
     }
 
+    // Визначаємо контекст гри (local або virtual-player)
+    const intendedGameType = get(uiStateStore).intendedGameType;
+    const isLocalGameContext = intendedGameType === 'local';
+
+    // Блокуємо синхронізацію для 'observer' в virtual-player контексті
+    // (observer - це пресет тільки для локальної гри)
+    if (state.gameMode === 'observer' && !isLocalGameContext) {
+      return state;
+    }
+
     let newMode: GameModePreset | null = null;
 
     if (!state.autoHideBoard) {
-      // Автоприховування ВИМКНЕНО → режим "Наглядач" (observer)
-      newMode = 'observer';
+      // Автоприховування ВИМКНЕНО
+      // Local: observer (Наглядач), Virtual-player: beginner (Новачок)
+      newMode = isLocalGameContext ? 'observer' : 'beginner';
     } else {
       // Автоприховування УВІМКНЕНО
       if (state.blockModeEnabled) {
@@ -109,6 +120,7 @@ function createGameSettingsStore() {
     }
 
     if (newMode && state.gameMode !== newMode) {
+      logService.GAME_MODE(`[syncGameMode] Context: ${intendedGameType}, Current: ${state.gameMode}, New: ${newMode}`);
       state.gameMode = newMode;
     }
 

@@ -952,4 +952,49 @@ Stay_on_the_board/game/local
 надважлива задача нічого не поламати в режимі Stay_on_the_board/game/virtual-player
 потрібно виправити саме в Stay_on_the_board/game/local або Stay_on_the_board/local-setup
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+в Stay_on_the_board/game/virtual-player поламався режим "Новачок"
+
+в game/virtual-player є наступні режими:
+game-mode-beginner
+game-mode-experienced
+game-mode-pro
+game-mode-timed
+
+в game/local є наступні режими:
+game-mode-observer
+game-mode-experienced
+game-mode-pro
+
+game-mode-beginner та game-mode-observer схожі 
+і думаю що коли ми міняти налаштування для game-mode-observer ми поламати game-mode-beginner (але це тільки припущення)
+
+треба зробити архітектурно грамотну систему, щоб режими з game/virtual-player не ломали режими в game/local
+
+також треба зробити чіткий немінг для режимів на BE 
+наприклад:
+game-mode-virtual-player-beginner
+game-mode-virtual-player-experienced
+game-mode-virtual-player-pro
+game-mode-virtual-player-timed
+
+game-mode-local-observer
+game-mode-local-experienced
+game-mode-local-pro
+
+game-mode-online-beginner
+game-mode-online-experienced
+game-mode-online-pro
+
+думає це може допомогти уникнути проблеми в майбутньому
+
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+я вибираю щоб ти зробив правильне комплексне архітектурне рішення
+
+і ще у нас зараз наплутані режими, бо в game/virtual-player режим "Новачок" має опис "Режим для запису ходів живої гри. Таймер вимкнено, щоб ви могли спокійно повторювати ходи за гравцями." а це повинно було бути в лише в game/local
+
+в game/virtual-player режим "Новачок" треба знайти і повернути попередній правильний опис для режиму "Новачок"
+    beginner: "Ідеальний старт для ознайомлення з керуванням, але в цьому режимі важко зрозуміти сенс гри, тому щойно відчуєте впевненість — переходьте до рівня складності!",
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦

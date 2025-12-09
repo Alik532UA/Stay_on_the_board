@@ -36,9 +36,9 @@ class GameModeService {
     // (player vs. computer) mode. The specific settings for each preset (like board size)
     // are handled in gameSettingsStore.applyPreset.
     const presetToModeMap: Record<string, string> = {
-        beginner: 'training',
-        experienced: 'training',
-        pro: 'training'
+      beginner: 'training',
+      experienced: 'training',
+      pro: 'training'
     };
     const implementationName = name ? presetToModeMap[name] || name : 'training'; // Fallback to training if null
 
@@ -46,7 +46,7 @@ class GameModeService {
 
     if (mode) {
       timerStore.reset();
-      if (applyPresetSettings && name && ['beginner', 'experienced', 'pro', 'timed', 'local', 'online'].includes(name)) {
+      if (applyPresetSettings && name && ['beginner', 'experienced', 'pro', 'timed', 'local', 'online', 'observer'].includes(name)) {
         gameSettingsStore.applyPreset(name as any);
       }
       mode.initialize();
