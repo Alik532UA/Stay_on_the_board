@@ -240,7 +240,8 @@
   - [x] `logService.js` → `logService.ts`
   - [x] `modalStore.js` → `modalStore.ts`
   - [x] `voiceStore.js` → `voiceStore.ts`
-  - [ ] Інші `.js` файли в `stores/` та `services/`
+  - [x] Інші `.js` файли в `stores/` (мігровано 9 додаткових файлів)
+  - [ ] Інші `.js` файли в `services/` (`audioService`, `navigationService` - done; `speechService` - todo)
 
 - [x] **4.2. Усунення `any` типів**
   - [x] `currentState: any` в `performMove` → створити тип `CombinedGameState`
