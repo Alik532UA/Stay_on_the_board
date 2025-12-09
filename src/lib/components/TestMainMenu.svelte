@@ -15,7 +15,7 @@
   import { appVersion } from '$lib/stores/versionStore.js';
   import { currentLanguageFlagSvg } from '$lib/stores/derivedState.ts';
   import { languages } from '$lib/constants';
-  import { modalStore } from '$lib/stores/modalStore.js';
+  import { modalStore } from '$lib/stores/modalStore';
   import { onMount, onDestroy, tick } from 'svelte';
   import { get } from 'svelte/store';
   
@@ -456,3 +456,4 @@
     transition: all 0.2s ease;
   }
 </style>
+

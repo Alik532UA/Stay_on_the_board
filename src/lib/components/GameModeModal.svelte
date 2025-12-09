@@ -2,7 +2,7 @@
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import hotkeyService from '$lib/services/hotkeyService';
-  import { modalStore } from '$lib/stores/modalStore.js';
+  import { modalStore } from '$lib/stores/modalStore';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { get } from 'svelte/store';
@@ -231,3 +231,4 @@
     cursor: help;
   }
 </style>
+

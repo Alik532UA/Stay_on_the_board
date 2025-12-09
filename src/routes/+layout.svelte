@@ -15,10 +15,10 @@
 	import { clearCache } from '$lib/utils/cacheManager.js';
 	import Modal from '$lib/components/Modal.svelte';
 	import { navigating } from '$app/stores';
-	import { modalStore } from '$lib/stores/modalStore.js';
+	import { modalStore } from '$lib/stores/modalStore';
 	import { afterNavigate } from '$app/navigation';
 	import DontShowAgainCheckbox from '$lib/components/DontShowAgainCheckbox.svelte';
-	import { modalState } from '$lib/stores/modalStore.js';
+	import { modalState } from '$lib/stores/modalStore';
 	import { logService } from '$lib/services/logService.js';
 	import TestModeWidget from '$lib/components/widgets/TestModeWidget.svelte';
 	import { tooltipStore } from '$lib/stores/tooltipStore.js';
@@ -251,3 +251,4 @@
     border-color: #81C784;
   }
 </style>
+

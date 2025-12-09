@@ -1,13 +1,27 @@
+// src/lib/stores/voiceStore.ts
+/**
+ * @file Store для керування голосами озвучування.
+ */
+
 import { writable, get } from 'svelte/store';
 import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService.js';
 import { locale } from 'svelte-i18n';
-import { logService } from '$lib/services/logService.js';
-import { gameSettingsStore } from './gameSettingsStore.ts';
+import { logService } from '$lib/services/logService';
+import { gameSettingsStore } from './gameSettingsStore';
 
-export const availableVoices = writable([]);
-export const isLoading = writable(true);
+/**
+ * Тип голосу.
+ */
+export interface Voice {
+    name: string;
+    lang: string;
+    voiceURI: string;
+}
 
-export async function initializeVoices() {
+export const availableVoices = writable<Voice[]>([]);
+export const isLoading = writable<boolean>(true);
+
+export async function initializeVoices(): Promise<void> {
     isLoading.set(true);
     const currentLocale = get(locale) || 'uk';
     try {
@@ -15,7 +29,7 @@ export async function initializeVoices() {
         let mainVoices = filterVoicesByLang(allVoices, currentLocale);
 
         if (currentLocale === 'nl') {
-            mainVoices.sort((a, b) => {
+            mainVoices.sort((a: Voice, b: Voice) => {
                 if (a.lang === 'nl-NL' && b.lang !== 'nl-NL') return -1;
                 if (a.lang !== 'nl-NL' && b.lang === 'nl-NL') return 1;
                 return a.name.localeCompare(b.name);
@@ -24,8 +38,8 @@ export async function initializeVoices() {
 
         if (currentLocale !== 'en') {
             const enVoices = filterVoicesByLang(allVoices, 'en');
-            const mainVoiceURIs = new Set(mainVoices.map(v => v.voiceURI));
-            const onlyEn = enVoices.filter(v => !mainVoiceURIs.has(v.voiceURI));
+            const mainVoiceURIs = new Set(mainVoices.map((v: Voice) => v.voiceURI));
+            const onlyEn = enVoices.filter((v: Voice) => !mainVoiceURIs.has(v.voiceURI));
             availableVoices.set([...mainVoices, ...onlyEn]);
         } else {
             availableVoices.set(mainVoices);
@@ -35,14 +49,12 @@ export async function initializeVoices() {
         availableVoices.set([]);
     }
 
-        isLoading.set(false);
+    isLoading.set(false);
 }
 
 availableVoices.subscribe(voices => {
-    // Ensure we have a non-empty array to avoid errors
     if (Array.isArray(voices) && voices.length > 0) {
         const settings = get(gameSettingsStore);
-        // Only set the default if one isn't already set.
         if (!settings.selectedVoiceURI) {
             gameSettingsStore.updateSettings({ selectedVoiceURI: voices[0].voiceURI });
             logService.ui(`Default voice reactively selected: ${voices[0].name}`);
@@ -51,8 +63,8 @@ availableVoices.subscribe(voices => {
 });
 
 locale.subscribe(newLocale => {
-  if (newLocale) {
-    logService.ui(`Locale changed to ${newLocale}, re-initializing voices.`);
-    initializeVoices();
-  }
+    if (newLocale) {
+        logService.ui(`Locale changed to ${newLocale}, re-initializing voices.`);
+        initializeVoices();
+    }
 });

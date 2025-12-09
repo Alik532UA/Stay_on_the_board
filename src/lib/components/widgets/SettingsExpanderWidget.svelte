@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { userActionService } from '$lib/services/userActionService.js';
-  import { modalStore } from '$lib/stores/modalStore.js';
+  import { modalStore } from '$lib/stores/modalStore';
   import { _ } from 'svelte-i18n';
   import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
   import { uiStateStore } from '$lib/stores/uiStateStore.js';
@@ -580,3 +580,4 @@
     cursor: help;
   }
 </style>
+

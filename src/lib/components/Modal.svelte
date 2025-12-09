@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { modalState, modalStore } from "$lib/stores/modalStore.js";
+  import { modalState, modalStore } from "$lib/stores/modalStore";
   import { get } from "svelte/store";
   import { _ } from "svelte-i18n";
   import { i18nReady } from "$lib/i18n/init.js";
@@ -987,3 +987,4 @@
     margin-left: 4px; /* Space between plate/colon and score */
   }
 </style>
+

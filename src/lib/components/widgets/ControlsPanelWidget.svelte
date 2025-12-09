@@ -5,7 +5,7 @@
   import SvgIcons from '../SvgIcons.svelte';
   import { get } from 'svelte/store';
   import { isPlayerTurn, isConfirmButtonDisabled, lastComputerMove, lastPlayerMove, isPauseBetweenMoves, distanceRows, previousPlayerColor } from '$lib/stores/derivedState.ts';
-  import { modalStore } from '$lib/stores/modalStore.js';
+  import { modalStore } from '$lib/stores/modalStore';
   import DirectionControls from './DirectionControls.svelte';
   import { getCenterInfoState } from '$lib/utils/centerInfoUtil';
   import { logService } from '$lib/services/logService.js';
@@ -236,3 +236,4 @@ ${generalLogs}`;
   {/if}
 </div>
 {/if}
+
