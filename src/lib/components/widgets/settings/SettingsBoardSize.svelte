@@ -22,14 +22,14 @@
     <span class="settings-expander__label">{$_("settings.boardSize")}</span>
     <div class="settings-expander__size-adjuster">
         <button
-            data-testid="settings-expander-size-decrease-btn"
+            data-testid="decrease-board-size-btn"
             class="settings-expander__square-btn"
             on:click={() => changeBoardSize(-1)}
         >
             -
         </button>
         <span
-            data-testid="settings-expander-current-size"
+            data-testid="current-board-size"
             class="settings-expander__current-size"
         >
             {$boardStore ? $boardStore.boardSize : "?"}x{$boardStore
@@ -37,7 +37,7 @@
                 : "?"}
         </span>
         <button
-            data-testid="settings-expander-size-increase-btn"
+            data-testid="increase-board-size-btn"
             class="settings-expander__square-btn"
             on:click={() => changeBoardSize(1)}
         >
