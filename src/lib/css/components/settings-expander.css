@@ -1,0 +1,228 @@
+.settings-expander {
+    --button-height: 36px;
+    --summary-height: 64px;
+    --button-padding: 4px 8px;
+    --button-border-width: 1.5px;
+    --button-border-radius: 8px;
+    --button-font-size: 1em;
+    background: var(--bg-secondary);
+    border-radius: var(--unified-border-radius);
+    border: var(--unified-border);
+    box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
+    transition:
+        background 0.25s,
+        box-shadow 0.25s;
+    backdrop-filter: var(--unified-backdrop-filter);
+}
+
+.settings-expander:hover {
+    box-shadow: var(--unified-shadow-hover);
+}
+
+.settings-expander.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.settings-expander__summary {
+    position: relative;
+    padding: 0 20px;
+    font-weight: 700;
+    font-size: 1.18em;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: none;
+    border-radius: var(--unified-border-radius);
+    cursor: pointer;
+    user-select: none;
+    transition:
+        background 0.2s,
+        margin-bottom 0.4s ease-out;
+    display: flex;
+    align-items: center;
+    height: var(--summary-height);
+    min-height: var(--summary-height);
+    box-sizing: border-box;
+    outline: none;
+}
+
+.settings-expander__summary.disabled {
+    cursor: not-allowed;
+}
+
+.settings-expander__summary:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.settings-expander.open>.settings-expander__summary {
+    border-radius: var(--unified-border-radius) var(--unified-border-radius) 0 0;
+}
+
+.settings-expander__arrow {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-expander.open .settings-expander__arrow {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.settings-expander__content {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition:
+        max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.settings-expander.open>.settings-expander__content {
+    max-height: 1200px;
+    opacity: 1;
+    padding: 0 16px 16px 16px;
+}
+
+.settings-expander__setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.08em;
+    padding: 0;
+    gap: 12px;
+}
+
+.settings-expander__label {
+    font-weight: 700;
+    font-size: 1em;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.settings-expander__button-group {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.settings-expander__button-group--three {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.settings-expander__size-adjuster {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.settings-expander__square-btn {
+    background: var(--control-bg);
+    color: var(--text-primary);
+    border: var(--button-border-width) solid #888;
+    border-radius: var(--button-border-radius);
+    width: var(--button-height);
+    min-width: var(--button-height);
+    height: var(--button-height);
+    min-height: var(--button-height);
+    box-sizing: border-box;
+    font-size: calc(var(--button-height) * 0.5);
+    font-weight: bold;
+    cursor: pointer;
+    transition:
+        background 0.18s,
+        color 0.18s,
+        border 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.settings-expander__square-btn:hover,
+.settings-expander__square-btn.active {
+    background: var(--control-selected);
+    color: var(--control-selected-text);
+    border-color: var(--control-selected);
+    outline: none;
+}
+
+.settings-expander__current-size {
+    font-weight: 500;
+}
+
+.settings-expander__options-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 0 12px;
+    gap: 12px;
+}
+
+.settings-expander__row-btn {
+    background: var(--control-bg);
+    color: var(--text-primary);
+    border: var(--button-border-width) solid #888;
+    border-radius: var(--button-border-radius);
+    padding: 0 calc(var(--button-height) * 0.3);
+    height: var(--button-height);
+    min-height: var(--button-height);
+
+    box-sizing: border-box;
+    font-size: calc(var(--button-height) * 0.4);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background 0.18s,
+        color 0.18s,
+        border 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.settings-expander__row-btn:hover,
+.settings-expander__row-btn:focus {
+    border-color: var(--control-selected);
+    color: var(--text-primary);
+    outline: none;
+}
+
+.settings-expander__row-btn.active {
+    background: var(--control-selected);
+    color: var(--control-selected-text);
+    border-color: var(--control-selected);
+    transform: scale(1.07);
+    z-index: 1;
+}
+
+.settings-expander__divider {
+    border: none;
+    border-top: 1.5px solid var(--border-color, #444);
+    margin: 0;
+    width: 100%;
+}
+
+.settings-expander__section-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.locked-setting {
+    opacity: 0.2;
+    cursor: help;
+}
