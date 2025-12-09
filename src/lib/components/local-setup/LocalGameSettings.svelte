@@ -9,6 +9,29 @@
   // що відповідає принципу SSoT.
   $: settings = $gameSettingsStore;
 
+  // Helper: перевіряє, чи відповідає поточний gameMode legacy пресету
+  // Враховує нові structured presets (local-observer, local-experienced, local-pro)
+  /**
+   * @param {string} legacyPreset
+   * @returns {boolean}
+   */
+  function isPresetActive(legacyPreset) {
+    const currentMode = settings.gameMode;
+    if (!currentMode) return false;
+
+    // Пряме порівняння (legacy presets)
+    if (currentMode === legacyPreset) return true;
+
+    // Порівняння з новими structured presets для local режиму
+    if (legacyPreset === "observer" && currentMode === "local-observer")
+      return true;
+    if (legacyPreset === "experienced" && currentMode === "local-experienced")
+      return true;
+    if (legacyPreset === "pro" && currentMode === "local-pro") return true;
+
+    return false;
+  }
+
   /**
    * Оновлює налаштування розміру дошки в store
    * @param {number} increment - Крок зміни (+1 або -1)
@@ -59,22 +82,25 @@
         <div class="mode-options-grid">
           <button
             class="mode-btn"
-            class:active={settings.gameMode === "observer"}
+            class:active={isPresetActive("observer")}
             on:click={() => gameSettingsStore.applyPreset("observer")}
+            data-testid="local-setup-mode-observer"
           >
             {$_("gameModes.observer")}
           </button>
           <button
             class="mode-btn"
-            class:active={settings.gameMode === "experienced"}
+            class:active={isPresetActive("experienced")}
             on:click={() => gameSettingsStore.applyPreset("experienced")}
+            data-testid="local-setup-mode-experienced"
           >
             {$_("gameModes.experienced")}
           </button>
           <button
             class="mode-btn"
-            class:active={settings.gameMode === "pro"}
+            class:active={isPresetActive("pro")}
             on:click={() => gameSettingsStore.applyPreset("pro")}
+            data-testid="local-setup-mode-pro"
           >
             {$_("gameModes.pro")}
           </button>
