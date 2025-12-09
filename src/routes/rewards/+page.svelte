@@ -22,7 +22,7 @@
 
 <div class="rewards-page">
     <div class="header">
-        <FloatingBackButton route="/" />
+        <FloatingBackButton />
         <h1>{$_("rewards.pageTitle")}</h1>
         <div class="spacer"></div>
     </div>

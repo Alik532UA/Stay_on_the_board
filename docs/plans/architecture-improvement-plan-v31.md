@@ -1,6 +1,6 @@
 # План покращення архітектури v31
 
-**Статус:** Виконано Фази 1-4 ✅ (готово до Фази 5: Firebase)  
+**Статус:** Виконано Фази 1-4, 6 ✅ (готово до Фази 5: Firebase)  
 **Дата:** 2025-12-09
 **Оновлено:** 2025-12-09
 
@@ -312,22 +312,22 @@ NOTE: We do NOT update playerToUpdate.score here anymore.
 
 ---
 
-### Фаза 6: Підготовка до системи нагород
+### Фаза 6: Підготовка до системи нагород ✅
 
 > [!NOTE]
 > Детальний план: [rewards-plan.md](file:///c:/Users/ozapolnov/Documents/code/study/Stay_on_the_board/docs/plans/rewards-plan.md)
 
-- [ ] **6.1. Розширення системи подій**
-  - [ ] Додати події `ACHIEVEMENT_UNLOCKED`, `REWARD_EARNED` в `gameEventBus`
-  - [ ] Створити `rewardsEventHandler` для прослуховування
+- [x] **6.1. Розширення системи подій**
+  - [x] Додати події `ACHIEVEMENT_UNLOCKED`, `REWARD_EARNED` в `gameEventBus`
+  - [x] Створити `rewardsEventHandler` для прослуховування
 
-- [ ] **6.2. Розширення `rewardsService`**
-  - [ ] Додати типи нагород та умови отримання
-  - [ ] Реалізувати персистентність (localStorage)
+- [x] **6.2. Розширення `rewardsService`**
+  - [x] Додати типи нагород та умови отримання
+  - [x] Реалізувати персистентність (localStorage)
 
-- [ ] **6.3. UI для нагород**
-  - [ ] Створити сторінку `/rewards`
-  - [ ] Створити компонент `RewardCard.svelte`
+- [x] **6.3. UI для нагород**
+  - [x] Створити сторінку `/rewards`
+  - [x] Створити компонент `RewardCard.svelte`
 
 ---
 

@@ -10,6 +10,7 @@ import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import { Piece, type MoveDirectionType } from '../models/Piece';
+import type { GameMoveResult, SuccessfulMoveResult, ScoreChangesData } from '$lib/types/gameMove';
 import { logService } from '$lib/services/logService';
 import { animationService } from '$lib/services/animationService';
 import { endGameService } from '$lib/services/endGameService';
@@ -32,7 +33,7 @@ export abstract class BaseGameMode implements IGameMode {
   abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
   abstract getPlayersConfiguration(): Player[];
   protected abstract advanceToNextPlayer(): Promise<void>;
-  protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
+  protected abstract applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void>;
   abstract continueAfterNoMoves(): Promise<void>;
 
   /**
@@ -87,7 +88,7 @@ export abstract class BaseGameMode implements IGameMode {
 
     const combinedState = { ...boardState, ...playerState, ...scoreState, ...uiState };
 
-    const moveResult = gameLogicService.performMove(direction, distance, playerState!.currentPlayerIndex, combinedState, settings, this.getModeName(), onEndCallback);
+    const moveResult = gameLogicService.performMove(direction, distance, playerState!.currentPlayerIndex, combinedState, settings, this.getModeName(), onEndCallback) as GameMoveResult;
 
     if (moveResult.success) {
       boardStore.update(s => s ? ({ ...s, ...moveResult.changes.boardState }) : null);
@@ -100,17 +101,18 @@ export abstract class BaseGameMode implements IGameMode {
         gameEventBus.dispatch('new_move_added', newMove);
       }
 
-      await this.applyScoreChanges(moveResult);
+      await this.applyScoreChanges({ bonusPoints: moveResult.bonusPoints, penaltyPoints: moveResult.penaltyPoints });
       await this.onPlayerMoveSuccess(moveResult);
     } else {
-      if (moveResult.changes && moveResult.changes.boardState) {
-        boardStore.update(s => s ? ({ ...s, ...moveResult.changes.boardState }) : null);
+      const failedResult = moveResult as import('$lib/types/gameMove').FailedMoveResult;
+      if (failedResult.changes && failedResult.changes.boardState) {
+        boardStore.update(s => s ? ({ ...s, ...failedResult.changes!.boardState }) : null);
       }
-      await this.onPlayerMoveFailure(moveResult.reason, direction, distance);
+      await this.onPlayerMoveFailure(failedResult.reason, direction, distance);
     }
   }
 
-  protected async onPlayerMoveSuccess(moveResult: any): Promise<void> {
+  protected async onPlayerMoveSuccess(moveResult: SuccessfulMoveResult): Promise<void> {
     const playerState = get(playerStore);
     const currentPlayer = playerState!.players[playerState!.currentPlayerIndex];
 

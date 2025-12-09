@@ -7,6 +7,8 @@ import { uiStateStore } from '$lib/stores/uiStateStore';
 import { timerStore } from '$lib/stores/timerStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 
+import { type MoveDirectionType } from '$lib/models/Piece';
+
 export class TimedGameMode extends TrainingGameMode {
   constructor() {
     super();
@@ -28,7 +30,7 @@ export class TimedGameMode extends TrainingGameMode {
     });
   }
 
-  async handlePlayerMove(direction: any, distance: any): Promise<void> {
+  async handlePlayerMove(direction: MoveDirectionType, distance: number): Promise<void> {
     const state = get(uiStateStore);
     if (state?.isFirstMove) {
       this.startGameTimer();
