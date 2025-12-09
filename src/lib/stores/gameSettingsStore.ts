@@ -44,12 +44,12 @@ const isBrowser = typeof window !== 'undefined';
 export const defaultGameSettings: GameSettingsState = {
   showMoves: true,
   showBoard: true,
-  speechEnabled: false,
+  speechEnabled: true,
   selectedVoiceURI: null,
-  blockModeEnabled: true,
+  blockModeEnabled: false,
   showPiece: true,
   blockOnVisitCount: 0,
-  autoHideBoard: false,
+  autoHideBoard: true,
   boardSize: 4,
   keybindings: {
     'up-left': ['Numpad7', 'KeyQ'], 'up': ['Numpad8', 'KeyW'], 'up-right': ['Numpad9', 'KeyE'],
@@ -67,13 +67,13 @@ export const defaultGameSettings: GameSettingsState = {
     'main-menu': ['Escape'],
   },
   keyConflictResolution: {},
-  gameMode: null,
-  rememberGameMode: false,
+  gameMode: 'experienced',
+  rememberGameMode: true,
   showGameModeModal: true,
   showDifficultyWarningModal: true,
   showGameInfoWidget: 'compact',
   lockSettings: false,
-  speechRate: 1.2,
+  speechRate: 1.4,
   speechOrder: 'dist_dir',
   shortSpeech: true,
   speechFor: { player: false, computer: true },
@@ -87,17 +87,23 @@ function createGameSettingsStore() {
   const { subscribe, set, update } = writable<GameSettingsState>(defaultGameSettings);
 
   const syncGameMode = (state: GameSettingsState): GameSettingsState => {
-    if (state.lockSettings || state.gameMode === 'timed' || state.gameMode === 'local' || state.gameMode === 'observer') {
+    // Блокуємо синхронізацію для: lockSettings, timed, або базового local пресету
+    if (state.lockSettings || state.gameMode === 'timed' || state.gameMode === 'local') {
       return state;
     }
 
     let newMode: GameModePreset | null = null;
+
     if (!state.autoHideBoard) {
-      newMode = 'beginner';
+      // Автоприховування ВИМКНЕНО → режим "Наглядач" (observer)
+      newMode = 'observer';
     } else {
+      // Автоприховування УВІМКНЕНО
       if (state.blockModeEnabled) {
+        // Автоприховування + Блокування → "Потужний" (pro)
         newMode = 'pro';
       } else {
+        // Автоприховування БЕЗ блокування → "Розбійник" (experienced)
         newMode = 'experienced';
       }
     }
