@@ -356,23 +356,23 @@ NOTE: We do NOT update playerToUpdate.score here anymore.
 
 ---
 
-### Фаза 6: Рефакторинг великих файлів (низький пріоритет)
+### Фаза 6: Рефакторинг великих файлів
 
 > [!NOTE]
-> Ці завдання відкладено як технічний борг — розбиття великих компонентів є ризикованим і потребує окремого планування.
+> Детальні плани створено для кожного файлу. Розбиття великих компонентів потребує окремого планування.
 
-- [ ] **6.1. Розбиття `userActionService.ts` (16KB)**
-  - [ ] Виділити UI-related actions в `uiActionService.ts`
-  - [ ] Виділити game actions в окремий модуль
-  - [ ] Зберегти публічний API незмінним
+- [x] **6.1. Очищення `userActionService.ts`** ✅
+  - [x] Скорочено коментарі (304 → 250 рядків, -17%)
+  - [x] Виправлено `any` тип
+  - [x] Додано JSDoc
+  - Детальний план: [userActionService-refactoring-plan.md](file:///c:/Users/ozapolnov/Documents/code/study/Stay_on_the_board/docs/plans/userActionService-refactoring-plan.md)
 
-- [ ] **6.2. Розбиття `Modal.svelte` (29KB)** — *відкладено*
-  - [ ] Аналіз залежностей
-  - [ ] План декомпозиції
+- [x] **6.2. Рефакторинг `Modal.svelte`** ✅
+  - [x] Винесено ~560 рядків CSS в `modal.css` (-56%)
+  - Детальний план: [modal-refactoring-plan.md](file:///c:/Users/ozapolnov/Documents/code/study/Stay_on_the_board/docs/plans/modal-refactoring-plan.md)
 
-- [ ] **6.3. Розбиття `MainMenu.svelte` (22KB)** — *відкладено*
-  - [ ] Аналіз залежностей
-  - [ ] План декомпозиції
+- [ ] **6.3. Рефакторинг `MainMenu.svelte` (22KB)** — *відкладено*
+  - Детальний план: [mainmenu-refactoring-plan.md](file:///c:/Users/ozapolnov/Documents/code/study/Stay_on_the_board/docs/plans/mainmenu-refactoring-plan.md)
 
 ---
 
