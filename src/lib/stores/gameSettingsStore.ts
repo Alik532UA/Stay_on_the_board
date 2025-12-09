@@ -11,95 +11,24 @@ import { uiStateStore } from './uiStateStore.js';
 import { boardStore } from './boardStore.ts';
 import { availableMovesService } from '../services/availableMovesService.ts';
 
-export type KeybindingAction = 'up' | 'down' | 'left' | 'right' | 'up-left' | 'up-right' | 'down-left' | 'down-right' | 'confirm' | 'no-moves' | 'toggle-block-mode' | 'toggle-board' | 'increase-board' | 'decrease-board' | 'toggle-speech' | 'distance-1' | 'distance-2' | 'distance-3' | 'distance-4' | 'distance-5' | 'distance-6' | 'distance-7' | 'distance-8' | 'auto-hide-board' | 'show-help' | 'main-menu';
+// Re-export types for backward compatibility
+export type {
+  KeybindingAction,
+  VirtualPlayerPreset,
+  LocalPreset,
+  OnlinePreset,
+  LegacyPreset,
+  GameModePreset,
+  GameSettingsState
+} from './gameSettingsTypes';
 
-// Phase 2: Structured presets with clear context separation
-export type VirtualPlayerPreset =
-  | 'virtual-player-beginner'
-  | 'virtual-player-experienced'
-  | 'virtual-player-pro'
-  | 'virtual-player-timed';
+// Import types and defaults from extracted files
+import type { GameModePreset, GameSettingsState } from './gameSettingsTypes';
+import { defaultGameSettings, defaultKeybindings } from './gameSettingsDefaults';
+import { presetConfigurations } from './gameSettingsPresets';
 
-export type LocalPreset =
-  | 'local-observer'
-  | 'local-experienced'
-  | 'local-pro';
-
-export type OnlinePreset =
-  | 'online-beginner'
-  | 'online-experienced'
-  | 'online-pro';
-
-// Legacy presets for backward compatibility (will be removed in future)
-export type LegacyPreset = 'beginner' | 'experienced' | 'pro' | 'timed' | 'local' | 'online' | 'observer';
-
-export type GameModePreset = VirtualPlayerPreset | LocalPreset | OnlinePreset | LegacyPreset;
-
-export type GameSettingsState = {
-  showMoves: boolean;
-  showBoard: boolean;
-  speechEnabled: boolean;
-  selectedVoiceURI: string | null;
-  blockModeEnabled: boolean;
-  showPiece: boolean;
-  blockOnVisitCount: number;
-  autoHideBoard: boolean;
-  boardSize: number;
-  keybindings: Record<KeybindingAction, string[]>;
-  keyConflictResolution: Record<string, KeybindingAction>;
-  gameMode: GameModePreset | null;
-  rememberGameMode: boolean;
-  showGameModeModal: boolean;
-  showDifficultyWarningModal: boolean;
-  showGameInfoWidget: 'hidden' | 'shown' | 'compact';
-  lockSettings: boolean;
-  speechRate: number;
-  speechOrder: 'dir_dist' | 'dist_dir';
-  shortSpeech: boolean;
-  speechFor: { player: boolean; computer: boolean };
-  speakModalTitles: boolean;
-};
-
-const isBrowser = typeof window !== 'undefined';
-
-export const defaultGameSettings: GameSettingsState = {
-  showMoves: true,
-  showBoard: true,
-  speechEnabled: true,
-  selectedVoiceURI: null,
-  blockModeEnabled: false,
-  showPiece: true,
-  blockOnVisitCount: 0,
-  autoHideBoard: true,
-  boardSize: 4,
-  keybindings: {
-    'up-left': ['Numpad7', 'KeyQ'], 'up': ['Numpad8', 'KeyW'], 'up-right': ['Numpad9', 'KeyE'],
-    'left': ['Numpad4', 'KeyA'], 'right': ['Numpad6', 'KeyD'],
-    'down-left': ['Numpad1', 'KeyZ'], 'down': ['Numpad2', 'KeyX', 'KeyS'], 'down-right': ['Numpad3', 'KeyC'],
-    'confirm': ['Numpad5', 'Enter', 'Space', 'NumpadEnter', 'KeyS'], 'no-moves': ['NumpadDecimal', 'Backspace'],
-    'distance-1': ['Digit1'], 'distance-2': ['Digit2'], 'distance-3': ['Digit3'],
-    'distance-4': ['Digit4'], 'distance-5': ['Digit5'], 'distance-6': ['Digit6'],
-    'distance-7': ['Digit7'], 'distance-8': ['Digit8'],
-    'toggle-block-mode': ['NumpadMultiply', 'KeyB'], 'toggle-board': ['NumpadDivide', 'KeyH'],
-    'increase-board': ['NumpadAdd', 'Equal'], 'decrease-board': ['NumpadSubtract', 'Minus'],
-    'toggle-speech': ['KeyV'],
-    'auto-hide-board': ['Numpad0'],
-    'show-help': ['KeyI'],
-    'main-menu': ['Escape'],
-  },
-  keyConflictResolution: {},
-  gameMode: 'experienced',
-  rememberGameMode: true,
-  showGameModeModal: true,
-  showDifficultyWarningModal: true,
-  showGameInfoWidget: 'compact',
-  lockSettings: false,
-  speechRate: 1.4,
-  speechOrder: 'dist_dir',
-  shortSpeech: true,
-  speechFor: { player: false, computer: true },
-  speakModalTitles: true,
-};
+// Re-export defaults for backward compatibility
+export { defaultGameSettings } from './gameSettingsDefaults';
 
 function createGameSettingsStore() {
   // The store is now initialized with the default settings.
@@ -244,199 +173,14 @@ function createGameSettingsStore() {
 
     applyPreset: (preset: GameModePreset) => {
       logService.GAME_MODE(`[GameSettingsStore] Applying preset: "${preset}"`);
-      const presets: Record<GameModePreset, Partial<GameSettingsState>> = {
-        // Virtual-Player presets
-        'virtual-player-beginner': {
-          gameMode: 'virtual-player-beginner',
-          blockModeEnabled: false,
-          autoHideBoard: false,
-          speechEnabled: false,
-          rememberGameMode: true,
-          speechRate: 1,
-          shortSpeech: false,
-          speechFor: { player: true, computer: true },
-          showGameInfoWidget: 'shown',
-          showBoard: true,
-          showPiece: true,
-          showMoves: true,
-        },
-        'virtual-player-experienced': {
-          gameMode: 'virtual-player-experienced',
-          blockModeEnabled: false,
-          autoHideBoard: true,
-          speechEnabled: true,
-          rememberGameMode: true,
-          speechRate: 1.4,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-          showGameInfoWidget: 'compact',
-        },
-        'virtual-player-pro': {
-          gameMode: 'virtual-player-pro',
-          blockModeEnabled: true,
-          autoHideBoard: true,
-          speechEnabled: true,
-          rememberGameMode: true,
-          speechRate: 1.6,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-          showGameInfoWidget: 'compact',
-        },
-        'virtual-player-timed': {
-          gameMode: 'virtual-player-timed',
-          autoHideBoard: true,
-          blockModeEnabled: true,
-          speechEnabled: false,
-          showGameInfoWidget: 'compact',
-          speechRate: 1.6,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-        },
 
-        // Local presets
-        'local-observer': {
-          gameMode: 'local-observer',
-          autoHideBoard: false,
-          blockModeEnabled: false,
-          speechEnabled: false,
-          showGameInfoWidget: 'compact',
-          speechRate: 1.6,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-        },
-        'local-experienced': {
-          gameMode: 'local-experienced',
-          autoHideBoard: true,
-          blockModeEnabled: false,
-          speechEnabled: false,
-          showGameInfoWidget: 'compact',
-          speechRate: 1.6,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-        },
-        'local-pro': {
-          gameMode: 'local-pro',
-          autoHideBoard: true,
-          blockModeEnabled: true,
-          speechEnabled: false,
-          showGameInfoWidget: 'compact',
-          speechRate: 1.6,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-        },
+      const presetSettings = presetConfigurations[preset];
 
-        // Online presets (майбутнє)
-        'online-beginner': {
-          gameMode: 'online-beginner',
-          autoHideBoard: false,
-          blockModeEnabled: false,
-          speechEnabled: false,
-          showGameInfoWidget: 'compact',
-          speechRate: 1,
-          shortSpeech: false,
-          speechFor: { player: false, computer: true },
-        },
-        'online-experienced': {
-          gameMode: 'online-experienced',
-          autoHideBoard: true,
-          blockModeEnabled: false,
-          speechEnabled: false,
-          showGameInfoWidget: 'compact',
-          speechRate: 1.4,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-        },
-        'online-pro': {
-          gameMode: 'online-pro',
-          autoHideBoard: true,
-          blockModeEnabled: true,
-          speechEnabled: false,
-          showGameInfoWidget: 'compact',
-          speechRate: 1.6,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-        },
+      if (!presetSettings) {
+        logService.error(`[GameSettingsStore] Unknown preset: "${preset}"`);
+        return;
+      }
 
-        // Legacy presets (backward compatibility)
-        beginner: {
-          gameMode: 'virtual-player-beginner', // Auto-migrate to new preset
-          blockModeEnabled: false,
-          autoHideBoard: false,
-          speechEnabled: false,
-          rememberGameMode: true,
-          speechRate: 1,
-          shortSpeech: false,
-          speechFor: { player: true, computer: true },
-          showGameInfoWidget: 'shown',
-          showBoard: true,
-          showPiece: true,
-          showMoves: true,
-        },
-        experienced: {
-          gameMode: 'experienced', // Context-dependent migration needed
-          blockModeEnabled: false,
-          autoHideBoard: true,
-          speechEnabled: true,
-          rememberGameMode: true,
-          speechRate: 1.4,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-          showGameInfoWidget: 'compact',
-        },
-        pro: {
-          gameMode: 'pro', // Context-dependent migration needed
-          blockModeEnabled: true,
-          autoHideBoard: true,
-          speechEnabled: true,
-          rememberGameMode: true,
-          speechRate: 1.6,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-          showGameInfoWidget: 'compact',
-        },
-        timed: {
-          gameMode: 'virtual-player-timed', // Auto-migrate
-          autoHideBoard: true,
-          blockModeEnabled: true,
-          speechEnabled: false,
-          showGameInfoWidget: 'compact',
-          speechRate: 1.6,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-        },
-        local: {
-          gameMode: 'local-pro', // Default local preset
-          autoHideBoard: true,
-          blockModeEnabled: true,
-          speechEnabled: false,
-          showGameInfoWidget: 'compact',
-          speechRate: 1.6,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-        },
-        online: {
-          gameMode: 'online-pro', // Default online preset
-          autoHideBoard: true,
-          blockModeEnabled: true,
-          speechEnabled: false,
-          showGameInfoWidget: 'compact',
-          speechRate: 1.6,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-        },
-        observer: {
-          gameMode: 'local-observer', // Auto-migrate
-          autoHideBoard: false,
-          blockModeEnabled: false,
-          speechEnabled: false,
-          showGameInfoWidget: 'compact',
-          speechRate: 1.6,
-          shortSpeech: true,
-          speechFor: { player: false, computer: true },
-        }
-      };
-
-      const presetSettings = presets[preset];
       const currentState = get(gameSettingsStore);
 
       if (presetSettings.blockModeEnabled !== undefined && presetSettings.blockModeEnabled !== currentState.blockModeEnabled) {
