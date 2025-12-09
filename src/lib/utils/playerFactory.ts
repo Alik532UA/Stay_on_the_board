@@ -107,3 +107,24 @@ export function createVirtualPlayerPlayers(): Player[] {
         createAIPlayer(2, "Комп'ютер", '#ffffff')
     ];
 }
+/**
+ * Створює гравців для режиму Training (Human vs AI, simplified)
+ * Currently same as VirtualPlayer but may differ in future configuration
+ */
+export function createTrainingPlayers(): Player[] {
+    return [
+        createHumanPlayer(1, 'Гравець', '#000000'),
+        createAIPlayer(2, "Комп'ютер", '#ffffff')
+    ];
+}
+
+/**
+ * Створює гравців для режиму Online
+ */
+export function createOnlinePlayers(): Player[] {
+    return [
+        createHumanPlayer(1, 'You', '#000000'),
+        createHumanPlayer(2, 'Opponent', '#ffffff')
+    ];
+}
+
