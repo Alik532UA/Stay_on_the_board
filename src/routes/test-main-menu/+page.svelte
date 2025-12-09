@@ -1,5 +1,5 @@
 <script lang="ts">
-  import TestMainMenu from '$lib/components/TestMainMenu.svelte';
+  import MainMenu from "$lib/components/MainMenu.svelte";
 </script>
 
-<TestMainMenu />
+<MainMenu />
