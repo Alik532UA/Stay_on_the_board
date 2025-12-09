@@ -13,7 +13,7 @@
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
   import { replayAutoPlayStore } from '$lib/stores/replayAutoPlayStore.js';
-  import { replayStore } from '$lib/stores/replayStore.js'; // Corrected import
+  import { replayStore } from '$lib/stores/replayStore'; // Corrected import
   import { modalStore } from '$lib/stores/modalStore';
   import { _ } from 'svelte-i18n'; // Added import for i18n
 
@@ -144,4 +144,5 @@
     100% { transform: scale(1) rotate(0); opacity: 1; }
   }
 </style> 
+
 

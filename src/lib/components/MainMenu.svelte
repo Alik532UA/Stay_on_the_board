@@ -12,7 +12,7 @@
   import { base } from '$app/paths';
   import { _ , isLoading, locale } from 'svelte-i18n';
   import SvgIcons from './SvgIcons.svelte';
-  import { appVersion } from '$lib/stores/versionStore.js';
+  import { appVersion } from '$lib/stores/versionStore';
   import { currentLanguageFlagSvg } from '$lib/stores/derivedState.ts';
   import { languages } from '$lib/constants';
   import { modalStore } from '$lib/stores/modalStore';
@@ -460,4 +460,5 @@
     margin-top: 24px;
   }
 </style>
+
 

@@ -2,9 +2,9 @@
   import { createEventDispatcher, onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
   import { slide } from 'svelte/transition';
-  import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
+  import { columnStyleMode } from '$lib/stores/columnStyleStore';
   import { _ } from 'svelte-i18n';
-  import { layoutUpdateStore } from '$lib/stores/layoutUpdateStore.js';
+  import { layoutUpdateStore } from '$lib/stores/layoutUpdateStore';
 
   export let columns: { id: string, label: string, items: { id: string, label: string, props?: any }[] }[];
   export let itemContent: (item: any) => any = item => item.label;
@@ -242,3 +242,4 @@
     {$_('ui.dndEditInstruction')}
   </div>
 {/if} 
+

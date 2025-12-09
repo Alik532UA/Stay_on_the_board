@@ -11,7 +11,7 @@
   import SvgIcons from '../SvgIcons.svelte';
   import { get } from 'svelte/store';
   import { onMount, tick } from 'svelte';
-  import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
+  import { columnStyleMode } from '$lib/stores/columnStyleStore';
   import VoiceSettingsModalWrapper from '$lib/components/VoiceSettingsModalWrapper.svelte';
   import { slide } from 'svelte/transition';
   import { layoutStore } from '$lib/stores/layoutStore';
@@ -21,7 +21,7 @@
   import { customTooltip } from '$lib/actions/customTooltip.js';
   import { gameModeService } from '$lib/services/gameModeService';
   import { boardStore } from '$lib/stores/boardStore';
-  import { layoutUpdateStore } from '$lib/stores/layoutUpdateStore.js';
+  import { layoutUpdateStore } from '$lib/stores/layoutUpdateStore';
   import { dev } from '$app/environment';
 
   let expanderRef: HTMLDetailsElement;
@@ -580,6 +580,7 @@
     cursor: help;
   }
 </style>
+
 
 
 
