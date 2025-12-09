@@ -5,7 +5,7 @@ import { modalStore } from '$lib/stores/modalStore.js';
 import { gameStore } from '$lib/stores/gameStore';
 import { modalService } from './modalService';
 import { gameModeService } from './gameModeService';
-import { logService } from './logService.js';
+import { logService } from './logService';
 import type { Direction } from '$lib/utils/gameUtils';
 import { navigationService } from './navigationService';
 import { gameSettingsStore, type GameModePreset } from '$lib/stores/gameSettingsStore.js';

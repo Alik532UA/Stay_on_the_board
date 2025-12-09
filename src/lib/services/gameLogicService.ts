@@ -2,7 +2,7 @@
 import { Piece, type MoveDirectionType } from '../models/Piece';
 import { get } from 'svelte/store';
 import { isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils';
-import { logService } from './logService.js';
+import { logService } from './logService';
 import { calculateMoveScore } from './scoreService';
 import type { Direction } from '$lib/utils/gameUtils';
 import { uiStateStore } from '$lib/stores/uiStateStore';
