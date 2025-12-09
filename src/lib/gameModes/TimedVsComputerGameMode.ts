@@ -2,6 +2,7 @@
 import { TrainingGameMode } from './TrainingGameMode';
 import { timeService } from '$lib/services/timeService';
 import { endGameService } from '$lib/services/endGameService';
+import { TIMED_GAME_DURATION } from '$lib/config/timeConstants';
 
 export class TimedVsComputerGameMode extends TrainingGameMode {
   private gameTimer: NodeJS.Timeout | null = null;
@@ -15,7 +16,7 @@ export class TimedVsComputerGameMode extends TrainingGameMode {
     this.stopGameTimer();
     this.gameTimer = setTimeout(() => {
       endGameService.endGame('modal.gameOverReasonTimeUp');
-    }, 60000); // 1 minute game
+    }, TIMED_GAME_DURATION);
   }
 
   private stopGameTimer() {
