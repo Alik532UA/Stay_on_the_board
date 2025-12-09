@@ -3,7 +3,7 @@
   import "$lib/css/components/game-board.css";
   import "$lib/css/components/controls.css";
   import DraggableColumns from "$lib/components/DraggableColumns.svelte";
-  import { layoutStore, WIDGETS } from "$lib/stores/layoutStore.js";
+  import { layoutStore, WIDGETS } from "$lib/stores/layoutStore";
   import TopRowWidget from "$lib/components/widgets/TopRowWidget.svelte";
   import ScorePanelWidget from "$lib/components/widgets/ScorePanelWidget.svelte";
   import BoardWrapperWidget from "$lib/components/widgets/BoardWrapperWidget.svelte";
@@ -127,3 +127,4 @@
   />
   <DevClearCacheButton />
 {/if}
+

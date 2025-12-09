@@ -21,7 +21,7 @@
 	import { modalState } from '$lib/stores/modalStore';
 	import { logService } from '$lib/services/logService.js';
 	import TestModeWidget from '$lib/components/widgets/TestModeWidget.svelte';
-	import { tooltipStore } from '$lib/stores/tooltipStore.js';
+	import { tooltipStore } from '$lib/stores/tooltipStore';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 	import ModalManager from '$lib/components/ModalManager.svelte';
 	import { testModeStore, toggleTestMode } from '$lib/stores/testModeStore';
@@ -251,4 +251,5 @@
     border-color: #81C784;
   }
 </style>
+
 

@@ -14,7 +14,7 @@
   import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
   import VoiceSettingsModalWrapper from '$lib/components/VoiceSettingsModalWrapper.svelte';
   import { slide } from 'svelte/transition';
-  import { layoutStore } from '$lib/stores/layoutStore.js';
+  import { layoutStore } from '$lib/stores/layoutStore';
   import { logService } from '$lib/services/logService.js';
   import ToggleButton from '../ToggleButton.svelte';
   import { blurOnClick } from '$lib/utils/actions';
@@ -580,5 +580,6 @@
     cursor: help;
   }
 </style>
+
 
 
