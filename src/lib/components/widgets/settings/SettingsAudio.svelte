@@ -26,7 +26,7 @@
         dataTestId="speech-toggle"
     />
     <button
-        data-testid="voice-settings-btn"
+        data-testid="settings-expander-voice-settings-btn"
         class="settings-expander__square-btn"
         use:blurOnClick
         use:customTooltip={$_("gameControls.voiceSettingsTitle")}
