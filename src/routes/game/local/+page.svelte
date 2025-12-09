@@ -22,15 +22,32 @@
   import { logService } from "$lib/services/logService";
   import { _ } from "svelte-i18n";
   import { i18nReady } from "$lib/i18n/init.js";
+
   import { replayStore } from "$lib/stores/replayStore";
+  import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
 
   onMount(() => {
     const boardState = get(boardStore);
     if (!boardState || boardState.moveHistory.length <= 1) {
-      logService.init(
-        '[LocalGamePage] onMount: No active game found, initializing "local" mode.',
-      );
-      gameModeService.initializeGameMode("local");
+      const currentSettings = get(gameSettingsStore);
+      const preservedPresets = ["observer", "beginner", "experienced", "pro"];
+
+      if (
+        currentSettings.gameMode &&
+        preservedPresets.includes(currentSettings.gameMode)
+      ) {
+        logService.init(
+          `[LocalGamePage] onMount: Preserving existing preset "${currentSettings.gameMode}" for local game.`,
+        );
+        // Initialize 'local' mode logic, but DO NOT apply default 'local' settings
+        // This keeps the settings selected in Local Setup (Observer/Robber/etc.)
+        gameModeService.initializeGameMode("local", false);
+      } else {
+        logService.init(
+          '[LocalGamePage] onMount: No specific preset found, initializing default "local" mode.',
+        );
+        gameModeService.initializeGameMode("local");
+      }
     } else {
       logService.init(
         "[LocalGamePage] onMount: Active game found, not re-initializing.",

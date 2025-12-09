@@ -39,7 +39,11 @@ function showGameOverModal(payload: any) {
   }
 
   if (get(gameSettingsStore).speakModalTitles) {
-    const title = get(_)(titleKey, { values: { winners: winners.map((w: any) => w.name).join(', ') } });
+    const speechValues: any = { winners: winners ? winners.map((w: any) => w.name).join(', ') : '' };
+    if (winners && winners.length === 1) {
+      speechValues.winnerName = winners[0].name;
+    }
+    const title = get(_)(titleKey, { values: speechValues });
     const lang = get(locale) || 'uk';
     const voiceURI = get(gameSettingsStore).selectedVoiceURI;
     speakText(title, lang, voiceURI, undefined);

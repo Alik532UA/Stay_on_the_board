@@ -40,8 +40,8 @@ export class OnlineGameMode extends BaseGameMode {
 
   getPlayersConfiguration(): Player[] {
     return [
-      { id: 1, type: 'human', name: 'You', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
-      { id: 2, type: 'human', name: 'Opponent', score: 0, color: '#ffffff', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
+      { id: 1, type: 'human', name: 'You', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [], roundScore: 0 },
+      { id: 2, type: 'human', name: 'Opponent', score: 0, color: '#ffffff', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [], roundScore: 0 }
     ];
   }
 
@@ -55,9 +55,12 @@ export class OnlineGameMode extends BaseGameMode {
 
   protected async advanceToNextPlayer(): Promise<void> {
     logService.GAME_MODE('[OnlineGameMode] Advancing to next player...');
+    // Implement Fair Scoring flush logic here if/when online state sync is implemented.
+    // For now, logging the intent.
   }
 
   protected async applyScoreChanges(scoreChanges: any): Promise<void> {
     logService.GAME_MODE('[OnlineGameMode] Applying score changes...', scoreChanges);
+    // Implement Fair Scoring logic here if/when online state sync is implemented.
   }
 }

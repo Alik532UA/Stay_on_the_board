@@ -178,6 +178,13 @@ export function determineWinner(playerState: PlayerState, reasonKey: string, los
     }
   }
 
+  // User Requirement 2C: If there is a tie (multiple winners), we declare NO winners.
+  // We only have a winner if there is strictly one player with the highest score.
+  if (winners.length > 1) {
+    winners.length = 0; // Clear the array
+    logService.GAME_MODE('[scoreService] Tie detected. No winners declared (Option 2C).');
+  }
+
   const winningPlayerIndex = winners.length > 0 ? playerState.players.findIndex(p => p.id === winners[0].id) : -1;
   const loser = losingPlayerIndex !== null && losingPlayerIndex >= 0 ? playerState.players[losingPlayerIndex] : null;
 

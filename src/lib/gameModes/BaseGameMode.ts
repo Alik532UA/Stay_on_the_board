@@ -56,14 +56,14 @@ export abstract class BaseGameMode implements IGameMode {
 
     const combinedState = { ...boardState, ...playerState, ...scoreState, ...uiState };
 
-    const moveResult = gameLogicService.performMove(direction, distance, playerState!.currentPlayerIndex, combinedState, settings, onEndCallback);
+    const moveResult = gameLogicService.performMove(direction, distance, playerState!.currentPlayerIndex, combinedState, settings, this.getModeName(), onEndCallback);
 
     if (moveResult.success) {
       boardStore.update(s => s ? ({ ...s, ...moveResult.changes.boardState }) : null);
       playerStore.update(s => s ? ({ ...s, ...moveResult.changes.playerState }) : null);
       scoreStore.update(s => s ? ({ ...s, ...moveResult.changes.scoreState }) : null);
       uiStateStore.update(s => s ? ({ ...s, ...moveResult.changes.uiState }) : null);
-      
+
       const newMove = moveResult.changes.boardState.moveQueue.slice(-1)[0];
       if (newMove) {
         gameEventBus.dispatch('new_move_added', newMove);
@@ -91,14 +91,14 @@ export abstract class BaseGameMode implements IGameMode {
     }
 
     uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null, isFirstMove: false }) : null);
-    
+
     if (moveResult.sideEffects && moveResult.sideEffects.length > 0) {
       logService.GAME_MODE('[BaseGameMode] Executing side effects for move...', moveResult.sideEffects);
       moveResult.sideEffects.forEach((effect: SideEffect) => sideEffectService.execute(effect));
     }
 
     await this.advanceToNextPlayer();
-    
+
     availableMovesService.updateAvailableMoves();
   }
 
@@ -116,12 +116,12 @@ export abstract class BaseGameMode implements IGameMode {
       distance: distance,
       to: finalInvalidPosition
     };
-    
+
     boardStore.update(s => {
       if (!s) return null;
       const updatedMoveHistory = [...s.moveHistory, {
         pos: { row: finalInvalidPosition.row, col: finalInvalidPosition.col },
-        blocked: [] as {row: number, col: number}[],
+        blocked: [] as { row: number, col: number }[],
         visits: { ...s.cellVisitCounts },
         blockModeEnabled: get(gameSettingsStore).blockModeEnabled
       }];
@@ -146,7 +146,7 @@ export abstract class BaseGameMode implements IGameMode {
     animationService.reset();
     gameEventBus.dispatch('CloseModal');
   }
-  
+
   cleanup(): void {
     logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
     timeService.stopGameTimer();
@@ -177,7 +177,7 @@ export abstract class BaseGameMode implements IGameMode {
     if (computerMove) {
       logService.GAME_MODE('triggerComputerMove: Комп\'ютер має хід, виконуємо...');
       const { direction, distance } = computerMove;
-      
+
       // ЧОМУ: Консолідуємо логіку ввімкнення голосового керування.
       // Замість дублювання логіки та передчасного виклику, ми завжди використовуємо
       // onEndCallback, який спрацьовує після завершення анімації ходу комп'ютера.

@@ -10,4 +10,5 @@ export interface Player {
   penaltyPoints: number;
   bonusPoints: number;
   bonusHistory: any[];
+  roundScore?: number;
 }
