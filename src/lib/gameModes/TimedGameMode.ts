@@ -8,11 +8,12 @@ import { timerStore } from '$lib/stores/timerStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 
 import { type MoveDirectionType } from '$lib/models/Piece';
+import { TIMED_GAME_DEFAULT_DURATION } from '$lib/config/timeConstants';
 
 export class TimedGameMode extends TrainingGameMode {
   constructor() {
     super();
-    this.gameDuration = 100;
+    this.gameDuration = TIMED_GAME_DEFAULT_DURATION;
   }
 
   getModeName(): 'training' | 'local' | 'timed' | 'online' {
