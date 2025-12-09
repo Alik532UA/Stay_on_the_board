@@ -5,7 +5,7 @@
  * Використовує localStorage для збереження конфігурації.
  */
 
-import { debugLogStore } from '../stores/debugLogStore.js';
+import { debugLogStore } from '../stores/debugLogStore';
 
 const isBrowser = typeof window !== 'undefined';
 const isDev = import.meta.env.DEV;
@@ -203,3 +203,4 @@ if (isBrowser) {
         debugLogStore.add('[INFO] Production logging enabled.');
     };
 }
+

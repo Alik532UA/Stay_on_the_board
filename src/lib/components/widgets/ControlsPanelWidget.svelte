@@ -11,7 +11,7 @@
   import { logService } from '$lib/services/logService.js';
   import { uiStateStore } from '$lib/stores/uiStateStore';
   import { voiceControlStore } from '$lib/stores/voiceControlStore';
-  import { debugLogStore } from '$lib/stores/debugLogStore.js';
+  import { debugLogStore } from '$lib/stores/debugLogStore';
 
   let showDebug = false;
   let clickCount = 0;
@@ -236,4 +236,5 @@ ${generalLogs}`;
   {/if}
 </div>
 {/if}
+
 

@@ -11,7 +11,7 @@ import { navigationService } from './navigationService';
 import { gameSettingsStore, type GameModePreset } from '$lib/stores/gameSettingsStore.js';
 import { endGameService } from './endGameService';
 import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService.js';
-import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
+import { openVoiceSettingsModal } from '$lib/stores/uiStore';
 import { locale } from 'svelte-i18n';
 import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
@@ -299,4 +299,5 @@ export const userActionService = {
     navigateToGame();
   }
 };
+
 

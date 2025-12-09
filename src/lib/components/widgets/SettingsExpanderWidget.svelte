@@ -5,7 +5,7 @@
   import { userActionService } from '$lib/services/userActionService.js';
   import { modalStore } from '$lib/stores/modalStore';
   import { _ } from 'svelte-i18n';
-  import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
+  import { openVoiceSettingsModal } from '$lib/stores/uiStore';
   import { uiStateStore } from '$lib/stores/uiStateStore.js';
   import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
   import SvgIcons from '../SvgIcons.svelte';
@@ -580,4 +580,5 @@
     cursor: help;
   }
 </style>
+
 
