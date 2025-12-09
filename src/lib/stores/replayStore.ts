@@ -4,7 +4,7 @@
  */
 
 import { writable } from 'svelte/store';
-import type { MoveHistoryEntry } from '$lib/stores/boardStore';
+import type { MoveHistoryEntry } from '$lib/models/moveHistory';
 
 export type AutoPlayDirection = 'paused' | 'forward' | 'backward';
 

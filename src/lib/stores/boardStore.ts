@@ -9,6 +9,7 @@ import { logService } from '$lib/services/logService';
 import { writable } from 'svelte/store';
 import { createEmptyBoard } from '$lib/utils/boardUtils';
 import type { MoveHistoryEntry } from '$lib/models/moveHistory';
+import type { MoveDirectionType } from '$lib/models/Piece';
 
 export interface BoardState {
   boardSize: number;
@@ -17,7 +18,7 @@ export interface BoardState {
   playerCol: number | null;
   cellVisitCounts: Record<string, number>;
   moveHistory: MoveHistoryEntry[];
-  moveQueue: Array<{ player: number; direction: string; distance: number; to: { row: number; col: number } }>;
+  moveQueue: Array<{ player: number; direction: MoveDirectionType; distance: number; to: { row: number; col: number } }>;
 }
 
 function createBoardStore() {
