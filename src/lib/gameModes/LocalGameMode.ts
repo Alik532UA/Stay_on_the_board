@@ -87,7 +87,8 @@ export class LocalGameMode extends BaseGameMode {
         score: 0,
         penaltyPoints: 0,
         bonusPoints: 0,
-        bonusHistory: [] as any[]
+        bonusHistory: [] as any[],
+        roundScore: 0
       }));
     }
     // If no players in store (e.g. F5 refresh), generate default players
@@ -104,7 +105,8 @@ export class LocalGameMode extends BaseGameMode {
         isComputer: false,
         penaltyPoints: 0,
         bonusPoints: 0,
-        bonusHistory: [] as any[]
+        bonusHistory: [] as any[],
+        roundScore: 0
       };
     });
   }
@@ -118,10 +120,29 @@ export class LocalGameMode extends BaseGameMode {
     if (!currentPlayerState) return;
     const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
 
+    // Detect Round Completion (Wrap-around)
+    if (nextPlayerIndex === 0) {
+      logService.GAME_MODE(`[${this.constructor.name}] Round completed. Flushing round scores to fixed scores.`);
+      this.flushRoundScores();
+    }
+
     playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
 
     await this.checkComputerTurn();
     this.startTurn();
+  }
+
+  private flushRoundScores(): void {
+    playerStore.update(s => {
+      if (!s) return null;
+      const newPlayers = s.players.map(p => ({
+        ...p,
+        score: p.score + (p.roundScore || 0),
+        roundScore: 0
+      }));
+      logService.score('Flushed round scores. New fixed scores:', newPlayers.map(p => ({ name: p.name, score: p.score })));
+      return { ...s, players: newPlayers };
+    });
   }
 
   protected async applyScoreChanges(scoreChanges: any): Promise<void> {
@@ -134,11 +155,25 @@ export class LocalGameMode extends BaseGameMode {
       const newPlayers = [...s.players];
       const playerToUpdate = { ...newPlayers[s.currentPlayerIndex] };
 
-      playerToUpdate.bonusPoints += bonusPoints;
-      playerToUpdate.penaltyPoints += penaltyPoints;
+      // Local Game Scoring Rule: Score split (Fixed + Round)
+      // We add points to roundScore. Fixed 'score' is updated only at the end of the round.
+      // Note: bonusPoints here already includes distance bonus + jump bonus (from scoreService)
+      // and does NOT include baseScoreChange (filtered out in performMove for local mode).
+      const currentRoundScore = playerToUpdate.roundScore || 0;
+      // Calculate net change for this move
+      const moveScore = bonusPoints - penaltyPoints;
+      playerToUpdate.roundScore = currentRoundScore + moveScore;
 
-      // Local Game Scoring Rule: Score = Bonuses - Penalties
-      playerToUpdate.score = playerToUpdate.bonusPoints - playerToUpdate.penaltyPoints;
+      // NOTE: We do NOT update playerToUpdate.score here anymore.
+      // It serves as the 'Fixed Score' reference.
+
+      logService.score(`[LocalGameMode] applyScoreChanges for ${playerToUpdate.name}:`, {
+        bonusPointsFromMove: bonusPoints,
+        penaltyPointsFromMove: penaltyPoints,
+        moveScore: moveScore,
+        newRoundScore: playerToUpdate.roundScore,
+        fixedScore: playerToUpdate.score
+      });
 
       newPlayers[s.currentPlayerIndex] = playerToUpdate;
       return { ...s, players: newPlayers };
