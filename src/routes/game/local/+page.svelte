@@ -69,16 +69,28 @@
   };
 
   $: columns = $i18nReady
-    ? get(layoutStore).map((col) => ({
+    ? $layoutStore.map((col) => ({
         id: col.id,
         label: col.id,
-        items: col.widgets.map((id) => {
-          const item: { id: string; label: string; props?: any } = {
-            id,
-            label: id,
-          };
-          return item;
-        }),
+        items: col.widgets
+          .filter((id) => {
+            // Local observer mode should not have a timer
+            if (
+              id === WIDGETS.TIMER &&
+              ($gameSettingsStore.gameMode === "local-observer" ||
+                $gameSettingsStore.gameMode === "observer")
+            ) {
+              return false;
+            }
+            return true;
+          })
+          .map((id) => {
+            const item: { id: string; label: string; props?: any } = {
+              id,
+              label: id,
+            };
+            return item;
+          }),
       }))
     : [];
 
