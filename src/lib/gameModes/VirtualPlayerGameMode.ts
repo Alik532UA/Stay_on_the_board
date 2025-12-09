@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { TrainingGameMode } from './TrainingGameMode';
-import type { Player } from '$lib/models/player';
+import type { Player, BonusHistoryItem } from '$lib/models/player';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
@@ -37,8 +37,8 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
 
   getPlayersConfiguration(): Player[] {
     return [
-      { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
-      { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#ffffff', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
+      { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as BonusHistoryItem[] },
+      { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#ffffff', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as BonusHistoryItem[] }
     ];
   }
 

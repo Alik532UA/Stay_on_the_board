@@ -7,6 +7,7 @@ import type { BoardState } from '$lib/stores/boardStore';
 import type { PlayerState } from '$lib/stores/playerStore';
 import type { ScoreState } from '$lib/stores/scoreStore';
 import type { UiState } from '$lib/stores/uiStateStore';
+import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
 
 export function calculateFinalScore(
   boardState: BoardState,
@@ -61,7 +62,7 @@ export function calculateFinalScore(
   };
 }
 
-function _calculateBaseScore(player: Player, settings: any): number {
+function _calculateBaseScore(player: Player, settings: GameSettingsState): number {
   if (player?.type !== 'human') {
     return 0;
   }
@@ -74,7 +75,7 @@ function _calculateBaseScore(player: Player, settings: any): number {
   return 1;
 }
 
-function _calculateMirrorMovePenalty(currentState: any, direction: string, distance: number, settings: any): { penaltyPoints: number; penaltyPointsForMove: number } {
+function _calculateMirrorMovePenalty(currentState: any, direction: string, distance: number, settings: GameSettingsState): { penaltyPoints: number; penaltyPointsForMove: number } {
   let penaltyPoints = 0;
   let penaltyPointsForMove = 0;
   const humanPlayersCount = currentState.players.filter((p: any) => p.type === 'human').length;
@@ -100,7 +101,7 @@ function _calculateDistanceBonus(distance: number): { bonus: number; distanceBon
   return { bonus: 0, distanceBonusChange: 0 };
 }
 
-function _calculateJumpBonus(jumpedCount: number, settings: any): number {
+function _calculateJumpBonus(jumpedCount: number, settings: GameSettingsState): number {
   if (jumpedCount > 0 && settings.blockModeEnabled) {
     return jumpedCount;
   }
@@ -111,9 +112,10 @@ export function calculateMoveScore(
   currentState: any,
   newPosition: { row: number; col: number },
   playerIndex: number,
-  settings: any,
+  settings: GameSettingsState,
   distance: number = 1,
   direction?: string
+
 ): {
   baseScoreChange: number;
   penaltyPoints: number;

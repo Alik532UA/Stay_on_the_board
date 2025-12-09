@@ -6,6 +6,7 @@
   import { customTooltip } from "$lib/actions/customTooltip.js";
   import { playerStore } from "$lib/stores/playerStore";
   import { scoreStore } from "$lib/stores/scoreStore";
+  import type { BonusHistoryItem } from "$lib/models/player";
 
   $: currentPlayer = $playerStore
     ? $playerStore.players[$playerStore.currentPlayerIndex]
@@ -45,10 +46,12 @@
     ) {
       let bonusDetails = `Бонусні бали гравця ${currentPlayer.name}:\n\n`;
 
-      currentPlayer.bonusHistory.forEach((bonus: any, index: number) => {
-        const time = new Date(bonus.timestamp).toLocaleTimeString();
-        bonusDetails += `${index + 1}. +${bonus.points} балів - ${bonus.reason} (${time})\n`;
-      });
+      currentPlayer.bonusHistory.forEach(
+        (bonus: BonusHistoryItem, index: number) => {
+          const time = new Date(bonus.timestamp).toLocaleTimeString();
+          bonusDetails += `${index + 1}. +${bonus.points} балів - ${bonus.reason} (${time})\n`;
+        },
+      );
 
       bonusDetails += `\nЗагальна сума бонусних балів: ${currentPlayer.bonusPoints}`;
 
@@ -332,5 +335,3 @@
     }
   }
 </style>
-
-

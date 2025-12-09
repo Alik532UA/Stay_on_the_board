@@ -11,7 +11,7 @@
     getRandomUnusedColor,
     getRandomUnusedName,
   } from "$lib/utils/playerUtils";
-  import type { Player } from "$lib/models/player";
+  import type { Player, BonusHistoryItem } from "$lib/models/player";
 
   function startGame() {
     logService.action('Click: "Почати гру" (PlayerManager)');
@@ -32,7 +32,7 @@
         type: "human" as const,
         penaltyPoints: 0,
         bonusPoints: 0,
-        bonusHistory: [] as any[],
+        bonusHistory: [] as BonusHistoryItem[],
         roundScore: 0,
       };
       return { ...s, players: [...s.players, newPlayer] };

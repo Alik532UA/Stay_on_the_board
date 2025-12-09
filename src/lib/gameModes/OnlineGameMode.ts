@@ -9,7 +9,7 @@
  */
 import { get } from 'svelte/store';
 import { BaseGameMode } from './BaseGameMode';
-import type { Player } from '$lib/models/player';
+import type { Player, BonusHistoryItem } from '$lib/models/player';
 import { logService } from '$lib/services/logService';
 import { gameService } from '$lib/services/gameService';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
@@ -110,8 +110,8 @@ export class OnlineGameMode extends BaseGameMode {
 
   getPlayersConfiguration(): Player[] {
     return [
-      { id: 1, type: 'human', name: 'You', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [], roundScore: 0 },
-      { id: 2, type: 'human', name: 'Opponent', score: 0, color: '#ffffff', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [], roundScore: 0 }
+      { id: 1, type: 'human', name: 'You', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as BonusHistoryItem[], roundScore: 0 },
+      { id: 2, type: 'human', name: 'Opponent', score: 0, color: '#ffffff', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] as BonusHistoryItem[], roundScore: 0 }
     ];
   }
 
