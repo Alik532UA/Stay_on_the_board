@@ -19,6 +19,7 @@ import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import type { IGameStateSync, GameStateSyncEvent } from '$lib/sync';
 import { localGameStateSync } from '$lib/sync';
+import type { ScoreChangesData } from '$lib/types/gameMove';
 
 export class OnlineGameMode extends BaseGameMode {
   /**
@@ -139,7 +140,7 @@ export class OnlineGameMode extends BaseGameMode {
     this.startTurn();
   }
 
-  protected async applyScoreChanges(scoreChanges: any): Promise<void> {
+  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
     logService.GAME_MODE('[OnlineGameMode] Applying score changes...', scoreChanges);
 
     const { bonusPoints, penaltyPoints } = scoreChanges;

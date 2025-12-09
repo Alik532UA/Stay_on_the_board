@@ -5,16 +5,18 @@ import { modalService } from './modalService';
 import { gameEventBus } from './gameEventBus';
 import { logService } from './logService';
 import type { MoveDirectionType } from '$lib/models/Piece';
+import type { GameOverPayload } from '$lib/stores/gameOverStore';
+import type { ModalState } from '$lib/stores/modalStore';
 
 export type SideEffect =
   | { type: 'navigate'; payload: string }
   | { type: 'speak'; payload: { text: string; lang: string; voiceURI: string | null } }
   | { type: 'speak_move'; payload: { move: { direction: MoveDirectionType; distance: number }; lang: string; voiceURI: string | null, onEndCallback?: () => void } }
-  | { type: 'localStorage_set'; payload: { key: string; value: any } }
-  | { type: 'ui/showGameOverModal'; payload: any }
+  | { type: 'localStorage_set'; payload: { key: string; value: unknown } }
+  | { type: 'ui/showGameOverModal'; payload: GameOverPayload }
   | { type: 'ui/closeModal' }
-  | { type: 'ui/showModal'; payload: any }
-  | { type: 'audio/speak'; payload: any };
+  | { type: 'ui/showModal'; payload: Partial<ModalState> & { dataTestId: string } }
+  | { type: 'audio/speak'; payload: { text: string; lang: string; voiceURI: string | null } };
 
 class SideEffectService {
   public execute(effect: SideEffect): void {

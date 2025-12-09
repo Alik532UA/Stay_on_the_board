@@ -13,6 +13,7 @@ import { gameService } from '$lib/services/gameService';
 import { playerStore } from '$lib/stores/playerStore';
 import { boardStore } from '$lib/stores/boardStore';
 import { resetPlayerScore, createDefaultLocalPlayers } from '$lib/utils/playerFactory';
+import type { ScoreChangesData } from '$lib/types/gameMove';
 import { BASE_TURN_DURATION, DEV_TIME_MULTIPLIER } from '$lib/config/gameConfig';
 import { dev } from '$app/environment';
 
@@ -108,7 +109,7 @@ export class LocalGameMode extends BaseGameMode {
     });
   }
 
-  protected async applyScoreChanges(scoreChanges: any): Promise<void> {
+  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
     const { bonusPoints, penaltyPoints } = scoreChanges;
     const playerState = get(playerStore);
     if (!playerState) return;

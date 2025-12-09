@@ -17,6 +17,7 @@ import { boardStore } from '$lib/stores/boardStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
 import { timerStore } from '$lib/stores/timerStore';
 import { endGameService } from '$lib/services/endGameService';
+import type { ScoreChangesData } from '$lib/types/gameMove';
 
 import { voiceControlService } from '$lib/services/voiceControlService';
 
@@ -70,7 +71,7 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
     }
   }
 
-  protected async applyScoreChanges(scoreChanges: any): Promise<void> {
+  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
     // No specific score changes to apply in training mode
   }
 

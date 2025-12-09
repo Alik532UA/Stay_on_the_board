@@ -14,6 +14,7 @@ import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { boardStore } from '$lib/stores/boardStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
+import type { ScoreChangesData } from '$lib/types/gameMove';
 
 export class TrainingGameMode extends BaseGameMode {
   initialize(options: { newSize?: number } = {}): void {
@@ -54,7 +55,7 @@ export class TrainingGameMode extends BaseGameMode {
     }
   }
 
-  protected async applyScoreChanges(scoreChanges: any): Promise<void> {
+  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
     // No specific score changes to apply in training mode
   }
 
