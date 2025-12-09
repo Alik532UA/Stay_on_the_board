@@ -1,173 +1,81 @@
 // src/lib/services/rewardsService.ts
-/**
- * @file Сервіс для керування системою нагород.
- * @description Слухає події гри через gameEventBus та оновлює rewardsStore.
- * Це SSoT для логіки перевірки та присвоєння нагород.
- */
-
+import type { Achievement } from '$lib/types/rewards';
+import { rewardsStore } from '$lib/stores/rewardsStore';
 import { get } from 'svelte/store';
-import { gameEventBus, type RewardEventPayloads } from './gameEventBus';
-import { rewardsStore, REWARD_DEFINITIONS, type RewardDefinition } from '$lib/stores/rewardsStore';
 import { logService } from './logService';
+import { notificationService } from './notificationService';
 
-/**
- * Статистика поточної сесії для відстеження streaks.
- */
-interface SessionStats {
-  gamesPlayed: number;
-  currentWinStreak: number;
-  totalJumpsThisGame: number;
-}
+// Hardcoded definitions for the initial request
+export const ACHIEVEMENTS: Achievement[] = [
+  {
+    id: 'score_11_any',
+    titleKey: 'rewards.score11Any.title',
+    descriptionKey: 'rewards.score11Any.description',
+    icon: 'trophy_bronze',
+    condition: (context: any) => {
+      return context.score >= 11;
+    }
+  },
+  {
+    id: 'score_11_timed',
+    titleKey: 'rewards.score11Timed.title',
+    descriptionKey: 'rewards.score11Timed.description',
+    icon: 'stopwatch_gold',
+    condition: (context: any) => {
+      return context.score >= 11 && (context.gameMode === 'timed' || context.gameMode?.includes('timed'));
+    }
+  },
+  {
+    id: 'score_5_local',
+    titleKey: 'rewards.score5Local.title',
+    descriptionKey: 'rewards.score5Local.description',
+    icon: 'handshake', // Assuming we have or will add this icon
+    condition: (context: any) => {
+      return context.score >= 5 && (context.gameMode === 'local' || context.gameMode?.includes('local'));
+    }
+  }
+];
 
 class RewardsService {
-  private sessionStats: SessionStats = {
-    gamesPlayed: 0,
-    currentWinStreak: 0,
-    totalJumpsThisGame: 0
-  };
+  constructor() { }
 
-  private unsubscribers: (() => void)[] = [];
-
-  constructor() {
-    this.initializeEventListeners();
+  init() {
+    rewardsStore.init();
   }
 
-  /**
-   * Ініціалізує слухачів подій.
-   */
-  private initializeEventListeners(): void {
-    // Слухаємо завершення ходу
-    this.unsubscribers.push(
-      gameEventBus.subscribe('MOVE_COMPLETED', (payload) => {
-        this.handleMoveCompleted(payload);
-      })
-    );
+  checkAchievements(context: { score: number; gameMode: string }) {
+    const state = get(rewardsStore);
 
-    // Слухаємо завершення гри
-    this.unsubscribers.push(
-      gameEventBus.subscribe('GAME_FINISHED', (payload) => {
-        this.handleGameFinished(payload);
-      })
-    );
+    ACHIEVEMENTS.forEach(achievement => {
+      // If already unlocked, skip
+      if (state.unlockedRewards[achievement.id]) return;
 
-    // Слухаємо досягнення milestone рахунку
-    this.unsubscribers.push(
-      gameEventBus.subscribe('SCORE_MILESTONE_REACHED', (payload) => {
-        this.handleScoreMilestone(payload);
-      })
-    );
-
-    // Слухаємо серії стрибків
-    this.unsubscribers.push(
-      gameEventBus.subscribe('JUMP_STREAK_ACHIEVED', (payload) => {
-        this.handleJumpStreak(payload);
-      })
-    );
-
-    logService.init('[RewardsService] Event listeners initialized');
-  }
-
-  /**
-   * Обробляє подію завершення ходу.
-   */
-  private handleMoveCompleted(payload: RewardEventPayloads['MOVE_COMPLETED']): void {
-    // Оновлюємо лічильник стрибків
-    if (payload.jumpedBlockedCells > 0) {
-      this.sessionStats.totalJumpsThisGame += payload.jumpedBlockedCells;
-
-      // Перевіряємо нагороду за стрибки
-      this.checkReward('jumps_10', this.sessionStats.totalJumpsThisGame);
-    }
-
-    // Перевіряємо нагороди за рахунок
-    this.checkScoreRewards(payload.newScore);
-  }
-
-  /**
-   * Обробляє подію завершення гри.
-   */
-  private handleGameFinished(payload: RewardEventPayloads['GAME_FINISHED']): void {
-    this.sessionStats.gamesPlayed++;
-
-    // Перевіряємо нагороду за кількість ігор
-    this.checkReward('games_10', this.sessionStats.gamesPlayed);
-
-    // Оновлюємо streak перемог
-    if (payload.isWinner) {
-      this.sessionStats.currentWinStreak++;
-      this.checkReward('win_streak_3', this.sessionStats.currentWinStreak);
-    } else {
-      this.sessionStats.currentWinStreak = 0;
-    }
-
-    // Перевіряємо нагороду expert player для training mode
-    if (payload.gameMode === 'training' && payload.finalScore > 532) {
-      rewardsStore.unlockReward('score_532');
-    }
-
-    // Скидаємо статистику гри
-    this.sessionStats.totalJumpsThisGame = 0;
-
-    logService.init('[RewardsService] Game finished', {
-      gamesPlayed: this.sessionStats.gamesPlayed,
-      winStreak: this.sessionStats.currentWinStreak
+      if (achievement.condition(context)) {
+        this.unlockAchievement(achievement);
+      }
     });
   }
 
-  /**
-   * Обробляє подію досягнення milestone.
-   */
-  private handleScoreMilestone(payload: RewardEventPayloads['SCORE_MILESTONE_REACHED']): void {
-    const milestoneRewardId = `score_${payload.milestone}`;
-    rewardsStore.unlockReward(milestoneRewardId);
-  }
+  private unlockAchievement(achievement: Achievement) {
+    rewardsStore.unlock(achievement.id);
 
-  /**
-   * Обробляє подію серії стрибків.
-   */
-  private handleJumpStreak(payload: RewardEventPayloads['JUMP_STREAK_ACHIEVED']): void {
-    this.checkReward('jumps_10', payload.streakCount);
-  }
+    // Trigger generic notification (can be handled by UI component)
+    // We can emit an event or update a store that the UI consumes
+    // For simplicity, let's assume we have a simple event bus or store for notifications
 
-  /**
-   * Перевіряє та оновлює прогрес конкретної нагороди.
-   */
-  private checkReward(rewardId: string, currentValue: number): void {
-    rewardsStore.updateProgress(rewardId, currentValue);
-  }
+    // Use a custom event dispatch or a new notification store.
+    // Let's use a simple custom event on window for now to keep it decoupled, 
+    // or better, a 'notificationStore' if we want a robust Toast system.
+    // I will assume we will create a notificationStore next.
 
-  /**
-   * Перевіряє нагороди за рахунок.
-   */
-  private checkScoreRewards(score: number): void {
-    const scoreMilestones = [100, 250, 532];
+    notificationService.show({
+      type: 'achievement',
+      titleKey: achievement.titleKey,
+      icon: achievement.icon,
+      duration: 4000
+    });
 
-    for (const milestone of scoreMilestones) {
-      if (score >= milestone) {
-        const rewardId = `score_${milestone}`;
-        rewardsStore.updateProgress(rewardId, score);
-      }
-    }
-  }
-
-  /**
-   * Очищає слухачів подій.
-   */
-  cleanup(): void {
-    this.unsubscribers.forEach(unsub => unsub());
-    this.unsubscribers = [];
-    logService.init('[RewardsService] Cleaned up');
-  }
-
-  /**
-   * Скидає статистику сесії.
-   */
-  resetSessionStats(): void {
-    this.sessionStats = {
-      gamesPlayed: 0,
-      currentWinStreak: 0,
-      totalJumpsThisGame: 0
-    };
+    logService.info(`[RewardsService] Achievement unlocked: ${achievement.id}`);
   }
 }
 

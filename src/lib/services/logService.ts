@@ -160,6 +160,7 @@ export const logService = {
     testMode: (message: string, ...data: unknown[]) => log(LOG_GROUPS.TEST_MODE, message, ...data),
     modal: (message: string, ...data: unknown[]) => log(LOG_GROUPS.MODAL, message, ...data),
     error: (message: string, ...data: unknown[]) => log(LOG_GROUPS.ERROR, message, ...data),
+    info: (message: string, ...data: unknown[]) => log(LOG_GROUPS.INIT, message, ...data),
     forceEnableLogging: (): void => {
         if (!isForceEnabled) {
             isForceEnabled = true;
