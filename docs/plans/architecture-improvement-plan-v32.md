@@ -329,21 +329,20 @@ NOTE: We do NOT update playerToUpdate.score here anymore.
 
 ---
 
-### Фаза 4: Типізація voice control та rewards
+### Фаза 4: Типізація voice control та rewards ✅
 
-- [ ] **4.1. Типізувати `voiceControlService.ts`**
-  - [ ] Створити типи для Web Speech API events
-  - [ ] `recognition: SpeechRecognition | null`
-  - [ ] `handleResult(event: SpeechRecognitionEvent)`
-  - [ ] `handleError(event: SpeechRecognitionErrorEvent)`
+- [x] **4.1. Типізувати `voiceControlService.ts`**
+  - [x] Створено `src/lib/types/speech-recognition.d.ts` з типами Web Speech API
+  - [x] `recognition: SpeechRecognition`
+  - [x] `handleResult(event: SpeechRecognitionEvent)`
+  - [x] `handleError(event: SpeechRecognitionErrorEvent)`
 
-- [ ] **4.2. Типізувати rewards**
-  - [ ] Створити єдиний тип `RewardConditionContext` замість `any`
-  - [ ] Оновити `types/rewards.ts`
-  - [ ] Оновити `rewardsService.ts`
+- [x] **4.2. Типізувати rewards**
+  - [x] Створено тип `RewardConditionContext`
+  - [x] Оновлено `types/rewards.ts` та `rewardsService.ts`
 
-- [ ] **4.3. Верифікація**
-  - [ ] Запустити `npm run check`
+- [x] **4.3. Верифікація**
+  - [x] `npm run check` — **0 помилок**
 
 ---
 
