@@ -1,10 +1,12 @@
-refactor(tooltip): Improve tooltip system reliability
+feat(docs, scoring): Document multiplayer scoring and architectural principles
 
-Refactored the tooltip system to fix a regression where tooltips (especially hotkey tooltips) were not appearing. Also fixed a related issue where destroying one component could cancel another's tooltip.
+This commit introduces comprehensive documentation for the game's scoring systems and
+clarifies a core architectural principle.
 
-Key changes:
-
-- Introduced `ownerNode` concept: The `tooltipStore` now tracks which DOM element owns a tooltip.
-- Robust show logic: `scheduleShow` now verifies that the `ownerNode` is still in the DOM before showing the tooltip, preventing 'ghost' tooltips.
-- Targeted cleanup: Added `cancelForOwner` and `hideIfOwner` methods to safely cancel and hide tooltips belonging to a specific element, eliminating side effects.
-- Updated actions: `customTooltip` and `hotkeyTooltip` were updated to use the new architecture, including passing the `ownerNode` and using the safe cleanup methods in `destroy`.
+- Documented the new "Fair Victory" scoring system for Local/Online multiplayer modes,
+  including "Committed Score" and "Current Round Score" concepts in `docs/logic/SCORING_SYSTEM.md`.
+- Clarified that multiplayer scores should use default text colors,
+  removing hardcoded light-blue for `.fixed-score` in `src/lib/components/widgets/ScorePanelWidget.svelte`.
+- Added a section on "Key Architectural Principles" to `docs/architecture/README.md`,
+  emphasizing the "Golden Rule" of separating game logic from UI visualization.
+  This explains that UI animations should not block core game logic.
