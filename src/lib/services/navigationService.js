@@ -1,7 +1,7 @@
 // src/lib/services/navigationService.js
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
-import { logService } from './logService.js';
+import { logService } from './logService';
 import { modalStore } from '$lib/stores/modalStore';
 
 export const navigationService = {

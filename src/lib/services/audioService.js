@@ -1,6 +1,6 @@
 // src/lib/services/audioService.js
 import { base } from '$app/paths';
-import { logService } from './logService.js';
+import { logService } from './logService';
 
 /** @type {HTMLAudioElement|null} */
 let audioInstance = null;

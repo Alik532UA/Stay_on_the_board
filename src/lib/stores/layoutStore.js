@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { logService } from '../services/logService.js';
+import { logService } from '../services/logService';
 
 const isBrowser = typeof window !== 'undefined';
 

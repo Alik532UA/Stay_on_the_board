@@ -6,7 +6,7 @@
  */
 // src/lib/stores/gameSettingsStore.ts
 import { writable, get } from 'svelte/store';
-import { logService } from '../services/logService.js';
+import { logService } from '../services/logService';
 import { uiStateStore } from './uiStateStore.js';
 import { boardStore } from './boardStore.ts';
 import { availableMovesService } from '../services/availableMovesService.ts';
