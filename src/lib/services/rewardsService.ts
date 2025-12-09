@@ -1,5 +1,5 @@
 // src/lib/services/rewardsService.ts
-import type { Achievement } from '$lib/types/rewards';
+import type { Achievement, RewardConditionContext } from '$lib/types/rewards';
 import { rewardsStore } from '$lib/stores/rewardsStore';
 import { get } from 'svelte/store';
 import { logService } from './logService';
@@ -12,7 +12,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     titleKey: 'rewards.score11Any.title',
     descriptionKey: 'rewards.score11Any.description',
     icon: 'trophy_bronze',
-    condition: (context: any) => {
+    condition: (context: RewardConditionContext) => {
       return context.score >= 11;
     }
   },
@@ -21,7 +21,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     titleKey: 'rewards.score11Timed.title',
     descriptionKey: 'rewards.score11Timed.description',
     icon: 'stopwatch_gold',
-    condition: (context: any) => {
+    condition: (context: RewardConditionContext) => {
       return context.score >= 11 && (context.gameMode === 'timed' || context.gameMode?.includes('timed'));
     }
   },
@@ -30,7 +30,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     titleKey: 'rewards.score5Local.title',
     descriptionKey: 'rewards.score5Local.description',
     icon: 'handshake', // Assuming we have or will add this icon
-    condition: (context: any) => {
+    condition: (context: RewardConditionContext) => {
       return context.score >= 5 && (context.gameMode === 'local' || context.gameMode?.includes('local'));
     }
   }
