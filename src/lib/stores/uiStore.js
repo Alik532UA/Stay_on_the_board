@@ -1,4 +1,4 @@
-// src/stores/uiStore.js
+// src/stores/uiStore
 import { writable } from 'svelte/store';
 
 export const uiState = writable({
@@ -17,3 +17,4 @@ export function closeVoiceSettingsModal() {
 export function requestGameModeModal() {
   uiState.update(state => ({ ...state, shouldShowGameModeModalOnLoad: true }));
 }
+

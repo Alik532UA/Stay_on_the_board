@@ -5,7 +5,7 @@
   // Це дозволяє уникнути дублювання коду (DRY).
 
   import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
-  import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore.js';
+  import { uiState, closeVoiceSettingsModal } from '$lib/stores/uiStore';
   import { appSettingsStore } from '$lib/stores/appSettingsStore.js';
   import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
   import { get } from 'svelte/store';
@@ -115,3 +115,4 @@
     padding-bottom: 24px;
   }
 </style>
+
