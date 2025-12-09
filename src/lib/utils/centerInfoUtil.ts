@@ -1,6 +1,7 @@
 import { logService } from '$lib/services/logService';
+import type { MoveDirectionType } from '$lib/models/Piece';
 
-const directionArrows: Record<any, string> = {
+const directionArrows: Record<MoveDirectionType, string> = {
   'up-left': '↖',
   'up': '↑',
   'up-right': '↗',
@@ -11,6 +12,17 @@ const directionArrows: Record<any, string> = {
   'down-right': '↘',
 };
 
+/**
+ * Стан центральної інформаційної кнопки
+ */
+export interface CenterInfoState {
+  class: string;
+  content: string;
+  clickable: boolean;
+  aria: string;
+  backgroundColor?: string;
+}
+
 export function getCenterInfoState({
   selectedDirection,
   selectedDistance,
@@ -20,14 +32,14 @@ export function getCenterInfoState({
   isPauseBetweenMoves = false,
   previousPlayerColor = null
 }: {
-  selectedDirection: any | null;
+  selectedDirection: MoveDirectionType | null;
   selectedDistance: number | null;
-  lastComputerMove?: { direction?: any; distance?: number } | null;
-  lastPlayerMove?: { direction?: any; distance?: number } | null;
+  lastComputerMove?: { direction?: MoveDirectionType; distance?: number } | null;
+  lastPlayerMove?: { direction?: MoveDirectionType; distance?: number } | null;
   isPlayerTurn: boolean;
   isPauseBetweenMoves?: boolean;
   previousPlayerColor?: string | null;
-}): any {
+}): CenterInfoState {
   // НАВІЩО: Додано логування для відладки стану центральної кнопки.
   // Це допоможе швидко діагностувати проблеми з її відображенням у майбутньому.
   logService.ui('[centerInfoUtil] Calculating state', {
@@ -52,7 +64,7 @@ export function getCenterInfoState({
       aria: `Підтвердити хід: ${dir}${selectedDistance}`
     };
   }
-  
+
   // Якщо є тільки напрямок
   if (selectedDirection) {
     let dir = '';
@@ -66,7 +78,7 @@ export function getCenterInfoState({
       aria: `Вибрано напрямок: ${dir}`
     };
   }
-  
+
   // Якщо є тільки відстань
   if (!selectedDirection && selectedDistance) {
     return {
@@ -76,14 +88,14 @@ export function getCenterInfoState({
       aria: `Вибрано відстань: ${selectedDistance}`
     };
   }
-  
+
   // Якщо немає вибраного ходу і є хід комп'ютера
   if (!selectedDirection && !selectedDistance && lastComputerMove) {
     // Якщо зараз пауза між ходами - приховуємо хід комп'ютера
     // if (isPauseBetweenMoves) {
     //   return { class: '', content: '', clickable: false, aria: 'Пауза між ходами' };
     // }
-    
+
     let dir = '';
     let dist = '';
     if (lastComputerMove.direction && directionArrows[lastComputerMove.direction]) {
@@ -100,7 +112,7 @@ export function getCenterInfoState({
       aria: `Хід комп'ютера: ${dir}${dist}`
     };
   }
-  
+
   // Якщо немає вибраного ходу і є останній хід гравця (для локальних ігор)
   if (!selectedDirection && !selectedDistance && !lastComputerMove && lastPlayerMove) {
     let dir = '';
@@ -119,11 +131,11 @@ export function getCenterInfoState({
       backgroundColor: previousPlayerColor || '#43a047' // Використовуємо колір гравця або зелений за замовчуванням
     };
   }
-  
+
   // Якщо немає нічого
   if (!selectedDirection && !selectedDistance && !lastComputerMove && !lastPlayerMove) {
     return { class: '', content: '', clickable: false, aria: 'Порожньо' };
   }
-  
+
   return { class: '', content: '', clickable: false, aria: '' };
 }

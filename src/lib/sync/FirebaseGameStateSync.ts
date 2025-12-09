@@ -1,0 +1,278 @@
+// src/lib/sync/FirebaseGameStateSync.ts
+/**
+ * @file Firebase реалізація синхронізації ігрового стану.
+ * @description Ця реалізація використовує Firebase Firestore для
+ * синхронізації стану гри в реальному часі між гравцями.
+ * Використовується для онлайн-режиму гри.
+ */
+
+import {
+    doc,
+    setDoc,
+    getDoc,
+    onSnapshot,
+    updateDoc,
+    collection,
+    addDoc,
+    serverTimestamp,
+    type Unsubscribe,
+    type DocumentReference,
+    type Firestore
+} from 'firebase/firestore';
+
+import type {
+    IGameStateSync,
+    SyncableGameState,
+    SyncMoveData,
+    GameStateSyncCallback,
+    GameStateSyncEvent
+} from './gameStateSync.interface';
+
+import { getFirestoreDb, isFirebaseConfigured } from '$lib/services/firebaseService';
+import { logService } from '$lib/services/logService';
+
+/**
+ * Структура документа кімнати у Firestore.
+ */
+interface FirebaseRoomDocument {
+    gameState: SyncableGameState;
+    createdAt: ReturnType<typeof serverTimestamp>;
+    updatedAt: ReturnType<typeof serverTimestamp>;
+    hostPlayerId: number;
+    players: Array<{
+        id: number;
+        name: string;
+        joinedAt: number;
+    }>;
+    status: 'waiting' | 'playing' | 'finished';
+}
+
+/**
+ * Firebase реалізація синхронізації стану гри.
+ * Використовує Firestore для real-time синхронізації.
+ */
+export class FirebaseGameStateSync implements IGameStateSync {
+    private _sessionId: string | null = null;
+    private _isConnected: boolean = false;
+    private _subscribers: Set<GameStateSyncCallback> = new Set();
+    private _stateVersion: number = 0;
+    private _unsubscribeSnapshot: Unsubscribe | null = null;
+    private _roomRef: DocumentReference | null = null;
+    private _db: Firestore | null = null;
+
+    get sessionId(): string | null {
+        return this._sessionId;
+    }
+
+    get isConnected(): boolean {
+        return this._isConnected;
+    }
+
+    /**
+     * Ініціалізує з'єднання з Firebase та підписується на оновлення кімнати.
+     * @param sessionId - ID кімнати (roomId). Якщо не вказано, створюється нова кімната.
+     */
+    async initialize(sessionId?: string): Promise<void> {
+        if (!isFirebaseConfigured()) {
+            throw new Error('Firebase не налаштовано. Перевірте .env файл.');
+        }
+
+        try {
+            this._db = getFirestoreDb();
+
+            if (sessionId) {
+                // Приєднання до існуючої кімнати
+                this._sessionId = sessionId;
+                this._roomRef = doc(this._db, 'rooms', sessionId);
+
+                const roomSnapshot = await getDoc(this._roomRef);
+                if (!roomSnapshot.exists()) {
+                    throw new Error(`Кімната "${sessionId}" не знайдена.`);
+                }
+            } else {
+                // Створення нової кімнати
+                const roomsCollection = collection(this._db, 'rooms');
+                const newRoomRef = await addDoc(roomsCollection, {
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                    status: 'waiting',
+                    players: [],
+                    gameState: null
+                });
+
+                this._sessionId = newRoomRef.id;
+                this._roomRef = newRoomRef;
+
+                logService.init(`[FirebaseGameStateSync] Created new room: ${this._sessionId}`);
+            }
+
+            // Підписуємося на real-time оновлення
+            this._subscribeToRoomUpdates();
+            this._isConnected = true;
+
+            logService.init(`[FirebaseGameStateSync] Connected to room: ${this._sessionId}`);
+        } catch (error) {
+            this._isConnected = false;
+            logService.error('[FirebaseGameStateSync] Initialization error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Надсилає стан гри до Firestore.
+     */
+    async pushState(state: SyncableGameState): Promise<void> {
+        if (!this._roomRef || !this._isConnected) {
+            logService.error('[FirebaseGameStateSync] Cannot push state: not connected');
+            return;
+        }
+
+        try {
+            this._stateVersion++;
+
+            const stateToSync: SyncableGameState = {
+                ...state,
+                version: this._stateVersion,
+                updatedAt: Date.now()
+            };
+
+            await updateDoc(this._roomRef, {
+                gameState: stateToSync,
+                updatedAt: serverTimestamp()
+            });
+
+            logService.state(`[FirebaseGameStateSync] State pushed, version: ${this._stateVersion}`);
+        } catch (error) {
+            logService.error('[FirebaseGameStateSync] Push state error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Отримує поточний стан гри з Firestore.
+     */
+    async pullState(): Promise<SyncableGameState | null> {
+        if (!this._roomRef) {
+            return null;
+        }
+
+        try {
+            const snapshot = await getDoc(this._roomRef);
+            if (!snapshot.exists()) {
+                return null;
+            }
+
+            const data = snapshot.data() as FirebaseRoomDocument;
+            return data.gameState || null;
+        } catch (error) {
+            logService.error('[FirebaseGameStateSync] Pull state error:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Надсилає хід до підколекції moves для історії.
+     */
+    async pushMove(moveData: SyncMoveData): Promise<void> {
+        if (!this._roomRef || !this._db) {
+            logService.error('[FirebaseGameStateSync] Cannot push move: not connected');
+            return;
+        }
+
+        try {
+            const movesCollection = collection(this._roomRef, 'moves');
+            await addDoc(movesCollection, {
+                ...moveData,
+                createdAt: serverTimestamp()
+            });
+
+            logService.logicMove('[FirebaseGameStateSync] Move pushed:', moveData);
+        } catch (error) {
+            logService.error('[FirebaseGameStateSync] Push move error:', error);
+        }
+    }
+
+    /**
+     * Підписується на оновлення стану гри.
+     */
+    subscribe(callback: GameStateSyncCallback): () => void {
+        this._subscribers.add(callback);
+        return () => {
+            this._subscribers.delete(callback);
+        };
+    }
+
+    /**
+     * Очищає ресурси та відписується від оновлень.
+     */
+    async cleanup(): Promise<void> {
+        if (this._unsubscribeSnapshot) {
+            this._unsubscribeSnapshot();
+            this._unsubscribeSnapshot = null;
+        }
+
+        this._subscribers.clear();
+        this._isConnected = false;
+        this._sessionId = null;
+        this._roomRef = null;
+        this._db = null;
+
+        logService.init('[FirebaseGameStateSync] Cleaned up');
+    }
+
+    /**
+     * Приватний метод для підписки на real-time оновлення кімнати.
+     */
+    private _subscribeToRoomUpdates(): void {
+        if (!this._roomRef) return;
+
+        this._unsubscribeSnapshot = onSnapshot(
+            this._roomRef,
+            (snapshot) => {
+                if (!snapshot.exists()) {
+                    this._notifySubscribers({ type: 'game_ended', reason: 'room_deleted' });
+                    return;
+                }
+
+                const data = snapshot.data() as FirebaseRoomDocument;
+
+                if (data.gameState) {
+                    // Перевіряємо, чи версія новіша
+                    if (data.gameState.version > this._stateVersion) {
+                        this._stateVersion = data.gameState.version;
+                        this._notifySubscribers({
+                            type: 'state_updated',
+                            state: data.gameState
+                        });
+                    }
+                }
+            },
+            (error) => {
+                logService.error('[FirebaseGameStateSync] Snapshot error:', error);
+                this._isConnected = false;
+                this._notifySubscribers({ type: 'connection_lost' });
+            }
+        );
+    }
+
+    /**
+     * Повідомляє всіх підписників про подію.
+     */
+    private _notifySubscribers(event: GameStateSyncEvent): void {
+        this._subscribers.forEach((callback) => {
+            try {
+                callback(event);
+            } catch (error) {
+                logService.error('[FirebaseGameStateSync] Subscriber error:', error);
+            }
+        });
+    }
+}
+
+/**
+ * Factory функція для створення FirebaseGameStateSync.
+ * Використовувати замість singleton для кращого контролю життєвого циклу.
+ */
+export function createFirebaseGameStateSync(): FirebaseGameStateSync {
+    return new FirebaseGameStateSync();
+}
