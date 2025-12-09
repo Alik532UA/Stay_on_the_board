@@ -50,24 +50,11 @@ export class LocalGameMode extends BaseGameMode {
 
   async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
-    const boardState = get(boardStore);
-    if (!boardState) return;
 
-    boardStore.update(s => {
-      if (!s) return null;
-      return {
-        ...s,
-        cellVisitCounts: {},
-        moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
-        moveQueue: [],
-      };
-    });
-    availableMovesService.updateAvailableMoves();
+    // Використовуємо спільну логіку з базового класу
+    this.resetBoardForContinuation();
+
     await this.advanceToNextPlayer();
-
-    gameOverStore.resetGameOverState();
-    animationService.reset();
-
     await this.checkComputerTurn();
     this.startTurn();
     gameEventBus.dispatch('CloseModal');

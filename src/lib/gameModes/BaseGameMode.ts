@@ -35,6 +35,37 @@ export abstract class BaseGameMode implements IGameMode {
   protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
   abstract continueAfterNoMoves(): Promise<void>;
 
+  /**
+   * Скидає стан дошки для продовження гри після "немає ходів".
+   * Використовується в різних GameModes для уникнення дублювання.
+   * 
+   * ВАЖЛИВО: Цей метод лише скидає стан дошки і оновлює доступні ходи.
+   * Специфічна логіка режиму (перемикання гравців, таймери) залишається в конкретних реалізаціях.
+   */
+  protected resetBoardForContinuation(): void {
+    const boardState = get(boardStore);
+    if (!boardState) return;
+
+    boardStore.update(s => {
+      if (!s) return null;
+      return {
+        ...s,
+        cellVisitCounts: {},
+        moveHistory: [{
+          pos: { row: s.playerRow!, col: s.playerCol! },
+          blocked: [],
+          visits: {},
+          blockModeEnabled: get(gameSettingsStore).blockModeEnabled
+        }],
+        moveQueue: [],
+      };
+    });
+
+    availableMovesService.updateAvailableMoves();
+    gameOverStore.resetGameOverState();
+    animationService.reset();
+  }
+
   protected startTurn(): void {
     if (this.turnDuration > 0) {
       timeService.startTurnTimer(this.turnDuration, () => {

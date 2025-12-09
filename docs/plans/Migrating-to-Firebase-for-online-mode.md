@@ -100,47 +100,123 @@
 
 ---
 
+### Фаза 2.5: Інтеграція з абстракцією синхронізації (НОВЕ)
+
+**Мета:** Використати існуючу абстракцію `IGameStateSync` для реалізації Firebase синхронізації.
+
+> [!IMPORTANT]
+> Цей проект вже має абстракцію синхронізації стану в `src/lib/sync/`.
+> - `IGameStateSync` - інтерфейс для синхронізації
+> - `LocalGameStateSync` - локальна реалізація (поточна поведінка)
+> - `OnlineGameMode` - вже підготовлений до прийому `IGameStateSync` через конструктор
+
+-   [ ] **Створення FirebaseGameStateSync:**
+    -   [ ] Створіть файл `src/lib/sync/FirebaseGameStateSync.ts`
+    -   [ ] Реалізуйте інтерфейс `IGameStateSync`:
+        ```typescript
+        // src/lib/sync/FirebaseGameStateSync.ts
+        import { doc, setDoc, onSnapshot, updateDoc, getDoc } from 'firebase/firestore';
+        import { db } from '$lib/services/firebaseService';
+        import type { IGameStateSync, SyncableGameState, SyncMoveData, GameStateSyncCallback, GameStateSyncEvent } from './gameStateSync.interface';
+
+        export class FirebaseGameStateSync implements IGameStateSync {
+          private _sessionId: string | null = null;
+          private _isConnected: boolean = false;
+          private _subscribers: Set<GameStateSyncCallback> = new Set();
+          private _unsubscribeFirestore: (() => void) | null = null;
+
+          get sessionId(): string | null { return this._sessionId; }
+          get isConnected(): boolean { return this._isConnected; }
+
+          async initialize(sessionId?: string): Promise<void> {
+            this._sessionId = sessionId || this.generateRoomId();
+            // Підписка на зміни в Firestore
+            const gameSessionRef = doc(db, 'game_sessions', this._sessionId);
+            this._unsubscribeFirestore = onSnapshot(gameSessionRef, (docSnap) => {
+              if (docSnap.exists()) {
+                this._notifySubscribers({ type: 'state_updated', state: docSnap.data() as SyncableGameState });
+              }
+            });
+            this._isConnected = true;
+          }
+
+          async pushState(state: SyncableGameState): Promise<void> {
+            if (!this._sessionId) return;
+            const gameSessionRef = doc(db, 'game_sessions', this._sessionId);
+            await setDoc(gameSessionRef, state, { merge: true });
+          }
+
+          async pullState(): Promise<SyncableGameState | null> {
+            if (!this._sessionId) return null;
+            const gameSessionRef = doc(db, 'game_sessions', this._sessionId);
+            const docSnap = await getDoc(gameSessionRef);
+            return docSnap.exists() ? (docSnap.data() as SyncableGameState) : null;
+          }
+
+          async pushMove(moveData: SyncMoveData): Promise<void> {
+            // Можна зберігати історію ходів окремо
+          }
+
+          subscribe(callback: GameStateSyncCallback): () => void {
+            this._subscribers.add(callback);
+            return () => this._subscribers.delete(callback);
+          }
+
+          async cleanup(): Promise<void> {
+            if (this._unsubscribeFirestore) this._unsubscribeFirestore();
+            this._isConnected = false;
+          }
+
+          private generateRoomId(): string {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+          }
+
+          private _notifySubscribers(event: GameStateSyncEvent): void {
+            this._subscribers.forEach(cb => cb(event));
+          }
+        }
+        ```
+
+-   [ ] **Структура даних Firestore:**
+    ```
+    game_sessions/{sessionId}
+    ├── boardState: BoardState      // Стан дошки
+    ├── playerState: PlayerState    // Стан гравців
+    ├── scoreState: ScoreState      // Рахунок
+    ├── version: number             // Версія для конфліктів
+    ├── updatedAt: number           // Timestamp
+    ├── status: 'waiting' | 'playing' | 'finished'
+    ├── hostId: string              // ID хоста
+    └── moves: Move[]               // Історія ходів (опціонально)
+    ```
+
+-   [ ] **Обробка конфліктів:**
+    -   [ ] Використовувати `version` для optimistic locking
+    -   [ ] При конфлікті - повторити операцію з актуальним станом
+
+-   [ ] **Офлайн-режим:**
+    -   [ ] Увімкнути `enablePersistence()` в `firebaseService.ts`
+    -   [ ] Показувати індикатор з'єднання в UI
+
+---
+
 ### Фаза 3: Реалізація логіки онлайн-гри
 
 **Мета:** Створити сервіси для керування ігровими сесіями та таблицею лідерів.
 
--   [ ] **Створення сервісу для онлайн-гри:**
-    -   [ ] Створіть файл `src/lib/services/onlineGameService.ts`.
-    -   [ ] Реалізуйте в ньому наступні методи:
+> [!NOTE]
+> Замість створення окремого `onlineGameService.ts`, використовуйте `FirebaseGameStateSync`
+> який реалізує інтерфейс `IGameStateSync`. Це забезпечує кращу архітектуру.
+
+-   [ ] **Інтеграція FirebaseGameStateSync в OnlineGameMode:**
+    -   [ ] В `OnlineGameMode` передати `FirebaseGameStateSync` через конструктор:
         ```typescript
-        import { doc, setDoc, onSnapshot, updateDoc } from 'firebase/firestore';
-        import { db } from './firebaseService';
-        import { gameState } from '$lib/stores/gameState'; // Приклад
-
-        export const onlineGameService = {
-          /** Створює нову ігрову кімнату в Firestore */
-          createRoom: async (roomId: string) => {
-            const gameSessionRef = doc(db, 'game_sessions', roomId);
-            await setDoc(gameSessionRef, {
-              // Початковий стан гри
-              ...get(gameState),
-              players: [], // Гравці будуть додаватися при підключенні
-              createdAt: new Date(),
-            });
-          },
-
-          /** Підписується на оновлення ігрової сесії */
-          listenForUpdates: (roomId: string, callback: (data: any) => void) => {
-            const gameSessionRef = doc(db, 'game_sessions', roomId);
-            return onSnapshot(gameSessionRef, (doc) => {
-              callback(doc.data());
-            });
-          },
-
-          /** Надсилає хід гравця в Firestore */
-          sendMove: async (roomId: string, moveData: any) => {
-            const gameSessionRef = doc(db, 'game_sessions', roomId);
-            await updateDoc(gameSessionRef, {
-              // Оновлюємо лише ті поля, що змінилися
-              ...moveData
-            });
-          },
-        };
+        import { FirebaseGameStateSync } from '$lib/sync/FirebaseGameStateSync';
+        
+        // При створенні онлайн-гри:
+        const firebaseSync = new FirebaseGameStateSync();
+        const onlineMode = new OnlineGameMode(firebaseSync);
+        await onlineMode.initialize({ roomId: 'ABC123' });
         ```
 
 -   [ ] **Створення сервісу для таблиці лідерів:**
@@ -148,8 +224,7 @@
     -   [ ] Реалізуйте методи для додавання результату та отримання списку лідерів.
 
 -   [ ] **Інтеграція з UI:**
-    -   [ ] Оновіть компоненти `OnlineMenu.svelte`, `JoinRoom.svelte` та `WaitingForPlayer.svelte`, щоб вони викликали методи з `onlineGameService`.
-    -   [ ] У `gameOrchestrator` або в новому `OnlineGameMode` додайте логіку, яка буде викликати `onlineGameService.listenForUpdates` при вході в кімнату та оновлювати локальний `gameState` на основі даних з Firestore.
+    -   [ ] Оновіть компоненти `OnlineMenu.svelte`, `JoinRoom.svelte` та `WaitingForPlayer.svelte`.
     -   [ ] При завершенні онлайн-гри викликайте `leaderboardService.addScore()`.
 
 ---
