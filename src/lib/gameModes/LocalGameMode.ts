@@ -14,7 +14,7 @@ import { playerStore } from '$lib/stores/playerStore';
 import { boardStore } from '$lib/stores/boardStore';
 import { resetPlayerScore, createDefaultLocalPlayers } from '$lib/utils/playerFactory';
 import type { ScoreChangesData } from '$lib/types/gameMove';
-import { BASE_TURN_DURATION, DEV_TIME_MULTIPLIER } from '$lib/config/gameConfig';
+import { BASE_TURN_DURATION, DEV_TIME_MULTIPLIER, COMPUTER_TURN_DELAY } from '$lib/config/timeConstants';
 import { dev } from '$app/environment';
 
 export class LocalGameMode extends BaseGameMode {
@@ -153,7 +153,7 @@ export class LocalGameMode extends BaseGameMode {
     if (currentPlayer.type === 'computer' || currentPlayer.isComputer) {
       // Note: 'computer' check depends on Player model type literal. Assuming 'computer' or 'ai'.
       // Player type is 'human' | 'computer' usually.
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, COMPUTER_TURN_DELAY));
       await this.triggerComputerMove();
     }
   }
