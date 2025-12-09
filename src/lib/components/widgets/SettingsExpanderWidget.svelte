@@ -36,9 +36,6 @@
 
   async function toggleExpander() {
     logService.action('Click: "Розгорнути/Згорнути налаштування" (SettingsExpanderWidget)');
-    if ($gameSettingsStore.lockSettings) {
-      return;
-    }
     isOpen = !isOpen;
     setTimeout(() => layoutUpdateStore.update(n => n + 1), 500);
   }
@@ -114,7 +111,7 @@
   $: speechEnabled = $gameSettingsStore.speechEnabled;
 
   $: activeMode = $gameModeStore.activeMode;
-  $: isCompetitiveMode = ($gameModeStore.activeMode === 'timed' || $gameModeStore.activeMode === 'local' || $gameModeStore.activeMode === 'online') || $uiStateStore.settingsMode === 'competitive';
+  $: isCompetitiveMode = ($gameModeStore.activeMode === 'timed' || ($gameModeStore.activeMode === 'local' && $gameSettingsStore.lockSettings) || $gameModeStore.activeMode === 'online') || $uiStateStore.settingsMode === 'competitive';
 
   function showCompetitiveModeModal() {
     const activeMode = get(gameModeStore).activeMode;
@@ -220,17 +217,16 @@
 </script>
 
 {#if $boardStore}
-<div class="settings-expander {isOpen ? 'open' : ''}" class:disabled={$gameSettingsStore.lockSettings}>
+<div class="settings-expander {isOpen ? 'open' : ''}">
   <div
     data-testid="settings-expander-summary"
     class="settings-expander__summary"
-    class:disabled={$gameSettingsStore.lockSettings}
     role="button"
     aria-label={$_('gameControls.settings')}
     on:click={toggleExpander}
     on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleExpander()}
     bind:this={summaryRef}
-    tabindex={$gameSettingsStore.lockSettings ? -1 : 0}
+    tabindex={0}
   >
     {$_('gameControls.settings')}
     <span class="settings-expander__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
