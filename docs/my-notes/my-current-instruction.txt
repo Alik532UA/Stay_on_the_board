@@ -1,40 +1,5 @@
-@C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\docs\my-notes\my-log.txt
-перевір на проаналізуй оновлений log
-
-в Stay_on_the_board/game/virtual-player поламався режим "Новачок"
-
-в game/virtual-player є наступні режими:
-game-mode-beginner
-game-mode-experienced
-game-mode-pro
-game-mode-timed
-
-в game/local є наступні режими:
-game-mode-observer
-game-mode-experienced
-game-mode-pro
-
-game-mode-beginner та game-mode-observer схожі 
-і думаю що коли ми міняти налаштування для game-mode-observer ми поламати game-mode-beginner (але це тільки припущення)
-
-треба зробити архітектурно грамотну систему, щоб режими з game/virtual-player не ломали режими в game/local
-
-також треба зробити чіткий немінг для режимів на BE 
-наприклад:
-game-mode-virtual-player-beginner
-game-mode-virtual-player-experienced
-game-mode-virtual-player-pro
-game-mode-virtual-player-timed
-
-game-mode-local-observer
-game-mode-local-experienced
-game-mode-local-pro
-
-game-mode-online-beginner
-game-mode-online-experienced
-game-mode-online-pro
-
-думає це може допомогти уникнути проблеми в майбутньому
+всі описи є, але коли перемикаю режими в game/virtual-player або в game/local, то опис не оновлюється в data-testid="game-mode-description"
+p.s. але якщо вже заходжу в гру з перним пресетом, то бачу правильний опис, тому і написав що описи є
 
 ---
 
