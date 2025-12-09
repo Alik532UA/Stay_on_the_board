@@ -14,7 +14,7 @@
   import { onMount } from 'svelte';
   import { replayAutoPlayStore } from '$lib/stores/replayAutoPlayStore.js';
   import { replayStore } from '$lib/stores/replayStore.js'; // Corrected import
-  import { modalStore } from '$lib/stores/modalStore.js';
+  import { modalStore } from '$lib/stores/modalStore';
   import { _ } from 'svelte-i18n'; // Added import for i18n
 
   let { moveHistory, boardSize, autoPlayForward = false } = $props<{ moveHistory: any[]; boardSize: number; autoPlayForward?: boolean }>();
@@ -144,3 +144,4 @@
     100% { transform: scale(1) rotate(0); opacity: 1; }
   }
 </style> 
+

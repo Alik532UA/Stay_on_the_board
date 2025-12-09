@@ -1,6 +1,6 @@
 <script>
   import { _ } from 'svelte-i18n';
-  import { modalStore } from '$lib/stores/modalStore.js';
+  import { modalStore } from '$lib/stores/modalStore';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { onMount, onDestroy } from 'svelte';
@@ -89,3 +89,4 @@
     color: var(--text-accent, #ff9800);
   }
 </style> 
+

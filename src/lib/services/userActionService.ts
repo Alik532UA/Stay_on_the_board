@@ -1,7 +1,7 @@
 // src/lib/services/userActionService.ts
 import { get } from 'svelte/store';
 import { tick } from 'svelte';
-import { modalStore } from '$lib/stores/modalStore.js';
+import { modalStore } from '$lib/stores/modalStore';
 import { gameStore } from '$lib/stores/gameStore';
 import { modalService } from './modalService';
 import { gameModeService } from './gameModeService';
@@ -299,3 +299,4 @@ export const userActionService = {
     navigateToGame();
   }
 };
+

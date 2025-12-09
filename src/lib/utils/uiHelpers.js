@@ -1,6 +1,6 @@
 // file: svelte-app/src/lib/utils/uiHelpers.js
 
-import { modalStore } from '$lib/stores/modalStore.js';
+import { modalStore } from '$lib/stores/modalStore';
 import { logService } from '$lib/services/logService.js';
 import { clearCache } from '$lib/utils/cacheManager.js';
 import { goto } from '$app/navigation';
@@ -59,3 +59,4 @@ export function showClearCacheModal() {
     ],
   });
 }
+

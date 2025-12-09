@@ -236,10 +236,10 @@
 
 ### Фаза 4: Покращення типізації
 
-- [ ] **4.1. Міграція .js → .ts**
-  - [ ] `logService.js` → `logService.ts`
-  - [ ] `modalStore.js` → `modalStore.ts`
-  - [ ] `voiceStore.js` → `voiceStore.ts`
+- [/] **4.1. Міграція .js → .ts**
+  - [x] `logService.js` → `logService.ts`
+  - [x] `modalStore.js` → `modalStore.ts`
+  - [x] `voiceStore.js` → `voiceStore.ts`
   - [ ] Інші `.js` файли в `stores/` та `services/`
 
 - [x] **4.2. Усунення `any` типів**
