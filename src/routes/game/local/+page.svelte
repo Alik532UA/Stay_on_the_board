@@ -3,7 +3,7 @@
   import "$lib/css/components/game-board.css";
   import "$lib/css/components/controls.css";
   import DraggableColumns from "$lib/components/DraggableColumns.svelte";
-  import { layoutStore, WIDGETS } from "$lib/stores/layoutStore";
+  import { layoutStore, WIDGETS, type WidgetId } from "$lib/stores/layoutStore";
   import TopRowWidget from "$lib/components/widgets/TopRowWidget.svelte";
   import ScorePanelWidget from "$lib/components/widgets/ScorePanelWidget.svelte";
   import BoardWrapperWidget from "$lib/components/widgets/BoardWrapperWidget.svelte";
@@ -83,7 +83,7 @@
     : [];
 
   function itemContent(item: { id: string; label: string }) {
-    return widgetMap[item.id] || item.id;
+    return widgetMap[item.id as keyof typeof widgetMap] || item.id;
   }
 
   function handleDrop(
@@ -103,7 +103,7 @@
       return newCols.map((col) => {
         if (col.id === dropTargetCol) {
           const widgets = [...col.widgets];
-          widgets.splice(dropIndex, 0, dragging.id);
+          widgets.splice(dropIndex, 0, dragging.id as WidgetId);
           return { ...col, widgets };
         }
         return col;
@@ -127,4 +127,3 @@
   />
   <DevClearCacheButton />
 {/if}
-

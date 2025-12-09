@@ -127,8 +127,8 @@ export const visualPosition = derived(
     } else if ($animationStore.visualMoveQueue && $animationStore.visualMoveQueue.length > 0) {
       const lastAnimatedMove = $animationStore.visualMoveQueue[$animationStore.visualMoveQueue.length - 1];
       result = {
-        row: lastAnimatedMove.to?.row ?? $boardStore.playerRow,
-        col: lastAnimatedMove.to?.col ?? $boardStore.playerCol
+        row: lastAnimatedMove.row ?? $boardStore.playerRow,
+        col: lastAnimatedMove.col ?? $boardStore.playerCol
       };
       logService.piece(`(visualPosition) animation in progress, returning animated position: [${result.row}, ${result.col}]`);
     } else {
