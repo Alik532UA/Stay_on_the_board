@@ -12,6 +12,7 @@ import { scoreStore } from '$lib/stores/scoreStore';
 import { appSettingsStore, type AppSettingsState } from '$lib/stores/appSettingsStore';
 import type { CombinedGameState } from '$lib/models/gameState';
 import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
+import { rewardsService } from './rewardsService';
 
 export function performMove(
   direction: MoveDirectionType,
@@ -106,6 +107,20 @@ export function performMove(
   }
 
   logService.logicMove('performMove: завершено успішно');
+
+  // Check achievements after move (based on score update prediction)
+  if (changes.playerState && changes.playerState.players) {
+    // Find the player who moved
+    const updatedPlayer = changes.playerState.players[playerIndex];
+    // We pass a context object that matches what achievements expect
+    // Note: gameModeService.getCurrentMode() might be safer to get actual mode string from store if needed
+    // For now, we use the passed `actualGameMode/settings` 
+    rewardsService.checkAchievements({
+      score: updatedPlayer.score,
+      gameMode: settings.gameMode || actualGameMode // Prioritize preset for accurate checks
+    });
+  }
+
   return {
     success: true,
     changes,
