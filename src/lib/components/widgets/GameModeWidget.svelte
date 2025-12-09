@@ -10,6 +10,65 @@
   $: isCompetitiveMode =
     activeMode === "timed" || activeMode === "local" || activeMode === "online";
 
+  // Helper: перевіряє, чи відповідає поточний gameMode legacy пресету
+  // Враховує нові structured presets (virtual-player-*, local-*, online-*)
+  function isPresetActive(legacyPreset: string): boolean {
+    const currentMode = $gameSettingsStore.gameMode;
+    if (!currentMode) return false;
+
+    // Пряме порівняння (legacy presets)
+    if (currentMode === legacyPreset) return true;
+
+    // Порівняння з новими structured presets
+    // observer → local-observer
+    // beginner → virtual-player-beginner
+    // experienced → virtual-player-experienced або local-experienced
+    // pro → virtual-player-pro або local-pro
+    // timed → virtual-player-timed
+    if (legacyPreset === "observer" && currentMode === "local-observer")
+      return true;
+    if (
+      legacyPreset === "beginner" &&
+      currentMode === "virtual-player-beginner"
+    )
+      return true;
+    if (
+      legacyPreset === "experienced" &&
+      (currentMode === "virtual-player-experienced" ||
+        currentMode === "local-experienced")
+    )
+      return true;
+    if (
+      legacyPreset === "pro" &&
+      (currentMode === "virtual-player-pro" || currentMode === "local-pro")
+    )
+      return true;
+    if (legacyPreset === "timed" && currentMode === "virtual-player-timed")
+      return true;
+
+    return false;
+  }
+
+  // Реактивна змінна для ключа опису
+  let descriptionKey: string | null = null;
+
+  // Реактивний блок - обчислює ключ опису при зміні gameMode
+  // Svelte відслідковує $gameSettingsStore.gameMode безпосередньо
+  $: {
+    const currentMode = $gameSettingsStore.gameMode;
+    if (!currentMode) {
+      descriptionKey = null;
+    } else if (
+      currentMode.startsWith("virtual-player-") ||
+      currentMode.startsWith("local-") ||
+      currentMode.startsWith("online-")
+    ) {
+      descriptionKey = `gameModes.description.${currentMode}`;
+    } else {
+      descriptionKey = `gameModes.description.${currentMode}`;
+    }
+  }
+
   async function handlePresetClick(
     preset: "beginner" | "experienced" | "pro" | "timed" | "observer",
   ) {
@@ -72,50 +131,50 @@
   >
     {#if activeMode === "local"}
       <button
-        data-testid="settings-expander-game-mode-observer-btn"
+        data-testid="settings-game-mode-local-observer"
         class="settings-expander__row-btn"
-        class:active={$gameSettingsStore.gameMode === "observer"}
+        class:active={isPresetActive("observer")}
         on:click={() => handlePresetClick("observer")}
         >{$_("gameModes.observer")}</button
       >
       <button
-        data-testid="settings-expander-game-mode-experienced-btn"
+        data-testid="settings-game-mode-local-experienced"
         class="settings-expander__row-btn"
-        class:active={$gameSettingsStore.gameMode === "experienced"}
+        class:active={isPresetActive("experienced")}
         on:click={() => handlePresetClick("experienced")}
         >{$_("gameModes.experienced")}</button
       >
       <button
-        data-testid="settings-expander-game-mode-pro-btn"
+        data-testid="settings-game-mode-local-pro"
         class="settings-expander__row-btn"
-        class:active={$gameSettingsStore.gameMode === "pro"}
+        class:active={isPresetActive("pro")}
         on:click={() => handlePresetClick("pro")}>{$_("gameModes.pro")}</button
       >
     {:else}
       <button
-        data-testid="settings-expander-game-mode-beginner-btn"
+        data-testid="settings-game-mode-virtual-player-beginner"
         class="settings-expander__row-btn"
-        class:active={$gameSettingsStore.gameMode === "beginner"}
+        class:active={isPresetActive("beginner")}
         on:click={() => handlePresetClick("beginner")}
         >{$_("gameModes.beginner")}</button
       >
       <button
-        data-testid="settings-expander-game-mode-experienced-btn"
+        data-testid="settings-game-mode-virtual-player-experienced"
         class="settings-expander__row-btn"
-        class:active={$gameSettingsStore.gameMode === "experienced"}
+        class:active={isPresetActive("experienced")}
         on:click={() => handlePresetClick("experienced")}
         >{$_("gameModes.experienced")}</button
       >
       <button
-        data-testid="settings-expander-game-mode-pro-btn"
+        data-testid="settings-game-mode-virtual-player-pro"
         class="settings-expander__row-btn"
-        class:active={$gameSettingsStore.gameMode === "pro"}
+        class:active={isPresetActive("pro")}
         on:click={() => handlePresetClick("pro")}>{$_("gameModes.pro")}</button
       >
       <button
-        data-testid="settings-expander-game-mode-timed-btn"
+        data-testid="settings-game-mode-virtual-player-timed"
         class="settings-expander__row-btn"
-        class:active={$gameSettingsStore.gameMode === "timed"}
+        class:active={isPresetActive("timed")}
         on:click={() => handlePresetClick("timed")}
         >{$_("gameModes.timed")}</button
       >
@@ -126,16 +185,8 @@
     data-testid="game-mode-description"
     class:settings-expander-closed={!$uiStateStore.isSettingsExpanderOpen}
   >
-    {#if $gameSettingsStore.gameMode === "beginner"}
-      {$_("gameModes.description.beginner")}
-    {:else if $gameSettingsStore.gameMode === "experienced"}
-      {$_("gameModes.description.experienced")}
-    {:else if $gameSettingsStore.gameMode === "pro"}
-      {$_("gameModes.description.pro")}
-    {:else if $gameSettingsStore.gameMode === "timed"}
-      {$_("gameModes.description.timed")}
-    {:else if $gameSettingsStore.gameMode === "observer"}
-      {$_("gameModes.description.observer")}
+    {#if descriptionKey}
+      {$_(descriptionKey)}
     {/if}
   </div>
 </div>
