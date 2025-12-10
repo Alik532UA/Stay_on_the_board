@@ -184,53 +184,56 @@
   }
 </script>
 
-<main class="main-menu" data-testid="main-menu-container">
-  {#if $isLoading}
+<div style="display: flex; flex-direction: column; min-height: 100vh; align-items: center; justify-content: center;">
+  <main class="main-menu" data-testid="main-menu-container">
+    {#if $isLoading}
     <div class="main-menu-loading">{$_("mainMenu.loadingTranslations")}</div>
-  {:else}
+    {:else}
+      <div>
+        {#if showWipNotice}
+          <WipNotice onClose={closeDropdowns} />
+        {/if}
 
-    {#if showWipNotice}
-      <WipNotice onClose={closeDropdowns} />
+        {#if showThemeDropdown}
+          <ThemeDropdown onClose={() => (showThemeDropdown = false)} />
+        {/if}
+
+        <div class="main-menu-title" data-testid="main-menu-title">
+          {$_("mainMenu.title")}
+        </div>
+        <div
+          id="main-menu-buttons"
+          bind:this={mainMenuButtonsNode}
+          tabindex="-1"
+          role="group"
+          aria-label={$_("mainMenu.menu")}
+        >
+          <StyledButton
+            variant="menu"
+            size="large"
+            on:click={handleControls}
+            dataTestId="controls-btn">{$_("mainMenu.controls")}</StyledButton
+          >
+          <StyledButton
+            variant="menu"
+            size="large"
+            on:click={handleRules}
+            dataTestId="rules-btn">{$_("mainMenu.rules")}</StyledButton
+          >
+          <StyledButton
+            variant="primary"
+            size="large"
+            class="play-button ripple"
+            style="padding: 32px;"
+            on:click={handlePlayVirtualPlayer}
+            dataTestId="play-btn"
+            >{$_("mainMenu.virtualPlayer")}</StyledButton
+          >
+        </div>
+      </div>
     {/if}
-
-    {#if showThemeDropdown}
-      <ThemeDropdown onClose={() => (showThemeDropdown = false)} />
-    {/if}
-
-    <div class="main-menu-title" data-testid="main-menu-title">
-      {$_("mainMenu.title")}
-    </div>
-    <div
-      id="main-menu-buttons"
-      bind:this={mainMenuButtonsNode}
-      tabindex="-1"
-      role="group"
-      aria-label={$_("mainMenu.menu")}
-    >
-      <StyledButton
-        variant="menu"
-        size="large"
-        on:click={handleControls}
-        dataTestId="controls-btn">{$_("mainMenu.controls")}</StyledButton
-      >
-      <StyledButton
-        variant="menu"
-        size="large"
-        on:click={handleRules}
-        dataTestId="rules-btn">{$_("mainMenu.rules")}</StyledButton
-      >
-      <StyledButton
-        variant="primary"
-        size="large"
-        class="play-button ripple"
-        style="padding: 32px;"
-        on:click={handlePlayVirtualPlayer}
-        dataTestId="virtual-player-btn"
-        >{$_("mainMenu.virtualPlayer")}</StyledButton
-      >
-    </div>
-  {/if}
-</main>
+  </main>
+</div>
 
 <style>
   /* Усі стилі винесено в src/lib/css/layouts/main-menu.css */

@@ -9,4 +9,8 @@ export interface IMenuItem {
     dataTestId?: string;
 }
 
+export interface IFlexibleMenuProps {
+    dataTestId?: string;
+}
+
 export type MenuPosition = 'top' | 'bottom';

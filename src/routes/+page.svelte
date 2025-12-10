@@ -1,5 +1,5 @@
 <script lang="ts">
-  import MainMenuComponent from "$lib/components/MainMenu.svelte";
+  import MainMenu from "$lib/components/MainMenu.svelte";
   import DevClearCacheButton from "$lib/components/widgets/DevClearCacheButton.svelte";
   import FlexibleMenu from "$lib/components/ui/FlexibleMenu/FlexibleMenu.svelte";
   import type { IMenuItem } from "$lib/components/ui/FlexibleMenu/FlexibleMenu.types";
@@ -107,7 +107,7 @@ $: devMenuItems = [
   ];
 </script>
 
-<MainMenuComponent />
+<MainMenu />
 <DevClearCacheButton />
 
 {#if import.meta.env.DEV}
@@ -115,6 +115,7 @@ $: devMenuItems = [
     items={devMenuItems}
     position="top"
     persistenceKey="main-top-menu"
+    dataTestId="flexible-menu-top-wrapper"
   />
 {/if}
 
@@ -123,4 +124,5 @@ $: devMenuItems = [
   items={menuItems}
   position="bottom"
   persistenceKey="main-bottom-menu"
+  dataTestId="flexible-menu-bottom-wrapper"
 />
