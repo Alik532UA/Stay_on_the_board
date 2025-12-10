@@ -13,7 +13,6 @@
   import ControlsPanelWidget from "$lib/components/widgets/ControlsPanelWidget.svelte";
   import SettingsExpanderWidget from "$lib/components/widgets/SettingsExpanderWidget.svelte";
   import GameInfoWidget from "$lib/components/widgets/GameInfoWidget.svelte";
-  import DevClearCacheButton from "$lib/components/widgets/DevClearCacheButton.svelte";
   import TimerWidget from "$lib/components/widgets/TimerWidget.svelte";
   import GameModeWidget from "$lib/components/widgets/GameModeWidget.svelte";
 
@@ -111,4 +110,3 @@
 </script>
 
 <DraggableColumns {columns} {itemContent} on:drop={handleDrop} />
-<DevClearCacheButton />

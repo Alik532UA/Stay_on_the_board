@@ -16,7 +16,7 @@
 	import Modal from "$lib/components/Modal.svelte";
 	import { navigating } from "$app/stores";
 	import { modalStore } from "$lib/stores/modalStore";
-	import { afterNavigate } from "$app/navigation";
+	import { afterNavigate, goto } from "$app/navigation";
 	import DontShowAgainCheckbox from "$lib/components/DontShowAgainCheckbox.svelte";
 	import { modalState } from "$lib/stores/modalStore";
 	import { logService } from "$lib/services/logService.js";
@@ -31,6 +31,12 @@
 	import { _, locale } from "svelte-i18n";
 	import RewardNotification from "$lib/components/rewards/RewardNotification.svelte";
 	import { rewardsService } from "$lib/services/rewardsService";
+
+	// Imports for Menus
+	import FlexibleMenu from "$lib/components/ui/FlexibleMenu/FlexibleMenu.svelte";
+	import type { IMenuItem } from "$lib/components/ui/FlexibleMenu/FlexibleMenu.types";
+	import GameModeModal from "$lib/components/GameModeModal.svelte";
+	import DevMenu from "$lib/components/main-menu/DevMenu.svelte";
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = "app_version";
@@ -141,6 +147,101 @@
 		logService.ui("[layout] afterNavigate: hiding tooltip");
 		tooltipStore.hide();
 	});
+
+	// --- Menu Logic ---
+
+	function handlePlayVirtualPlayer() {
+		modalStore.showModal({
+			titleKey: "mainMenu.gameModeModal.title",
+			dataTestId: "game-mode-modal",
+			component: GameModeModal,
+			props: { extended: true },
+			buttons: [
+				{
+					textKey: "modal.close",
+					onClick: () => modalStore.closeModal(),
+					dataTestId: "modal-btn-modal.close",
+					hotKey: "ESC",
+				},
+			],
+		});
+	}
+
+	// Bottom Menu Items
+	const menuItems: IMenuItem[] = [
+		{
+			id: "rewards",
+			emoji: "🏆",
+			onClick: () => goto(`${base}/rewards`),
+		},
+		{
+			id: "donate",
+			icon: "donate",
+			dataTestId: "donate-btn",
+			onClick: () => goto(`${base}/supporters`),
+		},
+		{
+			id: "play",
+			icon: "piece",
+			onClick: handlePlayVirtualPlayer,
+			primary: true,
+		},
+		{
+			id: "settings",
+			emoji: "⚙️",
+			onClick: () => goto(`${base}/settings`),
+		},
+		{
+			id: "rules",
+			emoji: "📝",
+			onClick: () => goto(`${base}/rules`),
+		},
+	];
+
+	// Top (Dev) Menu Logic
+	function openDevMenuModal() {
+		modalStore.showModal({
+			titleKey: "Dev Menu Modal",
+			component: DevMenu,
+			dataTestId: "dev-menu-modal",
+			customClass: "dev-menu-modal-window",
+			props: {
+				onClose: () => modalStore.closeModal(),
+				versionNumber: $appVersion,
+			},
+		});
+	}
+
+	// Reactive Dev Menu Items
+	$: devMenuItems = [
+		{
+			id: "main-menu-link",
+			emoji: "🏠",
+			onClick: () => goto(`${base}/`),
+		},
+		{
+			id: "dev-empty-1",
+			emoji: "",
+			onClick: () => {},
+		},
+		{
+			id: "test-mode-btn",
+			emoji: "🛠️",
+			onClick: toggleTestMode,
+			primary: true,
+			isActive: $testModeStore.isEnabled,
+		},
+		{
+			id: "dev-menu-modal",
+			emoji: "☰",
+			onClick: openDevMenuModal,
+		},
+		{
+			id: "dev-clear-cache-btn",
+			emoji: "🧹",
+			onClick: () => clearCache({ keepAppearance: false }),
+		},
+	];
 </script>
 
 {#if showUpdateNotice}
@@ -189,18 +290,22 @@
 	</div>
 {/if}
 
-<!-- 
+<!-- Global Menus -->
 {#if import.meta.env.DEV}
-	<div class="test-mode-toggle">
-		<button
-			on:click={handleTestModeChange}
-			class:active={testModeEnabled}
-			data-testid="test-mode-btn"
-		>
-			Test Mode: {testModeEnabled ? "ON" : "OFF"}
-		</button>
-	</div>
-{/if} -->
+	<FlexibleMenu
+		items={devMenuItems}
+		position="top"
+		persistenceKey="main-top-menu"
+		dataTestId="flexible-menu-top-wrapper"
+	/>
+{/if}
+
+<FlexibleMenu
+	items={menuItems}
+	position="bottom"
+	persistenceKey="main-bottom-menu"
+	dataTestId="flexible-menu-bottom-wrapper"
+/>
 
 <style>
 	.app {

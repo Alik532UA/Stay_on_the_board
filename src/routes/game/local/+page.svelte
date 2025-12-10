@@ -11,7 +11,6 @@
   import SettingsExpanderWidget from "$lib/components/widgets/SettingsExpanderWidget.svelte";
   import GameInfoWidget from "$lib/components/widgets/GameInfoWidget.svelte";
   import PlayerTurnIndicator from "$lib/components/widgets/PlayerTurnIndicator.svelte";
-  import DevClearCacheButton from "$lib/components/widgets/DevClearCacheButton.svelte";
   import TimerWidget from "$lib/components/widgets/TimerWidget.svelte";
   import GameModeWidget from "$lib/components/widgets/GameModeWidget.svelte";
   import { onMount, onDestroy } from "svelte";
@@ -137,5 +136,4 @@
     on:drop={handleDrop}
     class_name="game-layout"
   />
-  <DevClearCacheButton />
 {/if}

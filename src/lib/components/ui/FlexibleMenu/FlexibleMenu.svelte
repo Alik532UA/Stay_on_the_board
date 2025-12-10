@@ -67,7 +67,15 @@
 -->
 
 {#if withSpacer}
-    <div class="menu-spacer" class:is-open={isOpen} aria-hidden="true"></div>
+    <!-- 
+        FIX: Додаємо клас is-open тільки якщо меню знизу. 
+        Для верхнього меню нижній спейсер не повинен розширюватися.
+    -->
+    <div
+        class="menu-spacer"
+        class:is-open={isOpen && position === "bottom"}
+        aria-hidden="true"
+    ></div>
 {/if}
 
 <div
