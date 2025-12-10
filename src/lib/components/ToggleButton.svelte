@@ -18,6 +18,7 @@
 <button
   class="settings-expander__toggle-btn"
   class:active={checked}
+  class:active-disabled={checked && disabled}
   on:click={handleClick}
   {disabled}
   data-testid={dataTestId}
@@ -61,5 +62,13 @@
     color: var(--text-primary);
     border-color: #888;
     box-shadow: none;
+  }
+
+  /* FIX: Стиль для активної, але заблокованої кнопки */
+  .settings-expander__toggle-btn.active-disabled {
+    background: var(--control-selected);
+    color: var(--control-selected-text);
+    border-color: var(--control-selected);
+    opacity: 0.6; /* Трохи прозоріша, щоб показати неактивність, але колір залишається */
   }
 </style>
