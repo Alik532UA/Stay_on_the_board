@@ -18,7 +18,8 @@ export interface Room {
     createdAt: number;
     lastActivity: number;
     isPrivate: boolean;
-    settingsLocked: boolean;
+    settingsLocked: boolean; // Блокування під час гри
+    allowGuestSettings: boolean; // Дозвіл гостям змінювати налаштування в лобі
 
     // Стан гри (може бути null, якщо гра ще не почалася)
     gameState: SyncableGameState | null;

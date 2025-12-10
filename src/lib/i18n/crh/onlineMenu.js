@@ -30,7 +30,8 @@ export default {
     you: "Siz",
     copyLink: "ID Kopiyalamaq",
     linkCopied: "Kopiyalandı!",
-    hostOnlySettings: "Sozlamalarnı tek oda saibi deñiştirip bile"
+    hostOnlySettings: "Sozlamalarnı tek oda saibi deñiştirip bile",
+    allowGuestSettings: "Musafirlere sozlamalarnı deñiştirmege ruhset bermek"
   },
   chat: {
     placeholder: "Bir şey yazıñız...",

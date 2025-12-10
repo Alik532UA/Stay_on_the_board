@@ -66,37 +66,52 @@
     // --- Функції налаштувань (Тільки Хост) ---
 
     function updateBoardSize(increment: number) {
-        if (!room || !amIHost) return;
+        if (!room || !canEditSettings) return;
         const newSize = room.settings.boardSize + increment;
         setBoardSize(newSize);
     }
 
     function setBoardSize(size: number) {
-        if (!room || !amIHost) return;
+        if (!room || !canEditSettings) return;
         if (size >= 3 && size <= 9) {
             roomService.updateRoomSettings(roomId, { boardSize: size });
         }
     }
 
     function updateTurnDuration(increment: number) {
-        if (!room || !amIHost) return;
+        if (!room || !canEditSettings) return;
         const currentDuration = room.settings.turnDuration || 30;
         const newDuration = currentDuration + increment;
         setTurnDuration(newDuration);
     }
 
     function setTurnDuration(duration: number) {
-        if (!room || !amIHost) return;
-        // Обмеження: від 5 до 1000 секунд
+        if (!room || !canEditSettings) return;
         const newDuration = Math.max(5, Math.min(1000, duration));
         roomService.updateRoomSettings(roomId, { turnDuration: newDuration });
     }
 
     function toggleSetting(key: keyof GameSettingsState) {
-        if (!room || !amIHost) return;
+        if (!room || !canEditSettings) return;
         // @ts-ignore
         const newValue = !room.settings[key];
         roomService.updateRoomSettings(roomId, { [key]: newValue });
+    }
+
+    // Тільки хост може змінювати права доступу
+    function toggleGuestAccess() {
+        if (!room || !amIHost) return;
+        roomService.updateRoomSettings(roomId, {
+            allowGuestSettings: !room.allowGuestSettings,
+        });
+    }
+
+    // Функція для перемикання блокування налаштувань під час гри
+    function toggleSettingsLock() {
+        if (!room || !canEditSettings) return;
+        roomService.updateRoomSettings(roomId, {
+            settingsLocked: !room.settings.settingsLocked,
+        });
     }
 
     // --- Action для скраббінгу (перетягування значень) ---
@@ -167,6 +182,7 @@
 
     $: playersList = room ? Object.values(room.players) : [];
     $: amIHost = room && myPlayerId ? room.hostId === myPlayerId : false;
+    $: canEditSettings = amIHost || (room && room.allowGuestSettings);
     $: allReady =
         playersList.length === 2 && playersList.every((p) => p.isReady);
     $: myName = room && myPlayerId ? room.players[myPlayerId]?.name : "Player";
@@ -280,7 +296,7 @@
                 </div>
             </div>
 
-            <!-- Права колонка: Налаштування та Чат -->
+            <!-- Права колонка: Налаштування -->
             <div class="right-column">
                 <div class="settings-section">
                     <h3>{$_("settings.title")}</h3>
@@ -290,25 +306,24 @@
                         <span>{$_("settings.boardSize")}</span>
                         <div class="size-controls">
                             <button
-                                disabled={!amIHost ||
+                                disabled={!canEditSettings ||
                                     room.settings.boardSize <= 3}
                                 on:click={() => updateBoardSize(-1)}
                                 data-testid="board-size-decrease-btn">-</button
                             >
 
-                            <!-- Scrubbable Value -->
                             <span
                                 class="size-value scrubbable-value"
-                                class:disabled={!amIHost}
+                                class:disabled={!canEditSettings}
                                 use:scrubbable={{
                                     value: room.settings.boardSize,
                                     min: 3,
                                     max: 9,
-                                    step: 20, // 20px drag = 1 unit change
+                                    step: 20,
                                     onUpdate: setBoardSize,
-                                    disabled: !amIHost,
+                                    disabled: !canEditSettings,
                                 }}
-                                title={amIHost
+                                title={canEditSettings
                                     ? "Натисніть і потягніть для зміни"
                                     : ""}
                                 data-testid="board-size-value"
@@ -318,7 +333,7 @@
                             </span>
 
                             <button
-                                disabled={!amIHost ||
+                                disabled={!canEditSettings ||
                                     room.settings.boardSize >= 9}
                                 on:click={() => updateBoardSize(1)}
                                 data-testid="board-size-increase-btn">+</button
@@ -331,25 +346,24 @@
                         <span>Час на хід (сек)</span>
                         <div class="size-controls">
                             <button
-                                disabled={!amIHost}
+                                disabled={!canEditSettings}
                                 on:click={() => updateTurnDuration(-5)}
                                 data-testid="turn-duration-decrease-btn"
                                 >-</button
                             >
 
-                            <!-- Scrubbable Value -->
                             <span
                                 class="size-value scrubbable-value"
-                                class:disabled={!amIHost}
+                                class:disabled={!canEditSettings}
                                 use:scrubbable={{
                                     value: room.settings.turnDuration || 30,
                                     min: 5,
                                     max: 1000,
-                                    step: 2, // 2px drag = 1 second change (більш чутливий)
+                                    step: 2,
                                     onUpdate: setTurnDuration,
-                                    disabled: !amIHost,
+                                    disabled: !canEditSettings,
                                 }}
-                                title={amIHost
+                                title={canEditSettings
                                     ? "Натисніть і потягніть для зміни"
                                     : ""}
                                 data-testid="turn-duration-value"
@@ -358,7 +372,7 @@
                             </span>
 
                             <button
-                                disabled={!amIHost}
+                                disabled={!canEditSettings}
                                 on:click={() => updateTurnDuration(5)}
                                 data-testid="turn-duration-increase-btn"
                                 >+</button
@@ -371,7 +385,7 @@
                         <ToggleButton
                             label={$_("gameModes.autoHideBoard")}
                             checked={room.settings.autoHideBoard}
-                            disabled={!amIHost}
+                            disabled={!canEditSettings}
                             on:toggle={() => toggleSetting("autoHideBoard")}
                             dataTestId="auto-hide-board-toggle"
                         />
@@ -382,7 +396,7 @@
                         <ToggleButton
                             label={$_("gameControls.blockMode")}
                             checked={room.settings.blockModeEnabled}
-                            disabled={!amIHost}
+                            disabled={!canEditSettings}
                             on:toggle={() => toggleSetting("blockModeEnabled")}
                             dataTestId="block-mode-toggle"
                         />
@@ -393,13 +407,27 @@
                         <ToggleButton
                             label={$_("localGame.lockSettings")}
                             checked={room.settings.settingsLocked}
-                            disabled={!amIHost}
-                            on:toggle={() => toggleSetting("settingsLocked")}
+                            disabled={!canEditSettings}
+                            on:toggle={toggleSettingsLock}
                             dataTestId="lock-settings-toggle"
                         />
                     </div>
 
-                    {#if !amIHost}
+                    <!-- Дозволити гостям змінювати налаштування -->
+                    {#if amIHost}
+                        <div class="setting-item full-width">
+                            <ToggleButton
+                                label={$_(
+                                    "onlineMenu.lobby.allowGuestSettings",
+                                )}
+                                checked={room.allowGuestSettings}
+                                on:toggle={toggleGuestAccess}
+                                dataTestId="allow-guest-settings-toggle"
+                            />
+                        </div>
+                    {/if}
+
+                    {#if !amIHost && !room.allowGuestSettings}
                         <div
                             class="host-only-hint"
                             data-testid="host-only-hint"
