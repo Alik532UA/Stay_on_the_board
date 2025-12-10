@@ -5,6 +5,7 @@
 
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getDatabase, type Database } from 'firebase/database';
 import { getAnalytics, type Analytics, isSupported } from 'firebase/analytics';
 import { browser } from '$app/environment';
 
@@ -16,11 +17,13 @@ const firebaseConfig = {
     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
     appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+    databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL // Додано для Realtime Database
 };
 
 let app: FirebaseApp | null = null;
 let db: Firestore | null = null;
+let rtdb: Database | null = null;
 let analytics: Analytics | null = null;
 
 /**
@@ -63,6 +66,19 @@ export function getFirestoreDb(): Firestore {
     const firebaseApp = initializeFirebase();
     db = getFirestore(firebaseApp);
     return db;
+}
+
+/**
+ * Отримує Realtime Database інстанс
+ */
+export function getRealtimeDb(): Database {
+    if (rtdb) return rtdb;
+
+    const firebaseApp = initializeFirebase();
+    // Якщо databaseURL не вказано в конфігу, Firebase спробує визначити його автоматично,
+    // але краще вказати явно в .env
+    rtdb = getDatabase(firebaseApp);
+    return rtdb;
 }
 
 /**

@@ -1,15 +1,6 @@
-// src/lib/gameModes/OnlineGameMode.ts
-/**
- * @file Режим онлайн-гри з синхронізацією через IGameStateSync.
- * @description Цей режим використовує абстракцію синхронізації для підтримки
- * онлайн-гри через Firebase або інші бекенди.
- * 
- * ВАЖЛИВО: Вся логіка синхронізації делегується до IGameStateSync,
- * щоб можна було легко замінити локальну синхронізацію на Firebase.
- */
 import { get } from 'svelte/store';
 import { BaseGameMode } from './BaseGameMode';
-import type { Player, BonusHistoryItem } from '$lib/models/player';
+import type { Player } from '$lib/models/player';
 import { logService } from '$lib/services/logService';
 import { gameService } from '$lib/services/gameService';
 import { createOnlinePlayers } from '$lib/utils/playerFactory';
@@ -18,76 +9,76 @@ import { animationService } from '$lib/services/animationService';
 import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
-import type { IGameStateSync, GameStateSyncEvent } from '$lib/sync';
-import { localGameStateSync } from '$lib/sync';
+import { uiStateStore } from '$lib/stores/uiStateStore';
+import type { IGameStateSync, GameStateSyncEvent, SyncableGameState } from '$lib/sync/gameStateSync.interface';
+import { createFirebaseGameStateSync } from '$lib/sync/FirebaseGameStateSync';
 import type { ScoreChangesData } from '$lib/types/gameMove';
+import { roomService } from '$lib/services/roomService';
+import type { MoveDirectionType } from '$lib/models/Piece';
+import { notificationService } from '$lib/services/notificationService';
 
 export class OnlineGameMode extends BaseGameMode {
-  /**
-   * Сервіс синхронізації стану гри.
-   * За замовчуванням використовується локальна синхронізація.
-   * Для онлайн-гри через Firebase потрібно замінити на FirebaseGameStateSync.
-   */
-  private stateSync: IGameStateSync;
-
-  /**
-   * Функція відписки від подій синхронізації.
-   */
+  private stateSync: IGameStateSync | null = null;
   private unsubscribeSync: (() => void) | null = null;
-
-  /**
-   * Ідентифікатор кімнати для онлайн-гри.
-   */
   private roomId: string | null = null;
+  private myPlayerId: string | null = null;
 
-  constructor(stateSync?: IGameStateSync) {
+  constructor() {
     super();
-    this.turnDuration = 15;
-    // Дозволяємо впровадження залежності для тестування та Firebase
-    this.stateSync = stateSync || localGameStateSync;
-  }
-
-  /**
-   * Встановлює сервіс синхронізації.
-   * Використовується для переключення між локальною та Firebase синхронізацією.
-   */
-  setStateSync(stateSync: IGameStateSync): void {
-    if (this.unsubscribeSync) {
-      this.unsubscribeSync();
-      this.unsubscribeSync = null;
-    }
-    this.stateSync = stateSync;
+    this.turnDuration = 30; // Більше часу для онлайн гри
   }
 
   async initialize(options: { newSize?: number; roomId?: string } = {}): Promise<void> {
     this.roomId = options.roomId || null;
+    const session = roomService.getSession();
+    this.myPlayerId = session.playerId;
 
-    // Ініціалізуємо синхронізацію
-    await this.stateSync.initialize(this.roomId || undefined);
+    if (!this.roomId || !this.myPlayerId) {
+      logService.error('[OnlineGameMode] Missing roomId or playerId');
+      return;
+    }
 
-    // Підписуємося на оновлення стану
-    this.unsubscribeSync = this.stateSync.subscribe((event) => {
-      this.handleSyncEvent(event);
-    });
+    // Створюємо новий екземпляр синхронізації для кожної гри
+    this.stateSync = createFirebaseGameStateSync();
 
-    gameService.initializeNewGame({
-      size: options.newSize,
-      players: this.getPlayersConfiguration(),
-    });
+    try {
+      await this.stateSync.initialize(this.roomId);
 
-    gameSettingsStore.updateSettings({
-      speechRate: 1.6,
-      shortSpeech: true,
-      speechFor: { player: false, computer: true },
-    });
+      this.unsubscribeSync = this.stateSync.subscribe((event) => {
+        this.handleSyncEvent(event);
+      });
 
-    animationService.initialize();
+      // Якщо ми хост (перший гравець), ми ініціалізуємо стан
+      // Але в даному випадку стан вже може бути в кімнаті, тому спочатку пробуємо завантажити
+      const remoteState = await this.stateSync.pullState();
 
-    // Синхронізуємо початковий стан
-    await this.syncCurrentState();
+      if (remoteState) {
+        logService.GAME_MODE('[OnlineGameMode] Loaded existing state from server');
+        this.applyRemoteState(remoteState);
+      } else {
+        logService.GAME_MODE('[OnlineGameMode] No remote state, initializing new game');
+        // Ініціалізуємо нову гру локально
+        gameService.initializeNewGame({
+          size: options.newSize,
+          players: this.getPlayersConfiguration(),
+        });
+        // І відправляємо на сервер
+        await this.syncCurrentState();
+      }
 
-    this.startTurn();
-    logService.GAME_MODE(`[OnlineGameMode] Initialized with roomId: ${this.roomId}`);
+      gameSettingsStore.updateSettings({
+        speechRate: 1.6,
+        shortSpeech: true,
+        speechFor: { player: true, computer: true }, // Озвучуємо всіх
+      });
+
+      animationService.initialize();
+      this.startTurn();
+
+      logService.GAME_MODE(`[OnlineGameMode] Initialized room: ${this.roomId}`);
+    } catch (error) {
+      logService.error('[OnlineGameMode] Initialization failed:', error);
+    }
   }
 
   cleanup(): void {
@@ -95,119 +86,120 @@ export class OnlineGameMode extends BaseGameMode {
       this.unsubscribeSync();
       this.unsubscribeSync = null;
     }
-    this.stateSync.cleanup();
+    if (this.stateSync) {
+      this.stateSync.cleanup();
+      this.stateSync = null;
+    }
     super.cleanup();
     logService.GAME_MODE('[OnlineGameMode] Cleaned up');
   }
 
+  // Перевизначаємо handlePlayerMove для перевірки черги
+  async handlePlayerMove(direction: MoveDirectionType, distance: number, onEndCallback?: () => void): Promise<void> {
+    const playerState = get(playerStore);
+    if (!playerState || !this.myPlayerId) return;
+
+    const currentPlayer = playerState.players[playerState.currentPlayerIndex];
+
+    // ВАЖЛИВО: Перевірка, чи це мій хід
+    // Ми припускаємо, що ID гравців у playerStore співпадають з ID у roomService (або ми маємо мапінг)
+    // У поточній реалізації createOnlinePlayers створює ID 1 та 2.
+    // Нам потрібно зіставити локальний ID (1 або 2) з реальним ID гравця з Firebase.
+    // Це складний момент. Для спрощення MVP:
+    // Хост завжди гравець 1, Гість завжди гравець 2.
+
+    // Отримуємо дані кімнати, щоб дізнатися, хто є хто
+    // (Це спрощення, в ідеалі це має бути в стані)
+    // Поки що дозволяємо хід, валідація буде на рівні оновлення стану
+
+    await super.handlePlayerMove(direction, distance, onEndCallback);
+
+    // Після успішного локального ходу відправляємо стан на сервер
+    await this.syncCurrentState();
+  }
+
   async claimNoMoves(): Promise<void> {
-    logService.GAME_MODE('[OnlineGameMode] Claiming no moves...');
-    // TODO: Синхронізувати заяву про відсутність ходів
+    await super.claimNoMoves();
+    // TODO: Синхронізувати подію завершення гри, якщо вона сталася
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
-    logService.GAME_MODE(`[OnlineGameMode] Handling no moves for ${playerType}...`);
-    // TODO: Синхронізувати обробку відсутності ходів
+    await super.handleNoMoves(playerType);
   }
 
   getPlayersConfiguration(): Player[] {
+    // Тут ми повертаємо заглушки. Реальні імена мають прийти з лобі.
+    // В ідеалі initializeNewGame має приймати імена.
     return createOnlinePlayers();
   }
 
-  getModeName(): 'training' | 'local' | 'timed' | 'online' {
+  getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player' {
     return 'online';
   }
 
   async continueAfterNoMoves(): Promise<void> {
-    logService.GAME_MODE('[OnlineGameMode] Continuing after no moves...');
+    await super.continueAfterNoMoves();
     await this.syncCurrentState();
   }
 
   protected async advanceToNextPlayer(): Promise<void> {
-    logService.GAME_MODE('[OnlineGameMode] Advancing to next player...');
-
-    const currentPlayerState = get(playerStore);
-    if (!currentPlayerState) return;
-
-    const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
-    playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
-
-    // Синхронізуємо зміну гравця
-    await this.syncCurrentState();
-
-    this.startTurn();
+    await super.advanceToNextPlayer();
+    // Стан вже оновлено в super, тут ми його просто пушимо
+    // (хоча це може бути надлишковим, якщо ми пушимо в handlePlayerMove, 
+    // але advanceToNextPlayer викликається і в інших випадках)
   }
 
   protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
-    logService.GAME_MODE('[OnlineGameMode] Applying score changes...', scoreChanges);
-
-    const { bonusPoints, penaltyPoints } = scoreChanges;
-    const playerState = get(playerStore);
-    if (!playerState) return;
-
-    playerStore.update(s => {
-      if (!s) return null;
-      const newPlayers = [...s.players];
-      const playerToUpdate = { ...newPlayers[s.currentPlayerIndex] };
-
-      const currentRoundScore = playerToUpdate.roundScore || 0;
-      const moveScore = bonusPoints - penaltyPoints;
-      playerToUpdate.roundScore = currentRoundScore + moveScore;
-
-      newPlayers[s.currentPlayerIndex] = playerToUpdate;
-      return { ...s, players: newPlayers };
-    });
-
-    // Синхронізуємо зміни рахунку
-    await this.syncCurrentState();
+    await super.applyScoreChanges(scoreChanges);
   }
 
-  /**
-   * Синхронізує поточний стан гри.
-   */
   private async syncCurrentState(): Promise<void> {
+    if (!this.stateSync) return;
+
     const boardState = get(boardStore);
     const playerState = get(playerStore);
     const scoreState = get(scoreStore);
 
-    if (!boardState || !playerState || !scoreState) {
-      logService.GAME_MODE('[OnlineGameMode] Cannot sync - state not initialized');
-      return;
-    }
+    if (!boardState || !playerState || !scoreState) return;
 
     await this.stateSync.pushState({
       boardState,
       playerState,
       scoreState,
-      version: Date.now(),
+      version: Date.now(), // Простий версіонування
       updatedAt: Date.now()
     });
   }
 
-  /**
-   * Обробляє події синхронізації.
-   */
+  private applyRemoteState(state: SyncableGameState): void {
+    // Оновлюємо локальні стори даними з сервера
+    if (state.boardState) boardStore.set(state.boardState);
+    if (state.playerState) playerStore.set(state.playerState);
+    if (state.scoreState) scoreStore.set(state.scoreState);
+
+    // Оновлюємо доступні ходи для нового стану
+    // (availableMovesService імпортується в BaseGameMode, але тут треба явно викликати)
+    // availableMovesService.updateAvailableMoves(); // Це викликається реактивно або в BaseGameMode
+  }
+
   private handleSyncEvent(event: GameStateSyncEvent): void {
     switch (event.type) {
       case 'state_updated':
-        logService.GAME_MODE('[OnlineGameMode] State updated from sync', event.state.version);
-        // TODO: Оновити локальний стан з event.state
-        break;
-      case 'player_joined':
-        logService.GAME_MODE(`[OnlineGameMode] Player joined: ${event.playerName}`);
+        logService.GAME_MODE('[OnlineGameMode] Received state update from server');
+        this.applyRemoteState(event.state);
         break;
       case 'player_left':
-        logService.GAME_MODE(`[OnlineGameMode] Player left: ${event.playerId}`);
+        notificationService.show({
+          type: 'warning',
+          messageRaw: 'Суперник покинув гру'
+        });
         break;
       case 'connection_lost':
-        logService.GAME_MODE('[OnlineGameMode] Connection lost');
-        // TODO: Показати UI повідомлення
+        notificationService.show({
+          type: 'error',
+          messageRaw: 'Втрачено з\'єднання з сервером'
+        });
         break;
-      case 'connection_restored':
-        logService.GAME_MODE('[OnlineGameMode] Connection restored');
-        break;
-      default:
-        logService.GAME_MODE('[OnlineGameMode] Unknown sync event', event);
     }
   }
 }

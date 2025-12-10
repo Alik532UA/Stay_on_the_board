@@ -169,6 +169,12 @@
     uiStateStore.update((s) => ({ ...s, intendedGameType: "local" })); // Set intended game type
     navigateTo("/local-setup");
   }
+  function handleOnlineGame() {
+    hotkeyService.popContext();
+    logService.action('Click: "Онлайн гра" (MainMenu)');
+    uiStateStore.update((s) => ({ ...s, intendedGameType: "online" }));
+    navigateTo("/online");
+  }
   function handleControls() {
     logService.action('Click: "Управління" (MainMenu)');
     navigateTo("/controls");
