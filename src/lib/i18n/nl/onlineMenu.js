@@ -30,7 +30,8 @@ export default {
     you: "Jij",
     copyLink: "Kopieer ID",
     linkCopied: "Gekopieerd!",
-    hostOnlySettings: "Alleen de host kan instellingen wijzigen"
+    hostOnlySettings: "Alleen de host kan instellingen wijzigen",
+    allowGuestSettings: "Gasten toestaan instellingen te wijzigen"
   },
   chat: {
     placeholder: "Typ een bericht...",

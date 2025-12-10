@@ -81,6 +81,7 @@ class RoomService {
             lastActivity: Date.now(),
             isPrivate: isPrivate,
             settingsLocked: false,
+            allowGuestSettings: false,
             gameState: null,
             players: {
                 [hostId]: initialPlayer
@@ -234,16 +235,18 @@ class RoomService {
         });
     }
 
-    async updateRoomSettings(roomId: string, settings: Partial<GameSettingsState>): Promise<void> {
+    async updateRoomSettings(roomId: string, settings: Partial<GameSettingsState> & { allowGuestSettings?: boolean }): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
         const updates: Record<string, any> = { lastActivity: Date.now() };
 
         for (const [key, value] of Object.entries(settings)) {
-            // Оновлюємо вкладені поля settings.key
-            updates[`settings.${key}`] = value;
+            if (key === 'allowGuestSettings') {
+                updates['allowGuestSettings'] = value;
+            } else {
+                updates[`settings.${key}`] = value;
+            }
         }
 
-        // Якщо ми оновлюємо settingsLocked, дублюємо його в корінь для зручності (опціонально, але корисно для списків)
         if (settings.settingsLocked !== undefined) {
             updates['settingsLocked'] = settings.settingsLocked;
         }

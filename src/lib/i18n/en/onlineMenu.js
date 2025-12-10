@@ -30,7 +30,8 @@ export default {
     you: "You",
     copyLink: "Copy ID",
     linkCopied: "Copied!",
-    hostOnlySettings: "Only the host can change settings"
+    hostOnlySettings: "Only the host can change settings",
+    allowGuestSettings: "Allow guests to change settings"
   },
   chat: {
     placeholder: "Type a message...",
