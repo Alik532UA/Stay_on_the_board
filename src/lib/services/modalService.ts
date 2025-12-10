@@ -7,10 +7,8 @@ import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { speakText } from './speechService';
 import type { Player } from '$lib/models/player';
 import type { GameOverPayload, PlayerScoreResult, FinalScoreDetails } from '$lib/stores/gameOverStore';
+import { uiStateStore } from '$lib/stores/uiStateStore'; // Додано
 
-/**
- * Вміст модального вікна GameOver
- */
 interface GameOverModalContent {
   reasonKey: string;
   reason: string;
@@ -32,8 +30,7 @@ function showGameOverModal(payload: GameOverPayload) {
 
   if (gameType === 'training' || gameType === 'virtual-player') {
     titleKey = 'modal.trainingOverTitle';
-  } else if (gameType === 'local') {
-    // For local games, show player scores
+  } else if (gameType === 'local' || gameType === 'online') { // Додано online
     titleKey = winners && winners.length === 1 ? 'modal.winnerTitle' : 'modal.drawTitle';
     content.playerScores = payload.scores.map((s: PlayerScoreResult) => ({
       ...s,
@@ -46,8 +43,6 @@ function showGameOverModal(payload: GameOverPayload) {
     if (winners && winners.length === 1) {
       content.winnerName = winners[0].name;
     } else if (winners && winners.length > 1) {
-      // Optional: Handle multiple winners in title if needed, currently falls back to 'Draw!' or 'Winners: ...'
-      // content.winnerNumbers (plural) is used in 'winnersTitle'.
       content.winnerNumbers = winners.map((w: Player) => w.name).join(', ');
     }
   }
@@ -76,7 +71,11 @@ function showGameOverModal(payload: GameOverPayload) {
         primary: true,
         onClick: () => {
           gameEventBus.dispatch('ReplayGame');
-          modalStore.closeAllModals();
+          // FIX: Для онлайн гри не закриваємо модалку одразу, чекаємо синхронізації
+          const uiState = get(uiStateStore);
+          if (uiState.intendedGameType !== 'online') {
+            modalStore.closeAllModals();
+          }
         },
         dataTestId: 'play-again-btn'
       },

@@ -1,31 +1,23 @@
 // src/lib/sync/gameStateSync.interface.ts
-/**
- * @file Інтерфейс для абстракції синхронізації ігрового стану.
- */
-
 import type { BoardState } from '$lib/stores/boardStore';
 import type { PlayerState } from '$lib/stores/playerStore';
 import type { ScoreState } from '$lib/stores/scoreStore';
 import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
+import type { GameOverPayload } from '$lib/stores/gameOverStore';
 
-/**
- * Повний стан гри, що синхронізується між гравцями.
- */
 export interface SyncableGameState {
     boardState: BoardState;
     playerState: PlayerState;
     scoreState: ScoreState;
-    // Додаємо налаштування для синхронізації
     settings?: Partial<GameSettingsState>;
-    /** Версія стану для виявлення конфліктів */
     version: number;
-    /** Час останнього оновлення */
     updatedAt: number;
+    // Додаємо стан завершення гри
+    gameOver?: GameOverPayload | null;
+    // Додаємо стан запитів на рестарт
+    restartRequests?: Record<string, boolean>; // playerId -> true
 }
 
-/**
- * Дані для синхронізації ходу.
- */
 export interface SyncMoveData {
     playerId: number;
     direction: string;
@@ -34,9 +26,6 @@ export interface SyncMoveData {
     timestamp: number;
 }
 
-/**
- * Подія синхронізації стану.
- */
 export type GameStateSyncEvent =
     | { type: 'state_updated'; state: SyncableGameState }
     | { type: 'player_joined'; playerId: number; playerName: string }
@@ -44,16 +33,11 @@ export type GameStateSyncEvent =
     | { type: 'game_started' }
     | { type: 'game_ended'; reason: string }
     | { type: 'connection_lost' }
-    | { type: 'connection_restored' };
+    | { type: 'connection_restored' }
+    | { type: 'game_over_sync'; payload: GameOverPayload }; // Нова подія
 
-/**
- * Callback для обробки подій синхронізації.
- */
 export type GameStateSyncCallback = (event: GameStateSyncEvent) => void;
 
-/**
- * Інтерфейс для синхронізації ігрового стану.
- */
 export interface IGameStateSync {
     readonly sessionId: string | null;
     readonly isConnected: boolean;
