@@ -3,22 +3,8 @@
     import "$lib/css/components/game-board.css";
     import "$lib/css/components/controls.css";
     import DraggableColumns from "$lib/components/DraggableColumns.svelte";
-    import {
-        layoutStore,
-        WIDGETS,
-        type WidgetId,
-    } from "$lib/stores/layoutStore";
-
-    // Widgets
-    import TopRowWidget from "$lib/components/widgets/TopRowWidget.svelte";
-    import ScorePanelWidget from "$lib/components/widgets/ScorePanelWidget.svelte";
-    import BoardWrapperWidget from "$lib/components/widgets/BoardWrapperWidget.svelte";
-    import ControlsPanelWidget from "$lib/components/widgets/ControlsPanelWidget.svelte";
-    import SettingsExpanderWidget from "$lib/components/widgets/SettingsExpanderWidget.svelte";
-    import GameInfoWidget from "$lib/components/widgets/GameInfoWidget.svelte";
-    import PlayerTurnIndicator from "$lib/components/widgets/PlayerTurnIndicator.svelte";
-    import TimerWidget from "$lib/components/widgets/TimerWidget.svelte";
-    import GameModeWidget from "$lib/components/widgets/GameModeWidget.svelte";
+    import { layoutStore, type WidgetId } from "$lib/stores/layoutStore";
+    import { widgetRegistry } from "$lib/config/widgetRegistry"; // <-- Новий імпорт
 
     import { onMount } from "svelte";
     import { animationService } from "$lib/services/animationService.js";
@@ -31,38 +17,19 @@
     /**
      * Функція фільтрації віджетів.
      * Дозволяє кожній сторінці (режиму) вирішувати, які віджети показувати.
-     * Наприклад, Online режим може приховати налаштування.
      */
     export let widgetFilter: (widgetId: string) => boolean = () => true;
 
     /**
      * Кастомна логіка ініціалізації.
-     * Якщо передана, викликається замість стандартної перевірки boardStore.
-     * Це критично для Online режиму (підключення) та Local (збереження пресетів).
      */
     export let initLogic: (() => void) | undefined = undefined;
-
-    // Централізована мапа віджетів.
-    // Це полегшує додавання нових віджетів (наприклад, OnlineChatWidget) у майбутньому.
-    const widgetMap = {
-        [WIDGETS.TOP_ROW]: TopRowWidget,
-        [WIDGETS.SCORE_PANEL]: ScorePanelWidget,
-        [WIDGETS.BOARD_WRAPPER]: BoardWrapperWidget,
-        [WIDGETS.CONTROLS_PANEL]: ControlsPanelWidget,
-        [WIDGETS.SETTINGS_EXPANDER]: SettingsExpanderWidget,
-        [WIDGETS.GAME_INFO]: GameInfoWidget,
-        [WIDGETS.PLAYER_TURN_INDICATOR]: PlayerTurnIndicator,
-        [WIDGETS.TIMER]: TimerWidget,
-        [WIDGETS.GAME_MODE]: GameModeWidget,
-    };
 
     onMount(() => {
         if (initLogic) {
             logService.init("[GamePageLayout] Running custom init logic.");
             initLogic();
         } else {
-            // Стандартна логіка: якщо гри немає, нічого не робимо (або можна додати дефолтний старт)
-            // Зазвичай initLogic передається завжди, але це fallback.
             const boardState = get(boardStore);
             if (!boardState || boardState.moveHistory.length <= 1) {
                 logService.init(
@@ -86,7 +53,8 @@
         : [];
 
     function itemContent(item: { id: string; label: string }) {
-        return widgetMap[item.id as keyof typeof widgetMap] || item.id;
+        // Використовуємо централізований реєстр
+        return widgetRegistry[item.id] || item.id;
     }
 
     function handleDrop(
