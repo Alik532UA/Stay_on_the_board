@@ -11,29 +11,58 @@ import {
     getDoc,
     updateDoc,
     onSnapshot,
+    limit,
     type DocumentData,
-    type Unsubscribe
+    type Unsubscribe,
+    type DocumentReference
 } from 'firebase/firestore';
 import { getFirestoreDb } from './firebaseService';
 import { logService } from './logService';
 import type { Room, RoomSummary, OnlinePlayer } from '$lib/types/online';
-import { defaultGameSettings } from '$lib/stores/gameSettingsDefaults';
+import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
+import { defaultGameSettings } from '$lib/stores/gameSettingsStore';
 import { v4 as uuidv4 } from 'uuid';
 
-// Час життя кімнати без активності (в мілісекундах)
 const ROOM_TIMEOUT_MS = import.meta.env.DEV ? 10000 : 120000;
+const OPERATION_TIMEOUT_MS = 10000; // 10 секунд на операцію створення/входу
+
+export interface ChatMessage {
+    id?: string;
+    senderId: string;
+    senderName: string;
+    text: string;
+    createdAt: number;
+}
+
+/**
+ * Обгортка для промісів з таймаутом
+ */
+function withTimeout<T>(promise: Promise<T>, ms: number, errorMsg: string): Promise<T> {
+    let timer: NodeJS.Timeout;
+    const timeoutPromise = new Promise<T>((_, reject) => {
+        timer = setTimeout(() => {
+            reject(new Error(errorMsg));
+        }, ms);
+    });
+
+    return Promise.race([
+        promise.then((res) => {
+            clearTimeout(timer);
+            return res;
+        }),
+        timeoutPromise
+    ]);
+}
 
 class RoomService {
     private get db() {
         return getFirestoreDb();
     }
 
-    /**
-     * Створює нову кімнату.
-     */
-    async createRoom(hostName: string, isPrivate: boolean = false): Promise<string> {
-        const hostId = uuidv4();
+    async createRoom(hostName: string, isPrivate: boolean = false, customRoomName?: string): Promise<string> {
+        logService.init(`[RoomService] createRoom START. Host: ${hostName}`);
 
+        const hostId = uuidv4();
         const initialPlayer: OnlinePlayer = {
             id: hostId,
             name: hostName,
@@ -43,14 +72,18 @@ class RoomService {
             isOnline: true
         };
 
+        const finalRoomName = customRoomName && customRoomName.trim() !== ""
+            ? customRoomName.trim()
+            : `Room #${Math.floor(Math.random() * 10000)}`;
+
         const roomData: Omit<Room, 'id'> = {
-            name: `Room #${Math.floor(Math.random() * 10000)}`,
+            name: finalRoomName,
             hostId: hostId,
             status: 'waiting',
             createdAt: Date.now(),
             lastActivity: Date.now(),
             isPrivate: isPrivate,
-            settingsLocked: true,
+            settingsLocked: false,
             gameState: null,
             players: {
                 [hostId]: initialPlayer
@@ -59,8 +92,17 @@ class RoomService {
         };
 
         try {
-            const docRef = await addDoc(collection(this.db, 'rooms'), roomData);
-            logService.init(`[RoomService] Created room: ${docRef.id}`);
+            logService.init('[RoomService] Sending addDoc request...');
+
+            // Використовуємо обгортку з таймаутом
+            const docRef = await withTimeout(
+                addDoc(collection(this.db, 'rooms'), roomData),
+                OPERATION_TIMEOUT_MS,
+                'Timeout: Failed to connect to Firebase Firestore.'
+            );
+
+            logService.init(`[RoomService] addDoc SUCCESS. Room ID: ${docRef.id}`);
+
             this.saveSession(docRef.id, hostId);
             return docRef.id;
         } catch (error) {
@@ -69,9 +111,6 @@ class RoomService {
         }
     }
 
-    /**
-     * Отримує список публічних кімнат з "лінивим очищенням".
-     */
     async getPublicRooms(): Promise<RoomSummary[]> {
         try {
             const q = query(
@@ -80,20 +119,23 @@ class RoomService {
                 orderBy('lastActivity', 'desc')
             );
 
-            const querySnapshot = await getDocs(q);
+            // Також додаємо таймаут на отримання списку
+            const querySnapshot = await withTimeout(
+                getDocs(q),
+                OPERATION_TIMEOUT_MS,
+                'Timeout fetching rooms'
+            );
+
             const rooms: RoomSummary[] = [];
             const now = Date.now();
             const cleanupPromises: Promise<void>[] = [];
 
             querySnapshot.forEach((doc) => {
                 const data = doc.data() as Room;
-
                 if (now - data.lastActivity > ROOM_TIMEOUT_MS) {
-                    logService.init(`[RoomService] Cleaning up dead room: ${doc.id}`);
                     cleanupPromises.push(deleteDoc(doc.ref));
                     return;
                 }
-
                 rooms.push({
                     id: doc.id,
                     name: data.name,
@@ -105,30 +147,41 @@ class RoomService {
             });
 
             if (cleanupPromises.length > 0) {
-                await Promise.allSettled(cleanupPromises);
+                // Не блокуємо UI очищенням
+                Promise.allSettled(cleanupPromises).catch(e => console.error(e));
             }
 
             return rooms;
         } catch (error) {
             logService.error('[RoomService] Failed to get rooms:', error);
+            // Повертаємо пустий масив, щоб не ламати UI, але помилка залогована
             return [];
         }
     }
 
-    /**
-     * Приєднує гравця до кімнати.
-     */
     async joinRoom(roomId: string, playerName: string): Promise<string> {
+        logService.init(`[RoomService] joinRoom START. Room: ${roomId}`);
         const playerId = uuidv4();
         const roomRef = doc(this.db, 'rooms', roomId);
 
         try {
-            const roomSnap = await getDoc(roomRef);
+            const roomSnap = await withTimeout(
+                getDoc(roomRef),
+                OPERATION_TIMEOUT_MS,
+                'Timeout connecting to room'
+            );
+
             if (!roomSnap.exists()) {
                 throw new Error('Room not found');
             }
 
             const roomData = roomSnap.data() as Room;
+            const existingSession = this.getSession();
+
+            if (existingSession.roomId === roomId && existingSession.playerId && roomData.players[existingSession.playerId]) {
+                logService.init(`[RoomService] Reconnecting as existing player`);
+                return existingSession.playerId;
+            }
 
             if (Object.keys(roomData.players).length >= 2) {
                 throw new Error('Room is full');
@@ -146,14 +199,16 @@ class RoomService {
                 isOnline: true
             };
 
-            await updateDoc(roomRef, {
-                [`players.${playerId}`]: newPlayer,
-                lastActivity: Date.now()
-            });
+            await withTimeout(
+                updateDoc(roomRef, {
+                    [`players.${playerId}`]: newPlayer,
+                    lastActivity: Date.now()
+                }),
+                OPERATION_TIMEOUT_MS,
+                'Timeout joining room'
+            );
 
             this.saveSession(roomId, playerId);
-            logService.init(`[RoomService] Joined room ${roomId} as ${playerId}`);
-
             return playerId;
         } catch (error) {
             logService.error('[RoomService] Failed to join room:', error);
@@ -161,38 +216,61 @@ class RoomService {
         }
     }
 
-    /**
-     * Підписується на оновлення кімнати в реальному часі.
-     */
     subscribeToRoom(roomId: string, callback: (room: Room) => void): Unsubscribe {
         const roomRef = doc(this.db, 'rooms', roomId);
         return onSnapshot(roomRef, (doc) => {
             if (doc.exists()) {
                 const roomData = doc.data() as Room;
-                // Додаємо ID до об'єкта, бо в data() його немає
                 callback({ ...roomData, id: doc.id });
             } else {
-                // Кімната видалена
                 logService.init(`[RoomService] Room ${roomId} deleted`);
-                // Можна передати null або спеціальний об'єкт, але поки що просто ігноруємо
             }
         }, (error) => {
             logService.error('[RoomService] Subscribe error:', error);
         });
     }
 
-    /**
-     * Вихід з кімнати.
-     */
+    async updateRoomSettings(roomId: string, settings: Partial<GameSettingsState>): Promise<void> {
+        const roomRef = doc(this.db, 'rooms', roomId);
+        const updates: Record<string, any> = { lastActivity: Date.now() };
+        for (const [key, value] of Object.entries(settings)) {
+            updates[`settings.${key}`] = value;
+        }
+        await updateDoc(roomRef, updates);
+    }
+
+    async sendMessage(roomId: string, senderId: string, senderName: string, text: string): Promise<void> {
+        const messagesRef = collection(this.db, 'rooms', roomId, 'messages');
+        await addDoc(messagesRef, {
+            senderId,
+            senderName,
+            text,
+            createdAt: serverTimestamp()
+        });
+    }
+
+    subscribeToChat(roomId: string, callback: (messages: ChatMessage[]) => void): Unsubscribe {
+        const messagesRef = collection(this.db, 'rooms', roomId, 'messages');
+        const q = query(messagesRef, orderBy('createdAt', 'asc'), limit(50));
+        return onSnapshot(q, (snapshot) => {
+            const messages: ChatMessage[] = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                messages.push({
+                    id: doc.id,
+                    senderId: data.senderId,
+                    senderName: data.senderName,
+                    text: data.text,
+                    createdAt: data.createdAt ? data.createdAt.toMillis() : Date.now()
+                });
+            });
+            callback(messages);
+        });
+    }
+
     async leaveRoom(roomId: string, playerId: string): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
         try {
-            // Видаляємо гравця зі списку
-            // У Firestore видалення поля робиться через FieldValue.delete(), але тут ми оновлюємо весь об'єкт players
-            // Простіше отримати поточний стан, видалити ключ і записати назад, або використати dot notation для видалення
-            // Але для видалення поля вкладеного об'єкта потрібен спеціальний синтаксис.
-            // Спростимо: читаємо -> модифікуємо -> пишемо (транзакція була б краще, але поки так)
-
             const roomSnap = await getDoc(roomRef);
             if (!roomSnap.exists()) return;
 
@@ -200,23 +278,22 @@ class RoomService {
             const players = { ...roomData.players };
             delete players[playerId];
 
-            // Якщо гравців не залишилось, можна видалити кімнату або залишити на TTL
-            // Якщо це був хост, треба передати права (реалізуємо пізніше)
-
-            await updateDoc(roomRef, {
-                players: players,
-                lastActivity: Date.now()
-            });
-
+            if (Object.keys(players).length === 0) {
+                await deleteDoc(roomRef);
+            } else {
+                let updates: any = { players: players, lastActivity: Date.now() };
+                if (roomData.hostId === playerId) {
+                    const nextHostId = Object.keys(players)[0];
+                    updates.hostId = nextHostId;
+                }
+                await updateDoc(roomRef, updates);
+            }
             this.clearSession();
         } catch (error) {
             logService.error('[RoomService] Failed to leave room:', error);
         }
     }
 
-    /**
-     * Перемикає стан готовності гравця.
-     */
     async toggleReady(roomId: string, playerId: string, isReady: boolean): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
         await updateDoc(roomRef, {
@@ -225,26 +302,12 @@ class RoomService {
         });
     }
 
-    /**
-     * Запускає гру (тільки хост).
-     */
     async startGame(roomId: string): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
         await updateDoc(roomRef, {
             status: 'playing',
             lastActivity: Date.now()
         });
-    }
-
-    async touchRoom(roomId: string): Promise<void> {
-        try {
-            const roomRef = doc(this.db, 'rooms', roomId);
-            await updateDoc(roomRef, {
-                lastActivity: Date.now()
-            });
-        } catch (error) {
-            // Ignore heartbeat errors
-        }
     }
 
     private saveSession(roomId: string, playerId: string) {

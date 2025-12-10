@@ -16,6 +16,7 @@ import type { ScoreChangesData } from '$lib/types/gameMove';
 import { roomService } from '$lib/services/roomService';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import { notificationService } from '$lib/services/notificationService';
+import { availableMovesService } from '$lib/services/availableMovesService';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
@@ -62,7 +63,7 @@ export class OnlineGameMode extends BaseGameMode {
           size: options.newSize,
           players: this.getPlayersConfiguration(),
         });
-        // І відправляємо на сервер
+        // І відправляємо на сервер, щоб другий гравець побачив стан
         await this.syncCurrentState();
       }
 
@@ -99,18 +100,9 @@ export class OnlineGameMode extends BaseGameMode {
     const playerState = get(playerStore);
     if (!playerState || !this.myPlayerId) return;
 
-    const currentPlayer = playerState.players[playerState.currentPlayerIndex];
-
     // ВАЖЛИВО: Перевірка, чи це мій хід
-    // Ми припускаємо, що ID гравців у playerStore співпадають з ID у roomService (або ми маємо мапінг)
-    // У поточній реалізації createOnlinePlayers створює ID 1 та 2.
-    // Нам потрібно зіставити локальний ID (1 або 2) з реальним ID гравця з Firebase.
-    // Це складний момент. Для спрощення MVP:
-    // Хост завжди гравець 1, Гість завжди гравець 2.
-
-    // Отримуємо дані кімнати, щоб дізнатися, хто є хто
-    // (Це спрощення, в ідеалі це має бути в стані)
-    // Поки що дозволяємо хід, валідація буде на рівні оновлення стану
+    // Для MVP: Хост завжди гравець 1, Гість завжди гравець 2.
+    // Тут можна додати перевірку, чи співпадає myPlayerId з ID поточного гравця в roomService
 
     await super.handlePlayerMove(direction, distance, onEndCallback);
 
@@ -121,10 +113,12 @@ export class OnlineGameMode extends BaseGameMode {
   async claimNoMoves(): Promise<void> {
     await super.claimNoMoves();
     // TODO: Синхронізувати подію завершення гри, якщо вона сталася
+    await this.syncCurrentState();
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
     await super.handleNoMoves(playerType);
+    await this.syncCurrentState();
   }
 
   getPlayersConfiguration(): Player[] {
@@ -145,8 +139,6 @@ export class OnlineGameMode extends BaseGameMode {
   protected async advanceToNextPlayer(): Promise<void> {
     await super.advanceToNextPlayer();
     // Стан вже оновлено в super, тут ми його просто пушимо
-    // (хоча це може бути надлишковим, якщо ми пушимо в handlePlayerMove, 
-    // але advanceToNextPlayer викликається і в інших випадках)
   }
 
   protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
@@ -178,8 +170,7 @@ export class OnlineGameMode extends BaseGameMode {
     if (state.scoreState) scoreStore.set(state.scoreState);
 
     // Оновлюємо доступні ходи для нового стану
-    // (availableMovesService імпортується в BaseGameMode, але тут треба явно викликати)
-    // availableMovesService.updateAvailableMoves(); // Це викликається реактивно або в BaseGameMode
+    availableMovesService.updateAvailableMoves();
   }
 
   private handleSyncEvent(event: GameStateSyncEvent): void {

@@ -11,6 +11,7 @@
 
     let rooms: RoomSummary[] = [];
     let isLoading = false;
+    let joiningRoomId: string | null = null; // Для відстеження, яку кімнату зараз приєднуємо
     let error: string | null = null;
 
     async function loadRooms() {
@@ -27,25 +28,37 @@
     }
 
     async function handleJoin(roomId: string) {
+        logService.action(`[RoomList] Clicked Join for room: ${roomId}`);
+
+        if (joiningRoomId) return; // Запобігаємо подвійним клікам
+        joiningRoomId = roomId;
+
         // Перевіряємо, чи є ім'я гравця
         const playerName = localStorage.getItem("online_playerName");
         if (!playerName) {
-            // Якщо імені немає, це має обробити батьківський компонент або модалка
-            // Поки що просто генеруємо, якщо немає (але в ідеалі треба питати)
             localStorage.setItem(
                 "online_playerName",
                 `Player ${Math.floor(Math.random() * 1000)}`,
             );
+            logService.init(`[RoomList] Generated new player name`);
         }
 
         try {
             const myName = localStorage.getItem("online_playerName")!;
+            logService.init(`[RoomList] Calling roomService.joinRoom...`);
+
             await roomService.joinRoom(roomId, myName);
+
+            logService.init(
+                `[RoomList] Joined successfully. Navigating to lobby...`,
+            );
             goto(`${base}/online/lobby/${roomId}`);
         } catch (e) {
-            logService.error("Failed to join room", e);
+            logService.error("[RoomList] Failed to join room", e);
             alert($_("onlineMenu.errors.joinFailed"));
             loadRooms(); // Оновлюємо список, можливо кімната вже повна
+        } finally {
+            joiningRoomId = null;
         }
     }
 
@@ -57,28 +70,28 @@
     });
 </script>
 
-<div class="room-list-container">
+<div class="room-list-container" data-testid="room-list-container">
     <div class="list-header">
-        <h3>{$_("onlineMenu.title")}</h3>
+        <h3 data-testid="room-list-title">{$_("onlineMenu.title")}</h3>
         <button
             class="refresh-btn"
             on:click={loadRooms}
             disabled={isLoading}
             aria-label={$_("onlineMenu.refresh")}
+            data-testid="refresh-rooms-btn"
         >
             <span class:spinning={isLoading}>
                 <SvgIcons name="clear-cache" />
-                <!-- Використовуємо іконку оновлення/очищення як тимчасову -->
             </span>
         </button>
     </div>
 
     {#if error}
-        <div class="error-message">{error}</div>
+        <div class="error-message" data-testid="room-list-error">{error}</div>
     {/if}
 
     <div class="rooms-table-wrapper">
-        <table class="rooms-table">
+        <table class="rooms-table" data-testid="rooms-table">
             <thead>
                 <tr>
                     <th>{$_("onlineMenu.roomName")}</th>
@@ -90,13 +103,19 @@
             <tbody>
                 {#if rooms.length === 0 && !isLoading}
                     <tr>
-                        <td colspan="4" class="empty-message"
+                        <td
+                            colspan="4"
+                            class="empty-message"
+                            data-testid="no-rooms-message"
                             >{$_("onlineMenu.noRooms")}</td
                         >
                     </tr>
                 {:else}
                     {#each rooms as room (room.id)}
-                        <tr class="room-row">
+                        <tr
+                            class="room-row"
+                            data-testid={`room-row-${room.id}`}
+                        >
                             <td class="room-name">{room.name}</td>
                             <td>
                                 <span class="status-badge {room.status}">
@@ -110,8 +129,14 @@
                                         size="small"
                                         variant="primary"
                                         on:click={() => handleJoin(room.id)}
+                                        disabled={!!joiningRoomId}
+                                        dataTestId={`join-room-btn-${room.id}`}
                                     >
-                                        {$_("onlineMenu.join")}
+                                        {#if joiningRoomId === room.id}
+                                            {$_("common.loading")}
+                                        {:else}
+                                            {$_("onlineMenu.join")}
+                                        {/if}
                                     </StyledButton>
                                 {:else}
                                     <span class="full-text">-</span>

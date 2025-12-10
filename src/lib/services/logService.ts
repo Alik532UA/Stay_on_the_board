@@ -58,13 +58,16 @@ const defaultConfig: LogConfig = {
     [LOG_GROUPS.UI]: false,
     [LOG_GROUPS.TOOLTIP]: false,
     [LOG_GROUPS.ANIMATION]: false,
-    [LOG_GROUPS.INIT]: false,
-    [LOG_GROUPS.ACTION]: false,
-    [LOG_GROUPS.GAME_MODE]: true, // УВІМКНЕНО для діагностики
+    // УВІМКНЕНО для діагностики створення кімнати
+    [LOG_GROUPS.INIT]: true,
+    // УВІМКНЕНО для відстеження дій користувача
+    [LOG_GROUPS.ACTION]: true,
+    [LOG_GROUPS.GAME_MODE]: false,
     [LOG_GROUPS.SPEECH]: false,
     [LOG_GROUPS.VOICE_CONTROL]: false,
     [LOG_GROUPS.TEST_MODE]: false,
     [LOG_GROUPS.MODAL]: false,
+    // УВІМКНЕНО для вилову помилок
     [LOG_GROUPS.ERROR]: true,
 };
 
@@ -204,4 +207,3 @@ if (isBrowser) {
         debugLogStore.add('[INFO] Production logging enabled.');
     };
 }
-

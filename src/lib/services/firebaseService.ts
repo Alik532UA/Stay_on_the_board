@@ -8,6 +8,7 @@ import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getDatabase, type Database } from 'firebase/database';
 import { getAnalytics, type Analytics, isSupported } from 'firebase/analytics';
 import { browser } from '$app/environment';
+import { logService } from './logService';
 
 // Firebase конфігурація з змінних середовища Vite
 const firebaseConfig = {
@@ -18,7 +19,7 @@ const firebaseConfig = {
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
     appId: import.meta.env.VITE_FIREBASE_APP_ID,
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-    databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL // Додано для Realtime Database
+    databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL
 };
 
 let app: FirebaseApp | null = null;
@@ -30,17 +31,26 @@ let analytics: Analytics | null = null;
  * Перевіряє, чи налаштовано Firebase
  */
 export function isFirebaseConfigured(): boolean {
-    return Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
+    const isConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
+    if (!isConfigured) {
+        logService.error('[FirebaseService] Missing configuration. Check .env file.', {
+            hasApiKey: !!firebaseConfig.apiKey,
+            hasProjectId: !!firebaseConfig.projectId,
+            projectId: firebaseConfig.projectId // Безпечно логувати ID проекту
+        });
+    } else {
+        // Логуємо один раз при перевірці, щоб знати, що конфіг є
+        logService.init(`[FirebaseService] Configuration present for project: ${firebaseConfig.projectId}`);
+    }
+    return isConfigured;
 }
 
 /**
  * Ініціалізує Firebase застосунок
- * Викликається лениво при першому зверненні до сервісів
  */
 function initializeFirebase(): FirebaseApp {
     if (app) return app;
 
-    // Перевіряємо, чи вже ініціалізовано (для HMR)
     const existingApps = getApps();
     if (existingApps.length > 0) {
         app = existingApps[0];
@@ -48,13 +58,17 @@ function initializeFirebase(): FirebaseApp {
     }
 
     if (!isFirebaseConfigured()) {
-        throw new Error(
-            'Firebase не налаштовано. Скопіюйте .env.example до .env та заповніть конфігурацію.'
-        );
+        throw new Error('Firebase не налаштовано. Перевірте змінні середовища.');
     }
 
-    app = initializeApp(firebaseConfig);
-    return app;
+    try {
+        app = initializeApp(firebaseConfig);
+        logService.init('[FirebaseService] App initialized successfully');
+        return app;
+    } catch (e) {
+        logService.error('[FirebaseService] Failed to initialize app', e);
+        throw e;
+    }
 }
 
 /**
@@ -62,7 +76,6 @@ function initializeFirebase(): FirebaseApp {
  */
 export function getFirestoreDb(): Firestore {
     if (db) return db;
-
     const firebaseApp = initializeFirebase();
     db = getFirestore(firebaseApp);
     return db;
@@ -73,16 +86,13 @@ export function getFirestoreDb(): Firestore {
  */
 export function getRealtimeDb(): Database {
     if (rtdb) return rtdb;
-
     const firebaseApp = initializeFirebase();
-    // Якщо databaseURL не вказано в конфігу, Firebase спробує визначити його автоматично,
-    // але краще вказати явно в .env
     rtdb = getDatabase(firebaseApp);
     return rtdb;
 }
 
 /**
- * Ініціалізує Google Analytics (тільки в браузері)
+ * Ініціалізує Google Analytics
  */
 export async function initializeAnalytics(): Promise<Analytics | null> {
     if (!browser) return null;
@@ -90,10 +100,7 @@ export async function initializeAnalytics(): Promise<Analytics | null> {
 
     try {
         const supported = await isSupported();
-        if (!supported) {
-            console.warn('Firebase Analytics не підтримується в цьому середовищі');
-            return null;
-        }
+        if (!supported) return null;
 
         const firebaseApp = initializeFirebase();
         analytics = getAnalytics(firebaseApp);
@@ -104,9 +111,6 @@ export async function initializeAnalytics(): Promise<Analytics | null> {
     }
 }
 
-/**
- * Отримує Firebase App інстанс
- */
 export function getFirebaseApp(): FirebaseApp {
     return initializeFirebase();
 }
