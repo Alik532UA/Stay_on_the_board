@@ -29,13 +29,14 @@
     }
 
     function handleTimedGame() {
-        // NOTE: Original MainMenu logic for timed game:
-        // onclick={() => {
-        //   uiStateStore.update((s) => ({ ...s, intendedGameType: "timed" }));
-        //   navigateTo("/game/timed");
-        // }}
         uiStateStore.update((s) => ({ ...s, intendedGameType: "timed" }));
         navigateTo("/game/timed");
+    }
+
+    function handleOnlineGame() {
+        uiStateStore.update((s) => ({ ...s, intendedGameType: "online" }));
+        navigateTo("/online");
+        onClose();
     }
 </script>
 
@@ -100,15 +101,6 @@
     <StyledButton
         variant="menu"
         class="secondary"
-        on:click={() => handlePhantomPage("Online Menu (WIP)", "/online")}
-        dataTestId="dev-menu-online-menu-btn"
-    >
-        Online Menu (WIP)
-    </StyledButton>
-
-    <StyledButton
-        variant="menu"
-        class="secondary"
         on:click={() => handlePhantomPage("Waiting Screen (WIP)", "/waiting")}
         dataTestId="dev-menu-waiting-btn"
     >
@@ -142,8 +134,7 @@
     <StyledButton
         variant="menu"
         class="secondary"
-        disabled={true}
-        on:click={onOpenWipNotice}
+        on:click={handleOnlineGame}
         dataTestId="online-game-btn">{$_("mainMenu.playOnline")}</StyledButton
     >
 </div>
