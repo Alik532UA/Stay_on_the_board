@@ -6,7 +6,7 @@
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
     import LobbyChat from "./LobbyChat.svelte";
-    import { goto, beforeNavigate } from "$app/navigation"; // Додано beforeNavigate
+    import { goto, beforeNavigate } from "$app/navigation";
     import { base } from "$app/paths";
     import type { Unsubscribe } from "firebase/firestore";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
@@ -19,7 +19,7 @@
     let myPlayerId: string | null = null;
     let unsubscribe: Unsubscribe | null = null;
     let isCopied = false;
-    let isLeaving = false; // Прапорець, щоб уникнути подвійного виклику
+    let isLeaving = false;
 
     onMount(() => {
         const session = roomService.getSession();
@@ -31,27 +31,23 @@
         }
 
         unsubscribe = roomService.subscribeToRoom(roomId, (updatedRoom) => {
+            // Якщо ми зараз активно тягнемо повзунок (scrubbing),
+            // ми не хочемо, щоб вхідні дані з сервера перебивали наші локальні зміни.
+            // Але оскільки скраббінг робить тільки хост, конфлікту не має бути.
             room = updatedRoom;
+
             if (room.status === "playing") {
-                // Перехід в гру обробляється автоматично, beforeNavigate це пропустить
                 goto(`${base}/game/online`);
             }
         });
     });
 
-    // FIX: Автоматичний вихід з кімнати при навігації
     beforeNavigate(async ({ to, cancel }) => {
-        // Якщо ми йдемо в гру, не виходимо з кімнати
         if (to?.route.id === "/game/online") return;
-
-        // Якщо ми вже в процесі виходу, нічого не робимо
         if (isLeaving) return;
 
-        // В усіх інших випадках (назад, головне меню, оновлення) - виходимо
         if (myPlayerId && roomId) {
             isLeaving = true;
-            // Ми не чекаємо await тут, щоб не блокувати навігацію,
-            // але roomService виконає запит у фоні
             roomService.leaveRoom(roomId, myPlayerId);
         }
     });
@@ -94,27 +90,31 @@
 
     // --- Функції налаштувань (Тільки Хост) ---
 
+    // Викликається кнопками +/- (одразу відправляє на сервер)
     function updateBoardSize(increment: number) {
         if (!room || !canEditSettings) return;
         const newSize = room.settings.boardSize + increment;
-        setBoardSize(newSize);
+        commitBoardSize(newSize);
     }
 
-    function setBoardSize(size: number) {
+    // Викликається при завершенні скраббінгу (відправляє на сервер)
+    function commitBoardSize(size: number) {
         if (!room || !canEditSettings) return;
         if (size >= 3 && size <= 9) {
             roomService.updateRoomSettings(roomId, { boardSize: size });
         }
     }
 
+    // Викликається кнопками +/- (одразу відправляє на сервер)
     function updateTurnDuration(increment: number) {
         if (!room || !canEditSettings) return;
         const currentDuration = room.settings.turnDuration || 30;
         const newDuration = currentDuration + increment;
-        setTurnDuration(newDuration);
+        commitTurnDuration(newDuration);
     }
 
-    function setTurnDuration(duration: number) {
+    // Викликається при завершенні скраббінгу (відправляє на сервер)
+    function commitTurnDuration(duration: number) {
         if (!room || !canEditSettings) return;
         const newDuration = Math.max(5, Math.min(1000, duration));
         roomService.updateRoomSettings(roomId, { turnDuration: newDuration });
@@ -141,6 +141,7 @@
         });
     }
 
+    // --- Action для скраббінгу (Оптимізований) ---
     function scrubbable(
         node: HTMLElement,
         params: {
@@ -148,19 +149,22 @@
             min: number;
             max: number;
             step: number;
-            onUpdate: (val: number) => void;
+            onInput: (val: number) => void; // Оновлення UI (локально)
+            onChange: (val: number) => void; // Відправка на сервер (commit)
             disabled: boolean;
         },
     ) {
-        let { value, min, max, step, onUpdate, disabled } = params;
+        let { value, min, max, step, onInput, onChange, disabled } = params;
         let startX = 0;
         let startValue = 0;
+        let currentValue = value;
 
         function onMouseDown(e: MouseEvent) {
             if (disabled) return;
             e.preventDefault();
             startX = e.clientX;
             startValue = value;
+            currentValue = value;
 
             window.addEventListener("mousemove", onMouseMove);
             window.addEventListener("mouseup", onMouseUp);
@@ -173,8 +177,11 @@
             const deltaValue = Math.round(deltaX / step);
             let newValue = startValue + deltaValue;
             newValue = Math.max(min, Math.min(max, newValue));
-            if (newValue !== value) {
-                onUpdate(newValue);
+
+            if (newValue !== currentValue) {
+                currentValue = newValue;
+                // Тільки оновлюємо локальне значення для відображення
+                onInput(currentValue);
             }
         }
 
@@ -183,6 +190,11 @@
             window.removeEventListener("mouseup", onMouseUp);
             document.body.style.cursor = "";
             node.classList.remove("scrubbing");
+
+            // Відправляємо на сервер тільки коли відпустили кнопку
+            if (currentValue !== startValue) {
+                onChange(currentValue);
+            }
         }
 
         node.addEventListener("mousedown", onMouseDown);
@@ -193,7 +205,8 @@
                 min = newParams.min;
                 max = newParams.max;
                 step = newParams.step;
-                onUpdate = newParams.onUpdate;
+                onInput = newParams.onInput;
+                onChange = newParams.onChange;
                 disabled = newParams.disabled;
             },
             destroy() {
@@ -376,7 +389,12 @@
                                     min: 3,
                                     max: 9,
                                     step: 20,
-                                    onUpdate: setBoardSize,
+                                    // FIX: Оновлюємо тільки локально при русі
+                                    onInput: (val) => {
+                                        if (room) room.settings.boardSize = val;
+                                    },
+                                    // FIX: Відправляємо на сервер тільки при відпусканні
+                                    onChange: commitBoardSize,
                                     disabled: !canEditSettings,
                                 }}
                                 title={canEditSettings
@@ -416,7 +434,13 @@
                                     min: 5,
                                     max: 1000,
                                     step: 2,
-                                    onUpdate: setTurnDuration,
+                                    // FIX: Оновлюємо тільки локально при русі
+                                    onInput: (val) => {
+                                        if (room)
+                                            room.settings.turnDuration = val;
+                                    },
+                                    // FIX: Відправляємо на сервер тільки при відпусканні
+                                    onChange: commitTurnDuration,
                                     disabled: !canEditSettings,
                                 }}
                                 title={canEditSettings
