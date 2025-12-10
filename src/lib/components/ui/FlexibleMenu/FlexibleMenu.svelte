@@ -99,7 +99,7 @@
 
         <div class="menu-grid" data-testid="flexible-menu-grid">
             {#each [0, 1, 2, 3, 4] as i}
-                <div class="menu-slot slot-{i}">
+                <div class="menu-slot slot-{i}" data-testid="{position}-menu-slot-{i}">
                     {#if displayItems[i]}
                         <!-- Force primary prop on index 2 if not explicitly set but it IS index 2 -->
                         <MenuButton

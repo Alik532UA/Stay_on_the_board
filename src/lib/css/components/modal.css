@@ -59,6 +59,16 @@
   }
 }
 
+/* DevMenu Modal Specific Styles */
+.modal-window.dev-menu-modal-window {
+  max-height: none;
+  height: fit-content;
+}
+
+.modal-window.dev-menu-modal-window .modal-content {
+  max-height: none;
+}
+
 /* Content */
 .modal-content {
   flex: 1;
@@ -386,6 +396,15 @@
   .modal-window {
     max-height: 80vh;
     margin: 8px;
+  }
+
+  /* Override for DevMenu Modal on mobile */
+  .modal-window.dev-menu-modal-window {
+    max-height: none;
+  }
+
+  .modal-window.dev-menu-modal-window .modal-content {
+    max-height: none;
   }
 
   .modal-header {

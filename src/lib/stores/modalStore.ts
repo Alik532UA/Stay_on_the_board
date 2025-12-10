@@ -48,6 +48,7 @@ export interface ModalState {
     closable?: boolean;
     closeOnOverlayClick?: boolean;
     dataTestId?: string;
+    customClass?: string;
     titleValues?: Record<string, unknown>;
 }
 
@@ -60,7 +61,8 @@ const initialState: ModalState = {
     props: {},
     closable: true,
     closeOnOverlayClick: false,
-    dataTestId: undefined
+    dataTestId: undefined,
+    customClass: undefined
 };
 
 const store = writable<ModalState>(initialState);

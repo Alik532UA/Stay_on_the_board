@@ -1246,6 +1246,15 @@ label[for^="blocked-mode-checkbox"] {
     min-width: 280px;
 }
 
+.modal-window .dev-menu {
+    position: static;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    width: 100%;
+}
+
 .dev-menu h3 {
     margin: 0;
     text-align: center;
