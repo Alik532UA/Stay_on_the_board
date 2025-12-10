@@ -6,12 +6,12 @@
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
     import LobbyChat from "./LobbyChat.svelte";
-    import { goto } from "$app/navigation";
+    import { goto, beforeNavigate } from "$app/navigation"; // Додано beforeNavigate
     import { base } from "$app/paths";
     import type { Unsubscribe } from "firebase/firestore";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
     import type { GameSettingsState } from "$lib/stores/gameSettingsStore";
-    import ColorPicker from "$lib/components/local-setup/ColorPicker.svelte"; // Імпортуємо ColorPicker
+    import ColorPicker from "$lib/components/local-setup/ColorPicker.svelte";
 
     export let roomId: string;
 
@@ -19,6 +19,7 @@
     let myPlayerId: string | null = null;
     let unsubscribe: Unsubscribe | null = null;
     let isCopied = false;
+    let isLeaving = false; // Прапорець, щоб уникнути подвійного виклику
 
     onMount(() => {
         const session = roomService.getSession();
@@ -32,9 +33,27 @@
         unsubscribe = roomService.subscribeToRoom(roomId, (updatedRoom) => {
             room = updatedRoom;
             if (room.status === "playing") {
+                // Перехід в гру обробляється автоматично, beforeNavigate це пропустить
                 goto(`${base}/game/online`);
             }
         });
+    });
+
+    // FIX: Автоматичний вихід з кімнати при навігації
+    beforeNavigate(async ({ to, cancel }) => {
+        // Якщо ми йдемо в гру, не виходимо з кімнати
+        if (to?.route.id === "/game/online") return;
+
+        // Якщо ми вже в процесі виходу, нічого не робимо
+        if (isLeaving) return;
+
+        // В усіх інших випадках (назад, головне меню, оновлення) - виходимо
+        if (myPlayerId && roomId) {
+            isLeaving = true;
+            // Ми не чекаємо await тут, щоб не блокувати навігацію,
+            // але roomService виконає запит у фоні
+            roomService.leaveRoom(roomId, myPlayerId);
+        }
     });
 
     onDestroy(() => {
@@ -54,6 +73,7 @@
 
     async function handleLeave() {
         if (!myPlayerId) return;
+        isLeaving = true;
         await roomService.leaveRoom(roomId, myPlayerId);
         goto(`${base}/online`);
     }
@@ -64,18 +84,15 @@
         setTimeout(() => (isCopied = false), 2000);
     }
 
-    // --- Функції оновлення гравця ---
     function handleUpdatePlayer(data: Partial<OnlinePlayer>) {
         if (!room || !myPlayerId) return;
         roomService.updatePlayer(roomId, myPlayerId, data);
-
-        // Якщо змінили ім'я, зберігаємо його локально для майбутніх ігор
         if (data.name) {
             localStorage.setItem("online_playerName", data.name);
         }
     }
 
-    // --- Функції налаштувань ---
+    // --- Функції налаштувань (Тільки Хост) ---
 
     function updateBoardSize(increment: number) {
         if (!room || !canEditSettings) return;
@@ -124,7 +141,6 @@
         });
     }
 
-    // --- Action для скраббінгу ---
     function scrubbable(
         node: HTMLElement,
         params: {
@@ -186,7 +202,6 @@
         };
     }
 
-    // FIX: Сортування гравців за часом приєднання (стабільний список)
     $: playersList = room
         ? Object.values(room.players).sort((a, b) => a.joinedAt - b.joinedAt)
         : [];
@@ -238,7 +253,6 @@
                                 class:is-me={player.id === myPlayerId}
                                 data-testid={`player-card-${player.id}`}
                             >
-                                <!-- FIX: ColorPicker для себе, аватар для інших -->
                                 {#if player.id === myPlayerId}
                                     <div class="color-picker-wrapper">
                                         <ColorPicker
@@ -260,7 +274,6 @@
 
                                 <div class="player-info">
                                     <div class="player-name-row">
-                                        <!-- FIX: Input для редагування імені -->
                                         {#if player.id === myPlayerId}
                                             <input
                                                 type="text"
@@ -302,7 +315,6 @@
                             </div>
                         {/each}
 
-                        <!-- Показуємо плейсхолдери, якщо гравців менше 2 -->
                         {#if playersList.length < 2}
                             <div class="player-card empty">
                                 <div class="player-avatar placeholder">?</div>
@@ -603,7 +615,7 @@
 
     .player-info {
         flex: 1;
-        min-width: 0; /* Для коректного скорочення тексту */
+        min-width: 0;
     }
 
     .player-name-row {
