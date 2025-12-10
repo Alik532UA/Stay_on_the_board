@@ -25,6 +25,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 const ROOM_TIMEOUT_MS = import.meta.env.DEV ? 10000 : 120000;
 const OPERATION_TIMEOUT_MS = 10000;
+// FIX: Збільшено ліміт гравців до 8
+const MAX_PLAYERS = 8;
 
 export interface ChatMessage {
     id?: string;
@@ -90,7 +92,6 @@ class RoomService {
         };
 
         try {
-            logService.init('[RoomService] Sending addDoc request...');
             const docRef = await withTimeout(
                 addDoc(collection(this.db, 'rooms'), roomData),
                 OPERATION_TIMEOUT_MS,
@@ -134,7 +135,7 @@ class RoomService {
                     name: data.name,
                     status: data.status,
                     playerCount: Object.keys(data.players || {}).length,
-                    maxPlayers: 2,
+                    maxPlayers: MAX_PLAYERS, // FIX: Використовуємо нову константу
                     isPrivate: data.isPrivate
                 });
             });
@@ -174,7 +175,8 @@ class RoomService {
                 return existingSession.playerId;
             }
 
-            if (Object.keys(roomData.players).length >= 2) {
+            // FIX: Перевірка на новий ліміт гравців
+            if (Object.keys(roomData.players).length >= MAX_PLAYERS) {
                 throw new Error('Room is full');
             }
             if (roomData.status !== 'waiting') {
@@ -184,7 +186,7 @@ class RoomService {
             const newPlayer: OnlinePlayer = {
                 id: playerId,
                 name: playerName,
-                color: '#f4a261',
+                color: '#f4a261', // Дефолтний колір, можна змінити в лобі
                 isReady: false,
                 joinedAt: Date.now(),
                 isOnline: true
@@ -205,6 +207,18 @@ class RoomService {
             logService.error('[RoomService] Failed to join room:', error);
             throw error;
         }
+    }
+
+    // FIX: Новий метод для оновлення даних гравця (ім'я, колір)
+    async updatePlayer(roomId: string, playerId: string, data: Partial<OnlinePlayer>): Promise<void> {
+        const roomRef = doc(this.db, 'rooms', roomId);
+        const updates: Record<string, any> = { lastActivity: Date.now() };
+
+        for (const [key, value] of Object.entries(data)) {
+            updates[`players.${playerId}.${key}`] = value;
+        }
+
+        await updateDoc(roomRef, updates);
     }
 
     async getRoom(roomId: string): Promise<Room | null> {
@@ -252,15 +266,6 @@ class RoomService {
         }
 
         await updateDoc(roomRef, updates);
-    }
-
-    // FIX: Новий метод для перемикання блокування налаштувань
-    async toggleSettingsLock(roomId: string, isLocked: boolean): Promise<void> {
-        const roomRef = doc(this.db, 'rooms', roomId);
-        await updateDoc(roomRef, {
-            settingsLocked: isLocked,
-            lastActivity: Date.now()
-        });
     }
 
     async sendMessage(roomId: string, senderId: string, senderName: string, text: string): Promise<void> {

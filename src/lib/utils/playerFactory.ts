@@ -7,6 +7,7 @@
 import type { Player, BonusHistoryItem } from '$lib/models/player';
 import { DEFAULT_PLAYER_NAMES } from '$lib/config/defaultPlayers';
 import { getRandomUnusedColor } from '$lib/utils/playerUtils';
+import type { OnlinePlayer } from '$lib/types/online';
 
 /**
  * Базова конфігурація для створення гравця
@@ -121,10 +122,25 @@ export function createTrainingPlayers(): Player[] {
 /**
  * Створює гравців для режиму Online
  */
-export function createOnlinePlayers(): Player[] {
-    return [
-        createHumanPlayer(1, 'You', '#000000'),
-        createHumanPlayer(2, 'Opponent', '#ffffff')
-    ];
+export function createOnlinePlayers(onlinePlayers?: OnlinePlayer[], hostId?: string): Player[] {
+    if (!onlinePlayers || onlinePlayers.length === 0) {
+        // Fallback, якщо даних немає (не повинно траплятися в реальній грі)
+        return [
+            createHumanPlayer(1, 'You', '#000000'),
+            createHumanPlayer(2, 'Opponent', '#ffffff')
+        ];
+    }
+
+    // Сортуємо гравців: Хост завжди перший (ID 1), Гість другий (ID 2)
+    // Це важливо для синхронізації черги ходів
+    const sortedPlayers = [...onlinePlayers].sort((a, b) => {
+        if (a.id === hostId) return -1;
+        if (b.id === hostId) return 1;
+        return 0;
+    });
+
+    return sortedPlayers.map((p, index) => {
+        return createHumanPlayer(index + 1, p.name, p.color);
+    });
 }
 
