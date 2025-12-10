@@ -2,7 +2,6 @@
   import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
   import PlayerManager from "$lib/components/local-setup/PlayerManager.svelte";
   import LocalGameSettings from "$lib/components/local-setup/LocalGameSettings.svelte";
-  import DevClearCacheButton from "$lib/components/widgets/DevClearCacheButton.svelte";
   import { _ } from "svelte-i18n";
   import { onMount } from "svelte";
   import { get } from "svelte/store";
@@ -34,8 +33,6 @@
     gameService.initializeNewGame({ players });
   });
 </script>
-
-<DevClearCacheButton />
 
 <div class="page-container">
   <div class="header-container">
