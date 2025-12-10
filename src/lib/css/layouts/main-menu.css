@@ -21,41 +21,7 @@
     margin-right: auto;
 }
 
-#main-menu-buttons .modal-button {
-    padding: 24px 32px;
-    font-size: 1.2em;
-    font-weight: bold;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: var(--control-bg);
-    color: var(--text-primary);
-    box-shadow: 0 4px 12px var(--shadow-color);
-}
 
-#main-menu-buttons .modal-button:hover {
-    background: var(--control-hover);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px var(--shadow-color);
-}
-
-#main-menu-buttons .modal-button.pseudo-disabled {
-    background: var(--disabled-bg);
-    color: var(--disabled-text);
-    cursor: pointer;
-    box-shadow: none;
-    border: 1.5px dashed var(--disabled-text);
-    pointer-events: auto;
-    transition: none;
-}
-
-#main-menu-buttons .modal-button.pseudo-disabled:hover {
-    transform: none;
-    background: var(--disabled-bg);
-    color: var(--disabled-text);
-}
 
 .wip-notice-overlay {
     position: fixed;
@@ -209,9 +175,7 @@
     background: transparent !important;
 }
 
-.cell,
-.control-btn,
-.modal-button {
+.cell {
     border-radius: 12px;
     transition: all 0.3s ease;
 }
@@ -236,43 +200,9 @@
     border-radius: 0 0 var(--unified-radius) var(--unified-radius);
 }
 
-.modal-footer .modal-button {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.2s ease;
-    min-width: 80px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
 
-.modal-button {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.2s ease;
-    min-width: 80px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
 
-.modal-button.primary {
-    background: var(--control-selected);
-    color: white;
-}
 
-.modal-button.secondary {
-    background: var(--control-bg);
-    color: var(--text-primary);
-}
 
 #visual-controls,
 #ui-panel {
@@ -283,30 +213,7 @@
     align-items: center;
 }
 
-.control-btn,
-.modal-button {
-    background: var(--control-bg);
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    padding: 12px 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: var(--text-primary);
-    font-weight: bold;
-    font-size: 1em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 44px;
-}
 
-.control-btn.selected,
-.modal-button.primary {
-    background: var(--control-selected);
-    color: white;
-    box-shadow: 0 0 15px var(--control-selected);
-}
 
 .score-panel {
     background: var(--bg-secondary);

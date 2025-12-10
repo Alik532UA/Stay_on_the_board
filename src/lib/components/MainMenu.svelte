@@ -22,6 +22,7 @@
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import { boardStore } from "$lib/stores/boardStore";
 
+  import StyledButton from "$lib/components/ui/StyledButton.svelte";
   import ThemeDropdown from "./main-menu/ThemeDropdown.svelte";
   import LanguageDropdown from "./main-menu/LanguageDropdown.svelte";
   import WipNotice from "./main-menu/WipNotice.svelte";
@@ -332,41 +333,53 @@
       bind:this={mainMenuButtonsNode}
       onkeydown={handleMenuKeyDown}
       tabindex="-1"
+      role="group"
+      aria-label={$_("mainMenu.menu")}
     >
-      <button
-        class="modal-button secondary"
-        onclick={() => navigateTo("/settings")}
-        data-testid="settings-btn">{$_("mainMenu.settings")}</button
+      <StyledButton
+        variant="menu"
+        size="large"
+        on:click={() => navigateTo("/settings")}
+        dataTestId="settings-btn">{$_("mainMenu.settings")}</StyledButton
       >
-      <button
-        class="modal-button secondary"
-        onclick={handleControls}
-        data-testid="controls-btn">{$_("mainMenu.controls")}</button
+      <StyledButton
+        variant="menu"
+        size="large"
+        on:click={handleControls}
+        dataTestId="controls-btn">{$_("mainMenu.controls")}</StyledButton
       >
-      <button
-        class="modal-button secondary"
-        onclick={handleRules}
-        data-testid="rules-btn">{$_("mainMenu.rules")}</button
+      <StyledButton
+        variant="menu"
+        size="large"
+        on:click={handleRules}
+        dataTestId="rules-btn">{$_("mainMenu.rules")}</StyledButton
       >
-      <button
-        class="modal-button secondary"
-        onclick={handleSupporters}
-        data-testid="supporters-btn">{$_("mainMenu.supporters")}</button
+      <StyledButton
+        variant="menu"
+        size="large"
+        on:click={handleSupporters}
+        dataTestId="supporters-btn">{$_("mainMenu.supporters")}</StyledButton
       >
-      <button
-        class="modal-button secondary"
-        onclick={() => navigateTo("/rewards")}
-        data-testid="rewards-btn"
+      <StyledButton
+        variant="menu"
+        size="large"
+        on:click={() => navigateTo("/rewards")}
+        dataTestId="rewards-btn"
       >
-        <span class="icon-spacer"><SvgIcons name="trophy_bronze" /></span>
-        <span class="text">{$_("rewards.pageTitle")}</span>
-      </button>
+        <span slot="icon" class="icon-spacer" style="margin-right: 0px;"
+          ><SvgIcons name="trophy_bronze" /></span
+        >
+        {$_("rewards.pageTitle")}
+      </StyledButton>
       <!-- <button class="modal-button danger" onclick={showClearCacheModal} data-testid="clear-cache-btn">{$_('mainMenu.clearCache')}</button> -->
-      <button
-        class="modal-button secondary play-button ripple test-green-button"
+      <StyledButton
+        variant="primary"
+        size="large"
+        class="play-button ripple"
         style="padding: 32px;"
-        onclick={handlePlayVirtualPlayer}
-        data-testid="virtual-player-btn">{$_("mainMenu.virtualPlayer")}</button
+        on:click={handlePlayVirtualPlayer}
+        dataTestId="virtual-player-btn"
+        >{$_("mainMenu.virtualPlayer")}</StyledButton
       >
     </div>
   {/if}
