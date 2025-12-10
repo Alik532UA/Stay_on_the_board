@@ -105,7 +105,6 @@
     showLangDropdown = false;
     showWipNotice = false;
   }
-  
 
   function handlePlayVirtualPlayer() {
     hotkeyService.popContext();
@@ -184,10 +183,17 @@
   }
 </script>
 
-<div style="display: flex; flex-direction: column; min-height: 100vh; align-items: center; justify-content: center;">
+<!-- 
+  FIX: Замінено min-height: 100vh на flex: 1 та width: 100%.
+  Це дозволяє компоненту заповнювати батьківський контейнер (який має min-height: 100vh),
+  але не форсувати власну висоту, що дозволяє коректно працювати зі спейсерами меню.
+-->
+<div
+  style="display: flex; flex-direction: column; flex: 1; width: 100%; align-items: center; justify-content: center;"
+>
   <main class="main-menu" data-testid="main-menu-container">
     {#if $isLoading}
-    <div class="main-menu-loading">{$_("mainMenu.loadingTranslations")}</div>
+      <div class="main-menu-loading">{$_("mainMenu.loadingTranslations")}</div>
     {:else}
       <div>
         {#if showWipNotice}
@@ -226,8 +232,7 @@
             class="play-button ripple"
             style="padding: 32px;"
             on:click={handlePlayVirtualPlayer}
-            dataTestId="play-btn"
-            >{$_("mainMenu.virtualPlayer")}</StyledButton
+            dataTestId="play-btn">{$_("mainMenu.virtualPlayer")}</StyledButton
           >
         </div>
       </div>
