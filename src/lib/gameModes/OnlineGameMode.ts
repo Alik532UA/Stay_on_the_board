@@ -18,6 +18,7 @@ import type { MoveDirectionType } from '$lib/models/Piece';
 import { notificationService } from '$lib/services/notificationService';
 import { availableMovesService } from '$lib/services/availableMovesService';
 import { gameEventBus } from '$lib/services/gameEventBus';
+import type { Room } from '$lib/types/online';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
@@ -27,7 +28,8 @@ export class OnlineGameMode extends BaseGameMode {
   private myPlayerId: string | null = null;
   private amIHost: boolean = false;
   private myPlayerIndex: number = -1;
-  private isApplyingRemoteState: boolean = false; // Прапорець для уникнення циклів
+  private isApplyingRemoteState: boolean = false;
+  private roomData: Room | null = null;
 
   constructor() {
     super();
@@ -44,9 +46,9 @@ export class OnlineGameMode extends BaseGameMode {
       return;
     }
 
-    const roomData = await roomService.getRoom(this.roomId);
-    if (roomData) {
-      this.amIHost = roomData.hostId === this.myPlayerId;
+    this.roomData = await roomService.getRoom(this.roomId);
+    if (this.roomData) {
+      this.amIHost = this.roomData.hostId === this.myPlayerId;
       this.myPlayerIndex = this.amIHost ? 0 : 1;
 
       uiStateStore.update(s => ({
@@ -56,15 +58,14 @@ export class OnlineGameMode extends BaseGameMode {
         intendedGameType: 'online'
       }));
 
-      // Застосовуємо початкові налаштування з кімнати
-      if (roomData.settings) {
+      if (this.roomData.settings) {
         this.isApplyingRemoteState = true;
         gameSettingsStore.updateSettings({
-          ...roomData.settings,
-          settingsLocked: roomData.settingsLocked // Синхронізуємо стан блокування
+          ...this.roomData.settings,
+          settingsLocked: this.roomData.settingsLocked
         });
-        if (roomData.settings.turnDuration) {
-          this.turnDuration = roomData.settings.turnDuration;
+        if (this.roomData.settings.turnDuration) {
+          this.turnDuration = this.roomData.settings.turnDuration;
         }
         this.isApplyingRemoteState = false;
       }
@@ -84,21 +85,14 @@ export class OnlineGameMode extends BaseGameMode {
         this.handleSyncEvent(event);
       });
 
-      // Підписуємося на локальні зміни налаштувань, щоб відправляти їх на сервер
       this.unsubscribeSettings = gameSettingsStore.subscribe(settings => {
         if (!this.isApplyingRemoteState && this.roomId) {
-          // Відправляємо зміни тільки якщо вони зроблені локально
-          // І тільки ті, що впливають на геймплей
           const settingsToSync = {
             blockModeEnabled: settings.blockModeEnabled,
             autoHideBoard: settings.autoHideBoard,
             boardSize: settings.boardSize,
             turnDuration: settings.turnDuration
           };
-
-          // Використовуємо roomService для оновлення налаштувань (це оновить документ кімнати)
-          // АЛЕ: нам також треба оновити gameState, щоб інші гравці отримали це через stateSync
-          // Тому краще оновлювати через pushState
           this.syncCurrentState();
         }
       });
@@ -111,9 +105,12 @@ export class OnlineGameMode extends BaseGameMode {
       } else {
         if (this.amIHost) {
           logService.GAME_MODE('[OnlineGameMode] I am Host. Initializing new game state.');
+
+          const playersConfig = this.getPlayersConfiguration();
+
           gameService.initializeNewGame({
             size: options.newSize,
-            players: this.getPlayersConfiguration(),
+            players: playersConfig,
           });
           await this.syncCurrentState();
         } else {
@@ -121,7 +118,6 @@ export class OnlineGameMode extends BaseGameMode {
         }
       }
 
-      // Локальні налаштування (не синхронізуються)
       gameSettingsStore.updateSettings({
         speechRate: 1.6,
         shortSpeech: true,
@@ -184,6 +180,10 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   getPlayersConfiguration(): Player[] {
+    if (this.roomData) {
+      const onlinePlayers = Object.values(this.roomData.players);
+      return createOnlinePlayers(onlinePlayers, this.roomData.hostId);
+    }
     return createOnlinePlayers();
   }
 
@@ -199,6 +199,14 @@ export class OnlineGameMode extends BaseGameMode {
     await this.syncCurrentState();
   }
 
+  protected async advanceToNextPlayer(): Promise<void> {
+    await super.advanceToNextPlayer();
+  }
+
+  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
+    await super.applyScoreChanges(scoreChanges);
+  }
+
   private async syncCurrentState(): Promise<void> {
     if (!this.stateSync) return;
     const boardState = get(boardStore);
@@ -212,7 +220,7 @@ export class OnlineGameMode extends BaseGameMode {
       boardState,
       playerState,
       scoreState,
-      settings: { // Синхронізуємо важливі налаштування
+      settings: {
         blockModeEnabled: settings.blockModeEnabled,
         autoHideBoard: settings.autoHideBoard,
         boardSize: settings.boardSize,
@@ -225,10 +233,11 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   private applyRemoteState(remoteState: SyncableGameState): void {
-    this.isApplyingRemoteState = true; // Блокуємо зворотню синхронізацію
+    this.isApplyingRemoteState = true;
 
     const currentBoard = get(boardStore);
 
+    // 1. Виявляємо нові ходи для анімації
     if (currentBoard && remoteState.boardState) {
       const oldQueueLength = currentBoard.moveQueue.length;
       const newQueueLength = remoteState.boardState.moveQueue.length;
@@ -238,11 +247,13 @@ export class OnlineGameMode extends BaseGameMode {
         logService.animation(`[OnlineGameMode] Found ${newMoves.length} new moves from server. Queueing animation.`);
 
         newMoves.forEach(move => {
+          // FIX: Додаємо ходи в чергу анімації
           gameEventBus.dispatch('new_move_added', move);
         });
       }
     }
 
+    // 2. Оновлюємо стори
     if (remoteState.boardState) boardStore.set(remoteState.boardState);
     if (remoteState.playerState) playerStore.set(remoteState.playerState);
     if (remoteState.scoreState) scoreStore.set(remoteState.scoreState);
@@ -258,7 +269,7 @@ export class OnlineGameMode extends BaseGameMode {
     availableMovesService.updateAvailableMoves();
     this.startTurn();
 
-    this.isApplyingRemoteState = false; // Розблоковуємо
+    this.isApplyingRemoteState = false;
   }
 
   private handleSyncEvent(event: GameStateSyncEvent): void {

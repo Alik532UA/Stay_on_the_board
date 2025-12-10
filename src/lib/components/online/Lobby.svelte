@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import { roomService } from "$lib/services/roomService";
-    import type { Room } from "$lib/types/online";
+    import type { Room, OnlinePlayer } from "$lib/types/online";
     import { _ } from "svelte-i18n";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
@@ -11,6 +11,7 @@
     import type { Unsubscribe } from "firebase/firestore";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
     import type { GameSettingsState } from "$lib/stores/gameSettingsStore";
+    import ColorPicker from "$lib/components/local-setup/ColorPicker.svelte"; // Імпортуємо ColorPicker
 
     export let roomId: string;
 
@@ -63,7 +64,18 @@
         setTimeout(() => (isCopied = false), 2000);
     }
 
-    // --- Функції налаштувань (Тільки Хост) ---
+    // --- Функції оновлення гравця ---
+    function handleUpdatePlayer(data: Partial<OnlinePlayer>) {
+        if (!room || !myPlayerId) return;
+        roomService.updatePlayer(roomId, myPlayerId, data);
+
+        // Якщо змінили ім'я, зберігаємо його локально для майбутніх ігор
+        if (data.name) {
+            localStorage.setItem("online_playerName", data.name);
+        }
+    }
+
+    // --- Функції налаштувань ---
 
     function updateBoardSize(increment: number) {
         if (!room || !canEditSettings) return;
@@ -98,7 +110,6 @@
         roomService.updateRoomSettings(roomId, { [key]: newValue });
     }
 
-    // Тільки хост може змінювати права доступу
     function toggleGuestAccess() {
         if (!room || !amIHost) return;
         roomService.updateRoomSettings(roomId, {
@@ -106,7 +117,6 @@
         });
     }
 
-    // Функція для перемикання блокування налаштувань під час гри
     function toggleSettingsLock() {
         if (!room || !canEditSettings) return;
         roomService.updateRoomSettings(roomId, {
@@ -114,14 +124,14 @@
         });
     }
 
-    // --- Action для скраббінгу (перетягування значень) ---
+    // --- Action для скраббінгу ---
     function scrubbable(
         node: HTMLElement,
         params: {
             value: number;
             min: number;
             max: number;
-            step: number; // Скільки пікселів треба пройти для зміни на 1 одиницю
+            step: number;
             onUpdate: (val: number) => void;
             disabled: boolean;
         },
@@ -132,7 +142,7 @@
 
         function onMouseDown(e: MouseEvent) {
             if (disabled) return;
-            e.preventDefault(); // Запобігає виділенню тексту
+            e.preventDefault();
             startX = e.clientX;
             startValue = value;
 
@@ -144,13 +154,9 @@
 
         function onMouseMove(e: MouseEvent) {
             const deltaX = e.clientX - startX;
-            // Чим більше step, тим повільніше змінюється значення (більше пікселів на одиницю)
-            // Тут step це "чутливість" (пікселів на 1 одиницю значення)
             const deltaValue = Math.round(deltaX / step);
-
             let newValue = startValue + deltaValue;
             newValue = Math.max(min, Math.min(max, newValue));
-
             if (newValue !== value) {
                 onUpdate(newValue);
             }
@@ -180,11 +186,15 @@
         };
     }
 
-    $: playersList = room ? Object.values(room.players) : [];
+    // FIX: Сортування гравців за часом приєднання (стабільний список)
+    $: playersList = room
+        ? Object.values(room.players).sort((a, b) => a.joinedAt - b.joinedAt)
+        : [];
+
     $: amIHost = room && myPlayerId ? room.hostId === myPlayerId : false;
     $: canEditSettings = amIHost || (room && room.allowGuestSettings);
     $: allReady =
-        playersList.length === 2 && playersList.every((p) => p.isReady);
+        playersList.length >= 2 && playersList.every((p) => p.isReady);
     $: myName = room && myPlayerId ? room.players[myPlayerId]?.name : "Player";
 </script>
 
@@ -220,7 +230,7 @@
                 </div>
 
                 <div class="players-section">
-                    <h3>{$_("onlineMenu.players")} ({playersList.length}/2)</h3>
+                    <h3>{$_("onlineMenu.players")} ({playersList.length}/8)</h3>
                     <div class="players-list" data-testid="players-list">
                         {#each playersList as player (player.id)}
                             <div
@@ -228,15 +238,47 @@
                                 class:is-me={player.id === myPlayerId}
                                 data-testid={`player-card-${player.id}`}
                             >
-                                <div
-                                    class="player-avatar"
-                                    style="background-color: {player.color}"
-                                >
-                                    {player.name[0].toUpperCase()}
-                                </div>
+                                <!-- FIX: ColorPicker для себе, аватар для інших -->
+                                {#if player.id === myPlayerId}
+                                    <div class="color-picker-wrapper">
+                                        <ColorPicker
+                                            value={player.color}
+                                            on:change={(e) =>
+                                                handleUpdatePlayer({
+                                                    color: e.detail.value,
+                                                })}
+                                        />
+                                    </div>
+                                {:else}
+                                    <div
+                                        class="player-avatar"
+                                        style="background-color: {player.color}"
+                                    >
+                                        {player.name[0].toUpperCase()}
+                                    </div>
+                                {/if}
+
                                 <div class="player-info">
-                                    <div class="player-name">
-                                        {player.name}
+                                    <div class="player-name-row">
+                                        <!-- FIX: Input для редагування імені -->
+                                        {#if player.id === myPlayerId}
+                                            <input
+                                                type="text"
+                                                class="player-name-input"
+                                                value={player.name}
+                                                on:change={(e) =>
+                                                    handleUpdatePlayer({
+                                                        name: e.currentTarget
+                                                            .value,
+                                                    })}
+                                                maxlength="15"
+                                            />
+                                        {:else}
+                                            <span class="player-name-text"
+                                                >{player.name}</span
+                                            >
+                                        {/if}
+
                                         {#if player.id === room.hostId}
                                             <span
                                                 class="host-badge"
@@ -259,6 +301,8 @@
                                 </div>
                             </div>
                         {/each}
+
+                        <!-- Показуємо плейсхолдери, якщо гравців менше 2 -->
                         {#if playersList.length < 2}
                             <div class="player-card empty">
                                 <div class="player-avatar placeholder">?</div>
@@ -557,13 +601,45 @@
         color: var(--text-secondary);
     }
 
+    .player-info {
+        flex: 1;
+        min-width: 0; /* Для коректного скорочення тексту */
+    }
+
+    .player-name-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+    }
+
+    .player-name-text {
+        font-weight: bold;
+        font-size: 1.1em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .player-name-input {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 2px 6px;
+        color: var(--text-primary);
+        font-weight: bold;
+        font-size: 1.1em;
+        width: 100%;
+        max-width: 150px;
+    }
+
     .host-badge {
         background: #ffd700;
         color: #000;
         font-size: 0.7em;
         padding: 2px 6px;
         border-radius: 4px;
-        margin-left: 6px;
+        white-space: nowrap;
     }
 
     .player-status.ready {

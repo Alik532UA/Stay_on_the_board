@@ -15,7 +15,10 @@ function createAnimationService() {
     logService.animation('[AnimationService] addToAnimationQueue:', move);
     animationStore.update(state => {
       const newQueue = [...state.animationQueue, move];
+
+      // FIX: Завжди запускаємо анімацію, якщо вона не йде, навіть якщо це перший хід
       if (!state.isPlayingAnimation) {
+        // Використовуємо setTimeout, щоб дати Svelte оновити стор перед запуском
         setTimeout(() => playNextAnimation(true), 0);
       }
       return { ...state, animationQueue: newQueue };
@@ -40,13 +43,13 @@ function createAnimationService() {
     }));
 
     const isPlayerMove = move.player === 1;
-    const animationDuration = 500; // Стандартна тривалість анімації (Варіант 1A: не змінюємо)
+    const animationDuration = 500;
 
     const activeMode = get(gameModeStore).activeMode;
     const currentPreset = get(gameSettingsStore).gameMode;
     const isListening = get(uiStateStore).isListening;
 
-    let pauseValues = { player: 100, computer: 100 }; // Default values
+    let pauseValues = { player: 100, computer: 100 };
 
     if (isListening) {
       pauseValues = { player: 30, computer: 30 };
@@ -65,13 +68,9 @@ function createAnimationService() {
 
     let pauseAfterMove = isPlayerMove ? pauseValues.player : pauseValues.computer;
 
-    // --- ЛОГІКА "НАЗДОГАНЯННЯ" (Варіант 2A) ---
-    // Якщо в черзі є 2 або більше ходів (поточний + наступні),
-    // ми зменшуємо паузу до мінімуму, щоб швидше перейти до наступної анімації.
-    // Сама анімація (animationDuration) залишається плавною.
     if (state.animationQueue.length >= 2) {
       logService.animation(`[AnimationService] Catch-up mode active (queue: ${state.animationQueue.length}). Reducing pause to 1ms.`);
-      pauseAfterMove = 1; // Варіант 1A: зменшуємо тільки паузу
+      pauseAfterMove = 1;
     } else {
       logService.animation(`[AnimationService] Playing move. Standard pause: ${pauseAfterMove}ms`);
     }
@@ -90,7 +89,7 @@ function createAnimationService() {
 
   return {
     initialize: () => {
-      if (unsubscribe) return; // Prevent multiple subscriptions
+      if (unsubscribe) return;
       unsubscribe = gameEventBus.subscribe('new_move_added', addToAnimationQueue);
     },
     destroy: () => {
