@@ -10,6 +10,7 @@
     export let position: MenuPosition = "bottom";
     export let persistenceKey: string = "";
     export let withSpacer: boolean = true;
+    export let dataTestId: string = "flexible-menu-wrapper";
 
     // State
     let isOpen = true;
@@ -74,7 +75,7 @@
         ? 'is-open'
         : 'is-closed'}"
     aria-hidden={!isOpen}
-    data-testid="flexible-menu-wrapper"
+    data-testid={dataTestId}
 >
     <!-- Main Content Panel -->
     <div class="menu-panel" data-testid="flexible-menu-panel">

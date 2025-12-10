@@ -1283,9 +1283,23 @@ id="main-menu-buttons"
 Правила
 Грати
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+1.
+data-testid="main-menu-container"
+Актуальний результат: зверху екрану
+Очікуваний результат: відцетрувати по центру по висоті
 
+2.
+class="styled-button styled-button--variant-primary styled-button--size-large styled-button--shape-default play-button ripple"
+data-testid="virtual-player-btn"
+
+Актуальний результат: data-testid="virtual-player-btn"
+Очікуваний результат: ця кнопка не запускає одразу , відкриває data-testid="game-mode-modal" , може data-testid="play-btn"
+
+Актуальний результат: margin-top: 0px; margin-bottom: 24px;
+Очікуваний результат: margin-top: 24px; margin-bottom: 0px;
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
+два об'єкта з data-testid="flexible-menu-wrapper"
+data-testid повинні бути унікальними
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
