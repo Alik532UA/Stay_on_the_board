@@ -24,7 +24,7 @@ export enum GameMode {
 export async function enableTestMode(page: Page) {
   // НАВІЩО: Чекаємо, доки наш тестовий хук стане доступним на window.
   await page.waitForFunction(() => (window as any).toggleTestMode, null, { timeout: 10000 });
-  
+
   // НАВІЩО: Викликаємо єдину, централізовану функцію для ввімкнення
   // тестового режиму. Це гарантує, що тест взаємодіє з додатком
   // через той самий SSoT, що й користувацький інтерфейс.
@@ -40,7 +40,7 @@ export async function enableTestMode(page: Page) {
 export async function startNewGame(page: Page, mode: GameMode = GameMode.Beginner) {
   await page.goto('/');
   await enableTestMode(page);
-  await page.getByTestId('virtual-player-btn').click();
+  await page.getByTestId('play-btn').click();
 
   await page.getByTestId(mode).click();
 

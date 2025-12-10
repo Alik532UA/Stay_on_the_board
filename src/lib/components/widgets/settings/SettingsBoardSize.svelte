@@ -1,7 +1,7 @@
 <script lang="ts">
     import { boardStore } from "$lib/stores/boardStore";
-    import { userActionService } from "$lib/services/userActionService.js";
-    import { logService } from "$lib/services/logService.js";
+    import { userActionService } from "$lib/services/userActionService";
+    import { logService } from "$lib/services/logService";
     import { _ } from "svelte-i18n";
     import { get } from "svelte/store";
 

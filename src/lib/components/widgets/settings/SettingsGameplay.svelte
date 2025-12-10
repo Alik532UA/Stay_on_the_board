@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
-    import { gameModeStore } from "$lib/stores/gameModeStore.js";
+    import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
+    import { gameModeStore } from "$lib/stores/gameModeStore";
     import { modalStore } from "$lib/stores/modalStore";
-    import { userActionService } from "$lib/services/userActionService.js";
+    import { userActionService } from "$lib/services/userActionService";
     import { gameModeService } from "$lib/services/gameModeService";
-    import { uiStateStore } from "$lib/stores/uiStateStore.js";
-    import { logService } from "$lib/services/logService.js";
+    import { uiStateStore } from "$lib/stores/uiStateStore";
+    import { logService } from "$lib/services/logService";
     import { _ } from "svelte-i18n";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
     import { fitTextAction } from "$lib/actions/fitText";

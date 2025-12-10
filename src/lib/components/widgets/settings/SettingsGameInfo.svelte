@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
+    import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
     import { _ } from "svelte-i18n";
     import { fitTextAction } from "$lib/actions/fitText";
 </script>
