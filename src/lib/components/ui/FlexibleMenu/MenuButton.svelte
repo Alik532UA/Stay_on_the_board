@@ -5,8 +5,6 @@
     // Explicitly typing the prop
     export let item: IMenuItem;
     export let dataTestId: string = "";
-
-    console.log(item.id, item.isActive);
 </script>
 
 <button
