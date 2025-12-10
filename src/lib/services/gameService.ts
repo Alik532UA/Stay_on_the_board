@@ -5,6 +5,7 @@ import { scoreStore, type ScoreState } from '$lib/stores/scoreStore';
 import { uiStateStore, type UiState } from '$lib/stores/uiStateStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { testModeStore } from '$lib/stores/testModeStore';
+import { gameOverStore } from '$lib/stores/gameOverStore'; // <-- IMPORTED
 import { getInitialPosition } from '$lib/utils/initialPositionUtils';
 import { createEmptyBoard } from '$lib/utils/boardUtils';
 import type { Player, BonusHistoryItem } from '$lib/models/player';
@@ -13,7 +14,7 @@ import { animationService } from './animationService';
 import { logService } from './logService';
 import { DEFAULT_PLAYER_NAMES } from '$lib/config/defaultPlayers';
 import { getRandomUnusedColor } from '$lib/utils/playerUtils';
-import { initialUIState } from '$lib/stores/uiStateStore'; // Імпортуємо початковий стан
+import { initialUIState } from '$lib/stores/uiStateStore';
 
 export const gameService = {
   initializeNewGame(config: {
@@ -87,10 +88,15 @@ export const gameService = {
       testModeOverrides: currentUiState.testModeOverrides
     };
 
+    // Оновлюємо всі стори
     boardStore.set(initialBoardState);
     playerStore.set(initialPlayerState);
     scoreStore.set(initialScoreState);
     uiStateStore.set(newUiState);
+
+    // FIX: Критично важливо скинути стан завершення гри.
+    // Інакше при синхронізації (OnlineGameMode) буде відправлено старий статус "Game Over".
+    gameOverStore.resetGameOverState();
 
     gameSettingsStore.updateSettings({
       showBoard: true,
