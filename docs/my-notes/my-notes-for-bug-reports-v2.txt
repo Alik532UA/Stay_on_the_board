@@ -1300,6 +1300,66 @@ data-testid="virtual-player-btn"
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 два об'єкта з data-testid="flexible-menu-wrapper"
 data-testid повинні бути унікальними
+
+P.S.
+у нас була така проблема з 
+data-testid="top-menu-slot-1"
+data-testid="bottom-menu-slot-1"
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+у нас є дублюючі кнопки:
+data-testid="menu-button-dev-clear-cache-btn"
+та
+data-testid="dev-clear-cache-btn"
+
+і ще  дублюючі кнопки:
+data-testid="menu-button-test-mode-btn"
+та
+data-testid="test-mode-btn"
+
+і тому data-testid="test-mode-btn" та data-testid="dev-clear-cache-btn" прибираємо
+
+але не ламати міханіку відкриття class="test-mode-widget s-6zYjNZG5fqGH" якщо натиснути на data-testid="menu-button-test-mode-btn"
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+але кнопки data-testid="test-mode-btn" та data-testid="dev-clear-cache-btn" досі на екрані, а вони більше не потрібі
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="test-mode-btn" досі є на екрані
+fix
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+є сторінка /test/buttons
+і ми "не знаємо" нічого про її існування з точки зору доступу до неї, бо жодна кнопка не відкриває цю сторінку
+
+але є сторінка /test і на неї веде кнопка data-testid="dev-menu-dnd-btn" з data-testid="dev-menu"
+
+задача знати всі "фантомні сторінки" для яких немає кнопки, і додати кнопку в data-testid="dev-menu"
+
+відправити повний код виправлених файлів
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+є два об'єкта з data-testid="flexible-menu-toggle-trigger"
+data-testid повинні бути унікальними
+
+P.S.
+у нас була така проблема з 
+data-testid="top-menu-slot-1"
+data-testid="bottom-menu-slot-1"
+
+треба fix
+і пошукати ще data-testid які можуть повторюватися та виправити всі
+всі data-testid повинні бути унікальними
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Актуальний результат: стрілка знаходиться Не рівно по центру class="toggle-icon closed s-bSeVPxb6RwRh"
+Очікуваний результат: стрілка знаходиться рівно по центру class="toggle-icon closed s-bSeVPxb6RwRh"
+
+data-testid="top-menu-toggle-trigger"
+Актуальний результат: зона для натискання прозора, але має ефект тіні і через це цю зону видно
+Очікуваний результат: зона для натискання прозора, і немає ефект тіні і цю зону повністю не видно
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+data-testid="flexible-menu-bottom-wrapper"
+data-testid="flexible-menu-top-wrapper"
+Актуальний результат: тільки в головному меню
+Очікуваний результат: на усіх сторінках
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦

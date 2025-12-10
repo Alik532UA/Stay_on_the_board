@@ -78,7 +78,7 @@
     data-testid={dataTestId}
 >
     <!-- Main Content Panel -->
-    <div class="menu-panel" data-testid="flexible-menu-panel">
+    <div class="menu-panel" data-testid="{position}-menu-panel">
         <!-- Toggle Button ("Tongue") -->
         <!-- Position depends on main position relative to panel -->
         <button
@@ -86,7 +86,7 @@
             on:click={toggle}
             aria-label={isOpen ? "Згорнути меню" : "Розгорнути меню"}
             title={isOpen ? "Згорнути" : "Розгорнути"}
-            data-testid="flexible-menu-toggle-trigger"
+            data-testid="{position}-menu-toggle-trigger"
         >
             <div class="toggle-visual">
                 <div class="toggle-icon {isOpen ? 'open' : 'closed'}">
@@ -98,9 +98,12 @@
             </div>
         </button>
 
-        <div class="menu-grid" data-testid="flexible-menu-grid">
+        <div class="menu-grid" data-testid="{position}-menu-grid">
             {#each [0, 1, 2, 3, 4] as i}
-                <div class="menu-slot slot-{i}" data-testid="{position}-menu-slot-{i}">
+                <div
+                    class="menu-slot slot-{i}"
+                    data-testid="{position}-menu-slot-{i}"
+                >
                     {#if displayItems[i]}
                         <!-- Force primary prop on index 2 if not explicitly set but it IS index 2 -->
                         <MenuButton
@@ -111,7 +114,8 @@
                                         ? displayItems[i].primary
                                         : i === 2,
                             }}
-                            dataTestId={displayItems[i].dataTestId || `menu-button-${displayItems[i].id}`}
+                            dataTestId={displayItems[i].dataTestId ||
+                                `menu-button-${displayItems[i].id}`}
                         />
                     {/if}
                 </div>
@@ -259,6 +263,14 @@
         right: 8px; /* Adjust position */
         padding: 0;
         /* align-items is now position-dependent */
+        -webkit-tap-highlight-color: transparent; /* Remove mobile tap highlight */
+    }
+
+    /* Remove focus outline and shadow for the invisible trigger */
+    .toggle-trigger:focus,
+    .toggle-trigger:active {
+        outline: none;
+        box-shadow: none;
     }
 
     .toggle-visual {
@@ -302,13 +314,25 @@
         transition: transform 0.3s;
         width: 16px;
         height: 16px;
+        /* Center the SVG perfectly */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
+    /* 
+       Unified rotation logic:
+       When closed, rotate 180deg to indicate "expand".
+       When open, default rotation (0deg) indicates "collapse".
+       
+       Bottom: Default (Open) = Arrow Down. Closed = Arrow Up (180deg).
+       Top: Default (Open) = Arrow Up. Closed = Arrow Down (180deg).
+    */
     .position-bottom .toggle-icon.closed {
         transform: rotate(180deg);
     }
 
-    .position-top .toggle-icon.open {
+    .position-top .toggle-icon.closed {
         transform: rotate(180deg);
     }
 

@@ -22,6 +22,12 @@
         onClose();
     }
 
+    function handlePhantomPage(name: string, route: string) {
+        logService.action(`Click: "${name}" (DevMenu)`);
+        navigateTo(route);
+        onClose();
+    }
+
     function handleTimedGame() {
         // NOTE: Original MainMenu logic for timed game:
         // onclick={() => {
@@ -44,6 +50,8 @@
     onkeydown={(e) => e.key === "Escape" && onClose()}
 >
     <h3>dev v.{versionNumber}</h3>
+
+    <!-- Test Pages -->
     <StyledButton
         variant="menu"
         class="secondary"
@@ -52,12 +60,66 @@
     >
         {$_("mainMenu.dragAndDropTest")}
     </StyledButton>
+
+    <StyledButton
+        variant="menu"
+        class="secondary"
+        on:click={() =>
+            handlePhantomPage("Button Styles Test", "/test/buttons")}
+        dataTestId="dev-menu-buttons-test-btn"
+    >
+        Button Styles Test
+    </StyledButton>
+
     <StyledButton
         variant="menu"
         class="secondary"
         on:click={() => navigateTo("/test-main-menu")}
         dataTestId="dev-menu-test-main-menu-btn">Test Main Menu</StyledButton
     >
+
+    <!-- Phantom / WIP Pages -->
+    <StyledButton
+        variant="menu"
+        class="secondary"
+        on:click={() => handlePhantomPage("Join Room (WIP)", "/join")}
+        dataTestId="dev-menu-join-btn"
+    >
+        Join Room (WIP)
+    </StyledButton>
+
+    <StyledButton
+        variant="menu"
+        class="secondary"
+        on:click={() => handlePhantomPage("Local Game Comp (WIP)", "/local")}
+        dataTestId="dev-menu-local-comp-btn"
+    >
+        Local Game Comp (WIP)
+    </StyledButton>
+
+    <StyledButton
+        variant="menu"
+        class="secondary"
+        on:click={() => handlePhantomPage("Online Menu (WIP)", "/online")}
+        dataTestId="dev-menu-online-menu-btn"
+    >
+        Online Menu (WIP)
+    </StyledButton>
+
+    <StyledButton
+        variant="menu"
+        class="secondary"
+        on:click={() => handlePhantomPage("Waiting Screen (WIP)", "/waiting")}
+        dataTestId="dev-menu-waiting-btn"
+    >
+        Waiting Screen (WIP)
+    </StyledButton>
+
+    <hr
+        style="width: 100%; border: 0; border-top: 1px solid #444; margin: 8px 0;"
+    />
+
+    <!-- Standard Game Modes -->
     <StyledButton
         variant="menu"
         class="secondary"

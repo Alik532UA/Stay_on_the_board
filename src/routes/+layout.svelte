@@ -189,6 +189,7 @@
 	</div>
 {/if}
 
+<!-- 
 {#if import.meta.env.DEV}
 	<div class="test-mode-toggle">
 		<button
@@ -199,7 +200,7 @@
 			Test Mode: {testModeEnabled ? "ON" : "OFF"}
 		</button>
 	</div>
-{/if}
+{/if} -->
 
 <style>
 	.app {
