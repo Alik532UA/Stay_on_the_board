@@ -5,11 +5,59 @@
  * @description Цей модуль також підтримує систему нагород через спеціалізовані події.
  */
 
+import type { GameOverPayload } from '$lib/stores/gameOverStore';
+import type { ModalState } from '$lib/stores/modalStore';
+import type { MoveDirectionType } from '$lib/models/Piece';
+
 /**
- * Типи подій для системи нагород.
+ * Тип payload для показу модального вікна.
  */
-export interface RewardEventPayloads {
-  /** Хід успішно завершено */
+export type ShowModalPayload = Partial<ModalState> & { dataTestId: string };
+
+/**
+ * Payload для озвучення ходу.
+ */
+export interface SpeakMovePayload {
+  move: {
+    direction: string;
+    distance: number;
+  };
+  lang?: string;
+  voiceURI?: string | null;
+  onEndCallback?: () => void;
+}
+
+/**
+ * Payload для підтвердження зміни розміру дошки.
+ */
+export interface BoardResizePayload {
+  newSize: number;
+}
+
+/**
+ * Payload для показу модального вікна "Немає ходів".
+ */
+export interface ShowNoMovesModalPayload {
+  playerType: 'human' | 'computer';
+  scoreDetails: any; // Можна уточнити тип, якщо він експортується
+  boardSize: number;
+}
+
+/**
+ * Payload для додавання нового ходу в чергу анімації.
+ */
+export interface NewMoveAddedPayload {
+  player: number;
+  direction: MoveDirectionType;
+  distance: number;
+  to: { row: number; col: number };
+}
+
+/**
+ * Всі типи подій гри та їх payloads.
+ */
+export interface GameEventPayloads {
+  // Reward Events
   MOVE_COMPLETED: {
     playerId: number;
     playerName: string;
@@ -19,8 +67,6 @@ export interface RewardEventPayloads {
     jumpedBlockedCells: number;
     totalMoves: number;
   };
-
-  /** Гра завершена */
   GAME_FINISHED: {
     gameMode: string;
     finalScore: number;
@@ -30,52 +76,49 @@ export interface RewardEventPayloads {
     isWinner: boolean;
     reason: string;
   };
-
-  /** Досягнуто milestone рахунку */
   SCORE_MILESTONE_REACHED: {
     playerId: number;
     milestone: number;
     currentScore: number;
   };
-
-  /** Серія стрибків через заблоковані клітинки */
   JUMP_STREAK_ACHIEVED: {
     playerId: number;
     streakCount: number;
   };
-
-  /** Виграш раунду в локальній грі */
   ROUND_WON: {
     playerId: number;
     roundNumber: number;
     roundScore: number;
   };
-
-  /** Немає ходів - успішно заявлено */
   NO_MOVES_CLAIMED: {
     playerId: number;
     wasCorrect: boolean;
     bonusAwarded: number;
   };
+
+  // UI & Game Flow Events
+  GameOver: GameOverPayload;
+  CloseModal: void;
+  ShowModal: ShowModalPayload;
+  SpeakMove: SpeakMovePayload;
+  ReplayGame: void;
+  RequestReplay: void;
+  BoardResizeConfirmed: BoardResizePayload;
+  ShowNoMovesModal: ShowNoMovesModalPayload;
+  new_move_added: NewMoveAddedPayload;
+
+  // Legacy/Other Events (можна додати за потреби)
+  GameStateChanged: any;
+  PlayerTurnStarted: any;
+  PlayerTurnEnded: any;
 }
 
-/**
- * Всі типи подій гри.
- */
-export type GameEventType =
-  | keyof RewardEventPayloads
-  | 'CloseModal'
-  | 'OpenModal'
-  | 'GameStateChanged'
-  | 'PlayerTurnStarted'
-  | 'PlayerTurnEnded'
-  | string; // Для зворотної сумісності
+export type GameEventType = keyof GameEventPayloads;
 
-type GameEventPayload = any;
-type GameEventListener<T = any> = (payload: T) => void;
+type GameEventListener<T> = (payload: T) => void;
 
 class GameEventBus {
-  private listeners: Map<GameEventType, GameEventListener[]> = new Map();
+  private listeners: Map<GameEventType, GameEventListener<any>[]> = new Map();
 
   /**
    * Subscribes a listener to a specific event type.
@@ -83,12 +126,10 @@ class GameEventBus {
    * @param listener The callback function to execute when the event is dispatched.
    * @returns An unsubscribe function.
    */
-  subscribe<K extends keyof RewardEventPayloads>(
+  subscribe<K extends GameEventType>(
     eventType: K,
-    listener: GameEventListener<RewardEventPayloads[K]>
-  ): () => void;
-  subscribe(eventType: GameEventType, listener: GameEventListener): () => void;
-  subscribe(eventType: GameEventType, listener: GameEventListener): () => void {
+    listener: GameEventListener<GameEventPayloads[K]>
+  ): () => void {
     if (!this.listeners.has(eventType)) {
       this.listeners.set(eventType, []);
     }
@@ -110,12 +151,10 @@ class GameEventBus {
    * @param eventType The type of event to dispatch.
    * @param payload The data to pass to the listeners.
    */
-  dispatch<K extends keyof RewardEventPayloads>(
+  dispatch<K extends GameEventType>(
     eventType: K,
-    payload: RewardEventPayloads[K]
-  ): void;
-  dispatch(eventType: GameEventType, payload?: GameEventPayload): void;
-  dispatch(eventType: GameEventType, payload?: GameEventPayload): void {
+    payload: GameEventPayloads[K]
+  ): void {
     if (this.listeners.has(eventType)) {
       this.listeners.get(eventType)!.forEach(listener => listener(payload));
     }

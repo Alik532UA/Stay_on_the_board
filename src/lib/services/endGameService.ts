@@ -98,6 +98,7 @@ export const endGameService = {
 
     logService.score('[endGameService] Dispatching GameOver event with payload:', gameOverPayload);
     gameOverStore.setGameOver(gameOverPayload);
+    // @ts-ignore - state is not part of GameOverPayload but might be used by listeners
     gameEventBus.dispatch('GameOver', { ...gameOverPayload, state: { ...boardState, ...finalPlayerState, ...get(scoreStore)!, ...uiState } });
   }
 };
