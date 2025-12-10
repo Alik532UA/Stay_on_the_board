@@ -45,10 +45,17 @@ test.describe('Модальне вікно підтвердження зміни
     let initialCellCount: number;
     let initialScore: string | null;
 
+    // FIX: Використовуємо CSS селектор для пошуку по префіксу data-testid
+    const cellSelector = '[data-testid^="board-cell-"]';
+
     await test.step('Етап 1: Робимо хід, щоб рахунок не був 0', async () => {
       await makeFirstMove(page);
-      initialCellCount = await page.getByTestId('board-cell').count();
+      // Чекаємо, поки клітинки з'являться, щоб не отримати 0
+      await expect(page.locator(cellSelector).first()).toBeVisible();
+      initialCellCount = await page.locator(cellSelector).count();
       initialScore = await page.getByTestId('score-value').textContent();
+
+      console.log(`Initial cell count: ${initialCellCount}`); // Для дебагу
     });
 
     await test.step('Етап 2: Натискаємо "Ні" і перевіряємо, що вікно закрилося, а дані не змінилися', async () => {
@@ -57,7 +64,7 @@ test.describe('Модальне вікно підтвердження зміни
       await page.getByTestId('board-resize-cancel-btn').click();
       await expect(page.getByTestId('board-resize-confirm-modal')).not.toBeVisible();
 
-      const currentCellCount = await page.getByTestId('board-cell').count();
+      const currentCellCount = await page.locator(cellSelector).count();
       const currentScore = await page.getByTestId('score-value').textContent();
 
       expect(currentCellCount).toBe(initialCellCount);
@@ -70,8 +77,12 @@ test.describe('Модальне вікно підтвердження зміни
       await page.getByTestId('board-resize-confirm-btn').click();
       await expect(page.getByTestId('board-resize-confirm-modal')).not.toBeVisible();
 
-      const finalCellCount = await page.getByTestId('board-cell').count();
-      expect(finalCellCount).toBeGreaterThan(initialCellCount);
+      // Використовуємо expect.poll для очікування зміни кількості клітинок
+      await expect.poll(async () => {
+        const count = await page.locator(cellSelector).count();
+        console.log(`Polling cell count: ${count}`); // Для дебагу
+        return count;
+      }).toBeGreaterThan(initialCellCount);
     });
   });
 });

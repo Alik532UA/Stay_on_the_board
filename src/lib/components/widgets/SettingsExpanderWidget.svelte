@@ -1,12 +1,27 @@
 <script lang="ts">
-  import { gameModeStore } from "$lib/stores/gameModeStore.js";
+  import { gameModeStore } from "$lib/stores/gameModeStore";
+  import { goto } from "$app/navigation";
+  import { base } from "$app/paths";
+  import { userActionService } from "$lib/services/userActionService";
+  import { modalStore } from "$lib/stores/modalStore";
   import { _ } from "svelte-i18n";
-  import { uiStateStore } from "$lib/stores/uiStateStore.js";
-  import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
+  import { openVoiceSettingsModal } from "$lib/stores/uiStore";
+  import { uiStateStore } from "$lib/stores/uiStateStore";
+  import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
+  import SvgIcons from "../SvgIcons.svelte";
+  import { get } from "svelte/store";
   import { onMount, tick } from "svelte";
-  import { layoutUpdateStore } from "$lib/stores/layoutUpdateStore";
-  import { logService } from "$lib/services/logService.js";
+  import { columnStyleMode } from "$lib/stores/columnStyleStore";
+  import VoiceSettingsModalWrapper from "$lib/components/VoiceSettingsModalWrapper.svelte";
+  import { slide } from "svelte/transition";
+  import { layoutStore } from "$lib/stores/layoutStore";
+  import { logService } from "$lib/services/logService";
+  import ToggleButton from "../ToggleButton.svelte";
+  import { blurOnClick } from "$lib/utils/actions";
+  import { customTooltip } from "$lib/actions/customTooltip.js";
+  import { gameModeService } from "$lib/services/gameModeService";
   import { boardStore } from "$lib/stores/boardStore";
+  import { layoutUpdateStore } from "$lib/stores/layoutUpdateStore";
   import { dev } from "$app/environment";
 
   import SettingsBoardSize from "./settings/SettingsBoardSize.svelte";

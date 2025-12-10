@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
-    import { userActionService } from "$lib/services/userActionService.js";
-    import { logService } from "$lib/services/logService.js";
+    import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
+    import { userActionService } from "$lib/services/userActionService";
+    import { logService } from "$lib/services/logService";
     import { openVoiceSettingsModal } from "$lib/stores/uiStore";
     import { _ } from "svelte-i18n";
     import { blurOnClick } from "$lib/utils/actions";
