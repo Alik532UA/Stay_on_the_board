@@ -20,6 +20,7 @@ import { notificationService } from '$lib/services/notificationService';
 import { availableMovesService } from '$lib/services/availableMovesService';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import type { Room } from '$lib/types/online';
+import { endGameService } from '$lib/services/endGameService';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
@@ -207,13 +208,11 @@ export class OnlineGameMode extends BaseGameMode {
     await this.syncCurrentState();
   }
 
-  // FIX: Перевизначено advanceToNextPlayer для фіксації балів (як у LocalGameMode)
   protected async advanceToNextPlayer(): Promise<void> {
     const currentPlayerState = get(playerStore);
     if (!currentPlayerState) return;
     const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
 
-    // Якщо коло завершилось (хід переходить до першого гравця), фіксуємо бали
     if (nextPlayerIndex === 0) {
       logService.GAME_MODE(`[OnlineGameMode] Round completed. Flushing round scores to fixed scores.`);
       this.flushRoundScores();
@@ -221,12 +220,9 @@ export class OnlineGameMode extends BaseGameMode {
 
     playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
 
-    // В OnlineGameMode ми не викликаємо super.advanceToNextPlayer(), бо ми вже оновили стор
-    // і нам не треба запускати таймер тут (він запуститься після sync або в startTurn)
     this.startTurn();
   }
 
-  // FIX: Метод для фіксації балів (перенесення roundScore в score)
   private flushRoundScores(): void {
     playerStore.update(s => {
       if (!s) return null;
@@ -325,6 +321,17 @@ export class OnlineGameMode extends BaseGameMode {
 
     const currentBoard = get(boardStore);
 
+    // FIX: Детекція рестарту гри
+    // Якщо нова історія ходів коротша за поточну, значить відбувся рестарт.
+    // Скидаємо анімацію, щоб фігура стала на стартову позицію.
+    if (currentBoard && remoteState.boardState) {
+      if (remoteState.boardState.moveHistory.length < currentBoard.moveHistory.length) {
+        logService.GAME_MODE('[OnlineGameMode] Detected game reset. Resetting animation service.');
+        animationService.reset();
+      }
+    }
+
+    // Детекція нових ходів для анімації
     if (currentBoard && remoteState.boardState) {
       const oldQueueLength = currentBoard.moveQueue.length;
       const newQueueLength = remoteState.boardState.moveQueue.length;

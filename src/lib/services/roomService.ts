@@ -25,7 +25,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 const ROOM_TIMEOUT_MS = import.meta.env.DEV ? 10000 : 120000;
 const OPERATION_TIMEOUT_MS = 10000;
-// FIX: Збільшено ліміт гравців до 8
 const MAX_PLAYERS = 8;
 
 export interface ChatMessage {
@@ -135,7 +134,7 @@ class RoomService {
                     name: data.name,
                     status: data.status,
                     playerCount: Object.keys(data.players || {}).length,
-                    maxPlayers: MAX_PLAYERS, // FIX: Використовуємо нову константу
+                    maxPlayers: MAX_PLAYERS,
                     isPrivate: data.isPrivate
                 });
             });
@@ -175,7 +174,6 @@ class RoomService {
                 return existingSession.playerId;
             }
 
-            // FIX: Перевірка на новий ліміт гравців
             if (Object.keys(roomData.players).length >= MAX_PLAYERS) {
                 throw new Error('Room is full');
             }
@@ -186,7 +184,7 @@ class RoomService {
             const newPlayer: OnlinePlayer = {
                 id: playerId,
                 name: playerName,
-                color: '#f4a261', // Дефолтний колір, можна змінити в лобі
+                color: '#f4a261',
                 isReady: false,
                 joinedAt: Date.now(),
                 isOnline: true
@@ -209,7 +207,6 @@ class RoomService {
         }
     }
 
-    // FIX: Новий метод для оновлення даних гравця (ім'я, колір)
     async updatePlayer(roomId: string, playerId: string, data: Partial<OnlinePlayer>): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
         const updates: Record<string, any> = { lastActivity: Date.now() };
@@ -298,26 +295,39 @@ class RoomService {
     }
 
     async leaveRoom(roomId: string, playerId: string): Promise<void> {
+        logService.init(`[RoomService] Leaving room ${roomId} as ${playerId}`);
         const roomRef = doc(this.db, 'rooms', roomId);
+
+        // Очищаємо сесію одразу, щоб запобігти реконекту
+        this.clearSession();
+
         try {
             const roomSnap = await getDoc(roomRef);
-            if (!roomSnap.exists()) return;
+            if (!roomSnap.exists()) {
+                logService.init(`[RoomService] Room ${roomId} does not exist, nothing to leave.`);
+                return;
+            }
 
             const roomData = roomSnap.data() as Room;
             const players = { ...roomData.players };
-            delete players[playerId];
 
-            if (Object.keys(players).length === 0) {
-                await deleteDoc(roomRef);
-            } else {
-                let updates: any = { players: players, lastActivity: Date.now() };
-                if (roomData.hostId === playerId) {
-                    const nextHostId = Object.keys(players)[0];
-                    updates.hostId = nextHostId;
+            if (players[playerId]) {
+                delete players[playerId];
+                logService.init(`[RoomService] Removed player ${playerId} from local object.`);
+
+                if (Object.keys(players).length === 0) {
+                    logService.init(`[RoomService] Room empty, deleting room.`);
+                    await deleteDoc(roomRef);
+                } else {
+                    let updates: any = { players: players, lastActivity: Date.now() };
+                    if (roomData.hostId === playerId) {
+                        const nextHostId = Object.keys(players)[0];
+                        updates.hostId = nextHostId;
+                        logService.init(`[RoomService] Host migrated to ${nextHostId}`);
+                    }
+                    await updateDoc(roomRef, updates);
                 }
-                await updateDoc(roomRef, updates);
             }
-            this.clearSession();
         } catch (error) {
             logService.error('[RoomService] Failed to leave room:', error);
         }
