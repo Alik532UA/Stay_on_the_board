@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from "svelte";
 
   export let label: string;
   export let checked: boolean;
@@ -10,16 +10,16 @@
 
   function handleClick() {
     if (!disabled) {
-      dispatch('toggle');
+      dispatch("toggle");
     }
   }
 </script>
 
-<button 
+<button
   class="settings-expander__toggle-btn"
   class:active={checked}
   on:click={handleClick}
-  disabled={disabled}
+  {disabled}
   data-testid={dataTestId}
 >
   {label}
@@ -32,10 +32,10 @@
     border: var(--button-border-width, 1.5px) solid #888;
     border-radius: var(--button-border-radius, 8px);
     padding: 0;
-    height: var(--button-height);
-    min-height: var(--button-height);
+    height: var(--button-height, 44px);
+    min-height: var(--button-height, 44px);
     box-sizing: border-box;
-    font-size: calc(var(--button-height) * 0.4);
+    font-size: calc(var(--button-height, 44px) * 0.4);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease-in-out;

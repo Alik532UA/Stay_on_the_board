@@ -4,6 +4,7 @@
     import { base } from "$app/paths";
     import { uiStateStore } from "$lib/stores/uiStateStore.js";
     import { logService } from "$lib/services/logService.js";
+    import StyledButton from "$lib/components/ui/StyledButton.svelte";
 
     export let onClose: () => void;
     export let onOpenWipNotice: () => void;
@@ -42,37 +43,44 @@
     onkeydown={(e) => e.key === "Escape" && onClose()}
 >
     <h3>dev</h3>
-    <button
-        class="modal-button secondary"
-        onclick={handleDevMenuBtn}
-        data-testid="dev-menu-dnd-btn"
+    <StyledButton
+        variant="menu"
+        class="secondary"
+        on:click={handleDevMenuBtn}
+        dataTestId="dev-menu-dnd-btn"
     >
         {$_("mainMenu.dragAndDropTest")}
-    </button>
-    <button
-        class="modal-button secondary"
-        onclick={() => navigateTo("/test-main-menu")}
-        data-testid="dev-menu-test-main-menu-btn">Test Main Menu</button
+    </StyledButton>
+    <StyledButton
+        variant="menu"
+        class="secondary"
+        on:click={() => navigateTo("/test-main-menu")}
+        dataTestId="dev-menu-test-main-menu-btn">Test Main Menu</StyledButton
     >
-    <button
-        class="modal-button secondary"
-        onclick={onPlayVsComputer}
-        data-testid="training-btn">{$_("mainMenu.training")}</button
+    <StyledButton
+        variant="menu"
+        class="secondary"
+        on:click={onPlayVsComputer}
+        dataTestId="training-btn">{$_("mainMenu.training")}</StyledButton
     >
-    <button
-        class="modal-button secondary"
-        onclick={handleTimedGame}
-        data-testid="timed-game-btn">{$_("mainMenu.timedGame")}</button
+    <StyledButton
+        variant="menu"
+        class="secondary"
+        on:click={handleTimedGame}
+        dataTestId="timed-game-btn">{$_("mainMenu.timedGame")}</StyledButton
     >
-    <button
-        class="modal-button secondary"
-        class:pseudo-disabled={!import.meta.env.DEV}
-        onclick={import.meta.env.DEV ? onLocalGame : onOpenWipNotice}
-        data-testid="local-game-btn">{$_("mainMenu.localGame")}</button
+    <StyledButton
+        variant="menu"
+        class="secondary"
+        disabled={!import.meta.env.DEV}
+        on:click={import.meta.env.DEV ? onLocalGame : onOpenWipNotice}
+        dataTestId="local-game-btn">{$_("mainMenu.localGame")}</StyledButton
     >
-    <button
-        class="modal-button secondary pseudo-disabled"
-        onclick={onOpenWipNotice}
-        data-testid="online-game-btn">{$_("mainMenu.playOnline")}</button
+    <StyledButton
+        variant="menu"
+        class="secondary"
+        disabled={true}
+        on:click={onOpenWipNotice}
+        dataTestId="online-game-btn">{$_("mainMenu.playOnline")}</StyledButton
     >
 </div>

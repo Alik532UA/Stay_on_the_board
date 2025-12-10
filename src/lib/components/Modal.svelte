@@ -16,6 +16,7 @@
   import { trapFocus } from "$lib/actions/trapFocus.js";
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import ScoreBonusExpander from "./widgets/ScoreBonusExpander.svelte";
+  import StyledButton from "$lib/components/ui/StyledButton.svelte";
 
   let buttonRefs: (HTMLButtonElement | null)[] = [];
   let windowHeight = 0;
@@ -370,14 +371,22 @@
       </div>
       <div class="modal-action-buttons">
         {#each $modalState.buttons as btn, i (i)}
-          <button
-            class="modal-btn-generic"
-            class:primary={btn.primary && !btn.customClass}
-            class:blue-btn={btn.customClass === "blue-btn"}
-            class:green-btn={btn.customClass === "green-btn"}
-            class:danger-btn={btn.customClass === "danger-btn"}
-            bind:this={buttonRefs[i]}
-            use:hotkeyTooltip={{ key: btn.hotKey }}
+          <StyledButton
+            variant={btn.customClass === "blue-btn"
+              ? "info"
+              : btn.customClass === "green-btn"
+                ? "primary"
+                : btn.customClass === "danger-btn"
+                  ? "danger"
+                  : btn.primary
+                    ? "primary"
+                    : "default"}
+            bind:buttonElement={buttonRefs[i]}
+            dataTestId={btn.dataTestId ||
+              `${$modalState.dataTestId}-${btn.textKey || btn.text}-btn`}
+            disabled={btn.disabled ||
+              get(uiStateStore)?.isComputerMoveInProgress ||
+              processingButtons[i]}
             on:click={async () => {
               const $uiState = get(uiStateStore);
               if (
@@ -396,15 +405,9 @@
                 modalStore.closeModal();
               }
             }}
-            aria-label={btn.textKey ? $_(btn.textKey) : btn.text}
-            data-testid={btn.dataTestId ||
-              `${$modalState.dataTestId}-${btn.textKey || btn.text}-btn`}
-            disabled={btn.disabled ||
-              get(uiStateStore)?.isComputerMoveInProgress ||
-              processingButtons[i]}
           >
             {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
-          </button>
+          </StyledButton>
         {/each}
         {#if $modalState.titleKey === "gameModes.title"}
           <DontShowAgainCheckbox
