@@ -90,12 +90,9 @@ export class OnlineGameMode extends BaseGameMode {
 
       this.unsubscribeSettings = gameSettingsStore.subscribe(settings => {
         if (!this.isApplyingRemoteState && this.roomId) {
-          const settingsToSync = {
-            blockModeEnabled: settings.blockModeEnabled,
-            autoHideBoard: settings.autoHideBoard,
-            boardSize: settings.boardSize,
-            turnDuration: settings.turnDuration
-          };
+          // Тільки хост або якщо дозволено гостям
+          // Але тут ми просто синхронізуємо локальні зміни на сервер
+          // Перевірка прав відбувається в UI або в roomService
           this.syncCurrentState();
         }
       });
@@ -276,10 +273,14 @@ export class OnlineGameMode extends BaseGameMode {
     if (allReady) {
       logService.GAME_MODE('[OnlineGameMode] Both players requested restart. Starting new game.');
       const playersConfig = this.getPlayersConfiguration();
+
+      // Тут gameService.initializeNewGame скине gameOverStore локально
       gameService.initializeNewGame({
         size: get(gameSettingsStore).boardSize,
         players: playersConfig,
       });
+
+      // Синхронізуємо чистий стан (включаючи gameOver: null)
       await this.syncCurrentState({ restartRequests: {} });
     } else {
       logService.GAME_MODE('[OnlineGameMode] Restart requested. Waiting for opponent.');
@@ -309,6 +310,7 @@ export class OnlineGameMode extends BaseGameMode {
         turnDuration: settings.turnDuration,
         settingsLocked: settings.settingsLocked
       },
+      // Якщо гра завершена, відправляємо результат, інакше null
       gameOver: gameOverState.isGameOver ? gameOverState.gameResult : null,
       version: Date.now(),
       updatedAt: Date.now(),
@@ -353,7 +355,7 @@ export class OnlineGameMode extends BaseGameMode {
 
     if (remoteState.gameOver) {
       const currentGameOver = get(gameOverStore);
-      // FIX: Синхронізуємо прапорець isGameOver в uiStateStore
+      // Синхронізуємо прапорець isGameOver в uiStateStore
       uiStateStore.update(s => ({ ...s, isGameOver: true }));
 
       if (!currentGameOver.isGameOver) {
@@ -365,8 +367,10 @@ export class OnlineGameMode extends BaseGameMode {
       // FIX: Скидаємо прапорець isGameOver, якщо гра активна
       uiStateStore.update(s => ({ ...s, isGameOver: false }));
 
+      // FIX: Також скидаємо gameOverStore, щоб він відповідав серверному стану
       const currentGameOver = get(gameOverStore);
       if (currentGameOver.isGameOver) {
+        logService.GAME_MODE('[OnlineGameMode] Clearing local GameOver state (server state is active)');
         gameOverStore.resetGameOverState();
         modalService.closeAllModals();
       }
