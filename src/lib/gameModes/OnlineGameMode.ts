@@ -20,7 +20,7 @@ import { notificationService } from '$lib/services/notificationService';
 import { availableMovesService } from '$lib/services/availableMovesService';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import type { Room } from '$lib/types/online';
-import { endGameService } from '$lib/services/endGameService';
+import { modalService } from '$lib/services/modalService';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
@@ -231,7 +231,7 @@ export class OnlineGameMode extends BaseGameMode {
         score: p.score + (p.roundScore || 0),
         roundScore: 0
       }));
-      logService.score('[OnlineGameMode] Flushed round scores. New fixed scores:', newPlayers.map(p => ({ name: p.name, score: p.score })));
+      logService.score('[OnlineGameMode] Flushed round scores.', newPlayers.map(p => ({ name: p.name, score: p.score })));
       return { ...s, players: newPlayers };
     });
   }
@@ -321,9 +321,6 @@ export class OnlineGameMode extends BaseGameMode {
 
     const currentBoard = get(boardStore);
 
-    // FIX: Детекція рестарту гри
-    // Якщо нова історія ходів коротша за поточну, значить відбувся рестарт.
-    // Скидаємо анімацію, щоб фігура стала на стартову позицію.
     if (currentBoard && remoteState.boardState) {
       if (remoteState.boardState.moveHistory.length < currentBoard.moveHistory.length) {
         logService.GAME_MODE('[OnlineGameMode] Detected game reset. Resetting animation service.');
@@ -331,15 +328,12 @@ export class OnlineGameMode extends BaseGameMode {
       }
     }
 
-    // Детекція нових ходів для анімації
     if (currentBoard && remoteState.boardState) {
       const oldQueueLength = currentBoard.moveQueue.length;
       const newQueueLength = remoteState.boardState.moveQueue.length;
 
       if (newQueueLength > oldQueueLength) {
         const newMoves = remoteState.boardState.moveQueue.slice(oldQueueLength);
-        logService.animation(`[OnlineGameMode] Found ${newMoves.length} new moves from server. Queueing animation.`);
-
         newMoves.forEach(move => {
           gameEventBus.dispatch('new_move_added', move);
         });
@@ -359,18 +353,22 @@ export class OnlineGameMode extends BaseGameMode {
 
     if (remoteState.gameOver) {
       const currentGameOver = get(gameOverStore);
+      // FIX: Синхронізуємо прапорець isGameOver в uiStateStore
+      uiStateStore.update(s => ({ ...s, isGameOver: true }));
+
       if (!currentGameOver.isGameOver) {
         logService.GAME_MODE('[OnlineGameMode] Syncing GameOver state from server');
         gameOverStore.setGameOver(remoteState.gameOver);
-        import('$lib/services/modalService').then(({ modalService }) => {
-          modalService.showGameOverModal(remoteState.gameOver!);
-        });
+        modalService.showGameOverModal(remoteState.gameOver!);
       }
     } else {
+      // FIX: Скидаємо прапорець isGameOver, якщо гра активна
+      uiStateStore.update(s => ({ ...s, isGameOver: false }));
+
       const currentGameOver = get(gameOverStore);
       if (currentGameOver.isGameOver) {
         gameOverStore.resetGameOverState();
-        gameEventBus.dispatch('CloseModal');
+        modalService.closeAllModals();
       }
     }
 

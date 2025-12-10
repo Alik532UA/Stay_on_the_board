@@ -7,7 +7,7 @@ import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { speakText } from './speechService';
 import type { Player } from '$lib/models/player';
 import type { GameOverPayload, PlayerScoreResult, FinalScoreDetails } from '$lib/stores/gameOverStore';
-import { uiStateStore } from '$lib/stores/uiStateStore'; // Додано
+import { uiStateStore } from '$lib/stores/uiStateStore';
 
 interface GameOverModalContent {
   reasonKey: string;
@@ -30,7 +30,7 @@ function showGameOverModal(payload: GameOverPayload) {
 
   if (gameType === 'training' || gameType === 'virtual-player') {
     titleKey = 'modal.trainingOverTitle';
-  } else if (gameType === 'local' || gameType === 'online') { // Додано online
+  } else if (gameType === 'local' || gameType === 'online') {
     titleKey = winners && winners.length === 1 ? 'modal.winnerTitle' : 'modal.drawTitle';
     content.playerScores = payload.scores.map((s: PlayerScoreResult) => ({
       ...s,
@@ -71,7 +71,6 @@ function showGameOverModal(payload: GameOverPayload) {
         primary: true,
         onClick: () => {
           gameEventBus.dispatch('ReplayGame');
-          // FIX: Для онлайн гри не закриваємо модалку одразу, чекаємо синхронізації
           const uiState = get(uiStateStore);
           if (uiState.intendedGameType !== 'online') {
             modalStore.closeAllModals();
@@ -124,6 +123,7 @@ function showBoardResizeModal(newSize: number) {
 export const modalService = {
   showModal: modalStore.showModal,
   closeModal: modalStore.closeModal,
+  closeAllModals: modalStore.closeAllModals, // FIX: Додано експорт
   showGameOverModal,
   showBoardResizeModal,
   subscribe: modalStore.subscribe
