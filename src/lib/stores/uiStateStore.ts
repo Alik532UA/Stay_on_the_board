@@ -1,10 +1,3 @@
-/**
- * @file Manages the general UI state of the application.
- * @description This store tracks transient UI states that are not specific to a single component,
- * such as whether a computer move is in progress, game over status, and player input selections.
- * It helps coordinate UI behavior across different parts of the application.
- */
-// src/lib/stores/uiStateStore.ts
 import { writable } from 'svelte/store';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import { dev } from '$app/environment';
@@ -20,14 +13,15 @@ export interface UiState {
   isFirstMove: boolean;
   isListening: boolean;
   voiceMoveRequested: boolean;
-  intendedGameType: 'training' | 'local' | 'timed' | 'virtual-player' | 'online' | null; // Added 'online'
+  intendedGameType: 'training' | 'local' | 'timed' | 'virtual-player' | 'online' | null;
   settingsMode: 'default' | 'competitive';
   isSettingsExpanderOpen: boolean;
-  // НАВІЩО: Додаємо поле для перевизначень з тестового режиму.
-  // Це дозволяє передавати тестові дані через стан, дотримуючись UDF.
   testModeOverrides?: {
     nextComputerMove?: { direction: MoveDirectionType; distance: number };
   };
+  // Нові поля для онлайн режиму
+  onlinePlayerIndex: number | null; // 0 (Host) або 1 (Guest)
+  amIHost: boolean;
 }
 
 export const initialUIState: UiState = {
@@ -41,9 +35,11 @@ export const initialUIState: UiState = {
   isFirstMove: true,
   isListening: false,
   voiceMoveRequested: false,
-  intendedGameType: null, // За замовчуванням немає наміру
+  intendedGameType: null,
   settingsMode: 'default',
   isSettingsExpanderOpen: dev,
+  onlinePlayerIndex: null,
+  amIHost: false
 };
 
 function createUiStateStore() {
@@ -60,7 +56,6 @@ function createUiStateStore() {
         return { ...state, isGameOver: true, gameOverReasonKey: reasonKey, gameOverReasonValues: reasonValues };
       });
     },
-    // Інші мутатори для UI...
   };
 }
 

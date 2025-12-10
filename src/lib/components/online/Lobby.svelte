@@ -10,6 +10,7 @@
     import { base } from "$app/paths";
     import type { Unsubscribe } from "firebase/firestore";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
+    import type { GameSettingsState } from "$lib/stores/gameSettingsStore";
 
     export let roomId: string;
 
@@ -62,20 +63,106 @@
         setTimeout(() => (isCopied = false), 2000);
     }
 
-    // Функції для зміни налаштувань (тільки для хоста)
+    // --- Функції налаштувань (Тільки Хост) ---
+
     function updateBoardSize(increment: number) {
         if (!room || !amIHost) return;
         const newSize = room.settings.boardSize + increment;
-        if (newSize >= 3 && newSize <= 9) {
-            roomService.updateRoomSettings(roomId, { boardSize: newSize });
+        setBoardSize(newSize);
+    }
+
+    function setBoardSize(size: number) {
+        if (!room || !amIHost) return;
+        if (size >= 3 && size <= 9) {
+            roomService.updateRoomSettings(roomId, { boardSize: size });
         }
     }
 
-    function toggleBlockMode() {
+    function updateTurnDuration(increment: number) {
         if (!room || !amIHost) return;
-        roomService.updateRoomSettings(roomId, {
-            blockModeEnabled: !room.settings.blockModeEnabled,
-        });
+        const currentDuration = room.settings.turnDuration || 30;
+        const newDuration = currentDuration + increment;
+        setTurnDuration(newDuration);
+    }
+
+    function setTurnDuration(duration: number) {
+        if (!room || !amIHost) return;
+        // Обмеження: від 5 до 1000 секунд
+        const newDuration = Math.max(5, Math.min(1000, duration));
+        roomService.updateRoomSettings(roomId, { turnDuration: newDuration });
+    }
+
+    function toggleSetting(key: keyof GameSettingsState) {
+        if (!room || !amIHost) return;
+        // @ts-ignore
+        const newValue = !room.settings[key];
+        roomService.updateRoomSettings(roomId, { [key]: newValue });
+    }
+
+    // --- Action для скраббінгу (перетягування значень) ---
+    function scrubbable(
+        node: HTMLElement,
+        params: {
+            value: number;
+            min: number;
+            max: number;
+            step: number; // Скільки пікселів треба пройти для зміни на 1 одиницю
+            onUpdate: (val: number) => void;
+            disabled: boolean;
+        },
+    ) {
+        let { value, min, max, step, onUpdate, disabled } = params;
+        let startX = 0;
+        let startValue = 0;
+
+        function onMouseDown(e: MouseEvent) {
+            if (disabled) return;
+            e.preventDefault(); // Запобігає виділенню тексту
+            startX = e.clientX;
+            startValue = value;
+
+            window.addEventListener("mousemove", onMouseMove);
+            window.addEventListener("mouseup", onMouseUp);
+            document.body.style.cursor = "ew-resize";
+            node.classList.add("scrubbing");
+        }
+
+        function onMouseMove(e: MouseEvent) {
+            const deltaX = e.clientX - startX;
+            // Чим більше step, тим повільніше змінюється значення (більше пікселів на одиницю)
+            // Тут step це "чутливість" (пікселів на 1 одиницю значення)
+            const deltaValue = Math.round(deltaX / step);
+
+            let newValue = startValue + deltaValue;
+            newValue = Math.max(min, Math.min(max, newValue));
+
+            if (newValue !== value) {
+                onUpdate(newValue);
+            }
+        }
+
+        function onMouseUp() {
+            window.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("mouseup", onMouseUp);
+            document.body.style.cursor = "";
+            node.classList.remove("scrubbing");
+        }
+
+        node.addEventListener("mousedown", onMouseDown);
+
+        return {
+            update(newParams: any) {
+                value = newParams.value;
+                min = newParams.min;
+                max = newParams.max;
+                step = newParams.step;
+                onUpdate = newParams.onUpdate;
+                disabled = newParams.disabled;
+            },
+            destroy() {
+                node.removeEventListener("mousedown", onMouseDown);
+            },
+        };
     }
 
     $: playersList = room ? Object.values(room.players) : [];
@@ -85,7 +172,7 @@
     $: myName = room && myPlayerId ? room.players[myPlayerId]?.name : "Player";
 </script>
 
-<div class="lobby-container">
+<div class="lobby-container" data-testid="lobby-container">
     <FloatingBackButton on:click={handleLeave} />
 
     {#if room}
@@ -93,27 +180,37 @@
             <!-- Ліва колонка: Інфо та Гравці -->
             <div class="left-column">
                 <div class="lobby-header">
-                    <h1>{room.name}</h1>
+                    <h1 data-testid="room-name">{room.name}</h1>
                     <div class="room-id-container">
-                        <span class="room-id">ID: {roomId}</span>
-                        <button class="copy-btn" on:click={copyRoomId}>
+                        <span class="room-id" data-testid="room-id-display"
+                            >ID: {roomId}</span
+                        >
+                        <button
+                            class="copy-btn"
+                            on:click={copyRoomId}
+                            data-testid="copy-room-id-btn"
+                        >
                             {isCopied
                                 ? $_("onlineMenu.lobby.linkCopied")
                                 : $_("onlineMenu.lobby.copyLink")}
                         </button>
                     </div>
-                    <div class="status-badge {room.status}">
+                    <div
+                        class="status-badge {room.status}"
+                        data-testid="room-status-badge"
+                    >
                         {$_(`onlineMenu.${room.status}`)}
                     </div>
                 </div>
 
                 <div class="players-section">
                     <h3>{$_("onlineMenu.players")} ({playersList.length}/2)</h3>
-                    <div class="players-list">
+                    <div class="players-list" data-testid="players-list">
                         {#each playersList as player (player.id)}
                             <div
                                 class="player-card"
                                 class:is-me={player.id === myPlayerId}
+                                data-testid={`player-card-${player.id}`}
                             >
                                 <div
                                     class="player-avatar"
@@ -125,7 +222,9 @@
                                     <div class="player-name">
                                         {player.name}
                                         {#if player.id === room.hostId}
-                                            <span class="host-badge"
+                                            <span
+                                                class="host-badge"
+                                                data-testid="host-badge"
                                                 >{$_(
                                                     "onlineMenu.lobby.host",
                                                 )}</span
@@ -135,6 +234,7 @@
                                     <div
                                         class="player-status"
                                         class:ready={player.isReady}
+                                        data-testid={`player-status-${player.id}`}
                                     >
                                         {player.isReady
                                             ? $_("onlineMenu.lobby.ready")
@@ -160,6 +260,7 @@
                             ? "default"
                             : "primary"}
                         on:click={toggleReady}
+                        dataTestId="toggle-ready-btn"
                     >
                         {room.players[myPlayerId || ""]?.isReady
                             ? $_("onlineMenu.lobby.notReady")
@@ -171,6 +272,7 @@
                             variant="primary"
                             disabled={!allReady}
                             on:click={handleStartGame}
+                            dataTestId="start-game-btn"
                         >
                             {$_("onlineMenu.lobby.startGame")}
                         </StyledButton>
@@ -182,35 +284,126 @@
             <div class="right-column">
                 <div class="settings-section">
                     <h3>{$_("settings.title")}</h3>
+
+                    <!-- Розмір дошки -->
                     <div class="setting-item">
                         <span>{$_("settings.boardSize")}</span>
                         <div class="size-controls">
                             <button
                                 disabled={!amIHost ||
                                     room.settings.boardSize <= 3}
-                                on:click={() => updateBoardSize(-1)}>-</button
+                                on:click={() => updateBoardSize(-1)}
+                                data-testid="board-size-decrease-btn">-</button
                             >
-                            <span class="size-value"
-                                >{room.settings.boardSize}x{room.settings
-                                    .boardSize}</span
+
+                            <!-- Scrubbable Value -->
+                            <span
+                                class="size-value scrubbable-value"
+                                class:disabled={!amIHost}
+                                use:scrubbable={{
+                                    value: room.settings.boardSize,
+                                    min: 3,
+                                    max: 9,
+                                    step: 20, // 20px drag = 1 unit change
+                                    onUpdate: setBoardSize,
+                                    disabled: !amIHost,
+                                }}
+                                title={amIHost
+                                    ? "Натисніть і потягніть для зміни"
+                                    : ""}
+                                data-testid="board-size-value"
                             >
+                                {room.settings.boardSize}x{room.settings
+                                    .boardSize}
+                            </span>
+
                             <button
                                 disabled={!amIHost ||
                                     room.settings.boardSize >= 9}
-                                on:click={() => updateBoardSize(1)}>+</button
+                                on:click={() => updateBoardSize(1)}
+                                data-testid="board-size-increase-btn">+</button
                             >
                         </div>
                     </div>
+
+                    <!-- Таймер -->
                     <div class="setting-item">
+                        <span>Час на хід (сек)</span>
+                        <div class="size-controls">
+                            <button
+                                disabled={!amIHost}
+                                on:click={() => updateTurnDuration(-5)}
+                                data-testid="turn-duration-decrease-btn"
+                                >-</button
+                            >
+
+                            <!-- Scrubbable Value -->
+                            <span
+                                class="size-value scrubbable-value"
+                                class:disabled={!amIHost}
+                                use:scrubbable={{
+                                    value: room.settings.turnDuration || 30,
+                                    min: 5,
+                                    max: 1000,
+                                    step: 2, // 2px drag = 1 second change (більш чутливий)
+                                    onUpdate: setTurnDuration,
+                                    disabled: !amIHost,
+                                }}
+                                title={amIHost
+                                    ? "Натисніть і потягніть для зміни"
+                                    : ""}
+                                data-testid="turn-duration-value"
+                            >
+                                {room.settings.turnDuration || 30}
+                            </span>
+
+                            <button
+                                disabled={!amIHost}
+                                on:click={() => updateTurnDuration(5)}
+                                data-testid="turn-duration-increase-btn"
+                                >+</button
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Автоматично приховувати дошку -->
+                    <div class="setting-item full-width">
+                        <ToggleButton
+                            label={$_("gameModes.autoHideBoard")}
+                            checked={room.settings.autoHideBoard}
+                            disabled={!amIHost}
+                            on:toggle={() => toggleSetting("autoHideBoard")}
+                            dataTestId="auto-hide-board-toggle"
+                        />
+                    </div>
+
+                    <!-- Режим блокування -->
+                    <div class="setting-item full-width">
                         <ToggleButton
                             label={$_("gameControls.blockMode")}
                             checked={room.settings.blockModeEnabled}
                             disabled={!amIHost}
-                            on:toggle={toggleBlockMode}
+                            on:toggle={() => toggleSetting("blockModeEnabled")}
+                            dataTestId="block-mode-toggle"
                         />
                     </div>
+
+                    <!-- Заборонити зміни під час гри -->
+                    <div class="setting-item full-width">
+                        <ToggleButton
+                            label={$_("localGame.lockSettings")}
+                            checked={room.settings.settingsLocked}
+                            disabled={!amIHost}
+                            on:toggle={() => toggleSetting("settingsLocked")}
+                            dataTestId="lock-settings-toggle"
+                        />
+                    </div>
+
                     {#if !amIHost}
-                        <div class="host-only-hint">
+                        <div
+                            class="host-only-hint"
+                            data-testid="host-only-hint"
+                        >
                             {$_("onlineMenu.lobby.hostOnlySettings")}
                         </div>
                     {/if}
@@ -227,7 +420,9 @@
             </div>
         </div>
     {:else}
-        <div class="loading">{$_("common.loading")}</div>
+        <div class="loading" data-testid="lobby-loading">
+            {$_("common.loading")}
+        </div>
     {/if}
 </div>
 
@@ -362,6 +557,10 @@
         margin-bottom: 16px;
     }
 
+    .setting-item.full-width {
+        justify-content: center;
+    }
+
     .size-controls {
         display: flex;
         align-items: center;
@@ -387,6 +586,36 @@
         font-weight: bold;
         min-width: 40px;
         text-align: center;
+        user-select: none;
+    }
+
+    /* Стилі для інтерактивного значення */
+    .scrubbable-value {
+        cursor: ew-resize;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition:
+            background 0.2s,
+            color 0.2s;
+        border: 1px solid transparent;
+    }
+
+    .scrubbable-value:hover:not(.disabled) {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--border-color);
+        color: var(--text-accent);
+    }
+
+    .scrubbable-value.disabled {
+        cursor: default;
+        opacity: 0.8;
+    }
+
+    /* Клас, що додається під час перетягування */
+    :global(.scrubbable-value.scrubbing) {
+        background: var(--control-selected);
+        color: var(--control-selected-text);
+        border-color: var(--control-selected);
     }
 
     .host-only-hint {
