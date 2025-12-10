@@ -30,11 +30,34 @@ export abstract class BaseGameMode implements IGameMode {
 
   abstract getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player';
   abstract initialize(options?: { newSize?: number }): void;
-  abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
   abstract getPlayersConfiguration(): Player[];
-  protected abstract advanceToNextPlayer(): Promise<void>;
-  protected abstract applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void>;
-  abstract continueAfterNoMoves(): Promise<void>;
+
+  // Змінено з abstract на virtual (з дефолтною реалізацією)
+  async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
+    await noMovesService.dispatchNoMovesEvent(playerType);
+  }
+
+  // Змінено з abstract на virtual
+  async continueAfterNoMoves(): Promise<void> {
+    this.resetBoardForContinuation();
+    await this.advanceToNextPlayer();
+    gameEventBus.dispatch('CloseModal', undefined);
+  }
+
+  // Змінено з abstract на virtual
+  protected async advanceToNextPlayer(): Promise<void> {
+    const currentPlayerState = get(playerStore);
+    if (!currentPlayerState) return;
+    const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
+
+    playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
+    this.startTurn();
+  }
+
+  // Змінено з abstract на virtual
+  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
+    // Default implementation: do nothing (override in specific modes if needed)
+  }
 
   /**
    * Скидає стан дошки для продовження гри після "немає ходів".
@@ -177,7 +200,7 @@ export abstract class BaseGameMode implements IGameMode {
   async restartGame(options: { newSize?: number } = {}): Promise<void> {
     this.initialize(options);
     animationService.reset();
-    gameEventBus.dispatch('CloseModal');
+    gameEventBus.dispatch('CloseModal', undefined);
   }
 
   cleanup(): void {

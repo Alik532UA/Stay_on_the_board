@@ -29,11 +29,16 @@ export default {
     host: "Хост",
     you: "Ви",
     copyLink: "Копіювати ID",
-    linkCopied: "Скопійовано!"
+    linkCopied: "Скопійовано!",
+    hostOnlySettings: "Тільки хост може змінювати налаштування"
   },
   errors: {
     fetchFailed: "Не вдалося завантажити список кімнат",
     createFailed: "Не вдалося створити кімнату",
     joinFailed: "Не вдалося приєднатися до кімнати"
+  },
+  chat: {
+    placeholder: "Напишіть повідомлення...",
+    empty: "Чат порожній"
   }
 };

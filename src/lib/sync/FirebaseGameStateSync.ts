@@ -130,21 +130,31 @@ export class FirebaseGameStateSync implements IGameStateSync {
         try {
             this._stateVersion++;
 
-            const stateToSync: SyncableGameState = {
-                ...state,
+            // КЛОНУЄМО стан, щоб не мутувати оригінал
+            // Це важливо, бо ми будемо змінювати структуру даних перед відправкою
+            const stateToSync = JSON.parse(JSON.stringify(state));
+
+            // FIX: Firestore не підтримує вкладені масиви (board: number[][]).
+            // Конвертуємо board в JSON-рядок.
+            if (stateToSync.boardState && stateToSync.boardState.board) {
+                stateToSync.boardState.board = JSON.stringify(stateToSync.boardState.board);
+            }
+
+            const finalState = {
+                ...stateToSync,
                 version: this._stateVersion,
                 updatedAt: Date.now()
             };
 
             await updateDoc(this._roomRef, {
-                gameState: stateToSync,
+                gameState: finalState,
                 updatedAt: serverTimestamp()
             });
 
             logService.state(`[FirebaseGameStateSync] State pushed, version: ${this._stateVersion}`);
         } catch (error) {
             logService.error('[FirebaseGameStateSync] Push state error:', error);
-            throw error;
+            // Не кидаємо помилку далі, щоб не ламати гру локально, але логуємо
         }
     }
 
@@ -163,7 +173,18 @@ export class FirebaseGameStateSync implements IGameStateSync {
             }
 
             const data = snapshot.data() as FirebaseRoomDocument;
-            return data.gameState || null;
+            const remoteState = data.gameState;
+
+            // FIX: Відновлюємо board з рядка, якщо він там є
+            if (remoteState && remoteState.boardState && typeof remoteState.boardState.board === 'string') {
+                try {
+                    remoteState.boardState.board = JSON.parse(remoteState.boardState.board);
+                } catch (e) {
+                    logService.error('[FirebaseGameStateSync] Failed to parse board state in pullState', e);
+                }
+            }
+
+            return remoteState || null;
         } catch (error) {
             logService.error('[FirebaseGameStateSync] Pull state error:', error);
             return null;
@@ -240,9 +261,21 @@ export class FirebaseGameStateSync implements IGameStateSync {
                     // Перевіряємо, чи версія новіша
                     if (data.gameState.version > this._stateVersion) {
                         this._stateVersion = data.gameState.version;
+
+                        const remoteState = data.gameState;
+
+                        // FIX: Відновлюємо board з рядка
+                        if (remoteState.boardState && typeof remoteState.boardState.board === 'string') {
+                            try {
+                                remoteState.boardState.board = JSON.parse(remoteState.boardState.board);
+                            } catch (e) {
+                                logService.error('[FirebaseGameStateSync] Failed to parse board state in snapshot', e);
+                            }
+                        }
+
                         this._notifySubscribers({
                             type: 'state_updated',
-                            state: data.gameState
+                            state: remoteState
                         });
                     }
                 }

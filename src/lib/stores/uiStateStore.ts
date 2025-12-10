@@ -20,7 +20,7 @@ export interface UiState {
   isFirstMove: boolean;
   isListening: boolean;
   voiceMoveRequested: boolean;
-  intendedGameType: 'training' | 'local' | 'timed' | 'virtual-player' | null; // НАВІЩО: Зберігаємо тип гри, який користувач мав намір розпочати.
+  intendedGameType: 'training' | 'local' | 'timed' | 'virtual-player' | 'online' | null; // Added 'online'
   settingsMode: 'default' | 'competitive';
   isSettingsExpanderOpen: boolean;
   // НАВІЩО: Додаємо поле для перевизначень з тестового режиму.

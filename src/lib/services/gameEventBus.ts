@@ -149,12 +149,13 @@ class GameEventBus {
   /**
    * Dispatches an event to all subscribed listeners.
    * @param eventType The type of event to dispatch.
-   * @param payload The data to pass to the listeners.
+   * @param args The data to pass to the listeners (optional if payload is void).
    */
   dispatch<K extends GameEventType>(
     eventType: K,
-    payload: GameEventPayloads[K]
+    ...args: GameEventPayloads[K] extends void ? [payload?: void] : [payload: GameEventPayloads[K]]
   ): void {
+    const payload = args[0];
     if (this.listeners.has(eventType)) {
       this.listeners.get(eventType)!.forEach(listener => listener(payload));
     }

@@ -16,7 +16,7 @@
 	import Modal from "$lib/components/Modal.svelte";
 	import { navigating } from "$app/stores";
 	import { modalStore } from "$lib/stores/modalStore";
-	import { afterNavigate, goto } from "$app/navigation";
+	import { afterNavigate, goto } from "$app/navigation"; // goto вже тут
 	import DontShowAgainCheckbox from "$lib/components/DontShowAgainCheckbox.svelte";
 	import { modalState } from "$lib/stores/modalStore";
 	import { logService } from "$lib/services/logService.js";
@@ -37,6 +37,9 @@
 	import type { IMenuItem } from "$lib/components/ui/FlexibleMenu/FlexibleMenu.types";
 	import GameModeModal from "$lib/components/GameModeModal.svelte";
 	import DevMenu from "$lib/components/main-menu/DevMenu.svelte";
+
+	// Новий сервіс (goto видалено, бо він вже є вище)
+	import { roomService } from "$lib/services/roomService";
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = "app_version";
@@ -81,6 +84,9 @@
 		initializeTestModeSync();
 		rewardsService.init();
 
+		// 6. Check for active online session (Reconnection Logic)
+		checkOnlineSession();
+
 		// 7. Check for app updates
 		checkForUpdates();
 
@@ -111,6 +117,28 @@
 			unsubscribeGameSettings();
 		};
 	});
+
+	async function checkOnlineSession() {
+		const session = roomService.getSession();
+		if (session.roomId && session.playerId) {
+			logService.init(
+				`[Layout] Found active session for room ${session.roomId}`,
+			);
+			// Ми не перевіряємо статус тут, просто перенаправляємо в лобі.
+			// Лобі саме перевірить статус і перенаправить в гру, якщо вона йде.
+			// Але робимо це тільки якщо ми на головній або на сторінці входу
+			const path = window.location.pathname;
+			// Враховуємо base path, якщо він є
+			const basePath = base || "";
+			if (
+				path === basePath + "/" ||
+				path === basePath + "/online" ||
+				path === basePath + "/online/"
+			) {
+				goto(`${base}/online/lobby/${session.roomId}`);
+			}
+		}
+	}
 
 	async function checkForUpdates() {
 		try {

@@ -29,7 +29,12 @@ export default {
     host: "Host",
     you: "You",
     copyLink: "Copy ID",
-    linkCopied: "Copied!"
+    linkCopied: "Copied!",
+    hostOnlySettings: "Only the host can change settings"
+  },
+  chat: {
+    placeholder: "Type a message...",
+    empty: "Chat is empty"
   },
   errors: {
     fetchFailed: "Failed to fetch rooms",

@@ -12,51 +12,66 @@
     let isCreating = false;
 
     async function handleCreate() {
+        logService.action("[CreateRoomModal] Create button clicked");
+
         if (isCreating) return;
         isCreating = true;
 
         try {
-            // Отримуємо або запитуємо ім'я гравця
             let playerName = localStorage.getItem("online_playerName");
             if (!playerName) {
                 playerName = `Player ${Math.floor(Math.random() * 1000)}`;
                 localStorage.setItem("online_playerName", playerName);
             }
 
-            // Якщо назва пуста, roomService згенерує її сам, але ми можемо передати кастомну
-            // Тут ми передаємо ім'я хоста, а назву кімнати roomService згенерує, якщо ми не передамо її в майбутньому API
-            // Поки що roomService.createRoom приймає (hostName, isPrivate)
+            logService.init(
+                `[CreateRoomModal] Calling roomService.createRoom...`,
+            );
 
-            const roomId = await roomService.createRoom(playerName, isPrivate);
+            const roomId = await roomService.createRoom(
+                playerName,
+                isPrivate,
+                roomName,
+            );
 
+            logService.init(`[CreateRoomModal] Success. ID: ${roomId}`);
             modalStore.closeModal();
-            goto(`${base}/online/lobby/${roomId}`);
-        } catch (e) {
-            logService.error("Failed to create room", e);
-            alert($_("onlineMenu.errors.createFailed"));
+            await goto(`${base}/online/lobby/${roomId}`);
+        } catch (e: any) {
+            logService.error("[CreateRoomModal] Failed to create room", e);
+            // Показуємо конкретну помилку, якщо це таймаут
+            const msg = e.message?.includes("Timeout")
+                ? "Не вдалося з'єднатися з сервером. Перевірте інтернет."
+                : $_("onlineMenu.errors.createFailed");
+            alert(msg);
         } finally {
             isCreating = false;
         }
     }
 </script>
 
-<div class="create-room-form">
+<div class="create-room-form" data-testid="create-room-form">
     <div class="form-group">
-        <label for="room-name">{$_("onlineMenu.roomName")}</label>
+        <label for="room-name" data-testid="room-name-label"
+            >{$_("onlineMenu.roomName")}</label
+        >
         <input
             id="room-name"
             type="text"
             bind:value={roomName}
             placeholder={$_("onlineMenu.roomNamePlaceholder")}
             class="modal-input"
-            disabled
-            title="Custom room names coming soon"
+            data-testid="room-name-input"
         />
     </div>
 
     <div class="form-group checkbox-group">
-        <label class="checkbox-label">
-            <input type="checkbox" bind:checked={isPrivate} />
+        <label class="checkbox-label" data-testid="private-room-label">
+            <input
+                type="checkbox"
+                bind:checked={isPrivate}
+                data-testid="private-room-checkbox"
+            />
             <span>{$_("onlineMenu.privateRoom")}</span>
         </label>
     </div>
@@ -65,6 +80,7 @@
         <StyledButton
             variant="default"
             on:click={() => modalStore.closeModal()}
+            dataTestId="create-room-cancel-btn"
         >
             {$_("onlineMenu.cancel")}
         </StyledButton>
@@ -72,6 +88,7 @@
             variant="primary"
             on:click={handleCreate}
             disabled={isCreating}
+            dataTestId="create-room-confirm-btn"
         >
             {isCreating ? $_("common.loading") : $_("onlineMenu.create")}
         </StyledButton>
@@ -105,6 +122,12 @@
         padding: 12px;
         color: var(--text-primary);
         font-size: 1em;
+    }
+
+    .modal-input:focus {
+        outline: none;
+        border-color: var(--control-selected);
+        box-shadow: 0 0 0 2px rgba(var(--control-selected-rgb), 0.2);
     }
 
     .checkbox-group {

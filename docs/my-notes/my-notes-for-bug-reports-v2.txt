@@ -1421,3 +1421,9 @@ class="menu-spacer s-bSeVPxb6RwRh is-open"
 у мене немає  src/lib/components/MainMenu.svelte це треба зробити в src\lib\components\MainMenu.svelte ?
 чи треба ще створити MainMenu.svelte в src/lib/components/ ?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+скільки % плану "План реалізації Онлайн Режиму (v1)" вже виконено?
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
