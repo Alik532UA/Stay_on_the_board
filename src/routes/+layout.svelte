@@ -251,6 +251,19 @@
 <RewardNotification />
 
 <div class="app">
+	<!-- FIX: Меню переміщено всередину контейнера .app -->
+	<!-- Це дозволяє flexbox-контейнеру враховувати висоту спейсерів меню -->
+
+	<!-- Global Menus -->
+	{#if import.meta.env.DEV}
+		<FlexibleMenu
+			items={devMenuItems}
+			position="top"
+			persistenceKey="main-top-menu"
+			dataTestId="flexible-menu-top-wrapper"
+		/>
+	{/if}
+
 	{#if false}
 		<Header />
 	{/if}
@@ -272,6 +285,13 @@
 			</p>
 		</footer>
 	{/if}
+
+	<FlexibleMenu
+		items={menuItems}
+		position="bottom"
+		persistenceKey="main-bottom-menu"
+		dataTestId="flexible-menu-bottom-wrapper"
+	/>
 </div>
 
 {#if $tooltipStore.isVisible}
@@ -289,23 +309,6 @@
 		<TestModeWidget />
 	</div>
 {/if}
-
-<!-- Global Menus -->
-{#if import.meta.env.DEV}
-	<FlexibleMenu
-		items={devMenuItems}
-		position="top"
-		persistenceKey="main-top-menu"
-		dataTestId="flexible-menu-top-wrapper"
-	/>
-{/if}
-
-<FlexibleMenu
-	items={menuItems}
-	position="bottom"
-	persistenceKey="main-bottom-menu"
-	dataTestId="flexible-menu-bottom-wrapper"
-/>
 
 <style>
 	.app {
