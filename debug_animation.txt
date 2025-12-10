@@ -1,0 +1,818 @@
+
+--- START OF FILE src/lib/services/animationService.ts ---
+// src/lib/services/animationService.ts
+import { get } from 'svelte/store';
+import { animationStore } from '$lib/stores/animationStore';
+import { logService } from './logService';
+import { gameModeStore } from '$lib/stores/gameModeStore';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+import { uiStateStore } from '$lib/stores/uiStateStore';
+import { animationConfig, type AnimationConfigMode, type AnimationConfigPreset } from '$lib/config/animationConfig';
+import { gameEventBus } from './gameEventBus';
+
+function createAnimationService() {
+  let unsubscribe: (() => void) | null = null;
+
+  function addToAnimationQueue(move: import('$lib/stores/animationStore').AnimationMove) {
+    logService.animation('[AnimationService] addToAnimationQueue:', move);
+    animationStore.update(state => {
+      const newQueue = [...state.animationQueue, move];
+      if (!state.isPlayingAnimation) {
+        setTimeout(() => playNextAnimation(true), 0);
+      }
+      return { ...state, animationQueue: newQueue };
+    });
+  }
+
+  function playNextAnimation(isFirstCall = false) {
+    if (isFirstCall) {
+      animationStore.update(s => ({ ...s, isAnimating: true, isPlayingAnimation: true, isComputerMoveCompleted: false, visualMoveQueue: [] }));
+    }
+
+    const state = get(animationStore);
+    if (state.animationQueue.length === 0) {
+      animationStore.update(s => ({ ...s, isAnimating: false, isPlayingAnimation: false }));
+      return;
+    }
+
+    const move = state.animationQueue[0];
+    animationStore.update(s => ({
+      ...s,
+      visualMoveQueue: [...s.visualMoveQueue, move]
+    }));
+
+    const isPlayerMove = move.player === 1;
+    const animationDuration = 500;
+
+    const activeMode = get(gameModeStore).activeMode as AnimationConfigMode;
+    const currentPreset = get(gameSettingsStore).gameMode as AnimationConfigPreset | null;
+    const isListening = get(uiStateStore).isListening;
+
+    let pauseValues = { player: 100, computer: 100 }; // Default values
+
+    if (isListening) {
+      pauseValues = { player: 30, computer: 30 };
+    } else if (activeMode === 'training') {
+      if (currentPreset && animationConfig.training[currentPreset]) {
+        pauseValues = animationConfig.training[currentPreset];
+      }
+    } else if (activeMode && animationConfig[activeMode]) {
+      const configForMode = animationConfig[activeMode];
+      if ('player' in configForMode) {
+        pauseValues = configForMode;
+      }
+    }
+
+    const pauseAfterMove = isPlayerMove ? pauseValues.player : pauseValues.computer;
+
+    setTimeout(() => {
+      if (!isPlayerMove) {
+        animationStore.update(s => ({ ...s, isComputerMoveCompleted: true }));
+      }
+      animationStore.update(s => ({
+        ...s,
+        animationQueue: s.animationQueue.slice(1)
+      }));
+      playNextAnimation(false);
+    }, animationDuration + pauseAfterMove);
+  }
+
+  return {
+    initialize: () => {
+      if (unsubscribe) return; // Prevent multiple subscriptions
+      unsubscribe = gameEventBus.subscribe('new_move_added', addToAnimationQueue);
+    },
+    destroy: () => {
+      if (unsubscribe) {
+        unsubscribe();
+        unsubscribe = null;
+      }
+    },
+    reset: () => {
+      logService.animation('[AnimationService] reset() called');
+      animationStore.reset();
+    }
+  };
+}
+
+export const animationService = createAnimationService();
+--- END OF FILE src/lib/services/animationService.ts ---
+
+--- START OF FILE src/lib/stores/animationStore.ts ---
+// src/lib/stores/animationStore.ts
+import { writable } from 'svelte/store';
+import { logService } from '../services/logService';
+import type { MoveDirectionType } from '$lib/models/Piece';
+
+if (typeof global !== 'undefined' && !global.requestAnimationFrame) {
+  global.requestAnimationFrame = (cb: FrameRequestCallback): number => setTimeout(cb, 0) as unknown as number;
+}
+
+/**
+ * Рух для візуалізації анімації
+ */
+export interface AnimationMove {
+  player: number;
+  direction: MoveDirectionType;
+  distance: number;
+  row?: number;
+  col?: number;
+}
+
+export interface AnimationState {
+  isAnimating: boolean;
+  gameId: number;
+  currentAnimation: AnimationMove | null;
+  visualMoveQueue: AnimationMove[];
+  animationQueue: AnimationMove[];
+  isPlayingAnimation: boolean;
+  isComputerMoveCompleted: boolean;
+}
+
+export const initialState: AnimationState = {
+  isAnimating: false,
+  gameId: Date.now(),
+  currentAnimation: null,
+  visualMoveQueue: [],
+  animationQueue: [],
+  isPlayingAnimation: false,
+  isComputerMoveCompleted: true,
+};
+
+const { subscribe, set, update } = writable<AnimationState>(initialState);
+
+export const animationStore = {
+  subscribe,
+  update,
+  set,
+  reset: () => {
+    logService.animation('AnimationStore: reset()');
+    set(initialState);
+  }
+};
+--- END OF FILE src/lib/stores/animationStore.ts ---
+
+--- START OF FILE src/lib/gameModes/BaseGameMode.ts ---
+// src/lib/gameModes/BaseGameMode.ts
+import { get } from 'svelte/store';
+import { tick } from 'svelte';
+import { aiService } from '$lib/services/aiService';
+import type { IGameMode } from './gameMode.interface';
+import type { Player } from '$lib/models/player';
+import * as gameLogicService from '$lib/services/gameLogicService';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+import { gameOverStore } from '$lib/stores/gameOverStore';
+import { gameEventBus } from '$lib/services/gameEventBus';
+import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
+import { Piece, type MoveDirectionType } from '../models/Piece';
+import type { GameMoveResult, SuccessfulMoveResult, ScoreChangesData } from '$lib/types/gameMove';
+import { logService } from '$lib/services/logService';
+import { animationService } from '$lib/services/animationService';
+import { endGameService } from '$lib/services/endGameService';
+import { noMovesService } from '$lib/services/noMovesService';
+import { availableMovesService } from '$lib/services/availableMovesService';
+import { timeService } from '$lib/services/timeService';
+import { boardStore } from '$lib/stores/boardStore';
+import { playerStore } from '$lib/stores/playerStore';
+import { scoreStore } from '$lib/stores/scoreStore';
+import { uiStateStore } from '$lib/stores/uiStateStore';
+import { uiEffectsStore } from '$lib/stores/uiEffectsStore';
+import { voiceControlService } from '$lib/services/voiceControlService';
+
+export abstract class BaseGameMode implements IGameMode {
+  public turnDuration: number = 0;
+  public gameDuration: number = 0;
+
+  abstract getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player';
+  abstract initialize(options?: { newSize?: number }): void;
+  abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
+  abstract getPlayersConfiguration(): Player[];
+  protected abstract advanceToNextPlayer(): Promise<void>;
+  protected abstract applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void>;
+  abstract continueAfterNoMoves(): Promise<void>;
+
+  /**
+   * Скидає стан дошки для продовження гри після "немає ходів".
+   * Використовується в різних GameModes для уникнення дублювання.
+   * 
+   * ВАЖЛИВО: Цей метод лише скидає стан дошки і оновлює доступні ходи.
+   * Специфічна логіка режиму (перемикання гравців, таймери) залишається в конкретних реалізаціях.
+   */
+  protected resetBoardForContinuation(): void {
+    const boardState = get(boardStore);
+    if (!boardState) return;
+
+    boardStore.update(s => {
+      if (!s) return null;
+      return {
+        ...s,
+        cellVisitCounts: {},
+        moveHistory: [{
+          pos: { row: s.playerRow!, col: s.playerCol! },
+          blocked: [],
+          visits: {},
+          blockModeEnabled: get(gameSettingsStore).blockModeEnabled
+        }],
+        moveQueue: [],
+      };
+    });
+
+    availableMovesService.updateAvailableMoves();
+    gameOverStore.resetGameOverState();
+    animationService.reset();
+  }
+
+  protected startTurn(): void {
+    if (this.turnDuration > 0) {
+      timeService.startTurnTimer(this.turnDuration, () => {
+        endGameService.endGame('modal.gameOverReasonTimeUp');
+      });
+    }
+  }
+
+  async claimNoMoves(): Promise<void> {
+    await noMovesService.claimNoMoves();
+  }
+
+  async handlePlayerMove(direction: MoveDirectionType, distance: number, onEndCallback?: () => void): Promise<void> {
+    const boardState = get(boardStore);
+    const playerState = get(playerStore);
+    const scoreState = get(scoreStore);
+    const uiState = get(uiStateStore);
+    const settings = get(gameSettingsStore);
+
+    const combinedState = { ...boardState, ...playerState, ...scoreState, ...uiState };
+
+    const moveResult = gameLogicService.performMove(direction, distance, playerState!.currentPlayerIndex, combinedState, settings, this.getModeName(), onEndCallback) as GameMoveResult;
+
+    if (moveResult.success) {
+      boardStore.update(s => s ? ({ ...s, ...moveResult.changes.boardState }) : null);
+      playerStore.update(s => s ? ({ ...s, ...moveResult.changes.playerState }) : null);
+      scoreStore.update(s => s ? ({ ...s, ...moveResult.changes.scoreState }) : null);
+      uiStateStore.update(s => s ? ({ ...s, ...moveResult.changes.uiState }) : null);
+
+      const newMove = moveResult.changes.boardState.moveQueue.slice(-1)[0];
+      if (newMove) {
+        gameEventBus.dispatch('new_move_added', newMove);
+      }
+
+      await this.applyScoreChanges({ bonusPoints: moveResult.bonusPoints, penaltyPoints: moveResult.penaltyPoints });
+      await this.onPlayerMoveSuccess(moveResult);
+    } else {
+      const failedResult = moveResult as import('$lib/types/gameMove').FailedMoveResult;
+      if (failedResult.changes && failedResult.changes.boardState) {
+        boardStore.update(s => s ? ({ ...s, ...failedResult.changes!.boardState }) : null);
+      }
+      await this.onPlayerMoveFailure(failedResult.reason, direction, distance);
+    }
+  }
+
+  protected async onPlayerMoveSuccess(moveResult: SuccessfulMoveResult): Promise<void> {
+    const playerState = get(playerStore);
+    const currentPlayer = playerState!.players[playerState!.currentPlayerIndex];
+
+    if (currentPlayer.type === 'human') {
+      const settings = get(gameSettingsStore);
+      if (settings.autoHideBoard) {
+        uiEffectsStore.autoHideBoard(0);
+      }
+    }
+
+    uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null, isFirstMove: false }) : null);
+
+    if (moveResult.sideEffects && moveResult.sideEffects.length > 0) {
+      logService.GAME_MODE('[BaseGameMode] Executing side effects for move...', moveResult.sideEffects);
+      moveResult.sideEffects.forEach((effect: SideEffect) => sideEffectService.execute(effect));
+    }
+
+    await this.advanceToNextPlayer();
+
+    availableMovesService.updateAvailableMoves();
+  }
+
+  protected async onPlayerMoveFailure(reason: string | undefined, direction: MoveDirectionType, distance: number): Promise<void> {
+    const boardState = get(boardStore);
+    const playerState = get(playerStore);
+    if (!boardState || !playerState) return;
+
+    const piece = new Piece(boardState.playerRow!, boardState.playerCol!, boardState.boardSize);
+    const finalInvalidPosition = piece.calculateNewPosition(direction, distance);
+
+    const finalMoveForAnimation = {
+      player: playerState.currentPlayerIndex + 1,
+      direction: direction,
+      distance: distance,
+      to: finalInvalidPosition
+    };
+
+    boardStore.update(s => {
+      if (!s) return null;
+      const updatedMoveHistory = [...s.moveHistory, {
+        pos: { row: finalInvalidPosition.row, col: finalInvalidPosition.col },
+        blocked: [] as { row: number, col: number }[],
+        visits: { ...s.cellVisitCounts },
+        blockModeEnabled: get(gameSettingsStore).blockModeEnabled
+      }];
+      return {
+        ...s,
+        moveQueue: [...s.moveQueue, finalMoveForAnimation],
+        moveHistory: updatedMoveHistory
+      };
+    });
+
+    gameEventBus.dispatch('new_move_added', finalMoveForAnimation);
+
+    if (reason === 'out_of_bounds') {
+      await endGameService.endGame('modal.gameOverReasonOut');
+    } else if (reason === 'blocked_cell') {
+      await endGameService.endGame('modal.gameOverReasonBlocked');
+    }
+  }
+
+  async restartGame(options: { newSize?: number } = {}): Promise<void> {
+    this.initialize(options);
+    animationService.reset();
+    gameEventBus.dispatch('CloseModal');
+  }
+
+  cleanup(): void {
+    logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
+    timeService.stopGameTimer();
+    timeService.stopTurnTimer();
+  }
+
+  pauseTimers(): void {
+    timeService.pauseGameTimer();
+  }
+
+  resumeTimers(): void {
+    logService.GAME_MODE(`[${this.constructor.name}] Resuming timers.`);
+    timeService.resumeGameTimer();
+  }
+
+  protected async triggerComputerMove(): Promise<void> {
+    logService.GAME_MODE('triggerComputerMove: Початок ходу комп\'ютера.');
+    uiStateStore.update(s => s ? ({ ...s, isComputerMoveInProgress: true }) : null);
+
+    const boardState = get(boardStore);
+    const playerState = get(playerStore);
+    const uiState = get(uiStateStore);
+    if (!boardState || !playerState || !uiState) return;
+
+    const computerMove = aiService.getComputerMove(boardState, playerState, uiState);
+    logService.GAME_MODE('triggerComputerMove: Результат getComputerMove:', computerMove);
+
+    if (computerMove) {
+      logService.GAME_MODE('triggerComputerMove: Комп\'ютер має хід, виконуємо...');
+      const { direction, distance } = computerMove;
+
+      // ЧОМУ: Консолідуємо логіку ввімкнення голосового керування.
+      // Замість дублювання логіки та передчасного виклику, ми завжди використовуємо
+      // onEndCallback, який спрацьовує після завершення анімації ходу комп'ютера.
+      // Це гарантує, що розпізнавання мови не конфліктує з іншими UI-процесами.
+      // Прапор voiceMoveRequested скидається тут, оскільки його призначення виконано.
+      const onEndCallback = get(uiStateStore).voiceMoveRequested ? () => {
+        logService.voiceControl('[triggerComputerMove] onEndCallback: Re-enabling voice control.');
+        voiceControlService.startListening();
+        uiStateStore.update(s => ({ ...s, voiceMoveRequested: false }));
+      } : undefined;
+
+      await this.handlePlayerMove(direction, distance, onEndCallback);
+      // Set to false after successful move
+      uiStateStore.update(s => s ? ({ ...s, isComputerMoveInProgress: false }) : null);
+    } else {
+      logService.GAME_MODE('triggerComputerMove: У комп\'ютера немає ходів, викликаємо handleNoMoves.');
+      // Set to false before handling no moves
+      uiStateStore.update(s => s ? ({ ...s, isComputerMoveInProgress: false }) : null);
+      await this.handleNoMoves('computer');
+    }
+
+    // ВИДАЛЕНО: Цей блок викликав startListening() передчасно, до завершення анімації,
+    // що призводило до негайного припинення розпізнавання.
+    // if (get(uiStateStore).voiceMoveRequested) { ... }
+
+    await tick();
+  }
+}
+--- END OF FILE src/lib/gameModes/BaseGameMode.ts ---
+
+--- START OF FILE src/lib/gameModes/TrainingGameMode.ts ---
+import { get } from 'svelte/store';
+import { BaseGameMode } from './BaseGameMode';
+import type { Player, BonusHistoryItem } from '$lib/models/player';
+import { createTrainingPlayers } from '$lib/utils/playerFactory';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+import { gameOverStore } from '$lib/stores/gameOverStore';
+import { gameEventBus } from '$lib/services/gameEventBus';
+import { logService } from '$lib/services/logService';
+import { animationService } from '$lib/services/animationService';
+import { noMovesService } from '$lib/services/noMovesService';
+import { timeService } from '$lib/services/timeService';
+import { availableMovesService } from '$lib/services/availableMovesService';
+import { gameService } from '$lib/services/gameService';
+import { playerStore } from '$lib/stores/playerStore';
+import { scoreStore } from '$lib/stores/scoreStore';
+import { boardStore } from '$lib/stores/boardStore';
+import { uiStateStore } from '$lib/stores/uiStateStore';
+import type { ScoreChangesData } from '$lib/types/gameMove';
+
+export class TrainingGameMode extends BaseGameMode {
+  initialize(options: { newSize?: number } = {}): void {
+    gameService.initializeNewGame({
+      size: options.newSize,
+      players: this.getPlayersConfiguration(),
+    });
+    animationService.initialize();
+    this.startTurn();
+  }
+
+  getPlayersConfiguration(): Player[] {
+    return createTrainingPlayers();
+  }
+
+  getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player' {
+    return 'training';
+  }
+
+  protected async advanceToNextPlayer(): Promise<void> {
+    logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
+    const currentPlayerState = get(playerStore);
+    if (!currentPlayerState) return;
+    const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
+
+    playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
+
+    const nextPlayer = get(playerStore)?.players[nextPlayerIndex];
+    logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer?.type}.`);
+    if (nextPlayer?.type === 'ai') {
+      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера.');
+      await this.triggerComputerMove();
+    } else {
+      this.startTurn();
+    }
+  }
+
+  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
+    // No specific score changes to apply in training mode
+  }
+
+  async continueAfterNoMoves(): Promise<void> {
+    logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
+    const boardState = get(boardStore);
+    if (!boardState) return;
+
+    logService.logicMove('State of uiStateStore BEFORE continueAfterNoMoves:', get(uiStateStore));
+
+    boardStore.update(s => {
+      if (!s) return null;
+      return {
+        ...s,
+        cellVisitCounts: {},
+        moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
+        moveQueue: [],
+      };
+    });
+    availableMovesService.updateAvailableMoves();
+
+    gameOverStore.resetGameOverState();
+    animationService.reset();
+
+    // Явно повертаємо хід гравцю-людині
+    const humanPlayerIndex = get(playerStore)?.players.findIndex(p => p.type === 'human');
+    if (humanPlayerIndex !== undefined) {
+      playerStore.update(s => s ? { ...s, currentPlayerIndex: humanPlayerIndex } : null);
+      logService.logicMove('Set current player to human after continuing game.', { humanPlayerIndex });
+    }
+
+    // Скидаємо вибір гравця, щоб він міг зробити новий
+    uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null }) : null);
+    logService.logicMove('State of uiStateStore AFTER continueAfterNoMoves:', get(uiStateStore));
+
+    this.startTurn();
+    gameEventBus.dispatch('CloseModal');
+  }
+
+  async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
+    logService.GAME_MODE(`handleNoMoves: Обробка ситуації "немає ходів" для гравця типу: ${playerType}.`);
+    const boardState = get(boardStore);
+    if (!boardState) return;
+
+    gameOverStore.resetGameOverState();
+    scoreStore.update(s => s ? { ...s, noMovesBonus: (s.noMovesBonus || 0) + boardState.boardSize } : null);
+    noMovesService.dispatchNoMovesEvent(playerType);
+  }
+
+  protected startTurn(): void {
+    timeService.stopTurnTimer();
+  }
+}
+--- END OF FILE src/lib/gameModes/TrainingGameMode.ts ---
+
+--- START OF FILE src/lib/gameModes/VirtualPlayerGameMode.ts ---
+import { get } from 'svelte/store';
+import { TrainingGameMode } from './TrainingGameMode';
+import type { Player } from '$lib/models/player';
+import { createVirtualPlayerPlayers } from '$lib/utils/playerFactory';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+import { gameOverStore } from '$lib/stores/gameOverStore';
+import { gameEventBus } from '$lib/services/gameEventBus';
+import { logService } from '$lib/services/logService';
+import { animationService } from '$lib/services/animationService';
+import { noMovesService } from '$lib/services/noMovesService';
+import { timeService } from '$lib/services/timeService';
+import { availableMovesService } from '$lib/services/availableMovesService';
+import { gameService } from '$lib/services/gameService';
+import { playerStore } from '$lib/stores/playerStore';
+import { scoreStore } from '$lib/stores/scoreStore';
+import { boardStore } from '$lib/stores/boardStore';
+import { uiStateStore } from '$lib/stores/uiStateStore';
+import { timerStore } from '$lib/stores/timerStore';
+import { endGameService } from '$lib/services/endGameService';
+import type { ScoreChangesData } from '$lib/types/gameMove';
+
+import { voiceControlService } from '$lib/services/voiceControlService';
+
+export class VirtualPlayerGameMode extends TrainingGameMode {
+
+  constructor() {
+    super();
+  }
+
+  initialize(options: { newSize?: number } = {}): void {
+    timeService.stopGameTimer();
+    super.initialize(options);
+    gameSettingsStore.updateSettings({
+      speechRate: 1.6,
+      shortSpeech: true,
+      speechFor: { player: false, computer: true },
+    });
+  }
+
+  getPlayersConfiguration(): Player[] {
+    return createVirtualPlayerPlayers();
+  }
+
+  getModeName(): 'virtual-player' {
+    return 'virtual-player';
+  }
+
+
+
+  protected async advanceToNextPlayer(): Promise<void> {
+    logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
+    const currentPlayerState = get(playerStore);
+    if (!currentPlayerState) return;
+    const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
+
+    playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
+
+    const nextPlayer = get(playerStore)?.players[nextPlayerIndex];
+    logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer?.type}.`);
+    if (nextPlayer?.type === 'ai') {
+      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера.');
+      await this.triggerComputerMove();
+    } else {
+      this.startTurn();
+      // ВИДАЛЕНО: Ця логіка дублювала логіку в onEndCallback у BaseGameMode
+      // і викликалася передчасно, що призводило до конфліктів.
+      // if (get(uiStateStore).voiceMoveRequested) {
+      //   logService.GAME_MODE('advanceToNextPlayer: Повторне ввімкнення голосового керування.');
+      //   voiceControlService.startListening();
+      // }
+    }
+  }
+
+  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
+    // No specific score changes to apply in training mode
+  }
+
+  async continueAfterNoMoves(): Promise<void> {
+    logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
+    logService.logicMove('State of uiStateStore BEFORE continueAfterNoMoves:', get(uiStateStore));
+
+    // Використовуємо спільну логіку з базового класу
+    this.resetBoardForContinuation();
+
+    // Специфічна логіка для virtual-player: повертаємо хід гравцю-людині
+    const humanPlayerIndex = get(playerStore)?.players.findIndex(p => p.type === 'human');
+    if (humanPlayerIndex !== undefined) {
+      playerStore.update(s => s ? { ...s, currentPlayerIndex: humanPlayerIndex } : null);
+      logService.logicMove('Set current player to human after continuing game.', { humanPlayerIndex });
+    }
+
+    // Скидаємо вибір гравця, щоб він міг зробити новий
+    uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null }) : null);
+    logService.logicMove('State of uiStateStore AFTER continueAfterNoMoves:', get(uiStateStore));
+
+    this.startTurn();
+    gameEventBus.dispatch('CloseModal');
+  }
+
+  async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
+    logService.GAME_MODE(`handleNoMoves: Обробка ситуації "немає ходів" для гравця типу: ${playerType}.`);
+    const boardState = get(boardStore);
+    if (!boardState) return;
+
+    gameOverStore.resetGameOverState();
+    scoreStore.update(s => s ? { ...s, noMovesBonus: (s.noMovesBonus || 0) + boardState.boardSize } : null);
+    noMovesService.dispatchNoMovesEvent(playerType);
+  }
+
+  protected startTurn(): void {
+    timeService.stopTurnTimer();
+  }
+}
+--- END OF FILE src/lib/gameModes/VirtualPlayerGameMode.ts ---
+
+--- START OF FILE src/lib/services/gameLogicService.ts ---
+// src/lib/services/gameLogicService.ts
+import { Piece, type MoveDirectionType } from '../models/Piece';
+import { get } from 'svelte/store';
+import { isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils';
+import { logService } from './logService';
+import { calculateMoveScore } from './scoreService';
+import type { Direction } from '$lib/utils/gameUtils';
+import { uiStateStore } from '$lib/stores/uiStateStore';
+import { boardStore } from '$lib/stores/boardStore';
+import { playerStore } from '$lib/stores/playerStore';
+import { scoreStore } from '$lib/stores/scoreStore';
+import { appSettingsStore, type AppSettingsState } from '$lib/stores/appSettingsStore';
+import type { CombinedGameState } from '$lib/models/gameState';
+import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
+import { rewardsService } from './rewardsService';
+
+export function performMove(
+  direction: MoveDirectionType,
+  distance: number,
+  playerIndex: number,
+  currentState: CombinedGameState,
+  settings: GameSettingsState,
+  actualGameMode: 'training' | 'local' | 'timed' | 'online' | 'virtual-player',
+  onEndCallback?: () => void
+) {
+  logService.state('Logical Position (at move start)', { row: currentState.playerRow, col: currentState.playerCol });
+  logService.logicMove('performMove: початок з параметрами:', { direction, distance, playerIndex });
+
+  const piece = new Piece(currentState.playerRow, currentState.playerCol, currentState.boardSize);
+  const newPosition = piece.calculateNewPosition(direction, distance);
+
+  if (!piece.isValidPosition(newPosition.row, newPosition.col)) {
+    logService.logicMove('performMove: вихід за межі дошки');
+    return { success: false, reason: 'out_of_bounds' };
+  }
+
+  if (isCellBlocked(newPosition.row, newPosition.col, currentState.cellVisitCounts, settings)) {
+    logService.logicMove('performMove: хід на заблоковану клітинку');
+    return { success: false, reason: 'blocked_cell' };
+  }
+
+  const scoreChanges = calculateMoveScore(currentState, newPosition, playerIndex, settings, distance, direction);
+
+  const startCellKey = `${currentState.playerRow}-${currentState.playerCol}`;
+  const updatedCellVisitCounts = { ...currentState.cellVisitCounts, [startCellKey]: (currentState.cellVisitCounts[startCellKey] || 0) + 1 };
+
+  // ВАЖЛИВО: Згідно документації docs/user-guide/bonus-scoring.md (рядки 88-101),
+  // в режимах local/online НЕ нараховуються базові бали (+1/+2/+3 за видимість дошки).
+  // Базові бали нараховуються ТІЛЬКИ в режимах training/virtual-player/timed.
+  // ВИПРАВЛЕННЯ: Використовуємо actualGameMode (фактичний режим гри з BaseGameMode),
+  // а не settings.gameMode (який містить пресет, напр. 'observer', 'beginner').
+  const isLocalOrOnlineGame = actualGameMode === 'local' || actualGameMode === 'online';
+  const shouldApplyBaseScore = !isLocalOrOnlineGame;
+  const baseScoreToAdd = shouldApplyBaseScore ? scoreChanges.baseScoreChange : 0;
+
+  logService.score('[performMove] Score calculation:', {
+    actualGameMode,
+    presetGameMode: settings.gameMode,
+    isLocalOrOnlineGame,
+    shouldApplyBaseScore,
+    baseScoreChange: scoreChanges.baseScoreChange,
+    baseScoreToAdd,
+    bonusPoints: scoreChanges.bonusPoints,
+    penaltyPoints: scoreChanges.penaltyPointsForMove
+  });
+
+  const changes = {
+    boardState: {
+      playerRow: newPosition.row,
+      playerCol: newPosition.col,
+      cellVisitCounts: updatedCellVisitCounts,
+      moveQueue: [...currentState.moveQueue, { player: playerIndex + 1, direction, distance, to: newPosition }],
+      moveHistory: [...currentState.moveHistory, { pos: newPosition, blocked: [] as { row: number; col: number }[], visits: updatedCellVisitCounts, blockModeEnabled: settings.blockModeEnabled, lastMove: { direction, distance, player: playerIndex } }],
+    },
+    playerState: {
+      players: currentState.players.map((p: any, i: number) => i === playerIndex ? { ...p, score: p.score + baseScoreToAdd } : p),
+    },
+    scoreState: {
+      penaltyPoints: currentState.penaltyPoints + scoreChanges.penaltyPoints,
+      movesInBlockMode: currentState.movesInBlockMode + scoreChanges.movesInBlockModeChange,
+      jumpedBlockedCells: currentState.jumpedBlockedCells + scoreChanges.jumpedBlockedCellsChange,
+      distanceBonus: (currentState.distanceBonus || 0) + scoreChanges.distanceBonusChange,
+    },
+    uiState: {
+      lastMove: { direction, distance, player: playerIndex }
+    }
+  };
+
+  const sideEffects = [];
+  const currentPlayer = currentState.players[playerIndex];
+  const shouldSpeak = settings.speechEnabled &&
+    ((currentPlayer.isComputer && settings.speechFor.computer) ||
+      (!currentPlayer.isComputer && settings.speechFor.player));
+
+  // Якщо потрібно озвучити хід, АБО якщо є callback, який потрібно виконати в кінці ходу,
+  // ми створюємо побічний ефект. speechService сам вирішить, чи потрібно говорити.
+  if (shouldSpeak || onEndCallback) {
+    sideEffects.push({
+      type: 'speak_move',
+      payload: {
+        move: { direction, distance },
+        lang: (get(appSettingsStore) as AppSettingsState).language || 'uk',
+        voiceURI: settings.selectedVoiceURI,
+        onEndCallback
+      }
+    });
+  }
+
+  logService.logicMove('performMove: завершено успішно');
+
+  // Check achievements after move (based on score update prediction)
+  if (changes.playerState && changes.playerState.players) {
+    // Find the player who moved
+    const updatedPlayer = changes.playerState.players[playerIndex];
+    // We pass a context object that matches what achievements expect
+    // Note: gameModeService.getCurrentMode() might be safer to get actual mode string from store if needed
+    // For now, we use the passed `actualGameMode/settings` 
+    rewardsService.checkAchievements({
+      score: updatedPlayer.score,
+      gameMode: settings.gameMode || actualGameMode // Prioritize preset for accurate checks
+    });
+  }
+
+  return {
+    success: true,
+    changes,
+    newPosition,
+    bonusPoints: scoreChanges.bonusPoints,
+    penaltyPoints: scoreChanges.penaltyPointsForMove,
+    sideEffects
+  };
+}
+--- END OF FILE src/lib/services/gameLogicService.ts ---
+
+--- START OF FILE src/lib/config/timeConstants.ts ---
+
+/**
+ * Централізоване сховище для всіх часових констант гри.
+ * Дозволяє уникнути магічних чисел та легко налаштовувати таймінги.
+ */
+
+// Тривалість ходу в секундах
+export const TEMPO_TURN_DURATION = 15;
+export const BASE_TURN_DURATION = 10;
+
+// Множник часу для режиму розробки
+export const DEV_TIME_MULTIPLIER = 3;
+
+// Затримки
+export const COMPUTER_TURN_DELAY = 1000; // ms
+export const MOVE_ANIMATION_DELAY = 300; // ms (typical animation duration)
+
+// Тривалість ігор
+export const TIMED_GAME_DURATION = 60000; // 1 хвилина в ms (для TimedVsComputer)
+export const TIMED_GAME_DEFAULT_DURATION = 100; // 100 секунд (для TimedGameMode)
+--- END OF FILE src/lib/config/timeConstants.ts ---
+
+--- START OF FILE src/lib/config/animationConfig.ts ---
+export const animationConfig = {
+  training: {
+    beginner: {
+      player: 1000,
+      computer: 300,
+    },
+    experienced: {
+      player: 300,
+      computer: 100,
+    },
+    pro: {
+      player: 50,
+      computer: 50,
+    },
+  },
+  timed: {
+    player: 50,
+    computer: 50,
+  },
+  local: {
+    player: 50,
+    computer: 50,
+  },
+  online: {
+    player: 50,
+    computer: 50,
+  },
+} as const;
+
+export type AnimationConfigMode = keyof typeof animationConfig;
+export type AnimationConfigPreset = keyof typeof animationConfig.training;
+--- END OF FILE src/lib/config/animationConfig.ts ---
+

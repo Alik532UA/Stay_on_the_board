@@ -45,8 +45,6 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
     return 'virtual-player';
   }
 
-
-
   protected async advanceToNextPlayer(): Promise<void> {
     logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
     const currentPlayerState = get(playerStore);
@@ -57,17 +55,15 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
 
     const nextPlayer = get(playerStore)?.players[nextPlayerIndex];
     logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer?.type}.`);
+
     if (nextPlayer?.type === 'ai') {
-      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера.');
+      // ВИПРАВЛЕНО: Прибрано штучну затримку.
+      // Логіка оновлюється миттєво -> center-info показує хід одразу.
+      // Анімація на дошці буде відтворена з затримкою завдяки черзі в animationService.
+      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера (миттєво).');
       await this.triggerComputerMove();
     } else {
       this.startTurn();
-      // ВИДАЛЕНО: Ця логіка дублювала логіку в onEndCallback у BaseGameMode
-      // і викликалася передчасно, що призводило до конфліктів.
-      // if (get(uiStateStore).voiceMoveRequested) {
-      //   logService.GAME_MODE('advanceToNextPlayer: Повторне ввімкнення голосового керування.');
-      //   voiceControlService.startListening();
-      // }
     }
   }
 

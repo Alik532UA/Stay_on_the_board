@@ -9,11 +9,48 @@ import { languages } from '$lib/constants';
 import { animationStore } from './animationStore';
 import { availableMovesStore } from './availableMovesStore';
 import { logService } from '$lib/services/logService';
+import type { MoveDirectionType } from '$lib/models/Piece';
 
 function chunk<T>(arr: T[], n: number): T[][] {
   const res = [];
   for (let i = 0; i < arr.length; i += n) res.push(arr.slice(i, i + n));
   return res;
+}
+
+// Мапа протилежних напрямків для розрахунку попередньої позиції
+const oppositeDirections: Record<string, string> = {
+  'up': 'down', 'down': 'up',
+  'left': 'right', 'right': 'left',
+  'up-left': 'down-right', 'up-right': 'down-left',
+  'down-left': 'up-right', 'down-right': 'up-left'
+};
+
+/**
+ * Розраховує стартову позицію ходу, знаючи кінцеву точку, напрямок і відстань.
+ * Використовується для утримання фігури на місці, поки логіка вже втекла вперед, а анімація ще не почалася.
+ */
+function calculateStartPosition(move: { direction: MoveDirectionType, distance: number, to: { row: number, col: number } }) {
+  const { direction, distance, to } = move;
+  const oppositeDir = oppositeDirections[direction];
+
+  let dRow = 0;
+  let dCol = 0;
+
+  switch (oppositeDir) {
+    case 'up': dRow = -1; break;
+    case 'down': dRow = 1; break;
+    case 'left': dCol = -1; break;
+    case 'right': dCol = 1; break;
+    case 'up-left': dRow = -1; dCol = -1; break;
+    case 'up-right': dRow = -1; dCol = 1; break;
+    case 'down-left': dRow = 1; dCol = -1; break;
+    case 'down-right': dRow = 1; dCol = 1; break;
+  }
+
+  return {
+    row: to.row + (dRow * distance),
+    col: to.col + (dCol * distance)
+  };
 }
 
 export const lastComputerMove = derived(
@@ -116,27 +153,37 @@ export const visualPosition = derived(
   [boardStore, animationStore],
   ([$boardStore, $animationStore]) => {
     if (!$boardStore) {
-      logService.piece("(visualPosition) no boardStore, returning null");
       return { row: null, col: null };
     }
 
-    let result;
-    if (!$animationStore.isAnimating && $animationStore.animationQueue.length === 0) {
-      result = { row: $boardStore.playerRow, col: $boardStore.playerCol };
-      logService.piece(`(visualPosition) no animation, returning logical position: [${result.row}, ${result.col}]`);
-    } else if ($animationStore.visualMoveQueue && $animationStore.visualMoveQueue.length > 0) {
+    // 1. Анімація активно відтворюється (фігура рухається)
+    // Ми беремо цільову точку поточного кадру анімації.
+    if ($animationStore.visualMoveQueue && $animationStore.visualMoveQueue.length > 0) {
       const lastAnimatedMove = $animationStore.visualMoveQueue[$animationStore.visualMoveQueue.length - 1];
-      result = {
-        row: lastAnimatedMove.row ?? $boardStore.playerRow,
-        col: lastAnimatedMove.col ?? $boardStore.playerCol
+      // @ts-ignore - visualMoveQueue items come from gameLogicService which includes 'to'
+      const targetPos = lastAnimatedMove.to || { row: lastAnimatedMove.row, col: lastAnimatedMove.col };
+
+      return {
+        row: targetPos.row ?? $boardStore.playerRow,
+        col: targetPos.col ?? $boardStore.playerCol
       };
-      logService.piece(`(visualPosition) animation in progress, returning animated position: [${result.row}, ${result.col}]`);
-    } else {
-      result = { row: $boardStore.playerRow, col: $boardStore.playerCol };
-      logService.piece(`(visualPosition) fallback, returning logical position: [${result.row}, ${result.col}]`);
     }
 
-    return result;
+    // 2. Анімація в черзі, але ще не почалася (пауза або очікування)
+    // Це критичний момент: логіка вже оновила boardStore, але візуально ми ще не повинні там бути.
+    // Ми повинні показувати позицію ПЕРЕД першим ходом у черзі.
+    else if ($animationStore.animationQueue.length > 0) {
+      const nextMove = $animationStore.animationQueue[0];
+      // @ts-ignore
+      if (nextMove.to && nextMove.direction && nextMove.distance) {
+        // @ts-ignore
+        return calculateStartPosition(nextMove);
+      }
+    }
+
+    // 3. Спокійний стан (анімацій немає, черга пуста)
+    // Показуємо актуальний стан з boardStore.
+    return { row: $boardStore.playerRow, col: $boardStore.playerCol };
   }
 );
 
@@ -165,7 +212,6 @@ export const isPauseBetweenMoves = derived(
   $animationStore => $animationStore.isAnimating && $animationStore.animationQueue.length === 0
 );
 
-// НАВІЩО: Додано нові похідні стори для таймерів, щоб UI міг на них реагувати.
 export const remainingTime = derived(
   timerStore,
   $timerStore => $timerStore.remainingTime ?? 0
