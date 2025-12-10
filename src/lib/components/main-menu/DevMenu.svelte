@@ -10,6 +10,7 @@
     export let onOpenWipNotice: () => void;
     export let onPlayVsComputer: () => void;
     export let onLocalGame: () => void;
+    export let versionNumber: string;
 
     function navigateTo(route: string) {
         goto(`${base}${route}`);
@@ -42,7 +43,7 @@
     }}
     onkeydown={(e) => e.key === "Escape" && onClose()}
 >
-    <h3>dev</h3>
+    <h3>dev v.{versionNumber}</h3>
     <StyledButton
         variant="menu"
         class="secondary"

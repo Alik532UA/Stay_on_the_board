@@ -110,7 +110,7 @@
                                         ? displayItems[i].primary
                                         : i === 2,
                             }}
-                            dataTestId="menu-button-{displayItems[i].id}"
+                            dataTestId={displayItems[i].dataTestId || `menu-button-${displayItems[i].id}`}
                         />
                     {/if}
                 </div>

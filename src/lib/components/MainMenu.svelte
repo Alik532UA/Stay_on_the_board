@@ -31,7 +31,6 @@
   let showLangDropdown = false;
   let showThemeDropdown = false;
   let showWipNotice = false;
-  let showDevMenu = false;
   let mainMenuButtonsNode: HTMLElement;
 
   const CONTEXT_NAME = "main-menu";
@@ -67,47 +66,6 @@
   function getFocusableButtons() {
     if (!mainMenuButtonsNode) return [];
     return Array.from(mainMenuButtonsNode.querySelectorAll("button"));
-  }
-
-  function handleMenuKeyDown(event: KeyboardEvent) {
-    logService.action(
-      `[MainMenu] handleMenuKeyDown fired with key: ${event.key}`,
-    );
-    const buttons = getFocusableButtons();
-    if (buttons.length === 0) {
-      logService.action(`[MainMenu] No buttons found.`);
-      return;
-    }
-
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
-      const currentIndex = buttons.findIndex(
-        (btn) => btn === document.activeElement,
-      );
-      logService.action(`[MainMenu] Current focused index: ${currentIndex}`);
-      let nextIndex = currentIndex;
-
-      if (event.key === "ArrowDown") {
-        nextIndex = (currentIndex + 1) % buttons.length;
-      } else {
-        // ArrowUp
-        nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
-      }
-
-      logService.action(`[MainMenu] Focusing next index: ${nextIndex}`);
-      buttons[nextIndex].focus();
-    } else if (
-      event.key === "Enter" ||
-      event.key === " " ||
-      event.code === "NumpadEnter"
-    ) {
-      event.preventDefault();
-      const focusedButton = document.activeElement as HTMLElement;
-      if (buttons.includes(focusedButton as HTMLButtonElement)) {
-        logService.action(`[MainMenu] Clicking focused button:`, focusedButton);
-        focusedButton.click();
-      }
-    }
   }
 
   $: if (mainMenuButtonsNode) {
@@ -146,13 +104,8 @@
     showThemeDropdown = false;
     showLangDropdown = false;
     showWipNotice = false;
-    showDevMenu = false;
   }
-
-  function handleDevMenu() {
-    logService.action('Click: "dev version" (MainMenu)');
-    showDevMenu = !showDevMenu;
-  }
+  
 
   function handlePlayVirtualPlayer() {
     hotkeyService.popContext();
@@ -229,77 +182,12 @@
     logService.action('Click: "Підтримати" (MainMenu)');
     navigateTo("/supporters");
   }
-
-  // Derived or handled logic
-  $: isDev = import.meta.env.DEV;
 </script>
 
 <main class="main-menu" data-testid="main-menu-container">
   {#if $isLoading}
     <div class="main-menu-loading">{$_("mainMenu.loadingTranslations")}</div>
   {:else}
-    <div class="main-menu-top-icons">
-      <button
-        class="main-menu-icon"
-        use:customTooltip={$_("mainMenu.theme")}
-        aria-label={$_("mainMenu.theme")}
-        onclick={() => (showThemeDropdown = !showThemeDropdown)}
-        data-testid="theme-btn"
-      >
-        <span class="main-menu-icon-inner">
-          <SvgIcons name={settings.style} />
-        </span>
-      </button>
-
-      <button
-        class="main-menu-icon"
-        use:customTooltip={$_("mainMenu.language")}
-        aria-label={$_("mainMenu.language")}
-        onclick={toggleLangDropdown}
-        data-testid="language-btn"
-      >
-        <span class="main-menu-icon-inner">
-          {@html $currentLanguageFlagSvg}
-        </span>
-      </button>
-
-      {#if showLangDropdown}
-        <LanguageDropdown onClose={() => (showLangDropdown = false)} />
-      {/if}
-
-      <button
-        class="main-menu-icon"
-        use:customTooltip={$_("mainMenu.donate")}
-        aria-label={$_("mainMenu.donate")}
-        onclick={() => navigateTo("/supporters")}
-        data-testid="donate-btn"
-      >
-        <span class="main-menu-icon-inner">
-          <SvgIcons name="donate" />
-        </span>
-      </button>
-    </div>
-
-    {#if showThemeDropdown || showLangDropdown || showWipNotice || showDevMenu}
-      <div
-        class="screen-overlay-backdrop"
-        role="button"
-        tabindex="0"
-        aria-label={$_("mainMenu.closeDropdowns")}
-        onclick={closeDropdowns}
-        onkeydown={(e) =>
-          (e.key === "Enter" || e.key === " ") && closeDropdowns()}
-      ></div>
-    {/if}
-
-    {#if showDevMenu}
-      <DevMenu
-        onClose={() => (showDevMenu = false)}
-        onOpenWipNotice={openWipNotice}
-        onPlayVsComputer={handlePlayVsComputer}
-        onLocalGame={handleLocalGame}
-      />
-    {/if}
 
     {#if showWipNotice}
       <WipNotice onClose={closeDropdowns} />
@@ -312,36 +200,13 @@
     <div class="main-menu-title" data-testid="main-menu-title">
       {$_("mainMenu.title")}
     </div>
-    {#if isDev}
-      <div class="main-menu-subtitle" data-testid="main-menu-subtitle">
-        {$_("mainMenu.menu")}
-        <span
-          class="dev-version"
-          role="button"
-          tabindex="0"
-          onclick={handleDevMenu}
-          onkeydown={(e) =>
-            (e.key === "Enter" || e.key === " ") && handleDevMenu()}
-          data-testid="dev-version-span"
-        >
-          dev v.{$appVersion}
-        </span>
-      </div>
-    {/if}
     <div
       id="main-menu-buttons"
       bind:this={mainMenuButtonsNode}
-      onkeydown={handleMenuKeyDown}
       tabindex="-1"
       role="group"
       aria-label={$_("mainMenu.menu")}
     >
-      <StyledButton
-        variant="menu"
-        size="large"
-        on:click={() => navigateTo("/settings")}
-        dataTestId="settings-btn">{$_("mainMenu.settings")}</StyledButton
-      >
       <StyledButton
         variant="menu"
         size="large"
@@ -354,24 +219,6 @@
         on:click={handleRules}
         dataTestId="rules-btn">{$_("mainMenu.rules")}</StyledButton
       >
-      <StyledButton
-        variant="menu"
-        size="large"
-        on:click={handleSupporters}
-        dataTestId="supporters-btn">{$_("mainMenu.supporters")}</StyledButton
-      >
-      <StyledButton
-        variant="menu"
-        size="large"
-        on:click={() => navigateTo("/rewards")}
-        dataTestId="rewards-btn"
-      >
-        <span slot="icon" class="icon-spacer" style="margin-right: 0px;"
-          ><SvgIcons name="trophy_bronze" /></span
-        >
-        {$_("rewards.pageTitle")}
-      </StyledButton>
-      <!-- <button class="modal-button danger" onclick={showClearCacheModal} data-testid="clear-cache-btn">{$_('mainMenu.clearCache')}</button> -->
       <StyledButton
         variant="primary"
         size="large"
