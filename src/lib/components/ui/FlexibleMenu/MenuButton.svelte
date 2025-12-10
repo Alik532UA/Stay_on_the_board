@@ -5,6 +5,8 @@
     // Explicitly typing the prop
     export let item: IMenuItem;
     export let dataTestId: string = "";
+
+    console.log(item.id, item.isActive);
 </script>
 
 <button
@@ -66,8 +68,8 @@
         /* The specific positioning and large circle shape will likely be handled 
            by the parent grid/layout to ensure it breaks out of the flow properly,
            but we can give it the visual style here */
-        background: var(--primary-color, #ffaa00);
-        color: var(--black, #000);
+        background: var(--control-bg, #444);
+        color: var(--text-color, #fff);
         border-radius: 50%;
         width: 64px; /* Fixed size for the FAB */
         height: 64px;
@@ -78,6 +80,11 @@
     [data-testid="menu-button-play"].primary {
         background: #4CAF50; /* Green */
         color: white;
+    }
+
+    .menu-button.primary.active {
+        background: var(--primary-color, #ffaa00);
+        color: var(--black, #000);
     }
 
     .menu-button.primary:hover {

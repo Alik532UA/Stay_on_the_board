@@ -7,7 +7,11 @@
   import { base } from "$app/paths";
   import { modalStore } from "$lib/stores/modalStore";
   import GameModeModal from "$lib/components/GameModeModal.svelte";
+  import DevMenu from "$lib/components/main-menu/DevMenu.svelte";
+  import { testModeStore, toggleTestMode } from "$lib/stores/testModeStore";
+  import { clearCache } from "$lib/utils/cacheManager";
 
+  // Logic for bottom menu
   function handlePlayVirtualPlayer() {
     modalStore.showModal({
       titleKey: "mainMenu.gameModeModal.title",
@@ -53,10 +57,63 @@
       onClick: () => goto(`${base}/rules`),
     },
   ];
+
+  // Logic for top (dev) menu
+  let showDevMenuComponent: boolean = false;
+
+  function openDevMenuModal() {
+    modalStore.showModal({
+      titleKey: "Dev Menu Modal",
+      component: DevMenu,
+      dataTestId: "dev-menu-modal",
+      customClass: "dev-menu-modal-window",
+      props: {
+        onClose: () => modalStore.closeModal(),
+      },
+    });
+  }
+
+  const devMenuItems: IMenuItem[] = [
+    {
+      id: "main-menu-link",
+      emoji: "🏠",
+      onClick: () => goto(`${base}/`),
+    },
+    {
+      id: "dev-empty-1",
+      emoji: "",
+      onClick: () => {},
+    },
+    {
+      id: "test-mode-btn",
+      emoji: "🛠️",
+      onClick: toggleTestMode,
+      primary: true,
+      isActive: $testModeStore.isEnabled,
+    },
+    {
+      id: "dev-menu-modal",
+      emoji: "☰",
+      onClick: openDevMenuModal,
+    },
+    {
+      id: "dev-clear-cache-btn",
+      emoji: "🧹",
+      onClick: () => clearCache({ keepAppearance: false }),
+    },
+  ];
 </script>
 
 <MainMenu />
 <DevClearCacheButton />
+
+{#if import.meta.env.DEV}
+  <FlexibleMenu
+    items={devMenuItems}
+    position="top"
+    persistenceKey="main-top-menu"
+  />
+{/if}
 
 <!-- Demo of Flexible Menu -->
 <FlexibleMenu

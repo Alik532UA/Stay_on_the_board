@@ -152,7 +152,11 @@
     on:keydown={onOverlayKeyDown}
     data-testid="modal-overlay"
   >
-    <div class="modal-window" data-testid={$modalState.dataTestId}>
+    <div
+      class="modal-window"
+      class:[$modalState.customClass]={$modalState.customClass}
+      data-testid={$modalState.dataTestId}
+    >
       {#if ($modalState.titleKey || $modalState.title) && !($modalState.dataTestId === "replay-modal" && windowHeight < 870)}
         <div
           class="modal-header"
