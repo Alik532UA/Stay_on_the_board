@@ -17,16 +17,21 @@ import { roomService } from '$lib/services/roomService';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import { notificationService } from '$lib/services/notificationService';
 import { availableMovesService } from '$lib/services/availableMovesService';
+import { gameEventBus } from '$lib/services/gameEventBus';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
   private unsubscribeSync: (() => void) | null = null;
+  private unsubscribeSettings: (() => void) | null = null;
   private roomId: string | null = null;
   private myPlayerId: string | null = null;
+  private amIHost: boolean = false;
+  private myPlayerIndex: number = -1;
+  private isApplyingRemoteState: boolean = false; // Прапорець для уникнення циклів
 
   constructor() {
     super();
-    this.turnDuration = 30; // Більше часу для онлайн гри
+    this.turnDuration = 30;
   }
 
   async initialize(options: { newSize?: number; roomId?: string } = {}): Promise<void> {
@@ -39,7 +44,37 @@ export class OnlineGameMode extends BaseGameMode {
       return;
     }
 
-    // Створюємо новий екземпляр синхронізації для кожної гри
+    const roomData = await roomService.getRoom(this.roomId);
+    if (roomData) {
+      this.amIHost = roomData.hostId === this.myPlayerId;
+      this.myPlayerIndex = this.amIHost ? 0 : 1;
+
+      uiStateStore.update(s => ({
+        ...s,
+        amIHost: this.amIHost,
+        onlinePlayerIndex: this.myPlayerIndex,
+        intendedGameType: 'online'
+      }));
+
+      // Застосовуємо початкові налаштування з кімнати
+      if (roomData.settings) {
+        this.isApplyingRemoteState = true;
+        gameSettingsStore.updateSettings({
+          ...roomData.settings,
+          settingsLocked: roomData.settingsLocked // Синхронізуємо стан блокування
+        });
+        if (roomData.settings.turnDuration) {
+          this.turnDuration = roomData.settings.turnDuration;
+        }
+        this.isApplyingRemoteState = false;
+      }
+
+      logService.init(`[OnlineGameMode] Role determined. Host: ${this.amIHost}, Index: ${this.myPlayerIndex}`);
+    } else {
+      logService.error('[OnlineGameMode] Could not fetch room data');
+      return;
+    }
+
     this.stateSync = createFirebaseGameStateSync();
 
     try {
@@ -49,34 +84,55 @@ export class OnlineGameMode extends BaseGameMode {
         this.handleSyncEvent(event);
       });
 
-      // Якщо ми хост (перший гравець), ми ініціалізуємо стан
-      // Але в даному випадку стан вже може бути в кімнаті, тому спочатку пробуємо завантажити
+      // Підписуємося на локальні зміни налаштувань, щоб відправляти їх на сервер
+      this.unsubscribeSettings = gameSettingsStore.subscribe(settings => {
+        if (!this.isApplyingRemoteState && this.roomId) {
+          // Відправляємо зміни тільки якщо вони зроблені локально
+          // І тільки ті, що впливають на геймплей
+          const settingsToSync = {
+            blockModeEnabled: settings.blockModeEnabled,
+            autoHideBoard: settings.autoHideBoard,
+            boardSize: settings.boardSize,
+            turnDuration: settings.turnDuration
+          };
+
+          // Використовуємо roomService для оновлення налаштувань (це оновить документ кімнати)
+          // АЛЕ: нам також треба оновити gameState, щоб інші гравці отримали це через stateSync
+          // Тому краще оновлювати через pushState
+          this.syncCurrentState();
+        }
+      });
+
       const remoteState = await this.stateSync.pullState();
 
       if (remoteState) {
         logService.GAME_MODE('[OnlineGameMode] Loaded existing state from server');
         this.applyRemoteState(remoteState);
       } else {
-        logService.GAME_MODE('[OnlineGameMode] No remote state, initializing new game');
-        // Ініціалізуємо нову гру локально
-        gameService.initializeNewGame({
-          size: options.newSize,
-          players: this.getPlayersConfiguration(),
-        });
-        // І відправляємо на сервер, щоб другий гравець побачив стан
-        await this.syncCurrentState();
+        if (this.amIHost) {
+          logService.GAME_MODE('[OnlineGameMode] I am Host. Initializing new game state.');
+          gameService.initializeNewGame({
+            size: options.newSize,
+            players: this.getPlayersConfiguration(),
+          });
+          await this.syncCurrentState();
+        } else {
+          logService.GAME_MODE('[OnlineGameMode] I am Guest. Waiting for Host to initialize state...');
+        }
       }
 
+      // Локальні налаштування (не синхронізуються)
       gameSettingsStore.updateSettings({
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: true, computer: true }, // Озвучуємо всіх
+        speechFor: { player: true, computer: true },
       });
 
       animationService.initialize();
-      this.startTurn();
+      if (get(boardStore)) {
+        this.startTurn();
+      }
 
-      logService.GAME_MODE(`[OnlineGameMode] Initialized room: ${this.roomId}`);
     } catch (error) {
       logService.error('[OnlineGameMode] Initialization failed:', error);
     }
@@ -87,6 +143,10 @@ export class OnlineGameMode extends BaseGameMode {
       this.unsubscribeSync();
       this.unsubscribeSync = null;
     }
+    if (this.unsubscribeSettings) {
+      this.unsubscribeSettings();
+      this.unsubscribeSettings = null;
+    }
     if (this.stateSync) {
       this.stateSync.cleanup();
       this.stateSync = null;
@@ -95,24 +155,26 @@ export class OnlineGameMode extends BaseGameMode {
     logService.GAME_MODE('[OnlineGameMode] Cleaned up');
   }
 
-  // Перевизначаємо handlePlayerMove для перевірки черги
   async handlePlayerMove(direction: MoveDirectionType, distance: number, onEndCallback?: () => void): Promise<void> {
     const playerState = get(playerStore);
-    if (!playerState || !this.myPlayerId) return;
+    if (!playerState || this.myPlayerIndex === -1) return;
 
-    // ВАЖЛИВО: Перевірка, чи це мій хід
-    // Для MVP: Хост завжди гравець 1, Гість завжди гравець 2.
-    // Тут можна додати перевірку, чи співпадає myPlayerId з ID поточного гравця в roomService
+    if (playerState.currentPlayerIndex !== this.myPlayerIndex) {
+      notificationService.show({ type: 'warning', messageRaw: 'Зачекайте свого ходу!' });
+      return;
+    }
 
     await super.handlePlayerMove(direction, distance, onEndCallback);
-
-    // Після успішного локального ходу відправляємо стан на сервер
     await this.syncCurrentState();
   }
 
   async claimNoMoves(): Promise<void> {
+    const playerState = get(playerStore);
+    if (playerState?.currentPlayerIndex !== this.myPlayerIndex) {
+      notificationService.show({ type: 'warning', messageRaw: 'Зачекайте свого ходу!' });
+      return;
+    }
     await super.claimNoMoves();
-    // TODO: Синхронізувати подію завершення гри, якщо вона сталася
     await this.syncCurrentState();
   }
 
@@ -122,8 +184,6 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   getPlayersConfiguration(): Player[] {
-    // Тут ми повертаємо заглушки. Реальні імена мають прийти з лобі.
-    // В ідеалі initializeNewGame має приймати імена.
     return createOnlinePlayers();
   }
 
@@ -132,25 +192,19 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   async continueAfterNoMoves(): Promise<void> {
+    const playerState = get(playerStore);
+    if (playerState?.currentPlayerIndex !== this.myPlayerIndex) return;
+
     await super.continueAfterNoMoves();
     await this.syncCurrentState();
   }
 
-  protected async advanceToNextPlayer(): Promise<void> {
-    await super.advanceToNextPlayer();
-    // Стан вже оновлено в super, тут ми його просто пушимо
-  }
-
-  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
-    await super.applyScoreChanges(scoreChanges);
-  }
-
   private async syncCurrentState(): Promise<void> {
     if (!this.stateSync) return;
-
     const boardState = get(boardStore);
     const playerState = get(playerStore);
     const scoreState = get(scoreStore);
+    const settings = get(gameSettingsStore);
 
     if (!boardState || !playerState || !scoreState) return;
 
@@ -158,38 +212,65 @@ export class OnlineGameMode extends BaseGameMode {
       boardState,
       playerState,
       scoreState,
-      version: Date.now(), // Простий версіонування
+      settings: { // Синхронізуємо важливі налаштування
+        blockModeEnabled: settings.blockModeEnabled,
+        autoHideBoard: settings.autoHideBoard,
+        boardSize: settings.boardSize,
+        turnDuration: settings.turnDuration,
+        settingsLocked: settings.settingsLocked
+      },
+      version: Date.now(),
       updatedAt: Date.now()
     });
   }
 
-  private applyRemoteState(state: SyncableGameState): void {
-    // Оновлюємо локальні стори даними з сервера
-    if (state.boardState) boardStore.set(state.boardState);
-    if (state.playerState) playerStore.set(state.playerState);
-    if (state.scoreState) scoreStore.set(state.scoreState);
+  private applyRemoteState(remoteState: SyncableGameState): void {
+    this.isApplyingRemoteState = true; // Блокуємо зворотню синхронізацію
 
-    // Оновлюємо доступні ходи для нового стану
+    const currentBoard = get(boardStore);
+
+    if (currentBoard && remoteState.boardState) {
+      const oldQueueLength = currentBoard.moveQueue.length;
+      const newQueueLength = remoteState.boardState.moveQueue.length;
+
+      if (newQueueLength > oldQueueLength) {
+        const newMoves = remoteState.boardState.moveQueue.slice(oldQueueLength);
+        logService.animation(`[OnlineGameMode] Found ${newMoves.length} new moves from server. Queueing animation.`);
+
+        newMoves.forEach(move => {
+          gameEventBus.dispatch('new_move_added', move);
+        });
+      }
+    }
+
+    if (remoteState.boardState) boardStore.set(remoteState.boardState);
+    if (remoteState.playerState) playerStore.set(remoteState.playerState);
+    if (remoteState.scoreState) scoreStore.set(remoteState.scoreState);
+
+    // Застосовуємо налаштування з сервера
+    if (remoteState.settings) {
+      gameSettingsStore.updateSettings(remoteState.settings);
+      if (remoteState.settings.turnDuration) {
+        this.turnDuration = remoteState.settings.turnDuration;
+      }
+    }
+
     availableMovesService.updateAvailableMoves();
+    this.startTurn();
+
+    this.isApplyingRemoteState = false; // Розблоковуємо
   }
 
   private handleSyncEvent(event: GameStateSyncEvent): void {
     switch (event.type) {
       case 'state_updated':
-        logService.GAME_MODE('[OnlineGameMode] Received state update from server');
         this.applyRemoteState(event.state);
         break;
       case 'player_left':
-        notificationService.show({
-          type: 'warning',
-          messageRaw: 'Суперник покинув гру'
-        });
+        notificationService.show({ type: 'warning', messageRaw: 'Суперник покинув гру' });
         break;
       case 'connection_lost':
-        notificationService.show({
-          type: 'error',
-          messageRaw: 'Втрачено з\'єднання з сервером'
-        });
+        notificationService.show({ type: 'error', messageRaw: 'Втрачено з\'єднання з сервером' });
         break;
     }
   }

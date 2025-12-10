@@ -10,16 +10,16 @@ import { createEmptyBoard } from '$lib/utils/boardUtils';
 import type { Player, BonusHistoryItem } from '$lib/models/player';
 import { availableMovesService } from './availableMovesService';
 import { animationService } from './animationService';
-import { logService } from './logService'; // <-- Додано імпорт
+import { logService } from './logService';
 import { DEFAULT_PLAYER_NAMES } from '$lib/config/defaultPlayers';
 import { getRandomUnusedColor } from '$lib/utils/playerUtils';
+import { initialUIState } from '$lib/stores/uiStateStore'; // Імпортуємо початковий стан
 
 export const gameService = {
   initializeNewGame(config: {
     size?: number;
     players?: Player[];
   } = {}) {
-    // <-- Додано логування
     logService.init('[GameService] initializeNewGame: Створення нового ігрового стану...', config);
 
     const settings = get(gameSettingsStore);
@@ -28,7 +28,6 @@ export const gameService = {
 
     if (!config.players) {
       const usedColors: string[] = [];
-      // Якщо гравці не передані, використовуємо дефолтний список
       config.players = DEFAULT_PLAYER_NAMES.map((name, index) => {
         const color = getRandomUnusedColor(usedColors);
         usedColors.push(color);
@@ -75,30 +74,23 @@ export const gameService = {
       distanceBonus: 0,
     };
 
-    const existingUiState = get(uiStateStore);
+    // FIX: Зберігаємо контекст онлайн гри при скиданні стану
+    const currentUiState = get(uiStateStore);
 
-    const initialUiState: UiState = {
-      isComputerMoveInProgress: false,
-      isGameOver: false,
-      gameOverReasonKey: null,
-      gameOverReasonValues: null,
-      selectedDirection: null,
-      selectedDistance: null,
-      isFirstMove: true,
-      isListening: false,
-      voiceMoveRequested: false,
-      showBoardHiddenInfo: false,
-      intendedGameType: null, // Додано для відповідності UiState
-      settingsMode: 'default', // Додано для відповідності UiState
-      isSettingsExpanderOpen: false,
-      testModeOverrides: existingUiState?.testModeOverrides
+    const newUiState: UiState = {
+      ...initialUIState, // Беремо чистий дефолтний стан
+      // Але відновлюємо критичні поля для ідентифікації сесії
+      intendedGameType: currentUiState.intendedGameType,
+      onlinePlayerIndex: currentUiState.onlinePlayerIndex,
+      amIHost: currentUiState.amIHost,
+      // Також зберігаємо налаштування тест-режиму
+      testModeOverrides: currentUiState.testModeOverrides
     };
 
-    // Встановлюємо початковий стан для всіх сторів
     boardStore.set(initialBoardState);
     playerStore.set(initialPlayerState);
     scoreStore.set(initialScoreState);
-    uiStateStore.set(initialUiState);
+    uiStateStore.set(newUiState);
 
     gameSettingsStore.updateSettings({
       showBoard: true,
@@ -106,10 +98,7 @@ export const gameService = {
       showMoves: true
     });
 
-    // Оновлюємо доступні ходи
     availableMovesService.updateAvailableMoves();
-
-    // Скидаємо анімації
     animationService.reset();
   }
 };

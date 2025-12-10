@@ -24,7 +24,7 @@ import { defaultGameSettings } from '$lib/stores/gameSettingsStore';
 import { v4 as uuidv4 } from 'uuid';
 
 const ROOM_TIMEOUT_MS = import.meta.env.DEV ? 10000 : 120000;
-const OPERATION_TIMEOUT_MS = 10000; // 10 секунд на операцію створення/входу
+const OPERATION_TIMEOUT_MS = 10000;
 
 export interface ChatMessage {
     id?: string;
@@ -34,9 +34,6 @@ export interface ChatMessage {
     createdAt: number;
 }
 
-/**
- * Обгортка для промісів з таймаутом
- */
 function withTimeout<T>(promise: Promise<T>, ms: number, errorMsg: string): Promise<T> {
     let timer: NodeJS.Timeout;
     const timeoutPromise = new Promise<T>((_, reject) => {
@@ -93,16 +90,12 @@ class RoomService {
 
         try {
             logService.init('[RoomService] Sending addDoc request...');
-
-            // Використовуємо обгортку з таймаутом
             const docRef = await withTimeout(
                 addDoc(collection(this.db, 'rooms'), roomData),
                 OPERATION_TIMEOUT_MS,
                 'Timeout: Failed to connect to Firebase Firestore.'
             );
-
             logService.init(`[RoomService] addDoc SUCCESS. Room ID: ${docRef.id}`);
-
             this.saveSession(docRef.id, hostId);
             return docRef.id;
         } catch (error) {
@@ -119,7 +112,6 @@ class RoomService {
                 orderBy('lastActivity', 'desc')
             );
 
-            // Також додаємо таймаут на отримання списку
             const querySnapshot = await withTimeout(
                 getDocs(q),
                 OPERATION_TIMEOUT_MS,
@@ -147,14 +139,12 @@ class RoomService {
             });
 
             if (cleanupPromises.length > 0) {
-                // Не блокуємо UI очищенням
                 Promise.allSettled(cleanupPromises).catch(e => console.error(e));
             }
 
             return rooms;
         } catch (error) {
             logService.error('[RoomService] Failed to get rooms:', error);
-            // Повертаємо пустий масив, щоб не ламати UI, але помилка залогована
             return [];
         }
     }
@@ -216,6 +206,20 @@ class RoomService {
         }
     }
 
+    async getRoom(roomId: string): Promise<Room | null> {
+        try {
+            const roomRef = doc(this.db, 'rooms', roomId);
+            const roomSnap = await getDoc(roomRef);
+            if (roomSnap.exists()) {
+                return { ...roomSnap.data(), id: roomSnap.id } as Room;
+            }
+            return null;
+        } catch (error) {
+            logService.error('[RoomService] Failed to get room:', error);
+            return null;
+        }
+    }
+
     subscribeToRoom(roomId: string, callback: (room: Room) => void): Unsubscribe {
         const roomRef = doc(this.db, 'rooms', roomId);
         return onSnapshot(roomRef, (doc) => {
@@ -233,10 +237,27 @@ class RoomService {
     async updateRoomSettings(roomId: string, settings: Partial<GameSettingsState>): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
         const updates: Record<string, any> = { lastActivity: Date.now() };
+
         for (const [key, value] of Object.entries(settings)) {
+            // Оновлюємо вкладені поля settings.key
             updates[`settings.${key}`] = value;
         }
+
+        // Якщо ми оновлюємо settingsLocked, дублюємо його в корінь для зручності (опціонально, але корисно для списків)
+        if (settings.settingsLocked !== undefined) {
+            updates['settingsLocked'] = settings.settingsLocked;
+        }
+
         await updateDoc(roomRef, updates);
+    }
+
+    // FIX: Новий метод для перемикання блокування налаштувань
+    async toggleSettingsLock(roomId: string, isLocked: boolean): Promise<void> {
+        const roomRef = doc(this.db, 'rooms', roomId);
+        await updateDoc(roomRef, {
+            settingsLocked: isLocked,
+            lastActivity: Date.now()
+        });
     }
 
     async sendMessage(roomId: string, senderId: string, senderName: string, text: string): Promise<void> {

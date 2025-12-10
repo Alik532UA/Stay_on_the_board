@@ -1,3 +1,4 @@
+// src/lib/stores/gameSettingsDefaults.ts
 /**
  * @file Default values for game settings.
  * @description Contains all default values for the gameSettingsStore.
@@ -47,7 +48,7 @@ export const defaultKeybindings: Record<KeybindingAction, string[]> = {
 
 /**
  * Дефолтні налаштування гри.
- * Використовуються при ініціалізації та скиданні налаштувань.
+ * Використовується при ініціалізації та скиданні налаштувань.
  */
 export const defaultGameSettings: GameSettingsState = {
     // Візуальні налаштування дошки
@@ -79,6 +80,10 @@ export const defaultGameSettings: GameSettingsState = {
     showGameModeModal: true,
     showDifficultyWarningModal: true,
     lockSettings: false,
+    settingsLocked: false, // За замовчуванням розблоковано
+
+    // Таймер
+    turnDuration: 30,
 
     // Гарячі клавіші
     keybindings: defaultKeybindings,

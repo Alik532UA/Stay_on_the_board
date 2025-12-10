@@ -1,3 +1,4 @@
+// src/lib/stores/gameSettingsTypes.ts
 /**
  * @file Types for game settings.
  * @description Contains all type definitions for the gameSettingsStore.
@@ -106,7 +107,13 @@ export interface GameSettingsState {
     rememberGameMode: boolean;
     showGameModeModal: boolean;
     showDifficultyWarningModal: boolean;
-    lockSettings: boolean;
+
+    // Блокування налаштувань (для онлайн та локальної гри)
+    lockSettings: boolean; // Локальне налаштування (legacy)
+    settingsLocked: boolean; // Глобальне блокування (з сервера)
+
+    // Таймер
+    turnDuration?: number;
 
     // Гарячі клавіші
     keybindings: Record<KeybindingAction, string[]>;

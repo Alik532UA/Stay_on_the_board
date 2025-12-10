@@ -33,12 +33,11 @@
   import "$lib/css/components/settings-expander.css";
 
   let summaryRef: HTMLElement;
-  let isOpen = dev; // Local state for this component
+  let isOpen = dev;
 
   let contentRef: HTMLDivElement;
   let contentHeight = 0;
 
-  // Update the global store whenever the local state changes
   $: uiStateStore.update((s) => ({ ...s, isSettingsExpanderOpen: isOpen }));
 
   async function toggleExpander() {
@@ -79,11 +78,16 @@
     }
   }
 
+  // FIX: Логіка блокування
+  // Якщо settingsLocked == true, то блокуємо ВСІМ (і хосту, і гостю).
+  // Якщо settingsLocked == false, то дозволяємо ВСІМ.
+  // Також блокуємо в timed режимі.
   $: isCompetitiveMode =
     $gameModeStore.activeMode === "timed" ||
     ($gameModeStore.activeMode === "local" &&
       $gameSettingsStore.lockSettings) ||
-    $gameModeStore.activeMode === "online" ||
+    ($gameModeStore.activeMode === "online" &&
+      $gameSettingsStore.settingsLocked) ||
     $uiStateStore.settingsMode === "competitive";
 </script>
 

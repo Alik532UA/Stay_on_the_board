@@ -11,6 +11,7 @@ import { availableMovesStore } from './availableMovesStore';
 import { logService } from '$lib/services/logService';
 import type { MoveDirectionType } from '$lib/models/Piece';
 
+
 function chunk<T>(arr: T[], n: number): T[][] {
   const res = [];
   for (let i = 0; i < arr.length; i += n) res.push(arr.slice(i, i + n));
@@ -93,9 +94,24 @@ export const isConfirmButtonDisabled = derived(
   }
 );
 
+
 export const isPlayerTurn = derived(
-  [playerStore],
-  ([$playerStore]) => $playerStore ? $playerStore.players[$playerStore.currentPlayerIndex]?.type === 'human' : false
+  [playerStore, uiStateStore],
+  ([$playerStore, $uiStateStore]) => {
+    if (!$playerStore) return false;
+
+    const currentPlayerIndex = $playerStore.currentPlayerIndex;
+    const currentPlayer = $playerStore.players[currentPlayerIndex];
+
+    // Логіка для Онлайн гри
+    if ($uiStateStore.intendedGameType === 'online') {
+      // Це мій хід тільки якщо індекс поточного гравця співпадає з моїм індексом
+      return $uiStateStore.onlinePlayerIndex === currentPlayerIndex;
+    }
+
+    // Логіка для Локальної гри та гри з Ботом
+    return currentPlayer?.type === 'human';
+  }
 );
 
 export const availableMoves = availableMovesStore;
