@@ -45,8 +45,12 @@ export class TrainingGameMode extends BaseGameMode {
 
     const nextPlayer = get(playerStore)?.players[nextPlayerIndex];
     logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer?.type}.`);
+
     if (nextPlayer?.type === 'ai') {
-      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера.');
+      // ВИПРАВЛЕНО: Прибрано штучну затримку (await setTimeout).
+      // Логіка повинна відпрацювати миттєво, щоб оновити center-info.
+      // Візуальна пауза забезпечується чергою в animationService.
+      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера (миттєво).');
       await this.triggerComputerMove();
     } else {
       this.startTurn();

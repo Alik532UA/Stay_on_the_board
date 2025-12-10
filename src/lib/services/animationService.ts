@@ -42,26 +42,34 @@ function createAnimationService() {
     const isPlayerMove = move.player === 1;
     const animationDuration = 500;
 
-    const activeMode = get(gameModeStore).activeMode as AnimationConfigMode;
-    const currentPreset = get(gameSettingsStore).gameMode as AnimationConfigPreset | null;
+    const activeMode = get(gameModeStore).activeMode;
+    const currentPreset = get(gameSettingsStore).gameMode;
     const isListening = get(uiStateStore).isListening;
 
     let pauseValues = { player: 100, computer: 100 }; // Default values
 
     if (isListening) {
       pauseValues = { player: 30, computer: 30 };
-    } else if (activeMode === 'training') {
-      if (currentPreset && animationConfig.training[currentPreset]) {
-        pauseValues = animationConfig.training[currentPreset];
+    } else if (activeMode === 'training' || activeMode === 'virtual-player') {
+      // FIX: Обробка нових назв пресетів (virtual-player-beginner -> beginner)
+      // Це дозволяє використовувати існуючий animationConfig.training
+      const cleanPreset = currentPreset?.replace('virtual-player-', '') as AnimationConfigPreset;
+
+      if (cleanPreset && animationConfig.training[cleanPreset]) {
+        pauseValues = animationConfig.training[cleanPreset];
+        logService.animation(`[AnimationService] Using training config for preset: ${cleanPreset}`, pauseValues);
       }
-    } else if (activeMode && animationConfig[activeMode]) {
-      const configForMode = animationConfig[activeMode];
+    } else if (activeMode && activeMode in animationConfig) {
+      // Для режимів local, timed, online
+      const configForMode = animationConfig[activeMode as AnimationConfigMode];
       if ('player' in configForMode) {
-        pauseValues = configForMode;
+        pauseValues = configForMode as { player: number, computer: number };
       }
     }
 
     const pauseAfterMove = isPlayerMove ? pauseValues.player : pauseValues.computer;
+
+    logService.animation(`[AnimationService] Playing move. Pause after: ${pauseAfterMove}ms`);
 
     setTimeout(() => {
       if (!isPlayerMove) {
