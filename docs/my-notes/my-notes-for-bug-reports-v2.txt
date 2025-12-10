@@ -1265,5 +1265,31 @@ data-testid="menu-slot-*"
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 ні, в консолі не виводить інформацію про test-mode-btn
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="bottom-menu-slot-1"
+Актуальний результат: 🪙
+Очікуваний результат: SVG з data-testid="donate-btn"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="dev-version-span" є на головному меню
+треба щоб в data-testid="dev-menu-modal" замість тексту <h3>dev</h3> була номер версії
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+прибарти з головного меню:
+1. class="main-menu-top-icons s-OH_yfw94cnTP"
+2. data-testid="main-menu-subtitle"
+
+id="main-menu-buttons"
+залишити три кнопки:
+Керування
+Правила
+Грати
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦

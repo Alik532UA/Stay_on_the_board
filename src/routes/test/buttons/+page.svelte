@@ -4,7 +4,7 @@
     import "$lib/css/layouts/main-menu.css";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
 
-    let keys = [];
+    let keys: string[] = [];
     function logClick(name: string) {
         keys = [...keys, `Clicked: ${name}`];
         setTimeout(() => {

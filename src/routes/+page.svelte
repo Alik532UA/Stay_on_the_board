@@ -1,5 +1,5 @@
 <script lang="ts">
-  import MainMenu from "$lib/components/MainMenu.svelte";
+  import MainMenuComponent from "$lib/components/MainMenu.svelte";
   import DevClearCacheButton from "$lib/components/widgets/DevClearCacheButton.svelte";
   import FlexibleMenu from "$lib/components/ui/FlexibleMenu/FlexibleMenu.svelte";
   import type { IMenuItem } from "$lib/components/ui/FlexibleMenu/FlexibleMenu.types";
@@ -10,6 +10,7 @@
   import DevMenu from "$lib/components/main-menu/DevMenu.svelte";
   import { testModeStore, toggleTestMode } from "$lib/stores/testModeStore";
   import { clearCache } from "$lib/utils/cacheManager";
+  import { appVersion } from "$lib/stores/versionStore";
 
   // Logic for bottom menu
   function handlePlayVirtualPlayer() {
@@ -37,7 +38,8 @@
     },
     {
       id: "donate",
-      emoji: "🪙",
+      icon: "donate",
+      dataTestId: "donate-btn",
       onClick: () => goto(`${base}/supporters`),
     },
     {
@@ -69,6 +71,7 @@
       customClass: "dev-menu-modal-window",
       props: {
         onClose: () => modalStore.closeModal(),
+        versionNumber: $appVersion,
       },
     });
   }
@@ -104,7 +107,7 @@ $: devMenuItems = [
   ];
 </script>
 
-<MainMenu />
+<MainMenuComponent />
 <DevClearCacheButton />
 
 {#if import.meta.env.DEV}
