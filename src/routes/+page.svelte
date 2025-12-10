@@ -108,7 +108,6 @@ $: devMenuItems = [
 </script>
 
 <MainMenu />
-<DevClearCacheButton />
 
 {#if import.meta.env.DEV}
   <FlexibleMenu
