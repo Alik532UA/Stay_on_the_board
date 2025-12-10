@@ -52,7 +52,7 @@ export const endGameService = {
 
     // 5. Оновлюємо залежні стори
     // ВАЖЛИВО: Для локальної та онлайн гри ми НЕ перезаписуємо рахунок гравців глобальною сумою.
-    // У цих режимах рахунок кожного гравця ведеться окремо в playerStore (див. LocalGameMode.ts).
+    // У цих режимах рахунок кожного гравця ведеться окремо в playerStore.
     if (gameType !== 'local' && gameType !== 'online') {
       const humanPlayer = playerState.players.find(p => p.type === 'human');
       if (humanPlayer) {
@@ -74,14 +74,19 @@ export const endGameService = {
     let finalReasonKey = reasonKey;
     const finalReasonValues = { ...reasonValues };
 
-    if (gameType === 'local' && loser) {
+    // FIX: Логіка заміни повідомлення "Ви..." на "Гравець..." для мультиплеєра (Local + Online)
+    if ((gameType === 'local' || gameType === 'online') && loser) {
       if (reasonKey === 'modal.gameOverReasonOut') {
         finalReasonKey = 'modal.gameOverReasonPlayerOut';
       } else if (reasonKey === 'modal.gameOverReasonBlocked') {
         finalReasonKey = 'modal.gameOverReasonPlayerBlocked';
+      } else if (reasonKey === 'modal.gameOverReasonPlayerLied') {
+        // Цей ключ вже містить параметр {playerName}, але переконаємось
+        finalReasonKey = 'modal.gameOverReasonPlayerLied';
       }
 
-      if (finalReasonKey !== reasonKey) {
+      // Якщо ключ змінився або це специфічний ключ, додаємо ім'я гравця
+      if (finalReasonKey !== reasonKey || reasonKey === 'modal.gameOverReasonPlayerLied') {
         finalReasonValues.playerName = loser.name;
       }
     }
@@ -98,7 +103,7 @@ export const endGameService = {
 
     logService.score('[endGameService] Dispatching GameOver event with payload:', gameOverPayload);
     gameOverStore.setGameOver(gameOverPayload);
-    // @ts-ignore - state is not part of GameOverPayload but might be used by listeners
+    // @ts-ignore
     gameEventBus.dispatch('GameOver', { ...gameOverPayload, state: { ...boardState, ...finalPlayerState, ...get(scoreStore)!, ...uiState } });
   }
 };

@@ -20,7 +20,6 @@ import { notificationService } from '$lib/services/notificationService';
 import { availableMovesService } from '$lib/services/availableMovesService';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import type { Room } from '$lib/types/online';
-import { endGameService } from '$lib/services/endGameService';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
@@ -100,7 +99,6 @@ export class OnlineGameMode extends BaseGameMode {
         }
       });
 
-      // Підписка на подію рестарту (від кнопки "Грати ще раз")
       this.unsubscribeReplay = gameEventBus.subscribe('ReplayGame', () => {
         this.handleRestartRequest();
       });
@@ -209,7 +207,39 @@ export class OnlineGameMode extends BaseGameMode {
     await this.syncCurrentState();
   }
 
-  // FIX: Нарахування балів як у LocalGameMode
+  // FIX: Перевизначено advanceToNextPlayer для фіксації балів (як у LocalGameMode)
+  protected async advanceToNextPlayer(): Promise<void> {
+    const currentPlayerState = get(playerStore);
+    if (!currentPlayerState) return;
+    const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
+
+    // Якщо коло завершилось (хід переходить до першого гравця), фіксуємо бали
+    if (nextPlayerIndex === 0) {
+      logService.GAME_MODE(`[OnlineGameMode] Round completed. Flushing round scores to fixed scores.`);
+      this.flushRoundScores();
+    }
+
+    playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
+
+    // В OnlineGameMode ми не викликаємо super.advanceToNextPlayer(), бо ми вже оновили стор
+    // і нам не треба запускати таймер тут (він запуститься після sync або в startTurn)
+    this.startTurn();
+  }
+
+  // FIX: Метод для фіксації балів (перенесення roundScore в score)
+  private flushRoundScores(): void {
+    playerStore.update(s => {
+      if (!s) return null;
+      const newPlayers = s.players.map(p => ({
+        ...p,
+        score: p.score + (p.roundScore || 0),
+        roundScore: 0
+      }));
+      logService.score('[OnlineGameMode] Flushed round scores. New fixed scores:', newPlayers.map(p => ({ name: p.name, score: p.score })));
+      return { ...s, players: newPlayers };
+    });
+  }
+
   protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
     const { bonusPoints, penaltyPoints } = scoreChanges;
     const playerState = get(playerStore);
@@ -237,34 +267,27 @@ export class OnlineGameMode extends BaseGameMode {
     });
   }
 
-  // FIX: Обробка запиту на рестарт
   private async handleRestartRequest(): Promise<void> {
     if (!this.myPlayerId) return;
 
-    // Отримуємо поточний стан рестартів з сервера (або локального кешу)
-    // Але краще просто відправити свій голос
     const currentState = await this.stateSync?.pullState();
     const currentRequests = currentState?.restartRequests || {};
 
     const newRequests = { ...currentRequests, [this.myPlayerId]: true };
 
-    // Перевіряємо, чи всі готові
-    const allReady = Object.keys(newRequests).length >= 2; // Припускаємо 2 гравців
+    const allReady = Object.keys(newRequests).length >= 2;
 
     if (allReady) {
       logService.GAME_MODE('[OnlineGameMode] Both players requested restart. Starting new game.');
-      // Скидаємо гру
       const playersConfig = this.getPlayersConfiguration();
       gameService.initializeNewGame({
         size: get(gameSettingsStore).boardSize,
         players: playersConfig,
       });
-      // Очищаємо запити на рестарт
       await this.syncCurrentState({ restartRequests: {} });
     } else {
       logService.GAME_MODE('[OnlineGameMode] Restart requested. Waiting for opponent.');
       notificationService.show({ type: 'info', messageRaw: 'Очікування підтвердження суперника...' });
-      // Відправляємо свій запит
       await this.syncCurrentState({ restartRequests: newRequests });
     }
   }
@@ -327,23 +350,16 @@ export class OnlineGameMode extends BaseGameMode {
       }
     }
 
-    // FIX: Синхронізація GameOver
     if (remoteState.gameOver) {
       const currentGameOver = get(gameOverStore);
       if (!currentGameOver.isGameOver) {
         logService.GAME_MODE('[OnlineGameMode] Syncing GameOver state from server');
-        // Викликаємо endGameService, але без повторної відправки подій, просто оновлюємо UI
-        // Або просто оновлюємо стор
         gameOverStore.setGameOver(remoteState.gameOver);
-        // Також треба показати модалку, якщо вона ще не показана
-        // Це робиться через gameEventBus 'GameOver', але ми не хочемо зациклення
-        // Тому краще викликати напряму modalService
         import('$lib/services/modalService').then(({ modalService }) => {
           modalService.showGameOverModal(remoteState.gameOver!);
         });
       }
     } else {
-      // Якщо на сервері гра не закінчена, а у нас закінчена (наприклад, після рестарту)
       const currentGameOver = get(gameOverStore);
       if (currentGameOver.isGameOver) {
         gameOverStore.resetGameOverState();
