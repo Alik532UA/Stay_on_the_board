@@ -40,7 +40,7 @@ function createAnimationService() {
     }));
 
     const isPlayerMove = move.player === 1;
-    const animationDuration = 500;
+    const animationDuration = 500; // Стандартна тривалість анімації (Варіант 1A: не змінюємо)
 
     const activeMode = get(gameModeStore).activeMode;
     const currentPreset = get(gameSettingsStore).gameMode;
@@ -51,25 +51,30 @@ function createAnimationService() {
     if (isListening) {
       pauseValues = { player: 30, computer: 30 };
     } else if (activeMode === 'training' || activeMode === 'virtual-player') {
-      // FIX: Обробка нових назв пресетів (virtual-player-beginner -> beginner)
-      // Це дозволяє використовувати існуючий animationConfig.training
       const cleanPreset = currentPreset?.replace('virtual-player-', '') as AnimationConfigPreset;
 
       if (cleanPreset && animationConfig.training[cleanPreset]) {
         pauseValues = animationConfig.training[cleanPreset];
-        logService.animation(`[AnimationService] Using training config for preset: ${cleanPreset}`, pauseValues);
       }
     } else if (activeMode && activeMode in animationConfig) {
-      // Для режимів local, timed, online
       const configForMode = animationConfig[activeMode as AnimationConfigMode];
       if ('player' in configForMode) {
         pauseValues = configForMode as { player: number, computer: number };
       }
     }
 
-    const pauseAfterMove = isPlayerMove ? pauseValues.player : pauseValues.computer;
+    let pauseAfterMove = isPlayerMove ? pauseValues.player : pauseValues.computer;
 
-    logService.animation(`[AnimationService] Playing move. Pause after: ${pauseAfterMove}ms`);
+    // --- ЛОГІКА "НАЗДОГАНЯННЯ" (Варіант 2A) ---
+    // Якщо в черзі є 2 або більше ходів (поточний + наступні),
+    // ми зменшуємо паузу до мінімуму, щоб швидше перейти до наступної анімації.
+    // Сама анімація (animationDuration) залишається плавною.
+    if (state.animationQueue.length >= 2) {
+      logService.animation(`[AnimationService] Catch-up mode active (queue: ${state.animationQueue.length}). Reducing pause to 1ms.`);
+      pauseAfterMove = 1; // Варіант 1A: зменшуємо тільки паузу
+    } else {
+      logService.animation(`[AnimationService] Playing move. Standard pause: ${pauseAfterMove}ms`);
+    }
 
     setTimeout(() => {
       if (!isPlayerMove) {
