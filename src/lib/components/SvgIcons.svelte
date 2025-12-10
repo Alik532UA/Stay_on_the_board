@@ -503,6 +503,36 @@
   </svg>
 {/if}
 
+{#if name === "arrow-up"}
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <polyline points="18 15 12 9 6 15" />
+  </svg>
+{/if}
+
+{#if name === "arrow-down"}
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+{/if}
+
 <style>
   .crown-svg {
     max-width: 100%;
