@@ -73,7 +73,7 @@
     });
   }
 
-  const devMenuItems: IMenuItem[] = [
+$: devMenuItems = [
     {
       id: "main-menu-link",
       emoji: "🏠",
