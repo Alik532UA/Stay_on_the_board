@@ -119,17 +119,18 @@ export class OnlineMatchController {
 
                         // Оновлюємо локально (щоб Хост бачив зміни миттєво)
                         this.resetBoardCallback();
-                        this.advancePlayerCallback();
+                        this.advancePlayerCallback(); // Це оновлює playerStore локально
 
+                        // Отримуємо оновлений стан гравців після advancePlayerCallback
                         const newPlayerState = get(playerStore);
 
                         // FIX: Explicitly close modal for Host to ensure UI unblocks immediately
                         gameEventBus.dispatch('CloseModal');
 
-                        // Пушимо повний стан на сервер
+                        // Пушимо повний стан на сервер (включаючи playerState!)
                         this.syncState({
                             boardState: newBoardState,
-                            playerState: newPlayerState!,
+                            playerState: newPlayerState!, // <--- ВАЖЛИВО: Синхронізуємо зміну черги ходу
                             continueRequests: {},
                             finishRequests: {},
                             noMovesClaim: null
