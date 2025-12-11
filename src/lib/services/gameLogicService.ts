@@ -44,11 +44,6 @@ export function performMove(
   const startCellKey = `${currentState.playerRow}-${currentState.playerCol}`;
   const updatedCellVisitCounts = { ...currentState.cellVisitCounts, [startCellKey]: (currentState.cellVisitCounts[startCellKey] || 0) + 1 };
 
-  // ВАЖЛИВО: Згідно документації docs/user-guide/bonus-scoring.md (рядки 88-101),
-  // в режимах local/online НЕ нараховуються базові бали (+1/+2/+3 за видимість дошки).
-  // Базові бали нараховуються ТІЛЬКИ в режимах training/virtual-player/timed.
-  // ВИПРАВЛЕННЯ: Використовуємо actualGameMode (фактичний режим гри з BaseGameMode),
-  // а не settings.gameMode (який містить пресет, напр. 'observer', 'beginner').
   const isLocalOrOnlineGame = actualGameMode === 'local' || actualGameMode === 'online';
   const shouldApplyBaseScore = !isLocalOrOnlineGame;
   const baseScoreToAdd = shouldApplyBaseScore ? scoreChanges.baseScoreChange : 0;
@@ -88,12 +83,26 @@ export function performMove(
 
   const sideEffects = [];
   const currentPlayer = currentState.players[playerIndex];
-  const shouldSpeak = settings.speechEnabled &&
-    ((currentPlayer.isComputer && settings.speechFor.computer) ||
-      (!currentPlayer.isComputer && settings.speechFor.player));
 
-  // Якщо потрібно озвучити хід, АБО якщо є callback, який потрібно виконати в кінці ходу,
-  // ми створюємо побічний ефект. speechService сам вирішить, чи потрібно говорити.
+  // --- ЛОГІКА ВИЗНАЧЕННЯ ОЗВУЧЕННЯ ---
+  let shouldSpeak = false;
+
+  if (settings.speechEnabled) {
+    const uiState = get(uiStateStore);
+    if (uiState.intendedGameType === 'online') {
+      const isMyMove = playerIndex === uiState.onlinePlayerIndex;
+      if (isMyMove) {
+        shouldSpeak = settings.speechFor.onlineMyMove;
+      } else {
+        shouldSpeak = settings.speechFor.onlineOpponentMove;
+      }
+      logService.speech(`[performMove] Online speech check. My Index: ${uiState.onlinePlayerIndex}, Mover Index: ${playerIndex}. Is My Move: ${isMyMove}. Should Speak: ${shouldSpeak}`);
+    } else {
+      shouldSpeak = (currentPlayer.isComputer && settings.speechFor.computer) ||
+        (!currentPlayer.isComputer && settings.speechFor.player);
+    }
+  }
+
   if (shouldSpeak || onEndCallback) {
     sideEffects.push({
       type: 'speak_move',
@@ -101,23 +110,19 @@ export function performMove(
         move: { direction, distance },
         lang: (get(appSettingsStore) as AppSettingsState).language || 'uk',
         voiceURI: settings.selectedVoiceURI,
-        onEndCallback
+        onEndCallback,
+        force: true // <--- FIX: Примушуємо speakMove говорити, бо ми вже перевірили умови тут
       }
     });
   }
 
   logService.logicMove('performMove: завершено успішно');
 
-  // Check achievements after move (based on score update prediction)
   if (changes.playerState && changes.playerState.players) {
-    // Find the player who moved
     const updatedPlayer = changes.playerState.players[playerIndex];
-    // We pass a context object that matches what achievements expect
-    // Note: gameModeService.getCurrentMode() might be safer to get actual mode string from store if needed
-    // For now, we use the passed `actualGameMode/settings` 
     rewardsService.checkAchievements({
       score: updatedPlayer.score,
-      gameMode: settings.gameMode || actualGameMode // Prioritize preset for accurate checks
+      gameMode: settings.gameMode || actualGameMode
     });
   }
 

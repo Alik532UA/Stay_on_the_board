@@ -10,7 +10,7 @@ import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
-import { gameOverStore } from '$lib/stores/gameOverStore';
+import { gameOverStore, type GameOverPayload } from '$lib/stores/gameOverStore';
 import type { IGameStateSync, GameStateSyncEvent, SyncableGameState } from '$lib/sync/gameStateSync.interface';
 import { createFirebaseGameStateSync } from '$lib/sync/FirebaseGameStateSync';
 import type { ScoreChangesData } from '$lib/types/gameMove';
@@ -18,18 +18,33 @@ import { roomService } from '$lib/services/roomService';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import { notificationService } from '$lib/services/notificationService';
 import { availableMovesService } from '$lib/services/availableMovesService';
-import { gameEventBus } from '$lib/services/gameEventBus';
+import { gameEventBus, type ShowNoMovesModalPayload } from '$lib/services/gameEventBus';
 import type { Room } from '$lib/types/online';
 import { modalService } from '$lib/services/modalService';
 import { navigationService } from '$lib/services/navigationService';
 import { base } from '$app/paths';
+import { endGameService } from '$lib/services/endGameService';
+import { timeService } from '$lib/services/timeService';
+import { modalStore } from '$lib/stores/modalStore';
+
+// Імпорт нових класів
+import { GameStateReconciler } from './online/GameStateReconciler';
+import { OnlineMatchController } from './online/OnlineMatchController';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
+  private reconciler: GameStateReconciler | null = null;
+  private matchController: OnlineMatchController | null = null;
+
+  // Підписки
   private unsubscribeSync: (() => void) | null = null;
   private unsubscribeSettings: (() => void) | null = null;
   private unsubscribeReplay: (() => void) | null = null;
-  private unsubscribeCloseModal: (() => void) | null = null; // Нова підписка
+  private unsubscribeCloseModal: (() => void) | null = null;
+  private unsubscribeNoMoves: (() => void) | null = null;
+  private unsubscribeGameOver: (() => void) | null = null;
+  private unsubscribeModalStore: (() => void) | null = null;
+
   private roomId: string | null = null;
   private myPlayerId: string | null = null;
   private amIHost: boolean = false;
@@ -82,7 +97,18 @@ export class OnlineGameMode extends BaseGameMode {
       return;
     }
 
+    // Ініціалізація компонентів
     this.stateSync = createFirebaseGameStateSync();
+    this.reconciler = new GameStateReconciler(this.myPlayerId);
+    this.matchController = new OnlineMatchController(
+      this.roomId,
+      this.myPlayerId,
+      this.amIHost,
+      this.stateSync,
+      () => this.resetBoardForContinuation(),
+      () => this.advanceToNextPlayer(),
+      (reason) => endGameService.endGame(reason)
+    );
 
     try {
       await this.stateSync.initialize(this.roomId);
@@ -91,32 +117,7 @@ export class OnlineGameMode extends BaseGameMode {
         this.handleSyncEvent(event);
       });
 
-      this.unsubscribeSettings = gameSettingsStore.subscribe(settings => {
-        if (!this.isApplyingRemoteState && this.roomId) {
-          this.syncCurrentState();
-        }
-      });
-
-      this.unsubscribeReplay = gameEventBus.subscribe('ReplayGame', () => {
-        this.handleRestartRequest();
-      });
-
-      // Підписка на відкриття реплею (через RequestReplay, який викликає модалку)
-      // ВАЖЛИВО: RequestReplay викликається ДО відкриття модалки.
-      // Але ми також можемо слухати ShowModal, щоб бути точнішими.
-      // Для простоти, використаємо RequestReplay як сигнал "хочу подивитись реплей".
-      gameEventBus.subscribe('RequestReplay', () => {
-        if (this.roomId && this.myPlayerId) {
-          roomService.setWatchingReplay(this.roomId, this.myPlayerId, true);
-        }
-      });
-
-      // Підписка на закриття модалки
-      this.unsubscribeCloseModal = gameEventBus.subscribe('CloseModal', () => {
-        if (this.roomId && this.myPlayerId) {
-          roomService.setWatchingReplay(this.roomId, this.myPlayerId, false);
-        }
-      });
+      this.setupSubscriptions();
 
       const remoteState = await this.stateSync.pullState();
 
@@ -140,7 +141,12 @@ export class OnlineGameMode extends BaseGameMode {
       gameSettingsStore.updateSettings({
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: true, computer: true },
+        speechFor: {
+          player: false,
+          computer: true,
+          onlineMyMove: false,
+          onlineOpponentMove: true
+        },
       });
 
       animationService.initialize();
@@ -153,27 +159,80 @@ export class OnlineGameMode extends BaseGameMode {
     }
   }
 
+  private setupSubscriptions() {
+    this.unsubscribeSettings = gameSettingsStore.subscribe(settings => {
+      if (!this.isApplyingRemoteState && this.roomId) {
+        this.syncCurrentState();
+      }
+    });
+
+    this.unsubscribeReplay = gameEventBus.subscribe('ReplayGame', () => {
+      this.matchController?.handleRestartRequest();
+    });
+
+    gameEventBus.subscribe('RequestReplay', () => {
+      if (this.roomId && this.myPlayerId) {
+        roomService.setWatchingReplay(this.roomId, this.myPlayerId, true);
+      }
+    });
+
+    this.unsubscribeCloseModal = gameEventBus.subscribe('CloseModal', () => {
+      if (this.roomId && this.myPlayerId) {
+        roomService.setWatchingReplay(this.roomId, this.myPlayerId, false);
+      }
+    });
+
+    this.unsubscribeNoMoves = gameEventBus.subscribe('ShowNoMovesModal', (payload: ShowNoMovesModalPayload & { isRemote?: boolean }) => {
+      timeService.stopTurnTimer();
+
+      if (this.myPlayerId && !payload.isRemote) {
+        logService.GAME_MODE('[OnlineGameMode] Local NoMoves claim detected. Syncing to server.');
+        this.syncCurrentState({
+          noMovesClaim: {
+            playerId: this.myPlayerId,
+            scoreDetails: payload.scoreDetails,
+            boardSize: payload.boardSize,
+            timestamp: Date.now(),
+            isCorrect: true
+          }
+        });
+      }
+    });
+
+    this.unsubscribeGameOver = gameEventBus.subscribe('GameOver', (payload: GameOverPayload) => {
+      if (!this.isApplyingRemoteState && this.roomId) {
+        logService.GAME_MODE('[OnlineGameMode] Local GameOver detected. Syncing to server.');
+        this.syncCurrentState({
+          gameOver: payload
+        });
+      }
+    });
+
+    this.unsubscribeModalStore = modalStore.subscribe(state => {
+      if (state.isOpen) {
+        logService.GAME_MODE('[OnlineGameMode] Modal opened. Pausing timer.');
+        timeService.pauseGameTimer();
+        timeService.stopTurnTimer();
+      } else {
+        const uiState = get(uiStateStore);
+        if (!uiState.isGameOver && this.turnDuration > 0) {
+          logService.GAME_MODE('[OnlineGameMode] Modal closed. Resuming timer.');
+          // Тут можна додати логіку відновлення таймера, якщо потрібно
+        }
+      }
+    });
+  }
+
   cleanup(): void {
-    if (this.unsubscribeSync) {
-      this.unsubscribeSync();
-      this.unsubscribeSync = null;
-    }
-    if (this.unsubscribeSettings) {
-      this.unsubscribeSettings();
-      this.unsubscribeSettings = null;
-    }
-    if (this.unsubscribeReplay) {
-      this.unsubscribeReplay();
-      this.unsubscribeReplay = null;
-    }
-    if (this.unsubscribeCloseModal) {
-      this.unsubscribeCloseModal();
-      this.unsubscribeCloseModal = null;
-    }
-    if (this.stateSync) {
-      this.stateSync.cleanup();
-      this.stateSync = null;
-    }
+    if (this.unsubscribeSync) this.unsubscribeSync();
+    if (this.unsubscribeSettings) this.unsubscribeSettings();
+    if (this.unsubscribeReplay) this.unsubscribeReplay();
+    if (this.unsubscribeCloseModal) this.unsubscribeCloseModal();
+    if (this.unsubscribeNoMoves) this.unsubscribeNoMoves();
+    if (this.unsubscribeGameOver) this.unsubscribeGameOver();
+    if (this.unsubscribeModalStore) this.unsubscribeModalStore();
+    if (this.stateSync) this.stateSync.cleanup();
+
     super.cleanup();
     logService.GAME_MODE('[OnlineGameMode] Cleaned up');
   }
@@ -198,12 +257,10 @@ export class OnlineGameMode extends BaseGameMode {
       return;
     }
     await super.claimNoMoves();
-    await this.syncCurrentState();
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
     await super.handleNoMoves(playerType);
-    await this.syncCurrentState();
   }
 
   getPlayersConfiguration(): Player[] {
@@ -218,12 +275,21 @@ export class OnlineGameMode extends BaseGameMode {
     return 'online';
   }
 
-  async continueAfterNoMoves(): Promise<void> {
-    const playerState = get(playerStore);
-    if (playerState?.currentPlayerIndex !== this.myPlayerIndex) return;
+  // Делегування методів контролеру
+  async voteToContinue(): Promise<void> {
+    if (this.matchController) {
+      await this.matchController.handleContinueRequest();
+    }
+  }
 
-    await super.continueAfterNoMoves();
-    await this.syncCurrentState();
+  async voteToFinish(): Promise<void> {
+    if (this.matchController) {
+      await this.matchController.handleFinishRequest();
+    }
+  }
+
+  async continueAfterNoMoves(): Promise<void> {
+    await this.voteToContinue();
   }
 
   protected async advanceToNextPlayer(): Promise<void> {
@@ -282,18 +348,9 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   private async handleRestartRequest(): Promise<void> {
-    if (!this.myPlayerId || !this.roomId) {
-      logService.error('[OnlineGameMode] Cannot restart: missing ID or RoomID');
-      return;
+    if (this.matchController) {
+      await this.matchController.handleRestartRequest();
     }
-
-    logService.GAME_MODE('[OnlineGameMode] Restart requested. Returning to lobby.');
-
-    modalService.closeAllModals();
-
-    await roomService.returnToLobby(this.roomId, this.myPlayerId);
-
-    navigationService.goTo(`/online/lobby/${this.roomId}`);
   }
 
   private async syncCurrentState(overrides: Partial<SyncableGameState> = {}): Promise<void> {
@@ -327,60 +384,22 @@ export class OnlineGameMode extends BaseGameMode {
   private applyRemoteState(remoteState: SyncableGameState): void {
     this.isApplyingRemoteState = true;
 
-    const currentBoard = get(boardStore);
-
-    if (currentBoard && remoteState.boardState) {
-      if (remoteState.boardState.moveHistory.length < currentBoard.moveHistory.length) {
-        logService.GAME_MODE('[OnlineGameMode] Detected game reset. Resetting animation service.');
-        animationService.reset();
-      }
+    if (this.reconciler) {
+      this.reconciler.apply(remoteState);
     }
 
-    if (currentBoard && remoteState.boardState) {
-      const oldQueueLength = currentBoard.moveQueue.length;
-      const newQueueLength = remoteState.boardState.moveQueue.length;
-
-      if (newQueueLength > oldQueueLength) {
-        const newMoves = remoteState.boardState.moveQueue.slice(oldQueueLength);
-        newMoves.forEach(move => {
-          gameEventBus.dispatch('new_move_added', move);
-        });
-      }
+    if (this.matchController) {
+      this.matchController.checkVotes(remoteState);
     }
 
-    if (remoteState.boardState) boardStore.set(remoteState.boardState);
-    if (remoteState.playerState) playerStore.set(remoteState.playerState);
-    if (remoteState.scoreState) scoreStore.set(remoteState.scoreState);
-
-    if (remoteState.settings) {
-      gameSettingsStore.updateSettings(remoteState.settings);
-      if (remoteState.settings.turnDuration) {
-        this.turnDuration = remoteState.settings.turnDuration;
-      }
+    if (remoteState.settings && remoteState.settings.turnDuration) {
+      this.turnDuration = remoteState.settings.turnDuration;
     }
 
-    if (remoteState.gameOver) {
-      const currentGameOver = get(gameOverStore);
-      uiStateStore.update(s => ({ ...s, isGameOver: true }));
-
-      if (!currentGameOver.isGameOver) {
-        logService.GAME_MODE('[OnlineGameMode] Syncing GameOver state from server');
-        gameOverStore.setGameOver(remoteState.gameOver);
-        modalService.showGameOverModal(remoteState.gameOver!);
-      }
-    } else {
-      uiStateStore.update(s => ({ ...s, isGameOver: false }));
-
-      const currentGameOver = get(gameOverStore);
-      if (currentGameOver.isGameOver) {
-        logService.GAME_MODE('[OnlineGameMode] Clearing local GameOver state (server state is active)');
-        gameOverStore.resetGameOverState();
-        modalService.closeAllModals();
-      }
+    // Запускаємо таймер тільки якщо немає відкритих модалок
+    if (!get(modalStore).isOpen) {
+      this.startTurn();
     }
-
-    availableMovesService.updateAvailableMoves();
-    this.startTurn();
 
     this.isApplyingRemoteState = false;
   }

@@ -7,6 +7,7 @@
 	import { _, locale } from "svelte-i18n";
 	import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
 	import { speakText } from "$lib/services/speechService";
+	import { uiStateStore } from "$lib/stores/uiStateStore";
 
 	onMount(() => {
 		const unsubscribe = gameEventBus.subscribe(
