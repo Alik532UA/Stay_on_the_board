@@ -93,11 +93,6 @@ export const userActionService = {
     }
   },
 
-  /**
-   * Перезапускає гру.
-   * ВИПРАВЛЕНО: Для онлайн-режиму ігнорує локальний перезапуск, 
-   * оскільки це обробляється через OnlineGameMode.handleRestartRequest.
-   */
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
 
@@ -142,6 +137,9 @@ export const userActionService = {
     const boardState = get(boardStore);
     if (!boardState) return;
     const { moveHistory, boardSize } = boardState;
+
+    // FIX: Використовуємо gameEventBus.dispatch('CloseModal') замість прямого modalStore.closeModal().
+    // Це дозволяє OnlineGameMode перехопити подію і оновити статус гравця на сервері.
     modalStore.showModal({
       component: ReplayViewer,
       props: {
@@ -150,7 +148,10 @@ export const userActionService = {
         autoPlayForward: true
       },
       titleKey: 'replay.title',
-      buttons: [{ textKey: 'modal.close', onClick: () => modalStore.closeModal() }],
+      buttons: [{
+        textKey: 'modal.close',
+        onClick: () => gameEventBus.dispatch('CloseModal')
+      }],
       dataTestId: 'replay-modal',
     });
   },

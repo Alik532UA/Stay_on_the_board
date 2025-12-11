@@ -1,8 +1,8 @@
 <script>
-  import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
-  import AccordionSection from '$lib/components/AccordionSection.svelte';
-  import { _ } from 'svelte-i18n';
-  import { base } from '$app/paths';
+  import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
+  import AccordionSection from "$lib/components/AccordionSection.svelte";
+  import { _ } from "svelte-i18n";
+  import { base } from "$app/paths";
 </script>
 
 <div class="rules-page">
@@ -10,21 +10,23 @@
   <div class="rules-header">
     <div class="header-container">
       <div class="title-container">
-        <h1>{$_('rulesPage.title')}</h1>
+        <h1>{$_("rulesPage.title")}</h1>
         <!-- <div class="rules-slogan">{$_('rulesPage.slogan')}</div> -->
       </div>
     </div>
   </div>
 
   <AccordionSection isOpen={true}>
-    <span slot="title">🎯 {$_('rulesPage.goalTitle')}</span>
-    <p class="rules-text">{$_('rulesPage.goalText')}</p>
+    <span slot="title">🎯 {$_("rulesPage.goalTitle")}</span>
+    <p class="rules-text">{$_("rulesPage.goalText")}</p>
   </AccordionSection>
 
   <AccordionSection>
-    <span slot="title">🧭 {$_('rulesPage.moveProcessTitle')}</span>
+    <span slot="title">🧭 {$_("rulesPage.moveProcessTitle")}</span>
     <ol>
-      <li><b>{$_('rulesPage.step1')}</b> {$_('rulesPage.step1Text')}
+      <li>
+        <b>{$_("rulesPage.step1")}</b>
+        {$_("rulesPage.step1Text")}
         <div class="directions-grid-visual">
           <div class="dir-btn-visual">↖</div>
           <div class="dir-btn-visual">↑</div>
@@ -37,84 +39,87 @@
           <div class="dir-btn-visual">↘</div>
         </div>
       </li>
-      <li><b>{$_('rulesPage.step2')}</b> {$_('rulesPage.step2Text')}</li>
-      <li><b>{$_('rulesPage.step3')}</b> {$_('rulesPage.step3Text')}</li>
+      <li><b>{$_("rulesPage.step2")}</b> {$_("rulesPage.step2Text")}</li>
+      <li><b>{$_("rulesPage.step3")}</b> {$_("rulesPage.step3Text")}</li>
     </ol>
   </AccordionSection>
 
   <AccordionSection>
-    <span slot="title">🏆 {$_('rulesPage.winningAndLosing')}</span>
+    <span slot="title">🏆 {$_("rulesPage.winningAndLosing")}</span>
     <div class="rules-cards-row">
       <div class="rules-card rules-lose">
-        <h3>{$_('rulesPage.youLose')}</h3>
+        <h3>{$_("rulesPage.youLose")}</h3>
         <ul>
-          <li>{$_('rulesPage.lose1')}</li>
-          <li>{$_('rulesPage.lose2')}</li>
-          <li>{$_('rulesPage.lose3')}</li>
+          <li>{$_("rulesPage.lose1")}</li>
+          <li>{$_("rulesPage.lose2")}</li>
+          <li>{$_("rulesPage.lose3")}</li>
         </ul>
       </div>
       <div class="rules-card rules-win">
-        <h3>{$_('rulesPage.youWin')}</h3>
+        <h3>{$_("rulesPage.youWin")}</h3>
         <ul>
-          <li>{$_('rulesPage.win1')}</li>
-          <li>{$_('rulesPage.win2')}</li>
+          <li>{$_("rulesPage.win1")}</li>
+          <li>{$_("rulesPage.win2")}</li>
         </ul>
       </div>
     </div>
   </AccordionSection>
 
   <AccordionSection>
-    <span slot="title">⚔️ {$_('rulesPage.gameModes')}</span>
+    <span slot="title">⚔️ {$_("rulesPage.gameModes")}</span>
     <div class="rules-cards-row">
       <div class="rules-card rules-mode-normal">
-        <h3>{$_('rulesPage.normalMode')}</h3>
-        <p>{$_('rulesPage.normalModeText')}</p>
+        <h3>{$_("rulesPage.normalMode")}</h3>
+        <p>{$_("rulesPage.normalModeText")}</p>
       </div>
       <div class="rules-card rules-mode-block">
-        <h3>{$_('rulesPage.blockMode')}</h3>
-        <p>{$_('rulesPage.blockModeText')}</p>
+        <h3>{$_("rulesPage.blockMode")}</h3>
+        <p>{$_("rulesPage.blockModeText")}</p>
       </div>
     </div>
   </AccordionSection>
 
   <AccordionSection>
-    <span slot="title">📜 {$_('rulesPage.specialRules')}</span>
+    <span slot="title">📜 {$_("rulesPage.specialRules")}</span>
     <div class="rules-card rules-no-moves">
-      <h2>{$_('rulesPage.noMovesButtonTitle')}</h2>
-      <p>{$_('rulesPage.noMovesButtonText1')}</p>
+      <h2>{$_("rulesPage.noMovesButtonTitle")}</h2>
+      <p>{$_("rulesPage.noMovesButtonText1")}</p>
       <ul>
-        <li><b>{$_('rulesPage.noMovesWin')}</b></li>
-        <li><b>{$_('rulesPage.noMovesLoss')}</b></li>
+        <li><b>{$_("rulesPage.noMovesWin")}</b></li>
+        <li><b>{$_("rulesPage.noMovesLoss")}</b></li>
       </ul>
-      <p>{$_('rulesPage.noMovesButtonText2')}</p>
+      <p>{$_("rulesPage.noMovesButtonText2")}</p>
     </div>
     <div class="rules-card rules-scoring">
-      <h2>{$_('rulesPage.scoringTitle')}</h2>
-      <p>{$_('rulesPage.scoringText')}</p>
+      <h2>{$_("rulesPage.scoringTitle")}</h2>
+      <p>{$_("rulesPage.scoringText")}</p>
       <ul>
-        <li>{$_('rulesPage.scoreNormal')}</li>
-        <li>{$_('rulesPage.scoreHidePiece')}</li>
-        <li>{$_('rulesPage.scoreHideBoard')}</li>
+        <li>{$_("rulesPage.scoreNormal")}</li>
+        <li>{$_("rulesPage.scoreHidePiece")}</li>
+        <li>{$_("rulesPage.scoreHideBoard")}</li>
       </ul>
     </div>
   </AccordionSection>
 
   <AccordionSection>
-    <span slot="title">🔥 {$_('rulesPage.proModeTitle')}</span>
+    <span slot="title">🔥 {$_("rulesPage.proModeTitle")}</span>
     <div class="rules-card rules-pro-mode">
-      <p>{$_('rulesPage.proModeText')}</p>
-      <p><b>{$_('rulesPage.proModeTip')}</b></p>
+      <p>{$_("rulesPage.proModeText")}</p>
+      <p><b>{$_("rulesPage.proModeTip")}</b></p>
       <ol>
-        <li>{$_('rulesPage.proModeStep1')}</li>
-        <li>{$_('rulesPage.proModeStep2')}</li>
-        <li>{$_('rulesPage.proModeStep3')}</li>
-        <li>{@html $_('rulesPage.proModeStep4', { values: { controlsLink: `${base}/controls` } })}</li>
+        <li>{$_("rulesPage.proModeStep1")}</li>
+        <li>{$_("rulesPage.proModeStep2")}</li>
+        <li>{$_("rulesPage.proModeStep3")}</li>
+        <li>
+          {@html $_("rulesPage.proModeStep4", {
+            values: { controlsLink: `${base}/controls` },
+          })}
+        </li>
       </ol>
-      <p>{$_('rulesPage.proModeConclusion')}</p>
-      <p>{$_('rulesPage.proModeNextLevel')}</p>
+      <p>{$_("rulesPage.proModeConclusion")}</p>
+      <p>{$_("rulesPage.proModeNextLevel")}</p>
     </div>
   </AccordionSection>
-
 </div>
 
 <style>
@@ -142,7 +147,7 @@
   }
 
   .rules-header::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -176,12 +181,6 @@
     text-wrap: balance;
   }
 
-  .rules-slogan {
-    font-size: 1.1em;
-    color: var(--text-secondary, #aaa);
-    margin-top: 0.2em;
-  }
-
   /* --- Modal-like styling applied to Accordion --- */
   :global(.accordion-section) {
     position: relative;
@@ -194,7 +193,7 @@
     overflow: hidden;
   }
   :global(.accordion-section::before) {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -231,11 +230,10 @@
   }
   :global(.accordion-content .content-wrapper) {
     padding: 20px 24px;
-    background: rgba(0,0,0,0.1); /* 10% opaque black background */
+    background: rgba(0, 0, 0, 0.1); /* 10% opaque black background */
     border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
   /* --- End of Modal-like styling --- */
-
 
   /* Styling for cards inside accordion */
   .rules-card {
@@ -250,7 +248,7 @@
   .rules-card:not(:first-child) {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .rules-cards-row {
@@ -269,12 +267,14 @@
     background: none;
     border-radius: 0;
   }
-  
-  ul, ol {
+
+  ul,
+  ol {
     margin: 0.5em 0 0.5em 1.2em;
     line-height: 1.7;
   }
-  h2, h3 {
+  h2,
+  h3 {
     margin-top: 0.2em;
     margin-bottom: 0.2em;
   }
@@ -289,7 +289,7 @@
     gap: 6px;
     justify-content: center;
     margin: 1.2em 0;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-family: "M PLUS Rounded 1c", sans-serif;
   }
   .dir-btn-visual {
     display: flex;
@@ -299,7 +299,7 @@
     border-radius: 10px;
     background: var(--control-bg, #f0e8f2);
     color: var(--text-primary, #442c2e);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
     border: 1px solid var(--border-color, rgba(233, 84, 32, 0.3));
   }
   .dir-btn-visual.center-piece {
@@ -310,17 +310,17 @@
   }
 
   :global(.inline-link-button) {
-      display: inline-block;
-      padding: 0.1em 0.4em;
-      margin: 0 0.2em;
-      line-height: 1.2;
-      font-size: 0.9em;
-      text-decoration: none;
-      color: var(--text-primary);
-      background-color: var(--control-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+    display: inline-block;
+    padding: 0.1em 0.4em;
+    margin: 0 0.2em;
+    line-height: 1.2;
+    font-size: 0.9em;
+    text-decoration: none;
+    color: var(--text-primary);
+    background-color: var(--control-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
   }
 
   @media (max-width: 600px) {

@@ -374,32 +374,4 @@
 	footer a {
 		font-weight: bold;
 	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
-	}
-
-	.test-mode-toggle {
-		position: fixed;
-		bottom: 10px;
-		right: 10px;
-		z-index: 1000;
-	}
-	.test-mode-toggle button {
-		background: #555;
-		color: white;
-		border: 2px solid #777;
-		padding: 8px 12px;
-		border-radius: 8px;
-		cursor: pointer;
-		transition:
-			background-color 0.2s,
-			border-color 0.2s;
-	}
-	.test-mode-toggle button.active {
-		background: #4caf50;
-		border-color: #81c784;
-	}
 </style>

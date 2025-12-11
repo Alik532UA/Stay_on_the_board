@@ -127,8 +127,7 @@
     <StyledButton
         variant="menu"
         class="secondary"
-        disabled={!import.meta.env.DEV}
-        on:click={import.meta.env.DEV ? onLocalGame : onOpenWipNotice}
+        on:click={onLocalGame}
         dataTestId="local-game-btn">{$_("mainMenu.localGame")}</StyledButton
     >
     <StyledButton

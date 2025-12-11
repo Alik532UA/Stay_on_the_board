@@ -270,9 +270,6 @@
     align-items: center;
     gap: 4px;
   }
-  .fixed-score {
-    /* Removed hardcoded color for fixed points to use default theme text color */
-  }
   .cash-out-btn {
     background: var(--control-selected);
     color: var(--control-selected-text);

@@ -46,7 +46,6 @@ function createGameSettingsStore() {
     const intendedGameType = get(uiStateStore).intendedGameType;
     const isLocalGameContext = intendedGameType === 'local';
     const isVirtualPlayerContext = intendedGameType === 'virtual-player';
-    // @ts-expect-error - 'online' mode not yet implemented, but logic prepared for future
     const isOnlineContext = intendedGameType === 'online';
 
     // Блокуємо синхронізацію, якщо пресет не відповідає контексту
