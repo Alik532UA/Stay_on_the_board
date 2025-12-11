@@ -148,6 +148,8 @@ export class GameStateReconciler {
                 playerType: 'human',
                 scoreDetails: claim.scoreDetails,
                 boardSize: claim.boardSize,
+                // FIX: Передаємо отримані з сервера playerScores
+                playerScores: claim.playerScores,
                 // @ts-ignore
                 isRemote: true
             });

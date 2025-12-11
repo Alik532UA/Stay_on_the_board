@@ -1,14 +1,14 @@
 <script lang="ts">
   import { createEventDispatcher, onMount, onDestroy } from "svelte";
   import { registerGameAction } from "$lib/services/gameHotkeyService";
-  import SvgIcons from "../SvgIcons.svelte";
-  import { _ } from "svelte-i18n";
-  import { getCenterInfoState } from "$lib/utils/centerInfoUtil";
   import { logService } from "$lib/services/logService.js";
-  import { hotkeyTooltip } from "$lib/actions/hotkeyTooltip.js";
-  import { customTooltip } from "$lib/actions/customTooltip.js";
-  import { modalStore } from "$lib/stores/modalStore";
   import hotkeyService from "$lib/services/hotkeyService";
+  import { voiceControlService } from "$lib/services/voiceControlService.js";
+
+  import DirectionGrid from "./controls/DirectionGrid.svelte";
+  import DistanceSelector from "./controls/DistanceSelector.svelte";
+  import ActionButtons from "./controls/ActionButtons.svelte";
+
   export let isMoveInProgress = false;
   export let selectedDirection = null;
   export let selectedDistance = null;
@@ -25,34 +25,23 @@
     "down-right",
   ];
   export let distanceRows: number[][] = [];
-  // FIX AC #15: Змінено const на let, щоб пропс був реактивним і приймав значення від батька
   export let isPlayerTurn: boolean = false;
   export let blockModeEnabled: boolean = false;
   export let centerInfoProps: any = {};
   export let isConfirmDisabled: boolean = false;
 
-  import { uiStateStore } from "$lib/stores/uiStateStore.js";
-  import { voiceControlService } from "$lib/services/voiceControlService.js";
-  import { voiceControlStore } from "$lib/stores/voiceControlStore";
-
   const dispatch = createEventDispatcher();
 
   const isVoiceSupported = voiceControlService.isApiSupported;
-  const voiceButtonTooltip = isVoiceSupported
-    ? $_("gameControls.voiceCommandTitle")
-    : $_("gameControls.voiceCommandNotSupported");
-
   let isIos = false;
 
-  $: voiceButtonStyle = `box-shadow: 0 0 0 ${$voiceControlStore.volume * 20}px rgba(229, 57, 53, ${Math.min($voiceControlStore.volume * 2, 1)});`;
-
-  // FIX AC #15: Централізована логіка блокування кнопок.
-  // Кнопки неактивні, якщо йде анімація АБО якщо зараз не хід гравця.
   $: controlsDisabled = isMoveInProgress || !isPlayerTurn;
+  $: confirmButtonBlocked =
+    isConfirmDisabled || !selectedDirection || !selectedDistance;
 
   onMount(() => {
     isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    // Direction hotkeys
+
     availableDirections.forEach((dir) => {
       if (dir) {
         registerGameAction(
@@ -62,7 +51,6 @@
       }
     });
 
-    // Action hotkeys
     registerGameAction("confirm", handleConfirm);
     registerGameAction("no-moves", handleNoMoves);
   });
@@ -70,35 +58,20 @@
   $: {
     if (distanceRows && distanceRows.length > 0) {
       distanceRows.flat().forEach((dist) => {
-        registerGameAction(getActionForDistance(dist), () =>
+        registerGameAction(`distance-${dist}` as any, () =>
           handleDistance(dist),
         );
       });
     }
   }
 
-  onDestroy(() => {
-    // No explicit unregistration needed here, as gameHotkeyService handles context cleanup
-  });
-
-  $: confirmButtonBlocked =
-    isConfirmDisabled || !selectedDirection || !selectedDistance;
-
-  /**
-   * @param {number} dist
-   * @returns {import('$lib/stores/gameSettingsStore').KeybindingAction}
-   */
-  function getActionForDistance(dist: number) {
-    return `distance-${dist}` as import("$lib/stores/gameSettingsStore").KeybindingAction;
-  }
-
   function handleDirection(dir: string) {
-    if (controlsDisabled) return; // Prevent hotkey action if disabled
+    if (controlsDisabled) return;
     logService.action(`Click: "Напрямок: ${dir}" (DirectionControls)`);
     dispatch("direction", dir);
   }
   function handleDistance(dist: number) {
-    if (controlsDisabled) return; // Prevent hotkey action if disabled
+    if (controlsDisabled) return;
     logService.action(`Click: "Відстань: ${dist}" (DirectionControls)`);
     dispatch("distance", dist);
   }
@@ -108,16 +81,15 @@
     dispatch("central");
   }
   function handleConfirm() {
-    if (controlsDisabled) return; // Prevent hotkey action if disabled
+    if (controlsDisabled) return;
     logService.action('Click: "Підтвердити хід" (DirectionControls)');
     dispatch("confirm");
   }
   function handleNoMoves() {
-    if (controlsDisabled) return; // Prevent hotkey action if disabled
+    if (controlsDisabled) return;
     logService.action(`Click: "Ходів немає" (DirectionControls)`);
     dispatch("noMoves");
   }
-
   function handleVoiceCommand() {
     if (controlsDisabled) return;
     logService.action(`Click: "Голосова команда" (DirectionControls)`);
@@ -126,133 +98,31 @@
 </script>
 
 <div class="direction-controls-panel">
-  <div class="directions-3x3">
-    <button
-      class="dir-btn {selectedDirection === 'up-left' ? 'active' : ''}"
-      use:hotkeyTooltip={"up-left"}
-      on:click={() => handleDirection("up-left")}
-      data-testid="dir-btn-up-left"
-      disabled={controlsDisabled}>↖</button
-    >
-    <button
-      class="dir-btn {selectedDirection === 'up' ? 'active' : ''}"
-      use:hotkeyTooltip={"up"}
-      on:click={() => handleDirection("up")}
-      data-testid="dir-btn-up"
-      disabled={controlsDisabled}>↑</button
-    >
-    <button
-      class="dir-btn {selectedDirection === 'up-right' ? 'active' : ''}"
-      use:hotkeyTooltip={"up-right"}
-      on:click={() => handleDirection("up-right")}
-      data-testid="dir-btn-up-right"
-      disabled={controlsDisabled}>↗</button
-    >
-    <button
-      class="dir-btn {selectedDirection === 'left' ? 'active' : ''}"
-      use:hotkeyTooltip={"left"}
-      on:click={() => handleDirection("left")}
-      data-testid="dir-btn-left"
-      disabled={controlsDisabled}>←</button
-    >
-    <button
-      id="center-info"
-      class="control-btn center-info {centerInfoProps.class}"
-      type="button"
-      aria-label={centerInfoProps.aria}
-      on:click={centerInfoProps.clickable ? handleCentral : undefined}
-      tabindex="0"
-      disabled={!centerInfoProps.clickable || controlsDisabled}
-      style={centerInfoProps.backgroundColor
-        ? `background-color: ${centerInfoProps.backgroundColor} !important`
-        : ""}
-      data-testid="center-info-btn"
-    >
-      {centerInfoProps.content}
-    </button>
-    <button
-      class="dir-btn {selectedDirection === 'right' ? 'active' : ''}"
-      use:hotkeyTooltip={"right"}
-      on:click={() => handleDirection("right")}
-      data-testid="dir-btn-right"
-      disabled={controlsDisabled}>→</button
-    >
-    <button
-      class="dir-btn {selectedDirection === 'down-left' ? 'active' : ''}"
-      use:hotkeyTooltip={"down-left"}
-      on:click={() => handleDirection("down-left")}
-      data-testid="dir-btn-down-left"
-      disabled={controlsDisabled}>↙</button
-    >
-    <button
-      class="dir-btn {selectedDirection === 'down' ? 'active' : ''}"
-      use:hotkeyTooltip={"down"}
-      on:click={() => handleDirection("down")}
-      data-testid="dir-btn-down"
-      disabled={controlsDisabled}>↓</button
-    >
-    <button
-      class="dir-btn {selectedDirection === 'down-right' ? 'active' : ''}"
-      use:hotkeyTooltip={"down-right"}
-      on:click={() => handleDirection("down-right")}
-      data-testid="dir-btn-down-right"
-      disabled={controlsDisabled}>↘</button
-    >
-  </div>
-  <div class="distance-select">
-    <div class="distance-btns">
-      {#each distanceRows as row}
-        <div class="distance-row">
-          {#each row as dist}
-            <button
-              class="dist-btn {selectedDistance === dist ? 'active' : ''}"
-              on:click={() => handleDistance(dist)}
-              data-testid={`dist-btn-${dist}`}
-              disabled={controlsDisabled}>{dist}</button
-            >
-          {/each}
-        </div>
-      {/each}
-    </div>
-  </div>
-  <div class="action-btns">
-    <button
-      class="confirm-btn {confirmButtonBlocked ? 'disabled' : ''}"
-      on:click={handleConfirm}
-      use:customTooltip={$_("gameControls.confirm")}
-      data-testid="confirm-move-btn"
-      disabled={controlsDisabled}
-    >
-      <SvgIcons name="confirm" />
-      {$_("gameControls.confirm")}
-    </button>
-    {#if blockModeEnabled}
-      <button
-        class="no-moves-btn"
-        on:click={handleNoMoves}
-        use:customTooltip={$_("gameControls.noMovesTitle")}
-        data-testid="no-moves-btn"
-        disabled={controlsDisabled}
-      >
-        <SvgIcons name="no-moves" />
-        {$_("gameControls.noMovesTitle")}
-      </button>
-    {/if}
-    {#if !isIos}
-      <button
-        class="voice-btn"
-        on:click={handleVoiceCommand}
-        use:customTooltip={voiceButtonTooltip}
-        data-testid="voice-command-btn"
-        class:active={$uiStateStore.isListening}
-        disabled={!isVoiceSupported || controlsDisabled}
-        style={$uiStateStore.isListening ? voiceButtonStyle : ""}
-      >
-        <SvgIcons name="microphone" />
-        {$_("gameControls.voiceCommand")}
-      </button>
-    {/if}
-  </div>
+  <DirectionGrid
+    {selectedDirection}
+    disabled={controlsDisabled}
+    {centerInfoProps}
+    on:direction={(e) => handleDirection(e.detail)}
+    on:central={handleCentral}
+  />
+
+  <DistanceSelector
+    {distanceRows}
+    {selectedDistance}
+    disabled={controlsDisabled}
+    on:distance={(e) => handleDistance(e.detail)}
+  />
+
+  <ActionButtons
+    confirmDisabled={confirmButtonBlocked}
+    {blockModeEnabled}
+    {isVoiceSupported}
+    disabled={controlsDisabled}
+    {isIos}
+    on:confirm={handleConfirm}
+    on:noMoves={handleNoMoves}
+    on:voiceCommand={handleVoiceCommand}
+  />
 </div>
 
 <style>
@@ -263,17 +133,11 @@
     gap: 18px;
     width: 100%;
   }
-  .directions-3x3 {
-    display: grid;
-    grid-template-columns: repeat(3, 70px);
-    grid-template-rows: repeat(3, 70px);
-    gap: 14px;
-    margin: 18px 0 10px 0;
-    justify-content: center;
-  }
-  .dir-btn,
-  .dist-btn,
-  .control-btn {
+
+  /* Глобальні стилі для кнопок, які використовуються в підкомпонентах */
+  :global(.dir-btn),
+  :global(.dist-btn),
+  :global(.control-btn) {
     border-radius: 16px;
     border: 1.5px solid var(--border-color, #444);
     background: var(--control-bg, #222);
@@ -298,37 +162,39 @@
     height: 70px;
     font-family: "M PLUS Rounded 1c", sans-serif !important;
   }
-  .dir-btn:disabled,
-  .dist-btn:disabled,
-  .control-btn:disabled,
-  .confirm-btn:disabled,
-  .no-moves-btn:disabled,
-  .voice-btn:disabled {
+  :global(.dir-btn:disabled),
+  :global(.dist-btn:disabled),
+  :global(.control-btn:disabled),
+  :global(.confirm-btn:disabled),
+  :global(.no-moves-btn:disabled),
+  :global(.voice-btn:disabled) {
     opacity: 0.5;
     cursor: not-allowed;
     pointer-events: none;
   }
-  .dir-btn.active {
+  :global(.dir-btn.active) {
     background: var(--control-hover, #ff9800);
     color: var(--control-selected-text, #fff);
     border-color: var(--control-selected, #ff9800);
     transform: scale(1.1);
     box-shadow: 0 4px 24px 0 var(--shadow-color, #0004);
   }
-  .control-btn.center-info.confirm-btn-active {
+  :global(.control-btn.center-info.confirm-btn-active) {
     background: #43a047 !important;
     color: #fff !important;
   }
-  #center-info {
+  :global(#center-info) {
     border: none !important;
     font-family: "M PLUS Rounded 1c", sans-serif !important;
   }
-  #center-info:not(.confirm-btn-active):not(.computer-move-display):not(
-      .direction-distance-state
+  :global(
+      #center-info:not(.confirm-btn-active):not(.computer-move-display):not(
+          .direction-distance-state
+        )
     ) {
     background: transparent !important;
   }
-  #center-info.confirm-btn-active {
+  :global(#center-info.confirm-btn-active) {
     background: #43a047 !important;
     color: #fff !important;
     border-color: #43a047 !important;
@@ -346,36 +212,19 @@
       box-shadow: 0 0 0 0 #43a047;
     }
   }
-  #center-info.confirm-btn-active:hover {
+  :global(#center-info.confirm-btn-active:hover) {
     background: #2e7d32 !important;
     border-color: #2e7d32 !important;
     transform: scale(1.02);
   }
-  #center-info.computer-move-display {
+  :global(#center-info.computer-move-display) {
     background: orange !important;
     color: #fff !important;
     font-weight: bold !important;
     border: none !important;
     cursor: default !important;
   }
-  .distance-select {
-    width: 100%;
-    text-align: center;
-    margin-top: 18px;
-  }
-  .distance-btns {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 10px;
-  }
-  .distance-row {
-    display: flex;
-    gap: 18px;
-    justify-content: center;
-  }
-  .dist-btn {
+  :global(.dist-btn) {
     width: 50px;
     height: 50px;
     font-size: 1.5em;
@@ -389,29 +238,21 @@
       color 0.2s,
       transform 0.15s;
   }
-  .dist-btn.active {
+  :global(.dist-btn.active) {
     background: var(--control-hover, #ff9800);
     color: var(--control-selected-text, #fff);
     border-color: var(--control-selected, #ff9800);
     transform: scale(1.1);
   }
-  .action-btns {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    width: 100%;
-    align-items: center;
-    margin-top: 18px;
-  }
-  .confirm-btn,
-  .no-moves-btn,
-  .voice-btn {
+  :global(.confirm-btn),
+  :global(.no-moves-btn),
+  :global(.voice-btn) {
     background: #43a047cc;
     color: #fff;
     border: none;
     border-radius: 12px;
-    min-height: 52px; /* Збільшена висота */
-    width: 90%; /* Змінено на 90% */
+    min-height: 52px;
+    width: 90%;
     font-weight: bold;
     cursor: pointer;
     display: flex;
@@ -422,55 +263,41 @@
       background 0.25s,
       transform 0.15s;
   }
-  .confirm-btn.disabled {
+  :global(.confirm-btn.disabled) {
     background: rgba(85, 85, 85, 0.3);
     color: #999;
     cursor: pointer;
   }
-  .confirm-btn:not(.disabled):hover {
+  :global(.confirm-btn:not(.disabled):hover) {
     background: #2e7d32;
     transform: scale(1.02);
   }
-  .no-moves-btn {
+  :global(.no-moves-btn) {
     background: #ffb300;
     color: #222;
   }
-  .no-moves-btn:hover {
+  :global(.no-moves-btn:hover) {
     background: #f57c00;
     transform: scale(1.02);
   }
-  .voice-btn {
+  :global(.voice-btn) {
     background: #00bcd4;
     color: #fff;
   }
-  .voice-btn:hover {
+  :global(.voice-btn:hover) {
     background: #0097a7;
     transform: scale(1.02);
   }
-  .voice-btn.active {
+  :global(.voice-btn.active) {
     background: #e53935;
     color: #fff;
   }
-
-  .voice-btn:disabled {
+  :global(.voice-btn:disabled) {
     background: #757575;
     cursor: not-allowed;
   }
-
-  .voice-btn:disabled:hover {
+  :global(.voice-btn:disabled:hover) {
     background: #757575;
     transform: none;
-  }
-
-  @keyframes pulse-red {
-    0% {
-      box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7);
-    }
-    70% {
-      box-shadow: 0 0 0 10px rgba(229, 57, 53, 0);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgba(229, 57, 53, 0);
-    }
   }
 </style>

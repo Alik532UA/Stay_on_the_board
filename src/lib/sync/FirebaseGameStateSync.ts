@@ -1,7 +1,6 @@
 // src/lib/sync/FirebaseGameStateSync.ts
 import {
     doc,
-    setDoc,
     getDoc,
     onSnapshot,
     updateDoc,
@@ -23,17 +22,14 @@ import type {
 
 import { getFirestoreDb, isFirebaseConfigured } from '$lib/services/firebaseService';
 import { logService } from '$lib/services/logService';
+import { GameStateSerializer } from './GameStateSerializer';
 
 interface FirebaseRoomDocument {
-    gameState: SyncableGameState;
+    gameState: any; // Serialized state
     createdAt: ReturnType<typeof serverTimestamp>;
     updatedAt: ReturnType<typeof serverTimestamp>;
     hostPlayerId: number;
-    players: Array<{
-        id: number;
-        name: string;
-        joinedAt: number;
-    }>;
+    players: Array<any>;
     status: 'waiting' | 'playing' | 'finished';
 }
 
@@ -106,38 +102,8 @@ export class FirebaseGameStateSync implements IGameStateSync {
         try {
             this._stateVersion++;
 
-            // Глибоке копіювання для безпечної модифікації
-            const stateToSync = JSON.parse(JSON.stringify(state));
-
-            // FIX: Серіалізація дошки (вже було)
-            if (stateToSync.boardState && stateToSync.boardState.board) {
-                stateToSync.boardState.board = JSON.stringify(stateToSync.boardState.board);
-            }
-
-            // FIX: Серіалізація gameOver payload, якщо він містить складні вкладені структури
-            // Firestore не підтримує вкладені масиви (масив масивів).
-            // Перевіряємо, чи є такі структури в gameOver.
-            // Найпростіший спосіб уникнути помилки "Nested arrays are not supported" - це
-            // перетворити потенційно проблемні поля в JSON-рядки або переконатися, що структура пласка.
-
-            // У нашому випадку, gameOver.scores - це масив об'єктів, що дозволено.
-            // Але якщо всередині об'єктів є масиви, це може бути проблемою.
-            // Перевіримо структуру PlayerScoreResult.
-
-            // Якщо помилка виникає, можливо, ми передаємо щось зайве.
-            // Для надійності, давайте серіалізуємо весь об'єкт gameOver в рядок,
-            // а при отриманні (pullState) розпарсимо його назад.
-            // Це гарантовано вирішить проблему вкладеності для Firestore.
-
-            if (stateToSync.gameOver) {
-                // Створюємо спеціальне поле для серіалізованого gameOver
-                stateToSync.gameOverSerialized = JSON.stringify(stateToSync.gameOver);
-                // Видаляємо оригінальний об'єкт, щоб Firestore не намагався його парсити
-                delete stateToSync.gameOver;
-            }
-
             const finalState = {
-                ...stateToSync,
+                ...GameStateSerializer.serialize(state),
                 version: this._stateVersion,
                 updatedAt: Date.now()
             };
@@ -154,44 +120,14 @@ export class FirebaseGameStateSync implements IGameStateSync {
     }
 
     async pullState(): Promise<SyncableGameState | null> {
-        if (!this._roomRef) {
-            return null;
-        }
+        if (!this._roomRef) return null;
 
         try {
             const snapshot = await getDoc(this._roomRef);
-            if (!snapshot.exists()) {
-                return null;
-            }
+            if (!snapshot.exists()) return null;
 
             const data = snapshot.data() as FirebaseRoomDocument;
-            const remoteState = data.gameState;
-
-            if (remoteState) {
-                // Десеріалізація дошки
-                if (remoteState.boardState && typeof remoteState.boardState.board === 'string') {
-                    try {
-                        remoteState.boardState.board = JSON.parse(remoteState.boardState.board);
-                    } catch (e) {
-                        logService.error('[FirebaseGameStateSync] Failed to parse board state in pullState', e);
-                    }
-                }
-
-                // FIX: Десеріалізація gameOver
-                // @ts-ignore - ми знаємо, що це поле може існувати
-                if (remoteState.gameOverSerialized) {
-                    try {
-                        // @ts-ignore
-                        remoteState.gameOver = JSON.parse(remoteState.gameOverSerialized);
-                        // @ts-ignore
-                        delete remoteState.gameOverSerialized;
-                    } catch (e) {
-                        logService.error('[FirebaseGameStateSync] Failed to parse gameOver state in pullState', e);
-                    }
-                }
-            }
-
-            return remoteState || null;
+            return GameStateSerializer.deserialize(data.gameState);
         } catch (error) {
             logService.error('[FirebaseGameStateSync] Pull state error:', error);
             return null;
@@ -255,35 +191,14 @@ export class FirebaseGameStateSync implements IGameStateSync {
                 if (data.gameState) {
                     if (data.gameState.version > this._stateVersion) {
                         this._stateVersion = data.gameState.version;
+                        const remoteState = GameStateSerializer.deserialize(data.gameState);
 
-                        const remoteState = data.gameState;
-
-                        // Десеріалізація дошки
-                        if (remoteState.boardState && typeof remoteState.boardState.board === 'string') {
-                            try {
-                                remoteState.boardState.board = JSON.parse(remoteState.boardState.board);
-                            } catch (e) {
-                                logService.error('[FirebaseGameStateSync] Failed to parse board state in snapshot', e);
-                            }
+                        if (remoteState) {
+                            this._notifySubscribers({
+                                type: 'state_updated',
+                                state: remoteState
+                            });
                         }
-
-                        // FIX: Десеріалізація gameOver
-                        // @ts-ignore
-                        if (remoteState.gameOverSerialized) {
-                            try {
-                                // @ts-ignore
-                                remoteState.gameOver = JSON.parse(remoteState.gameOverSerialized);
-                                // @ts-ignore
-                                delete remoteState.gameOverSerialized;
-                            } catch (e) {
-                                logService.error('[FirebaseGameStateSync] Failed to parse gameOver state in snapshot', e);
-                            }
-                        }
-
-                        this._notifySubscribers({
-                            type: 'state_updated',
-                            state: remoteState
-                        });
                     }
                 }
             },

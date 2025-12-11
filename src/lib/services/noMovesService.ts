@@ -10,6 +10,7 @@ import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
+import { gameModeService } from './gameModeService';
 
 export const noMovesService = {
   async claimNoMoves(): Promise<void> {
@@ -35,11 +36,33 @@ export const noMovesService = {
     if (!boardState || !playerState || !scoreState || !uiState) return;
 
     const scoreDetails = calculateFinalScore(boardState, playerState, scoreState, uiState, 'training');
+
+    // FIX: Визначаємо режим гри для правильного формування payload
+    const currentGameMode = gameModeService.getCurrentMode();
+    const gameType = currentGameMode ? currentGameMode.getModeName() : 'training';
+    const isMultiplayer = gameType === 'local' || gameType === 'online';
+
+    let playerScores = undefined;
+
+    if (isMultiplayer) {
+      // Для мультиплеєра формуємо список рахунків усіх гравців
+      playerScores = playerState.players.map(p => ({
+        playerId: p.id,
+        score: p.score + (p.roundScore || 0), // Показуємо поточний сумарний рахунок (фіксований + раунд)
+        name: p.name,
+        color: p.color,
+        playerName: p.name,
+        playerColor: p.color
+      }));
+    }
+
     gameEventBus.dispatch('ShowNoMovesModal', {
       playerType,
       scoreDetails,
-      boardSize: boardState.boardSize
+      boardSize: boardState.boardSize,
+      playerScores // Передаємо список гравців
     });
+
     const gameMode = get(gameStore).mode;
     if (gameMode) {
       gameMode.pauseTimers();
