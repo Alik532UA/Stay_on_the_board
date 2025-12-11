@@ -202,8 +202,13 @@ export class OnlineGameMode extends BaseGameMode {
     this.unsubscribeGameOver = gameEventBus.subscribe('GameOver', (payload: GameOverPayload) => {
       if (!this.isApplyingRemoteState && this.roomId) {
         logService.GAME_MODE('[OnlineGameMode] Local GameOver detected. Syncing to server.');
+        // FIX AC #14: При відправці GameOver ми також очищаємо всі прапорці голосування та заяв.
+        // Це гарантує, що всі клієнти перейдуть у стан "Game Over" і вийдуть зі стану "Очікування".
         this.syncCurrentState({
-          gameOver: payload
+          gameOver: payload,
+          finishRequests: {},
+          continueRequests: {},
+          noMovesClaim: null
         });
       }
     });

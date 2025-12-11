@@ -7,10 +7,13 @@ import { logService } from '$lib/services/logService';
 import type { IGameStateSync, SyncableGameState } from '$lib/sync/gameStateSync.interface';
 import { get } from 'svelte/store';
 import { boardStore } from '$lib/stores/boardStore';
+import { playerStore } from '$lib/stores/playerStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { availableMovesService } from '$lib/services/availableMovesService';
 import { animationService } from '$lib/services/animationService';
 import { gameOverStore } from '$lib/stores/gameOverStore';
+import { modalStore } from '$lib/stores/modalStore';
+import { _ } from 'svelte-i18n';
 
 export class OnlineMatchController {
     constructor(
@@ -33,6 +36,22 @@ export class OnlineMatchController {
     public async handleContinueRequest(): Promise<void> {
         logService.GAME_MODE('[MatchController] Vote to CONTINUE game.');
 
+        // Optimistic UI update: Change button text to "Waiting..."
+        const t = get(_);
+        modalStore.update(s => {
+            if (s.isOpen && s.buttons && s.buttons.length > 0) {
+                const newButtons = s.buttons.map((b, i) => {
+                    // Assuming "Continue" is the first button (index 0)
+                    if (i === 0) {
+                        return { ...b, text: t('modal.waitingForPlayers'), disabled: true };
+                    }
+                    return b;
+                });
+                return { ...s, buttons: newButtons };
+            }
+            return s;
+        });
+
         const currentState = await this.stateSync.pullState();
         const currentRequests = currentState?.continueRequests || {};
         const newRequests = { ...currentRequests, [this.myPlayerId]: true };
@@ -44,6 +63,22 @@ export class OnlineMatchController {
 
     public async handleFinishRequest(): Promise<void> {
         logService.GAME_MODE('[MatchController] Vote to FINISH game.');
+
+        // Optimistic UI update: Change button text to "Waiting..."
+        const t = get(_);
+        modalStore.update(s => {
+            if (s.isOpen && s.buttons && s.buttons.length > 1) {
+                const newButtons = s.buttons.map((b, i) => {
+                    // Assuming "Finish" is the second button (index 1)
+                    if (i === 1) {
+                        return { ...b, text: t('modal.waitingForPlayers'), disabled: true };
+                    }
+                    return b;
+                });
+                return { ...s, buttons: newButtons };
+            }
+            return s;
+        });
 
         const currentState = await this.stateSync.pullState();
         const currentRequests = currentState?.finishRequests || {};
@@ -63,10 +98,9 @@ export class OnlineMatchController {
             if (allReady) {
                 logService.GAME_MODE('[MatchController] Consensus reached: CONTINUE game.');
 
-                // FIX AC #11: Тільки Хост генерує новий стан дошки і пушить його на сервер.
-                // Гість отримає оновлення через Reconciler.
+                // FIX AC #11 & #12: Тільки Хост генерує новий стан дошки ТА гравців і пушить його на сервер.
                 if (this.amIHost) {
-                    logService.GAME_MODE('[MatchController] I am Host. Resetting board state and pushing to server.');
+                    logService.GAME_MODE('[MatchController] I am Host. Resetting board/player state and pushing to server.');
 
                     // Генеруємо новий стан дошки (логіка взята з resetBoardForContinuation)
                     const currentBoard = get(boardStore);
@@ -87,9 +121,15 @@ export class OnlineMatchController {
                         this.resetBoardCallback();
                         this.advancePlayerCallback();
 
+                        const newPlayerState = get(playerStore);
+
+                        // FIX: Explicitly close modal for Host to ensure UI unblocks immediately
+                        gameEventBus.dispatch('CloseModal');
+
                         // Пушимо повний стан на сервер
                         this.syncState({
-                            boardState: newBoardState, // <--- ВАЖЛИВО: Відправляємо очищену дошку
+                            boardState: newBoardState,
+                            playerState: newPlayerState!,
                             continueRequests: {},
                             finishRequests: {},
                             noMovesClaim: null
@@ -111,12 +151,11 @@ export class OnlineMatchController {
 
                 if (!state.gameOver) {
                     if (this.amIHost) {
+                        // FIX AC #14: Хост ініціює завершення гри локально.
+                        // OnlineGameMode перехопить подію GameOver і відправить її на сервер
+                        // разом з очищенням прапорців (finishRequests).
+                        // Ми НЕ викликаємо syncState тут, щоб уникнути гонки станів.
                         this.endGameCallback('modal.gameOverReasonBonus');
-                        this.syncState({
-                            continueRequests: {},
-                            finishRequests: {},
-                            noMovesClaim: null
-                        });
                     }
                 }
             }
