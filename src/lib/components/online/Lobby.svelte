@@ -32,8 +32,6 @@
         unsubscribe = roomService.subscribeToRoom(roomId, (updatedRoom) => {
             room = updatedRoom;
 
-            // FIX: Перенаправляємо в гру ТІЛЬКИ якщо статус 'playing'.
-            // Якщо статус 'finished' або 'waiting', залишаємось в лобі.
             if (room.status === "playing") {
                 goto(`${base}/game/online`);
             }
@@ -113,6 +111,7 @@
                     {myPlayerId}
                     hostId={room.hostId}
                     {amIHost}
+                    roomStatus={room.status}
                     onUpdatePlayer={handleUpdatePlayer}
                     onToggleReady={toggleReady}
                     onStartGame={handleStartGame}

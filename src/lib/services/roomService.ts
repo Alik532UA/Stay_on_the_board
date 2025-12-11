@@ -12,6 +12,7 @@ import {
     updateDoc,
     onSnapshot,
     limit,
+    deleteField,
     type DocumentData,
     type Unsubscribe,
     type DocumentReference
@@ -23,7 +24,7 @@ import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
 import { defaultGameSettings } from '$lib/stores/gameSettingsStore';
 import { v4 as uuidv4 } from 'uuid';
 
-const ROOM_TIMEOUT_MS = import.meta.env.DEV ? 10000 : 120000;
+const ROOM_TIMEOUT_MS = 600000;
 const OPERATION_TIMEOUT_MS = 10000;
 const MAX_PLAYERS = 8;
 
@@ -177,7 +178,7 @@ class RoomService {
             if (Object.keys(roomData.players).length >= MAX_PLAYERS) {
                 throw new Error('Room is full');
             }
-            // Дозволяємо приєднуватися, якщо статус waiting або finished
+
             if (roomData.status === 'playing') {
                 throw new Error('Game already started');
             }
@@ -313,19 +314,31 @@ class RoomService {
 
             if (players[playerId]) {
                 delete players[playerId];
-                logService.init(`[RoomService] Removed player ${playerId} from local object.`);
 
                 if (Object.keys(players).length === 0) {
                     logService.init(`[RoomService] Room empty, deleting room.`);
                     await deleteDoc(roomRef);
                 } else {
-                    let updates: any = { players: players, lastActivity: Date.now() };
+                    const updates: Record<string, any> = {
+                        [`players.${playerId}`]: deleteField(),
+                        lastActivity: Date.now()
+                    };
+
                     if (roomData.hostId === playerId) {
                         const nextHostId = Object.keys(players)[0];
                         updates.hostId = nextHostId;
                         logService.init(`[RoomService] Host migrated to ${nextHostId}`);
                     }
+
+                    const remainingPlayers = Object.values(players);
+                    const allRemainingReady = remainingPlayers.length > 0 && remainingPlayers.every(p => p.isReady);
+
+                    if (allRemainingReady && roomData.status === 'finished') {
+                        updates.status = 'waiting';
+                    }
+
                     await updateDoc(roomRef, updates);
+                    logService.init(`[RoomService] Player removed atomically.`);
                 }
             }
         } catch (error) {
@@ -341,10 +354,6 @@ class RoomService {
         });
     }
 
-    /**
-     * Повертає гравця в лобі після гри.
-     * Встановлює статус гравця 'ready' і статус кімнати 'finished' (якщо вона була 'playing').
-     */
     async returnToLobby(roomId: string, playerId: string): Promise<void> {
         logService.init(`[RoomService] Player ${playerId} returning to lobby in room ${roomId}`);
         const roomRef = doc(this.db, 'rooms', roomId);
@@ -353,14 +362,21 @@ class RoomService {
         if (!roomSnap.exists()) return;
 
         const roomData = roomSnap.data() as Room;
+
         const updates: Record<string, any> = {
-            [`players.${playerId}.isReady`]: true, // Гравець автоматично готовий до нової гри
+            [`players.${playerId}.isReady`]: true,
             lastActivity: Date.now()
         };
 
-        // Якщо гра ще "триває" (playing), переводимо кімнату в стан "завершено" (finished).
-        // Це дозволяє іншим гравцям залишатися на екрані гри, поки вони теж не натиснуть "Грати ще раз".
-        if (roomData.status === 'playing') {
+        const updatedPlayers = { ...roomData.players };
+        if (updatedPlayers[playerId]) {
+            updatedPlayers[playerId] = { ...updatedPlayers[playerId], isReady: true };
+        }
+        const allReady = Object.values(updatedPlayers).every(p => p.isReady);
+
+        if (allReady) {
+            updates['status'] = 'waiting';
+        } else if (roomData.status === 'playing') {
             updates['status'] = 'finished';
         }
 
@@ -369,10 +385,23 @@ class RoomService {
 
     async startGame(roomId: string): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
-        // Скидаємо gameState в null, щоб змусити клієнтів ініціалізувати нову гру
+
+        // Отримуємо поточний стан, щоб оновити всіх гравців
+        const roomSnap = await getDoc(roomRef);
+        if (!roomSnap.exists()) return;
+
+        const roomData = roomSnap.data() as Room;
+        const players = { ...roomData.players };
+
+        // FIX: Скидаємо isReady для всіх гравців на початку гри
+        Object.keys(players).forEach(id => {
+            players[id].isReady = false;
+        });
+
         await updateDoc(roomRef, {
             status: 'playing',
             gameState: null,
+            players: players, // Оновлюємо гравців зі скинутим статусом
             lastActivity: Date.now()
         });
     }
