@@ -119,12 +119,16 @@ interface MoveData {
 
 /**
  * Озвучує ігровий хід.
+ * @param force - Якщо true, ігнорує внутрішні перевірки налаштувань (speechFor), 
+ *                покладаючись на те, що викликаючий код вже все перевірив.
+ *                Але все ще поважає глобальний speechEnabled.
  */
 export function speakMove(
     move: MoveData,
     lang: string,
     voiceURI: string | null,
-    onEndCallback?: () => void
+    onEndCallback?: () => void,
+    force: boolean = false
 ): void {
     if (typeof window === 'undefined' || !('speechSynthesis' in window) || !move) {
         if (onEndCallback) onEndCallback();
@@ -132,21 +136,33 @@ export function speakMove(
     }
 
     const settings = get(gameSettingsStore);
-    const playerState = get(playerStore);
-    if (!playerState) {
-        if (onEndCallback) onEndCallback();
+
+    // Глобальний перемикач має пріоритет
+    if (!settings.speechEnabled) {
+        logService.speech('[Speech] speakMove: Speech is globally disabled.');
+        if (onEndCallback) setTimeout(() => onEndCallback(), 100);
         return;
     }
-    const currentPlayer = playerState.players[playerState.currentPlayerIndex];
 
-    const shouldSpeak = settings.speechEnabled && currentPlayer &&
-        (currentPlayer.isComputer ? settings.speechFor.computer : settings.speechFor.player);
+    let shouldSpeak = false;
+
+    if (force) {
+        // Якщо force=true, ми довіряємо тому, хто викликав функцію
+        shouldSpeak = true;
+        logService.speech('[Speech] speakMove: Forced speech (settings checks bypassed).');
+    } else {
+        // Стара логіка для зворотної сумісності (якщо викликається без force)
+        const playerState = get(playerStore);
+        if (playerState) {
+            const currentPlayer = playerState.players[playerState.currentPlayerIndex];
+            shouldSpeak = currentPlayer &&
+                (currentPlayer.isComputer ? settings.speechFor.computer : settings.speechFor.player);
+        }
+    }
 
     if (!shouldSpeak) {
-        logService.speech('[Speech] speakMove: Speech is disabled for the current move. Executing callback directly.');
+        logService.speech('[Speech] speakMove: Speech logic determined NOT to speak.');
         if (onEndCallback) {
-            // Невелика затримка, щоб імітувати асинхронну природу озвучення та уникнути
-            // можливих race conditions з іншими оновленнями стану.
             setTimeout(() => onEndCallback(), 100);
         }
         return;

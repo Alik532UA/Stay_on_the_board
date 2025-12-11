@@ -138,8 +138,6 @@ export const userActionService = {
     if (!boardState) return;
     const { moveHistory, boardSize } = boardState;
 
-    // FIX: Використовуємо gameEventBus.dispatch('CloseModal') замість прямого modalStore.closeModal().
-    // Це дозволяє OnlineGameMode перехопити подію і оновити статус гравця на сервері.
     modalStore.showModal({
       component: ReplayViewer,
       props: {
@@ -168,6 +166,31 @@ export const userActionService = {
     }
   },
 
+  // --- Нові методи для голосування ---
+
+  async voteToContinue(): Promise<void> {
+    const activeGameMode = gameModeService.getCurrentMode();
+    // Перевіряємо, чи це OnlineGameMode (через перевірку наявності методу)
+    if (activeGameMode && 'voteToContinue' in activeGameMode) {
+      // @ts-ignore
+      await activeGameMode.voteToContinue();
+    } else {
+      // Локальний режим - просто продовжуємо
+      await this.continueAfterNoMoves();
+    }
+  },
+
+  async voteToFinish(reasonKey: string): Promise<void> {
+    const activeGameMode = gameModeService.getCurrentMode();
+    if (activeGameMode && 'voteToFinish' in activeGameMode) {
+      // @ts-ignore
+      await activeGameMode.voteToFinish();
+    } else {
+      // Локальний режим - завершуємо
+      await this.finishWithBonus(reasonKey);
+    }
+  },
+
   async handleModalAction(action: string, payload?: any): Promise<void> {
     const uiState = get(uiStateStore);
     if (uiState?.isComputerMoveInProgress) {
@@ -184,10 +207,12 @@ export const userActionService = {
           await this.requestReplay();
           break;
         case 'finishWithBonus':
-          await this.finishWithBonus(payload.reasonKey);
+          // Використовуємо новий метод голосування
+          await this.voteToFinish(payload.reasonKey);
           break;
         case 'continueAfterNoMoves':
-          await this.continueAfterNoMoves();
+          // Використовуємо новий метод голосування
+          await this.voteToContinue();
           break;
         case 'resetGame':
           const activeGameMode = gameModeService.getCurrentMode();

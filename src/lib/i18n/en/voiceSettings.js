@@ -28,6 +28,8 @@ export default {
   speakFor: 'Speak for',
   player: 'Player move',
   computer: 'Computer move',
+  myMove: 'My move',
+  opponentMove: 'Opponent move',
   testVoice: "Test Voice",
   testPhrase: "Glad to see you in the game",
   speakModalTitles: 'Speak modal windows'

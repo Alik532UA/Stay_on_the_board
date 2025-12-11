@@ -76,6 +76,18 @@ class RoomService {
             ? customRoomName.trim()
             : `Room #${Math.floor(Math.random() * 10000)}`;
 
+        // FIX: Оновлені налаштування за замовчуванням для онлайн кімнати
+        const onlineDefaultSettings: GameSettingsState = {
+            ...defaultGameSettings,
+            boardSize: 2,
+            turnDuration: 1000,
+            autoHideBoard: false,
+            blockModeEnabled: true,
+            settingsLocked: false,
+            // Важливо: speechFor налаштування залишаються індивідуальними для клієнта, 
+            // але тут ми задаємо початковий стан об'єкта settings в кімнаті
+        };
+
         const roomData: Omit<Room, 'id'> = {
             name: finalRoomName,
             hostId: hostId,
@@ -84,12 +96,12 @@ class RoomService {
             lastActivity: Date.now(),
             isPrivate: isPrivate,
             settingsLocked: false,
-            allowGuestSettings: false,
+            allowGuestSettings: true, // FIX: Дозволити гостям змінювати налаштування за замовчуванням
             gameState: null,
             players: {
                 [hostId]: initialPlayer
             },
-            settings: defaultGameSettings
+            settings: onlineDefaultSettings
         };
 
         try {
@@ -356,9 +368,6 @@ class RoomService {
         });
     }
 
-    /**
-     * Оновлює статус перегляду реплею для гравця.
-     */
     async setWatchingReplay(roomId: string, playerId: string, isWatching: boolean): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
         await updateDoc(roomRef, {
@@ -378,7 +387,7 @@ class RoomService {
 
         const updates: Record<string, any> = {
             [`players.${playerId}.isReady`]: true,
-            [`players.${playerId}.isWatchingReplay`]: false, // Скидаємо статус реплею
+            [`players.${playerId}.isWatchingReplay`]: false,
             lastActivity: Date.now()
         };
 
@@ -408,7 +417,7 @@ class RoomService {
 
         Object.keys(players).forEach(id => {
             players[id].isReady = false;
-            players[id].isWatchingReplay = false; // Скидаємо статус реплею при старті
+            players[id].isWatchingReplay = false;
         });
 
         await updateDoc(roomRef, {

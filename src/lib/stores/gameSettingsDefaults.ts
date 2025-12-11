@@ -71,7 +71,13 @@ export const defaultGameSettings: GameSettingsState = {
     speechRate: 1.4,
     speechOrder: 'dist_dir',
     shortSpeech: true,
-    speechFor: { player: false, computer: true },
+    speechFor: {
+        player: false,
+        computer: true,
+        // Defaults for Online Mode (FIXED)
+        onlineMyMove: false,
+        onlineOpponentMove: true
+    },
     speakModalTitles: true,
 
     // Режим гри

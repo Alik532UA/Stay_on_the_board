@@ -141,6 +141,7 @@ export function closeAllModals(): void {
 
 export const modalStore = {
     subscribe,
+    update, // <--- FIX: Експортуємо метод update
     closeModal,
     showModal,
     showModalAsReplacement,

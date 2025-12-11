@@ -16,23 +16,24 @@ export default {
   errorTitle: "Помилкова заява!",
   playAgain: "Грати ще раз",
   continueGame: "Продовжити",
+  waitingForPlayers: "Очікування інших гравців...", // Новий ключ
   finishGameWithBonus: "Завершити (+{bonus} балів)",
   keyConflictTitle: "Вибір дії для клавіші",
   keyConflictContent: "Клавіша '{key}' призначена для кількох дій. Будь ласка, виберіть, яку з них виконати зараз. Ваш вибір буде збережено для майбутніх натискань.",
   computerNoMovesContent: "Комп'ютер не може зробити хід.\nВи можете продовжити гру, очистивши всі заблоковані клітинки, або завершити її зараз і отримати бонусні бали.",
   playerNoMovesContent: "Ви можете очистити поле і продовжити гру, або завершити її зараз і отримати бонусні бали.",
-  errorContent: "У вас ще є доступні ходи ({count} шт.). Ви програли.",
+  errorContent: "У гравця ще є доступні ходи ({count} шт.). Гравець програв.", // Нейтрально
   noMovesLocalGameContent: "Гравець {playerName} правильно визначив, що відсутні доступні ходи. Можна очистити дошку і продовжити гру, або завершити її зараз.",
   endGame: "Завершити гру",
   reviewRecord: "Переглянути запис",
   gameOverReasonPlayerLied: "{playerName} зробив(ла) неправдиву заяву про відсутність ходів і програв(ла).",
   gameOverReasonNoMovesLeft: "Гра завершена, оскільки у гравця не залишилося ходів.",
-  gameOverReasonOut: "Ви вийшли за межі дошки.",
-  gameOverReasonBlocked: "Ви спробували стати на заблоковану клітинку.",
+  gameOverReasonOut: "Гравець вийшов за межі дошки.", // Нейтрально
+  gameOverReasonBlocked: "Гравець спробував стати на заблоковану клітинку.", // Нейтрально
   gameOverReasonPlayerOut: "{playerName} вийшов(-ла) за межі дошки.",
   gameOverReasonPlayerBlocked: "{playerName} спробував(-ла) стати на заблоковану клітинку.",
-  gameOverReasonCashOut: "Ви вирішили завершити гру і забрати свій рахунок.",
-  gameOverReasonBonus: "Ви вирішили завершити гру та забрати бонус.",
+  gameOverReasonCashOut: "Гру завершено за згодою гравців.", // Нейтрально
+  gameOverReasonBonus: "Гру завершено з отриманням бонусу.", // Нейтрально
   gameOverReasonTimeUp: "Час вийшов.",
   scoreDetails: {
     baseScore: "Базовий рахунок:",

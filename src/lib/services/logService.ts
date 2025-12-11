@@ -58,16 +58,13 @@ const defaultConfig: LogConfig = {
     [LOG_GROUPS.UI]: false,
     [LOG_GROUPS.TOOLTIP]: false,
     [LOG_GROUPS.ANIMATION]: false,
-    // УВІМКНЕНО для діагностики створення кімнати
-    [LOG_GROUPS.INIT]: true,
-    // УВІМКНЕНО для відстеження дій користувача
-    [LOG_GROUPS.ACTION]: true,
-    [LOG_GROUPS.GAME_MODE]: false,
-    [LOG_GROUPS.SPEECH]: false,
+    [LOG_GROUPS.INIT]: false, // Вимкнено для зменшення шуму
+    [LOG_GROUPS.ACTION]: false, // Вимкнено для зменшення шуму (кліки, хоткеї)
+    [LOG_GROUPS.GAME_MODE]: true, // УВІМКНЕНО для діагностики онлайну
+    [LOG_GROUPS.SPEECH]: true, // УВІМКНЕНО для діагностики озвучення
     [LOG_GROUPS.VOICE_CONTROL]: false,
     [LOG_GROUPS.TEST_MODE]: false,
     [LOG_GROUPS.MODAL]: false,
-    // УВІМКНЕНО для вилову помилок
     [LOG_GROUPS.ERROR]: true,
 };
 

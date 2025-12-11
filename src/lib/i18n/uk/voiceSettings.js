@@ -28,6 +28,8 @@ export default {
   speakFor: 'Озвучувати',
   player: 'Хід гравця',
   computer: 'Хід комп\'ютера',
+  myMove: 'Мій хід',
+  opponentMove: 'Хід суперника',
   testVoice: "Тест голосу",
   testPhrase: "Раді бачити тебе в грі",
   speakModalTitles: 'Озвучування модальних вікон'
