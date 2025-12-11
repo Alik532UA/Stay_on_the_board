@@ -2,17 +2,12 @@
 import { get } from 'svelte/store';
 import { tick } from 'svelte';
 import { modalStore } from '$lib/stores/modalStore';
-import { gameStore } from '$lib/stores/gameStore';
-import { modalService } from './modalService';
 import { gameModeService } from './gameModeService';
 import { logService } from './logService';
 import type { Direction } from '$lib/utils/gameUtils';
 import { navigationService } from './navigationService';
 import { gameSettingsStore, type GameModePreset } from '$lib/stores/gameSettingsStore.js';
 import { endGameService } from './endGameService';
-import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService';
-import { openVoiceSettingsModal } from '$lib/stores/uiStore';
-import { locale } from 'svelte-i18n';
 import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
@@ -20,9 +15,8 @@ import { uiStateStore } from '$lib/stores/uiStateStore';
 import { gameService } from './gameService';
 import ReplayViewer from '$lib/components/ReplayViewer.svelte';
 import { gameEventBus } from './gameEventBus';
-import { sideEffectService } from './sideEffectService';
-import { navigateToGame } from './uiService'; // Add this import
-import { gameModeStore } from '$lib/stores/gameModeStore';
+import { modalService } from './modalService';
+import { navigateToGame } from './uiService';
 
 export const userActionService = {
   selectDirection(direction: Direction): void {
@@ -43,8 +37,6 @@ export const userActionService = {
     }
 
     uiStateStore.update(s => s ? ({ ...s, selectedDirection: direction, selectedDistance: newDistance }) : null);
-
-    logService.logicMove('setDirection: встановлено напрямок', { dir: direction, newDistance });
   },
 
   selectDistance(distance: number): void {
@@ -88,7 +80,6 @@ export const userActionService = {
     const score = playerState.players.reduce((acc: number, p: { score: number }) => acc + p.score, 0);
     if (newSize === boardState.boardSize) return;
 
-    // Якщо гра ще не почалася (рахунок 0), змінюємо розмір дошки без підтвердження
     if (score === 0 && scoreState.penaltyPoints === 0) {
       const activeGameMode = gameModeService.getCurrentMode();
       if (activeGameMode) {
@@ -98,22 +89,14 @@ export const userActionService = {
       }
       gameSettingsStore.updateSettings({ boardSize: newSize });
     } else {
-      // Якщо гра вже триває, показуємо модальне вікно для підтвердження,
-      // оскільки зміна розміру дошки скине поточний прогрес.
       modalService.showBoardResizeModal(newSize);
     }
   },
 
-
-
   /**
-   * Перезапускає гру з поточними налаштуваннями.
-   * 
-   * ВАЖЛИВО: Завжди викликається з applyPresetSettings=false, тому що:
-   * - При зміні режиму: setGameModePreset вже застосував пресет через applyPreset()
-   * - При рестарті: Store містить кастомні налаштування (Block Mode тощо)
-   * 
-   * Для local-режиму: завжди перезапускає 'local' реалізацію.
+   * Перезапускає гру.
+   * ВИПРАВЛЕНО: Для онлайн-режиму ігнорує локальний перезапуск, 
+   * оскільки це обробляється через OnlineGameMode.handleRestartRequest.
    */
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
@@ -121,16 +104,18 @@ export const userActionService = {
     const currentMode = gameModeService.getCurrentMode();
     const currentModeName = currentMode?.getModeName();
 
+    if (currentModeName === 'online') {
+      logService.action('[userActionService] Online mode detected. Skipping local restart logic. Waiting for OnlineGameMode handler.');
+      return;
+    }
+
     if (currentModeName === 'local') {
-      // Local mode: зберігаємо налаштування (experienced/pro/observer)
       gameModeService.initializeGameMode('local', false);
     } else {
       const settings = get(gameSettingsStore);
       if (settings.gameMode) {
-        // Virtual-player та інші режими: ініціалізуємось за назвою з налаштувань
         gameModeService.initializeGameMode(settings.gameMode, false);
       } else {
-        // Fallback
         if (currentMode) {
           currentMode.restartGame();
         } else {
@@ -142,10 +127,6 @@ export const userActionService = {
     }
   },
 
-  /**
-   * Перезапускає гру з новим розміром дошки.
-   * Викликається після підтвердження у модальному вікні зміни розміру.
-   */
   async requestRestartWithSize(newSize: number): Promise<void> {
     modalStore.closeModal();
     const activeGameMode = gameModeService.getCurrentMode();
@@ -195,8 +176,6 @@ export const userActionService = {
       logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
       switch (action) {
         case 'restartGame':
-          await this.requestRestart();
-          break;
         case 'playAgain':
           await this.requestRestart();
           break;
@@ -238,9 +217,6 @@ export const userActionService = {
   },
 
   setGameModePreset(preset: GameModePreset): void {
-    // НАВІЩО (Архітектурне виправлення): Ця функція тепер відповідає ТІЛЬКИ за оновлення
-    // налаштувань (SSoT) через виклик атомарного методу в сторі. Ініціалізація гри (SoC)
-    // повністю делегована відповідній ігровій сторінці.
     gameSettingsStore.applyPreset(preset);
   },
 
@@ -248,5 +224,3 @@ export const userActionService = {
     navigateToGame();
   }
 };
-
-
