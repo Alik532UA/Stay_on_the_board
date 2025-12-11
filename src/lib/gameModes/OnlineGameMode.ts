@@ -22,12 +22,14 @@ import { gameEventBus } from '$lib/services/gameEventBus';
 import type { Room } from '$lib/types/online';
 import { modalService } from '$lib/services/modalService';
 import { navigationService } from '$lib/services/navigationService';
+import { base } from '$app/paths';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
   private unsubscribeSync: (() => void) | null = null;
   private unsubscribeSettings: (() => void) | null = null;
   private unsubscribeReplay: (() => void) | null = null;
+  private unsubscribeCloseModal: (() => void) | null = null; // Нова підписка
   private roomId: string | null = null;
   private myPlayerId: string | null = null;
   private amIHost: boolean = false;
@@ -41,7 +43,6 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   async initialize(options: { newSize?: number; roomId?: string } = {}): Promise<void> {
-    // Спроба відновити сесію, якщо параметри не передані (наприклад, при релоаді)
     const session = roomService.getSession();
     this.roomId = options.roomId || session.roomId;
     this.myPlayerId = session.playerId;
@@ -100,6 +101,23 @@ export class OnlineGameMode extends BaseGameMode {
         this.handleRestartRequest();
       });
 
+      // Підписка на відкриття реплею (через RequestReplay, який викликає модалку)
+      // ВАЖЛИВО: RequestReplay викликається ДО відкриття модалки.
+      // Але ми також можемо слухати ShowModal, щоб бути точнішими.
+      // Для простоти, використаємо RequestReplay як сигнал "хочу подивитись реплей".
+      gameEventBus.subscribe('RequestReplay', () => {
+        if (this.roomId && this.myPlayerId) {
+          roomService.setWatchingReplay(this.roomId, this.myPlayerId, true);
+        }
+      });
+
+      // Підписка на закриття модалки
+      this.unsubscribeCloseModal = gameEventBus.subscribe('CloseModal', () => {
+        if (this.roomId && this.myPlayerId) {
+          roomService.setWatchingReplay(this.roomId, this.myPlayerId, false);
+        }
+      });
+
       const remoteState = await this.stateSync.pullState();
 
       if (remoteState) {
@@ -147,6 +165,10 @@ export class OnlineGameMode extends BaseGameMode {
     if (this.unsubscribeReplay) {
       this.unsubscribeReplay();
       this.unsubscribeReplay = null;
+    }
+    if (this.unsubscribeCloseModal) {
+      this.unsubscribeCloseModal();
+      this.unsubscribeCloseModal = null;
     }
     if (this.stateSync) {
       this.stateSync.cleanup();
@@ -267,13 +289,10 @@ export class OnlineGameMode extends BaseGameMode {
 
     logService.GAME_MODE('[OnlineGameMode] Restart requested. Returning to lobby.');
 
-    // 1. Закриваємо всі модальні вікна
     modalService.closeAllModals();
 
-    // 2. Повідомляємо сервер про повернення в лобі (це змінить статус кімнати на 'finished')
     await roomService.returnToLobby(this.roomId, this.myPlayerId);
 
-    // 3. Переходимо на сторінку лобі
     navigationService.goTo(`/online/lobby/${this.roomId}`);
   }
 

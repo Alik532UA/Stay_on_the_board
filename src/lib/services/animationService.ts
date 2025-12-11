@@ -1,6 +1,6 @@
 // src/lib/services/animationService.ts
 import { get } from 'svelte/store';
-import { animationStore } from '$lib/stores/animationStore';
+import { animationStore, initialState } from '$lib/stores/animationStore';
 import { logService } from './logService';
 import { gameModeStore } from '$lib/stores/gameModeStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
@@ -10,16 +10,17 @@ import { gameEventBus } from './gameEventBus';
 
 function createAnimationService() {
   let unsubscribe: (() => void) | null = null;
+  let animationTimeout: NodeJS.Timeout | null = null; // FIX: Зберігаємо ID таймера
 
   function addToAnimationQueue(move: import('$lib/stores/animationStore').AnimationMove) {
     logService.animation('[AnimationService] addToAnimationQueue:', move);
     animationStore.update(state => {
       const newQueue = [...state.animationQueue, move];
 
-      // FIX: Завжди запускаємо анімацію, якщо вона не йде, навіть якщо це перший хід
       if (!state.isPlayingAnimation) {
         // Використовуємо setTimeout, щоб дати Svelte оновити стор перед запуском
-        setTimeout(() => playNextAnimation(true), 0);
+        if (animationTimeout) clearTimeout(animationTimeout);
+        animationTimeout = setTimeout(() => playNextAnimation(true), 0);
       }
       return { ...state, animationQueue: newQueue };
     });
@@ -75,7 +76,8 @@ function createAnimationService() {
       logService.animation(`[AnimationService] Playing move. Standard pause: ${pauseAfterMove}ms`);
     }
 
-    setTimeout(() => {
+    if (animationTimeout) clearTimeout(animationTimeout);
+    animationTimeout = setTimeout(() => {
       if (!isPlayerMove) {
         animationStore.update(s => ({ ...s, isComputerMoveCompleted: true }));
       }
@@ -97,10 +99,20 @@ function createAnimationService() {
         unsubscribe();
         unsubscribe = null;
       }
+      if (animationTimeout) {
+        clearTimeout(animationTimeout);
+        animationTimeout = null;
+      }
     },
     reset: () => {
-      logService.animation('[AnimationService] reset() called');
-      animationStore.reset();
+      logService.animation('[AnimationService] reset() called. Clearing state and timeouts.');
+      // FIX: Очищаємо активний таймер анімації
+      if (animationTimeout) {
+        clearTimeout(animationTimeout);
+        animationTimeout = null;
+      }
+      // Скидаємо стор до початкового стану
+      animationStore.set(initialState);
     }
   };
 }

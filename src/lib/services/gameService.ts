@@ -5,7 +5,7 @@ import { scoreStore, type ScoreState } from '$lib/stores/scoreStore';
 import { uiStateStore, type UiState } from '$lib/stores/uiStateStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { testModeStore } from '$lib/stores/testModeStore';
-import { gameOverStore } from '$lib/stores/gameOverStore'; // <-- IMPORTED
+import { gameOverStore } from '$lib/stores/gameOverStore';
 import { getInitialPosition } from '$lib/utils/initialPositionUtils';
 import { createEmptyBoard } from '$lib/utils/boardUtils';
 import type { Player, BonusHistoryItem } from '$lib/models/player';
@@ -22,6 +22,10 @@ export const gameService = {
     players?: Player[];
   } = {}) {
     logService.init('[GameService] initializeNewGame: Створення нового ігрового стану...', config);
+
+    // FIX: Спочатку скидаємо анімацію, щоб очистити черги і таймери.
+    // Це запобігає конфліктам між старими анімаціями і новим станом дошки.
+    animationService.reset();
 
     const settings = get(gameSettingsStore);
     const testModeState = get(testModeStore);
@@ -75,16 +79,13 @@ export const gameService = {
       distanceBonus: 0,
     };
 
-    // FIX: Зберігаємо контекст онлайн гри при скиданні стану
     const currentUiState = get(uiStateStore);
 
     const newUiState: UiState = {
-      ...initialUIState, // Беремо чистий дефолтний стан
-      // Але відновлюємо критичні поля для ідентифікації сесії
+      ...initialUIState,
       intendedGameType: currentUiState.intendedGameType,
       onlinePlayerIndex: currentUiState.onlinePlayerIndex,
       amIHost: currentUiState.amIHost,
-      // Також зберігаємо налаштування тест-режиму
       testModeOverrides: currentUiState.testModeOverrides
     };
 
@@ -94,8 +95,6 @@ export const gameService = {
     scoreStore.set(initialScoreState);
     uiStateStore.set(newUiState);
 
-    // FIX: Критично важливо скинути стан завершення гри.
-    // Інакше при синхронізації (OnlineGameMode) буде відправлено старий статус "Game Over".
     gameOverStore.resetGameOverState();
 
     gameSettingsStore.updateSettings({
@@ -105,6 +104,9 @@ export const gameService = {
     });
 
     availableMovesService.updateAvailableMoves();
-    animationService.reset();
+
+    // animationService.reset() вже викликано на початку, але для надійності
+    // можна викликати ще раз, якщо є підозра на асинхронні ефекти,
+    // але в даному випадку це зайве.
   }
 };

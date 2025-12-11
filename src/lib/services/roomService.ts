@@ -68,7 +68,8 @@ class RoomService {
             color: '#00bbf9',
             isReady: false,
             joinedAt: Date.now(),
-            isOnline: true
+            isOnline: true,
+            isWatchingReplay: false
         };
 
         const finalRoomName = customRoomName && customRoomName.trim() !== ""
@@ -189,7 +190,8 @@ class RoomService {
                 color: '#f4a261',
                 isReady: false,
                 joinedAt: Date.now(),
-                isOnline: true
+                isOnline: true,
+                isWatchingReplay: false
             };
 
             await withTimeout(
@@ -354,6 +356,17 @@ class RoomService {
         });
     }
 
+    /**
+     * Оновлює статус перегляду реплею для гравця.
+     */
+    async setWatchingReplay(roomId: string, playerId: string, isWatching: boolean): Promise<void> {
+        const roomRef = doc(this.db, 'rooms', roomId);
+        await updateDoc(roomRef, {
+            [`players.${playerId}.isWatchingReplay`]: isWatching,
+            lastActivity: Date.now()
+        });
+    }
+
     async returnToLobby(roomId: string, playerId: string): Promise<void> {
         logService.init(`[RoomService] Player ${playerId} returning to lobby in room ${roomId}`);
         const roomRef = doc(this.db, 'rooms', roomId);
@@ -365,6 +378,7 @@ class RoomService {
 
         const updates: Record<string, any> = {
             [`players.${playerId}.isReady`]: true,
+            [`players.${playerId}.isWatchingReplay`]: false, // Скидаємо статус реплею
             lastActivity: Date.now()
         };
 
@@ -386,22 +400,21 @@ class RoomService {
     async startGame(roomId: string): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
 
-        // Отримуємо поточний стан, щоб оновити всіх гравців
         const roomSnap = await getDoc(roomRef);
         if (!roomSnap.exists()) return;
 
         const roomData = roomSnap.data() as Room;
         const players = { ...roomData.players };
 
-        // FIX: Скидаємо isReady для всіх гравців на початку гри
         Object.keys(players).forEach(id => {
             players[id].isReady = false;
+            players[id].isWatchingReplay = false; // Скидаємо статус реплею при старті
         });
 
         await updateDoc(roomRef, {
             status: 'playing',
             gameState: null,
-            players: players, // Оновлюємо гравців зі скинутим статусом
+            players: players,
             lastActivity: Date.now()
         });
     }

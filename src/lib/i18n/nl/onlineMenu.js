@@ -24,6 +24,7 @@ export default {
     waitingForPlayers: "Wachten op spelers...",
     ready: "Klaar",
     notReady: "Niet klaar",
+    watchingReplay: "Kijkt herhaling",
     startGame: "Spel Starten",
     leave: "Verlaten",
     host: "Host",

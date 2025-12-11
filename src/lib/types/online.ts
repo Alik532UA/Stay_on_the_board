@@ -8,6 +8,7 @@ export interface OnlinePlayer {
     isReady: boolean;
     joinedAt: number;
     isOnline: boolean;
+    isWatchingReplay?: boolean; // Нове поле
 }
 
 export interface Room {
@@ -18,16 +19,11 @@ export interface Room {
     createdAt: number;
     lastActivity: number;
     isPrivate: boolean;
-    settingsLocked: boolean; // Блокування під час гри
-    allowGuestSettings: boolean; // Дозвіл гостям змінювати налаштування в лобі
+    settingsLocked: boolean;
+    allowGuestSettings: boolean;
 
-    // Стан гри (може бути null, якщо гра ще не почалася)
     gameState: SyncableGameState | null;
-
-    // Мапа гравців: playerId -> OnlinePlayer
     players: Record<string, OnlinePlayer>;
-
-    // Налаштування гри
     settings: GameSettingsState;
 }
 
