@@ -7,6 +7,7 @@
     export let players: OnlinePlayer[];
     export let myPlayerId: string;
     export let hostId: string;
+    export let roomStatus: "waiting" | "playing" | "finished";
     export let onUpdatePlayer: (data: Partial<OnlinePlayer>) => void;
     export let onToggleReady: () => void;
     export let onStartGame: () => void;
@@ -14,12 +15,24 @@
 
     $: allReady = players.length >= 2 && players.every((p) => p.isReady);
     $: myPlayer = players.find((p) => p.id === myPlayerId);
+
+    function getPlayerStatus(player: OnlinePlayer) {
+        if (player.isReady) {
+            return { text: "onlineMenu.lobby.ready", class: "ready" };
+        }
+        // Якщо гравець не готовий, але кімната в грі або завершена - він "У грі"
+        if (roomStatus === "playing" || roomStatus === "finished") {
+            return { text: "onlineMenu.playing", class: "playing" };
+        }
+        return { text: "onlineMenu.lobby.notReady", class: "" };
+    }
 </script>
 
 <div class="players-section">
     <h3>{$_("onlineMenu.players")} ({players.length}/8)</h3>
     <div class="players-list" data-testid="players-list">
         {#each players as player (player.id)}
+            {@const status = getPlayerStatus(player)}
             <div
                 class="player-card"
                 class:is-me={player.id === myPlayerId}
@@ -66,13 +79,10 @@
                         {/if}
                     </div>
                     <div
-                        class="player-status"
-                        class:ready={player.isReady}
+                        class="player-status {status.class}"
                         data-testid={`player-status-${player.id}`}
                     >
-                        {player.isReady
-                            ? $_("onlineMenu.lobby.ready")
-                            : $_("onlineMenu.lobby.notReady")}
+                        {$_(status.text)}
                     </div>
                 </div>
             </div>
@@ -192,6 +202,10 @@
     .player-status.ready {
         color: var(--positive-score-color);
         font-weight: bold;
+    }
+    .player-status.playing {
+        color: var(--text-accent);
+        font-style: italic;
     }
     .lobby-actions {
         display: flex;
