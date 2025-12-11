@@ -42,7 +42,8 @@
     }
 
     function handleCentral() {
-        if (disabled) return;
+        // Центральна кнопка керується власною логікою clickable
+        if (!centerInfoProps.clickable) return;
         dispatch("central");
     }
 </script>
@@ -60,14 +61,16 @@
                 {getArrow(dir)}
             </button>
         {:else}
+            <!-- FIX: disabled={false} гарантує, що кнопка ніколи не виглядає заблокованою (сірою/прозорою),
+           навіть якщо зараз хід суперника. Логіка кліку контролюється в handleCentral. -->
             <button
                 id="center-info"
                 class="control-btn center-info {centerInfoProps.class}"
                 type="button"
                 aria-label={centerInfoProps.aria}
-                on:click={centerInfoProps.clickable ? handleCentral : undefined}
+                on:click={handleCentral}
                 tabindex="0"
-                disabled={!centerInfoProps.clickable || disabled}
+                disabled={false}
                 style={centerInfoProps.backgroundColor
                     ? `background-color: ${centerInfoProps.backgroundColor} !important`
                     : ""}
