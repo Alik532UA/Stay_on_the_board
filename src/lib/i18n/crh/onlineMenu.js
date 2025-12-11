@@ -24,6 +24,7 @@ export default {
     waitingForPlayers: "Oyunçılar beklenile...",
     ready: "Azır",
     notReady: "Azır degil",
+    watchingReplay: "Tekrarnı baqa",
     startGame: "Oyunnı Başlamaq",
     leave: "Çıqmaq",
     host: "Saip",

@@ -172,6 +172,14 @@ export const visualPosition = derived(
       return { row: null, col: null };
     }
 
+    // FIX: New Game Guard (SSoT Enforcement)
+    // Якщо це початок нової гри (історія ходів <= 1), ми ІГНОРУЄМО будь-які анімації.
+    // Це запобігає "стрибкам" фігури зі старої позиції або зависанню в проміжному стані
+    // при рестарті гри. Логічна позиція стає візуальною миттєво.
+    if ($boardStore.moveHistory.length <= 1) {
+      return { row: $boardStore.playerRow, col: $boardStore.playerCol };
+    }
+
     // 1. Анімація активно відтворюється (фігура рухається)
     // Ми беремо цільову точку поточного кадру анімації.
     if ($animationStore.visualMoveQueue && $animationStore.visualMoveQueue.length > 0) {
@@ -207,6 +215,12 @@ export const visualCellVisitCounts = derived(
   [visualPosition, boardStore, animationStore],
   ([$visualPosition, $boardStore, $animationStore]) => {
     if (!$boardStore) return {};
+
+    // FIX: Аналогічний гард для підсвічування клітинок
+    if ($boardStore.moveHistory.length <= 1) {
+      return $boardStore.cellVisitCounts;
+    }
+
     if (!$animationStore.isAnimating) {
       return $boardStore.cellVisitCounts;
     }

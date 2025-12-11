@@ -24,6 +24,7 @@ export default {
     waitingForPlayers: "Очікування гравців...",
     ready: "Готовий",
     notReady: "Не готовий",
+    watchingReplay: "Дивиться запис",
     startGame: "Почати гру",
     leave: "Вийти",
     host: "Хост",

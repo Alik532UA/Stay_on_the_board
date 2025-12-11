@@ -24,6 +24,7 @@ export default {
     waitingForPlayers: "Waiting for players...",
     ready: "Ready",
     notReady: "Not Ready",
+    watchingReplay: "Watching Replay",
     startGame: "Start Game",
     leave: "Leave",
     host: "Host",

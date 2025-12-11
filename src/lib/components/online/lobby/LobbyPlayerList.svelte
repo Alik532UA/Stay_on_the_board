@@ -20,6 +20,12 @@
         if (player.isReady) {
             return { text: "onlineMenu.lobby.ready", class: "ready" };
         }
+        if (player.isWatchingReplay) {
+            return {
+                text: "onlineMenu.lobby.watchingReplay",
+                class: "watching",
+            };
+        }
         // Якщо гравець не готовий, але кімната в грі або завершена - він "У грі"
         if (roomStatus === "playing" || roomStatus === "finished") {
             return { text: "onlineMenu.playing", class: "playing" };
@@ -205,6 +211,10 @@
     }
     .player-status.playing {
         color: var(--text-accent);
+        font-style: italic;
+    }
+    .player-status.watching {
+        color: #03a9f4; /* Light Blue */
         font-style: italic;
     }
     .lobby-actions {
