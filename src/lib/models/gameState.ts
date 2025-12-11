@@ -2,7 +2,6 @@
 /**
  * @file Типи для ігрового стану.
  * @description Централізоване визначення типів для роботи з ігровим станом.
- * Замінює використання `any` в gameLogicService та інших місцях.
  */
 
 import type { BoardState } from '$lib/stores/boardStore';
@@ -70,6 +69,7 @@ export interface SideEffect {
         lang?: string;
         voiceURI?: string | null;
         onEndCallback?: () => void;
+        force?: boolean; // <--- НОВЕ ПОЛЕ: Примусове озвучення (ігнорує внутрішні перевірки speechService)
     };
 }
 

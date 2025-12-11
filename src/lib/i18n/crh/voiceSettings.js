@@ -28,6 +28,8 @@ export default {
   speakFor: 'İçün laf et',
   player: 'Oyuncı alımı',
   computer: 'Kompyuter alımı',
+  myMove: 'Menim areketim',
+  opponentMove: 'Raqip areketi',
   testVoice: "Ses testi",
   testPhrase: "Oyunda sizni körgenge şadmız",
   speakModalTitles: 'Модаль пенджерелерини сеслендирюв'

@@ -28,6 +28,8 @@ export default {
   speakFor: 'Spreek voor',
   player: 'Spelerszet',
   computer: 'Computerzet',
+  myMove: 'Mijn zet',
+  opponentMove: 'Tegenstander zet',
   testVoice: "Test Stem",
   testPhrase: "Blij je te zien in het spel",
   speakModalTitles: 'Spreek modale vensters uit'

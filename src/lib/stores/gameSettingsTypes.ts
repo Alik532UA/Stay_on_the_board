@@ -99,7 +99,13 @@ export interface GameSettingsState {
     speechRate: number;
     speechOrder: 'dir_dist' | 'dist_dir';
     shortSpeech: boolean;
-    speechFor: { player: boolean; computer: boolean };
+    speechFor: { 
+        player: boolean; 
+        computer: boolean;
+        // Нові налаштування для онлайн режиму
+        onlineMyMove: boolean;
+        onlineOpponentMove: boolean;
+    };
     speakModalTitles: boolean;
 
     // Режим гри

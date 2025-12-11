@@ -5,7 +5,7 @@
  * @description Цей модуль також підтримує систему нагород через спеціалізовані події.
  */
 
-import type { GameOverPayload } from '$lib/stores/gameOverStore';
+import type { GameOverPayload, PlayerScoreResult } from '$lib/stores/gameOverStore';
 import type { ModalState } from '$lib/stores/modalStore';
 import type { MoveDirectionType } from '$lib/models/Piece';
 
@@ -41,6 +41,8 @@ export interface ShowNoMovesModalPayload {
   playerType: 'human' | 'computer';
   scoreDetails: any; // Можна уточнити тип, якщо він експортується
   boardSize: number;
+  // FIX: Додаємо опціональний масив рахунків гравців для мультиплеєра
+  playerScores?: Array<PlayerScoreResult & { playerName: string; playerColor: string; isWinner?: boolean; isLoser?: boolean }>;
 }
 
 /**

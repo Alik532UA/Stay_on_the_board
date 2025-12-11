@@ -1,9 +1,13 @@
 <script>
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
+  import { uiStateStore } from "$lib/stores/uiStateStore.js";
   import { _ } from "svelte-i18n";
   import ToggleButton from "./ToggleButton.svelte";
   import { speakTestPhrase } from "$lib/services/speechService";
   import { logService } from "$lib/services/logService.js";
+
+  // Визначаємо, чи ми в онлайн режимі
+  $: isOnlineMode = $uiStateStore.intendedGameType === 'online';
 </script>
 
 <div class="settings-section">
@@ -127,33 +131,65 @@
 <div class="settings-section">
   <span class="settings-label">{$_("voiceSettings.speakFor")}</span>
   <div class="button-group">
-    <button
-      class:active={$gameSettingsStore.speechFor.player}
-      onclick={() => {
-        logService.ui("Speak for player toggled");
-        gameSettingsStore.updateSettings({
-          speechFor: {
-            ...$gameSettingsStore.speechFor,
-            player: !$gameSettingsStore.speechFor.player,
-          },
-        });
-      }}
-      data-testid="speech-for-player-btn">{$_("voiceSettings.player")}</button
-    >
-    <button
-      class:active={$gameSettingsStore.speechFor.computer}
-      onclick={() => {
-        logService.ui("Speak for computer toggled");
-        gameSettingsStore.updateSettings({
-          speechFor: {
-            ...$gameSettingsStore.speechFor,
-            computer: !$gameSettingsStore.speechFor.computer,
-          },
-        });
-      }}
-      data-testid="speech-for-computer-btn"
-      >{$_("voiceSettings.computer")}</button
-    >
+    {#if isOnlineMode}
+        <!-- Кнопки для Онлайн режиму -->
+        <button
+        class:active={$gameSettingsStore.speechFor.onlineMyMove}
+        onclick={() => {
+            logService.ui("Speak for MY move toggled");
+            gameSettingsStore.updateSettings({
+            speechFor: {
+                ...$gameSettingsStore.speechFor,
+                onlineMyMove: !$gameSettingsStore.speechFor.onlineMyMove,
+            },
+            });
+        }}
+        data-testid="speech-for-my-move-btn">{$_("voiceSettings.myMove")}</button
+        >
+        <button
+        class:active={$gameSettingsStore.speechFor.onlineOpponentMove}
+        onclick={() => {
+            logService.ui("Speak for OPPONENT move toggled");
+            gameSettingsStore.updateSettings({
+            speechFor: {
+                ...$gameSettingsStore.speechFor,
+                onlineOpponentMove: !$gameSettingsStore.speechFor.onlineOpponentMove,
+            },
+            });
+        }}
+        data-testid="speech-for-opponent-move-btn"
+        >{$_("voiceSettings.opponentMove")}</button
+        >
+    {:else}
+        <!-- Кнопки для Локального/Тренувального режиму -->
+        <button
+        class:active={$gameSettingsStore.speechFor.player}
+        onclick={() => {
+            logService.ui("Speak for player toggled");
+            gameSettingsStore.updateSettings({
+            speechFor: {
+                ...$gameSettingsStore.speechFor,
+                player: !$gameSettingsStore.speechFor.player,
+            },
+            });
+        }}
+        data-testid="speech-for-player-btn">{$_("voiceSettings.player")}</button
+        >
+        <button
+        class:active={$gameSettingsStore.speechFor.computer}
+        onclick={() => {
+            logService.ui("Speak for computer toggled");
+            gameSettingsStore.updateSettings({
+            speechFor: {
+                ...$gameSettingsStore.speechFor,
+                computer: !$gameSettingsStore.speechFor.computer,
+            },
+            });
+        }}
+        data-testid="speech-for-computer-btn"
+        >{$_("voiceSettings.computer")}</button
+        >
+    {/if}
   </div>
 </div>
 
