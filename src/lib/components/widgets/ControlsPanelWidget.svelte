@@ -5,13 +5,13 @@
   import SvgIcons from '../SvgIcons.svelte';
   import { get } from 'svelte/store';
   import { isPlayerTurn, isConfirmButtonDisabled, lastComputerMove, lastPlayerMove, isPauseBetweenMoves, distanceRows, previousPlayerColor } from '$lib/stores/derivedState.ts';
-  import { modalStore } from '$lib/stores/modalStore.js';
+  import { modalStore } from '$lib/stores/modalStore';
   import DirectionControls from './DirectionControls.svelte';
   import { getCenterInfoState } from '$lib/utils/centerInfoUtil';
   import { logService } from '$lib/services/logService.js';
   import { uiStateStore } from '$lib/stores/uiStateStore';
   import { voiceControlStore } from '$lib/stores/voiceControlStore';
-  import { debugLogStore } from '$lib/stores/debugLogStore.js';
+  import { debugLogStore } from '$lib/stores/debugLogStore';
 
   let showDebug = false;
   let clickCount = 0;
@@ -236,3 +236,5 @@ ${generalLogs}`;
   {/if}
 </div>
 {/if}
+
+

@@ -1,47 +1,115 @@
 <script lang="ts">
-  import { gameModeStore } from '$lib/stores/gameModeStore.js';
-  import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
-  import { userActionService } from '$lib/services/userActionService.js';
-  import { _ } from 'svelte-i18n';
-  import { tick } from 'svelte';
-  import { uiStateStore } from '$lib/stores/uiStateStore.js';
+  import { gameModeStore } from "$lib/stores/gameModeStore.js";
+  import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
+  import { userActionService } from "$lib/services/userActionService.js";
+  import { _ } from "svelte-i18n";
+  import { tick } from "svelte";
+  import { uiStateStore } from "$lib/stores/uiStateStore.js";
 
   $: activeMode = $gameModeStore.activeMode;
-  $: isCompetitiveMode = activeMode === 'timed' || activeMode === 'local' || activeMode === 'online';
+  $: isCompetitiveMode =
+    activeMode === "timed" || activeMode === "local" || activeMode === "online";
 
-  async function handlePresetClick(preset: 'beginner' | 'experienced' | 'pro' | 'timed') {
-    userActionService.setGameModePreset(preset);
-    if (preset === 'timed') {
-        uiStateStore.update(s => ({ ...s, settingsMode: 'competitive' }));
+  // Helper: перевіряє, чи відповідає поточний gameMode legacy пресету
+  // Враховує нові structured presets (virtual-player-*, local-*, online-*)
+  function isPresetActive(legacyPreset: string): boolean {
+    const currentMode = $gameSettingsStore.gameMode;
+    if (!currentMode) return false;
+
+    // Пряме порівняння (legacy presets)
+    if (currentMode === legacyPreset) return true;
+
+    // Порівняння з новими structured presets
+    // observer → local-observer
+    // beginner → virtual-player-beginner
+    // experienced → virtual-player-experienced або local-experienced
+    // pro → virtual-player-pro або local-pro
+    // timed → virtual-player-timed
+    if (legacyPreset === "observer" && currentMode === "local-observer")
+      return true;
+    if (
+      legacyPreset === "beginner" &&
+      currentMode === "virtual-player-beginner"
+    )
+      return true;
+    if (
+      legacyPreset === "experienced" &&
+      (currentMode === "virtual-player-experienced" ||
+        currentMode === "local-experienced")
+    )
+      return true;
+    if (
+      legacyPreset === "pro" &&
+      (currentMode === "virtual-player-pro" || currentMode === "local-pro")
+    )
+      return true;
+    if (legacyPreset === "timed" && currentMode === "virtual-player-timed")
+      return true;
+
+    return false;
+  }
+
+  // Реактивна змінна для ключа опису
+  let descriptionKey: string | null = null;
+
+  // Реактивний блок - обчислює ключ опису при зміні gameMode
+  // Svelte відслідковує $gameSettingsStore.gameMode безпосередньо
+  $: {
+    const currentMode = $gameSettingsStore.gameMode;
+    if (!currentMode) {
+      descriptionKey = null;
+    } else if (
+      currentMode.startsWith("virtual-player-") ||
+      currentMode.startsWith("local-") ||
+      currentMode.startsWith("online-")
+    ) {
+      descriptionKey = `gameModes.description.${currentMode}`;
     } else {
-        uiStateStore.update(s => ({ ...s, settingsMode: 'default' }));
+      descriptionKey = `gameModes.description.${currentMode}`;
+    }
+  }
+
+  async function handlePresetClick(
+    preset: "beginner" | "experienced" | "pro" | "timed" | "observer",
+  ) {
+    userActionService.setGameModePreset(preset);
+    if (preset === "timed") {
+      uiStateStore.update((s) => ({ ...s, settingsMode: "competitive" }));
+    } else {
+      uiStateStore.update((s) => ({ ...s, settingsMode: "default" }));
     }
     await userActionService.requestRestart();
   }
 
   function fitTextAction(node: HTMLElement, dependency: any) {
-    const buttons = Array.from(node.querySelectorAll('.settings-expander__row-btn')) as HTMLElement[];
+    const buttons = Array.from(
+      node.querySelectorAll(".settings-expander__row-btn"),
+    ) as HTMLElement[];
 
     const fit = () => {
       if (buttons.length === 0) return;
 
-      buttons.forEach(btn => btn.style.fontSize = '');
+      buttons.forEach((btn) => (btn.style.fontSize = ""));
 
       tick().then(() => {
-        const initialFontSize = parseFloat(getComputedStyle(buttons[0]).fontSize);
+        const initialFontSize = parseFloat(
+          getComputedStyle(buttons[0]).fontSize,
+        );
         let currentFontSize = initialFontSize;
 
         const fontSizeStep = 0.5;
         while (node.scrollWidth > node.clientWidth && currentFontSize > 12) {
           currentFontSize -= fontSizeStep;
-          buttons.forEach(btn => btn.style.fontSize = `${currentFontSize}px`);
+          buttons.forEach(
+            (btn) => (btn.style.fontSize = `${currentFontSize}px`),
+          );
         }
       });
     };
 
     const observer = new ResizeObserver(fit);
     observer.observe(node);
-    
+
     tick().then(fit);
 
     return {
@@ -50,28 +118,75 @@
       },
       destroy() {
         observer.disconnect();
-      }
+      },
     };
   }
 </script>
 
 <div class="game-mode-widget">
-  <h3 class="widget-title">{$_('gameModes.title')}</h3>
-  <div class="settings-expander__game-mode-row" use:fitTextAction={$_('gameModes.beginner')}>
-    <button data-testid="settings-expander-game-mode-beginner-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'beginner'} on:click={() => handlePresetClick('beginner')}>{$_('gameModes.beginner')}</button>
-    <button data-testid="settings-expander-game-mode-experienced-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'experienced'} on:click={() => handlePresetClick('experienced')}>{$_('gameModes.experienced')}</button>
-    <button data-testid="settings-expander-game-mode-pro-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'pro'} on:click={() => handlePresetClick('pro')}>{$_('gameModes.pro')}</button>
-    <button data-testid="settings-expander-game-mode-timed-btn" class="settings-expander__row-btn" class:active={$gameSettingsStore.gameMode === 'timed'} on:click={() => handlePresetClick('timed')}>{$_('gameModes.timed')}</button>
+  <h3 class="widget-title">{$_("gameModes.title")}</h3>
+  <div
+    class="settings-expander__game-mode-row"
+    use:fitTextAction={$_("gameModes.beginner")}
+  >
+    {#if activeMode === "local"}
+      <button
+        data-testid="settings-game-mode-local-observer"
+        class="settings-expander__row-btn"
+        class:active={isPresetActive("observer")}
+        on:click={() => handlePresetClick("observer")}
+        >{$_("gameModes.observer")}</button
+      >
+      <button
+        data-testid="settings-game-mode-local-experienced"
+        class="settings-expander__row-btn"
+        class:active={isPresetActive("experienced")}
+        on:click={() => handlePresetClick("experienced")}
+        >{$_("gameModes.experienced")}</button
+      >
+      <button
+        data-testid="settings-game-mode-local-pro"
+        class="settings-expander__row-btn"
+        class:active={isPresetActive("pro")}
+        on:click={() => handlePresetClick("pro")}>{$_("gameModes.pro")}</button
+      >
+    {:else}
+      <button
+        data-testid="settings-game-mode-virtual-player-beginner"
+        class="settings-expander__row-btn"
+        class:active={isPresetActive("beginner")}
+        on:click={() => handlePresetClick("beginner")}
+        >{$_("gameModes.beginner")}</button
+      >
+      <button
+        data-testid="settings-game-mode-virtual-player-experienced"
+        class="settings-expander__row-btn"
+        class:active={isPresetActive("experienced")}
+        on:click={() => handlePresetClick("experienced")}
+        >{$_("gameModes.experienced")}</button
+      >
+      <button
+        data-testid="settings-game-mode-virtual-player-pro"
+        class="settings-expander__row-btn"
+        class:active={isPresetActive("pro")}
+        on:click={() => handlePresetClick("pro")}>{$_("gameModes.pro")}</button
+      >
+      <button
+        data-testid="settings-game-mode-virtual-player-timed"
+        class="settings-expander__row-btn"
+        class:active={isPresetActive("timed")}
+        on:click={() => handlePresetClick("timed")}
+        >{$_("gameModes.timed")}</button
+      >
+    {/if}
   </div>
-  <div class="description" data-testid="game-mode-description" class:settings-expander-closed={!$uiStateStore.isSettingsExpanderOpen}>
-    {#if $gameSettingsStore.gameMode === 'beginner'}
-      {$_('gameModes.description.beginner')}
-    {:else if $gameSettingsStore.gameMode === 'experienced'}
-      {$_('gameModes.description.experienced')}
-    {:else if $gameSettingsStore.gameMode === 'pro'}
-      {$_('gameModes.description.pro')}
-    {:else if $gameSettingsStore.gameMode === 'timed'}
-      {$_('gameModes.description.timed')}
+  <div
+    class="description"
+    data-testid="game-mode-description"
+    class:settings-expander-closed={!$uiStateStore.isSettingsExpanderOpen}
+  >
+    {#if descriptionKey}
+      {$_(descriptionKey)}
     {/if}
   </div>
 </div>
@@ -82,7 +197,9 @@
     border-radius: var(--unified-border-radius);
     border: var(--unified-border);
     box-shadow: var(--dynamic-widget-shadow) var(--current-player-shadow-color);
-    transition: background 0.25s, box-shadow 0.25s;
+    transition:
+      background 0.25s,
+      box-shadow 0.25s;
     backdrop-filter: var(--unified-backdrop-filter);
     padding: 16px;
   }
@@ -113,13 +230,17 @@
     font-size: 14.4px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.18s, color 0.18s, border 0.18s;
+    transition:
+      background 0.18s,
+      color 0.18s,
+      border 0.18s;
     display: flex;
     align-items: center;
     justify-content: center;
     white-space: nowrap;
   }
-  .settings-expander__row-btn:hover, .settings-expander__row-btn:focus {
+  .settings-expander__row-btn:hover,
+  .settings-expander__row-btn:focus {
     border-color: var(--control-selected);
     color: var(--text-primary);
     outline: none;
@@ -135,7 +256,7 @@
     margin-top: 12px;
     padding: 8px;
     border-radius: 8px;
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
     min-height: 50px;
     text-align: center;
     font-size: 0.9em;

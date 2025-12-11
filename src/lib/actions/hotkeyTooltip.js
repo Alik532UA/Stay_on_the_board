@@ -1,4 +1,4 @@
-import { tooltipStore } from '$lib/stores/tooltipStore.js';
+import { tooltipStore } from '$lib/stores/tooltipStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
 import { get } from 'svelte/store';
 import { logService } from '$lib/services/logService.js';
@@ -136,3 +136,4 @@ export function hotkeyTooltip(node, param) {
     }
   };
 }
+

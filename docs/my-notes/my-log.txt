@@ -1,0 +1,34 @@
+[vite] connecting...
+client:827 [vite] connected.
+logService.js:192 Log service developer tools initialized. Use window.setLogLevels({ groupName: boolean }) to configure.
+logService.js:141 [INIT] [hotkeyService] Setting up global keydown listener.
+init.js:31 ✅ i18n initialized successfully
+logService.js:141 [INIT] Initializing Test Mode Sync Service...
+logService.js:141 [GAME_MODE] [GameSettingsStore] Applying preset: "beginner"
+logService.js:141 [INIT] [VirtualPlayerPage] onMount: No active game. Initializing mode from settings: "observer"
+logService.js:141 [GAME_MODE] Unknown game mode or preset: observer
+error-handling.js:36 
+ Uncaught TypeError: Cannot read properties of null (reading 'moveHistory')
+    at +layout.svelte:43:39
+    at run (utils.js:39:9)
+    at Array.map (<anonymous>)
+    at lifecycle.js:51:41
+    at untrack (runtime.js:732:10)
+    at $effect (lifecycle.js:51:15)
+    at update_reaction (runtime.js:292:16)
+    at update_effect (runtime.js:472:18)
+    at flush_queued_effects (batch.js:607:4)
+    at _Batch.process (batch.js:233:4)
+(anonymous)	@	+layout.svelte:43
+run	@	utils.js:39
+(anonymous)	@	lifecycle.js:51
+untrack	@	runtime.js:732
+$effect	@	lifecycle.js:51
+update_reaction	@	runtime.js:292
+update_effect	@	runtime.js:472
+flush_queued_effects	@	batch.js:607
+process	@	batch.js:233
+flush_effects	@	batch.js:562
+flush	@	batch.js:381
+(anonymous)	@	batch.js:460
+dequeue	@	batch.js:69

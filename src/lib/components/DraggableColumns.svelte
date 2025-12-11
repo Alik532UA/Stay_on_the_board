@@ -1,18 +1,22 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount, tick } from 'svelte';
-  import { fade } from 'svelte/transition';
-  import { slide } from 'svelte/transition';
-  import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
-  import { _ } from 'svelte-i18n';
-  import { layoutUpdateStore } from '$lib/stores/layoutUpdateStore.js';
+  import { createEventDispatcher, onMount, tick } from "svelte";
+  import { fade } from "svelte/transition";
+  import { slide } from "svelte/transition";
+  import { columnStyleMode } from "$lib/stores/columnStyleStore";
+  import { _ } from "svelte-i18n";
+  import { layoutUpdateStore } from "$lib/stores/layoutUpdateStore";
 
-  export let columns: { id: string, label: string, items: { id: string, label: string, props?: any }[] }[];
-  export let itemContent: (item: any) => any = item => item.label;
-  export let class_name = '';
+  export let columns: {
+    id: string;
+    label: string;
+    items: { id: string; label: string; props?: any }[];
+  }[];
+  export let itemContent: (item: any) => any = (item) => item.label;
+  export let class_name = "";
 
   const dispatch = createEventDispatcher();
 
-  let dragging: { id: string, label: string } | null = null;
+  let dragging: { id: string; label: string } | null = null;
   let dragSourceCol: string | null = null;
   let dragX = 0;
   let dragY = 0;
@@ -22,7 +26,7 @@
   let colRefs: HTMLUListElement[] = [];
   let isHorizontalLayout = true;
   let containerRef: HTMLDivElement;
-  let marginTop = '0';
+  let marginTop = "0";
 
   function updateLayoutMode() {
     isHorizontalLayout = window.innerWidth > 1270;
@@ -33,30 +37,34 @@
         if (contentHeight < windowHeight) {
           marginTop = `${(windowHeight - contentHeight) / 2}px`;
         } else {
-          marginTop = '2vh';
+          marginTop = "2vh";
         }
       } else {
-        marginTop = '0';
+        marginTop = "0";
       }
     });
   }
 
   onMount(() => {
-    window.addEventListener('resize', updateLayoutMode);
-    return () => window.removeEventListener('resize', updateLayoutMode);
+    window.addEventListener("resize", updateLayoutMode);
+    return () => window.removeEventListener("resize", updateLayoutMode);
   });
 
   $: $layoutUpdateStore, updateLayoutMode();
 
-  function handlePointerDown(e: PointerEvent, item: { id: string, label: string }, colId: string) {
+  function handlePointerDown(
+    e: PointerEvent,
+    item: { id: string; label: string },
+    colId: string,
+  ) {
     dragging = item;
     dragSourceCol = colId;
     isDragging = true;
     dragX = e.clientX;
     dragY = e.clientY;
-    document.body.style.userSelect = 'none';
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
+    document.body.style.userSelect = "none";
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
   }
 
   function handlePointerMove(e: PointerEvent) {
@@ -69,12 +77,14 @@
         if (!ul) continue;
         const ulRect = ul.getBoundingClientRect();
         if (
-          e.clientX >= ulRect.left && e.clientX <= ulRect.right &&
-          e.clientY >= ulRect.top && e.clientY <= ulRect.bottom
+          e.clientX >= ulRect.left &&
+          e.clientX <= ulRect.right &&
+          e.clientY >= ulRect.top &&
+          e.clientY <= ulRect.bottom
         ) {
           dropTargetCol = col.id;
           let found = false;
-          const liArr = Array.from(ul.querySelectorAll('li'));
+          const liArr = Array.from(ul.querySelectorAll("li"));
           for (let j = 0; j < liArr.length; j++) {
             const rect = liArr[j].getBoundingClientRect();
             if (e.clientY < rect.top + rect.height / 2) {
@@ -91,18 +101,82 @@
 
   function handlePointerUp(e: PointerEvent) {
     if (isDragging && dragging && dropTargetCol !== null) {
-      dispatch('drop', { dragging, dragSourceCol, dropTargetCol, dropIndex });
+      dispatch("drop", { dragging, dragSourceCol, dropTargetCol, dropIndex });
     }
     isDragging = false;
     dragging = null;
     dragSourceCol = null;
     dropTargetCol = null;
     dropIndex = null;
-    document.body.style.userSelect = '';
-    window.removeEventListener('pointermove', handlePointerMove);
-    window.removeEventListener('pointerup', handlePointerUp);
+    document.body.style.userSelect = "";
+    window.removeEventListener("pointermove", handlePointerMove);
+    window.removeEventListener("pointerup", handlePointerUp);
   }
 </script>
+
+<div
+  bind:this={containerRef}
+  class="dnd-columns-container {class_name}"
+  style="margin-top: {marginTop};"
+  data-testid="game-widgets-container"
+>
+  {#each columns as col, i}
+    <ul
+      bind:this={colRefs[i]}
+      class="dnd-column"
+      data-testid="dnd-column-{col.id}"
+      class:editing-column={$columnStyleMode === "flexible"}
+      style={$columnStyleMode === "flexible"
+        ? "padding: 0; background: none; border-radius: 8px; list-style: none; min-height: 80px;"
+        : "padding: 16px; background: #222; border-radius: 8px; list-style: none; min-height: 80px;"}
+      transition:slide={{ duration: 500 }}
+    >
+      {#if $columnStyleMode !== "flexible"}
+        <b class="dnd-column-header" style="color: #fff;">{col.label}</b>
+      {/if}
+      {#each col.items as item, j (item.id)}
+        <li
+          data-testid="widget-{item.id}"
+          class="dnd-item"
+          style="padding: 12px; margin: 8px 0; background: none; color: #fff; border-radius: 4px; {$columnStyleMode ===
+          'flexible'
+            ? 'cursor: grab;'
+            : 'cursor: default;'} opacity: {dragging && dragging.id === item.id
+            ? 0.5
+            : 1};"
+          on:pointerdown={$columnStyleMode === "flexible"
+            ? (e) => handlePointerDown(e, item, col.id)
+            : undefined}
+          transition:slide={{ duration: 500 }}
+        >
+          <div class="dnd-item-content">
+            {#if typeof itemContent(item) === "function"}
+              <svelte:component this={itemContent(item)} {...item.props} />
+            {:else}
+              {itemContent(item)}
+            {/if}
+          </div>
+        </li>
+      {/each}
+    </ul>
+  {/each}
+</div>
+
+{#if isDragging && dragging && $columnStyleMode === "flexible"}
+  <div
+    class="dnd-edit-instruction"
+    style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate({dragX}px, {dragY}px) scale(1.05);
+    "
+  >
+    {$_("ui.dndEditInstruction")}
+  </div>
+{/if}
 
 <style>
   .dnd-columns-container {
@@ -111,7 +185,10 @@
     justify-content: center;
     margin-top: 0;
     flex-direction: row;
-    transition: gap 0.6s cubic-bezier(0.4,0,0.2,1), padding 0.6s cubic-bezier(0.4,0,0.2,1), margin 0.6s cubic-bezier(0.4,0,0.2,1);
+    transition:
+      gap 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+      padding 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+      margin 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
   @media (max-width: 1270px) {
     .dnd-columns-container {
@@ -190,55 +267,3 @@
     pointer-events: none;
   }
 </style>
-
-<div bind:this={containerRef} class="dnd-columns-container {class_name}" style="margin-top: {marginTop};" data-testid="game-widgets-container">
-  {#each columns as col, i}
-    <ul
-      bind:this={colRefs[i]}
-      class="dnd-column"
-      data-testid="dnd-column-{col.id}"
-      class:editing-column={$columnStyleMode === 'editing'}
-      style={$columnStyleMode === 'editing'
-        ? 'padding: 0; background: none; border-radius: 8px; list-style: none; min-height: 80px;'
-        : 'padding: 16px; background: #222; border-radius: 8px; list-style: none; min-height: 80px;'}
-      transition:slide={{ duration: 500 }}
-    >
-      {#if $columnStyleMode !== 'editing'}
-        <b class="dnd-column-header" style="color: #fff;">{col.label}</b>
-      {/if}
-      {#each col.items as item, j (item.id)}
-        <li
-          data-testid="widget-{item.id}"
-          class="dnd-item"
-          style="padding: 12px; margin: 8px 0; background: none; color: #fff; border-radius: 4px; {($columnStyleMode === 'editing') ? 'cursor: grab;' : 'cursor: default;'} opacity: {dragging && dragging.id === item.id ? 0.5 : 1};"
-          on:pointerdown={($columnStyleMode === 'editing') ? (e) => handlePointerDown(e, item, col.id) : undefined}
-          transition:slide={{ duration: 500 }}
-        >
-          <div class="dnd-item-content">
-            {#if typeof itemContent(item) === 'function'}
-              <svelte:component this={itemContent(item)} {...item.props} />
-            {:else}
-              {itemContent(item)}
-            {/if}
-          </div>
-        </li>
-      {/each}
-    </ul>
-  {/each}
-</div>
-
-{#if isDragging && dragging && $columnStyleMode === 'editing'}
-  <div
-    class="dnd-edit-instruction"
-    style="
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate({dragX}px, {dragY}px) scale(1.05);
-    "
-  >
-    {$_('ui.dndEditInstruction')}
-  </div>
-{/if} 

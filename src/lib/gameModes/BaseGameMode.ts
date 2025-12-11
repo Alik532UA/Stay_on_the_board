@@ -10,6 +10,7 @@ import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import { Piece, type MoveDirectionType } from '../models/Piece';
+import type { GameMoveResult, SuccessfulMoveResult, ScoreChangesData } from '$lib/types/gameMove';
 import { logService } from '$lib/services/logService';
 import { animationService } from '$lib/services/animationService';
 import { endGameService } from '$lib/services/endGameService';
@@ -29,11 +30,65 @@ export abstract class BaseGameMode implements IGameMode {
 
   abstract getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player';
   abstract initialize(options?: { newSize?: number }): void;
-  abstract handleNoMoves(playerType: 'human' | 'computer'): Promise<void>;
   abstract getPlayersConfiguration(): Player[];
-  protected abstract advanceToNextPlayer(): Promise<void>;
-  protected abstract applyScoreChanges(scoreChanges: any): Promise<void>;
-  abstract continueAfterNoMoves(): Promise<void>;
+
+  // Змінено з abstract на virtual (з дефолтною реалізацією)
+  async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
+    await noMovesService.dispatchNoMovesEvent(playerType);
+  }
+
+  // Змінено з abstract на virtual
+  async continueAfterNoMoves(): Promise<void> {
+    this.resetBoardForContinuation();
+    await this.advanceToNextPlayer();
+    gameEventBus.dispatch('CloseModal', undefined);
+  }
+
+  // Змінено з abstract на virtual
+  protected async advanceToNextPlayer(): Promise<void> {
+    const currentPlayerState = get(playerStore);
+    if (!currentPlayerState) return;
+    const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
+
+    playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
+    this.startTurn();
+  }
+
+  // Змінено з abstract на virtual
+  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
+    // Default implementation: do nothing (override in specific modes if needed)
+  }
+
+  /**
+   * Скидає стан дошки для продовження гри після "немає ходів".
+   * Використовується в різних GameModes для уникнення дублювання.
+   * 
+   * ВАЖЛИВО: Цей метод лише скидає стан дошки і оновлює доступні ходи.
+   * Специфічна логіка режиму (перемикання гравців, таймери) залишається в конкретних реалізаціях.
+   */
+  protected resetBoardForContinuation(): void {
+    const boardState = get(boardStore);
+    if (!boardState) return;
+
+    boardStore.update(s => {
+      if (!s) return null;
+      return {
+        ...s,
+        cellVisitCounts: {},
+        moveHistory: [{
+          pos: { row: s.playerRow!, col: s.playerCol! },
+          blocked: [],
+          visits: {},
+          blockModeEnabled: get(gameSettingsStore).blockModeEnabled
+        }],
+        moveQueue: [],
+      };
+    });
+
+    availableMovesService.updateAvailableMoves();
+    gameOverStore.resetGameOverState();
+    animationService.reset();
+  }
 
   protected startTurn(): void {
     if (this.turnDuration > 0) {
@@ -56,30 +111,31 @@ export abstract class BaseGameMode implements IGameMode {
 
     const combinedState = { ...boardState, ...playerState, ...scoreState, ...uiState };
 
-    const moveResult = gameLogicService.performMove(direction, distance, playerState!.currentPlayerIndex, combinedState, settings, onEndCallback);
+    const moveResult = gameLogicService.performMove(direction, distance, playerState!.currentPlayerIndex, combinedState, settings, this.getModeName(), onEndCallback) as GameMoveResult;
 
     if (moveResult.success) {
       boardStore.update(s => s ? ({ ...s, ...moveResult.changes.boardState }) : null);
       playerStore.update(s => s ? ({ ...s, ...moveResult.changes.playerState }) : null);
       scoreStore.update(s => s ? ({ ...s, ...moveResult.changes.scoreState }) : null);
       uiStateStore.update(s => s ? ({ ...s, ...moveResult.changes.uiState }) : null);
-      
+
       const newMove = moveResult.changes.boardState.moveQueue.slice(-1)[0];
       if (newMove) {
         gameEventBus.dispatch('new_move_added', newMove);
       }
 
-      await this.applyScoreChanges(moveResult);
+      await this.applyScoreChanges({ bonusPoints: moveResult.bonusPoints, penaltyPoints: moveResult.penaltyPoints });
       await this.onPlayerMoveSuccess(moveResult);
     } else {
-      if (moveResult.changes && moveResult.changes.boardState) {
-        boardStore.update(s => s ? ({ ...s, ...moveResult.changes.boardState }) : null);
+      const failedResult = moveResult as import('$lib/types/gameMove').FailedMoveResult;
+      if (failedResult.changes && failedResult.changes.boardState) {
+        boardStore.update(s => s ? ({ ...s, ...failedResult.changes!.boardState }) : null);
       }
-      await this.onPlayerMoveFailure(moveResult.reason, direction, distance);
+      await this.onPlayerMoveFailure(failedResult.reason, direction, distance);
     }
   }
 
-  protected async onPlayerMoveSuccess(moveResult: any): Promise<void> {
+  protected async onPlayerMoveSuccess(moveResult: SuccessfulMoveResult): Promise<void> {
     const playerState = get(playerStore);
     const currentPlayer = playerState!.players[playerState!.currentPlayerIndex];
 
@@ -91,14 +147,14 @@ export abstract class BaseGameMode implements IGameMode {
     }
 
     uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null, isFirstMove: false }) : null);
-    
+
     if (moveResult.sideEffects && moveResult.sideEffects.length > 0) {
       logService.GAME_MODE('[BaseGameMode] Executing side effects for move...', moveResult.sideEffects);
       moveResult.sideEffects.forEach((effect: SideEffect) => sideEffectService.execute(effect));
     }
 
     await this.advanceToNextPlayer();
-    
+
     availableMovesService.updateAvailableMoves();
   }
 
@@ -116,12 +172,12 @@ export abstract class BaseGameMode implements IGameMode {
       distance: distance,
       to: finalInvalidPosition
     };
-    
+
     boardStore.update(s => {
       if (!s) return null;
       const updatedMoveHistory = [...s.moveHistory, {
         pos: { row: finalInvalidPosition.row, col: finalInvalidPosition.col },
-        blocked: [] as {row: number, col: number}[],
+        blocked: [] as { row: number, col: number }[],
         visits: { ...s.cellVisitCounts },
         blockModeEnabled: get(gameSettingsStore).blockModeEnabled
       }];
@@ -144,9 +200,9 @@ export abstract class BaseGameMode implements IGameMode {
   async restartGame(options: { newSize?: number } = {}): Promise<void> {
     this.initialize(options);
     animationService.reset();
-    gameEventBus.dispatch('CloseModal');
+    gameEventBus.dispatch('CloseModal', undefined);
   }
-  
+
   cleanup(): void {
     logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
     timeService.stopGameTimer();
@@ -177,7 +233,7 @@ export abstract class BaseGameMode implements IGameMode {
     if (computerMove) {
       logService.GAME_MODE('triggerComputerMove: Комп\'ютер має хід, виконуємо...');
       const { direction, distance } = computerMove;
-      
+
       // ЧОМУ: Консолідуємо логіку ввімкнення голосового керування.
       // Замість дублювання логіки та передчасного виклику, ми завжди використовуємо
       // onEndCallback, який спрацьовує після завершення анімації ходу комп'ютера.

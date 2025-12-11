@@ -1,32 +1,32 @@
 <script lang="ts">
-  import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
-  import PlayerManager from '$lib/components/local-setup/PlayerManager.svelte';
-  import LocalGameSettings from '$lib/components/local-setup/LocalGameSettings.svelte';
-  import DevClearCacheButton from '$lib/components/widgets/DevClearCacheButton.svelte';
-  import { _ } from 'svelte-i18n';
-  import { onMount } from 'svelte';
-  import { get } from 'svelte/store';
-  import { testModeStore } from '$lib/stores/testModeStore';
-  import { gameService } from '$lib/services/gameService';
-  import { getRandomUnusedColor } from '$lib/utils/playerUtils';
-  import type { Player } from '$lib/models/player';
+  import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
+  import PlayerManager from "$lib/components/local-setup/PlayerManager.svelte";
+  import LocalGameSettings from "$lib/components/local-setup/LocalGameSettings.svelte";
+  import { _ } from "svelte-i18n";
+  import { onMount } from "svelte";
+  import { get } from "svelte/store";
+  import { testModeStore } from "$lib/stores/testModeStore";
+  import { gameService } from "$lib/services/gameService";
+  import { getRandomUnusedColor } from "$lib/utils/playerUtils";
+  import type { Player } from "$lib/models/player";
+  import { DEFAULT_PLAYER_NAMES } from "$lib/config/defaultPlayers";
 
   onMount(() => {
-    const playerNames = ['den', 'Khaaaa', 'Destroyter94', 'MrGrom'];
+    const playerNames = DEFAULT_PLAYER_NAMES;
     const usedColors: string[] = [];
     const players: Player[] = playerNames.map((name, index) => {
       const color = getRandomUnusedColor(usedColors);
       usedColors.push(color);
       return {
         id: index + 1,
-        type: 'human',
+        type: "human",
         name,
         score: 0,
         color,
         isComputer: false,
         penaltyPoints: 0,
         bonusPoints: 0,
-        bonusHistory: [] as any[]
+        bonusHistory: [] as any[],
       };
     });
 
@@ -34,12 +34,10 @@
   });
 </script>
 
-<DevClearCacheButton />
-
 <div class="page-container">
   <div class="header-container">
     <FloatingBackButton />
-    <h1 data-testid="local-setup-title">{$_('localGame.title')}</h1>
+    <h1 data-testid="local-setup-title">{$_("localGame.title")}</h1>
   </div>
 
   <div class="setup-grid">

@@ -3,10 +3,10 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Запускати при пуші в гілку `main` (ПОВЕРНУЛИ НАЗАД)
+  # Запускати при пуші в гілку `main`
   push:
     branches:
-      - main # <-- ПОВЕРНУЛИ НАЗАД
+      - main
 
   # Дозволяє запускати цей воркфлоу вручну з вкладки Actions
   workflow_dispatch:
@@ -41,6 +41,15 @@ jobs:
       
       - name: Build
         run: npm run build
+        env:
+          # Передаємо секрети з налаштувань GitHub у змінні середовища під час збірки
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

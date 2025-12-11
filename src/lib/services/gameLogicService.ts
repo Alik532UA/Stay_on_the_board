@@ -2,7 +2,7 @@
 import { Piece, type MoveDirectionType } from '../models/Piece';
 import { get } from 'svelte/store';
 import { isCellBlocked, isMirrorMove } from '$lib/utils/boardUtils';
-import { logService } from './logService.js';
+import { logService } from './logService';
 import { calculateMoveScore } from './scoreService';
 import type { Direction } from '$lib/utils/gameUtils';
 import { uiStateStore } from '$lib/stores/uiStateStore';
@@ -10,13 +10,17 @@ import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { appSettingsStore, type AppSettingsState } from '$lib/stores/appSettingsStore';
+import type { CombinedGameState } from '$lib/models/gameState';
+import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
+import { rewardsService } from './rewardsService';
 
 export function performMove(
   direction: MoveDirectionType,
   distance: number,
   playerIndex: number,
-  currentState: any, // Combined state
-  settings: any,
+  currentState: CombinedGameState,
+  settings: GameSettingsState,
+  actualGameMode: 'training' | 'local' | 'timed' | 'online' | 'virtual-player',
   onEndCallback?: () => void
 ) {
   logService.state('Logical Position (at move start)', { row: currentState.playerRow, col: currentState.playerCol });
@@ -39,17 +43,37 @@ export function performMove(
 
   const startCellKey = `${currentState.playerRow}-${currentState.playerCol}`;
   const updatedCellVisitCounts = { ...currentState.cellVisitCounts, [startCellKey]: (currentState.cellVisitCounts[startCellKey] || 0) + 1 };
-  
+
+  // ВАЖЛИВО: Згідно документації docs/user-guide/bonus-scoring.md (рядки 88-101),
+  // в режимах local/online НЕ нараховуються базові бали (+1/+2/+3 за видимість дошки).
+  // Базові бали нараховуються ТІЛЬКИ в режимах training/virtual-player/timed.
+  // ВИПРАВЛЕННЯ: Використовуємо actualGameMode (фактичний режим гри з BaseGameMode),
+  // а не settings.gameMode (який містить пресет, напр. 'observer', 'beginner').
+  const isLocalOrOnlineGame = actualGameMode === 'local' || actualGameMode === 'online';
+  const shouldApplyBaseScore = !isLocalOrOnlineGame;
+  const baseScoreToAdd = shouldApplyBaseScore ? scoreChanges.baseScoreChange : 0;
+
+  logService.score('[performMove] Score calculation:', {
+    actualGameMode,
+    presetGameMode: settings.gameMode,
+    isLocalOrOnlineGame,
+    shouldApplyBaseScore,
+    baseScoreChange: scoreChanges.baseScoreChange,
+    baseScoreToAdd,
+    bonusPoints: scoreChanges.bonusPoints,
+    penaltyPoints: scoreChanges.penaltyPointsForMove
+  });
+
   const changes = {
     boardState: {
       playerRow: newPosition.row,
       playerCol: newPosition.col,
       cellVisitCounts: updatedCellVisitCounts,
       moveQueue: [...currentState.moveQueue, { player: playerIndex + 1, direction, distance, to: newPosition }],
-      moveHistory: [...currentState.moveHistory, { pos: newPosition, blocked: [], visits: updatedCellVisitCounts, blockModeEnabled: settings.blockModeEnabled, lastMove: { direction, distance, player: playerIndex } }],
+      moveHistory: [...currentState.moveHistory, { pos: newPosition, blocked: [] as { row: number; col: number }[], visits: updatedCellVisitCounts, blockModeEnabled: settings.blockModeEnabled, lastMove: { direction, distance, player: playerIndex } }],
     },
     playerState: {
-      players: currentState.players.map((p: any, i: number) => i === playerIndex ? { ...p, score: p.score + scoreChanges.baseScoreChange } : p),
+      players: currentState.players.map((p: any, i: number) => i === playerIndex ? { ...p, score: p.score + baseScoreToAdd } : p),
     },
     scoreState: {
       penaltyPoints: currentState.penaltyPoints + scoreChanges.penaltyPoints,
@@ -64,9 +88,9 @@ export function performMove(
 
   const sideEffects = [];
   const currentPlayer = currentState.players[playerIndex];
-  const shouldSpeak = settings.speechEnabled && 
-                      ((currentPlayer.isComputer && settings.speechFor.computer) || 
-                      (!currentPlayer.isComputer && settings.speechFor.player));
+  const shouldSpeak = settings.speechEnabled &&
+    ((currentPlayer.isComputer && settings.speechFor.computer) ||
+      (!currentPlayer.isComputer && settings.speechFor.player));
 
   // Якщо потрібно озвучити хід, АБО якщо є callback, який потрібно виконати в кінці ходу,
   // ми створюємо побічний ефект. speechService сам вирішить, чи потрібно говорити.
@@ -83,6 +107,20 @@ export function performMove(
   }
 
   logService.logicMove('performMove: завершено успішно');
+
+  // Check achievements after move (based on score update prediction)
+  if (changes.playerState && changes.playerState.players) {
+    // Find the player who moved
+    const updatedPlayer = changes.playerState.players[playerIndex];
+    // We pass a context object that matches what achievements expect
+    // Note: gameModeService.getCurrentMode() might be safer to get actual mode string from store if needed
+    // For now, we use the passed `actualGameMode/settings` 
+    rewardsService.checkAchievements({
+      score: updatedPlayer.score,
+      gameMode: settings.gameMode || actualGameMode // Prioritize preset for accurate checks
+    });
+  }
+
   return {
     success: true,
     changes,

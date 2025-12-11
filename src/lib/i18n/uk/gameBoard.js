@@ -20,6 +20,7 @@ export default {
     gameStarted: "Гра почалась!",
     firstMove: "Гра почалась!",
     yourTurnToMakeAMove: "Ваша черга робити хід",
+    opponentTurn: "Хід суперника",
     rememberPieceLocation: "Запам'ятай де фігура знаходиться!",
     gameResumed: "Гру продовжено, фігура знаходиться на тому ж місці де вона була до зупинки.\nВаша черга робити хід",
     playerTurn: "Ваша черга робити хід",

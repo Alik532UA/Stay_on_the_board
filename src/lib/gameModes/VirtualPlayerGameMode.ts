@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import { TrainingGameMode } from './TrainingGameMode';
 import type { Player } from '$lib/models/player';
+import { createVirtualPlayerPlayers } from '$lib/utils/playerFactory';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
@@ -16,6 +17,7 @@ import { boardStore } from '$lib/stores/boardStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
 import { timerStore } from '$lib/stores/timerStore';
 import { endGameService } from '$lib/services/endGameService';
+import type { ScoreChangesData } from '$lib/types/gameMove';
 
 import { voiceControlService } from '$lib/services/voiceControlService';
 
@@ -36,17 +38,12 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
   }
 
   getPlayersConfiguration(): Player[] {
-    return [
-      { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
-      { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#ffffff', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
-    ];
+    return createVirtualPlayerPlayers();
   }
 
-    getModeName(): 'virtual-player' {
+  getModeName(): 'virtual-player' {
     return 'virtual-player';
   }
-
-  
 
   protected async advanceToNextPlayer(): Promise<void> {
     logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
@@ -58,46 +55,30 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
 
     const nextPlayer = get(playerStore)?.players[nextPlayerIndex];
     logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer?.type}.`);
+
     if (nextPlayer?.type === 'ai') {
-      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера.');
+      // ВИПРАВЛЕНО: Прибрано штучну затримку.
+      // Логіка оновлюється миттєво -> center-info показує хід одразу.
+      // Анімація на дошці буде відтворена з затримкою завдяки черзі в animationService.
+      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера (миттєво).');
       await this.triggerComputerMove();
     } else {
       this.startTurn();
-      // ВИДАЛЕНО: Ця логіка дублювала логіку в onEndCallback у BaseGameMode
-      // і викликалася передчасно, що призводило до конфліктів.
-      // if (get(uiStateStore).voiceMoveRequested) {
-      //   logService.GAME_MODE('advanceToNextPlayer: Повторне ввімкнення голосового керування.');
-      //   voiceControlService.startListening();
-      // }
     }
   }
 
-  protected async applyScoreChanges(scoreChanges: any): Promise<void> {
+  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
     // No specific score changes to apply in training mode
   }
 
   async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
-    const boardState = get(boardStore);
-    if (!boardState) return;
-
     logService.logicMove('State of uiStateStore BEFORE continueAfterNoMoves:', get(uiStateStore));
 
-    boardStore.update(s => {
-        if (!s) return null;
-        return {
-            ...s,
-            cellVisitCounts: {},
-            moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
-            moveQueue: [],
-        };
-    });
-    availableMovesService.updateAvailableMoves();
-    
-    gameOverStore.resetGameOverState();
-    animationService.reset();
+    // Використовуємо спільну логіку з базового класу
+    this.resetBoardForContinuation();
 
-    // Явно повертаємо хід гравцю-людині
+    // Специфічна логіка для virtual-player: повертаємо хід гравцю-людині
     const humanPlayerIndex = get(playerStore)?.players.findIndex(p => p.type === 'human');
     if (humanPlayerIndex !== undefined) {
       playerStore.update(s => s ? { ...s, currentPlayerIndex: humanPlayerIndex } : null);

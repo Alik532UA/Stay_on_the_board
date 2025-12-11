@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
   import { gameSettingsStore, type GameSettingsState } from '$lib/stores/gameSettingsStore.js';
-  import { modalStore } from '$lib/stores/modalStore.js';
+  import { modalStore } from '$lib/stores/modalStore';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { animationStore } from '$lib/stores/animationStore.js';
@@ -145,3 +145,4 @@
 <style>
   /* Стилі залишаються без змін */
 </style>
+

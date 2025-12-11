@@ -1,4 +1,4 @@
-import { tooltipStore } from '$lib/stores/tooltipStore.js';
+import { tooltipStore } from '$lib/stores/tooltipStore';
 import { logService } from '$lib/services/logService.js';
 
 /**
@@ -57,3 +57,4 @@ export function customTooltip(node, customContent) {
     }
   };
 }
+

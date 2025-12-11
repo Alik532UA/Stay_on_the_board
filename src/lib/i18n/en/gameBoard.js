@@ -23,6 +23,7 @@ export default {
     rememberPieceLocation: "Remember where the piece is!",
     gameResumed: "Game resumed, the piece is in the same position as before the pause.\nYour turn to move",
     playerTurn: "Your turn to make a move",
+    opponentTurn: "Opponent's turn",
     computerTurn: "Computer is thinking...",
     playerSelectedDirection: "Selected direction: {direction}",
     playerSelectedDistance: "Selected distance: {distance}",

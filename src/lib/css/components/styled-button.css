@@ -1,0 +1,144 @@
+/* src/lib/css/components/styled-button.css */
+
+.styled-button {
+  margin: 0;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 700;
+  outline: none;
+  width: 100%;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  /* Default styles override generic button defaults */
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+}
+
+.styled-button:active {
+  transform: translateY(1px);
+}
+
+/* --- Sizes --- */
+
+/* Default (matches Modal generic) */
+.styled-button--size-default {
+  padding: 12px 26px;
+  font-size: 1.1em;
+  border-radius: 12px;
+}
+
+/* Large (matches Main Menu) */
+.styled-button--size-large {
+  padding: 24px 32px;
+  font-size: 1.2em;
+  border-radius: 12px;
+}
+
+/* Small (Example, for future use) */
+.styled-button--size-small {
+  padding: 8px 16px;
+  font-size: 0.9em;
+  border-radius: 8px;
+}
+
+/* --- Variants --- */
+
+/* Variant: Default (White background, Modal Generic style) */
+.styled-button--variant-default {
+  background: #fff;
+  color: #222;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+}
+
+.styled-button--variant-default:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Variant: Menu (Matches Main Menu style) */
+.styled-button--variant-menu {
+  background: var(--control-bg);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.styled-button--variant-menu:hover {
+  background: var(--control-hover);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px var(--shadow-color);
+}
+
+/* Variant: Primary (Green) */
+.styled-button--variant-primary {
+  background: var(--confirm-action-bg);
+  color: var(--confirm-action-text);
+  box-shadow: 0 2px 12px 0 var(--shadow-color);
+}
+
+.styled-button--variant-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+  filter: brightness(1.1);
+}
+
+/* Variant: Info (Blue) */
+.styled-button--variant-info {
+  background: var(--info-action-bg);
+  color: var(--info-action-text);
+  box-shadow: 0 2px 12px 0 var(--shadow-color);
+}
+
+.styled-button--variant-info:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+  filter: brightness(1.1);
+}
+
+/* Variant: Danger (Red) */
+.styled-button--variant-danger {
+  background: var(--error-color);
+  color: #fff;
+  box-shadow: 0 2px 12px 0 var(--shadow-color);
+}
+
+.styled-button--variant-danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+  filter: brightness(1.1);
+}
+
+/* Variant: Ghost (Transparent/Bordered) - Optional, for future */
+.styled-button--variant-ghost {
+  background: transparent;
+  border: 1px solid currentColor;
+  box-shadow: none;
+}
+
+/* State: Disabled */
+.styled-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: grayscale(0.5);
+}
+
+/* --- Shapes --- */
+
+.styled-button--shape-circle {
+  border-radius: 50%;
+  padding: 0;
+  width: var(--button-size, 48px);
+  height: var(--button-size, 48px);
+  min-height: auto;
+  /* Override default min-height if set */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

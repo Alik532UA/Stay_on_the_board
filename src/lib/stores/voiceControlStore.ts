@@ -2,10 +2,18 @@
 
 import { writable } from 'svelte/store';
 
+/**
+ * Тип помилки розпізнавання мовлення
+ */
+export interface VoiceRecognitionError {
+  error: string;
+  message?: string;
+}
+
 type VoiceControlState = {
   lastTranscript: string;
   volume: number;
-  recognitionError: any | null; // Changed to any to store the full error object
+  recognitionError: VoiceRecognitionError | Error | null;
 };
 
 function createVoiceControlStore() {
@@ -23,9 +31,9 @@ function createVoiceControlStore() {
     setVolume: (volume: number) => {
       update(state => ({ ...state, volume }));
     },
-    setError: (error: any) => {
-        // Store the full error event object for better debugging
-        update(state => ({ ...state, recognitionError: error }));
+    setError: (error: VoiceRecognitionError | Error | null) => {
+      // Store the full error event object for better debugging
+      update(state => ({ ...state, recognitionError: error }));
     },
     reset: () => {
       set({ lastTranscript: '', volume: 0, recognitionError: null });

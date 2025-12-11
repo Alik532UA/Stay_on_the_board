@@ -1,11 +1,11 @@
 <script>
-  import { slide } from 'svelte/transition';
+  import { slide } from "svelte/transition";
 
   export let isOpen = false;
 </script>
 
 <div class="accordion-section" class:open={isOpen}>
-  <button class="accordion-header" on:click={() => isOpen = !isOpen}>
+  <button class="accordion-header" on:click={() => (isOpen = !isOpen)}>
     <div class="header-content">
       <h2 class="accordion-title">
         <slot name="title" />
@@ -13,7 +13,14 @@
     </div>
     <span class="accordion-toggle" aria-hidden="true">
       <svg viewBox="0 0 24 24" width="24" height="24">
-        <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline
+          points="6 9 12 15 18 9"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
       </svg>
     </span>
   </button>
@@ -27,18 +34,6 @@
 </div>
 
 <style>
-  .accordion-section {
-    /* border: 1px solid var(--border-color, #ddd); */
-    /* border-radius: 12px; */
-    /* overflow: hidden; */
-    /* transition: all 0.3s ease; */
-    /* background: var(--bg-secondary, #fff); */
-  }
-
-  .accordion-section.open {
-    /* box-shadow: 0 4px 16px rgba(0,0,0,0.08); */
-  }
-
   .accordion-header {
     display: flex;
     justify-content: space-between;
@@ -82,7 +77,7 @@
   .accordion-content {
     background-color: var(--bg-primary, #fafafa);
   }
-  
+
   .content-wrapper {
     padding: 0.5rem 1.5rem 1.5rem 1.5rem;
   }
