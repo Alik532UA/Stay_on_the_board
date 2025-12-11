@@ -64,7 +64,7 @@ const defaultConfig: LogConfig = {
     [LOG_GROUPS.SPEECH]: true, // УВІМКНЕНО для діагностики озвучення
     [LOG_GROUPS.VOICE_CONTROL]: false,
     [LOG_GROUPS.TEST_MODE]: false,
-    [LOG_GROUPS.MODAL]: false,
+    [LOG_GROUPS.MODAL]: true, // УВІМКНЕНО для діагностики модальних вікон
     [LOG_GROUPS.ERROR]: true,
 };
 
