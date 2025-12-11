@@ -7,12 +7,14 @@
 	import { _, locale } from "svelte-i18n";
 	import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
 	import { speakText } from "$lib/services/speechService";
+	import { uiStateStore } from "$lib/stores/uiStateStore";
 
 	onMount(() => {
 		const unsubscribe = gameEventBus.subscribe(
 			"ShowNoMovesModal",
 			(payload) => {
-				const { playerType, scoreDetails, boardSize } = payload;
+				const { playerType, scoreDetails, boardSize, playerScores } =
+					payload;
 				const titleKey =
 					playerType === "human"
 						? "modal.playerNoMovesTitle"
@@ -34,6 +36,8 @@
 					content: {
 						reason: get(_)(contentKey),
 						scoreDetails: scoreDetails,
+						// FIX: Передаємо playerScores у контент модалки
+						playerScores: playerScores,
 					},
 					buttons: [
 						{

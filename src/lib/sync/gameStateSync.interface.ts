@@ -3,7 +3,20 @@ import type { BoardState } from '$lib/stores/boardStore';
 import type { PlayerState } from '$lib/stores/playerStore';
 import type { ScoreState } from '$lib/stores/scoreStore';
 import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
-import type { GameOverPayload } from '$lib/stores/gameOverStore';
+import type { GameOverPayload, PlayerScoreResult } from '$lib/stores/gameOverStore';
+
+/**
+ * Дані про заяву "Немає ходів"
+ */
+export interface NoMovesClaimPayload {
+    playerId: string; // ID гравця, який зробив заяву
+    scoreDetails: any; // Деталі рахунку
+    boardSize: number;
+    timestamp: number; // Для уникнення повторного відкриття
+    isCorrect: boolean; // Чи була заява вірною
+    // FIX: Додаємо масив рахунків для синхронізації вигляду модалки
+    playerScores?: Array<PlayerScoreResult & { playerName: string; playerColor: string; isWinner?: boolean; isLoser?: boolean }>;
+}
 
 export interface SyncableGameState {
     boardState: BoardState;
@@ -12,10 +25,17 @@ export interface SyncableGameState {
     settings?: Partial<GameSettingsState>;
     version: number;
     updatedAt: number;
-    // Додаємо стан завершення гри
     gameOver?: GameOverPayload | null;
-    // Додаємо стан запитів на рестарт
-    restartRequests?: Record<string, boolean>; // playerId -> true
+    restartRequests?: Record<string, boolean>;
+
+    // Синхронізація модального вікна "Немає ходів"
+    noMovesClaim?: NoMovesClaimPayload | null;
+
+    // Голосування за продовження гри (після NoMoves)
+    continueRequests?: Record<string, boolean>;
+
+    // Голосування за завершення гри з бонусом (після NoMoves)
+    finishRequests?: Record<string, boolean>;
 }
 
 export interface SyncMoveData {
@@ -34,7 +54,7 @@ export type GameStateSyncEvent =
     | { type: 'game_ended'; reason: string }
     | { type: 'connection_lost' }
     | { type: 'connection_restored' }
-    | { type: 'game_over_sync'; payload: GameOverPayload }; // Нова подія
+    | { type: 'game_over_sync'; payload: GameOverPayload };
 
 export type GameStateSyncCallback = (event: GameStateSyncEvent) => void;
 
