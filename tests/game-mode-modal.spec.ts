@@ -20,11 +20,11 @@ test.describe('Модальне вікно вибору режиму гри', ()
     });
 
     // 3. Perform test actions
-    await page.getByTestId('virtual-player-btn').click();
+    await page.getByTestId('play-btn').click();
     await expect(page.getByTestId('game-mode-modal-title')).toBeVisible();
   });
 
-  test('1. Повинно показувати FAQ для режиму "новачок"', { tag: ['@done', '@GMM-1']  }, async ({ page }) => {
+  test('1. Повинно показувати FAQ для режиму "новачок"', { tag: ['@done', '@GMM-1'] }, async ({ page }) => {
     await test.step('Вибір режиму "новачок" та перевірка FAQ', async () => {
       await page.getByTestId('beginner-mode-btn').click();
       await expect(page.getByTestId('faq-modal')).toBeVisible();

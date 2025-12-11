@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { get } from 'svelte/store';
-import { logService } from './logService.js';
+import { logService } from './logService';
 
 type HotkeyAction = {
     action: (event?: KeyboardEvent) => void;

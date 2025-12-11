@@ -1,119 +1,139 @@
 <script lang="ts">
-  import { playerStore } from '$lib/stores/playerStore';
-  import { _ } from 'svelte-i18n';
-  import { get } from 'svelte/store';
-  import { navigationService } from '$lib/services/navigationService.js';
-  import ColorPicker from './ColorPicker.svelte';
-  import { logService } from '$lib/services/logService.js';
-  import { customTooltip } from '$lib/actions/customTooltip.js';
-  import { generateId, getRandomUnusedColor, getRandomUnusedName } from '$lib/utils/playerUtils';
-  import type { Player } from '$lib/models/player';
-  
+  import { playerStore } from "$lib/stores/playerStore";
+  import { _ } from "svelte-i18n";
+  import { get } from "svelte/store";
+  import { navigationService } from "$lib/services/navigationService.js";
+  import ColorPicker from "./ColorPicker.svelte";
+  import { logService } from "$lib/services/logService.js";
+  import { customTooltip } from "$lib/actions/customTooltip.js";
+  import {
+    generateId,
+    getRandomUnusedColor,
+    getRandomUnusedName,
+  } from "$lib/utils/playerUtils";
+  import type { Player, BonusHistoryItem } from "$lib/models/player";
+
   function startGame() {
     logService.action('Click: "Почати гру" (PlayerManager)');
-    navigationService.goTo('/game/local');
+    navigationService.goTo("/game/local");
   }
 
   function addPlayer() {
-    playerStore.update(s => {
+    playerStore.update((s) => {
       if (!s || s.players.length >= 8) return s;
-      const usedColors = s.players.map(p => p.color);
-      const usedNames = s.players.map(p => p.name);
+      const usedColors = s.players.map((p) => p.color);
+      const usedNames = s.players.map((p) => p.name);
       const newPlayer: Player = {
         id: generateId(),
         name: getRandomUnusedName(usedNames),
         color: getRandomUnusedColor(usedColors),
         score: 0,
         isComputer: false,
-        type: 'human' as const,
+        type: "human" as const,
         penaltyPoints: 0,
         bonusPoints: 0,
-        bonusHistory: [] as any[]
+        bonusHistory: [] as BonusHistoryItem[],
+        roundScore: 0,
       };
       return { ...s, players: [...s.players, newPlayer] };
     });
   }
 
   function removePlayer(playerId: number) {
-    playerStore.update(s => {
+    playerStore.update((s) => {
       if (!s || s.players.length <= 2) return s;
-      return { ...s, players: s.players.filter(p => p.id !== playerId) };
+      return { ...s, players: s.players.filter((p) => p.id !== playerId) };
     });
   }
 
   function updatePlayer(playerId: number, updatedData: Partial<Player>) {
-    playerStore.update(s => {
+    playerStore.update((s) => {
       if (!s) return null;
       return {
         ...s,
-        players: s.players.map(p =>
-          p.id === playerId ? { ...p, ...updatedData } : p
-        )
+        players: s.players.map((p) =>
+          p.id === playerId ? { ...p, ...updatedData } : p,
+        ),
       };
     });
   }
 </script>
 
 {#if $playerStore}
-<div class="player-manager-card">
-  <h2 data-testid="player-manager-title">{$_('localGame.playerManagerTitle')}</h2>
+  <div class="player-manager-card">
+    <h2 data-testid="player-manager-title">
+      {$_("localGame.playerManagerTitle")}
+    </h2>
 
-  <div class="player-list">
-    {#each $playerStore.players as player (player.id)}
-      <div class="player-row">
-        <ColorPicker
-          value={player.color}
-          on:change={(e) => updatePlayer(player.id, { color: e.detail.value })}
-        />
-        <button
-          class="player-type-btn"
-          use:customTooltip={$_('localGame.togglePlayerType')}
-          on:click={() => updatePlayer(player.id, { type: player.type === 'human' ? 'ai' : 'human' })}
-          data-testid="player-type-btn-{player.id}"
-        >
-          {player.type === 'ai' ? '🤖' : '👤'}
-        </button>
-        <input
-          type="text"
-          class="player-name-input"
-          placeholder="Ім'я гравця"
-          value={player.name}
-          on:input={(e) => updatePlayer(player.id, { name: (e.currentTarget as HTMLInputElement).value })}
-          data-testid="player-name-input-{player.id}"
-        />
-        <button
-          class="remove-player-btn"
-          use:customTooltip={$_('localGame.removePlayer')}
-          on:click={() => {
-            logService.action(`Click: "Видалити гравця: ${player.name}" (PlayerManager)`);
-            removePlayer(player.id);
-          }}
-          disabled={$playerStore.players.length <= 2}
-          data-testid="remove-player-btn-{player.id}"
-        >
-          ×
-        </button>
-      </div>
-    {/each}
-  </div>
+    <div class="player-list">
+      {#each $playerStore.players as player (player.id)}
+        <div class="player-row">
+          <ColorPicker
+            value={player.color}
+            on:change={(e) =>
+              updatePlayer(player.id, { color: e.detail.value })}
+          />
+          <button
+            class="player-type-btn"
+            use:customTooltip={$_("localGame.togglePlayerType")}
+            on:click={() =>
+              updatePlayer(player.id, {
+                type: player.type === "human" ? "ai" : "human",
+              })}
+            data-testid="player-type-btn-{player.id}"
+          >
+            {player.type === "ai" ? "🤖" : "👤"}
+          </button>
+          <input
+            type="text"
+            class="player-name-input"
+            placeholder="Ім'я гравця"
+            value={player.name}
+            on:input={(e) =>
+              updatePlayer(player.id, {
+                name: (e.currentTarget as HTMLInputElement).value,
+              })}
+            data-testid="player-name-input-{player.id}"
+          />
+          <button
+            class="remove-player-btn"
+            use:customTooltip={$_("localGame.removePlayer")}
+            on:click={() => {
+              logService.action(
+                `Click: "Видалити гравця: ${player.name}" (PlayerManager)`,
+              );
+              removePlayer(player.id);
+            }}
+            disabled={$playerStore.players.length <= 2}
+            data-testid="remove-player-btn-{player.id}"
+          >
+            ×
+          </button>
+        </div>
+      {/each}
+    </div>
 
-  <div class="manager-actions">
-    <button
-      class="add-player-btn"
-      on:click={() => {
-        logService.action('Click: "Додати гравця" (PlayerManager)');
-        addPlayer();
-      }}
-      disabled={$playerStore.players.length >= 8}
-      data-testid="add-player-btn"
-    >
-      {$_('localGame.addPlayer')}
-    </button>
-    <button class="start-game-btn" on:click={startGame} data-testid="start-game-btn">
-      {$_('localGame.startGame')}
-    </button>
+    <div class="manager-actions">
+      <button
+        class="add-player-btn"
+        on:click={() => {
+          logService.action('Click: "Додати гравця" (PlayerManager)');
+          addPlayer();
+        }}
+        disabled={$playerStore.players.length >= 8}
+        data-testid="add-player-btn"
+      >
+        {$_("localGame.addPlayer")}
+      </button>
+      <button
+        class="start-game-btn"
+        on:click={startGame}
+        data-testid="start-game-btn"
+      >
+        {$_("localGame.startGame")}
+      </button>
+    </div>
   </div>
-</div>
 {/if}
 
 <style>
@@ -200,14 +220,17 @@
     flex-direction: column;
     gap: 12px;
   }
-  .add-player-btn, .start-game-btn {
+  .add-player-btn,
+  .start-game-btn {
     padding: 12px;
     font-size: 1.1em;
     font-weight: bold;
     border-radius: 10px;
     border: none;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+    transition:
+      background 0.2s,
+      transform 0.1s;
   }
   .add-player-btn {
     background: var(--control-bg);

@@ -3,9 +3,10 @@ import { uiStateStore } from '$lib/stores/uiStateStore';
 import { userActionService } from './userActionService';
 import { logService } from './logService';
 import { voiceControlStore } from '$lib/stores/voiceControlStore';
+import type { Direction } from '$lib/utils/gameUtils';
 
 class VoiceControlService {
-  private recognition: any | null = null;
+  private recognition: SpeechRecognition | null = null;
   private isSupported = false;
   private consecutiveFailedAttempts = 0;
   private readonly MAX_FAILED_ATTEMPTS = 5;
@@ -18,10 +19,10 @@ class VoiceControlService {
   private animationFrameId: number | null = null;
 
   constructor() {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognition) {
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognitionAPI) {
       this.isSupported = true;
-      this.recognition = new SpeechRecognition();
+      this.recognition = new SpeechRecognitionAPI();
       this.recognition.continuous = false;
       this.recognition.lang = 'uk-UA'; // Default language
       this.recognition.interimResults = false;
@@ -83,7 +84,7 @@ class VoiceControlService {
     this.initAudioAnalysis();
   }
 
-  private handleResult(event: any) {
+  private handleResult(event: SpeechRecognitionEvent) {
     this.processingResult = true; // We are processing a result, don't restart
     voiceControlStore.setError(null); // Clear any previous error
     const transcript = event.results[0][0].transcript.trim();
@@ -92,11 +93,11 @@ class VoiceControlService {
     this.parseCommand(transcript);
   }
 
-  private handleError(event: any) {
+  private handleError(event: SpeechRecognitionErrorEvent) {
     logService.voiceControl(`[VoiceControlService] Event: error. Error event:`, event.error);
     voiceControlStore.setError(event); // Store the full error object
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-        this.processingResult = true; // Permanent error, don't restart
+      this.processingResult = true; // Permanent error, don't restart
     }
     // For 'no-speech', processingResult remains false, so handleEnd will restart it.
   }
@@ -109,12 +110,12 @@ class VoiceControlService {
     // If recognition ended without processing a result (e.g., 'no-speech' error or timeout)
     // and it wasn't manually stopped, then restart.
     if (!this.processingResult) {
-        logService.voiceControl('[VoiceControlService] Recognition ended unexpectedly, restarting...');
-        setTimeout(() => {
-            if (!get(uiStateStore).isListening) {
-                this.startListening();
-            }
-        }, 500);
+      logService.voiceControl('[VoiceControlService] Recognition ended unexpectedly, restarting...');
+      setTimeout(() => {
+        if (!get(uiStateStore).isListening) {
+          this.startListening();
+        }
+      }, 500);
     }
   }
 
@@ -177,53 +178,53 @@ class VoiceControlService {
     logService.voiceControl(`[VoiceControlService] Parsing command with lang: ${lang}`);
 
     const noMovesPhrases: { [key: string]: string[] } = {
-        uk: ["ходів немає", "ходів нема", "немає ходів", "нема ходів", "все", "кінець"],
-        en: ["no moves", "no move"],
-        crh: [],
-        nl: []
+      uk: ["ходів немає", "ходів нема", "немає ходів", "нема ходів", "все", "кінець"],
+      en: ["no moves", "no move"],
+      crh: [],
+      nl: []
     };
 
     const directionRegex: { [key: string]: { [key: string]: RegExp } } = {
-        uk: {
-            'up-left': /(вгору|вверх|верх)[\s.,-]*(вліво|ліво|ліва|ліворуч)|(вліво|ліво|ліва|ліворуч)[\s.,-]*(вгору|вверх|верх)/,
-            'up-right': /(вгору|вверх|верх)[\s.,-]*(вправо|право|вправа|права|праворуч)|(вправо|право|вправа|права|праворуч)[\s.,-]*(вгору|вверх|верх)/,
-            'down-left': /(вниз|низ)[\s.,-]*(вліво|ліво|ліва|ліворуч)|(вліво|ліво|ліва|ліворуч)[\s.,-]*(вниз|низ)/,
-            'down-right': /(вниз|низ)[\s.,-]*(вправо|право|вправа|права|праворуч)|(вправо|право|вправа|права|праворуч)[\s.,-]*(вниз|низ)/,
-            'up': /в?гору|в?верх|верх/,
-            'down': /в?низ|внес/,
-            'left': /в?ліво?a?|ліворуч/,
-            'right': /в?право?a?|праворуч|вправа/,
-        },
-        en: {
-            'up-left': /up[\s.,-]*left|left[\s.,-]*up/,
-            'up-right': /up[\s.,-]*right|right[\s.,-]*up/,
-            'down-left': /down[\s.,-]*left|left[\s.,-]*down/,
-            'down-right': /down[\s.,-]*right|right[\s.,-]*down/,
-            'up': /up/,
-            'down': /down/,
-            'left': /left/,
-            'right': /right/,
-        },
-        crh: {},
-        nl: {}
+      uk: {
+        'up-left': /(вгору|вверх|верх)[\s.,-]*(вліво|ліво|ліва|ліворуч)|(вліво|ліво|ліва|ліворуч)[\s.,-]*(вгору|вверх|верх)/,
+        'up-right': /(вгору|вверх|верх)[\s.,-]*(вправо|право|вправа|права|праворуч)|(вправо|право|вправа|права|праворуч)[\s.,-]*(вгору|вверх|верх)/,
+        'down-left': /(вниз|низ)[\s.,-]*(вліво|ліво|ліва|ліворуч)|(вліво|ліво|ліва|ліворуч)[\s.,-]*(вниз|низ)/,
+        'down-right': /(вниз|низ)[\s.,-]*(вправо|право|вправа|права|праворуч)|(вправо|право|вправа|права|праворуч)[\s.,-]*(вниз|низ)/,
+        'up': /в?гору|в?верх|верх/,
+        'down': /в?низ|внес/,
+        'left': /в?ліво?a?|ліворуч/,
+        'right': /в?право?a?|праворуч|вправа/,
+      },
+      en: {
+        'up-left': /up[\s.,-]*left|left[\s.,-]*up/,
+        'up-right': /up[\s.,-]*right|right[\s.,-]*up/,
+        'down-left': /down[\s.,-]*left|left[\s.,-]*down/,
+        'down-right': /down[\s.,-]*right|right[\s.,-]*down/,
+        'up': /up/,
+        'down': /down/,
+        'left': /left/,
+        'right': /right/,
+      },
+      crh: {},
+      nl: {}
     };
 
     const numbers: { [key: string]: { [key: string]: number } } = {
-        uk: {
-            'один': 1, 'два': 2, 'три': 3, 'чотири': 4, 'п\'ять': 5, 'шість': 6, 'сім': 7, 'вісім': 8,
-        },
-        en: {
-            'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8,
-        },
-        crh: {},
-        nl: {}
+      uk: {
+        'один': 1, 'два': 2, 'три': 3, 'чотири': 4, 'п\'ять': 5, 'шість': 6, 'сім': 7, 'вісім': 8,
+      },
+      en: {
+        'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8,
+      },
+      crh: {},
+      nl: {}
     };
 
     const diagonalKeywords: { [key: string]: string[] } = {
-        uk: ['діагональ', 'діагоналі'],
-        en: ['diagonal', 'diagonally'],
-        crh: [],
-        nl: []
+      uk: ['діагональ', 'діагоналі'],
+      en: ['diagonal', 'diagonally'],
+      crh: [],
+      nl: []
     };
 
     const command_lower = command.toLowerCase();
@@ -233,99 +234,99 @@ class VoiceControlService {
 
     const current_no_moves = noMovesPhrases[lang] || [];
     for (const phrase of current_no_moves) {
-        if (command_lower.includes(phrase)) {
-            logService.voiceControl(`[VoiceControlService] Parsed "no moves" command.`);
-            userActionService.claimNoMoves();
-            command_parsed = true;
-            break;
-        }
+      if (command_lower.includes(phrase)) {
+        logService.voiceControl(`[VoiceControlService] Parsed "no moves" command.`);
+        userActionService.claimNoMoves();
+        command_parsed = true;
+        break;
+      }
     }
 
     if (!command_parsed) {
-        const isDiagonal = (diagonalKeywords[lang] || []).some(keyword => command_lower.includes(keyword));
+      const isDiagonal = (diagonalKeywords[lang] || []).some(keyword => command_lower.includes(keyword));
 
-        if (isDiagonal) {
-            const diagonalDirections = {
-                'up-left': directionRegex[lang]['up-left'],
-                'up-right': directionRegex[lang]['up-right'],
-                'down-left': directionRegex[lang]['down-left'],
-                'down-right': directionRegex[lang]['down-right'],
-            };
+      if (isDiagonal) {
+        const diagonalDirections = {
+          'up-left': directionRegex[lang]['up-left'],
+          'up-right': directionRegex[lang]['up-right'],
+          'down-left': directionRegex[lang]['down-left'],
+          'down-right': directionRegex[lang]['down-right'],
+        };
 
-            let foundDiagonalDirection = null;
-            for (const dir in diagonalDirections) {
-                if (diagonalDirections[dir as keyof typeof diagonalDirections].test(command_lower)) {
-                    foundDiagonalDirection = dir;
-                    break;
-                }
-            }
-
-            if (foundDiagonalDirection) {
-                const current_numbers = numbers[lang] || {};
-                for (const num_word in current_numbers) {
-                    if (command_lower.includes(num_word)) {
-                        found_distance = current_numbers[num_word];
-                        break;
-                    }
-                }
-                
-                const match = command_lower.match(/\d+/);
-                if (match) {
-                    found_distance = parseInt(match[0], 10);
-                }
-
-                const distance = found_distance ?? 1;
-                logService.voiceControl(`[VoiceControlService] Parsed diagonal command: ${foundDiagonalDirection} ${distance}`);
-                uiStateStore.update(s => ({ ...s, voiceMoveRequested: true }));
-                logService.voiceControl('[VoiceControlService] voiceMoveRequested set to true');
-                userActionService.executeMove(foundDiagonalDirection as any, distance);
-                command_parsed = true;
-            }
-        } else {
-            const current_directions = directionRegex[lang] || {};
-            for (const dir in current_directions) {
-                if (current_directions[dir].test(command_lower)) {
-                    found_direction = dir;
-                    break;
-                }
-            }
-
-            if (found_direction) {
-                const current_numbers = numbers[lang] || {};
-                for (const num_word in current_numbers) {
-                    if (command_lower.includes(num_word)) {
-                        found_distance = current_numbers[num_word];
-                        break;
-                    }
-                }
-                
-                const match = command_lower.match(/\d+/);
-                if (match) {
-                    found_distance = parseInt(match[0], 10);
-                }
-
-                const distance = found_distance ?? 1;
-                logService.voiceControl(`[VoiceControlService] Parsed command: ${found_direction} ${distance}`);
-                uiStateStore.update(s => ({ ...s, voiceMoveRequested: true }));
-                logService.voiceControl('[VoiceControlService] voiceMoveRequested set to true');
-                userActionService.executeMove(found_direction as any, distance);
-                command_parsed = true;
-            }
+        let foundDiagonalDirection = null;
+        for (const dir in diagonalDirections) {
+          if (diagonalDirections[dir as keyof typeof diagonalDirections].test(command_lower)) {
+            foundDiagonalDirection = dir;
+            break;
+          }
         }
+
+        if (foundDiagonalDirection) {
+          const current_numbers = numbers[lang] || {};
+          for (const num_word in current_numbers) {
+            if (command_lower.includes(num_word)) {
+              found_distance = current_numbers[num_word];
+              break;
+            }
+          }
+
+          const match = command_lower.match(/\d+/);
+          if (match) {
+            found_distance = parseInt(match[0], 10);
+          }
+
+          const distance = found_distance ?? 1;
+          logService.voiceControl(`[VoiceControlService] Parsed diagonal command: ${foundDiagonalDirection} ${distance}`);
+          uiStateStore.update(s => ({ ...s, voiceMoveRequested: true }));
+          logService.voiceControl('[VoiceControlService] voiceMoveRequested set to true');
+          userActionService.executeMove(foundDiagonalDirection as any, distance);
+          command_parsed = true;
+        }
+      } else {
+        const current_directions = directionRegex[lang] || {};
+        for (const dir in current_directions) {
+          if (current_directions[dir].test(command_lower)) {
+            found_direction = dir;
+            break;
+          }
+        }
+
+        if (found_direction) {
+          const current_numbers = numbers[lang] || {};
+          for (const num_word in current_numbers) {
+            if (command_lower.includes(num_word)) {
+              found_distance = current_numbers[num_word];
+              break;
+            }
+          }
+
+          const match = command_lower.match(/\d+/);
+          if (match) {
+            found_distance = parseInt(match[0], 10);
+          }
+
+          const distance = found_distance ?? 1;
+          logService.voiceControl(`[VoiceControlService] Parsed command: ${found_direction} ${distance}`);
+          uiStateStore.update(s => ({ ...s, voiceMoveRequested: true }));
+          logService.voiceControl('[VoiceControlService] voiceMoveRequested set to true');
+          userActionService.executeMove(found_direction as any, distance);
+          command_parsed = true;
+        }
+      }
     }
 
     if (command_parsed) {
-        this.consecutiveFailedAttempts = 0;
+      this.consecutiveFailedAttempts = 0;
     } else {
-        logService.voiceControl(`[VoiceControlService] Failed to parse command: ${command}`);
-        this.consecutiveFailedAttempts++;
-        if (this.consecutiveFailedAttempts < this.MAX_FAILED_ATTEMPTS) {
-            logService.voiceControl(`[VoiceControlService] Retrying... (${this.consecutiveFailedAttempts}/${this.MAX_FAILED_ATTEMPTS})`);
-            setTimeout(() => this.startListening(), 100);
-        } else {
-            logService.voiceControl('[VoiceControlService] Max failed attempts reached.');
-            this.consecutiveFailedAttempts = 0;
-        }
+      logService.voiceControl(`[VoiceControlService] Failed to parse command: ${command}`);
+      this.consecutiveFailedAttempts++;
+      if (this.consecutiveFailedAttempts < this.MAX_FAILED_ATTEMPTS) {
+        logService.voiceControl(`[VoiceControlService] Retrying... (${this.consecutiveFailedAttempts}/${this.MAX_FAILED_ATTEMPTS})`);
+        setTimeout(() => this.startListening(), 100);
+      } else {
+        logService.voiceControl('[VoiceControlService] Max failed attempts reached.');
+        this.consecutiveFailedAttempts = 0;
+      }
     }
   }
 }

@@ -1,13 +1,13 @@
-<script>
-  import { onMount, onDestroy } from 'svelte';
-  import { _ } from 'svelte-i18n';
-  import VoiceSettings from './VoiceSettings.svelte';
-  import VoiceList from './VoiceList.svelte';
+<script lang="ts">
+  import { onMount, onDestroy } from "svelte";
+  import { _ } from "svelte-i18n";
+  import VoiceSettings from "./VoiceSettings.svelte";
+  import VoiceList from "./VoiceList.svelte";
 
   export let close = () => {};
 
   let showFade = false;
-  let voiceListContainer;
+  let voiceListContainer: HTMLDivElement | null = null;
 
   function updateFadeState() {
     if (!voiceListContainer) return;
@@ -17,8 +17,8 @@
     showFade = isScrollable && !isAtBottom;
   }
 
-  let mutationObserver;
-  let resizeObserver;
+  let mutationObserver: MutationObserver | null = null;
+  let resizeObserver: ResizeObserver | null = null;
 
   onMount(() => {
     if (voiceListContainer) {
@@ -42,34 +42,40 @@
   });
 </script>
 
-<div 
-  class="modal-overlay" 
-  on:click={close} 
-  on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') close(); }}
+<div
+  class="modal-overlay"
+  on:click={close}
+  on:keydown={(e) => {
+    if (e.key === "Enter" || e.key === " ") close();
+  }}
   role="button"
   tabindex="0"
-  aria-label={$_('voiceSettings.close')}
+  aria-label={$_("voiceSettings.close")}
 >
-  <div 
+  <div
     class="modal-window"
     data-testid="voice-settings-modal"
     tabindex="0"
     on:click={(e) => e.stopPropagation()}
-    on:keydown={(e) => { if (e.key === 'Escape') close(); }}
+    on:keydown={(e) => {
+      if (e.key === "Escape") close();
+    }}
     role="dialog"
     aria-modal="true"
     aria-labelledby="voice-settings-title"
   >
     <div class="modal-header">
-      <h2 class="modal-title" id="voice-settings-title">{$_('voiceSettings.title')}</h2>
+      <h2 class="modal-title" id="voice-settings-title">
+        {$_("voiceSettings.title")}
+      </h2>
     </div>
     <div class="modal-body">
       <div class="voice-settings-container">
         <VoiceSettings />
       </div>
-      <hr class="divider-h"/>
+      <hr class="divider-h" />
       <div class="divider-v"></div>
-      <div 
+      <div
         class="voice-list-container"
         class:fade-bottom={showFade}
         bind:this={voiceListContainer}
@@ -79,7 +85,11 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button class="modal-btn-generic primary" on:click={close} data-testid="voice-settings-save-footer-btn">{$_('common.save')}</button>
+      <button
+        class="modal-btn-generic primary"
+        on:click={close}
+        data-testid="voice-settings-save-footer-btn">{$_("common.save")}</button
+      >
     </div>
   </div>
 </div>
@@ -105,7 +115,12 @@
     color: #fff;
     animation: modalFadeIn 0.3s ease-out forwards;
   }
-  @keyframes modalFadeIn { to { transform: scale(1); opacity: 1; } }
+  @keyframes modalFadeIn {
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
   .modal-header {
     padding: 16px 24px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -118,7 +133,7 @@
     font-weight: 700;
     margin: 0;
   }
-  
+
   .modal-body {
     padding: 24px;
     max-height: 60vh;

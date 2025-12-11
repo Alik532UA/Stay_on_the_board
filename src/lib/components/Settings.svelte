@@ -9,6 +9,8 @@
   import SvgIcons from "./SvgIcons.svelte";
   import { customTooltip } from "$lib/actions/customTooltip.js";
   import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
+  import StyledButton from "$lib/components/ui/StyledButton.svelte";
+  import ToggleButton from "$lib/components/ToggleButton.svelte";
   import { locale } from "svelte-i18n";
   import "../css/layouts/main-menu.css";
   import { languages } from "$lib/constants.js";
@@ -253,9 +255,8 @@
           class="settings-button-group"
           data-testid="settings-page-game-mode-group"
         >
-          <button
-            class="settings-group-button"
-            class:active={!gameSettings.rememberGameMode}
+          <StyledButton
+            variant={!gameSettings.rememberGameMode ? "primary" : "menu"}
             on:click={() => {
               gameSettingsStore.updateSettings({
                 gameMode: null,
@@ -266,39 +267,42 @@
                 sessionStorage.removeItem("gameMode");
               }
             }}
-            data-testid="settings-page-game-mode-null"
+            dataTestId="settings-page-game-mode-null"
           >
             {$_("gameModes.choose")}
-          </button>
+          </StyledButton>
           <div class="game-mode-buttons">
-            <button
-              class="settings-group-button"
-              class:active={gameSettings.rememberGameMode &&
-                gameSettings.gameMode === "beginner"}
+            <StyledButton
+              variant={gameSettings.rememberGameMode &&
+              gameSettings.gameMode === "beginner"
+                ? "primary"
+                : "menu"}
               on:click={() => userActionService.setGameModePreset("beginner")}
-              data-testid="settings-page-game-mode-beginner"
+              dataTestId="settings-page-game-mode-beginner"
             >
               {$_("gameModes.beginner")}
-            </button>
-            <button
-              class="settings-group-button"
-              class:active={gameSettings.rememberGameMode &&
-                gameSettings.gameMode === "experienced"}
+            </StyledButton>
+            <StyledButton
+              variant={gameSettings.rememberGameMode &&
+              gameSettings.gameMode === "experienced"
+                ? "primary"
+                : "menu"}
               on:click={() =>
                 userActionService.setGameModePreset("experienced")}
-              data-testid="settings-page-game-mode-experienced"
+              dataTestId="settings-page-game-mode-experienced"
             >
               {$_("gameModes.experienced")}
-            </button>
-            <button
-              class="settings-group-button"
-              class:active={gameSettings.rememberGameMode &&
-                gameSettings.gameMode === "pro"}
+            </StyledButton>
+            <StyledButton
+              variant={gameSettings.rememberGameMode &&
+              gameSettings.gameMode === "pro"
+                ? "primary"
+                : "menu"}
               on:click={() => userActionService.setGameModePreset("pro")}
-              data-testid="settings-page-game-mode-pro"
+              dataTestId="settings-page-game-mode-pro"
             >
               {$_("gameModes.pro")}
-            </button>
+            </StyledButton>
           </div>
         </div>
       </div>
@@ -307,39 +311,37 @@
         class="settings-option"
         data-testid="settings-page-difficulty-warning-option"
       >
-        <button
-          class="settings-toggle-button"
-          class:active={gameSettings.showDifficultyWarningModal}
-          on:click={() => toggleSetting("showDifficultyWarningModal")}
-          data-testid="settings-page-show-difficulty-warning-modal-toggle"
-        >
-          {$_("settings.showDifficultyWarningModal")}
-        </button>
+        <ToggleButton
+          label={$_("settings.showDifficultyWarningModal")}
+          checked={gameSettings.showDifficultyWarningModal}
+          on:toggle={() => toggleSetting("showDifficultyWarningModal")}
+          dataTestId="settings-page-show-difficulty-warning-modal-toggle"
+        />
       </div>
       <hr class="settings-divider" data-testid="settings-page-divider-4" />
       <div class="settings-actions" data-testid="settings-page-actions">
-        <button
-          class="settings-reset-button"
+        <StyledButton
+          variant="menu"
           on:click={resetSettings}
-          use:customTooltip={$_("settings.resetHint")}
-          data-testid="settings-page-reset-button"
+          tooltip={$_("settings.resetHint")}
+          dataTestId="settings-page-reset-button"
         >
           <span>{$_("settings.reset")}</span>
-        </button>
-        <button
-          data-testid="clear-cache-keep-appearance-btn"
-          class="settings-reset-button"
+        </StyledButton>
+        <StyledButton
+          variant="menu"
+          dataTestId="clear-cache-keep-appearance-btn"
           on:click={handleKeepAppearance}
         >
           <span>{$_("mainMenu.clearCacheModal.keepAppearance")}</span>
-        </button>
-        <button
-          data-testid="clear-cache-full-clear-btn"
-          class="settings-reset-button danger"
+        </StyledButton>
+        <StyledButton
+          variant="danger"
+          dataTestId="clear-cache-full-clear-btn"
           on:click={handleClearAll}
         >
           <span>{$_("mainMenu.clearCacheModal.fullClear")}</span>
-        </button>
+        </StyledButton>
       </div>
     </div>
   </div>
@@ -427,32 +429,7 @@
     flex-direction: column;
     gap: 12px;
   }
-  .settings-reset-button.danger {
-    background: var(--error-color);
-    color: #fff;
-  }
-  .settings-reset-button.danger:hover {
-    background: #a40e26;
-  }
-  .settings-reset-button {
-    background: var(--control-bg);
-    color: var(--text-primary);
-    border: 1.5px solid var(--border-color);
-    border-radius: 8px;
-    padding: 12px 20px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: background 0.2s;
-    width: 100%;
-    min-height: 50px;
-  }
-  .settings-reset-button:hover {
-    border-color: var(--control-selected);
-  }
+
   .language-selector {
     display: flex;
     gap: 8px;
@@ -472,26 +449,7 @@
     border-color: var(--control-selected) !important;
     box-shadow: none !important;
   }
-  .settings-toggle-button {
-    width: 100%;
-    background: var(--control-bg);
-    color: var(--text-primary);
-    border: 1.5px solid var(--border-color);
-    border-radius: 8px;
-    padding: 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 600;
-  }
-  .settings-toggle-button:hover {
-    border-color: var(--control-selected);
-  }
-  .settings-toggle-button.active {
-    background: var(--control-selected);
-    color: var(--button-text-color, #fff);
-    border-color: var(--control-selected);
-  }
+
   .settings-section {
     display: flex;
     flex-direction: column;
@@ -508,28 +466,6 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-  }
-
-  .settings-group-button {
-    flex: 1;
-    padding: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    border-radius: 8px;
-    border: 1.5px solid var(--border-color);
-    background: var(--control-bg);
-    color: var(--text-primary);
-    transition: all 0.2s;
-  }
-
-  .settings-group-button:hover {
-    border-color: var(--control-selected);
-  }
-
-  .settings-group-button.active {
-    background: var(--control-selected);
-    color: var(--button-text-color, #fff);
-    border-color: var(--control-selected);
   }
 
   .voice-list-wrapper {

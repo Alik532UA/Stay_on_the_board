@@ -7,11 +7,12 @@ import type { BoardState } from '$lib/stores/boardStore';
 import type { PlayerState } from '$lib/stores/playerStore';
 import type { ScoreState } from '$lib/stores/scoreStore';
 import type { UiState } from '$lib/stores/uiStateStore';
+import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
 
 export function calculateFinalScore(
-  boardState: BoardState, 
-  playerState: PlayerState, 
-  scoreState: ScoreState, 
+  boardState: BoardState,
+  playerState: PlayerState,
+  scoreState: ScoreState,
   uiState: UiState,
   gameMode: 'local' | 'training' | 'timed' | 'online' | 'virtual-player'
 ): FinalScoreDetails {
@@ -61,7 +62,7 @@ export function calculateFinalScore(
   };
 }
 
-function _calculateBaseScore(player: Player, settings: any): number {
+function _calculateBaseScore(player: Player, settings: GameSettingsState): number {
   if (player?.type !== 'human') {
     return 0;
   }
@@ -74,10 +75,21 @@ function _calculateBaseScore(player: Player, settings: any): number {
   return 1;
 }
 
-function _calculateMirrorMovePenalty(currentState: any, direction: string, distance: number, settings: any): { penaltyPoints: number; penaltyPointsForMove: number } {
+/**
+ * Типізований стан для розрахунку рахунку
+ */
+interface MoveScoreState {
+  players: Player[];
+  lastMove?: { player: number; direction: string; distance: number } | null;
+  playerRow: number;
+  playerCol: number;
+  cellVisitCounts: Record<string, number>;
+}
+
+function _calculateMirrorMovePenalty(currentState: MoveScoreState, direction: string, distance: number, settings: GameSettingsState): { penaltyPoints: number; penaltyPointsForMove: number } {
   let penaltyPoints = 0;
   let penaltyPointsForMove = 0;
-  const humanPlayersCount = currentState.players.filter((p: any) => p.type === 'human').length;
+  const humanPlayersCount = currentState.players.filter((p: Player) => p.type === 'human').length;
   const lastComputerMove = currentState.lastMove;
 
   if (direction && lastComputerMove && lastComputerMove.player !== 0 && !settings.blockModeEnabled) {
@@ -100,7 +112,7 @@ function _calculateDistanceBonus(distance: number): { bonus: number; distanceBon
   return { bonus: 0, distanceBonusChange: 0 };
 }
 
-function _calculateJumpBonus(jumpedCount: number, settings: any): number {
+function _calculateJumpBonus(jumpedCount: number, settings: GameSettingsState): number {
   if (jumpedCount > 0 && settings.blockModeEnabled) {
     return jumpedCount;
   }
@@ -108,12 +120,13 @@ function _calculateJumpBonus(jumpedCount: number, settings: any): number {
 }
 
 export function calculateMoveScore(
-  currentState: any,
+  currentState: MoveScoreState,
   newPosition: { row: number; col: number },
   playerIndex: number,
-  settings: any,
+  settings: GameSettingsState,
   distance: number = 1,
   direction?: string
+
 ): {
   baseScoreChange: number;
   penaltyPoints: number;
@@ -127,12 +140,12 @@ export function calculateMoveScore(
   const isHumanMove = originalPlayer?.type === 'human';
 
   const baseScoreChange = _calculateBaseScore(originalPlayer, settings);
-  
+
   let penaltyResult = { penaltyPoints: 0, penaltyPointsForMove: 0 };
   if (isHumanMove && direction) {
     penaltyResult = _calculateMirrorMovePenalty(currentState, direction, distance, settings);
   }
-  
+
   const startPosition = { row: currentState.playerRow, col: currentState.playerCol };
   const movePath = getMovePath(startPosition, newPosition);
   const jumpedCount = movePath.reduce((count, cell) => {
@@ -159,7 +172,7 @@ export function calculateMoveScore(
   };
 }
 
-export function determineWinner(playerState: PlayerState, reasonKey: string, losingPlayerIndex: number | null = null): { winners: number[], winningPlayerIndex: number } {
+export function determineWinner(playerState: PlayerState, reasonKey: string, losingPlayerIndex: number | null = null): { winners: Player[], winningPlayerIndex: number, loser: Player | null } {
   logService.GAME_MODE('[scoreService] determineWinner called', { losingPlayerIndex });
   const scores = playerState.players.map(p => p.score);
   let maxScore = -Infinity;
@@ -171,13 +184,22 @@ export function determineWinner(playerState: PlayerState, reasonKey: string, los
     }
   }
 
-  const winners: number[] = [];
+  const winners: Player[] = [];
   for (let i = 0; i < scores.length; i++) {
     if (i !== losingPlayerIndex && scores[i] === maxScore) {
-      winners.push(playerState.players[i].id);
+      winners.push(playerState.players[i]);
     }
   }
-  
-  const winningPlayerIndex = winners.length > 0 ? playerState.players.findIndex(p => p.id === winners[0]) : -1;
-  return { winners, winningPlayerIndex };
+
+  // User Requirement 2C: If there is a tie (multiple winners), we declare NO winners.
+  // We only have a winner if there is strictly one player with the highest score.
+  if (winners.length > 1) {
+    winners.length = 0; // Clear the array
+    logService.GAME_MODE('[scoreService] Tie detected. No winners declared (Option 2C).');
+  }
+
+  const winningPlayerIndex = winners.length > 0 ? playerState.players.findIndex(p => p.id === winners[0].id) : -1;
+  const loser = losingPlayerIndex !== null && losingPlayerIndex >= 0 ? playerState.players[losingPlayerIndex] : null;
+
+  return { winners, winningPlayerIndex, loser };
 }

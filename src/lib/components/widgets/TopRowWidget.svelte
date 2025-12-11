@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { navigationService } from '$lib/services/navigationService.js';
-  import { _ } from 'svelte-i18n';
-  import SvgIcons from '../SvgIcons.svelte';
-  import { showGameInfoModal } from '$lib/utils/uiHelpers.js';
-  import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
-  import { customTooltip } from '$lib/actions/customTooltip.js';
-  import { page } from '$app/stores';
-  import { onMount } from 'svelte';
-  import { get } from 'svelte/store';
-  import { modalService } from '$lib/services/modalService';
-  import { columnStyleMode } from '$lib/stores/columnStyleStore.js';
-  import { logService } from '$lib/services/logService.js';
-  import { uiStateStore } from '$lib/stores/uiStateStore';
-  import hotkeyService from '$lib/services/hotkeyService';
+  import { navigationService } from "$lib/services/navigationService.js";
+  import { _ } from "svelte-i18n";
+  import SvgIcons from "../SvgIcons.svelte";
+  import { showGameInfoModal } from "$lib/utils/uiHelpers.js";
+  import { hotkeyTooltip } from "$lib/actions/hotkeyTooltip.js";
+  import { customTooltip } from "$lib/actions/customTooltip.js";
+  import { page } from "$app/stores";
+  import { onMount } from "svelte";
+  import { get } from "svelte/store";
+  import { modalService } from "$lib/services/modalService";
+  import { columnStyleMode } from "$lib/stores/columnStyleStore";
+  import { logService } from "$lib/services/logService.js";
+  import { uiStateStore } from "$lib/stores/uiStateStore";
+  import hotkeyService from "$lib/services/hotkeyService";
 
   function handleMainMenuClick() {
     const uiState = get(uiStateStore);
@@ -24,42 +24,71 @@
   }
 
   function handleLocalSetupClick() {
-    navigationService.goTo('/local-setup');
+    navigationService.goTo("/local-setup");
   }
 
   onMount(() => {
-    hotkeyService.register('global', 'KeyI', showGameInfoModal);
-    hotkeyService.register('global', 'Escape', handleMainMenuClick);
+    hotkeyService.register("global", "KeyI", showGameInfoModal);
+    hotkeyService.register("global", "Escape", handleMainMenuClick);
   });
 </script>
+
+<div class="game-board-top-row">
+  <button
+    class="main-menu-btn"
+    use:hotkeyTooltip={{ title: $_("gameBoard.mainMenu"), key: "ESC" }}
+    on:click={handleMainMenuClick}
+    data-testid="top-row-main-menu-btn"
+  >
+    <SvgIcons name="home" />
+  </button>
+  {#if $page.route.id?.includes("/game/local")}
+    <button
+      class="main-menu-btn"
+      use:customTooltip={$_("tooltips.localGameSettings")}
+      on:click={handleLocalSetupClick}
+      data-testid="local-game-settings-btn"
+    >
+      <SvgIcons name="hamburger-menu" />
+    </button>
+  {/if}
+  <button
+    class="main-menu-btn"
+    use:hotkeyTooltip={{ title: $_("faq.title"), key: "I" }}
+    on:click={showGameInfoModal}
+    data-testid="game-info-btn"
+  >
+    <SvgIcons name="info" />
+  </button>
+  {#if false}
+    <button
+      class="main-menu-btn"
+      use:customTooltip={$columnStyleMode === "flexible"
+        ? "Switch to Fixed"
+        : "Switch to Flexible"}
+      on:click={() =>
+        columnStyleMode.update((v) => (v === "fixed" ? "flexible" : "fixed"))}
+      style="display: flex; align-items: center; justify-content: center;"
+      data-testid="column-style-mode-btn"
+    >
+      <SvgIcons name="palette" />
+      {#if $columnStyleMode === "flexible"}
+        <span
+          style="display: flex; align-items: center; justify-content: center; margin-left: 4px;"
+          ><SvgIcons name="editing" /></span
+        >
+      {:else}
+        <span
+          style="display: flex; align-items: center; justify-content: center; margin-left: 4px;"
+          ><SvgIcons name="fixed" /></span
+        >
+      {/if}
+    </button>
+  {/if}
+</div>
 
 <style>
   .game-board-top-row {
     margin: 0;
   }
 </style>
-
-<div class="game-board-top-row">
-  <button class="main-menu-btn" use:hotkeyTooltip={{ title: $_('gameBoard.mainMenu'), key: 'ESC' }} on:click={handleMainMenuClick} data-testid="top-row-main-menu-btn">
-    <SvgIcons name="home" />
-  </button>
-  {#if $page.route.id?.includes('/game/local')}
-    <button class="main-menu-btn" use:customTooltip={$_('tooltips.localGameSettings')} on:click={handleLocalSetupClick} data-testid="local-game-settings-btn">
-      <SvgIcons name="hamburger-menu" />
-    </button>
-  {/if}
-  <button class="main-menu-btn" use:hotkeyTooltip={{ title: $_('faq.title'), key: 'I' }} on:click={showGameInfoModal} data-testid="game-info-btn">
-    <SvgIcons name="info" />
-  </button>
-  {#if false}
-    <button class="main-menu-btn" use:customTooltip={$columnStyleMode === 'editing' ? 'Switch to Fixed' : 'Switch to Editing'} on:click={() => columnStyleMode.update(v => v === 'fixed' ? 'editing' : 'fixed')} style="display: flex; align-items: center; justify-content: center;" data-testid="column-style-mode-btn">
-      <SvgIcons name="palette" />
-      {#if $columnStyleMode === 'editing'}
-        <span style="display: flex; align-items: center; justify-content: center; margin-left: 4px;"><SvgIcons name="editing" /></span>
-      {:else}
-        <span style="display: flex; align-items: center; justify-content: center; margin-left: 4px;"><SvgIcons name="fixed" /></span>
-      {/if}
-    </button>
-  {/if}
-
-</div>

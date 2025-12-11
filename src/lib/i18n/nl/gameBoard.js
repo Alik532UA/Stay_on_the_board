@@ -19,6 +19,7 @@ export default {
   gameInfo: {
     gameStarted: "Spel gestart!\nDoe je zet",
     firstMove: "Spel gestart!\nJouw beurt om een zet te doen",
+    opponentTurn: "Beurt van tegenstander",
     rememberPieceLocation: "Onthoud waar het stuk is!",
     gameResumed: "Spel hervat, het stuk staat op dezelfde positie als voor de pauze.\nJouw beurt om te zetten",
     playerTurn: "Jouw beurt om een zet te doen",

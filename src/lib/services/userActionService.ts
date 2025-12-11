@@ -1,18 +1,13 @@
 // src/lib/services/userActionService.ts
 import { get } from 'svelte/store';
 import { tick } from 'svelte';
-import { modalStore } from '$lib/stores/modalStore.js';
-import { gameStore } from '$lib/stores/gameStore';
-import { modalService } from './modalService';
+import { modalStore } from '$lib/stores/modalStore';
 import { gameModeService } from './gameModeService';
-import { logService } from './logService.js';
+import { logService } from './logService';
 import type { Direction } from '$lib/utils/gameUtils';
 import { navigationService } from './navigationService';
 import { gameSettingsStore, type GameModePreset } from '$lib/stores/gameSettingsStore.js';
 import { endGameService } from './endGameService';
-import { loadAndGetVoices, filterVoicesByLang } from '$lib/services/speechService.js';
-import { openVoiceSettingsModal } from '$lib/stores/uiStore.js';
-import { locale } from 'svelte-i18n';
 import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
@@ -20,9 +15,8 @@ import { uiStateStore } from '$lib/stores/uiStateStore';
 import { gameService } from './gameService';
 import ReplayViewer from '$lib/components/ReplayViewer.svelte';
 import { gameEventBus } from './gameEventBus';
-import { sideEffectService } from './sideEffectService';
-import { navigateToGame } from './uiService'; // Add this import
-import { gameModeStore } from '$lib/stores/gameModeStore';
+import { modalService } from './modalService';
+import { navigateToGame } from './uiService';
 
 export const userActionService = {
   selectDirection(direction: Direction): void {
@@ -41,10 +35,8 @@ export const userActionService = {
     } else {
       newDistance = (!selectedDistance || selectedDistance >= maxDist) ? 1 : selectedDistance + 1;
     }
-    
+
     uiStateStore.update(s => s ? ({ ...s, selectedDirection: direction, selectedDistance: newDistance }) : null);
-    
-    logService.logicMove('setDirection: встановлено напрямок', { dir: direction, newDistance });
   },
 
   selectDistance(distance: number): void {
@@ -62,7 +54,7 @@ export const userActionService = {
   async executeMove(direction: Direction, distance: number): Promise<void> {
     const uiState = get(uiStateStore);
     if (uiState?.isComputerMoveInProgress) return;
-    
+
     const activeGameMode = gameModeService.getCurrentMode();
     if (activeGameMode) {
       await activeGameMode.handlePlayerMove(direction, distance);
@@ -85,45 +77,59 @@ export const userActionService = {
     const scoreState = get(scoreStore);
     if (!boardState || !playerState || !scoreState) return;
 
-    const score = playerState.players.reduce((acc: number, p: any) => acc + p.score, 0);
+    const score = playerState.players.reduce((acc: number, p: { score: number }) => acc + p.score, 0);
     if (newSize === boardState.boardSize) return;
 
-    // Якщо гра ще не почалася (рахунок 0), змінюємо розмір дошки без підтвердження.
-    // Це дозволяє користувачам вільно налаштовувати дошку перед початком гри.
     if (score === 0 && scoreState.penaltyPoints === 0) {
-      gameService.initializeNewGame({ size: newSize });
+      const activeGameMode = gameModeService.getCurrentMode();
+      if (activeGameMode) {
+        activeGameMode.restartGame({ newSize });
+      } else {
+        gameService.initializeNewGame({ size: newSize });
+      }
       gameSettingsStore.updateSettings({ boardSize: newSize });
     } else {
-      // Якщо гра вже триває, показуємо модальне вікно для підтвердження,
-      // оскільки зміна розміру дошки скине поточний прогрес.
       modalService.showBoardResizeModal(newSize);
     }
   },
 
-  
-
   async requestRestart(): Promise<void> {
     modalStore.closeModal();
-    // IMPORTANT: DO NOT CHANGE THIS TO use gameModeStore.
-    // This is the single source of truth for the selected game mode preset.
-    // It ensures that when a user selects a new mode, we initialize the correct one,
-    // not the one that is currently active.
-    const activeMode = get(gameSettingsStore).gameMode;
-    if (activeMode) {
-      gameModeService.initializeGameMode(activeMode, false);
+
+    const currentMode = gameModeService.getCurrentMode();
+    const currentModeName = currentMode?.getModeName();
+
+    if (currentModeName === 'online') {
+      logService.action('[userActionService] Online mode detected. Skipping local restart logic. Waiting for OnlineGameMode handler.');
+      return;
+    }
+
+    if (currentModeName === 'local') {
+      gameModeService.initializeGameMode('local', false);
     } else {
-      // Fallback, though a mode should always be active when this is called.
-      logService.state('ERROR: [userActionService] requestRestart called without an active game mode.');
-      const currentBoardSize = get(boardStore)?.boardSize;
-      gameService.initializeNewGame({ size: currentBoardSize });
+      const settings = get(gameSettingsStore);
+      if (settings.gameMode) {
+        gameModeService.initializeGameMode(settings.gameMode, false);
+      } else {
+        if (currentMode) {
+          currentMode.restartGame();
+        } else {
+          logService.state('ERROR: [userActionService] requestRestart called without an active game mode or setting.');
+          const currentBoardSize = get(boardStore)?.boardSize;
+          gameService.initializeNewGame({ size: currentBoardSize });
+        }
+      }
     }
   },
 
   async requestRestartWithSize(newSize: number): Promise<void> {
     modalStore.closeModal();
-    // Ця функція викликається після підтвердження у модальному вікні.
-    // Вона перезапускає гру з новим розміром дошки.
-    gameService.initializeNewGame({ size: newSize });
+    const activeGameMode = gameModeService.getCurrentMode();
+    if (activeGameMode) {
+      activeGameMode.restartGame({ newSize });
+    } else {
+      gameService.initializeNewGame({ size: newSize });
+    }
     gameSettingsStore.updateSettings({ boardSize: newSize });
   },
 
@@ -131,6 +137,9 @@ export const userActionService = {
     const boardState = get(boardStore);
     if (!boardState) return;
     const { moveHistory, boardSize } = boardState;
+
+    // FIX: Використовуємо gameEventBus.dispatch('CloseModal') замість прямого modalStore.closeModal().
+    // Це дозволяє OnlineGameMode перехопити подію і оновити статус гравця на сервері.
     modalStore.showModal({
       component: ReplayViewer,
       props: {
@@ -139,7 +148,10 @@ export const userActionService = {
         autoPlayForward: true
       },
       titleKey: 'replay.title',
-      buttons: [{ textKey: 'modal.close', onClick: () => modalStore.closeModal() }],
+      buttons: [{
+        textKey: 'modal.close',
+        onClick: () => gameEventBus.dispatch('CloseModal')
+      }],
       dataTestId: 'replay-modal',
     });
   },
@@ -165,8 +177,6 @@ export const userActionService = {
       logService.logicMove('[userActionService] Input locked: isComputerMoveInProgress=true');
       switch (action) {
         case 'restartGame':
-          await this.requestRestart();
-          break;
         case 'playAgain':
           await this.requestRestart();
           break;
@@ -208,9 +218,6 @@ export const userActionService = {
   },
 
   setGameModePreset(preset: GameModePreset): void {
-    // НАВІЩО (Архітектурне виправлення): Ця функція тепер відповідає ТІЛЬКИ за оновлення
-    // налаштувань (SSoT) через виклик атомарного методу в сторі. Ініціалізація гри (SoC)
-    // повністю делегована відповідній ігровій сторінці.
     gameSettingsStore.applyPreset(preset);
   },
 

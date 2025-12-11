@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import { BaseGameMode } from './BaseGameMode';
-import type { Player } from '$lib/models/player';
+import type { Player, BonusHistoryItem } from '$lib/models/player';
+import { createTrainingPlayers } from '$lib/utils/playerFactory';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
@@ -14,6 +15,7 @@ import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { boardStore } from '$lib/stores/boardStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
+import type { ScoreChangesData } from '$lib/types/gameMove';
 
 export class TrainingGameMode extends BaseGameMode {
   initialize(options: { newSize?: number } = {}): void {
@@ -26,10 +28,7 @@ export class TrainingGameMode extends BaseGameMode {
   }
 
   getPlayersConfiguration(): Player[] {
-    return [
-      { id: 1, type: 'human', name: 'Гравець', score: 0, color: '#000000', isComputer: false, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] },
-      { id: 2, type: 'ai', name: 'Комп\'ютер', score: 0, color: '#ffffff', isComputer: true, penaltyPoints: 0, bonusPoints: 0, bonusHistory: [] }
-    ];
+    return createTrainingPlayers();
   }
 
   getModeName(): 'training' | 'local' | 'timed' | 'online' | 'virtual-player' {
@@ -46,15 +45,19 @@ export class TrainingGameMode extends BaseGameMode {
 
     const nextPlayer = get(playerStore)?.players[nextPlayerIndex];
     logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer?.type}.`);
+
     if (nextPlayer?.type === 'ai') {
-      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера.');
+      // ВИПРАВЛЕНО: Прибрано штучну затримку (await setTimeout).
+      // Логіка повинна відпрацювати миттєво, щоб оновити center-info.
+      // Візуальна пауза забезпечується чергою в animationService.
+      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера (миттєво).');
       await this.triggerComputerMove();
     } else {
       this.startTurn();
     }
   }
 
-  protected async applyScoreChanges(scoreChanges: any): Promise<void> {
+  protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
     // No specific score changes to apply in training mode
   }
 
@@ -66,16 +69,16 @@ export class TrainingGameMode extends BaseGameMode {
     logService.logicMove('State of uiStateStore BEFORE continueAfterNoMoves:', get(uiStateStore));
 
     boardStore.update(s => {
-        if (!s) return null;
-        return {
-            ...s,
-            cellVisitCounts: {},
-            moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
-            moveQueue: [],
-        };
+      if (!s) return null;
+      return {
+        ...s,
+        cellVisitCounts: {},
+        moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
+        moveQueue: [],
+      };
     });
     availableMovesService.updateAvailableMoves();
-    
+
     gameOverStore.resetGameOverState();
     animationService.reset();
 

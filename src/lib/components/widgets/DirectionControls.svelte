@@ -7,7 +7,7 @@
   import { logService } from '$lib/services/logService.js';
   import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
   import { customTooltip } from '$lib/actions/customTooltip.js';
-  import { modalStore } from '$lib/stores/modalStore.js';
+  import { modalStore } from '$lib/stores/modalStore';
   import hotkeyService from '$lib/services/hotkeyService';
   export let isMoveInProgress = false;
   export let selectedDirection = null;
@@ -341,3 +341,4 @@
   }
 }
 </style>
+

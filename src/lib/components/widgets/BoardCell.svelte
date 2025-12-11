@@ -5,18 +5,32 @@
   export let gameSettings: any;
   export let isAvailable: boolean;
   export let isPenalty = false;
-  export const visualPosition: { row: number|null, col: number|null } = { row: null, col: null };
+  export const visualPosition: { row: number | null; col: number | null } = {
+    row: null,
+    col: null,
+  };
   export const boardState: any = {};
   export const gameState: any = {};
-  import { isCellBlocked, getDamageClass } from '$lib/utils/boardUtils.ts';
-  import { createEventDispatcher } from 'svelte';
+  import { isCellBlocked, getDamageClass } from "$lib/utils/boardUtils.ts";
+  import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
   function onCellRightClick(event: MouseEvent) {
-    dispatch('cellRightClick', { event, row: rowIdx, col: colIdx });
+    dispatch("cellRightClick", { event, row: rowIdx, col: colIdx });
   }
-  $: blocked = isCellBlocked(rowIdx, colIdx, visualCellVisitCounts, gameSettings);
-  $: damageClass = getDamageClass(rowIdx, colIdx, visualCellVisitCounts, gameSettings);
+  $: blocked = isCellBlocked(
+    rowIdx,
+    colIdx,
+    visualCellVisitCounts,
+    gameSettings,
+  );
+  $: damageClass = getDamageClass(
+    rowIdx,
+    colIdx,
+    visualCellVisitCounts,
+    gameSettings,
+  );
 </script>
+
 <div
   class="board-cell {damageClass}"
   class:light={(rowIdx + colIdx) % 2 === 0}
@@ -26,7 +40,7 @@
   aria-label={`Cell ${rowIdx + 1}, ${colIdx + 1}`}
   on:contextmenu={onCellRightClick}
   role="gridcell"
-  data-testid="board-cell"
+  data-testid={`board-cell-${rowIdx}-${colIdx}`}
   tabindex="0"
 >
   {#if blocked}
@@ -56,7 +70,9 @@
     border: 1px solid rgba(0, 0, 0, 0.2);
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.5);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
     pointer-events: none; /* Щоб не заважали клікам */
   }
 
@@ -68,5 +84,4 @@
   .move-dot.is-penalty {
     background-color: #e74c3c !important; /* Red */
   }
-
 </style>

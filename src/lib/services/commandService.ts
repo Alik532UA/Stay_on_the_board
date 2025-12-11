@@ -1,7 +1,8 @@
-import { gameEventBus } from './gameEventBus';
+import { gameEventBus, type ShowModalPayload, type SpeakMovePayload, type BoardResizePayload } from './gameEventBus';
 import { sideEffectService } from './sideEffectService';
 import { logService } from './logService';
 import { userActionService } from './userActionService';
+import type { GameOverPayload } from '$lib/stores/gameOverStore';
 
 class CommandService {
   constructor() {
@@ -18,7 +19,7 @@ class CommandService {
     gameEventBus.subscribe('BoardResizeConfirmed', (payload) => this.handleBoardResizeConfirmed(payload));
   }
 
-  private handleGameOver(payload: any) {
+  private handleGameOver(payload: GameOverPayload) {
     logService.logicMove('CommandService: Handling GameOver event', payload);
     sideEffectService.execute({
       type: 'ui/showGameOverModal',
@@ -33,7 +34,7 @@ class CommandService {
     });
   }
 
-  private handleShowModal(payload: any) {
+  private handleShowModal(payload: ShowModalPayload) {
     logService.logicMove('CommandService: Handling ShowModal event', payload);
     sideEffectService.execute({
       type: 'ui/showModal',
@@ -41,11 +42,16 @@ class CommandService {
     });
   }
 
-  private handleSpeakMove(payload: any) {
+  private handleSpeakMove(payload: SpeakMovePayload) {
     logService.logicMove('CommandService: Handling SpeakMove event', payload);
     sideEffectService.execute({
-      type: 'speak',
-      payload: payload
+      type: 'speak_move',
+      payload: {
+        move: payload.move as { direction: import('$lib/models/Piece').MoveDirectionType; distance: number },
+        lang: payload.lang || 'uk',
+        voiceURI: payload.voiceURI || null,
+        onEndCallback: payload.onEndCallback
+      }
     });
   }
 
@@ -59,7 +65,7 @@ class CommandService {
     userActionService.requestReplay();
   }
 
-  private handleBoardResizeConfirmed(payload: any) {
+  private handleBoardResizeConfirmed(payload: BoardResizePayload) {
     logService.logicMove('CommandService: Handling BoardResizeConfirmed event', payload);
     userActionService.requestRestartWithSize(payload.newSize);
   }

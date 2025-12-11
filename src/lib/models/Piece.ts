@@ -2,6 +2,7 @@
  * Enum для напрямків руху фігури
  */
 import { logService } from '$lib/services/logService.js';
+import type { Position, MoveResult, AvailableMove } from '$lib/types/position';
 export const MoveDirection = {
   UP: 'up',
   DOWN: 'down',
@@ -33,7 +34,7 @@ export class Piece {
   /**
    * Отримати поточну позицію
    */
-  getPosition(): any {
+  getPosition(): Position {
     return { row: this.row, col: this.col };
   }
 
@@ -53,14 +54,14 @@ export class Piece {
    * Перевірити чи позиція в межах дошки
    */
   isValidPosition(row: number, col: number): boolean {
-    return row >= 0 && row < this.boardSize && 
-           col >= 0 && col < this.boardSize;
+    return row >= 0 && row < this.boardSize &&
+      col >= 0 && col < this.boardSize;
   }
 
   /**
    * Обчислити нову позицію на основі напрямку та відстані
    */
-  calculateNewPosition(direction: MoveDirectionType, distance: number): any {
+  calculateNewPosition(direction: MoveDirectionType, distance: number): Position {
     const newRow = this.row;
     const newCol = this.col;
 
@@ -89,15 +90,15 @@ export class Piece {
   /**
    * Виконати рух у вказаному напрямку на вказану відстань
    */
-  move(direction: MoveDirectionType, distance: number): any {
+  move(direction: MoveDirectionType, distance: number): MoveResult {
     const newPosition = this.calculateNewPosition(direction, distance);
-    
+
     if (this.isValidPosition(newPosition.row, newPosition.col)) {
       this.row = newPosition.row;
       this.col = newPosition.col;
       return { success: true, newPosition };
     }
-    
+
     return { success: false, error: 'Позиція поза межами дошки' };
   }
 
@@ -112,11 +113,11 @@ export class Piece {
   /**
    * Отримати список доступних ходів
    */
-  getAvailableMoves(): any[] {
+  getAvailableMoves(): AvailableMove[] {
     logService.logicAvailability('Available Moves Calculation Position', { row: this.row, col: this.col });
-    const moves: any[] = [];
+    const moves: AvailableMove[] = [];
     const directions = Object.values(MoveDirection);
-    
+
     for (const direction of directions) {
       for (let distance = 1; distance <= this.boardSize; distance++) {
         if (this.canMove(direction, distance)) {
@@ -124,7 +125,7 @@ export class Piece {
         }
       }
     }
-    
+
     return moves;
   }
 
