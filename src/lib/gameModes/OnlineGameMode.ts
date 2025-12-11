@@ -21,6 +21,7 @@ import { availableMovesService } from '$lib/services/availableMovesService';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import type { Room } from '$lib/types/online';
 import { modalService } from '$lib/services/modalService';
+import { navigationService } from '$lib/services/navigationService';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
@@ -40,12 +41,13 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   async initialize(options: { newSize?: number; roomId?: string } = {}): Promise<void> {
-    this.roomId = options.roomId || null;
+    // Спроба відновити сесію, якщо параметри не передані (наприклад, при релоаді)
     const session = roomService.getSession();
+    this.roomId = options.roomId || session.roomId;
     this.myPlayerId = session.playerId;
 
     if (!this.roomId || !this.myPlayerId) {
-      logService.error('[OnlineGameMode] Missing roomId or playerId');
+      logService.error('[OnlineGameMode] Missing roomId or playerId. Cannot initialize.');
       return;
     }
 
@@ -90,9 +92,6 @@ export class OnlineGameMode extends BaseGameMode {
 
       this.unsubscribeSettings = gameSettingsStore.subscribe(settings => {
         if (!this.isApplyingRemoteState && this.roomId) {
-          // Тільки хост або якщо дозволено гостям
-          // Але тут ми просто синхронізуємо локальні зміни на сервер
-          // Перевірка прав відбувається в UI або в roomService
           this.syncCurrentState();
         }
       });
@@ -261,32 +260,21 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   private async handleRestartRequest(): Promise<void> {
-    if (!this.myPlayerId) return;
-
-    const currentState = await this.stateSync?.pullState();
-    const currentRequests = currentState?.restartRequests || {};
-
-    const newRequests = { ...currentRequests, [this.myPlayerId]: true };
-
-    const allReady = Object.keys(newRequests).length >= 2;
-
-    if (allReady) {
-      logService.GAME_MODE('[OnlineGameMode] Both players requested restart. Starting new game.');
-      const playersConfig = this.getPlayersConfiguration();
-
-      // Тут gameService.initializeNewGame скине gameOverStore локально
-      gameService.initializeNewGame({
-        size: get(gameSettingsStore).boardSize,
-        players: playersConfig,
-      });
-
-      // Синхронізуємо чистий стан (включаючи gameOver: null)
-      await this.syncCurrentState({ restartRequests: {} });
-    } else {
-      logService.GAME_MODE('[OnlineGameMode] Restart requested. Waiting for opponent.');
-      notificationService.show({ type: 'info', messageRaw: 'Очікування підтвердження суперника...' });
-      await this.syncCurrentState({ restartRequests: newRequests });
+    if (!this.myPlayerId || !this.roomId) {
+      logService.error('[OnlineGameMode] Cannot restart: missing ID or RoomID');
+      return;
     }
+
+    logService.GAME_MODE('[OnlineGameMode] Restart requested. Returning to lobby.');
+
+    // 1. Закриваємо всі модальні вікна
+    modalService.closeAllModals();
+
+    // 2. Повідомляємо сервер про повернення в лобі (це змінить статус кімнати на 'finished')
+    await roomService.returnToLobby(this.roomId, this.myPlayerId);
+
+    // 3. Переходимо на сторінку лобі
+    navigationService.goTo(`/online/lobby/${this.roomId}`);
   }
 
   private async syncCurrentState(overrides: Partial<SyncableGameState> = {}): Promise<void> {
@@ -310,7 +298,6 @@ export class OnlineGameMode extends BaseGameMode {
         turnDuration: settings.turnDuration,
         settingsLocked: settings.settingsLocked
       },
-      // Якщо гра завершена, відправляємо результат, інакше null
       gameOver: gameOverState.isGameOver ? gameOverState.gameResult : null,
       version: Date.now(),
       updatedAt: Date.now(),
@@ -355,7 +342,6 @@ export class OnlineGameMode extends BaseGameMode {
 
     if (remoteState.gameOver) {
       const currentGameOver = get(gameOverStore);
-      // Синхронізуємо прапорець isGameOver в uiStateStore
       uiStateStore.update(s => ({ ...s, isGameOver: true }));
 
       if (!currentGameOver.isGameOver) {
@@ -364,10 +350,8 @@ export class OnlineGameMode extends BaseGameMode {
         modalService.showGameOverModal(remoteState.gameOver!);
       }
     } else {
-      // FIX: Скидаємо прапорець isGameOver, якщо гра активна
       uiStateStore.update(s => ({ ...s, isGameOver: false }));
 
-      // FIX: Також скидаємо gameOverStore, щоб він відповідав серверному стану
       const currentGameOver = get(gameOverStore);
       if (currentGameOver.isGameOver) {
         logService.GAME_MODE('[OnlineGameMode] Clearing local GameOver state (server state is active)');

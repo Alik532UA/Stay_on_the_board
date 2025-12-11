@@ -177,7 +177,8 @@ class RoomService {
             if (Object.keys(roomData.players).length >= MAX_PLAYERS) {
                 throw new Error('Room is full');
             }
-            if (roomData.status !== 'waiting') {
+            // Дозволяємо приєднуватися, якщо статус waiting або finished
+            if (roomData.status === 'playing') {
                 throw new Error('Game already started');
             }
 
@@ -298,7 +299,6 @@ class RoomService {
         logService.init(`[RoomService] Leaving room ${roomId} as ${playerId}`);
         const roomRef = doc(this.db, 'rooms', roomId);
 
-        // Очищаємо сесію одразу, щоб запобігти реконекту
         this.clearSession();
 
         try {
@@ -341,10 +341,38 @@ class RoomService {
         });
     }
 
+    /**
+     * Повертає гравця в лобі після гри.
+     * Встановлює статус гравця 'ready' і статус кімнати 'finished' (якщо вона була 'playing').
+     */
+    async returnToLobby(roomId: string, playerId: string): Promise<void> {
+        logService.init(`[RoomService] Player ${playerId} returning to lobby in room ${roomId}`);
+        const roomRef = doc(this.db, 'rooms', roomId);
+
+        const roomSnap = await getDoc(roomRef);
+        if (!roomSnap.exists()) return;
+
+        const roomData = roomSnap.data() as Room;
+        const updates: Record<string, any> = {
+            [`players.${playerId}.isReady`]: true, // Гравець автоматично готовий до нової гри
+            lastActivity: Date.now()
+        };
+
+        // Якщо гра ще "триває" (playing), переводимо кімнату в стан "завершено" (finished).
+        // Це дозволяє іншим гравцям залишатися на екрані гри, поки вони теж не натиснуть "Грати ще раз".
+        if (roomData.status === 'playing') {
+            updates['status'] = 'finished';
+        }
+
+        await updateDoc(roomRef, updates);
+    }
+
     async startGame(roomId: string): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
+        // Скидаємо gameState в null, щоб змусити клієнтів ініціалізувати нову гру
         await updateDoc(roomRef, {
             status: 'playing',
+            gameState: null,
             lastActivity: Date.now()
         });
     }
