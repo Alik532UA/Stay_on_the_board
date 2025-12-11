@@ -26,10 +26,18 @@
                 class: "watching",
             };
         }
-        // Якщо гравець не готовий, але кімната в грі або завершена - він "У грі"
-        if (roomStatus === "playing" || roomStatus === "finished") {
+
+        // Розділяємо логіку для 'playing' та 'finished'
+        if (roomStatus === "playing") {
             return { text: "onlineMenu.playing", class: "playing" };
         }
+        if (roomStatus === "finished") {
+            return {
+                text: "onlineMenu.lobby.viewingResults",
+                class: "viewing-results",
+            };
+        }
+
         return { text: "onlineMenu.lobby.notReady", class: "" };
     }
 </script>
@@ -215,6 +223,10 @@
     }
     .player-status.watching {
         color: #03a9f4; /* Light Blue */
+        font-style: italic;
+    }
+    .player-status.viewing-results {
+        color: #9c27b0; /* Purple */
         font-style: italic;
     }
     .lobby-actions {

@@ -173,8 +173,7 @@
     </button>
     <button
       class="modal-btn-generic"
-      class:locked-setting={!import.meta.env.DEV}
-      onclick={import.meta.env.DEV ? handleLocalGame : openWipNotice}
+      onclick={handleLocalGame}
       data-testid="local-game-btn"
     >
       {$_("mainMenu.localGame")}

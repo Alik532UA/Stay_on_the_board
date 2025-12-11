@@ -17,6 +17,7 @@
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import ScoreBonusExpander from "./widgets/ScoreBonusExpander.svelte";
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
+  import { gameEventBus } from "$lib/services/gameEventBus"; // FIX: Імпорт шини подій
 
   let buttonRefs: (HTMLButtonElement | null)[] = [];
   let windowHeight = 0;
@@ -42,26 +43,22 @@
   $: {
     if ($modalState.isOpen) {
       const newContext = `modal-${$modalState.dataTestId}`;
-      // Ensure we're not adding contexts repeatedly
       if (currentModalContext !== newContext) {
-        // If there's an old context, pop it before pushing the new one.
         if (currentModalContext) {
           hotkeyService.popContext(currentModalContext);
         }
         currentModalContext = newContext;
         hotkeyService.pushContext(currentModalContext);
 
-        // Register hotkeys for the new context
         tick().then(() => {
-          // Register Escape key
           if ($modalState.closable) {
             hotkeyService.register(currentModalContext!, "Escape", () => {
               logService.ui("Escape key pressed, closing modal");
-              modalStore.closeModal();
+              // FIX: Використовуємо EventBus для закриття
+              gameEventBus.dispatch("CloseModal");
             });
           }
 
-          // Register button hotkeys
           $modalState.buttons.forEach((btn, i) => {
             if (btn.hotKey) {
               const key = btn.hotKey === "ESC" ? "Escape" : btn.hotKey;
@@ -74,7 +71,6 @@
         });
       }
     } else {
-      // If a modal was open and is now closing, pop its context.
       if (currentModalContext) {
         hotkeyService.popContext(currentModalContext);
         currentModalContext = null;
@@ -87,8 +83,6 @@
   }
 
   onDestroy(() => {
-    // Final cleanup to ensure no contexts are left hanging.
-    // This is the single source of truth for popping the context.
     if (currentModalContext) {
       hotkeyService.popContext(currentModalContext);
       currentModalContext = null;
@@ -137,7 +131,8 @@
     const target = e.target as HTMLElement;
     if (target && target.classList.contains("modal-overlay")) {
       logService.ui("Закриття модального вікна (overlay)");
-      modalStore.closeModal();
+      // FIX: Використовуємо EventBus для закриття
+      gameEventBus.dispatch("CloseModal");
     }
   }
 </script>
@@ -219,7 +214,8 @@
                 use:hotkeyTooltip={{ key: "ESC" }}
                 on:click={() => {
                   logService.ui("Закриття модального вікна (X)");
-                  modalStore.closeModal();
+                  // FIX: Використовуємо EventBus для закриття
+                  gameEventBus.dispatch("CloseModal");
                 }}
                 data-testid={`${$modalState.dataTestId}-close-btn`}>×</button
               >
@@ -406,7 +402,8 @@
               if (btn.onClick) {
                 await btn.onClick();
               } else {
-                modalStore.closeModal();
+                // FIX: Використовуємо EventBus для закриття
+                gameEventBus.dispatch("CloseModal");
               }
             }}
           >

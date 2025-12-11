@@ -76,7 +76,7 @@
     }
 
     [data-testid="menu-button-play"].primary {
-        background: #4CAF50; /* Green */
+        background: #4caf50; /* Green */
         color: white;
     }
 
@@ -94,10 +94,5 @@
         width: 48px;
         height: 48px;
         font-size: 48px;
-    }
-
-    .label {
-        font-size: 0.75rem;
-        margin-top: 4px;
     }
 </style>
