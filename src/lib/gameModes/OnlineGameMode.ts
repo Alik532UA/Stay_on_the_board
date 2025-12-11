@@ -8,42 +8,31 @@ import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { animationService } from '$lib/services/animationService';
 import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
-import { scoreStore } from '$lib/stores/scoreStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
-import { gameOverStore, type GameOverPayload } from '$lib/stores/gameOverStore';
 import type { IGameStateSync, GameStateSyncEvent, SyncableGameState } from '$lib/sync/gameStateSync.interface';
 import { createFirebaseGameStateSync } from '$lib/sync/FirebaseGameStateSync';
 import type { ScoreChangesData } from '$lib/types/gameMove';
 import { roomService } from '$lib/services/roomService';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import { notificationService } from '$lib/services/notificationService';
-import { availableMovesService } from '$lib/services/availableMovesService';
-import { gameEventBus, type ShowNoMovesModalPayload } from '$lib/services/gameEventBus';
 import type { Room } from '$lib/types/online';
-import { modalService } from '$lib/services/modalService';
-import { navigationService } from '$lib/services/navigationService';
-import { base } from '$app/paths';
-import { endGameService } from '$lib/services/endGameService';
-import { timeService } from '$lib/services/timeService';
 import { modalStore } from '$lib/stores/modalStore';
+import { endGameService } from '$lib/services/endGameService';
 
 // Імпорт нових класів
 import { GameStateReconciler } from './online/GameStateReconciler';
 import { OnlineMatchController } from './online/OnlineMatchController';
+import { OnlineGameEventManager } from './online/OnlineGameEventManager';
+import { OnlineStateSynchronizer } from './online/OnlineStateSynchronizer';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
   private reconciler: GameStateReconciler | null = null;
   private matchController: OnlineMatchController | null = null;
+  private eventManager: OnlineGameEventManager | null = null;
+  private synchronizer: OnlineStateSynchronizer | null = null;
 
-  // Підписки
   private unsubscribeSync: (() => void) | null = null;
-  private unsubscribeSettings: (() => void) | null = null;
-  private unsubscribeReplay: (() => void) | null = null;
-  private unsubscribeCloseModal: (() => void) | null = null;
-  private unsubscribeNoMoves: (() => void) | null = null;
-  private unsubscribeGameOver: (() => void) | null = null;
-  private unsubscribeModalStore: (() => void) | null = null;
 
   private roomId: string | null = null;
   private myPlayerId: string | null = null;
@@ -100,6 +89,8 @@ export class OnlineGameMode extends BaseGameMode {
     // Ініціалізація компонентів
     this.stateSync = createFirebaseGameStateSync();
     this.reconciler = new GameStateReconciler(this.myPlayerId);
+    this.synchronizer = new OnlineStateSynchronizer(this.stateSync);
+
     this.matchController = new OnlineMatchController(
       this.roomId,
       this.myPlayerId,
@@ -110,6 +101,18 @@ export class OnlineGameMode extends BaseGameMode {
       (reason) => endGameService.endGame(reason)
     );
 
+    // Ініціалізація менеджера подій
+    this.eventManager = new OnlineGameEventManager(
+      this.roomId,
+      this.myPlayerId,
+      this.matchController,
+      {
+        onSyncState: (overrides) => this.synchronizer?.syncCurrentState(overrides),
+        isApplyingRemoteState: () => this.isApplyingRemoteState
+      },
+      this.turnDuration
+    );
+
     try {
       await this.stateSync.initialize(this.roomId);
 
@@ -117,7 +120,8 @@ export class OnlineGameMode extends BaseGameMode {
         this.handleSyncEvent(event);
       });
 
-      this.setupSubscriptions();
+      // Підписка на події через менеджер
+      this.eventManager.setupSubscriptions();
 
       const remoteState = await this.stateSync.pullState();
 
@@ -132,7 +136,7 @@ export class OnlineGameMode extends BaseGameMode {
             size: options.newSize,
             players: playersConfig,
           });
-          await this.syncCurrentState();
+          await this.synchronizer.syncCurrentState();
         } else {
           logService.GAME_MODE('[OnlineGameMode] I am Guest. Waiting for Host to initialize state...');
         }
@@ -159,83 +163,9 @@ export class OnlineGameMode extends BaseGameMode {
     }
   }
 
-  private setupSubscriptions() {
-    this.unsubscribeSettings = gameSettingsStore.subscribe(settings => {
-      if (!this.isApplyingRemoteState && this.roomId) {
-        this.syncCurrentState();
-      }
-    });
-
-    this.unsubscribeReplay = gameEventBus.subscribe('ReplayGame', () => {
-      this.matchController?.handleRestartRequest();
-    });
-
-    gameEventBus.subscribe('RequestReplay', () => {
-      if (this.roomId && this.myPlayerId) {
-        roomService.setWatchingReplay(this.roomId, this.myPlayerId, true);
-      }
-    });
-
-    this.unsubscribeCloseModal = gameEventBus.subscribe('CloseModal', () => {
-      if (this.roomId && this.myPlayerId) {
-        roomService.setWatchingReplay(this.roomId, this.myPlayerId, false);
-      }
-    });
-
-    this.unsubscribeNoMoves = gameEventBus.subscribe('ShowNoMovesModal', (payload: ShowNoMovesModalPayload & { isRemote?: boolean }) => {
-      timeService.stopTurnTimer();
-
-      if (this.myPlayerId && !payload.isRemote) {
-        logService.GAME_MODE('[OnlineGameMode] Local NoMoves claim detected. Syncing to server.');
-        this.syncCurrentState({
-          noMovesClaim: {
-            playerId: this.myPlayerId,
-            scoreDetails: payload.scoreDetails,
-            boardSize: payload.boardSize,
-            timestamp: Date.now(),
-            isCorrect: true
-          }
-        });
-      }
-    });
-
-    this.unsubscribeGameOver = gameEventBus.subscribe('GameOver', (payload: GameOverPayload) => {
-      if (!this.isApplyingRemoteState && this.roomId) {
-        logService.GAME_MODE('[OnlineGameMode] Local GameOver detected. Syncing to server.');
-        // FIX AC #14: При відправці GameOver ми також очищаємо всі прапорці голосування та заяв.
-        // Це гарантує, що всі клієнти перейдуть у стан "Game Over" і вийдуть зі стану "Очікування".
-        this.syncCurrentState({
-          gameOver: payload,
-          finishRequests: {},
-          continueRequests: {},
-          noMovesClaim: null
-        });
-      }
-    });
-
-    this.unsubscribeModalStore = modalStore.subscribe(state => {
-      if (state.isOpen) {
-        logService.GAME_MODE('[OnlineGameMode] Modal opened. Pausing timer.');
-        timeService.pauseGameTimer();
-        timeService.stopTurnTimer();
-      } else {
-        const uiState = get(uiStateStore);
-        if (!uiState.isGameOver && this.turnDuration > 0) {
-          logService.GAME_MODE('[OnlineGameMode] Modal closed. Resuming timer.');
-          // Тут можна додати логіку відновлення таймера, якщо потрібно
-        }
-      }
-    });
-  }
-
   cleanup(): void {
     if (this.unsubscribeSync) this.unsubscribeSync();
-    if (this.unsubscribeSettings) this.unsubscribeSettings();
-    if (this.unsubscribeReplay) this.unsubscribeReplay();
-    if (this.unsubscribeCloseModal) this.unsubscribeCloseModal();
-    if (this.unsubscribeNoMoves) this.unsubscribeNoMoves();
-    if (this.unsubscribeGameOver) this.unsubscribeGameOver();
-    if (this.unsubscribeModalStore) this.unsubscribeModalStore();
+    if (this.eventManager) this.eventManager.cleanup();
     if (this.stateSync) this.stateSync.cleanup();
 
     super.cleanup();
@@ -252,7 +182,7 @@ export class OnlineGameMode extends BaseGameMode {
     }
 
     await super.handlePlayerMove(direction, distance, onEndCallback);
-    await this.syncCurrentState();
+    await this.synchronizer?.syncCurrentState();
   }
 
   async claimNoMoves(): Promise<void> {
@@ -349,40 +279,6 @@ export class OnlineGameMode extends BaseGameMode {
 
       newPlayers[s.currentPlayerIndex] = playerToUpdate;
       return { ...s, players: newPlayers };
-    });
-  }
-
-  private async handleRestartRequest(): Promise<void> {
-    if (this.matchController) {
-      await this.matchController.handleRestartRequest();
-    }
-  }
-
-  private async syncCurrentState(overrides: Partial<SyncableGameState> = {}): Promise<void> {
-    if (!this.stateSync) return;
-    const boardState = get(boardStore);
-    const playerState = get(playerStore);
-    const scoreState = get(scoreStore);
-    const settings = get(gameSettingsStore);
-    const gameOverState = get(gameOverStore);
-
-    if (!boardState || !playerState || !scoreState) return;
-
-    await this.stateSync.pushState({
-      boardState,
-      playerState,
-      scoreState,
-      settings: {
-        blockModeEnabled: settings.blockModeEnabled,
-        autoHideBoard: settings.autoHideBoard,
-        boardSize: settings.boardSize,
-        turnDuration: settings.turnDuration,
-        settingsLocked: settings.settingsLocked
-      },
-      gameOver: gameOverState.isGameOver ? gameOverState.gameResult : null,
-      version: Date.now(),
-      updatedAt: Date.now(),
-      ...overrides
     });
   }
 

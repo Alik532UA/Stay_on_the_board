@@ -3,7 +3,7 @@ import type { BoardState } from '$lib/stores/boardStore';
 import type { PlayerState } from '$lib/stores/playerStore';
 import type { ScoreState } from '$lib/stores/scoreStore';
 import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
-import type { GameOverPayload } from '$lib/stores/gameOverStore';
+import type { GameOverPayload, PlayerScoreResult } from '$lib/stores/gameOverStore';
 
 /**
  * Дані про заяву "Немає ходів"
@@ -14,6 +14,8 @@ export interface NoMovesClaimPayload {
     boardSize: number;
     timestamp: number; // Для уникнення повторного відкриття
     isCorrect: boolean; // Чи була заява вірною
+    // FIX: Додаємо масив рахунків для синхронізації вигляду модалки
+    playerScores?: Array<PlayerScoreResult & { playerName: string; playerColor: string; isWinner?: boolean; isLoser?: boolean }>;
 }
 
 export interface SyncableGameState {
