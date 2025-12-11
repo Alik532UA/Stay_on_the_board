@@ -37,9 +37,13 @@
 	import type { IMenuItem } from "$lib/components/ui/FlexibleMenu/FlexibleMenu.types";
 	import GameModeModal from "$lib/components/GameModeModal.svelte";
 	import DevMenu from "$lib/components/main-menu/DevMenu.svelte";
+	// Імпорт компонента зворотного зв'язку
+	import FeedbackModal from "$lib/components/modals/FeedbackModal.svelte";
 
 	// Новий сервіс (goto видалено, бо він вже є вище)
 	import { roomService } from "$lib/services/roomService";
+	// FIX: Імпортуємо commandService глобально, щоб обробка подій (наприклад, закриття модалок) працювала всюди
+	import "$lib/services/commandService";
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = "app_version";
@@ -195,6 +199,17 @@
 		});
 	}
 
+	function handleFeedback() {
+		logService.action('Click: "Feedback" (Layout)');
+		modalStore.showModal({
+			titleKey: "ui.feedback.title",
+			dataTestId: "feedback-modal",
+			component: FeedbackModal,
+			// Кнопки керуються всередині компонента FeedbackModal
+			buttons: [],
+		});
+	}
+
 	// Bottom Menu Items
 	const menuItems: IMenuItem[] = [
 		{
@@ -219,10 +234,12 @@
 			emoji: "⚙️",
 			onClick: () => goto(`${base}/settings`),
 		},
+		// FIX: Заміна кнопки Rules на Feedback (Варіант 2B)
 		{
-			id: "rules",
-			emoji: "📝",
-			onClick: () => goto(`${base}/rules`),
+			id: "feedback",
+			emoji: "💬",
+			onClick: handleFeedback,
+			dataTestId: "feedback-btn",
 		},
 	];
 
