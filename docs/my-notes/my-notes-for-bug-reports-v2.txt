@@ -2059,7 +2059,15 @@ data-testid="feedback-modal-close-btn" та всі інші data-testid="*-modal
 Актуальний результат: кнопка не закриває модальне вікно
 Очікуваний результат: кнопка закриває модальне вікно
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Я кожен раз вручну шукаю версію 0.5.497 і змінюю її на наступну аж в трьох файлах
+C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\package-lock.json
+C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\package.json
+C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\static\version.json
 
+чи можна автоматизувати цей процес?
+щоб кожен новий коміт автоматично збільшувалась версія
+
+які є варіанти вирішення проблеми?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
