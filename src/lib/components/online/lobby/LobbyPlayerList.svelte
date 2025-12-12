@@ -3,6 +3,8 @@
     import type { OnlinePlayer } from "$lib/types/online";
     import ColorPicker from "$lib/components/local-setup/ColorPicker.svelte";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
+    import EditableText from "$lib/components/ui/EditableText.svelte";
+    import { getRandomUnusedName } from "$lib/utils/playerUtils";
 
     export let players: OnlinePlayer[];
     export let myPlayerId: string;
@@ -27,7 +29,6 @@
             };
         }
 
-        // Розділяємо логіку для 'playing' та 'finished'
         if (roomStatus === "playing") {
             return { text: "onlineMenu.playing", class: "playing" };
         }
@@ -39,6 +40,15 @@
         }
 
         return { text: "onlineMenu.lobby.notReady", class: "" };
+    }
+
+    function handleNameChange(e: CustomEvent<string>) {
+        onUpdatePlayer({ name: e.detail });
+    }
+
+    function generateRandomName() {
+        const usedNames = players.map((p) => p.name);
+        return getRandomUnusedName(usedNames);
     }
 </script>
 
@@ -71,20 +81,13 @@
 
                 <div class="player-info">
                     <div class="player-name-row">
-                        {#if player.id === myPlayerId}
-                            <input
-                                type="text"
-                                class="player-name-input"
-                                value={player.name}
-                                on:change={(e) =>
-                                    onUpdatePlayer({
-                                        name: e.currentTarget.value,
-                                    })}
-                                maxlength="15"
-                            />
-                        {:else}
-                            <span class="player-name-text">{player.name}</span>
-                        {/if}
+                        <EditableText
+                            value={player.name}
+                            canEdit={player.id === myPlayerId}
+                            onRandom={generateRandomName}
+                            on:change={handleNameChange}
+                            dataTestId={`player-name-${player.id}`}
+                        />
 
                         {#if player.id === hostId}
                             <span class="host-badge" data-testid="host-badge">
@@ -172,6 +175,7 @@
         justify-content: center;
         font-weight: bold;
         color: #fff;
+        flex-shrink: 0;
     }
     .player-avatar.placeholder {
         background: var(--control-bg);
@@ -186,24 +190,7 @@
         align-items: center;
         gap: 8px;
         margin-bottom: 4px;
-    }
-    .player-name-text {
-        font-weight: bold;
-        font-size: 1.1em;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .player-name-input {
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        padding: 2px 6px;
-        color: var(--text-primary);
-        font-weight: bold;
-        font-size: 1.1em;
-        width: 100%;
-        max-width: 150px;
+        flex-wrap: wrap;
     }
     .host-badge {
         background: #ffd700;
@@ -234,5 +221,8 @@
         justify-content: center;
         gap: 16px;
         margin-top: 20px;
+    }
+    .color-picker-wrapper {
+        flex-shrink: 0;
     }
 </style>

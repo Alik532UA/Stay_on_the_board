@@ -6,17 +6,28 @@
   import { modalStore } from "$lib/stores/modalStore";
   import { _ } from "svelte-i18n";
   import { onMount } from "svelte";
+  import { logService } from "$lib/services/logService";
 
-  // Перевірка імені гравця при вході
+  let playerName = "";
+
   onMount(() => {
-    const name = localStorage.getItem("online_playerName");
-    if (!name) {
-      // Тут можна було б показати модалку для вводу імені
-      // Поки що генеруємо автоматично для спрощення
-      const newName = `Player ${Math.floor(Math.random() * 10000)}`;
-      localStorage.setItem("online_playerName", newName);
+    const storedName = localStorage.getItem("online_playerName");
+    if (storedName) {
+      playerName = storedName;
+    } else {
+      playerName = `Player ${Math.floor(Math.random() * 10000)}`;
+      localStorage.setItem("online_playerName", playerName);
     }
   });
+
+  function handleNameChange(e: Event) {
+    const input = e.target as HTMLInputElement;
+    playerName = input.value.trim();
+    if (playerName) {
+      localStorage.setItem("online_playerName", playerName);
+      logService.ui(`[OnlinePage] Player name updated to: ${playerName}`);
+    }
+  }
 
   function openCreateRoomModal() {
     modalStore.showModal({
@@ -34,6 +45,19 @@
   </div>
 
   <div class="content-container">
+    <div class="player-setup">
+      <label for="player-name-input">{$_("onlineMenu.enterNameTitle")}</label>
+      <input
+        id="player-name-input"
+        type="text"
+        value={playerName}
+        on:input={handleNameChange}
+        placeholder={$_("onlineMenu.enterNamePlaceholder")}
+        class="name-input"
+        data-testid="player-name-input"
+      />
+    </div>
+
     <div class="actions-bar">
       <StyledButton
         variant="primary"
@@ -80,6 +104,39 @@
     flex-direction: column;
     gap: 24px;
     flex: 1;
+  }
+
+  .player-setup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .player-setup label {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+
+  .name-input {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: var(--text-primary);
+    font-size: 1.1em;
+    text-align: center;
+    width: 100%;
+    max-width: 300px;
+    transition: all 0.2s;
+  }
+
+  .name-input:focus {
+    outline: none;
+    border-color: var(--text-accent);
+    box-shadow: 0 0 0 2px rgba(var(--text-accent-rgb), 0.2);
   }
 
   .actions-bar {

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { modalStore } from "$lib/stores/modalStore";
   import { logService } from "$lib/services/logService.js";
+  import { APP_CONFIG } from "$lib/config/appConfig";
 
   // Sub-components
   import TopIconsBar from "$lib/components/main-menu/v2/TopIconsBar.svelte";
@@ -14,7 +15,8 @@
   function handlePlay() {
     logService.action('Click: "Play" (MainMenuV2)');
     modalStore.showModal({
-      titleKey: "mainMenu.gameModeModal.title",
+      // FIX: Змінено заголовок на "Втримайся"
+      titleKey: `mainMenu.modes.${APP_CONFIG.MODES.SURVIVE}`,
       dataTestId: "game-mode-modal",
       component: GameModeModal,
       props: { extended: true },

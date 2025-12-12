@@ -20,7 +20,7 @@ export interface FeedbackData {
 class FeedbackService {
     /**
      * Збирає технічний контекст та відправляє відгук у Firestore.
-     * Використовує кастомний ID на основі дати для зручного сортування в консолі.
+     * Використовує структуру підколекцій для організації за типом.
      */
     async submitFeedback(data: FeedbackData): Promise<void> {
         logService.action('[FeedbackService] Submitting feedback...', data);
@@ -31,8 +31,9 @@ class FeedbackService {
             // Генеруємо читабельний ID: YYYY-MM-DD_HH-mm-ss_SSS_RAND
             const docId = this.generateTimestampId();
 
-            // Створюємо посилання на документ з конкретним ID
-            const feedbackDocRef = doc(db, 'feedback', docId);
+            // Створюємо шлях: feedback (колекція) -> {type} (документ) -> entries (підколекція) -> {docId} (документ)
+            // Це створює візуальну структуру "папок" у консолі Firebase
+            const feedbackDocRef = doc(db, 'feedback', data.type, 'entries', docId);
 
             // Збір контексту (Варіант 3A)
             const context = this.gatherContext();
@@ -42,14 +43,12 @@ class FeedbackService {
                 context,
                 createdAt: serverTimestamp(),
                 status: 'new',
-                // Зберігаємо ID також всередині документа для зручності експорту
                 id: docId
             };
 
-            // Використовуємо setDoc замість addDoc для запису з власним ID
             await setDoc(feedbackDocRef, payload);
 
-            logService.action(`[FeedbackService] Feedback submitted successfully. ID: ${docId}`);
+            logService.action(`[FeedbackService] Feedback submitted successfully to ${data.type}/${docId}`);
             notificationService.show({
                 type: 'success',
                 messageKey: 'ui.feedback.success',
@@ -84,7 +83,6 @@ class FeedbackService {
         const seconds = pad(now.getSeconds());
         const ms = padMs(now.getMilliseconds());
 
-        // Додаємо випадковий суфікс для уникнення колізій при одночасному записі
         const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
 
         return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}_${ms}_${randomSuffix}`;
@@ -94,10 +92,8 @@ class FeedbackService {
         const settings = get(gameSettingsStore);
         const playerState = get(playerStore);
 
-        // Визначаємо ID гравця, якщо він є (для локальної або онлайн гри)
         let playerId = 'anonymous';
         if (playerState && playerState.players.length > 0) {
-            // Беремо ID першого гравця або поточного
             playerId = playerState.players[0].id.toString();
         } else if (typeof localStorage !== 'undefined') {
             playerId = localStorage.getItem('online_playerName') || 'anonymous';
