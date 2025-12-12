@@ -1,5 +1,5 @@
 export default {
-  title: "Tahtada qalmaq",
+  title: "Señiñ Yürüşiñ", // Rebranding
   menu: "Menü",
   training: "İdman",
   virtualPlayer: "Oyna",
@@ -42,5 +42,11 @@ export default {
     title: "Oyun rejimini seçiñiz"
   },
   dragAndDropTest: "test",
-  loadingTranslations: "Tercimeler yükleniyor..."
+  loadingTranslations: "Tercimeler yükleniyor...",
+  // Future modes placeholders
+  modes: {
+    survive: "Tayan",
+    arena: "Meydan",
+    maze: "Labirint"
+  }
 };

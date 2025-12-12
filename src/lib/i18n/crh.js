@@ -26,6 +26,7 @@ import dndTest from './crh/dndTest.js';
 
 import trainingHelp from './crh/trainingHelp.js';
 import rewards from './crh/rewards.js';
+import platform from './crh/platform.js';
 
 export default {
   dndTest,
@@ -54,5 +55,6 @@ export default {
   gameModes,
   newWidget,
   trainingHelp,
-  rewards
+  rewards,
+  platform
 };

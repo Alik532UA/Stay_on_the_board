@@ -1,5 +1,5 @@
 export default {
-  title: "Stay on the Board",
+  title: "Your Move", // Rebranding
   menu: "Menu",
   training: "Training",
   virtualPlayer: "Play",
@@ -42,5 +42,11 @@ export default {
     title: "Select game mode"
   },
   dragAndDropTest: "test",
-  loadingTranslations: "Loading translations..."
+  loadingTranslations: "Loading translations...",
+  // Future modes placeholders
+  modes: {
+    survive: "Survive",
+    arena: "Arena",
+    maze: "Maze"
+  }
 };

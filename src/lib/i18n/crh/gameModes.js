@@ -1,6 +1,12 @@
 export default {
   title: "Oyun zorluq seviyesini seçiñiz",
   choose: "Saylañız",
+
+  // New top-level game modes
+  survive: "Tayan",
+  arena: "Meydan",
+  maze: "Labirint",
+
   // Legacy presets
   observer: "Közetici",
   beginner: "Başlanğıç",

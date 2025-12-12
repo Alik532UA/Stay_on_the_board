@@ -1,7 +1,7 @@
 # Тип: План
 # Статус: Виконано
 # Назва: Детальний план реалізації покращень архітектури
-# Опис: Завершений покроковий план впровадження сучасних принципів та патернів у кодову базу Stay on the Board. Містить всі етапи, чеклісти та підсумки виконання.
+# Опис: Завершений покроковий план впровадження сучасних принципів та патернів у кодову базу Твій Хід. Містить всі етапи, чеклісти та підсумки виконання.
 
 ## 🎯 Мета
 Поступово впровадити сучасні принципи та патерни в існуючу ванільну JS-кодову базу, щоб зробити її більш стабільною, масштабованою та легкою для підтримки.
@@ -1039,14 +1039,14 @@ describe('Integration Tests', () => {
  */
 import { test, expect } from '@playwright/test';
 
-test.describe('Stay on the Board E2E', () => {
+test.describe('Твій Хід E2E', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('http://localhost:3000');
     });
     
     test('should load main menu', async ({ page }) => {
         await expect(page.locator('#main-menu')).toBeVisible();
-        await expect(page.locator('.game-title')).toHaveText('Stay on the board');
+        await expect(page.locator('.game-title')).toHaveText('Твій Хід');
     });
     
     test('should navigate to settings', async ({ page }) => {

@@ -240,6 +240,8 @@
             on:click={handlePlayVirtualPlayer}
             dataTestId="play-btn">{$_("mainMenu.virtualPlayer")}</StyledButton
           >
+
+          <!-- TODO: Add navigation to other game modes (Arena, Maze) here -->
         </div>
       </div>
     {/if}

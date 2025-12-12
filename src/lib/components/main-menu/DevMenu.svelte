@@ -7,7 +7,7 @@
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
 
     export let onClose: () => void;
-    export let onOpenWipNotice: () => void;
+    // FIX: Видалено невикористаний експорт 'onOpenWipNotice', щоб виправити попередження Vite
     export let onPlayVsComputer: () => void;
     export let onLocalGame: () => void;
     export let versionNumber: string;
@@ -72,7 +72,6 @@
         Button Styles Test
     </StyledButton>
 
-    <!-- FIX: Змінено назву кнопки та шлях -->
     <StyledButton
         variant="menu"
         class="secondary"
