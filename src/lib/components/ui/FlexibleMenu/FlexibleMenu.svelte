@@ -11,9 +11,12 @@
     export let persistenceKey: string = "";
     export let withSpacer: boolean = true;
     export let dataTestId: string = "flexible-menu-wrapper";
+    // FIX: Додано проп для керування початковим станом (за замовчуванням відкрито)
+    export let startOpen: boolean = true;
 
     // State
-    let isOpen = true;
+    // Ініціалізуємо стан значенням пропу
+    let isOpen = startOpen;
     let isMounted = false;
 
     // Computed
