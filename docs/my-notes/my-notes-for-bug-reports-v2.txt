@@ -2350,17 +2350,83 @@ class="top-icons-bar s-glg6Bv93Wtro"
 
 також у кожної кнопки повинен бути унікальний data-testid
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Ось додатковий список файлів та модулів, які варто реорганізувати для покращення архітектури та полегшення роботи AI-агента.
 
+Я зосередився на місцях, де порушується принцип **DRY (Don't Repeat Yourself)** та **SoC (Separation of Concerns)**, що є найбільш критичним для розуміння коду штучним інтелектом.
+
+### 🟡 Середній пріоритет (Stores & Logic)
+
+#### 1. `src/lib/stores/gameSettingsStore.ts`
+*   **Проблема:** Цей файл зараз виконує забагато функцій: визначає типи, задає дефолтні значення, зберігає величезний об'єкт пресетів (`presetConfigurations`) і містить логіку оновлення. Це робить файл довгим і складним для аналізу контексту налаштувань.
+*   **Рішення:** Розділити на 4 файли:
+    1.  `gameSettingsTypes.ts` — тільки інтерфейси та типи (`KeybindingAction`, `GameModePreset`).
+    2.  `gameSettingsDefaults.ts` — константи дефолтних значень (`defaultGameSettings`, `defaultKeybindings`).
+    3.  `gameSettingsPresets.ts` — великий об'єкт конфігурацій пресетів.
+    4.  `gameSettingsStore.ts` — власне Svelte store та методи оновлення (`updateSettings`, `toggle...`).
+*   **Перевага:** AI зможе імпортувати лише типи або лише пресети, не завантажуючи в контекст логіку стору.
+
+#### 2. `src/lib/utils/boardUtils.ts`
+*   **Проблема:** Змішування "чистої" ігрової логіки (`isMirrorMove`), логіки створення даних (`createEmptyBoard`) та візуальної логіки (`getDamageClass`).
+*   **Рішення:** Розділити на:
+    1.  `BoardFactory.ts` — створення дошки.
+    2.  `GameRules.ts` — перевірка правил (`isMirrorMove`, `isCellBlocked`).
+    3.  `BoardVisuals.ts` — генерація CSS класів (`getDamageClass`).
+*   **Перевага:** Чітке розділення бізнес-логіки від відображення.
+
+---
+
+### 🟠 Архітектурний пріоритет (Components & DRY)
+
+#### 3. `src/lib/components/widgets/BoardWrapperWidget.svelte` та `src/lib/components/ReplayViewer.svelte`
+*   **Проблема (Критична для DRY):** Обидва компоненти містять майже ідентичний код для рендерингу сітки дошки (`#each rows`, `#each cols`, `<div class="board-cell">`). Якщо ви захочете змінити вигляд клітинки, доведеться правити два файли.
+*   **Рішення:**
+    *   Створити універсальний компонент **`VisualBoard.svelte`**.
+    *   Він має приймати пропси: `boardSize`, `cellsState` (масив або об'єкт), `pieces` (масив позицій).
+    *   Він має бути "дурним" (dumb component) — тільки відображати те, що передали, без підписок на стори всередині.
+    *   `BoardWrapperWidget` та `ReplayViewer` будуть просто обгортками, які передають дані в `VisualBoard`.
+*   **Перевага:** AI зможе змінювати дизайн дошки в одному місці.
+
+#### 4. `src/lib/services/speechService.ts`
+*   **Проблема:** Сервіс займається і низькорівневою роботою з Web Speech API (завантаження голосів, фільтрація), і високорівневою логікою формування фраз ("Гравець ходить вгору").
+*   **Рішення:**
+    1.  `TextToSpeechProvider.ts` — обгортка над `window.speechSynthesis` (завантаження, speak, cancel).
+    2.  `GameNarratorService.ts` — логіка, яка формує текст на основі подій гри (використовує переклади) і передає його в провайдер.
+*   **Перевага:** Легше додати нові мови або змінити фрази, не чіпаючи технічну реалізацію API.
+
+---
+
+### 🔵 Низький пріоритет (UI Organization)
+
+#### 5. `src/lib/components/local-setup/LocalGameSettings.svelte`
+*   **Проблема:** Компонент містить багато UI-розмітки для різних налаштувань (розмір дошки, режими, тогли) в одному файлі.
+*   **Рішення:** Винести окремі блоки налаштувань у мікро-компоненти:
+    *   `BoardSizeAdjuster.svelte`
+    *   `GameModeSelector.svelte`
+*   **Перевага:** Ці компоненти можна буде перевикористати в онлайн-лобі або інших меню.
+
+#### 6. `src/lib/components/widgets/DirectionControls.svelte`
+*   **Проблема:** Містить логіку для сітки напрямків, вибору відстані та кнопок дій.
+*   **Рішення:** Розбити на:
+    *   `controls/DirectionGrid.svelte` (3x3 сітка).
+    *   `controls/DistanceSelector.svelte` (рядки цифр).
+    *   `controls/ActionButtons.svelte` (Confirm, No Moves, Voice).
+*   **Перевага:** Простіше керувати лейаутом панелі керування.
+
+### Підсумок дій для AI
+
+1.  **Почніть з `gameSettingsStore.ts`**. Це фундамент, на якому будується вся конфігурація. Розбивка цього файлу дасть найбільший приріст у зрозумілості типів.
+2.  **Створіть `VisualBoard.svelte`**. Це усуне дублювання коду між грою та реплеєм.
+3.  **Розбийте `DirectionControls.svelte`**. Це спростить роботу з UI керування.
+
+чи ти погоджуєшся з цим планом?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
+що зараз в на головній сторінці (Stay_on_the_board/) треба зробити резервну копію  в Stay_on_the_board/test-main-menu-v1
+а те що зараз в Stay_on_the_board/test-main-menu-v2 помістити на головну сторінку Stay_on_the_board/
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+class="flexible-menu-wrapper position-bottom is-open s-bSeVPxb6RwRh"
+приховати для production залишити для dev по приккладу як це зроблено з class="flexible-menu-wrapper position-top is-open s-bSeVPxb6RwRh"
 
-🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
-🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
-🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
+class="flexible-menu-wrapper position-bottom is-open s-bSeVPxb6RwRh" зробити за замовчуванням прихованим
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
