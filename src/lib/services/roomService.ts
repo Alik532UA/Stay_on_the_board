@@ -22,7 +22,8 @@ import { chatService, type ChatMessage } from './chatService';
 import { withTimeout } from '$lib/utils/asyncUtils';
 import { roomSessionService } from './room/roomSessionService';
 import { roomPlayerService } from './room/roomPlayerService';
-import { generateRandomRoomName } from '$lib/utils/nameGenerator'; // ВИПРАВЛЕНО
+import { generateRandomRoomName } from '$lib/utils/nameGenerator';
+import { getRandomUnusedColor } from '$lib/utils/playerUtils'; // Додано імпорт
 
 const ROOM_TIMEOUT_MS = 600000;
 const OPERATION_TIMEOUT_MS = 10000;
@@ -41,20 +42,23 @@ class RoomService {
         logService.init(`[RoomService] createRoom START. Host: ${hostName}`);
 
         const hostId = uuidv4();
+
+        // Генеруємо випадковий колір для хоста (список використаних кольорів порожній)
+        const hostColor = getRandomUnusedColor([]);
+
         const initialPlayer: OnlinePlayer = {
             id: hostId,
             name: hostName,
-            color: '#00bbf9',
+            color: hostColor, // Використовуємо випадковий колір
             isReady: false,
             joinedAt: Date.now(),
             isOnline: true,
             isWatchingReplay: false
         };
 
-        // Використовуємо генератор імен кімнат, якщо назва не задана
         const finalRoomName = customRoomName && customRoomName.trim() !== ""
             ? customRoomName.trim()
-            : generateRandomRoomName(); // ВИПРАВЛЕНО
+            : generateRandomRoomName();
 
         const onlineDefaultSettings: GameSettingsState = {
             ...defaultGameSettings,
@@ -191,10 +195,15 @@ class RoomService {
             if (Object.keys(roomData.players).length >= MAX_PLAYERS) throw new Error('Room is full');
             if (roomData.status === 'playing') throw new Error('Game already started');
 
+            // Отримуємо список вже зайнятих кольорів
+            const usedColors = Object.values(roomData.players).map(p => p.color);
+            // Генеруємо унікальний колір для нового гравця
+            const playerColor = getRandomUnusedColor(usedColors);
+
             const newPlayer: OnlinePlayer = {
                 id: playerId,
                 name: playerName,
-                color: '#f4a261',
+                color: playerColor, // Використовуємо випадковий унікальний колір
                 isReady: false,
                 joinedAt: Date.now(),
                 isOnline: true,

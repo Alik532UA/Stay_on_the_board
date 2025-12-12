@@ -249,6 +249,7 @@
 			position="bottom"
 			persistenceKey="main-bottom-menu"
 			dataTestId="flexible-menu-bottom-wrapper"
+			startOpen={false}
 		/>
 	{/if}
 </div>
