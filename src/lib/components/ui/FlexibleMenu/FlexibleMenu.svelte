@@ -11,10 +11,9 @@
     export let persistenceKey: string = "";
     export let withSpacer: boolean = true;
     export let dataTestId: string = "flexible-menu-wrapper";
-    export let defaultOpen: boolean = true;
 
     // State
-    let isOpen = defaultOpen;
+    let isOpen = true;
     let isMounted = false;
 
     // Computed
