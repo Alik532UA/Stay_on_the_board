@@ -86,7 +86,7 @@
 	}
 </script>
 
-<svelte:window onkeydown={keydown} />
+<svelte:window on:keydown={keydown} />
 
 <svelte:head>
 	<title>Sverdle</title>
@@ -153,7 +153,7 @@
 				<button data-key="enter" class:selected={submittable} disabled={!submittable}>enter</button>
 
 				<button
-					onclick={update}
+					on:click={update}
 					data-key="backspace"
 					formaction="?/update"
 					name="key"
@@ -166,7 +166,7 @@
 					<div class="row">
 						{#each row as letter, index (index)}
 							<button
-								onclick={update}
+								on:click={update}
 								data-key={letter}
 								class={classnames[letter]}
 								disabled={submittable}

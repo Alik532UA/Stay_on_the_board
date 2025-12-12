@@ -143,21 +143,21 @@
 <div class="game-mode-buttons" bind:this={buttonsNode}>
   <button
     class="modal-btn-generic green-btn"
-    onclick={() => selectMode("beginner")}
+    on:click={() => selectMode("beginner")}
     data-testid="beginner-mode-btn"
   >
     {$_("gameModes.beginner")}
   </button>
   <button
     class="modal-btn-generic blue-btn"
-    onclick={() => selectMode("experienced")}
+    on:click={() => selectMode("experienced")}
     data-testid="experienced-mode-btn"
   >
     {$_("gameModes.experienced")}
   </button>
   <button
     class="modal-btn-generic danger-btn"
-    onclick={() => selectMode("pro")}
+    on:click={() => selectMode("pro")}
     data-testid="pro-mode-btn"
   >
     {$_("gameModes.pro")}
@@ -166,21 +166,21 @@
     <hr class="divider" />
     <button
       class="modal-btn-generic"
-      onclick={() => selectMode("timed")}
+      on:click={() => selectMode("timed")}
       data-testid="timed-game-btn"
     >
       {$_("mainMenu.timedGame")}
     </button>
     <button
       class="modal-btn-generic"
-      onclick={handleLocalGame}
+      on:click={handleLocalGame}
       data-testid="local-game-btn"
     >
       {$_("mainMenu.localGame")}
     </button>
     <button
       class="modal-btn-generic"
-      onclick={handleOnlineGame}
+      on:click={handleOnlineGame}
       data-testid="online-game-btn"
     >
       {$_("mainMenu.playOnline")}
@@ -193,22 +193,22 @@
     class="wip-notice-overlay"
     role="dialog"
     tabindex="0"
-    onclick={(e) => {
+    on:click={(e) => {
       e.stopPropagation();
     }}
-    onkeydown={(e) => e.key === "Escape" && closeWipNotice()}
+    on:keydown={(e) => e.key === "Escape" && closeWipNotice()}
   >
     <div class="wip-notice-content">
       <button
         class="wip-close-btn"
-        onclick={closeWipNotice}
+        on:click={closeWipNotice}
         data-testid="wip-notice-close-btn">×</button
       >
       <h3>{$_("mainMenu.wipNotice.title")}</h3>
       <p>{$_("mainMenu.wipNotice.description")}</p>
       <button
         class="wip-donate-btn"
-        onclick={() => {
+        on:click={() => {
           /* handleDonate logic here if needed */ closeWipNotice();
         }}
         data-testid="wip-notice-donate-btn"

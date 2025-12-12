@@ -15,7 +15,7 @@
     let chatContainer: HTMLElement;
 
     onMount(() => {
-        unsubscribe = roomService.subscribeToChat(roomId, (msgs) => {
+        unsubscribe = roomService.subscribeToChat(roomId, (msgs: ChatMessage[]) => {
             messages = msgs;
         });
     });

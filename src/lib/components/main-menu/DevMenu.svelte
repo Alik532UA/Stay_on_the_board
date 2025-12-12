@@ -45,10 +45,10 @@
     data-testid="dev-menu"
     role="dialog"
     tabindex="0"
-    onclick={(e) => {
+    on:click={(e) => {
         e.stopPropagation();
     }}
-    onkeydown={(e) => e.key === "Escape" && onClose()}
+    on:keydown={(e) => e.key === "Escape" && onClose()}
 >
     <h3>dev v.{versionNumber}</h3>
 
@@ -72,11 +72,12 @@
         Button Styles Test
     </StyledButton>
 
+    <!-- FIX: Змінено назву кнопки та шлях -->
     <StyledButton
         variant="menu"
         class="secondary"
-        on:click={() => navigateTo("/test-main-menu")}
-        dataTestId="dev-menu-test-main-menu-btn">Test Main Menu</StyledButton
+        on:click={() => navigateTo("/test-main-menu-v2")}
+        dataTestId="dev-menu-test-main-menu-btn">Main Menu v2</StyledButton
     >
 
     <!-- Phantom / WIP Pages -->

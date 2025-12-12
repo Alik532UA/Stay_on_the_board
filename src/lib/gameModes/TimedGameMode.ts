@@ -27,7 +27,12 @@ export class TimedGameMode extends TrainingGameMode {
     gameSettingsStore.updateSettings({
       speechRate: 1.6,
       shortSpeech: true,
-      speechFor: { player: false, computer: true },
+      speechFor: {
+        player: false,
+        computer: true,
+        onlineMyMove: false,
+        onlineOpponentMove: true
+      },
     });
   }
 

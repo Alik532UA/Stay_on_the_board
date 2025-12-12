@@ -264,10 +264,12 @@
 			emoji: "🏠",
 			onClick: () => goto(`${base}/`),
 		},
+		// FIX: Додано кнопку для переходу на нове меню v2
 		{
-			id: "dev-empty-1",
-			emoji: "",
-			onClick: () => {},
+			id: "main-menu-v2-link",
+			emoji: "v2",
+			onClick: () => goto(`${base}/test-main-menu-v2`),
+			dataTestId: "top-menu-slot-1",
 		},
 		{
 			id: "test-mode-btn",
