@@ -3,10 +3,12 @@
   import RoomList from "$lib/components/online/RoomList.svelte";
   import CreateRoomModal from "$lib/components/online/CreateRoomModal.svelte";
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
+  import EditableText from "$lib/components/ui/EditableText.svelte";
   import { modalStore } from "$lib/stores/modalStore";
   import { _ } from "svelte-i18n";
   import { onMount } from "svelte";
   import { logService } from "$lib/services/logService";
+  import { generateRandomPlayerName } from "$lib/utils/nameGenerator"; // ВИПРАВЛЕНО
 
   let playerName = "";
 
@@ -15,14 +17,14 @@
     if (storedName) {
       playerName = storedName;
     } else {
-      playerName = `Player ${Math.floor(Math.random() * 10000)}`;
+      // Використовуємо генератор імен гравців
+      playerName = generateRandomPlayerName(); // ВИПРАВЛЕНО
       localStorage.setItem("online_playerName", playerName);
     }
   });
 
-  function handleNameChange(e: Event) {
-    const input = e.target as HTMLInputElement;
-    playerName = input.value.trim();
+  function handleNameChange(e: CustomEvent<string>) {
+    playerName = e.detail;
     if (playerName) {
       localStorage.setItem("online_playerName", playerName);
       logService.ui(`[OnlinePage] Player name updated to: ${playerName}`);
@@ -46,16 +48,18 @@
 
   <div class="content-container">
     <div class="player-setup">
-      <label for="player-name-input">{$_("onlineMenu.enterNameTitle")}</label>
-      <input
-        id="player-name-input"
-        type="text"
-        value={playerName}
-        on:input={handleNameChange}
-        placeholder={$_("onlineMenu.enterNamePlaceholder")}
-        class="name-input"
-        data-testid="player-name-input"
-      />
+      <span class="label">{$_("onlineMenu.enterNameTitle")}</span>
+
+      <div class="name-editor-wrapper">
+        <EditableText
+          value={playerName}
+          canEdit={true}
+          onRandom={generateRandomPlayerName}
+          on:change={handleNameChange}
+          placeholder={$_("onlineMenu.enterNamePlaceholder")}
+          dataTestId="player-name-input"
+        />
+      </div>
     </div>
 
     <div class="actions-bar">
@@ -114,29 +118,20 @@
     margin-bottom: 10px;
   }
 
-  .player-setup label {
+  .label {
     color: var(--text-secondary);
     font-size: 0.9em;
     font-weight: bold;
   }
 
-  .name-input {
+  .name-editor-wrapper {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 12px 16px;
-    color: var(--text-primary);
-    font-size: 1.1em;
-    text-align: center;
-    width: 100%;
-    max-width: 300px;
-    transition: all 0.2s;
-  }
-
-  .name-input:focus {
-    outline: none;
-    border-color: var(--text-accent);
-    box-shadow: 0 0 0 2px rgba(var(--text-accent-rgb), 0.2);
+    padding: 8px 16px;
+    min-width: 200px;
+    display: flex;
+    justify-content: center;
   }
 
   .actions-bar {

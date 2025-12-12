@@ -2537,21 +2537,21 @@ class="game-mode-buttons s-7ixHSxZNgfWi"
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 1
 Актуальний результат: 
-data-testid="player-name-input" - немає ✏️ та 🎲
-data-testid="room-name-input" - немає ✏️ та 🎲
-data-testid="room-name-editable" - є ✏️ та 🎲
-class="view-mode s-v5LpMcKEkqmN" - є ✏️ та 🎲
+data-testid="player-name-input" - немає ✏️ та 🎲 (сторінка /online)
+data-testid="room-name-input" - немає ✏️ та 🎲 (сторінка /online)
+data-testid="room-name-editable" - є ✏️ та 🎲 (сторінка /online/lobby/*)
+class="view-mode s-v5LpMcKEkqmN" - є ✏️ та 🎲 (сторінка /online/lobby/*)
 Очікуваний результат: 
-data-testid="player-name-input" - є ✏️ та 🎲
-data-testid="room-name-input" - є ✏️ та 🎲
-data-testid="room-name-editable" - є ✏️ та 🎲
-class="view-mode s-v5LpMcKEkqmN" - є ✏️ та 🎲
+data-testid="player-name-input" - є ✏️ та 🎲 (сторінка /online)
+data-testid="room-name-input" - немає ✏️ та 🎲 (сторінка /online)
+data-testid="room-name-editable" - є ✏️ та 🎲 (сторінка /online/lobby/*)
+class="view-mode s-v5LpMcKEkqmN" - є ✏️ та 🎲 (сторінка /online/lobby/*)
 
 2
-data-testid="room-name-editable"
-натиснути на 🎲 
+room
+(не треба додавати #)
 Актуальний результат: Mario #579
-Очікуваний результат: Mario (не треба додавати #)
+Очікуваний результат: Mario
 
 3
 коли тільки створюєш ім'я гравця чи ім'я кімнати
@@ -2559,15 +2559,55 @@ data-testid="room-name-editable"
 Room #****
 Player ****
 Очікуваний результат: 
-викадкові назви з масиву випадкових назв
+Випадкові назви з масиву випадкових назв як під час 🎲
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+1.
+працює не погано, але наптутано, бо усюди використовуються імена для кімнат (як у нас виглядають як назви ігр)
+
+data-testid="player-name-input" в /online
+
+використовує export const RANDOM_NAMES з src\lib\utils\nameGenerator.ts
+Актуальний результат: 
+Очікуваний результат: const availableNames = ['Alik', 'Noah', 'Jack', 'Mateo', 'Lucas', 'Sofia', 'Olivia', 'Nora', 'Lucia', 'Emilia']; з src\lib\utils\playerUtils.ts
+
+2. 
+data-testid="room-name-input" в data-testid="create-room-modal"
+Актуальний результат: немає ✏️ та 🎲 (сторінка /online)
+Очікуваний результат: є ✏️ та 🎲 (сторінка /online)
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
-🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+/**
+ * Генерує випадкову назву кімнати (Назва гри + число).
+ * Додаємо число, щоб кімнати "FIFA" не дублювалися занадто часто.
+ */
+export function generateRandomRoomName(): string {
+    const name = ROOM_NAMES[Math.floor(Math.random() * ROOM_NAMES.length)];
+    const num = Math.floor(Math.random() * 1000);
+    return `${name} #${num}`;
+}
+
+/**
+ * Генерує випадкове ім'я гравця.
+ */
+export function generateRandomPlayerName(): string {
+    return PLAYER_NAMES[Math.floor(Math.random() * PLAYER_NAMES.length)];
+}
+
+
+room
+(не треба додавати #)
+Актуальний результат: Mario #579
+Очікуваний результат: Mario
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
+сторінка /online/lobby/*
+class="color-preview s-b_QAI1EKiACh"
+Актуальний результат: завжди однаковий колір
+Очікуваний результат: рандомний колір (наприклад так зроблено в локальній грі, там випадковий колір)
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
+data-testid="bottom-menu-panel"
+Актуальний результат: показується тільки в dev версії, але в розгорнутому вигляді
+Очікуваний результат: показується тільки в dev версії, але в згорнутому вигляді
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦

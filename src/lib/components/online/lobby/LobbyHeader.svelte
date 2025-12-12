@@ -4,36 +4,13 @@
     import EditableText from "$lib/components/ui/EditableText.svelte";
     import { roomService } from "$lib/services/roomService";
     import { logService } from "$lib/services/logService";
+    import { generateRandomRoomName } from "$lib/utils/nameGenerator"; // Оновлений імпорт
 
     export let room: Room;
     export let roomId: string;
     export let amIHost: boolean = false;
 
     let isCopied = false;
-
-    // Список ігор для випадкової генерації назви кімнати
-    const GAME_NAMES = [
-        "FIFA",
-        "SIMS",
-        "NFS",
-        "GTA",
-        "Peek",
-        "CS2",
-        "TrackMania",
-        "RoadRash",
-        "Minecraft",
-        "Tetris",
-        "Doom",
-        "Zelda",
-        "Mario",
-        "Portal",
-        "Halo",
-        "Cyberpunk",
-        "Witcher",
-        "Skyrim",
-        "Fortnite",
-        "Dota",
-    ];
 
     function copyRoomId() {
         navigator.clipboard.writeText(roomId);
@@ -47,13 +24,6 @@
             logService.action(`[LobbyHeader] Renaming room to: ${newName}`);
             roomService.renameRoom(roomId, newName);
         }
-    }
-
-    function generateRandomRoomName() {
-        const randomGame =
-            GAME_NAMES[Math.floor(Math.random() * GAME_NAMES.length)];
-        const randomNum = Math.floor(Math.random() * 1000);
-        return `${randomGame} #${randomNum}`;
     }
 </script>
 

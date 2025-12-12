@@ -6,10 +6,20 @@
     import { base } from "$app/paths";
     import { logService } from "$lib/services/logService";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
+    import EditableText from "$lib/components/ui/EditableText.svelte";
+    import {
+        generateRandomRoomName,
+        generateRandomPlayerName,
+    } from "$lib/utils/nameGenerator"; // ВИПРАВЛЕНО
 
-    let roomName = "";
+    // Ініціалізуємо випадковою назвою одразу
+    let roomName = generateRandomRoomName(); // ВИПРАВЛЕНО
     let isPrivate = false;
     let isCreating = false;
+
+    function handleRoomNameChange(e: CustomEvent<string>) {
+        roomName = e.detail;
+    }
 
     async function handleCreate() {
         logService.action("[CreateRoomModal] Create button clicked");
@@ -20,7 +30,7 @@
         try {
             let playerName = localStorage.getItem("online_playerName");
             if (!playerName) {
-                playerName = `Player ${Math.floor(Math.random() * 1000)}`;
+                playerName = generateRandomPlayerName(); // ВИПРАВЛЕНО
                 localStorage.setItem("online_playerName", playerName);
             }
 
@@ -28,10 +38,12 @@
                 `[CreateRoomModal] Calling roomService.createRoom...`,
             );
 
+            const finalRoomName = roomName.trim() || generateRandomRoomName(); // ВИПРАВЛЕНО
+
             const roomId = await roomService.createRoom(
                 playerName,
                 isPrivate,
-                roomName,
+                finalRoomName,
             );
 
             logService.init(`[CreateRoomModal] Success. ID: ${roomId}`);
@@ -39,7 +51,6 @@
             await goto(`${base}/online/lobby/${roomId}`);
         } catch (e: any) {
             logService.error("[CreateRoomModal] Failed to create room", e);
-            // Показуємо конкретну помилку, якщо це таймаут
             const msg = e.message?.includes("Timeout")
                 ? "Не вдалося з'єднатися з сервером. Перевірте інтернет."
                 : $_("onlineMenu.errors.createFailed");
@@ -52,17 +63,20 @@
 
 <div class="create-room-form" data-testid="create-room-form">
     <div class="form-group">
-        <label for="room-name" data-testid="room-name-label"
-            >{$_("onlineMenu.roomName")}</label
+        <span class="label" data-testid="room-name-label"
+            >{$_("onlineMenu.roomName")}</span
         >
-        <input
-            id="room-name"
-            type="text"
-            bind:value={roomName}
-            placeholder={$_("onlineMenu.roomNamePlaceholder")}
-            class="modal-input"
-            data-testid="room-name-input"
-        />
+
+        <div class="name-editor-wrapper">
+            <EditableText
+                value={roomName}
+                canEdit={true}
+                onRandom={generateRandomRoomName}
+                on:change={handleRoomNameChange}
+                placeholder={$_("onlineMenu.roomNamePlaceholder")}
+                dataTestId="room-name-input"
+            />
+        </div>
     </div>
 
     <div class="form-group checkbox-group">
@@ -107,31 +121,28 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+        align-items: center;
     }
 
-    label {
+    .label {
         font-weight: bold;
         color: var(--text-secondary);
         font-size: 0.9em;
     }
 
-    .modal-input {
+    .name-editor-wrapper {
         background: rgba(0, 0, 0, 0.2);
         border: 1px solid var(--border-color);
         border-radius: 8px;
-        padding: 12px;
-        color: var(--text-primary);
-        font-size: 1em;
-    }
-
-    .modal-input:focus {
-        outline: none;
-        border-color: var(--control-selected);
-        box-shadow: 0 0 0 2px rgba(var(--control-selected-rgb), 0.2);
+        padding: 8px 16px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
 
     .checkbox-group {
         flex-direction: row;
+        justify-content: center;
     }
 
     .checkbox-label {

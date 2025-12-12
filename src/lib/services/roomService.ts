@@ -22,6 +22,7 @@ import { chatService, type ChatMessage } from './chatService';
 import { withTimeout } from '$lib/utils/asyncUtils';
 import { roomSessionService } from './room/roomSessionService';
 import { roomPlayerService } from './room/roomPlayerService';
+import { generateRandomRoomName } from '$lib/utils/nameGenerator'; // ВИПРАВЛЕНО
 
 const ROOM_TIMEOUT_MS = 600000;
 const OPERATION_TIMEOUT_MS = 10000;
@@ -50,9 +51,10 @@ class RoomService {
             isWatchingReplay: false
         };
 
+        // Використовуємо генератор імен кімнат, якщо назва не задана
         const finalRoomName = customRoomName && customRoomName.trim() !== ""
             ? customRoomName.trim()
-            : `Room #${Math.floor(Math.random() * 10000)}`;
+            : generateRandomRoomName(); // ВИПРАВЛЕНО
 
         const onlineDefaultSettings: GameSettingsState = {
             ...defaultGameSettings,
@@ -177,7 +179,6 @@ class RoomService {
 
             if (existingSession.roomId === roomId && existingSession.playerId && roomData.players[existingSession.playerId]) {
                 logService.init(`[RoomService] Reconnecting as existing player`);
-                // Оновлюємо ім'я, якщо воно змінилося
                 if (roomData.players[existingSession.playerId].name !== playerName) {
                     await updateDoc(roomRef, {
                         [`players.${existingSession.playerId}.name`]: playerName,

@@ -163,10 +163,7 @@
   {/if}
 
   <!-- 2. Single Player Modes -->
-  <!-- FIX: Видалено внутрішній заголовок, оскільки він тепер є заголовком модального вікна -->
-  <!-- <div class="mode-section-label">
-    {$_(`mainMenu.modes.${APP_CONFIG.MODES.SURVIVE}`)}
-  </div> -->
+  <!-- Заголовок модального вікна вже містить "Втримайся", тому тут не дублюємо -->
 
   <button
     class="modal-btn-generic green-btn"
@@ -209,18 +206,6 @@
     >
       {$_("mainMenu.localGame")}
     </button>
-
-    <!-- FUTURE MODES PLACEHOLDERS -->
-    <!-- 
-    <hr class="divider" />
-    <div class="mode-section-label future">Coming Soon</div>
-    <button class="modal-btn-generic future-btn" on:click={handleArenaMode}>
-       {$_(`mainMenu.modes.${APP_CONFIG.MODES.ARENA}`)}
-    </button>
-    <button class="modal-btn-generic future-btn" on:click={handleMazeMode}>
-       {$_(`mainMenu.modes.${APP_CONFIG.MODES.MAZE}`)}
-    </button> 
-    -->
   {/if}
 </div>
 
