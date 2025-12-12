@@ -1,6 +1,5 @@
 <script lang="ts">
-  import MainMenu from "$lib/components/MainMenu.svelte";
-  import DevClearCacheButton from "$lib/components/widgets/DevClearCacheButton.svelte";
+  import MainMenuV2 from "$lib/components/MainMenuV2.svelte";
 </script>
 
-<MainMenu />
+<MainMenuV2 />
