@@ -4,7 +4,7 @@
     import ColorPicker from "$lib/components/local-setup/ColorPicker.svelte";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import EditableText from "$lib/components/ui/EditableText.svelte";
-    import { getRandomUnusedName } from "$lib/utils/playerUtils";
+    import { generateRandomPlayerName } from "$lib/utils/nameGenerator"; // Оновлений імпорт
 
     export let players: OnlinePlayer[];
     export let myPlayerId: string;
@@ -45,11 +45,6 @@
     function handleNameChange(e: CustomEvent<string>) {
         onUpdatePlayer({ name: e.detail });
     }
-
-    function generateRandomName() {
-        const usedNames = players.map((p) => p.name);
-        return getRandomUnusedName(usedNames);
-    }
 </script>
 
 <div class="players-section">
@@ -84,7 +79,7 @@
                         <EditableText
                             value={player.name}
                             canEdit={player.id === myPlayerId}
-                            onRandom={generateRandomName}
+                            onRandom={generateRandomPlayerName}
                             on:change={handleNameChange}
                             dataTestId={`player-name-${player.id}`}
                         />
