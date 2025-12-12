@@ -4,26 +4,50 @@
   import {
     gameSettingsStore,
     type GameSettingsState,
+    type GameModePreset,
   } from "../stores/gameSettingsStore.js";
   import { _ } from "svelte-i18n";
-  import SvgIcons from "./SvgIcons.svelte";
-  import { customTooltip } from "$lib/actions/customTooltip.js";
-  import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
-  import StyledButton from "$lib/components/ui/StyledButton.svelte";
-  import ToggleButton from "$lib/components/ToggleButton.svelte";
   import { locale } from "svelte-i18n";
   import "../css/layouts/main-menu.css";
   import { languages } from "$lib/constants.js";
   import { logService } from "$lib/services/logService.js";
   import { clearCache } from "$lib/utils/cacheManager.js";
-  import { gameModeService } from "$lib/services/gameModeService";
   import { userActionService } from "$lib/services/userActionService.js";
   import VoiceSettings from "./VoiceSettings.svelte";
   import VoiceList from "./VoiceList.svelte";
+  // Імпорт з правильного шляху
+  import HotkeysTab from "./settings/HotkeysTab.svelte";
+  import StyledButton from "$lib/components/ui/StyledButton.svelte";
+  import ToggleButton from "$lib/components/ToggleButton.svelte";
+  import { page } from "$app/stores";
 
   $: settings = $appSettingsStore;
   $: gameSettings = $gameSettingsStore;
 
+  // Tabs configuration
+  type Tab = 'general' | 'voice' | 'hotkeys';
+  let activeTab: Tab = 'general';
+
+  // Типізований список режимів для уникнення помилки TS
+  const modes: GameModePreset[] = ['beginner', 'experienced', 'pro'];
+
+  onMount(() => {
+    // Check URL params for tab selection
+    const tabParam = $page.url.searchParams.get('tab');
+    if (tabParam && ['general', 'voice', 'hotkeys'].includes(tabParam)) {
+      activeTab = tabParam as Tab;
+    }
+  });
+
+  function setTab(tab: Tab) {
+    activeTab = tab;
+    // Optional: update URL without reload
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', tab);
+    window.history.replaceState({}, '', url);
+  }
+
+  // --- Voice List Logic ---
   let showFade = false;
   let voiceListWrapper: HTMLDivElement;
 
@@ -38,27 +62,27 @@
   let mutationObserver: MutationObserver;
   let resizeObserver: ResizeObserver;
 
-  onMount(() => {
+  function initVoiceObservers() {
     if (voiceListWrapper) {
-      // Run the check after the DOM has been updated
       setTimeout(updateFadeState, 0);
-
       resizeObserver = new ResizeObserver(updateFadeState);
       resizeObserver.observe(voiceListWrapper);
-
       mutationObserver = new MutationObserver(updateFadeState);
-      mutationObserver.observe(voiceListWrapper, {
-        childList: true,
-        subtree: true,
-      });
+      mutationObserver.observe(voiceListWrapper, { childList: true, subtree: true });
     }
-  });
+  }
+
+  // Re-run observers when tab changes to voice
+  $: if (activeTab === 'voice') {
+    setTimeout(initVoiceObservers, 100);
+  }
 
   onDestroy(() => {
     if (mutationObserver) mutationObserver.disconnect();
     if (resizeObserver) resizeObserver.disconnect();
   });
 
+  // --- Actions ---
   function handleClearAll() {
     clearCache({ keepAppearance: false });
   }
@@ -88,285 +112,204 @@
   }
 </script>
 
-<div class="setup-grid">
-  <div class="grid-column" data-testid="settings-column-appearance">
-    <div class="settings-card" data-testid="settings-card-appearance">
-      <div class="settings-group" data-testid="settings-page-language-group">
-        <span class="settings-label" data-testid="settings-page-language-label"
-          >{$_("settings.language")}</span
-        >
-        <div
-          class="language-selector"
-          data-testid="settings-page-language-selector"
-        >
-          {#each languages as lang}
-            <button
-              class="language-button"
-              class:active={settings.language === lang.code}
-              on:click={() => selectLang(lang.code)}
-              data-testid={`settings-page-language-button-${lang.code}`}
-            >
-              {@html lang.svg}
-            </button>
-          {/each}
-        </div>
-      </div>
-      <hr class="settings-divider" data-testid="settings-page-divider-1" />
-      <div class="theme-selector" data-testid="settings-page-theme-selector">
-        <div
-          class="theme-style-row"
-          data-style="purple"
-          data-testid="settings-page-theme-row-purple"
-        >
-          <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("purple", "light")}
-            data-testid="settings-page-theme-button-purple-light">☀️</button
-          >
-          <span class="theme-name" data-testid="settings-page-theme-name-purple"
-            >{$_("mainMenu.themeName.purple")}</span
-          >
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("purple", "dark")}
-            data-testid="settings-page-theme-button-purple-dark">🌙</button
-          >
-        </div>
-        <div
-          class="theme-style-row"
-          data-style="green"
-          data-testid="settings-page-theme-row-green"
-        >
-          <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("green", "light")}
-            data-testid="settings-page-theme-button-green-light">☀️</button
-          >
-          <span class="theme-name" data-testid="settings-page-theme-name-green"
-            >{$_("mainMenu.themeName.green")}</span
-          >
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("green", "dark")}
-            data-testid="settings-page-theme-button-green-dark">🌙</button
-          >
-        </div>
-        <div
-          class="theme-style-row"
-          data-style="blue"
-          data-testid="settings-page-theme-row-blue"
-        >
-          <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("blue", "light")}
-            data-testid="settings-page-theme-button-blue-light">☀️</button
-          >
-          <span class="theme-name" data-testid="settings-page-theme-name-blue"
-            >{$_("mainMenu.themeName.blue")}</span
-          >
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("blue", "dark")}
-            data-testid="settings-page-theme-button-blue-dark">🌙</button
-          >
-        </div>
-        <div
-          class="theme-style-row"
-          data-style="gray"
-          data-testid="settings-page-theme-row-gray"
-        >
-          <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("gray", "light")}
-            data-testid="settings-page-theme-button-gray-light">☀️</button
-          >
-          <span class="theme-name" data-testid="settings-page-theme-name-gray"
-            >{$_("mainMenu.themeName.gray")}</span
-          >
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("gray", "dark")}
-            data-testid="settings-page-theme-button-gray-dark">🌙</button
-          >
-        </div>
-        <div
-          class="theme-style-row"
-          data-style="orange"
-          data-testid="settings-page-theme-row-orange"
-        >
-          <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("orange", "light")}
-            data-testid="settings-page-theme-button-orange-light">☀️</button
-          >
-          <span class="theme-name" data-testid="settings-page-theme-name-orange"
-            >{$_("mainMenu.themeName.orange")}</span
-          >
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("orange", "dark")}
-            data-testid="settings-page-theme-button-orange-dark">🌙</button
-          >
-        </div>
-        <div
-          class="theme-style-row"
-          data-style="wood"
-          data-testid="settings-page-theme-row-wood"
-        >
-          <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("wood", "light")}
-            data-testid="settings-page-theme-button-wood-light">☀️</button
-          >
-          <span class="theme-name" data-testid="settings-page-theme-name-wood"
-            >{$_("mainMenu.themeName.wood")}</span
-          >
-          <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("wood", "dark")}
-            data-testid="settings-page-theme-button-wood-dark">🌙</button
-          >
-        </div>
-      </div>
-    </div>
+<div class="settings-container">
+  <!-- Tabs Header -->
+  <div class="tabs-header">
+    <button 
+      class="tab-btn" 
+      class:active={activeTab === 'general'} 
+      on:click={() => setTab('general')}
+      data-testid="settings-tab-general"
+    >
+      {$_('settings.tabs.general')}
+    </button>
+    <button 
+      class="tab-btn" 
+      class:active={activeTab === 'voice'} 
+      on:click={() => setTab('voice')}
+      data-testid="settings-tab-voice"
+    >
+      {$_('settings.tabs.voice')}
+    </button>
+    <button 
+      class="tab-btn" 
+      class:active={activeTab === 'hotkeys'} 
+      on:click={() => setTab('hotkeys')}
+      data-testid="settings-tab-hotkeys"
+    >
+      {$_('settings.tabs.hotkeys')}
+    </button>
   </div>
-  <div class="grid-column" data-testid="settings-column-game">
-    <div class="settings-card" data-testid="settings-card-game">
-      <div
-        class="settings-section"
-        data-testid="settings-page-game-mode-section"
-      >
-        <span class="settings-label" data-testid="settings-page-game-mode-label"
-          >{$_("settings.gameMode")}</span
-        >
-        <div
-          class="settings-button-group"
-          data-testid="settings-page-game-mode-group"
-        >
-          <StyledButton
-            variant={!gameSettings.rememberGameMode ? "primary" : "menu"}
-            on:click={() => {
-              gameSettingsStore.updateSettings({
-                gameMode: null,
-                showGameModeModal: true,
-                rememberGameMode: false,
-              });
-              if (typeof window !== "undefined") {
-                sessionStorage.removeItem("gameMode");
-              }
-            }}
-            dataTestId="settings-page-game-mode-null"
-          >
-            {$_("gameModes.choose")}
-          </StyledButton>
-          <div class="game-mode-buttons">
-            <StyledButton
-              variant={gameSettings.rememberGameMode &&
-              gameSettings.gameMode === "beginner"
-                ? "primary"
-                : "menu"}
-              on:click={() => userActionService.setGameModePreset("beginner")}
-              dataTestId="settings-page-game-mode-beginner"
-            >
-              {$_("gameModes.beginner")}
-            </StyledButton>
-            <StyledButton
-              variant={gameSettings.rememberGameMode &&
-              gameSettings.gameMode === "experienced"
-                ? "primary"
-                : "menu"}
-              on:click={() =>
-                userActionService.setGameModePreset("experienced")}
-              dataTestId="settings-page-game-mode-experienced"
-            >
-              {$_("gameModes.experienced")}
-            </StyledButton>
-            <StyledButton
-              variant={gameSettings.rememberGameMode &&
-              gameSettings.gameMode === "pro"
-                ? "primary"
-                : "menu"}
-              on:click={() => userActionService.setGameModePreset("pro")}
-              dataTestId="settings-page-game-mode-pro"
-            >
-              {$_("gameModes.pro")}
-            </StyledButton>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    
+    <!-- GENERAL TAB -->
+    {#if activeTab === 'general'}
+      <div class="setup-grid">
+        <div class="grid-column" data-testid="settings-column-appearance">
+          <div class="settings-card">
+            <div class="settings-group">
+              <span class="settings-label">{$_("settings.language")}</span>
+              <div class="language-selector">
+                {#each languages as lang}
+                  <button
+                    class="language-button"
+                    class:active={settings.language === lang.code}
+                    on:click={() => selectLang(lang.code)}
+                  >
+                    {@html lang.svg}
+                  </button>
+                {/each}
+              </div>
+            </div>
+            <hr class="settings-divider" />
+            <div class="theme-selector">
+              {#each ['purple', 'green', 'blue', 'gray', 'orange', 'wood'] as style}
+                <div class="theme-style-row" data-style={style}>
+                  <button class="theme-btn" data-theme="light" on:click={() => selectTheme(style, "light")}>☀️</button>
+                  <span class="theme-name">{$_(`mainMenu.themeName.${style}`)}</span>
+                  <button class="theme-btn" data-theme="dark" on:click={() => selectTheme(style, "dark")}>🌙</button>
+                </div>
+              {/each}
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-column" data-testid="settings-column-game">
+          <div class="settings-card">
+            <div class="settings-section">
+              <span class="settings-label">{$_("settings.gameMode")}</span>
+              <div class="settings-button-group">
+                <StyledButton
+                  variant={!gameSettings.rememberGameMode ? "primary" : "menu"}
+                  on:click={() => {
+                    gameSettingsStore.updateSettings({
+                      gameMode: null,
+                      showGameModeModal: true,
+                      rememberGameMode: false,
+                    });
+                    if (typeof window !== "undefined") sessionStorage.removeItem("gameMode");
+                  }}
+                >
+                  {$_("gameModes.choose")}
+                </StyledButton>
+                <div class="game-mode-buttons">
+                  {#each modes as mode}
+                    <StyledButton
+                      variant={gameSettings.rememberGameMode && gameSettings.gameMode === mode ? "primary" : "menu"}
+                      on:click={() => userActionService.setGameModePreset(mode)}
+                    >
+                      {$_(`gameModes.${mode}`)}
+                    </StyledButton>
+                  {/each}
+                </div>
+              </div>
+            </div>
+            <hr class="settings-divider" />
+            <div class="settings-option">
+              <ToggleButton
+                label={$_("settings.showDifficultyWarningModal")}
+                checked={gameSettings.showDifficultyWarningModal}
+                on:toggle={() => toggleSetting("showDifficultyWarningModal")}
+              />
+            </div>
+            <hr class="settings-divider" />
+            <div class="settings-actions">
+              <StyledButton variant="menu" on:click={resetSettings} tooltip={$_("settings.resetHint")}>
+                <span>{$_("settings.reset")}</span>
+              </StyledButton>
+              <StyledButton variant="menu" on:click={handleKeepAppearance}>
+                <span>{$_("mainMenu.clearCacheModal.keepAppearance")}</span>
+              </StyledButton>
+              <StyledButton variant="danger" on:click={handleClearAll}>
+                <span>{$_("mainMenu.clearCacheModal.fullClear")}</span>
+              </StyledButton>
+            </div>
           </div>
         </div>
       </div>
-      <hr class="settings-divider" data-testid="settings-page-divider-3" />
-      <div
-        class="settings-option"
-        data-testid="settings-page-difficulty-warning-option"
-      >
-        <ToggleButton
-          label={$_("settings.showDifficultyWarningModal")}
-          checked={gameSettings.showDifficultyWarningModal}
-          on:toggle={() => toggleSetting("showDifficultyWarningModal")}
-          dataTestId="settings-page-show-difficulty-warning-modal-toggle"
-        />
+    {/if}
+
+    <!-- VOICE TAB -->
+    {#if activeTab === 'voice'}
+      <div class="setup-grid">
+        <div class="grid-column">
+          <div class="settings-card">
+            <span class="settings-label">{$_("settings.voiceSettings")}</span>
+            <VoiceSettings />
+          </div>
+        </div>
+        <div class="grid-column">
+          <div class="settings-card" style="height: 100%; min-height: 400px;">
+            <span class="settings-label">{$_("settings.voiceList")}</span>
+            <div
+              class="voice-list-wrapper"
+              class:fade-bottom={showFade}
+              bind:this={voiceListWrapper}
+              on:scroll={updateFadeState}
+            >
+              <VoiceList />
+            </div>
+          </div>
+        </div>
       </div>
-      <hr class="settings-divider" data-testid="settings-page-divider-4" />
-      <div class="settings-actions" data-testid="settings-page-actions">
-        <StyledButton
-          variant="menu"
-          on:click={resetSettings}
-          tooltip={$_("settings.resetHint")}
-          dataTestId="settings-page-reset-button"
-        >
-          <span>{$_("settings.reset")}</span>
-        </StyledButton>
-        <StyledButton
-          variant="menu"
-          dataTestId="clear-cache-keep-appearance-btn"
-          on:click={handleKeepAppearance}
-        >
-          <span>{$_("mainMenu.clearCacheModal.keepAppearance")}</span>
-        </StyledButton>
-        <StyledButton
-          variant="danger"
-          dataTestId="clear-cache-full-clear-btn"
-          on:click={handleClearAll}
-        >
-          <span>{$_("mainMenu.clearCacheModal.fullClear")}</span>
-        </StyledButton>
+    {/if}
+
+    <!-- HOTKEYS TAB -->
+    {#if activeTab === 'hotkeys'}
+      <div class="settings-card">
+        <HotkeysTab />
       </div>
-    </div>
-  </div>
-  <div class="grid-column" data-testid="settings-column-voice">
-    <div class="settings-card" data-testid="settings-card-voice">
-      <span class="settings-label">{$_("settings.voiceSettings")}</span>
-      <VoiceSettings />
-    </div>
-  </div>
-  <div class="grid-column" data-testid="settings-column-voice-list">
-    <div class="settings-card" data-testid="settings-card-voice-list">
-      <span class="settings-label">{$_("settings.voiceList")}</span>
-      <div
-        class="voice-list-wrapper"
-        class:fade-bottom={showFade}
-        bind:this={voiceListWrapper}
-        on:scroll={updateFadeState}
-      >
-        <VoiceList />
-      </div>
-    </div>
+    {/if}
+
   </div>
 </div>
 
 <style>
+  .settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Tabs Header */
+  .tabs-header {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 2px solid var(--border-color);
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tab-btn:hover {
+    background: var(--control-bg);
+    color: var(--text-primary);
+  }
+
+  .tab-btn.active {
+    background: var(--control-selected);
+    color: var(--control-selected-text);
+    border-color: var(--control-selected);
+    box-shadow: 0 4px 12px var(--shadow-color);
+  }
+
+  /* Grid Layout for General & Voice tabs */
   .setup-grid {
     display: grid;
     gap: 24px;
@@ -379,18 +322,11 @@
     }
   }
 
-  @media (min-width: 1600px) {
-    .setup-grid {
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
-  }
-
   .grid-column {
     display: flex;
     flex-direction: column;
     gap: 16px;
     min-width: 0;
-    min-height: 0;
   }
 
   .settings-card {
@@ -405,6 +341,7 @@
     flex-grow: 1;
   }
 
+  /* Reused styles */
   .settings-group {
     display: flex;
     align-items: center;
@@ -429,7 +366,6 @@
     flex-direction: column;
     gap: 12px;
   }
-
   .language-selector {
     display: flex;
     gap: 8px;
@@ -449,7 +385,6 @@
     border-color: var(--control-selected) !important;
     box-shadow: none !important;
   }
-
   .settings-section {
     display: flex;
     flex-direction: column;
@@ -461,26 +396,23 @@
     gap: 8px;
     width: 100%;
   }
-
   .game-mode-buttons {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
   }
-
   .voice-list-wrapper {
     flex-grow: 1;
     min-height: 0;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    max-height: 500px; /* Limit height for voice list */
   }
-
   .voice-list-wrapper.fade-bottom {
     -webkit-mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
     mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
   }
-
   .voice-list-wrapper::-webkit-scrollbar {
     width: 8px;
   }
@@ -494,21 +426,5 @@
   }
   .voice-list-wrapper::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.25);
-  }
-  /* 
-    Ensure the 4th column (Voice List) adapts to the height of the row (determined by the 3rd column) 
-    and scrolls internally if needed, rather than expanding the row height.
-  */
-  [data-testid="settings-column-voice-list"] > .settings-card {
-    height: 400px; /* Fixed height for mobile stack */
-  }
-
-  /* Tablet and up (Grid layout) */
-  @media (min-width: 768px) {
-    [data-testid="settings-column-voice-list"] > .settings-card {
-      height: auto;
-      flex-basis: 0; /* Allow it to shrink/grow from 0, filling available space */
-      min-height: 0; /* Allow shrinking below content height to enable internal scrolling */
-    }
   }
 </style>

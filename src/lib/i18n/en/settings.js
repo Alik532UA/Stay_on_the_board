@@ -39,5 +39,10 @@ export default {
     compact: "abbreviated"
   },
   voiceSettings: "Voice Settings",
-  voiceList: "Available Voices"
+  voiceList: "Available Voices",
+  tabs: {
+    general: "General",
+    voice: "Voice",
+    hotkeys: "Hotkeys"
+  }
 };
