@@ -248,6 +248,7 @@
 		position="bottom"
 		persistenceKey="main-bottom-menu"
 		dataTestId="flexible-menu-bottom-wrapper"
+		defaultOpen={false}
 	/>
 </div>
 
