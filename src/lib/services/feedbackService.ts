@@ -1,5 +1,5 @@
 import { getFirestoreDb } from './firebaseService';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { get } from 'svelte/store';
 import { appVersion } from '$lib/stores/versionStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
@@ -20,13 +20,19 @@ export interface FeedbackData {
 class FeedbackService {
     /**
      * Збирає технічний контекст та відправляє відгук у Firestore.
+     * Використовує кастомний ID на основі дати для зручного сортування в консолі.
      */
     async submitFeedback(data: FeedbackData): Promise<void> {
         logService.action('[FeedbackService] Submitting feedback...', data);
 
         try {
             const db = getFirestoreDb();
-            const feedbackRef = collection(db, 'feedback');
+
+            // Генеруємо читабельний ID: YYYY-MM-DD_HH-mm-ss_SSS_RAND
+            const docId = this.generateTimestampId();
+
+            // Створюємо посилання на документ з конкретним ID
+            const feedbackDocRef = doc(db, 'feedback', docId);
 
             // Збір контексту (Варіант 3A)
             const context = this.gatherContext();
@@ -35,12 +41,15 @@ class FeedbackService {
                 ...data,
                 context,
                 createdAt: serverTimestamp(),
-                status: 'new'
+                status: 'new',
+                // Зберігаємо ID також всередині документа для зручності експорту
+                id: docId
             };
 
-            await addDoc(feedbackRef, payload);
+            // Використовуємо setDoc замість addDoc для запису з власним ID
+            await setDoc(feedbackDocRef, payload);
 
-            logService.action('[FeedbackService] Feedback submitted successfully.');
+            logService.action(`[FeedbackService] Feedback submitted successfully. ID: ${docId}`);
             notificationService.show({
                 type: 'success',
                 messageKey: 'ui.feedback.success',
@@ -56,6 +65,29 @@ class FeedbackService {
             });
             throw error;
         }
+    }
+
+    /**
+     * Генерує унікальний ID на основі часу для зручного сортування.
+     * Формат: YYYY-MM-DD_HH-mm-ss_SSS_RAND
+     */
+    private generateTimestampId(): string {
+        const now = new Date();
+        const pad = (num: number) => num.toString().padStart(2, '0');
+        const padMs = (num: number) => num.toString().padStart(3, '0');
+
+        const year = now.getFullYear();
+        const month = pad(now.getMonth() + 1);
+        const day = pad(now.getDate());
+        const hours = pad(now.getHours());
+        const minutes = pad(now.getMinutes());
+        const seconds = pad(now.getSeconds());
+        const ms = padMs(now.getMilliseconds());
+
+        // Додаємо випадковий суфікс для уникнення колізій при одночасному записі
+        const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+
+        return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}_${ms}_${randomSuffix}`;
     }
 
     private gatherContext() {
