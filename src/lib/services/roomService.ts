@@ -1,6 +1,6 @@
 import {
     collection,
-    addDoc,
+    setDoc,
     getDocs,
     doc,
     deleteDoc,
@@ -78,17 +78,39 @@ class RoomService {
         };
 
         try {
-            const docRef = await withTimeout(
-                addDoc(collection(this.db, 'rooms'), roomData),
+            const roomId = this.generateTimestampId();
+            const roomRef = doc(this.db, 'rooms', roomId);
+
+            await withTimeout(
+                setDoc(roomRef, roomData),
                 OPERATION_TIMEOUT_MS,
                 'Timeout: Failed to connect to Firebase Firestore.'
             );
-            roomSessionService.saveSession(docRef.id, hostId);
-            return docRef.id;
+
+            roomSessionService.saveSession(roomId, hostId);
+            return roomId;
         } catch (error) {
             logService.error('[RoomService] Failed to create room:', error);
             throw error;
         }
+    }
+
+    private generateTimestampId(): string {
+        const now = new Date();
+        const pad = (num: number) => num.toString().padStart(2, '0');
+        const padMs = (num: number) => num.toString().padStart(3, '0');
+
+        const year = now.getFullYear();
+        const month = pad(now.getMonth() + 1);
+        const day = pad(now.getDate());
+        const hours = pad(now.getHours());
+        const minutes = pad(now.getMinutes());
+        const seconds = pad(now.getSeconds());
+        const ms = padMs(now.getMilliseconds());
+
+        const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+
+        return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}_${ms}_${randomSuffix}`;
     }
 
     async getPublicRooms(): Promise<RoomSummary[]> {
@@ -155,6 +177,13 @@ class RoomService {
 
             if (existingSession.roomId === roomId && existingSession.playerId && roomData.players[existingSession.playerId]) {
                 logService.init(`[RoomService] Reconnecting as existing player`);
+                // Оновлюємо ім'я, якщо воно змінилося
+                if (roomData.players[existingSession.playerId].name !== playerName) {
+                    await updateDoc(roomRef, {
+                        [`players.${existingSession.playerId}.name`]: playerName,
+                        lastActivity: Date.now()
+                    });
+                }
                 return existingSession.playerId;
             }
 
@@ -282,6 +311,14 @@ class RoomService {
         }
 
         await updateDoc(roomRef, updates);
+    }
+
+    async renameRoom(roomId: string, newName: string): Promise<void> {
+        const roomRef = doc(this.db, 'rooms', roomId);
+        await updateDoc(roomRef, {
+            name: newName,
+            lastActivity: Date.now()
+        });
     }
 
     // --- Delegations ---

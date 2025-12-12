@@ -11,7 +11,7 @@
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import type { GameModePreset } from "$lib/stores/gameSettingsStore";
   import { APP_CONFIG } from "$lib/config/appConfig";
-  import WipNotice from "./main-menu/WipNotice.svelte"; // Імпорт нового компонента
+  import WipNotice from "./main-menu/WipNotice.svelte";
 
   let showWipNotice = false;
 
@@ -149,10 +149,24 @@
 </script>
 
 <div class="game-mode-buttons" bind:this={buttonsNode}>
-  <!-- Current Mode: Survive (Втримайся) -->
-  <div class="mode-section-label">
+  {#if extended}
+    <!-- 1. Online Game (Top Priority) -->
+    <button
+      class="modal-btn-generic"
+      on:click={handleOnlineGame}
+      data-testid="online-game-btn"
+    >
+      {$_("mainMenu.playOnline")}
+    </button>
+
+    <hr class="divider" />
+  {/if}
+
+  <!-- 2. Single Player Modes -->
+  <!-- FIX: Видалено внутрішній заголовок, оскільки він тепер є заголовком модального вікна -->
+  <!-- <div class="mode-section-label">
     {$_(`mainMenu.modes.${APP_CONFIG.MODES.SURVIVE}`)}
-  </div>
+  </div> -->
 
   <button
     class="modal-btn-generic green-btn"
@@ -177,7 +191,6 @@
   </button>
 
   {#if extended}
-    <hr class="divider" />
     <button
       class="modal-btn-generic"
       on:click={() => selectMode("timed")}
@@ -185,19 +198,16 @@
     >
       {$_("mainMenu.timedGame")}
     </button>
+
+    <hr class="divider" />
+
+    <!-- 3. Local Game -->
     <button
       class="modal-btn-generic"
       on:click={handleLocalGame}
       data-testid="local-game-btn"
     >
       {$_("mainMenu.localGame")}
-    </button>
-    <button
-      class="modal-btn-generic"
-      on:click={handleOnlineGame}
-      data-testid="online-game-btn"
-    >
-      {$_("mainMenu.playOnline")}
     </button>
 
     <!-- FUTURE MODES PLACEHOLDERS -->

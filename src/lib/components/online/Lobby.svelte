@@ -104,7 +104,8 @@
         <div class="lobby-grid">
             <!-- Ліва колонка: Інфо та Гравці -->
             <div class="left-column">
-                <LobbyHeader {room} {roomId} />
+                <!-- FIX: Передаємо amIHost, щоб дозволити редагування назви кімнати -->
+                <LobbyHeader {room} {roomId} {amIHost} />
 
                 <LobbyPlayerList
                     players={playersList}

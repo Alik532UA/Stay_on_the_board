@@ -1,33 +1,90 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
     import type { Room } from "$lib/types/online";
+    import EditableText from "$lib/components/ui/EditableText.svelte";
+    import { roomService } from "$lib/services/roomService";
+    import { logService } from "$lib/services/logService";
 
     export let room: Room;
     export let roomId: string;
+    export let amIHost: boolean = false;
 
     let isCopied = false;
+
+    // Список ігор для випадкової генерації назви кімнати
+    const GAME_NAMES = [
+        "FIFA",
+        "SIMS",
+        "NFS",
+        "GTA",
+        "Peek",
+        "CS2",
+        "TrackMania",
+        "RoadRash",
+        "Minecraft",
+        "Tetris",
+        "Doom",
+        "Zelda",
+        "Mario",
+        "Portal",
+        "Halo",
+        "Cyberpunk",
+        "Witcher",
+        "Skyrim",
+        "Fortnite",
+        "Dota",
+    ];
 
     function copyRoomId() {
         navigator.clipboard.writeText(roomId);
         isCopied = true;
         setTimeout(() => (isCopied = false), 2000);
     }
+
+    function handleRoomNameChange(e: CustomEvent<string>) {
+        const newName = e.detail;
+        if (newName && newName !== room.name) {
+            logService.action(`[LobbyHeader] Renaming room to: ${newName}`);
+            roomService.renameRoom(roomId, newName);
+        }
+    }
+
+    function generateRandomRoomName() {
+        const randomGame =
+            GAME_NAMES[Math.floor(Math.random() * GAME_NAMES.length)];
+        const randomNum = Math.floor(Math.random() * 1000);
+        return `${randomGame} #${randomNum}`;
+    }
 </script>
 
 <div class="lobby-header">
-    <h1 data-testid="room-name">{room.name}</h1>
-    <div class="room-id-container">
-        <span class="room-id" data-testid="room-id-display">ID: {roomId}</span>
-        <button
-            class="copy-btn"
-            on:click={copyRoomId}
-            data-testid="copy-room-id-btn"
-        >
-            {isCopied
-                ? $_("onlineMenu.lobby.linkCopied")
-                : $_("onlineMenu.lobby.copyLink")}
-        </button>
+    <div class="room-name-wrapper">
+        <EditableText
+            value={room.name}
+            canEdit={amIHost}
+            onRandom={generateRandomRoomName}
+            on:change={handleRoomNameChange}
+            dataTestId="room-name-editable"
+        />
     </div>
+
+    {#if import.meta.env.DEV}
+        <div class="room-id-container">
+            <span class="room-id" data-testid="room-id-display"
+                >ID: {roomId}</span
+            >
+            <button
+                class="copy-btn"
+                on:click={copyRoomId}
+                data-testid="copy-room-id-btn"
+            >
+                {isCopied
+                    ? $_("onlineMenu.lobby.linkCopied")
+                    : $_("onlineMenu.lobby.copyLink")}
+            </button>
+        </div>
+    {/if}
+
     <div class="status-badge {room.status}" data-testid="room-status-badge">
         {$_(`onlineMenu.${room.status}`)}
     </div>
@@ -41,19 +98,28 @@
         border: var(--unified-border);
         box-shadow: var(--unified-shadow);
         margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
     }
-    h1 {
-        margin: 0 0 8px 0;
-        font-size: 1.8em;
-        text-align: center;
+
+    .room-name-wrapper {
+        font-size: 1.5em;
+        margin-bottom: 4px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
+
     .room-id-container {
         display: flex;
         justify-content: center;
         gap: 10px;
-        margin-bottom: 10px;
+        margin-bottom: 4px;
         color: var(--text-secondary);
         font-family: monospace;
+        font-size: 0.9em;
     }
     .copy-btn {
         background: none;
@@ -62,6 +128,7 @@
         cursor: pointer;
         color: var(--text-accent);
         font-size: 0.8em;
+        padding: 2px 6px;
     }
     .status-badge {
         text-align: center;
@@ -69,5 +136,8 @@
         text-transform: uppercase;
         font-size: 0.9em;
         color: var(--text-accent);
+        background: rgba(255, 255, 255, 0.05);
+        padding: 4px 12px;
+        border-radius: 12px;
     }
 </style>

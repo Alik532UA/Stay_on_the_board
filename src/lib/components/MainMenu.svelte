@@ -27,6 +27,7 @@
   import LanguageDropdown from "./main-menu/LanguageDropdown.svelte";
   import WipNotice from "./main-menu/WipNotice.svelte";
   import DevMenu from "./main-menu/DevMenu.svelte";
+  import { APP_CONFIG } from "$lib/config/appConfig";
 
   let showLangDropdown = false;
   let showThemeDropdown = false;
@@ -112,7 +113,8 @@
     import("./GameModeModal.svelte").then((module) => {
       const GameModeModal = module.default;
       modalStore.showModal({
-        titleKey: "mainMenu.gameModeModal.title",
+        // FIX: Змінено заголовок на "Втримайся"
+        titleKey: `mainMenu.modes.${APP_CONFIG.MODES.SURVIVE}`,
         dataTestId: "game-mode-modal",
         component: GameModeModal,
         props: { extended: true },
