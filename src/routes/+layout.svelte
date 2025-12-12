@@ -243,12 +243,14 @@
 		{/if}
 	</main>
 
-	<FlexibleMenu
-		items={menuItems}
-		position="bottom"
-		persistenceKey="main-bottom-menu"
-		dataTestId="flexible-menu-bottom-wrapper"
-	/>
+	{#if import.meta.env.DEV}
+		<FlexibleMenu
+			items={menuItems}
+			position="bottom"
+			persistenceKey="main-bottom-menu"
+			dataTestId="flexible-menu-bottom-wrapper"
+		/>
+	{/if}
 </div>
 
 {#if $tooltipStore.isVisible}
