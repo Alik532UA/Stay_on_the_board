@@ -39,5 +39,10 @@ export default {
     compact: "скорочено"
   },
   voiceSettings: "Налаштування голосу",
-  voiceList: "Доступні голоси"
+  voiceList: "Доступні голоси",
+  tabs: {
+    general: "Основні",
+    voice: "Голос",
+    hotkeys: "Гарячі клавіші"
+  }
 };

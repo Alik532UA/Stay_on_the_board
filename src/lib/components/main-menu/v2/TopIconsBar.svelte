@@ -38,19 +38,37 @@
 </script>
 
 <div class="top-icons-bar">
-    <!-- Тема -->
-    <div class="icon-wrapper">
-        <button
-            class="icon-btn"
-            on:click={toggleTheme}
-            title={$_("mainMenu.theme")}
-            data-testid="top-theme-btn"
-        >
-            <span class="icon-inner"><SvgIcons name="theme" /></span>
-        </button>
-    </div>
+    <!-- 1. Правила -->
+    <button
+        class="icon-btn"
+        on:click={() => navigateTo("/rules")}
+        title={$_("mainMenu.rules")}
+        data-testid="top-rules-btn"
+    >
+        <span class="emoji">📝</span>
+    </button>
 
-    <!-- Мова -->
+    <!-- 2. Нагороди -->
+    <button
+        class="icon-btn"
+        on:click={() => navigateTo("/rewards")}
+        title={$_("rewards.pageTitle")}
+        data-testid="top-rewards-btn"
+    >
+        <span class="emoji">🏆</span>
+    </button>
+
+    <!-- 3. Налаштування -->
+    <button
+        class="icon-btn"
+        on:click={() => navigateTo("/settings")}
+        title={$_("mainMenu.settings")}
+        data-testid="top-settings-btn"
+    >
+        <span class="emoji">⚙️</span>
+    </button>
+
+    <!-- 4. Мова -->
     <div class="icon-wrapper">
         <button
             class="icon-btn"
@@ -62,17 +80,29 @@
         </button>
     </div>
 
-    <!-- Нагороди -->
+    <!-- 5. Тема -->
+    <div class="icon-wrapper">
+        <button
+            class="icon-btn"
+            on:click={toggleTheme}
+            title={$_("mainMenu.theme")}
+            data-testid="top-theme-btn"
+        >
+            <span class="icon-inner"><SvgIcons name="theme" /></span>
+        </button>
+    </div>
+
+    <!-- 6. Керування (Desktop only) -->
     <button
-        class="icon-btn"
-        on:click={() => navigateTo("/rewards")}
-        title={$_("rewards.pageTitle")}
-        data-testid="top-rewards-btn"
+        class="icon-btn desktop-only"
+        on:click={() => navigateTo("/settings?tab=hotkeys")}
+        title={$_("mainMenu.controls")}
+        data-testid="top-controls-btn"
     >
-        <span class="emoji">🏆</span>
+        <span class="emoji">⌨️</span>
     </button>
 
-    <!-- Підтримати (Donate) -->
+    <!-- 7. Підтримати (Donate) -->
     <button
         class="icon-btn"
         on:click={() => navigateTo("/supporters")}
@@ -82,37 +112,7 @@
         <span class="icon-inner"><SvgIcons name="donate" /></span>
     </button>
 
-    <!-- Налаштування -->
-    <button
-        class="icon-btn"
-        on:click={() => navigateTo("/settings")}
-        title={$_("mainMenu.settings")}
-        data-testid="top-settings-btn"
-    >
-        <span class="emoji">⚙️</span>
-    </button>
-
-    <!-- Керування (Desktop only) -->
-    <button
-        class="icon-btn desktop-only"
-        on:click={() => navigateTo("/controls")}
-        title={$_("mainMenu.controls")}
-        data-testid="top-controls-btn"
-    >
-        <span class="emoji">⌨️</span>
-    </button>
-
-    <!-- Правила -->
-    <button
-        class="icon-btn"
-        on:click={() => navigateTo("/rules")}
-        title={$_("mainMenu.rules")}
-        data-testid="top-rules-btn"
-    >
-        <span class="emoji">📝</span>
-    </button>
-
-    <!-- Зворотній зв'язок -->
+    <!-- 8. Зворотній зв'язок -->
     <button
         class="icon-btn"
         on:click={onFeedback}
@@ -161,11 +161,12 @@
     }
 
     .icon-btn {
-        /* FIX: Фон як у гамбургера (bg-secondary) */
-        background: var(--bg-secondary);
+        /* FIX: Прозорий фон */
+        background: transparent;
         /* FIX: Прибрано обводку */
         border: none;
-        border-radius: 12px;
+        /* FIX: Кругла форма */
+        border-radius: 50%;
         width: 48px;
         height: 48px;
         display: flex;
@@ -174,18 +175,17 @@
         cursor: pointer;
         transition:
             transform 0.2s,
-            background 0.2s,
-            box-shadow 0.2s;
-        /* Тінь для виділення на фоні */
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background 0.2s;
+        /* FIX: Прибрано тінь для повної прозорості */
+        box-shadow: none;
         padding: 0;
         color: var(--text-primary);
     }
 
     .icon-btn:hover {
         transform: scale(1.1);
-        /* Трохи світліший фон при наведенні */
-        filter: brightness(1.2);
+        /* Легкий фон при наведенні для зворотного зв'язку */
+        background: rgba(255, 255, 255, 0.1);
     }
 
     .emoji {

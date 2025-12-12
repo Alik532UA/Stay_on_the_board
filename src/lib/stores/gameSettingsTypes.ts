@@ -21,7 +21,9 @@ export type KeybindingAction =
     | 'toggle-speech'
     | 'distance-1' | 'distance-2' | 'distance-3' | 'distance-4'
     | 'distance-5' | 'distance-6' | 'distance-7' | 'distance-8'
-    | 'auto-hide-board' | 'show-help' | 'main-menu';
+    | 'auto-hide-board' | 'show-help' | 'main-menu'
+    // FIX: Додано відсутні типи дій
+    | 'toggle-theme' | 'toggle-language';
 
 // ============================================================================
 // Game Mode Presets
@@ -99,8 +101,8 @@ export interface GameSettingsState {
     speechRate: number;
     speechOrder: 'dir_dist' | 'dist_dir';
     shortSpeech: boolean;
-    speechFor: { 
-        player: boolean; 
+    speechFor: {
+        player: boolean;
         computer: boolean;
         // Нові налаштування для онлайн режиму
         onlineMyMove: boolean;

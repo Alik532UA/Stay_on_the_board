@@ -38,6 +38,11 @@ export default {
     shown: "köstermek",
     compact: "qısqartılğan"
   },
-    voiceSettings: "Ses ayarları",
-  voiceList: "Mevcut sesler"
+  voiceSettings: "Ses ayarları",
+  voiceList: "Mevcut sesler",
+  tabs: {
+    general: "Umumiy",
+    voice: "Ses",
+    hotkeys: "Qısqa yollar"
+  }
 };

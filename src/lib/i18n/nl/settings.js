@@ -39,5 +39,10 @@ export default {
     compact: "afgekort"
   },
   voiceSettings: "Spraakinstellingen",
-  voiceList: "Beschikbare stemmen"
+  voiceList: "Beschikbare stemmen",
+  tabs: {
+    general: "Algemeen",
+    voice: "Spraak",
+    hotkeys: "Sneltoetsen"
+  }
 };

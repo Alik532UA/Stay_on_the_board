@@ -44,6 +44,10 @@ export const defaultKeybindings: Record<KeybindingAction, string[]> = {
     'auto-hide-board': ['Numpad0'],
     'show-help': ['KeyI'],
     'main-menu': ['Escape'],
+
+    // FIX: Додано дефолтні значення для нових дій (поки що порожні, щоб не конфліктувати)
+    'toggle-theme': [],
+    'toggle-language': []
 };
 
 /**

@@ -65,7 +65,6 @@
             transition:scale={{ duration: 300, easing: quintOut, start: 0.9 }}
             data-testid="menu-list"
         >
-            <!-- FIX: Додано унікальні data-testid для кожного пункту меню -->
             <button
                 class="menu-item"
                 on:click={() => {
@@ -105,9 +104,10 @@
                 <span class="menu-text">{$_("mainMenu.settings")}</span>
             </button>
 
+            <!-- FIX: Оновлено посилання на вкладку гарячих клавіш -->
             <button
                 class="menu-item"
-                on:click={() => navigateTo("/controls")}
+                on:click={() => navigateTo("/settings?tab=hotkeys")}
                 data-testid="menu-item-controls"
             >
                 <span class="menu-icon">⌨️</span>
