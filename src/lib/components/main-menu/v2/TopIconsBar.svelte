@@ -1,0 +1,240 @@
+<script lang="ts">
+    import { goto } from "$app/navigation";
+    import { base } from "$app/paths";
+    import { _ } from "svelte-i18n";
+    import SvgIcons from "$lib/components/SvgIcons.svelte";
+    import { logService } from "$lib/services/logService.js";
+    import { currentLanguageFlagSvg } from "$lib/stores/derivedState";
+
+    // Components
+    import ThemeDropdown from "$lib/components/main-menu/ThemeDropdown.svelte";
+    import LanguageDropdown from "$lib/components/main-menu/LanguageDropdown.svelte";
+
+    export let onFeedback: () => void;
+
+    let showThemeDropdown = false;
+    let showLangDropdown = false;
+
+    function closeAll() {
+        showThemeDropdown = false;
+        showLangDropdown = false;
+    }
+
+    function navigateTo(route: string) {
+        logService.action(`Click: "Навігація: ${route}" (TopIconsBar)`);
+        closeAll();
+        goto(`${base}${route}`);
+    }
+
+    function toggleTheme() {
+        showThemeDropdown = !showThemeDropdown;
+        showLangDropdown = false;
+    }
+
+    function toggleLang() {
+        showLangDropdown = !showLangDropdown;
+        showThemeDropdown = false;
+    }
+</script>
+
+<div class="top-icons-bar">
+    <!-- Тема -->
+    <div class="icon-wrapper">
+        <button
+            class="icon-btn"
+            on:click={toggleTheme}
+            title={$_("mainMenu.theme")}
+            data-testid="top-theme-btn"
+        >
+            <span class="icon-inner"><SvgIcons name="theme" /></span>
+        </button>
+    </div>
+
+    <!-- Мова -->
+    <div class="icon-wrapper">
+        <button
+            class="icon-btn"
+            on:click={toggleLang}
+            title={$_("mainMenu.language")}
+            data-testid="top-language-btn"
+        >
+            <span class="icon-inner">{@html $currentLanguageFlagSvg}</span>
+        </button>
+    </div>
+
+    <!-- Нагороди -->
+    <button
+        class="icon-btn"
+        on:click={() => navigateTo("/rewards")}
+        title={$_("rewards.pageTitle")}
+        data-testid="top-rewards-btn"
+    >
+        <span class="emoji">🏆</span>
+    </button>
+
+    <!-- Підтримати (Donate) -->
+    <button
+        class="icon-btn"
+        on:click={() => navigateTo("/supporters")}
+        title={$_("mainMenu.donate")}
+        data-testid="top-donate-btn"
+    >
+        <span class="icon-inner"><SvgIcons name="donate" /></span>
+    </button>
+
+    <!-- Налаштування -->
+    <button
+        class="icon-btn"
+        on:click={() => navigateTo("/settings")}
+        title={$_("mainMenu.settings")}
+        data-testid="top-settings-btn"
+    >
+        <span class="emoji">⚙️</span>
+    </button>
+
+    <!-- Керування (Desktop only) -->
+    <button
+        class="icon-btn desktop-only"
+        on:click={() => navigateTo("/controls")}
+        title={$_("mainMenu.controls")}
+        data-testid="top-controls-btn"
+    >
+        <span class="emoji">⌨️</span>
+    </button>
+
+    <!-- Правила -->
+    <button
+        class="icon-btn"
+        on:click={() => navigateTo("/rules")}
+        title={$_("mainMenu.rules")}
+        data-testid="top-rules-btn"
+    >
+        <span class="emoji">📝</span>
+    </button>
+
+    <!-- Зворотній зв'язок -->
+    <button
+        class="icon-btn"
+        on:click={onFeedback}
+        title={$_("ui.feedback.title")}
+        data-testid="top-feedback-btn"
+    >
+        <span class="emoji">💬</span>
+    </button>
+</div>
+
+<!-- Глобальний бекдроп та контейнери для дропдаунів -->
+{#if showThemeDropdown || showLangDropdown}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="dropdown-backdrop" on:click={closeAll}></div>
+
+    {#if showThemeDropdown}
+        <div class="centered-dropdown-container">
+            <ThemeDropdown onClose={() => (showThemeDropdown = false)} />
+        </div>
+    {/if}
+
+    {#if showLangDropdown}
+        <div class="centered-dropdown-container">
+            <LanguageDropdown onClose={() => (showLangDropdown = false)} />
+        </div>
+    {/if}
+{/if}
+
+<style>
+    .top-icons-bar {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        z-index: 10;
+        padding: 0 10px;
+    }
+
+    .icon-wrapper {
+        position: relative;
+    }
+
+    .icon-btn {
+        /* FIX: Фон як у гамбургера (bg-secondary) */
+        background: var(--bg-secondary);
+        /* FIX: Прибрано обводку */
+        border: none;
+        border-radius: 12px;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition:
+            transform 0.2s,
+            background 0.2s,
+            box-shadow 0.2s;
+        /* Тінь для виділення на фоні */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        padding: 0;
+        color: var(--text-primary);
+    }
+
+    .icon-btn:hover {
+        transform: scale(1.1);
+        /* Трохи світліший фон при наведенні */
+        filter: brightness(1.2);
+    }
+
+    .emoji {
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+
+    .icon-inner {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    :global(.icon-inner svg) {
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+    }
+
+    .desktop-only {
+        display: none;
+    }
+
+    @media (min-width: 768px) {
+        .desktop-only {
+            display: flex;
+        }
+        .top-icons-bar {
+            gap: 24px;
+        }
+    }
+
+    .centered-dropdown-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10002;
+        width: auto;
+        max-width: 90vw;
+    }
+
+    .dropdown-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 10001;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(4px);
+    }
+</style>

@@ -22,7 +22,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         rememberGameMode: true,
         speechRate: 1,
         shortSpeech: false,
-        speechFor: { player: true, computer: true },
+        speechFor: {
+            player: true,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
         showGameInfoWidget: 'shown',
         showBoard: true,
         showPiece: true,
@@ -36,7 +41,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         rememberGameMode: true,
         speechRate: 1.4,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
         showGameInfoWidget: 'compact',
     },
     'virtual-player-pro': {
@@ -47,7 +57,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         rememberGameMode: true,
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
         showGameInfoWidget: 'compact',
     },
     'virtual-player-timed': {
@@ -58,7 +73,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         showGameInfoWidget: 'compact',
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
     },
 
     // ============================================================================
@@ -72,7 +92,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         showGameInfoWidget: 'compact',
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
     },
     'local-experienced': {
         gameMode: 'local-experienced',
@@ -82,7 +107,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         showGameInfoWidget: 'compact',
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
     },
     'local-pro': {
         gameMode: 'local-pro',
@@ -92,7 +122,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         showGameInfoWidget: 'compact',
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
     },
 
     // ============================================================================
@@ -106,7 +141,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         showGameInfoWidget: 'compact',
         speechRate: 1,
         shortSpeech: false,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
     },
     'online-experienced': {
         gameMode: 'online-experienced',
@@ -116,7 +156,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         showGameInfoWidget: 'compact',
         speechRate: 1.4,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
     },
     'online-pro': {
         gameMode: 'online-pro',
@@ -126,7 +171,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         showGameInfoWidget: 'compact',
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
     },
 
     // ============================================================================
@@ -140,7 +190,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         rememberGameMode: true,
         speechRate: 1,
         shortSpeech: false,
-        speechFor: { player: true, computer: true },
+        speechFor: {
+            player: true,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
         showGameInfoWidget: 'shown',
         showBoard: true,
         showPiece: true,
@@ -154,7 +209,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         rememberGameMode: true,
         speechRate: 1.4,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
         showGameInfoWidget: 'compact',
     },
     pro: {
@@ -165,7 +225,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         rememberGameMode: true,
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
         showGameInfoWidget: 'compact',
     },
     timed: {
@@ -176,7 +241,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         showGameInfoWidget: 'compact',
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
     },
     local: {
         gameMode: 'local-pro', // Default local preset
@@ -186,7 +256,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         showGameInfoWidget: 'compact',
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
     },
     online: {
         gameMode: 'online-pro', // Default online preset
@@ -196,7 +271,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         showGameInfoWidget: 'compact',
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
     },
     observer: {
         gameMode: 'local-observer', // Auto-migrate
@@ -206,7 +286,12 @@ export const presetConfigurations: Record<GameModePreset, Partial<GameSettingsSt
         showGameInfoWidget: 'compact',
         speechRate: 1.6,
         shortSpeech: true,
-        speechFor: { player: false, computer: true },
+        speechFor: {
+            player: false,
+            computer: true,
+            onlineMyMove: false,
+            onlineOpponentMove: true
+        },
     },
 };
 

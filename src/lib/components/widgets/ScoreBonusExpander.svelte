@@ -7,6 +7,10 @@
   export let totalBonus: number;
   export let expanded = false;
 
+  // Використовуємо локальну змінну стану, ініціалізовану пропом
+  let isOpen = expanded;
+
+  // Реактивно оновлюємо локальний стан, якщо проп змінюється ззовні
   $: isOpen = expanded;
 
   const dispatch = createEventDispatcher();

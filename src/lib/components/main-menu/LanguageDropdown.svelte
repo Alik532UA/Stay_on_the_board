@@ -16,15 +16,15 @@
     class="lang-dropdown"
     role="menu"
     tabindex="0"
-    onclick={(e) => {
+    on:click={(e) => {
         e.stopPropagation();
     }}
-    onkeydown={(e) => e.key === "Escape" && onClose()}
+    on:keydown={(e) => e.key === "Escape" && onClose()}
 >
     {#each languages as lang}
         <button
             class="lang-option"
-            onclick={() => selectLang(lang.code)}
+            on:click={() => selectLang(lang.code)}
             aria-label={lang.code}
             data-testid={`lang-option-${lang.code}`}
         >

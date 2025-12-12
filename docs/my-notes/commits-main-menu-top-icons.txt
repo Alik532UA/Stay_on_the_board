@@ -1,0 +1,412 @@
+commit 587ac8bed1297d4455be83901c4da80d0e1b5f4b
+Author: Alik Zapolnov <174180213+Alik532UA@users.noreply.github.com>
+Date:   Wed Dec 10 14:52:32 2025 +0200
+
+    feat: Refactor MainMenu, implement dev menu features, and fix build errors
+
+    This commit introduces several significant changes and fixes across the application:
+
+    - **MainMenu Refactoring:**
+      - Removed top icon section (`main-menu-top-icons`) and subtitle section (`data-testid="main-menu-subtitle"`)
+.
+      - Streamlined buttons in `id="main-menu-buttons"` to include only "Controls", "Rules", and "Play".
+      - Cleaned up unused script variables and functions (`showDevMenu`, `handleDevMenu`, `handleMenuKeyDown`, `is
+Dev`) and resolved Svelte block errors.
+    - **Developer Menu Enhancements:**
+      - Implemented a new top `FlexibleMenu` for development mode only, featuring links to the main menu, a dev me
+nu modal, a test mode toggle, and a clear cache button.
+      - Displayed the application version number in the Dev Menu modal.
+      - Ensured unique `data-testid` attributes for menu slots (`{position}-menu-slot-{i}`) to distinguish between
+ top and bottom menus.
+    - **Component & Type Improvements:**
+      - Updated `FlexibleMenu` to prioritize `item.dataTestId` when passing `dataTestId` to `MenuButton`, allowing
+ for custom test IDs.
+      - Added `label` and `dataTestId` properties to the `IMenuItem` interface for enhanced flexibility and testin
+g.
+    - **Reactivity & Styling Fixes:**
+      - Resolved an issue where the test mode button's background color wasn't updating by making the `devMenuItem
+s` array reactive.
+      - Addressed modal height issues for the DevMenu modal by introducing a `customClass` prop in `modalStore` an
+d applying specific CSS overrides to remove height restrictions.
+    - **Build & Typing Corrections:**
+      - Fixed "Module has no default export" errors by correctly importing `MainMenu` as `MainMenuComponent` in re
+levant pages.
+      - Corrected TypeScript typing for the `keys` variable in test files (`test/buttons/+page.svelte`).
+
+diff --git a/docs/my-notes/my-notes-for-bug-reports-v2.txt b/docs/my-notes/my-notes-for-bug-reports-v2.txt        
+index 35581a0..ee4835c 100644
+--- a/docs/my-notes/my-notes-for-bug-reports-v2.txt
++++ b/docs/my-notes/my-notes-for-bug-reports-v2.txt
+@@ -1264,6 +1264,32 @@ data-testid="menu-slot-*"
+ для верхніх та нижніх повинні відрізнятися data-testid
+ 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+ ні, в консолі не виводить інформацію про test-mode-btn
++🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
++data-testid="bottom-menu-slot-1"
++Актуальний результат: 🪙
++Очікуваний результат: SVG з data-testid="donate-btn"
++🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
++data-testid="dev-version-span" є на головному меню
++треба щоб в data-testid="dev-menu-modal" замість тексту <h3>dev</h3> була номер версії
++🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
++
++прибарти з головного меню:
++1. class="main-menu-top-icons s-OH_yfw94cnTP"
++2. data-testid="main-menu-subtitle"
++
++id="main-menu-buttons"
++залишити три кнопки:
++Керування
++Правила
++Грати
++🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
++
++🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
++
++🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
++
++🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
++
+ 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+ 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+\ No newline at end of file
+diff --git a/src/lib/components/MainMenu.svelte b/src/lib/components/MainMenu.svelte
+index 156b7e5..bd223f3 100644
+--- a/src/lib/components/MainMenu.svelte
++++ b/src/lib/components/MainMenu.svelte
+@@ -31,7 +31,6 @@
+   let showLangDropdown = false;
+   let showThemeDropdown = false;
+   let showWipNotice = false;
+-  let showDevMenu = false;
+   let mainMenuButtonsNode: HTMLElement;
+
+   const CONTEXT_NAME = "main-menu";
+@@ -69,47 +68,6 @@
+     return Array.from(mainMenuButtonsNode.querySelectorAll("button"));
+   }
+
+-  function handleMenuKeyDown(event: KeyboardEvent) {
+-    logService.action(
+-      `[MainMenu] handleMenuKeyDown fired with key: ${event.key}`,
+-    );
+-    const buttons = getFocusableButtons();
+-    if (buttons.length === 0) {
+-      logService.action(`[MainMenu] No buttons found.`);
+-      return;
+-    }
+-
+-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+-      event.preventDefault();
+-      const currentIndex = buttons.findIndex(
+-        (btn) => btn === document.activeElement,
+-      );
+-      logService.action(`[MainMenu] Current focused index: ${currentIndex}`);
+-      let nextIndex = currentIndex;
+-
+-      if (event.key === "ArrowDown") {
+-        nextIndex = (currentIndex + 1) % buttons.length;
+-      } else {
+-        // ArrowUp
+-        nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+-      }
+-
+-      logService.action(`[MainMenu] Focusing next index: ${nextIndex}`);
+-      buttons[nextIndex].focus();
+-    } else if (
+-      event.key === "Enter" ||
+-      event.key === " " ||
+-      event.code === "NumpadEnter"
+-    ) {
+-      event.preventDefault();
+-      const focusedButton = document.activeElement as HTMLElement;
+-      if (buttons.includes(focusedButton as HTMLButtonElement)) {
+-        logService.action(`[MainMenu] Clicking focused button:`, focusedButton);
+-        focusedButton.click();
+-      }
+-    }
+-  }
+-
+   $: if (mainMenuButtonsNode) {
+     const buttons = getFocusableButtons();
+     buttons.forEach((btn, index) => {
+@@ -146,13 +104,8 @@
+     showThemeDropdown = false;
+     showLangDropdown = false;
+     showWipNotice = false;
+-    showDevMenu = false;
+-  }
+-
+-  function handleDevMenu() {
+-    logService.action('Click: "dev version" (MainMenu)');
+-    showDevMenu = !showDevMenu;
+   }
++  
+
+   function handlePlayVirtualPlayer() {
+     hotkeyService.popContext();
+@@ -229,77 +182,12 @@
+     logService.action('Click: "Підтримати" (MainMenu)');
+     navigateTo("/supporters");
+   }
+-
+-  // Derived or handled logic
+-  $: isDev = import.meta.env.DEV;
+ </script>
+
+ <main class="main-menu" data-testid="main-menu-container">
+   {#if $isLoading}
+     <div class="main-menu-loading">{$_("mainMenu.loadingTranslations")}</div>
+   {:else}
+-    <div class="main-menu-top-icons">
+-      <button
+-        class="main-menu-icon"
+-        use:customTooltip={$_("mainMenu.theme")}
+-        aria-label={$_("mainMenu.theme")}
+-        onclick={() => (showThemeDropdown = !showThemeDropdown)}
+-        data-testid="theme-btn"
+-      >
+-        <span class="main-menu-icon-inner">
+-          <SvgIcons name={settings.style} />
+-        </span>
+-      </button>
+-
+-      <button
+-        class="main-menu-icon"
+-        use:customTooltip={$_("mainMenu.language")}
+-        aria-label={$_("mainMenu.language")}
+-        onclick={toggleLangDropdown}
+-        data-testid="language-btn"
+-      >
+-        <span class="main-menu-icon-inner">
+-          {@html $currentLanguageFlagSvg}
+-        </span>
+-      </button>
+-
+-      {#if showLangDropdown}
+-        <LanguageDropdown onClose={() => (showLangDropdown = false)} />
+-      {/if}
+-
+-      <button
+-        class="main-menu-icon"
+-        use:customTooltip={$_("mainMenu.donate")}
+-        aria-label={$_("mainMenu.donate")}
+-        onclick={() => navigateTo("/supporters")}
+-        data-testid="donate-btn"
+-      >
+-        <span class="main-menu-icon-inner">
+-          <SvgIcons name="donate" />
+-        </span>
+-      </button>
+-    </div>
+-
+-    {#if showThemeDropdown || showLangDropdown || showWipNotice || showDevMenu}
+-      <div
+-        class="screen-overlay-backdrop"
+-        role="button"
+-        tabindex="0"
+-        aria-label={$_("mainMenu.closeDropdowns")}
+-        onclick={closeDropdowns}
+-        onkeydown={(e) =>
+-          (e.key === "Enter" || e.key === " ") && closeDropdowns()}
+-      ></div>
+-    {/if}
+-
+-    {#if showDevMenu}
+-      <DevMenu
+-        onClose={() => (showDevMenu = false)}
+-        onOpenWipNotice={openWipNotice}
+-        onPlayVsComputer={handlePlayVsComputer}
+-        onLocalGame={handleLocalGame}
+-      />
+-    {/if}
+
+     {#if showWipNotice}
+       <WipNotice onClose={closeDropdowns} />
+@@ -312,36 +200,13 @@
+     <div class="main-menu-title" data-testid="main-menu-title">
+       {$_("mainMenu.title")}
+     </div>
+-    {#if isDev}
+-      <div class="main-menu-subtitle" data-testid="main-menu-subtitle">
+-        {$_("mainMenu.menu")}
+-        <span
+-          class="dev-version"
+-          role="button"
+-          tabindex="0"
+-          onclick={handleDevMenu}
+-          onkeydown={(e) =>
+-            (e.key === "Enter" || e.key === " ") && handleDevMenu()}
+-          data-testid="dev-version-span"
+-        >
+-          dev v.{$appVersion}
+-        </span>
+-      </div>
+-    {/if}
+     <div
+       id="main-menu-buttons"
+       bind:this={mainMenuButtonsNode}
+-      onkeydown={handleMenuKeyDown}
+       tabindex="-1"
+       role="group"
+       aria-label={$_("mainMenu.menu")}
+     >
+-      <StyledButton
+-        variant="menu"
+-        size="large"
+-        on:click={() => navigateTo("/settings")}
+-        dataTestId="settings-btn">{$_("mainMenu.settings")}</StyledButton
+-      >
+       <StyledButton
+         variant="menu"
+         size="large"
+@@ -354,24 +219,6 @@
+         on:click={handleRules}
+         dataTestId="rules-btn">{$_("mainMenu.rules")}</StyledButton
+       >
+-      <StyledButton
+-        variant="menu"
+-        size="large"
+-        on:click={handleSupporters}
+-        dataTestId="supporters-btn">{$_("mainMenu.supporters")}</StyledButton
+-      >
+-      <StyledButton
+-        variant="menu"
+-        size="large"
+-        on:click={() => navigateTo("/rewards")}
+-        dataTestId="rewards-btn"
+-      >
+-        <span slot="icon" class="icon-spacer" style="margin-right: 0px;"
+-          ><SvgIcons name="trophy_bronze" /></span
+-        >
+-        {$_("rewards.pageTitle")}
+-      </StyledButton>
+-      <!-- <button class="modal-button danger" onclick={showClearCacheModal} data-testid="clear-cache-btn">{$_('m
+ainMenu.clearCache')}</button> -->
+       <StyledButton
+         variant="primary"
+         size="large"
+diff --git a/src/lib/components/main-menu/DevMenu.svelte b/src/lib/components/main-menu/DevMenu.svelte
+index c266b73..94b4c7b 100644
+--- a/src/lib/components/main-menu/DevMenu.svelte
++++ b/src/lib/components/main-menu/DevMenu.svelte
+@@ -10,6 +10,7 @@
+     export let onOpenWipNotice: () => void;
+     export let onPlayVsComputer: () => void;
+     export let onLocalGame: () => void;
++    export let versionNumber: string;
+
+     function navigateTo(route: string) {
+         goto(`${base}${route}`);
+@@ -42,7 +43,7 @@
+     }}
+     onkeydown={(e) => e.key === "Escape" && onClose()}
+ >
+-    <h3>dev</h3>
++    <h3>dev v.{versionNumber}</h3>
+     <StyledButton
+         variant="menu"
+         class="secondary"
+diff --git a/src/lib/components/ui/FlexibleMenu/FlexibleMenu.svelte b/src/lib/components/ui/FlexibleMenu/FlexibleM
+enu.svelte
+index 3201e3f..6e834e3 100644
+--- a/src/lib/components/ui/FlexibleMenu/FlexibleMenu.svelte
++++ b/src/lib/components/ui/FlexibleMenu/FlexibleMenu.svelte
+@@ -110,7 +110,7 @@
+                                         ? displayItems[i].primary
+                                         : i === 2,
+                             }}
+-                            dataTestId="menu-button-{displayItems[i].id}"
++                            dataTestId={displayItems[i].dataTestId || `menu-button-${displayItems[i].id}`}       
+                         />
+                     {/if}
+                 </div>
+diff --git a/src/lib/components/ui/FlexibleMenu/FlexibleMenu.types.ts b/src/lib/components/ui/FlexibleMenu/Flexibl
+eMenu.types.ts
+index c96d5d6..ff12194 100644
+--- a/src/lib/components/ui/FlexibleMenu/FlexibleMenu.types.ts
++++ b/src/lib/components/ui/FlexibleMenu/FlexibleMenu.types.ts
+@@ -2,9 +2,11 @@ export interface IMenuItem {
+     id: string;
+     icon?: string; // Name of the icon for SvgIcons component
+     emoji?: string; // Emoji character
++    label?: string;
+     onClick: () => void;
+     isActive?: boolean; // Highlight active state
+     primary?: boolean; // Explicit flag for the central FAB (optional, as index 2 is default)
++    dataTestId?: string;
+ }
+
+ export type MenuPosition = 'top' | 'bottom';
+diff --git a/src/routes/+page.svelte b/src/routes/+page.svelte
+index 9131745..deb7b76 100644
+--- a/src/routes/+page.svelte
++++ b/src/routes/+page.svelte
+@@ -1,5 +1,5 @@
+ <script lang="ts">
+-  import MainMenu from "$lib/components/MainMenu.svelte";
++  import MainMenuComponent from "$lib/components/MainMenu.svelte";
+   import DevClearCacheButton from "$lib/components/widgets/DevClearCacheButton.svelte";
+   import FlexibleMenu from "$lib/components/ui/FlexibleMenu/FlexibleMenu.svelte";
+   import type { IMenuItem } from "$lib/components/ui/FlexibleMenu/FlexibleMenu.types";
+@@ -10,6 +10,7 @@
+   import DevMenu from "$lib/components/main-menu/DevMenu.svelte";
+   import { testModeStore, toggleTestMode } from "$lib/stores/testModeStore";
+   import { clearCache } from "$lib/utils/cacheManager";
++  import { appVersion } from "$lib/stores/versionStore";
+
+   // Logic for bottom menu
+   function handlePlayVirtualPlayer() {
+@@ -37,7 +38,8 @@
+     },
+     {
+       id: "donate",
+-      emoji: "🪙",
++      icon: "donate",
++      dataTestId: "donate-btn",
+       onClick: () => goto(`${base}/supporters`),
+     },
+     {
+@@ -69,6 +71,7 @@
+       customClass: "dev-menu-modal-window",
+       props: {
+         onClose: () => modalStore.closeModal(),
++        versionNumber: $appVersion,
+       },
+     });
+   }
+@@ -104,7 +107,7 @@ $: devMenuItems = [
+   ];
+ </script>
+
+-<MainMenu />
++<MainMenuComponent />
+ <DevClearCacheButton />
+
+ {#if import.meta.env.DEV}
+diff --git a/src/routes/test-main-menu/+page.svelte b/src/routes/test-main-menu/+page.svelte
+index fcceb04..d1e19c0 100644
+--- a/src/routes/test-main-menu/+page.svelte
++++ b/src/routes/test-main-menu/+page.svelte
+@@ -1,5 +1,5 @@
+ <script lang="ts">
+-  import MainMenu from "$lib/components/MainMenu.svelte";
++  import MainMenuComponent from "$lib/components/MainMenu.svelte";
+ </script>
+
+-<MainMenu />
++<MainMenuComponent />
+diff --git a/src/routes/test/buttons/+page.svelte b/src/routes/test/buttons/+page.svelte
+index 705341a..b922630 100644
+--- a/src/routes/test/buttons/+page.svelte
++++ b/src/routes/test/buttons/+page.svelte
+@@ -4,7 +4,7 @@
+     import "$lib/css/layouts/main-menu.css";
+     import SvgIcons from "$lib/components/SvgIcons.svelte";
+
+-    let keys = [];
++    let keys: string[] = [];
+     function logClick(name: string) {
+         keys = [...keys, `Clicked: ${name}`];
+         setTimeout(() => {

@@ -16,22 +16,22 @@
     class="wip-notice-overlay"
     role="dialog"
     tabindex="0"
-    onclick={(e) => {
+    on:click={(e) => {
         e.stopPropagation();
     }}
-    onkeydown={(e) => e.key === "Escape" && onClose()}
+    on:keydown={(e) => e.key === "Escape" && onClose()}
 >
     <div class="wip-notice-content">
         <button
             class="wip-close-btn"
-            onclick={onClose}
+            on:click={onClose}
             data-testid="wip-notice-close-btn">×</button
         >
         <h3>{$_("mainMenu.wipNotice.title")}</h3>
         <p>{$_("mainMenu.wipNotice.description")}</p>
         <button
             class="wip-donate-btn"
-            onclick={handleDonate}
+            on:click={handleDonate}
             data-testid="wip-notice-donate-btn"
         >
             {$_("mainMenu.donate")}

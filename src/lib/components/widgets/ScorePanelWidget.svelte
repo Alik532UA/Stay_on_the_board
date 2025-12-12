@@ -193,6 +193,7 @@
 {/if}
 
 <style>
+  /* Стилі залишаються без змін */
   .score-panel {
     background: var(--bg-secondary, #fff3);
     padding: 12px 16px;

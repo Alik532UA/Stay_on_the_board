@@ -18,23 +18,23 @@
     tabindex="0"
     aria-modal="true"
     aria-label={$_("mainMenu.themeDropdown")}
-    onclick={(e) => {
+    on:click={(e) => {
         e.stopPropagation();
     }}
-    onkeydown={(e) => e.key === "Escape" && onClose()}
+    on:keydown={(e) => e.key === "Escape" && onClose()}
 >
     <div class="theme-style-row" data-style="purple">
         <button
             class="theme-btn"
             data-theme="light"
-            onclick={() => selectTheme("purple", "light")}
+            on:click={() => selectTheme("purple", "light")}
             data-testid="theme-purple-light-btn">☀️</button
         >
         <span class="theme-name">{$_("mainMenu.themeName.purple")}</span>
         <button
             class="theme-btn"
             data-theme="dark"
-            onclick={() => selectTheme("purple", "dark")}
+            on:click={() => selectTheme("purple", "dark")}
             data-testid="theme-purple-dark-btn">🌙</button
         >
     </div>
@@ -42,14 +42,14 @@
         <button
             class="theme-btn"
             data-theme="light"
-            onclick={() => selectTheme("green", "light")}
+            on:click={() => selectTheme("green", "light")}
             data-testid="theme-green-light-btn">☀️</button
         >
         <span class="theme-name">{$_("mainMenu.themeName.green")}</span>
         <button
             class="theme-btn"
             data-theme="dark"
-            onclick={() => selectTheme("green", "dark")}
+            on:click={() => selectTheme("green", "dark")}
             data-testid="theme-green-dark-btn">🌙</button
         >
     </div>
@@ -57,14 +57,14 @@
         <button
             class="theme-btn"
             data-theme="light"
-            onclick={() => selectTheme("blue", "light")}
+            on:click={() => selectTheme("blue", "light")}
             data-testid="theme-blue-light-btn">☀️</button
         >
         <span class="theme-name">{$_("mainMenu.themeName.blue")}</span>
         <button
             class="theme-btn"
             data-theme="dark"
-            onclick={() => selectTheme("blue", "dark")}
+            on:click={() => selectTheme("blue", "dark")}
             data-testid="theme-blue-dark-btn">🌙</button
         >
     </div>
@@ -72,14 +72,14 @@
         <button
             class="theme-btn"
             data-theme="light"
-            onclick={() => selectTheme("gray", "light")}
+            on:click={() => selectTheme("gray", "light")}
             data-testid="theme-gray-light-btn">☀️</button
         >
         <span class="theme-name">{$_("mainMenu.themeName.gray")}</span>
         <button
             class="theme-btn"
             data-theme="dark"
-            onclick={() => selectTheme("gray", "dark")}
+            on:click={() => selectTheme("gray", "dark")}
             data-testid="theme-gray-dark-btn">🌙</button
         >
     </div>
@@ -87,14 +87,14 @@
         <button
             class="theme-btn"
             data-theme="light"
-            onclick={() => selectTheme("orange", "light")}
+            on:click={() => selectTheme("orange", "light")}
             data-testid="theme-orange-light-btn">☀️</button
         >
         <span class="theme-name">{$_("mainMenu.themeName.orange")}</span>
         <button
             class="theme-btn"
             data-theme="dark"
-            onclick={() => selectTheme("orange", "dark")}
+            on:click={() => selectTheme("orange", "dark")}
             data-testid="theme-orange-dark-btn">🌙</button
         >
     </div>
@@ -102,14 +102,14 @@
         <button
             class="theme-btn"
             data-theme="light"
-            onclick={() => selectTheme("wood", "light")}
+            on:click={() => selectTheme("wood", "light")}
             data-testid="theme-wood-light-btn">☀️</button
         >
         <span class="theme-name">{$_("mainMenu.themeName.wood")}</span>
         <button
             class="theme-btn"
             data-theme="dark"
-            onclick={() => selectTheme("wood", "dark")}
+            on:click={() => selectTheme("wood", "dark")}
             data-testid="theme-wood-dark-btn">🌙</button
         >
     </div>

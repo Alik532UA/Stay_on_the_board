@@ -41,7 +41,12 @@ export class LocalGameMode extends BaseGameMode {
     gameSettingsStore.updateSettings({
       speechRate: 1.6,
       shortSpeech: true,
-      speechFor: { player: false, computer: true },
+      speechFor: {
+        player: false,
+        computer: true,
+        onlineMyMove: false,
+        onlineOpponentMove: true
+      },
     });
     animationService.initialize();
     this.checkComputerTurn();

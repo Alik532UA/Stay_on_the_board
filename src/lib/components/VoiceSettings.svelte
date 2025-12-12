@@ -13,7 +13,7 @@
 <div class="settings-section">
   <button
     class="test-voice-button"
-    onclick={() => speakTestPhrase()}
+    on:click={() => speakTestPhrase()}
     data-testid="voice-settings-test-voice-btn"
   >
     {$_("voiceSettings.testVoice")}
@@ -25,7 +25,7 @@
   <div class="button-group">
     <button
       class:active={$gameSettingsStore.speechRate === 1}
-      onclick={() => {
+      on:click={() => {
         logService.ui("Speech rate changed to 1");
         gameSettingsStore.updateSettings({ speechRate: 1 });
         speakTestPhrase();
@@ -34,7 +34,7 @@
     >
     <button
       class:active={$gameSettingsStore.speechRate === 1.2}
-      onclick={() => {
+      on:click={() => {
         logService.ui("Speech rate changed to 1.2");
         gameSettingsStore.updateSettings({ speechRate: 1.2 });
         speakTestPhrase();
@@ -43,7 +43,7 @@
     >
     <button
       class:active={$gameSettingsStore.speechRate === 1.4}
-      onclick={() => {
+      on:click={() => {
         logService.ui("Speech rate changed to 1.4");
         gameSettingsStore.updateSettings({ speechRate: 1.4 });
         speakTestPhrase();
@@ -52,7 +52,7 @@
     >
     <button
       class:active={$gameSettingsStore.speechRate === 1.6}
-      onclick={() => {
+      on:click={() => {
         logService.ui("Speech rate changed to 1.6");
         gameSettingsStore.updateSettings({ speechRate: 1.6 });
         speakTestPhrase();
@@ -61,7 +61,7 @@
     >
     <button
       class:active={$gameSettingsStore.speechRate === 1.8}
-      onclick={() => {
+      on:click={() => {
         logService.ui("Speech rate changed to 1.8");
         gameSettingsStore.updateSettings({ speechRate: 1.8 });
         speakTestPhrase();
@@ -70,7 +70,7 @@
     >
     <button
       class:active={$gameSettingsStore.speechRate === 2}
-      onclick={() => {
+      on:click={() => {
         logService.ui("Speech rate changed to 2");
         gameSettingsStore.updateSettings({ speechRate: 2 });
         speakTestPhrase();
@@ -84,7 +84,7 @@
   <div class="button-group">
     <button
       class:active={$gameSettingsStore.speechOrder === "dist_dir"}
-      onclick={() => {
+      on:click={() => {
         logService.ui("Speech order changed to dist_dir");
         gameSettingsStore.updateSettings({ speechOrder: "dist_dir" });
       }}
@@ -93,7 +93,7 @@
     >
     <button
       class:active={$gameSettingsStore.speechOrder === "dir_dist"}
-      onclick={() => {
+      on:click={() => {
         logService.ui("Speech order changed to dir_dist");
         gameSettingsStore.updateSettings({ speechOrder: "dir_dist" });
       }}
@@ -135,7 +135,7 @@
         <!-- Кнопки для Онлайн режиму -->
         <button
         class:active={$gameSettingsStore.speechFor.onlineMyMove}
-        onclick={() => {
+        on:click={() => {
             logService.ui("Speak for MY move toggled");
             gameSettingsStore.updateSettings({
             speechFor: {
@@ -148,7 +148,7 @@
         >
         <button
         class:active={$gameSettingsStore.speechFor.onlineOpponentMove}
-        onclick={() => {
+        on:click={() => {
             logService.ui("Speak for OPPONENT move toggled");
             gameSettingsStore.updateSettings({
             speechFor: {
@@ -164,7 +164,7 @@
         <!-- Кнопки для Локального/Тренувального режиму -->
         <button
         class:active={$gameSettingsStore.speechFor.player}
-        onclick={() => {
+        on:click={() => {
             logService.ui("Speak for player toggled");
             gameSettingsStore.updateSettings({
             speechFor: {
@@ -177,7 +177,7 @@
         >
         <button
         class:active={$gameSettingsStore.speechFor.computer}
-        onclick={() => {
+        on:click={() => {
             logService.ui("Speak for computer toggled");
             gameSettingsStore.updateSettings({
             speechFor: {
