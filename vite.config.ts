@@ -7,7 +7,7 @@ import { VitePWA, type ManifestOptions, type Display } from 'vite-plugin-pwa';
 const base = process.env.VITE_BASE_PATH || '/';
 
 const manifest: Partial<ManifestOptions> = {
-	name: 'Stay on the Board',
+	name: 'Твій Хід',
 	short_name: 'StayBoard',
 	description: 'Стратегічна гра на витривалість та просторову уяву',
 	start_url: '/Stay_on_the_board/',

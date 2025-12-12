@@ -1,5 +1,5 @@
 export default {
-  title: "Залишитися на дошці",
+  title: "Твій Хід", // Rebranding
   menu: "Меню",
   training: "Тренування",
   virtualPlayer: "Грати",
@@ -42,5 +42,11 @@ export default {
     title: "Вибір режиму гри"
   },
   dragAndDropTest: "test",
-  loadingTranslations: "Завантаження перекладу..."
-}; 
+  loadingTranslations: "Завантаження перекладу...",
+  // Future modes placeholders
+  modes: {
+    survive: "Втримайся",
+    arena: "Арена",
+    maze: "Лабіринт"
+  }
+};

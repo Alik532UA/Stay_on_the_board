@@ -1,6 +1,12 @@
 export default {
   title: "Вибір складності гри",
   choose: "Вибирати",
+  
+  // Нові основні режими гри
+  survive: "Втримайся",
+  arena: "Арена",
+  maze: "Лабіринт",
+
   // Legacy presets
   observer: "Наглядач",
   beginner: "Новачок",

@@ -1,5 +1,5 @@
 export default {
-  title: "Blijf op het bord",
+  title: "Jouw Zet", // Rebranding
   menu: "Menu",
   training: "Training",
   virtualPlayer: "Spelen",
@@ -42,5 +42,11 @@ export default {
     title: "Selecteer spelmodus"
   },
   dragAndDropTest: "test",
-  loadingTranslations: "Vertalingen laden..."
+  loadingTranslations: "Vertalingen laden...",
+  // Future modes placeholders
+  modes: {
+    survive: "Overleef",
+    arena: "Arena",
+    maze: "Doolhof"
+  }
 };

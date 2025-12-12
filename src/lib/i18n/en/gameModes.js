@@ -1,6 +1,12 @@
 export default {
   title: "Select Game Difficulty",
   choose: "Choose",
+
+  // New top-level game modes
+  survive: "Survive",
+  arena: "Arena",
+  maze: "Maze",
+
   // Legacy presets
   observer: "Observer",
   beginner: "Beginner",

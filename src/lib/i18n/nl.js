@@ -26,6 +26,7 @@ import dndTest from './nl/dndTest.js';
 
 import trainingHelp from './nl/trainingHelp.js';
 import rewards from './nl/rewards.js';
+import platform from './nl/platform.js';
 
 export default {
   dndTest,
@@ -54,5 +55,6 @@ export default {
   gameModes,
   newWidget,
   trainingHelp,
-  rewards
+  rewards,
+  platform
 };

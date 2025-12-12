@@ -1,6 +1,12 @@
 export default {
   title: "Selecteer spelmoeilijkheid",
   choose: "Kiezen",
+
+  // New top-level game modes
+  survive: "Overleef",
+  arena: "Arena",
+  maze: "Doolhof",
+
   // Legacy presets
   observer: "Waarnemer",
   beginner: "Beginner",

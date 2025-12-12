@@ -5,7 +5,6 @@
   import { modalStore } from "$lib/stores/modalStore";
   import { goto } from "$app/navigation";
   import { base } from "$app/paths";
-  import { get } from "svelte/store";
   import DontShowAgainCheckbox from "./DontShowAgainCheckbox.svelte";
   import { userActionService } from "$lib/services/userActionService";
   import { logService } from "$lib/services/logService";
@@ -294,10 +293,5 @@
   }
   .wip-close-btn:hover {
     opacity: 1;
-  }
-
-  .locked-setting {
-    opacity: 0.2;
-    cursor: help;
   }
 </style>

@@ -16,7 +16,7 @@
 	import Modal from "$lib/components/Modal.svelte";
 	import { navigating } from "$app/stores";
 	import { modalStore } from "$lib/stores/modalStore";
-	import { afterNavigate, goto } from "$app/navigation"; // goto вже тут
+	import { afterNavigate, goto } from "$app/navigation";
 	import DontShowAgainCheckbox from "$lib/components/DontShowAgainCheckbox.svelte";
 	import { modalState } from "$lib/stores/modalStore";
 	import { logService } from "$lib/services/logService.js";
@@ -37,12 +37,9 @@
 	import type { IMenuItem } from "$lib/components/ui/FlexibleMenu/FlexibleMenu.types";
 	import GameModeModal from "$lib/components/GameModeModal.svelte";
 	import DevMenu from "$lib/components/main-menu/DevMenu.svelte";
-	// Імпорт компонента зворотного зв'язку
 	import FeedbackModal from "$lib/components/modals/FeedbackModal.svelte";
 
-	// Новий сервіс (goto видалено, бо він вже є вище)
 	import { roomService } from "$lib/services/roomService";
-	// FIX: Імпортуємо commandService глобально, щоб обробка подій (наприклад, закриття модалок) працювала всюди
 	import "$lib/services/commandService";
 
 	let showUpdateNotice = false;
@@ -97,7 +94,7 @@
 		if (import.meta.env.DEV) {
 			(window as any).appSettingsStore = appSettingsStore;
 			(window as any).toggleTestMode = toggleTestMode;
-			(window as any).resetAllStores = resetAllStores; // Add reset function to window
+			(window as any).resetAllStores = resetAllStores;
 		}
 
 		// Hotkeys
@@ -116,7 +113,6 @@
 
 		document.body.classList.remove("preload-theme");
 
-		// Cleanup subscriptions on component destroy
 		return () => {
 			unsubscribeGameSettings();
 		};
@@ -128,11 +124,7 @@
 			logService.init(
 				`[Layout] Found active session for room ${session.roomId}`,
 			);
-			// Ми не перевіряємо статус тут, просто перенаправляємо в лобі.
-			// Лобі саме перевірить статус і перенаправить в гру, якщо вона йде.
-			// Але робимо це тільки якщо ми на головній або на сторінці входу
 			const path = window.location.pathname;
-			// Враховуємо base path, якщо він є
 			const basePath = base || "";
 			if (
 				path === basePath + "/" ||
@@ -205,7 +197,6 @@
 			titleKey: "ui.feedback.title",
 			dataTestId: "feedback-modal",
 			component: FeedbackModal,
-			// Кнопки керуються всередині компонента FeedbackModal
 			buttons: [],
 		});
 	}
@@ -234,7 +225,6 @@
 			emoji: "⚙️",
 			onClick: () => goto(`${base}/settings`),
 		},
-		// FIX: Заміна кнопки Rules на Feedback (Варіант 2B)
 		{
 			id: "feedback",
 			emoji: "💬",
@@ -243,7 +233,6 @@
 		},
 	];
 
-	// Top (Dev) Menu Logic
 	function openDevMenuModal() {
 		modalStore.showModal({
 			titleKey: "Dev Menu Modal",
@@ -257,14 +246,14 @@
 		});
 	}
 
-	// Reactive Dev Menu Items
-	$: devMenuItems = [
+	// FIX: Reactive Dev Menu Items with i18n Guard
+	// Ми перевіряємо $i18nReady, щоб не викликати $_() до ініціалізації
+	$: devMenuItems = $i18nReady ? [
 		{
 			id: "main-menu-link",
 			emoji: "🏠",
 			onClick: () => goto(`${base}/`),
 		},
-		// FIX: Додано кнопку для переходу на нове меню v2
 		{
 			id: "main-menu-v2-link",
 			emoji: "v2",
@@ -288,7 +277,7 @@
 			emoji: "🧹",
 			onClick: () => clearCache({ keepAppearance: false }),
 		},
-	];
+	] : [];
 </script>
 
 {#if showUpdateNotice}
@@ -298,10 +287,6 @@
 <RewardNotification />
 
 <div class="app">
-	<!-- FIX: Меню переміщено всередину контейнера .app -->
-	<!-- Це дозволяє flexbox-контейнеру враховувати висоту спейсерів меню -->
-
-	<!-- Global Menus -->
 	{#if import.meta.env.DEV}
 		<FlexibleMenu
 			items={devMenuItems}
@@ -311,27 +296,13 @@
 		/>
 	{/if}
 
-	{#if false}
-		<Header />
-	{/if}
-
 	<main>
 		{#if $i18nReady}
 			<slot />
 		{:else}
-			<div>Loading...</div>
+			<div class="loading-screen">Loading...</div>
 		{/if}
 	</main>
-
-	{#if false}
-		<footer>
-			<p>
-				visit <a href="https://svelte.dev/docs/kit"
-					>svelte.dev/docs/kit</a
-				> to learn about SvelteKit
-			</p>
-		</footer>
-	{/if}
 
 	<FlexibleMenu
 		items={menuItems}
@@ -377,20 +348,15 @@
 		flex-direction: column;
 		padding: 1rem;
 		width: 100%;
-
 		margin: 0 auto;
 		box-sizing: border-box;
 	}
-
-	footer {
+	
+	.loading-screen {
 		display: flex;
-		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		padding: 12px;
-	}
-
-	footer a {
-		font-weight: bold;
+		height: 100%;
+		color: var(--text-secondary);
 	}
 </style>
