@@ -10,17 +10,14 @@
   import { logService } from "$lib/services/logService";
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import type { GameModePreset } from "$lib/stores/gameSettingsStore";
+  import { APP_CONFIG } from "$lib/config/appConfig";
+  import WipNotice from "./main-menu/WipNotice.svelte"; // Імпорт нового компонента
 
   let showWipNotice = false;
 
   function openWipNotice() {
     logService.action('Click: "Play Online (WIP)" (GameModeModal)');
     showWipNotice = true;
-  }
-
-  function closeWipNotice() {
-    logService.action('Click: "Закрити WIP notice" (GameModeModal)');
-    showWipNotice = false;
   }
 
   function handleLocalGame() {
@@ -35,6 +32,18 @@
     uiStateStore.update((s) => ({ ...s, intendedGameType: "online" }));
     modalStore.closeModal();
     goto(`${base}/online`);
+  }
+
+  // TODO: Implement navigation for Arena Mode
+  function handleArenaMode() {
+    logService.action('Click: "Arena Mode" (Future Feature)');
+    openWipNotice();
+  }
+
+  // TODO: Implement navigation for Maze Mode
+  function handleMazeMode() {
+    logService.action('Click: "Maze Mode" (Future Feature)');
+    openWipNotice();
   }
 
   export let scope: string;
@@ -140,6 +149,11 @@
 </script>
 
 <div class="game-mode-buttons" bind:this={buttonsNode}>
+  <!-- Current Mode: Survive (Втримайся) -->
+  <div class="mode-section-label">
+    {$_(`mainMenu.modes.${APP_CONFIG.MODES.SURVIVE}`)}
+  </div>
+
   <button
     class="modal-btn-generic green-btn"
     on:click={() => selectMode("beginner")}
@@ -161,6 +175,7 @@
   >
     {$_("gameModes.pro")}
   </button>
+
   {#if extended}
     <hr class="divider" />
     <button
@@ -184,38 +199,23 @@
     >
       {$_("mainMenu.playOnline")}
     </button>
+
+    <!-- FUTURE MODES PLACEHOLDERS -->
+    <!-- 
+    <hr class="divider" />
+    <div class="mode-section-label future">Coming Soon</div>
+    <button class="modal-btn-generic future-btn" on:click={handleArenaMode}>
+       {$_(`mainMenu.modes.${APP_CONFIG.MODES.ARENA}`)}
+    </button>
+    <button class="modal-btn-generic future-btn" on:click={handleMazeMode}>
+       {$_(`mainMenu.modes.${APP_CONFIG.MODES.MAZE}`)}
+    </button> 
+    -->
   {/if}
 </div>
 
 {#if showWipNotice}
-  <div
-    class="wip-notice-overlay"
-    role="dialog"
-    tabindex="0"
-    on:click={(e) => {
-      e.stopPropagation();
-    }}
-    on:keydown={(e) => e.key === "Escape" && closeWipNotice()}
-  >
-    <div class="wip-notice-content">
-      <button
-        class="wip-close-btn"
-        on:click={closeWipNotice}
-        data-testid="wip-notice-close-btn">×</button
-      >
-      <h3>{$_("mainMenu.wipNotice.title")}</h3>
-      <p>{$_("mainMenu.wipNotice.description")}</p>
-      <button
-        class="wip-donate-btn"
-        on:click={() => {
-          /* handleDonate logic here if needed */ closeWipNotice();
-        }}
-        data-testid="wip-notice-donate-btn"
-      >
-        {$_("mainMenu.donate")}
-      </button>
-    </div>
-  </div>
+  <WipNotice onClose={() => (showWipNotice = false)} />
 {/if}
 
 {#if !extended}
@@ -235,63 +235,23 @@
     margin: 0;
   }
 
-  .wip-notice-overlay {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10000; /* Ensure it's above other modals */
-    width: 90vw;
-    max-width: 400px;
-  }
-  .wip-notice-content {
-    position: relative;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    padding: 28px 32px;
-    border-radius: 18px;
+  .mode-section-label {
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
     text-align: center;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  .wip-notice-content h3 {
-    font-size: 1.4em;
-    margin: 0 0 12px 0;
-    color: var(--text-accent);
-  }
-  .wip-notice-content p {
-    margin: 0 0 24px 0;
-    line-height: 1.5;
-    font-size: 1.05em;
-  }
-  .wip-donate-btn {
-    background: var(--warning-action-bg);
-    color: var(--warning-action-text);
-    border: none;
-    border-radius: 10px;
-    padding: 12px 32px;
+    margin-bottom: -8px;
     font-weight: bold;
-    cursor: pointer;
-    font-size: 1.1em;
-    transition: all 0.2s ease;
   }
-  .wip-donate-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 16px var(--warning-action-bg);
+
+  .mode-section-label.future {
+    opacity: 0.6;
+    margin-top: 8px;
   }
-  .wip-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 2em;
-    color: var(--text-primary);
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-  }
-  .wip-close-btn:hover {
-    opacity: 1;
+
+  .future-btn {
+    opacity: 0.6;
+    border-style: dashed;
   }
 </style>

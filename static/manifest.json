@@ -1,6 +1,6 @@
 {
-  "name": "Твій Хід",
-  "short_name": "Stay Board",
+  "name": "Your Move",
+  "short_name": "Your Move",
   "description": "Кожен хід має значення. Продумайте свій шлях, щоб залишитися на дошці та перемогти у грі на витривалість!",
   "start_url": ".",
   "display": "standalone",
@@ -34,4 +34,4 @@
       "type": "image/png"
     }
   ]
-} 
+}

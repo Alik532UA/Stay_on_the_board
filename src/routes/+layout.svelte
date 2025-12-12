@@ -1,36 +1,25 @@
 <script lang="ts">
 	import Header from "./Header.svelte";
 	import "../app.css";
-	import { appSettingsStore } from "$lib/stores/appSettingsStore";
-	import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
-	import { settingsPersistenceService } from "$lib/services/SettingsPersistenceService";
-	import { debounce } from "$lib/utils/debounce";
-	import { uiStateStore } from "$lib/stores/uiStateStore.js";
-	import { initializeI18n, i18nReady } from "$lib/i18n/init.js";
+	import { appInitializationService } from "$lib/services/appInitializationService";
 	import { appVersion } from "$lib/stores/versionStore";
-	import { assets } from "$app/paths";
 	import { onMount, onDestroy } from "svelte";
 	import { base } from "$app/paths";
 	import UpdateNotification from "$lib/components/UpdateNotification.svelte";
 	import { clearCache } from "$lib/utils/cacheManager.js";
 	import Modal from "$lib/components/Modal.svelte";
-	import { navigating } from "$app/stores";
 	import { modalStore } from "$lib/stores/modalStore";
 	import { afterNavigate, goto } from "$app/navigation";
-	import DontShowAgainCheckbox from "$lib/components/DontShowAgainCheckbox.svelte";
-	import { modalState } from "$lib/stores/modalStore";
 	import { logService } from "$lib/services/logService.js";
 	import TestModeWidget from "$lib/components/widgets/TestModeWidget.svelte";
 	import { tooltipStore } from "$lib/stores/tooltipStore";
 	import Tooltip from "$lib/components/Tooltip.svelte";
 	import ModalManager from "$lib/components/ModalManager.svelte";
 	import { testModeStore, toggleTestMode } from "$lib/stores/testModeStore";
-	import { initializeTestModeSync } from "$lib/services/testModeService";
 	import { resetAllStores } from "$lib/services/testingService";
 	import hotkeyService from "$lib/services/hotkeyService";
-	import { _, locale } from "svelte-i18n";
+	import { i18nReady } from "$lib/i18n/init.js";
 	import RewardNotification from "$lib/components/rewards/RewardNotification.svelte";
-	import { rewardsService } from "$lib/services/rewardsService";
 
 	// Imports for Menus
 	import FlexibleMenu from "$lib/components/ui/FlexibleMenu/FlexibleMenu.svelte";
@@ -49,50 +38,29 @@
 	let unsubscribeTestMode: () => void;
 
 	onMount(() => {
+		// Centralized initialization
+		appInitializationService.initialize();
+
 		unsubscribeTestMode = testModeStore.subscribe((state) => {
 			testModeEnabled = state.isEnabled;
 		});
-	});
 
-	onDestroy(() => {
-		if (unsubscribeTestMode) unsubscribeTestMode();
-	});
-
-	function handleTestModeChange() {
-		toggleTestMode();
-	}
-
-	onMount(() => {
-		// 1. Initialize app settings (theme, language) FIRST
-		appSettingsStore.init();
-
-		// 2. Initialize game settings from localStorage
-		const loadedGameSettings = settingsPersistenceService.load();
-		gameSettingsStore.set(loadedGameSettings);
-
-		// 3. Subscribe to game settings changes to persist them
-		const debouncedSave = debounce(settingsPersistenceService.save, 300);
-		const unsubscribeGameSettings = gameSettingsStore.subscribe(
-			(settings) => {
-				debouncedSave(settings);
-			},
-		);
-
-		// 4. Initialize internationalization
-		initializeI18n();
-
-		// 5. Initialize other services and stores
-		initializeTestModeSync();
-		rewardsService.init();
-
-		// 6. Check for active online session (Reconnection Logic)
+		// Check for active online session
 		checkOnlineSession();
 
-		// 7. Check for app updates
-		checkForUpdates();
+		// Subscribe to version changes to show update notice
+		const unsubscribeVersion = appVersion.subscribe((serverVersion) => {
+			const localVersion = localStorage.getItem(APP_VERSION_KEY);
+			if (
+				serverVersion &&
+				localVersion &&
+				localVersion !== serverVersion
+			) {
+				showUpdateNotice = true;
+			}
+		});
 
 		if (import.meta.env.DEV) {
-			(window as any).appSettingsStore = appSettingsStore;
 			(window as any).toggleTestMode = toggleTestMode;
 			(window as any).resetAllStores = resetAllStores;
 		}
@@ -111,11 +79,14 @@
 			}
 		});
 
-		document.body.classList.remove("preload-theme");
-
 		return () => {
-			unsubscribeGameSettings();
+			appInitializationService.cleanup();
+			unsubscribeVersion();
 		};
+	});
+
+	onDestroy(() => {
+		if (unsubscribeTestMode) unsubscribeTestMode();
 	});
 
 	async function checkOnlineSession() {
@@ -136,28 +107,6 @@
 		}
 	}
 
-	async function checkForUpdates() {
-		try {
-			const response = await fetch(
-				`${base}/version.json?v=${new Date().getTime()}`,
-			);
-			if (!response.ok) return;
-
-			const serverVersionData = await response.json();
-			const serverVersion = serverVersionData.version;
-			const localVersion = localStorage.getItem(APP_VERSION_KEY);
-			appVersion.set(serverVersion);
-
-			if (localVersion && localVersion !== serverVersion) {
-				showUpdateNotice = true;
-			} else if (!localVersion) {
-				localStorage.setItem(APP_VERSION_KEY, serverVersion);
-			}
-		} catch (error) {
-			logService.error("Failed to check for app update:", error);
-		}
-	}
-
 	function handleReload() {
 		clearCache({ keepAppearance: true });
 	}
@@ -173,7 +122,6 @@
 	});
 
 	// --- Menu Logic ---
-
 	function handlePlayVirtualPlayer() {
 		modalStore.showModal({
 			titleKey: "mainMenu.gameModeModal.title",
@@ -201,13 +149,8 @@
 		});
 	}
 
-	// Bottom Menu Items
 	const menuItems: IMenuItem[] = [
-		{
-			id: "rewards",
-			emoji: "🏆",
-			onClick: () => goto(`${base}/rewards`),
-		},
+		{ id: "rewards", emoji: "🏆", onClick: () => goto(`${base}/rewards`) },
 		{
 			id: "donate",
 			icon: "donate",
@@ -246,38 +189,34 @@
 		});
 	}
 
-	// FIX: Reactive Dev Menu Items with i18n Guard
-	// Ми перевіряємо $i18nReady, щоб не викликати $_() до ініціалізації
-	$: devMenuItems = $i18nReady ? [
-		{
-			id: "main-menu-link",
-			emoji: "🏠",
-			onClick: () => goto(`${base}/`),
-		},
-		{
-			id: "main-menu-v2-link",
-			emoji: "v2",
-			onClick: () => goto(`${base}/test-main-menu-v2`),
-			dataTestId: "top-menu-slot-1",
-		},
-		{
-			id: "test-mode-btn",
-			emoji: "🛠️",
-			onClick: toggleTestMode,
-			primary: true,
-			isActive: $testModeStore.isEnabled,
-		},
-		{
-			id: "dev-menu-modal",
-			emoji: "☰",
-			onClick: openDevMenuModal,
-		},
-		{
-			id: "dev-clear-cache-btn",
-			emoji: "🧹",
-			onClick: () => clearCache({ keepAppearance: false }),
-		},
-	] : [];
+	$: devMenuItems = $i18nReady
+		? [
+				{
+					id: "main-menu-link",
+					emoji: "🏠",
+					onClick: () => goto(`${base}/`),
+				},
+				{
+					id: "main-menu-v2-link",
+					emoji: "v2",
+					onClick: () => goto(`${base}/test-main-menu-v2`),
+					dataTestId: "top-menu-slot-1",
+				},
+				{
+					id: "test-mode-btn",
+					emoji: "🛠️",
+					onClick: toggleTestMode,
+					primary: true,
+					isActive: $testModeStore.isEnabled,
+				},
+				{ id: "dev-menu-modal", emoji: "☰", onClick: openDevMenuModal },
+				{
+					id: "dev-clear-cache-btn",
+					emoji: "🧹",
+					onClick: () => clearCache({ keepAppearance: false }),
+				},
+			]
+		: [];
 </script>
 
 {#if showUpdateNotice}
@@ -334,14 +273,12 @@
 		flex-direction: column;
 		min-height: 100vh;
 	}
-
 	.test-mode-container {
 		position: fixed;
 		bottom: 60px;
 		right: 10px;
 		z-index: 1001;
 	}
-
 	main {
 		flex: 1;
 		display: flex;
@@ -351,7 +288,6 @@
 		margin: 0 auto;
 		box-sizing: border-box;
 	}
-	
 	.loading-screen {
 		display: flex;
 		justify-content: center;
