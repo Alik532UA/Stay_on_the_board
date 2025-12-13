@@ -1,39 +1,21 @@
 /* src/lib/css/components/modal.css */
-/* Aggregator file for modal styles */
 
-@import url('./modals/core.css');
-@import url('./modals/variants.css');
+/* 1. Базова структура (анімації, z-index, overlay) - спільна для всіх */
+@import url('./modals/base.css');
+
+/* 2. Віджети контенту (слайдери, інпути, таблиці) - спільні */
 @import url('./modals/content.css');
 
-/* Responsive overrides (keep here or move to separate file if grows) */
+/* 3. ТЕМИ (Ізольовані стилі) */
+@import url('./modals/theme-classic.css');
+@import url('./modals/theme-glass.css');
+
+/* 4. Адаптивність (глобальні оверрайди, якщо потрібні) */
 @media (max-width: 480px) {
-  .modal-window {
+
+  /* Тільки для класичних вікон, бо скляні мають свою адаптивність */
+  .modal-window.style-classic {
     max-height: 80vh;
     margin: 8px;
-  }
-
-  .modal-header {
-    padding: 20px 16px 12px;
-  }
-
-  .modal-title {
-    font-size: 1.6em;
-  }
-
-  .modal-content {
-    padding: 16px;
-    max-height: 50vh;
-  }
-}
-
-@media (max-width: 360px) {
-  .modal-window {
-    max-height: 75vh;
-    margin: 4px;
-  }
-
-  .modal-content {
-    max-height: 45vh;
-    padding: 12px;
   }
 }

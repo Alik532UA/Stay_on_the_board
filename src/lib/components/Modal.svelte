@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "$lib/css/components/modal.css";
+  import "$lib/css/components/modal.css"; // Імпорт агрегатора
   import { modalState, modalStore } from "$lib/stores/modalStore";
   import { _ } from "svelte-i18n";
   import { i18nReady } from "$lib/i18n/init.js";
@@ -35,6 +35,12 @@
   let volumePercentage = 30;
   let processingButtons: boolean[] = [];
   let currentModalContext: string | null = null;
+
+  // === ЛОГІКА ВИБОРУ ТЕМИ ===
+  // Якщо variant === 'menu', використовуємо style-glass.
+  // В усіх інших випадках (включаючи undefined) - style-classic.
+  $: themeClass =
+    $modalState.variant === "menu" ? "style-glass" : "style-classic";
 
   $: {
     if ($modalState.isOpen) {
@@ -107,8 +113,13 @@
 
   function onOverlayClick(e: MouseEvent) {
     if (!$modalState.closeOnOverlayClick) return;
+    // Перевіряємо, чи клік був саме по оверлею або по "порожньому місцю" у style-glass
     const target = e.target as HTMLElement;
-    if (target && target.classList.contains("modal-overlay")) {
+    if (
+      target &&
+      (target.classList.contains("modal-overlay") ||
+        target.classList.contains("modal-window"))
+    ) {
       logService.ui("Закриття модального вікна (overlay)");
       gameEventBus.dispatch("CloseModal");
     }
@@ -116,9 +127,10 @@
 </script>
 
 {#if $modalState.isOpen}
+  <!-- Додаємо themeClass до overlay -->
   <div
     use:trapFocus
-    class="modal-overlay screen-overlay-backdrop"
+    class="modal-overlay screen-overlay-backdrop {themeClass}"
     role="button"
     tabindex="-1"
     on:click={onOverlayClick}
@@ -126,22 +138,17 @@
       (e.key === "Enter" || e.key === " ") && onOverlayClick(e as any)}
     data-testid="modal-overlay"
   >
-    <!-- 
-      Архітектурне рішення: 
-      Якщо variant="menu", ми рендеримо FloatingBackButton і приховуємо стандартний хедер.
-      Клас .variant-menu в CSS прибирає рамки та фон.
-    -->
     {#if $modalState.variant === "menu"}
       <FloatingBackButton onClick={() => gameEventBus.dispatch("CloseModal")} />
     {/if}
 
+    <!-- Додаємо themeClass до window -->
     <div
-      class="modal-window"
-      class:variant-menu={$modalState.variant === "menu"}
+      class="modal-window {themeClass}"
       class:[$modalState.customClass]={$modalState.customClass}
       data-testid={$modalState.dataTestId}
     >
-      <!-- Header: Only for standard variant -->
+      <!-- Header: Тільки для standard variant -->
       {#if $modalState.variant === "standard" && ($modalState.titleKey || $modalState.title) && !($modalState.dataTestId === "replay-modal" && windowHeight < 870)}
         <div
           class="modal-header"
@@ -178,9 +185,7 @@
           {/if}
 
           <div class="modal-title-wrapper">
-            {#if $modalState.titleKey === "modal.gameOverTitle"}
-              <span class="modal-victory-icon"><SvgIcons name="piece" /></span>
-            {/if}
+            <!-- FIX: Видалено іконку корони/фігури для Game Over -->
             <h2
               class="modal-title"
               data-testid={`${$modalState.dataTestId}-title`}
