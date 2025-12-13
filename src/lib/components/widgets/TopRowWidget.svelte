@@ -28,8 +28,10 @@
   }
 
   onMount(() => {
-    hotkeyService.register("global", "KeyI", showGameInfoModal);
-    hotkeyService.register("global", "Escape", handleMainMenuClick);
+    // FIX: Змінено контекст з "global" на "game".
+    // Тепер ці клавіші працюватимуть тільки коли активний ігровий лейаут.
+    hotkeyService.register("game", "KeyI", showGameInfoModal);
+    hotkeyService.register("game", "Escape", handleMainMenuClick);
   });
 </script>
 
