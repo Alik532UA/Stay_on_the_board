@@ -9,10 +9,10 @@ export default {
     typeImprovement: "Запропонувати покращення",
     typeBug: "Повідомити про проблему",
     typeOther: "Інше",
-    typeReward: "Запропонувати нагороду", // Новий тип
+    typeReward: "Запропонувати нагороду",
     pageLabel: "Сторінка (необов'язково)",
     improvementLabel: "Ваша пропозиція",
-    rewardLabel: "Опишіть ідею для нагороди та умови її отримання", // Лейбл для нагороди
+    rewardLabel: "Опишіть ідею для нагороди та умови її отримання",
     actualResultLabel: "Актуальний результат (що сталося?)",
     expectedResultLabel: "Очікуваний результат (як мало бути?)",
     descriptionLabel: "Опис",
@@ -20,5 +20,20 @@ export default {
     success: "Дякуємо! Ваш відгук отримано.",
     error: "Помилка відправки. Спробуйте пізніше.",
     selectType: "Оберіть тип звернення:"
+  },
+  auth: {
+    titleSave: "Зберегти прогрес",
+    titleLogin: "Вхід",
+    titleReset: "Відновлення паролю",
+    emailLabel: "Email",
+    passwordLabel: "Пароль",
+    saveBtn: "Зареєструватися та зберегти",
+    loginBtn: "Увійти",
+    resetBtn: "Надіслати лист",
+    switchLogin: "Вже є акаунт? Увійти",
+    switchRegister: "Немає акаунту? Зареєструватися",
+    forgotPassword: "Забули пароль?",
+    backToLogin: "Повернутися до входу",
+    saveDescription: "Створіть акаунт, щоб не втратити свої рекорди та нагороди при зміні пристрою або очищенні кешу."
   }
 };

@@ -5,6 +5,8 @@
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import { logService } from "$lib/services/logService.js";
     import { currentLanguageFlagSvg } from "$lib/stores/derivedState";
+    import { modalStore } from "$lib/stores/modalStore";
+    import AuthModal from "$lib/components/modals/AuthModal.svelte";
 
     // Components
     import ThemeDropdown from "$lib/components/main-menu/ThemeDropdown.svelte";
@@ -34,6 +36,16 @@
     function toggleLang() {
         showLangDropdown = !showLangDropdown;
         showThemeDropdown = false;
+    }
+
+    function openAuthModal() {
+        logService.action('Click: "Account" (TopIconsBar)');
+        modalStore.showModal({
+            title: "",
+            component: AuthModal,
+            dataTestId: "auth-modal",
+            buttons: [],
+        });
     }
 </script>
 
@@ -121,6 +133,16 @@
     >
         <span class="emoji">💬</span>
     </button>
+
+    <!-- 9. Акаунт (Нова кнопка) -->
+    <button
+        class="icon-btn"
+        on:click={openAuthModal}
+        title={$_("mainMenu.account")}
+        data-testid="top-account-btn"
+    >
+        <span class="emoji">👤</span>
+    </button>
 </div>
 
 <!-- Глобальний бекдроп та контейнери для дропдаунів -->
@@ -161,11 +183,8 @@
     }
 
     .icon-btn {
-        /* FIX: Прозорий фон */
         background: transparent;
-        /* FIX: Прибрано обводку */
         border: none;
-        /* FIX: Кругла форма */
         border-radius: 50%;
         width: 48px;
         height: 48px;
@@ -176,7 +195,6 @@
         transition:
             transform 0.2s,
             background 0.2s;
-        /* FIX: Прибрано тінь для повної прозорості */
         box-shadow: none;
         padding: 0;
         color: var(--text-primary);
@@ -184,7 +202,6 @@
 
     .icon-btn:hover {
         transform: scale(1.1);
-        /* Легкий фон при наведенні для зворотного зв'язку */
         background: rgba(255, 255, 255, 0.1);
     }
 

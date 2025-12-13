@@ -12,6 +12,7 @@ import { uiStateStore } from '$lib/stores/uiStateStore';
 import type { Player } from '$lib/models/player';
 import { tick } from 'svelte';
 import { gameModeService } from './gameModeService';
+import { leaderboardService } from './leaderboardService'; // Імпорт
 
 export const endGameService = {
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
@@ -51,6 +52,13 @@ export const endGameService = {
           p.id === humanPlayer.id ? { ...p, score: finalScoreDetails.totalScore } : p
         );
         playerStore.set({ ...playerState, players: updatedPlayers });
+
+        // === ІНТЕГРАЦІЯ ЛІДЕРБОРДУ ===
+        // Зберігаємо результат, якщо це гра на час
+        if (gameType === 'timed') {
+          logService.score('[endGameService] Submitting score to leaderboard...');
+          leaderboardService.submitScore(finalScoreDetails.totalScore, 'timed');
+        }
       }
     }
 
@@ -63,14 +71,12 @@ export const endGameService = {
     let finalReasonKey = reasonKey;
     const finalReasonValues = { ...reasonValues };
 
-    // FIX: Підміна ключів для мультиплеєра (щоб не писало "Ви", а писало ім'я)
     if ((gameType === 'local' || gameType === 'online') && loser) {
       if (reasonKey === 'modal.gameOverReasonOut') {
         finalReasonKey = 'modal.gameOverReasonPlayerOut';
       } else if (reasonKey === 'modal.gameOverReasonBlocked') {
         finalReasonKey = 'modal.gameOverReasonPlayerBlocked';
       }
-      // Для 'modal.gameOverReasonPlayerLied' ключ залишається, але треба переконатись, що є ім'я
       finalReasonValues.playerName = loser.name;
     }
 

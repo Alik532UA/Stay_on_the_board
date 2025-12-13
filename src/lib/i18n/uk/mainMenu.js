@@ -1,5 +1,5 @@
 export default {
-  title: "Твій Хід", // Rebranding
+  title: "Твій Хід",
   menu: "Меню",
   training: "Тренування",
   virtualPlayer: "Грати",
@@ -13,6 +13,7 @@ export default {
   theme: "Тема",
   language: "Мова",
   donate: "Підтримати проєкт",
+  account: "Акаунт", // Додано
   lang: {
     uk: "Українська",
     en: "English",
@@ -43,7 +44,6 @@ export default {
   },
   dragAndDropTest: "test",
   loadingTranslations: "Завантаження перекладу...",
-  // Future modes placeholders
   modes: {
     survive: "Втримайся",
     arena: "Арена",
