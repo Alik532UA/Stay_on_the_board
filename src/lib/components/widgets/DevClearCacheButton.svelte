@@ -1,10 +1,10 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
-  import { _ } from 'svelte-i18n';
-  import SvgIcons from '../SvgIcons.svelte';
-  import { clearCache } from '$lib/utils/cacheManager.js';
-  import { customTooltip } from '$lib/actions/customTooltip.js';
-  import hotkeyService from '$lib/services/hotkeyService';
+  import { onMount, onDestroy } from "svelte";
+  import { _ } from "svelte-i18n";
+  import SvgIcons from "../SvgIcons.svelte";
+  import { clearCache } from "$lib/utils/cacheManager.js";
+  import { customTooltip } from "$lib/actions/customTooltip.js";
+  import hotkeyService from "$lib/services/hotkeyService";
 
   let isVisible = false;
 
@@ -13,11 +13,22 @@
   }
 
   onMount(() => {
-    if (import.meta.env.DEV) {
-      hotkeyService.register('global', 'KeyR', handleClearCache);
-    }
+    // REMOVED: Global hotkey registration
+    // if (import.meta.env.DEV) {
+    //   hotkeyService.register('global', 'KeyR', handleClearCache);
+    // }
   });
 </script>
+
+{#if import.meta.env.DEV}
+  <button
+    class="dev-clear-cache-button"
+    use:customTooltip={`${$_("gameBoard.clearCache")}`}
+    on:click={handleClearCache}
+  >
+    <SvgIcons name="clear-cache" />
+  </button>
+{/if}
 
 <style>
   .dev-clear-cache-button {
@@ -45,13 +56,3 @@
     transform: translateY(0);
   }
 </style>
-
-{#if import.meta.env.DEV}
-  <button 
-    class="dev-clear-cache-button" 
-    use:customTooltip={`${$_('gameBoard.clearCache')} (R/К)`}
-    on:click={handleClearCache}
-  >
-    <SvgIcons name="clear-cache" />
-  </button>
-{/if}

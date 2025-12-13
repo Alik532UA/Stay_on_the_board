@@ -45,6 +45,7 @@
             component: AuthModal,
             dataTestId: "auth-modal",
             buttons: [],
+            customClass: "modal-style-menu", // <--- NEW CLASS
         });
     }
 </script>

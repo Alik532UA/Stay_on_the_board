@@ -229,11 +229,19 @@
         width: 100%;
         max-width: 320px;
         margin: 0 auto;
+        /* Додаємо фон та розмиття для самого контенту, оскільки вікно прозоре */
+        background: rgba(30, 30, 30, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
     .title {
         text-align: center;
         margin: 0;
         color: var(--text-primary);
+        font-size: 1.4em;
     }
     .description {
         font-size: 0.9em;

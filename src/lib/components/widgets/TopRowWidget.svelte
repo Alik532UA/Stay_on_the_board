@@ -28,17 +28,16 @@
   }
 
   onMount(() => {
-    // FIX: Змінено контекст з "global" на "game".
-    // Тепер ці клавіші працюватимуть тільки коли активний ігровий лейаут.
-    hotkeyService.register("game", "KeyI", showGameInfoModal);
-    hotkeyService.register("game", "Escape", handleMainMenuClick);
+    // REMOVED: Global hotkey registration
+    // hotkeyService.register("global", "KeyI", showGameInfoModal);
+    // hotkeyService.register("global", "Escape", handleMainMenuClick);
   });
 </script>
 
 <div class="game-board-top-row">
   <button
     class="main-menu-btn"
-    use:hotkeyTooltip={{ title: $_("gameBoard.mainMenu"), key: "ESC" }}
+    use:customTooltip={$_("gameBoard.mainMenu")}
     on:click={handleMainMenuClick}
     data-testid="top-row-main-menu-btn"
   >
@@ -56,7 +55,7 @@
   {/if}
   <button
     class="main-menu-btn"
-    use:hotkeyTooltip={{ title: $_("faq.title"), key: "I" }}
+    use:customTooltip={$_("faq.title")}
     on:click={showGameInfoModal}
     data-testid="game-info-btn"
   >

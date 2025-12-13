@@ -65,19 +65,9 @@
 			(window as any).resetAllStores = resetAllStores;
 		}
 
-		// Hotkeys
-		if (import.meta.env.DEV) {
-			hotkeyService.register("global", "[", (e: KeyboardEvent) => {
-				e.preventDefault();
-				showUpdateNotice = !showUpdateNotice;
-			});
-		}
-		hotkeyService.register("global", "t", (e: KeyboardEvent) => {
-			if (e.ctrlKey && e.altKey) {
-				e.preventDefault();
-				toggleTestMode();
-			}
-		});
+		// REMOVED: Global hotkeys registration
+		// hotkeyService.register("global", "[", ...);
+		// hotkeyService.register("global", "t", ...);
 
 		return () => {
 			appInitializationService.cleanup();
