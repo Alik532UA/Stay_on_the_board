@@ -7,12 +7,13 @@ import { playerStore } from '$lib/stores/playerStore';
 import { logService } from './logService';
 import { notificationService } from './notificationService';
 
-export type FeedbackType = 'improvement' | 'bug' | 'other';
+// Додано 'reward_suggestion'
+export type FeedbackType = 'improvement' | 'bug' | 'other' | 'reward_suggestion';
 
 export interface FeedbackData {
     type: FeedbackType;
     page?: string;
-    text?: string; // Для "improvement" та "other"
+    text?: string; // Для "improvement", "other" та "reward_suggestion"
     actualResult?: string; // Для "bug"
     expectedResult?: string; // Для "bug"
 }
@@ -32,10 +33,9 @@ class FeedbackService {
             const docId = this.generateTimestampId();
 
             // Створюємо шлях: feedback (колекція) -> {type} (документ) -> entries (підколекція) -> {docId} (документ)
-            // Це створює візуальну структуру "папок" у консолі Firebase
             const feedbackDocRef = doc(db, 'feedback', data.type, 'entries', docId);
 
-            // Збір контексту (Варіант 3A)
+            // Збір контексту
             const context = this.gatherContext();
 
             const payload = {
@@ -66,10 +66,6 @@ class FeedbackService {
         }
     }
 
-    /**
-     * Генерує унікальний ID на основі часу для зручного сортування.
-     * Формат: YYYY-MM-DD_HH-mm-ss_SSS_RAND
-     */
     private generateTimestampId(): string {
         const now = new Date();
         const pad = (num: number) => num.toString().padStart(2, '0');

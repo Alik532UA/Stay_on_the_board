@@ -9,8 +9,11 @@
     import { logService } from "$lib/services/logService";
     import { onMount } from "svelte";
 
+    // Props
+    export let initialType: FeedbackType | null = null;
+
     // Стан компонента
-    let selectedType: FeedbackType | null = null;
+    let selectedType: FeedbackType | null = initialType;
     let isSubmitting = false;
 
     // Поля форми
@@ -23,6 +26,11 @@
         // Автозаповнення поточної сторінки
         if (typeof window !== "undefined") {
             pageLocation = window.location.pathname;
+        }
+        if (initialType) {
+            logService.ui(
+                `[FeedbackModal] Initialized with type: ${initialType}`,
+            );
         }
     });
 
@@ -37,6 +45,7 @@
         // Валідація
         if (selectedType === "improvement" && !textContent.trim()) return;
         if (selectedType === "other" && !textContent.trim()) return;
+        if (selectedType === "reward_suggestion" && !textContent.trim()) return;
         if (
             selectedType === "bug" &&
             (!actualResult.trim() || !expectedResult.trim())
@@ -62,10 +71,15 @@
     }
 
     function goBack() {
-        selectedType = null;
-        textContent = "";
-        actualResult = "";
-        expectedResult = "";
+        // Якщо тип був переданий при ініціалізації, кнопка "Назад" закриває модалку
+        if (initialType) {
+            modalStore.closeModal();
+        } else {
+            selectedType = null;
+            textContent = "";
+            actualResult = "";
+            expectedResult = "";
+        }
     }
 </script>
 
@@ -117,6 +131,22 @@
                         bind:value={textContent}
                         class="modal-textarea"
                         rows="4"
+                    ></textarea>
+                </div>
+            {/if}
+
+            <!-- Поля для Reward Suggestion -->
+            {#if selectedType === "reward_suggestion"}
+                <div class="form-group">
+                    <label for="fb-reward"
+                        >{$_("ui.feedback.rewardLabel")} *</label
+                    >
+                    <textarea
+                        id="fb-reward"
+                        bind:value={textContent}
+                        class="modal-textarea"
+                        rows="5"
+                        placeholder="Наприклад: 'Майстер захисту' - виграти гру, не втративши жодного очка..."
                     ></textarea>
                 </div>
             {/if}

@@ -2,6 +2,8 @@
 export default {
     pageTitle: "Нагороди",
     unlockedOn: "Відкрито: {date}",
+    suggestRewardTitle: "Запропонувати нагороду",
+    suggestRewardDescription: "Маєте ідею для досягнення? Напишіть нам!",
     score11Any: {
         title: "Початківець",
         description: "Набрати 11 очок в будь-якому режимі."

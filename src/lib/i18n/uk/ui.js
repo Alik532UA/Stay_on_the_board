@@ -9,8 +9,10 @@ export default {
     typeImprovement: "Запропонувати покращення",
     typeBug: "Повідомити про проблему",
     typeOther: "Інше",
+    typeReward: "Запропонувати нагороду", // Новий тип
     pageLabel: "Сторінка (необов'язково)",
     improvementLabel: "Ваша пропозиція",
+    rewardLabel: "Опишіть ідею для нагороди та умови її отримання", // Лейбл для нагороди
     actualResultLabel: "Актуальний результат (що сталося?)",
     expectedResultLabel: "Очікуваний результат (як мало бути?)",
     descriptionLabel: "Опис",

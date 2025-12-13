@@ -2,6 +2,7 @@
     import { rewardsStore } from "$lib/stores/rewardsStore";
     import { ACHIEVEMENTS } from "$lib/services/rewardsService";
     import RewardCard from "$lib/components/rewards/RewardCard.svelte";
+    import SuggestRewardCard from "$lib/components/rewards/SuggestRewardCard.svelte";
     import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
     import { _ } from "svelte-i18n";
     import { onMount, onDestroy } from "svelte";
@@ -34,6 +35,9 @@
                 unlockedInfo={unlockedMap[achievement.id]}
             />
         {/each}
+
+        <!-- Кнопка пропозиції нагороди в кінці списку -->
+        <SuggestRewardCard />
     </div>
 </div>
 
