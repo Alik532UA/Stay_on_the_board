@@ -13,20 +13,21 @@ import { tick } from 'svelte';
 import { gameModeService } from './gameModeService';
 import { leaderboardService } from './leaderboardService';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
+import { authService } from './authService';
+import { doc, updateDoc, getFirestore } from 'firebase/firestore';
+import { getFirebaseApp } from './firebaseService';
+import { rewardsService } from './rewardsService'; // Додано імпорт
 
 export const endGameService = {
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
     logService.GAME_MODE(`[endGameService] endGame called with reason: '${reasonKey}'`);
 
-    // 1. Оновлюємо ключовий стан
     uiStateStore.update(s => s ? ({ ...s, isGameOver: true, gameOverReasonKey: reasonKey, gameOverReasonValues: reasonValues }) : null);
     timeService.stopGameTimer();
     timeService.stopTurnTimer();
 
-    // 2. Чекаємо оновлення Svelte
     await tick();
 
-    // 3. Отримуємо АКТУАЛЬНИЙ стан
     const boardState = get(boardStore);
     const playerState = get(playerStore);
     const scoreState = get(scoreStore);
@@ -40,11 +41,9 @@ export const endGameService = {
     const currentGameMode = gameModeService.getCurrentMode();
     const gameType = currentGameMode ? currentGameMode.getModeName() : 'training';
 
-    // 4. Розраховуємо фінальний рахунок
     const finalScoreDetails = calculateFinalScore(boardState, playerState, scoreState, uiState, gameType);
     logService.score('[endGameService] Final score calculated:', finalScoreDetails);
 
-    // 5. Оновлюємо рахунок гравців (крім local/online, де він ведеться окремо)
     if (gameType !== 'local' && gameType !== 'online') {
       const humanPlayer = playerState.players.find(p => p.type === 'human');
       if (humanPlayer) {
@@ -53,10 +52,8 @@ export const endGameService = {
         );
         playerStore.set({ ...playerState, players: updatedPlayers });
 
-        // === ІНТЕГРАЦІЯ ЛІДЕРБОРДУ ===
         logService.score('[endGameService] Submitting score to leaderboard...');
 
-        // Визначаємо "чистий" режим для статистики
         let cleanMode = gameType;
         if (gameType === 'virtual-player') {
           const preset = get(gameSettingsStore).gameMode;
@@ -64,17 +61,25 @@ export const endGameService = {
           else cleanMode = 'training';
         }
 
-        // ВИПРАВЛЕНО: Передаємо об'єкт контексту замість рядка
         leaderboardService.submitScore(finalScoreDetails.totalScore, {
           mode: cleanMode,
           size: boardState.boardSize
         });
+
+        // FIX: Перевіряємо досягнення після нарахування фінальних бонусів
+        logService.score('[endGameService] Checking achievements with final score...');
+        rewardsService.checkAchievements({
+          score: finalScoreDetails.totalScore,
+          gameMode: cleanMode,
+          boardSize: boardState.boardSize
+        });
+
+        this.saveLastPlayedInfo(cleanMode, boardState.boardSize, finalScoreDetails.totalScore);
       }
     }
 
     scoreStore.set(initialScoreState);
 
-    // 6. Визначаємо переможця
     const finalPlayerState = get(playerStore)!;
     const { winners, loser } = determineWinner(finalPlayerState, reasonKey, playerState.currentPlayerIndex);
 
@@ -105,5 +110,25 @@ export const endGameService = {
 
     // @ts-ignore
     gameEventBus.dispatch('GameOver', { ...gameOverPayload, state: { ...boardState, ...finalPlayerState, ...get(scoreStore)!, ...uiState } });
+  },
+
+  async saveLastPlayedInfo(mode: string, size: number, score: number) {
+    const user = authService.getCurrentUser();
+    if (!user) return;
+
+    try {
+      const db = getFirestore(getFirebaseApp());
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        lastPlayed: {
+          mode,
+          size,
+          score,
+          timestamp: Date.now()
+        }
+      });
+    } catch (e) {
+      console.warn('Failed to save last played info', e);
+    }
   }
 };

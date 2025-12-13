@@ -4,8 +4,8 @@ import { get } from 'svelte/store';
 import { logService } from './logService';
 import { notificationService } from './notificationService';
 
-// Розширена структура для майбутнього
-export const ACHIEVEMENTS: Achievement[] = [
+// Базові нагороди (не залежать від дошки)
+const BASE_ACHIEVEMENTS: Achievement[] = [
   {
     id: 'score_11_any',
     titleKey: 'rewards.score11Any.title',
@@ -13,15 +13,6 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: 'trophy_bronze',
     condition: (context: RewardConditionContext) => {
       return context.score >= 11;
-    }
-  },
-  {
-    id: 'score_11_timed',
-    titleKey: 'rewards.score11Timed.title',
-    descriptionKey: 'rewards.score11Timed.description',
-    icon: 'stopwatch_gold',
-    condition: (context: RewardConditionContext) => {
-      return context.score >= 11 && (context.gameMode === 'timed' || context.gameMode?.includes('timed'));
     }
   },
   {
@@ -33,14 +24,29 @@ export const ACHIEVEMENTS: Achievement[] = [
       return context.score >= 5 && (context.gameMode === 'local' || context.gameMode?.includes('local'));
     }
   }
-  // ТУТ ЛЕГКО ДОДАВАТИ НОВІ НАГОРОДИ
-  // Наприклад:
-  // {
-  //   id: 'arena_survivor',
-  //   titleKey: 'rewards.arenaSurvivor.title',
-  //   ...
-  //   condition: (ctx) => ctx.gameMode === 'arena' && ctx.score > 20
-  // }
+];
+
+// Генерація нагород для кожного розміру дошки (2x2 ... 9x9)
+const BOARD_SIZES = [2, 3, 4, 5, 6, 7, 8, 9];
+
+const SPRINTER_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
+  id: `score_11_timed_${size}`,
+  groupId: 'sprinter', // Групуємо їх разом
+  variantLabel: `${size}x${size}`,
+  titleKey: 'rewards.score11Timed.title',
+  descriptionKey: 'rewards.score11Timed.description',
+  icon: 'stopwatch_gold',
+  condition: (context: RewardConditionContext) => {
+    return context.score >= 11 &&
+      (context.gameMode === 'timed' || context.gameMode?.includes('timed')) &&
+      context.boardSize === size;
+  }
+}));
+
+// Об'єднуємо всі нагороди
+export const ACHIEVEMENTS: Achievement[] = [
+  ...BASE_ACHIEVEMENTS,
+  ...SPRINTER_ACHIEVEMENTS
 ];
 
 class RewardsService {
@@ -54,7 +60,7 @@ class RewardsService {
    * Перевіряє досягнення.
    * @param context Контекст гри (рахунок, режим, розмір дошки тощо)
    */
-  checkAchievements(context: { score: number; gameMode: string; boardSize?: number }) {
+  checkAchievements(context: { score: number; gameMode: string; boardSize: number }) {
     const state = get(rewardsStore);
 
     ACHIEVEMENTS.forEach(achievement => {
