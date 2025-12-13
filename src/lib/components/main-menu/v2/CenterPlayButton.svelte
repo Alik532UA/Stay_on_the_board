@@ -5,8 +5,8 @@
     export let onPlay: () => void;
 
     // Налаштування анімації
-    const waveCount = 5;
-    const duration = 5; // секунд
+    const waveCount = 11;
+    const duration = 11; // секунд
     const delayStep = duration / waveCount;
 </script>
 
@@ -94,28 +94,31 @@
         left: 0;
         right: 0;
         bottom: 0;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1); /* Біла тінь */
+        border-radius: 100%;
+        /* background: rgba(255, 255, 255, 0.1); /* Біла тінь */
         z-index: -1; /* Під кнопкою */
         pointer-events: none;
         opacity: 0;
         animation-name: pulse-in;
-        animation-timing-function: linear;
+        animation-timing-function: ease;
         animation-iteration-count: infinite;
-        border: 3px solid rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 1);
         /* outline: 1px solid rgba(0, 0, 0, 0.5); */
     }
 
     @keyframes pulse-in {
         0% {
-            transform: scale(5); /* Розмах 5 */
+            transform: scale(9); /* Розмах 5 */
             opacity: 0;
         }
-        20% {
-            opacity: 0.25; /* Прозорість 0.25 */
+        15% {
+            opacity: 0;
+        }
+        40% {
+            opacity: 0.03; /* Прозорість 0.25 */
         }
         100% {
-            transform: scale(1);
+            transform: scale(0.5);
             opacity: 0;
         }
     }
