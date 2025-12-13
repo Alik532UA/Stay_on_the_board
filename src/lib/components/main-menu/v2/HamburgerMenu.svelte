@@ -6,6 +6,8 @@
     import { logService } from "$lib/services/logService.js";
     import { fade, scale } from "svelte/transition";
     import { quintOut } from "svelte/easing";
+    import { modalStore } from "$lib/stores/modalStore";
+    import AuthModal from "$lib/components/modals/AuthModal.svelte";
 
     import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
 
@@ -33,6 +35,17 @@
         if (e.target === e.currentTarget) {
             closeMenu();
         }
+    }
+
+    function openAuthModal() {
+        logService.action('Click: "Account" (HamburgerMenu)');
+        closeMenu();
+        modalStore.showModal({
+            title: "",
+            component: AuthModal,
+            dataTestId: "auth-modal",
+            buttons: [],
+        });
     }
 </script>
 
@@ -104,7 +117,6 @@
                 <span class="menu-text">{$_("mainMenu.settings")}</span>
             </button>
 
-            <!-- FIX: Оновлено посилання на вкладку гарячих клавіш -->
             <button
                 class="menu-item"
                 on:click={() => navigateTo("/settings?tab=hotkeys")}
@@ -134,6 +146,16 @@
                 <span class="menu-icon">💬</span>
                 <span class="menu-text">{$_("ui.feedback.title")}</span>
             </button>
+
+            <!-- Нова кнопка Акаунт -->
+            <button
+                class="menu-item"
+                on:click={openAuthModal}
+                data-testid="menu-item-account"
+            >
+                <span class="menu-icon">👤</span>
+                <span class="menu-text">{$_("mainMenu.account")}</span>
+            </button>
         </div>
     </div>
 {/if}
@@ -147,7 +169,6 @@
         height: 64px;
         border-radius: 50%;
         background: var(--bg-secondary);
-        /* FIX: Прибрано обводку */
         border: none;
         color: var(--text-primary);
         display: flex;
@@ -192,9 +213,7 @@
         align-items: center;
         gap: 16px;
         padding: 16px 24px;
-        /* Стиль кнопок: напівпрозорий фон */
         background: rgba(255, 255, 255, 0.1);
-        /* FIX: Прибрано обводку */
         border: none;
         border-radius: 16px;
         color: #fff;
