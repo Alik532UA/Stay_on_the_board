@@ -6,14 +6,22 @@ export default {
     suggestRewardDescription: "Маєте ідею для досягнення? Напишіть нам!",
     score11Any: {
         title: "Початківець",
-        description: "Набрати 11 очок в будь-якому режимі."
+        description: "Набрати 11 балів в будь-якому режимі."
     },
     score11Timed: {
+        title: "Спринтер test",
+        description: "Набрати 11 балів в режимі 'На час'."
+    },
+    score111Timed: {
         title: "Спринтер",
-        description: "Набрати 11 очок в режимі 'На час'."
+        description: "Набрати 111 балів в режимі 'На час'."
+    },
+    score532Timed: {
+        title: "Alik",
+        description: "Набрати 532 бали в режимі 'На час'."
     },
     score5Local: {
         title: "Дружня гра",
-        description: "Набрати 5 очок в локальній грі."
+        description: "Набрати 5 балів в локальній грі."
     }
 };

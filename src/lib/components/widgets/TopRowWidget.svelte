@@ -8,11 +8,11 @@
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { get } from "svelte/store";
-  import { modalService } from "$lib/services/modalService";
   import { columnStyleMode } from "$lib/stores/columnStyleStore";
-  import { logService } from "$lib/services/logService.js";
   import { uiStateStore } from "$lib/stores/uiStateStore";
-  import hotkeyService from "$lib/services/hotkeyService";
+
+  // hotkeyService більше не потрібен для реєстрації глобальних подій тут
+  // import hotkeyService from "$lib/services/hotkeyService";
 
   function handleMainMenuClick() {
     const uiState = get(uiStateStore);
@@ -37,7 +37,7 @@
 <div class="game-board-top-row">
   <button
     class="main-menu-btn"
-    use:customTooltip={$_("gameBoard.mainMenu")}
+    use:hotkeyTooltip={{ title: $_("gameBoard.mainMenu"), key: "ESC" }}
     on:click={handleMainMenuClick}
     data-testid="top-row-main-menu-btn"
   >
@@ -55,7 +55,7 @@
   {/if}
   <button
     class="main-menu-btn"
-    use:customTooltip={$_("faq.title")}
+    use:hotkeyTooltip={{ title: $_("faq.title"), key: "I" }}
     on:click={showGameInfoModal}
     data-testid="game-info-btn"
   >

@@ -13,6 +13,9 @@ export interface UserDocument {
     createdAt: number | Timestamp;
     lastActive: number | Timestamp;
 
+    // Версія додатку, на якій був створений акаунт
+    createdVersion?: string;
+
     // Агреговані дані (для швидкого доступу без зайвих запитів)
     stats: UserStats;
 

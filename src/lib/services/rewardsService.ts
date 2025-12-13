@@ -29,9 +29,10 @@ const BASE_ACHIEVEMENTS: Achievement[] = [
 // Генерація нагород для кожного розміру дошки (2x2 ... 9x9)
 const BOARD_SIZES = [2, 3, 4, 5, 6, 7, 8, 9];
 
-const SPRINTER_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
+// 1. Спринтер Test (11 балів)
+const SPRINTER_TEST_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
   id: `score_11_timed_${size}`,
-  groupId: 'sprinter', // Групуємо їх разом
+  groupId: 'sprinter_test',
   variantLabel: `${size}x${size}`,
   titleKey: 'rewards.score11Timed.title',
   descriptionKey: 'rewards.score11Timed.description',
@@ -43,10 +44,42 @@ const SPRINTER_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
   }
 }));
 
+// 2. Спринтер (111 балів)
+const SPRINTER_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
+  id: `score_111_timed_${size}`,
+  groupId: 'sprinter',
+  variantLabel: `${size}x${size}`,
+  titleKey: 'rewards.score111Timed.title',
+  descriptionKey: 'rewards.score111Timed.description',
+  icon: 'stopwatch_gold',
+  condition: (context: RewardConditionContext) => {
+    return context.score >= 111 &&
+      (context.gameMode === 'timed' || context.gameMode?.includes('timed')) &&
+      context.boardSize === size;
+  }
+}));
+
+// 3. Alik (532 бали)
+const ALIK_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
+  id: `score_532_timed_${size}`,
+  groupId: 'alik',
+  variantLabel: `${size}x${size}`,
+  titleKey: 'rewards.score532Timed.title',
+  descriptionKey: 'rewards.score532Timed.description',
+  icon: 'trophy_bronze', // Можна змінити іконку на щось унікальне, якщо є
+  condition: (context: RewardConditionContext) => {
+    return context.score >= 532 &&
+      (context.gameMode === 'timed' || context.gameMode?.includes('timed')) &&
+      context.boardSize === size;
+  }
+}));
+
 // Об'єднуємо всі нагороди
 export const ACHIEVEMENTS: Achievement[] = [
   ...BASE_ACHIEVEMENTS,
-  ...SPRINTER_ACHIEVEMENTS
+  ...SPRINTER_TEST_ACHIEVEMENTS,
+  ...SPRINTER_ACHIEVEMENTS,
+  ...ALIK_ACHIEVEMENTS
 ];
 
 class RewardsService {

@@ -18,6 +18,7 @@
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
   import { gameEventBus } from "$lib/services/gameEventBus";
   import { get } from "svelte/store";
+  import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
 
   let buttonRefs: (HTMLButtonElement | null)[] = [];
   let windowHeight = 0;
@@ -125,12 +126,23 @@
       (e.key === "Enter" || e.key === " ") && onOverlayClick(e as any)}
     data-testid="modal-overlay"
   >
+    <!-- 
+      Архітектурне рішення: 
+      Якщо variant="menu", ми рендеримо FloatingBackButton і приховуємо стандартний хедер.
+      Клас .variant-menu в CSS прибирає рамки та фон.
+    -->
+    {#if $modalState.variant === "menu"}
+      <FloatingBackButton onClick={() => gameEventBus.dispatch("CloseModal")} />
+    {/if}
+
     <div
       class="modal-window"
+      class:variant-menu={$modalState.variant === "menu"}
       class:[$modalState.customClass]={$modalState.customClass}
       data-testid={$modalState.dataTestId}
     >
-      {#if ($modalState.titleKey || $modalState.title) && !($modalState.dataTestId === "replay-modal" && windowHeight < 870)}
+      <!-- Header: Only for standard variant -->
+      {#if $modalState.variant === "standard" && ($modalState.titleKey || $modalState.title) && !($modalState.dataTestId === "replay-modal" && windowHeight < 870)}
         <div
           class="modal-header"
           data-testid={`${$modalState.dataTestId}-header`}
@@ -242,56 +254,58 @@
         {/if}
       </div>
 
-      <div class="modal-action-buttons">
-        {#each $modalState.buttons as btn, i (i)}
-          <StyledButton
-            variant={btn.customClass === "blue-btn"
-              ? "info"
-              : btn.customClass === "green-btn"
-                ? "primary"
-                : btn.customClass === "danger-btn"
-                  ? "danger"
-                  : btn.primary
-                    ? "primary"
-                    : "default"}
-            bind:buttonElement={buttonRefs[i]}
-            dataTestId={btn.dataTestId ||
-              `${$modalState.dataTestId}-${btn.textKey || btn.text}-btn`}
-            disabled={btn.disabled ||
-              get(uiStateStore)?.isComputerMoveInProgress ||
-              processingButtons[i]}
-            on:click={async () => {
-              if (
-                processingButtons[i] ||
-                get(uiStateStore)?.isComputerMoveInProgress
-              )
-                return;
-              processingButtons[i] = true;
-              logService.action(
-                `Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`,
-              );
-              if (btn.onClick) await btn.onClick();
-              else gameEventBus.dispatch("CloseModal");
-            }}
-          >
-            {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
-          </StyledButton>
-        {/each}
-        {#if $modalState.titleKey === "gameModes.title"}
-          <DontShowAgainCheckbox
-            modalType="gameMode"
-            tid={`${$modalState.dataTestId}-dont-show-again-switch`}
-            scope={currentModalContext}
-          />
-        {:else if $modalState.titleKey === "modal.expertModeTitle"}
-          <DontShowAgainCheckbox
-            modalType="expertMode"
-            tid={`${$modalState.dataTestId}-dont-show-again-switch`}
-            scope={currentModalContext}
-          />
-        {/if}
-        <slot />
-      </div>
+      {#if $modalState.buttons.length > 0}
+        <div class="modal-action-buttons">
+          {#each $modalState.buttons as btn, i (i)}
+            <StyledButton
+              variant={btn.customClass === "blue-btn"
+                ? "info"
+                : btn.customClass === "green-btn"
+                  ? "primary"
+                  : btn.customClass === "danger-btn"
+                    ? "danger"
+                    : btn.primary
+                      ? "primary"
+                      : "default"}
+              bind:buttonElement={buttonRefs[i]}
+              dataTestId={btn.dataTestId ||
+                `${$modalState.dataTestId}-${btn.textKey || btn.text}-btn`}
+              disabled={btn.disabled ||
+                get(uiStateStore)?.isComputerMoveInProgress ||
+                processingButtons[i]}
+              on:click={async () => {
+                if (
+                  processingButtons[i] ||
+                  get(uiStateStore)?.isComputerMoveInProgress
+                )
+                  return;
+                processingButtons[i] = true;
+                logService.action(
+                  `Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`,
+                );
+                if (btn.onClick) await btn.onClick();
+                else gameEventBus.dispatch("CloseModal");
+              }}
+            >
+              {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
+            </StyledButton>
+          {/each}
+          {#if $modalState.titleKey === "gameModes.title"}
+            <DontShowAgainCheckbox
+              modalType="gameMode"
+              tid={`${$modalState.dataTestId}-dont-show-again-switch`}
+              scope={currentModalContext}
+            />
+          {:else if $modalState.titleKey === "modal.expertModeTitle"}
+            <DontShowAgainCheckbox
+              modalType="expertMode"
+              tid={`${$modalState.dataTestId}-dont-show-again-switch`}
+              scope={currentModalContext}
+            />
+          {/if}
+          <slot />
+        </div>
+      {/if}
     </div>
   </div>
 {/if}

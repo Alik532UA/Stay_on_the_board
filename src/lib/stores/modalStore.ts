@@ -8,6 +8,13 @@ import { writable } from 'svelte/store';
 import { logService } from '$lib/services/logService';
 
 /**
+ * Тип варіанту відображення модального вікна.
+ * - standard: Класичне вікно з рамкою, фоном та хедером.
+ * - menu: Прозоре вікно на весь екран, контент центрується, хедер прихований, додається кнопка "Назад".
+ */
+export type ModalVariant = 'standard' | 'menu';
+
+/**
  * Кнопка модального вікна.
  */
 export interface ModalButton {
@@ -50,6 +57,7 @@ export interface ModalState {
     dataTestId?: string;
     customClass?: string;
     titleValues?: Record<string, unknown>;
+    variant: ModalVariant; // Нове поле
 }
 
 const initialState: ModalState = {
@@ -62,7 +70,8 @@ const initialState: ModalState = {
     closable: true,
     closeOnOverlayClick: false,
     dataTestId: undefined,
-    customClass: undefined
+    customClass: undefined,
+    variant: 'standard' // Значення за замовчуванням
 };
 
 const store = writable<ModalState>(initialState);
@@ -75,9 +84,8 @@ export const modalState = { subscribe };
 /**
  * Показує модальне вікно.
  */
-export function showModal({ dataTestId, ...modalDetails }: Partial<ModalState> & { dataTestId: string }): void {
+export function showModal({ dataTestId, variant = 'standard', ...modalDetails }: Partial<ModalState> & { dataTestId: string }): void {
     update(currentState => {
-        // НАВІЩО: Ця перевірка запобігає "нашаруванню" однакових модалок.
         if (currentState.isOpen) {
             const sameIdentity =
                 (dataTestId && currentState.dataTestId === dataTestId) ||
@@ -92,9 +100,10 @@ export function showModal({ dataTestId, ...modalDetails }: Partial<ModalState> &
             ...initialState,
             ...modalDetails,
             dataTestId,
+            variant, // Зберігаємо варіант
             isOpen: true,
         };
-        logService.modal(`[ModalStore] showModal called. New modal: '${newState.dataTestId || newState.titleKey}'. Stack size: ${modalStack.length}`, { newState, stack: [...modalStack] });
+        logService.modal(`[ModalStore] showModal called. New modal: '${newState.dataTestId || newState.titleKey}' (${newState.variant}). Stack size: ${modalStack.length}`, { newState, stack: [...modalStack] });
         return newState;
     });
 }
@@ -141,7 +150,7 @@ export function closeAllModals(): void {
 
 export const modalStore = {
     subscribe,
-    update, // <--- FIX: Експортуємо метод update
+    update,
     closeModal,
     showModal,
     showModalAsReplacement,

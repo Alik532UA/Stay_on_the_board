@@ -45,7 +45,8 @@
             component: AuthModal,
             dataTestId: "auth-modal",
             buttons: [],
-            customClass: "modal-style-menu", // <--- NEW CLASS
+            variant: "menu",
+            closeOnOverlayClick: true, // <--- FIX: Додано для закриття по кліку на фон
         });
     }
 </script>
