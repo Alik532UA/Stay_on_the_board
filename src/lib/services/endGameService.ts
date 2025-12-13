@@ -1,4 +1,3 @@
-// src/lib/services/endGameService.ts
 import { get } from 'svelte/store';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { calculateFinalScore, determineWinner } from './scoreService';
@@ -12,7 +11,8 @@ import { uiStateStore } from '$lib/stores/uiStateStore';
 import type { Player } from '$lib/models/player';
 import { tick } from 'svelte';
 import { gameModeService } from './gameModeService';
-import { leaderboardService } from './leaderboardService'; // Імпорт
+import { leaderboardService } from './leaderboardService';
+import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 
 export const endGameService = {
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
@@ -54,11 +54,21 @@ export const endGameService = {
         playerStore.set({ ...playerState, players: updatedPlayers });
 
         // === ІНТЕГРАЦІЯ ЛІДЕРБОРДУ ===
-        // Зберігаємо результат, якщо це гра на час
-        if (gameType === 'timed') {
-          logService.score('[endGameService] Submitting score to leaderboard...');
-          leaderboardService.submitScore(finalScoreDetails.totalScore, 'timed');
+        logService.score('[endGameService] Submitting score to leaderboard...');
+
+        // Визначаємо "чистий" режим для статистики
+        let cleanMode = gameType;
+        if (gameType === 'virtual-player') {
+          const preset = get(gameSettingsStore).gameMode;
+          if (preset && preset.includes('timed')) cleanMode = 'timed';
+          else cleanMode = 'training';
         }
+
+        // ВИПРАВЛЕНО: Передаємо об'єкт контексту замість рядка
+        leaderboardService.submitScore(finalScoreDetails.totalScore, {
+          mode: cleanMode,
+          size: boardState.boardSize
+        });
       }
     }
 

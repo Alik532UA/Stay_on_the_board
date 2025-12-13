@@ -25,11 +25,17 @@ export default {
     titleSave: "Зберегти прогрес",
     titleLogin: "Вхід",
     titleReset: "Відновлення паролю",
+    titleProfile: "Мій профіль", // Нове
     emailLabel: "Email",
     passwordLabel: "Пароль",
     saveBtn: "Зареєструватися та зберегти",
     loginBtn: "Увійти",
     resetBtn: "Надіслати лист",
+    logoutBtn: "Вийти з акаунту", // Нове
+    deleteAccountBtn: "Видалити акаунт", // Нове
+    confirmDeleteBtn: "Підтвердити видалення", // Нове
+    cancelDeleteBtn: "Скасувати", // Нове
+    deleteWarning: "Увага! Це дію неможливо скасувати. Всі ваші дані та рекорди будуть видалені назавжди. Введіть пароль для підтвердження.", // Нове
     switchLogin: "Вже є акаунт? Увійти",
     switchRegister: "Немає акаунту? Зареєструватися",
     forgotPassword: "Забули пароль?",

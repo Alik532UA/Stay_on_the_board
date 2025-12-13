@@ -1,11 +1,10 @@
-// src/lib/services/rewardsService.ts
 import type { Achievement, RewardConditionContext } from '$lib/types/rewards';
 import { rewardsStore } from '$lib/stores/rewardsStore';
 import { get } from 'svelte/store';
 import { logService } from './logService';
 import { notificationService } from './notificationService';
 
-// Hardcoded definitions for the initial request
+// Розширена структура для майбутнього
 export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'score_11_any',
@@ -29,11 +28,19 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: 'score_5_local',
     titleKey: 'rewards.score5Local.title',
     descriptionKey: 'rewards.score5Local.description',
-    icon: 'handshake', // Assuming we have or will add this icon
+    icon: 'handshake',
     condition: (context: RewardConditionContext) => {
       return context.score >= 5 && (context.gameMode === 'local' || context.gameMode?.includes('local'));
     }
   }
+  // ТУТ ЛЕГКО ДОДАВАТИ НОВІ НАГОРОДИ
+  // Наприклад:
+  // {
+  //   id: 'arena_survivor',
+  //   titleKey: 'rewards.arenaSurvivor.title',
+  //   ...
+  //   condition: (ctx) => ctx.gameMode === 'arena' && ctx.score > 20
+  // }
 ];
 
 class RewardsService {
@@ -43,11 +50,14 @@ class RewardsService {
     rewardsStore.init();
   }
 
-  checkAchievements(context: { score: number; gameMode: string }) {
+  /**
+   * Перевіряє досягнення.
+   * @param context Контекст гри (рахунок, режим, розмір дошки тощо)
+   */
+  checkAchievements(context: { score: number; gameMode: string; boardSize?: number }) {
     const state = get(rewardsStore);
 
     ACHIEVEMENTS.forEach(achievement => {
-      // If already unlocked, skip
       if (state.unlockedRewards[achievement.id]) return;
 
       if (achievement.condition(context)) {
@@ -58,15 +68,6 @@ class RewardsService {
 
   private unlockAchievement(achievement: Achievement) {
     rewardsStore.unlock(achievement.id);
-
-    // Trigger generic notification (can be handled by UI component)
-    // We can emit an event or update a store that the UI consumes
-    // For simplicity, let's assume we have a simple event bus or store for notifications
-
-    // Use a custom event dispatch or a new notification store.
-    // Let's use a simple custom event on window for now to keep it decoupled, 
-    // or better, a 'notificationStore' if we want a robust Toast system.
-    // I will assume we will create a notificationStore next.
 
     notificationService.show({
       type: 'achievement',
