@@ -11,17 +11,17 @@
   <p class="gratitude-text">{$_('supportersPage.gratitudeText')}</p>
   
   <div class="supporters-list">
-    <div class="supporter-item" role="button" tabindex="0" on:click={() => window.open('https://steamcommunity.com/profiles/76561198948943743/', '_blank', 'noopener,noreferrer')} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && window.open('https://steamcommunity.com/profiles/76561198948943743/', '_blank', 'noopener,noreferrer')}>den</div>
+    <a href="https://steamcommunity.com/profiles/76561198948943743/" target="_blank" rel="noopener noreferrer" class="supporter-item">den</a>
     <div class="supporter-item">brusnikaa</div>
-    <div class="supporter-item" role="button" tabindex="0" on:click={() => window.open('https://steamcommunity.com/profiles/76561198055854871/', '_blank', 'noopener,noreferrer')} on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && window.open('https://steamcommunity.com/profiles/76561198055854871/', '_blank', 'noopener,noreferrer')}>Khaaaa</div>
+    <a href="https://steamcommunity.com/profiles/76561198055854871/" target="_blank" rel="noopener noreferrer" class="supporter-item">Khaaaa</a>
     <div class="supporter-item">Destroyter94</div>
     <div class="supporter-item">MrGrom</div>
     <!-- Майбутні імена будуть додаватися сюди -->
   </div>
   <p class="call-to-action-text">{@html $_('supportersPage.callToAction')}</p>
-  <button class="support-btn" on:click={() => window.open('https://send.monobank.ua/jar/8TPmFKQTCK', '_blank', 'noopener,noreferrer')}>
+  <a href="https://send.monobank.ua/jar/8TPmFKQTCK" target="_blank" rel="noopener noreferrer" class="support-btn">
     {$_('supportersPage.supportButton')}
-  </button>
+  </a>
 </div>
 
 <style>
