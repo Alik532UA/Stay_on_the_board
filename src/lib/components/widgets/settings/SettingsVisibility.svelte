@@ -2,12 +2,11 @@
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
     import { _ } from "svelte-i18n";
     import { fitTextAction } from "$lib/actions/fitText";
-    import SvgIcons from "$lib/components/SvgIcons.svelte";
     import { get } from "svelte/store";
 
     export let isCompetitiveMode = false;
 
-    const icons = ["visibility_off", "grid_on", "view_in_ar", "rule"];
+    // Видалено масив icons, оскільки іконки тут не потрібні
 
     const toggleFunctions = [
         () =>
@@ -79,12 +78,8 @@
             on:click={toggleFunctions[i]}
             disabled={isCompetitiveMode}
         >
-            <span style="display: flex; align-items: center; gap: 6px;">
-                <span style="margin-right: -4px;">
-                    <SvgIcons name={icons[i]} />
-                </span>
-                {label}
-            </span>
+            <!-- Видалено SvgIcons -->
+            {label}
         </button>
     {/each}
 </div>

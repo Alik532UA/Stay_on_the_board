@@ -25,6 +25,7 @@ C:\Users\ozapolnov\Documents\code\AQA\zirkonzahn.tests\docs\framework_improvemen
 зроби git diff HEAD та проаналізуй зміни
 оціни код "до" та "після" змін по шкалі від 0 до 100 балів
 також оціни змін за SOLID принципами "до" та "після" по шкалі від 0 до 100 балів
+якщо є те що погіршило код, то надай окреми список
 звіт надай в новий .md файлі
 🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪
 C:\Users\ozapolnov\.gemini\GEMINI.md
