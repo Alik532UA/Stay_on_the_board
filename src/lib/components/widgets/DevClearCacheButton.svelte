@@ -1,19 +1,19 @@
 <script>
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import { _ } from "svelte-i18n";
   import SvgIcons from "../SvgIcons.svelte";
   import { clearCache } from "$lib/utils/cacheManager.js";
   import { customTooltip } from "$lib/actions/customTooltip.js";
-  import hotkeyService from "$lib/services/hotkeyService";
 
-  let isVisible = false;
+  // hotkeyService більше не потрібен тут, оскільки ми прибрали глобальний лісенер
+  // import hotkeyService from '$lib/services/hotkeyService';
 
   function handleClearCache() {
     clearCache({ keepAppearance: false });
   }
 
   onMount(() => {
-    // REMOVED: Global hotkey registration
+    // REMOVED: Global hotkey registration to prevent conflicts
     // if (import.meta.env.DEV) {
     //   hotkeyService.register('global', 'KeyR', handleClearCache);
     // }

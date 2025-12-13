@@ -10,6 +10,7 @@ import {
     signOut,
     reauthenticateWithCredential,
     deleteUser,
+    updatePassword, // Додано
     type User
 } from 'firebase/auth';
 import { getFirebaseApp } from './firebaseService';
@@ -18,10 +19,11 @@ import { logService } from './logService';
 import { doc, setDoc, getFirestore, getDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { notificationService } from './notificationService';
 import { rewardsStore } from '$lib/stores/rewardsStore';
+import { appVersion } from '$lib/stores/versionStore';
 
 export interface UserProfile {
     uid: string;
-    displayName: string | null; // Може бути null
+    displayName: string | null;
     bestTimeScore: number;
     isAnonymous: boolean;
 }
@@ -32,7 +34,6 @@ const getInitialProfile = (): UserProfile => {
     if (typeof localStorage === 'undefined') {
         return { uid: 'local', displayName: null, bestTimeScore: 0, isAnonymous: true };
     }
-    // Якщо в localStorage "Player", вважаємо це як null (дефолт)
     const localName = localStorage.getItem('online_playerName');
     const displayName = (localName === 'Player' || !localName) ? null : localName;
 
@@ -85,6 +86,10 @@ class AuthService {
             const result = await linkWithCredential(user, credential);
 
             logService.action(`[AuthService] Account linked successfully: ${result.user.email}`);
+
+            // FIX: Примусово оновлюємо userStore, щоб UI миттєво відреагував на зміну isAnonymous
+            userStore.set(result.user);
+
             await this.syncUserProfile(result.user);
 
             notificationService.show({
@@ -131,6 +136,26 @@ class AuthService {
             return true;
         } catch (error) {
             logService.error('[AuthService] Logout error', error);
+            return false;
+        }
+    }
+
+    // === NEW: Change Password ===
+    async changePassword(newPassword: string): Promise<boolean> {
+        const user = this.auth.currentUser;
+        if (!user) return false;
+
+        try {
+            await updatePassword(user, newPassword);
+            logService.action('[AuthService] Password updated successfully');
+            notificationService.show({
+                type: 'success',
+                messageRaw: 'Пароль успішно змінено.'
+            });
+            return true;
+        } catch (error: any) {
+            logService.error('[AuthService] Change password error', error);
+            this.handleAuthError(error);
             return false;
         }
     }
@@ -186,7 +211,6 @@ class AuthService {
     }
 
     async updateNickname(name: string) {
-        // Якщо ім'я пусте або "Player", зберігаємо як null
         const nameToSave = (name && name.trim() !== '' && name !== 'Player') ? name : null;
 
         userProfileStore.update(s => s ? { ...s, displayName: nameToSave } : null);
@@ -206,7 +230,6 @@ class AuthService {
             await updateProfile(user, { displayName: nameToSave });
             const userRef = doc(this.db, 'users', user.uid);
 
-            // Оновлюємо ім'я та час активності
             await setDoc(userRef, {
                 displayName: nameToSave,
                 lastActive: Date.now()
@@ -237,16 +260,13 @@ class AuthService {
 
                 const finalBest = Math.max(localBest, cloudBest);
 
-                // Оновлюємо базу: кращий рекорд + lastActive
                 const updates: any = { lastActive: Date.now() };
                 if (localBest > cloudBest) updates.bestTimeScore = localBest;
 
-                // Якщо в базі немає імені, а локально є - записуємо локальне
                 if (!cloudName && localName) updates.displayName = localName;
 
                 await setDoc(userRef, updates, { merge: true });
 
-                // Оновлюємо локалку
                 if (cloudBest > localBest && typeof localStorage !== 'undefined') {
                     localStorage.setItem('local_best_time_score', cloudBest.toString());
                 }
@@ -256,17 +276,18 @@ class AuthService {
 
                 userProfileStore.set({
                     uid: user.uid,
-                    displayName: cloudName || localName, // null якщо ніде немає
+                    displayName: cloudName || localName,
                     bestTimeScore: finalBest,
                     isAnonymous: user.isAnonymous
                 });
             } else {
-                // Новий користувач в базі
+                const currentVersion = get(appVersion);
                 const initialData = {
-                    displayName: localName, // null або ім'я
+                    displayName: localName,
                     bestTimeScore: localBest,
                     createdAt: Date.now(),
-                    lastActive: Date.now()
+                    lastActive: Date.now(),
+                    createdVersion: currentVersion || 'unknown'
                 };
                 await setDoc(userRef, initialData);
 

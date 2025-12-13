@@ -17,8 +17,12 @@
     let email = "";
     let password = "";
     let deletePassword = "";
+    let newPassword = ""; // Для зміни пароля
     let isLoading = false;
-    let isDeleteMode = false; // Для показу форми видалення
+
+    // Sub-modes for Profile view
+    let isDeleteMode = false;
+    let isChangePasswordMode = false;
 
     // Визначаємо, чи користувач повноцінно авторизований (не анонім)
     $: isAuthorized = $userStore && !$userStore.isAnonymous;
@@ -68,12 +72,26 @@
         }
     }
 
+    async function handleChangePassword() {
+        if (!newPassword || newPassword.length < 6) {
+            // Можна додати валідацію тут або покластися на authService
+            return;
+        }
+        isLoading = true;
+        const success = await authService.changePassword(newPassword);
+        isLoading = false;
+        if (success) {
+            isChangePasswordMode = false;
+            newPassword = "";
+        }
+    }
+
     function handleNameChange(e: CustomEvent<string>) {
         authService.updateNickname(e.detail);
     }
 </script>
 
-<div class="auth-modal">
+<div class="auth-modal-content">
     {#if isAuthorized}
         <!-- PROFILE VIEW -->
         <h3 class="title">{$_("ui.auth.titleProfile")}</h3>
@@ -95,8 +113,16 @@
             </div>
         </div>
 
-        {#if !isDeleteMode}
+        {#if !isDeleteMode && !isChangePasswordMode}
+            <!-- MAIN PROFILE ACTIONS -->
             <div class="actions">
+                <StyledButton
+                    variant="default"
+                    on:click={() => (isChangePasswordMode = true)}
+                >
+                    {$_("ui.auth.changePasswordBtn")}
+                </StyledButton>
+
                 <StyledButton variant="default" on:click={handleLogout}>
                     {$_("ui.auth.logoutBtn")}
                 </StyledButton>
@@ -109,7 +135,43 @@
                     {$_("ui.auth.deleteAccountBtn")}
                 </StyledButton>
             </div>
-        {:else}
+        {:else if isChangePasswordMode}
+            <!-- CHANGE PASSWORD VIEW -->
+            <div class="change-password-zone">
+                <div class="form-group">
+                    <label for="new-password"
+                        >{$_("ui.auth.newPasswordLabel")}</label
+                    >
+                    <input
+                        id="new-password"
+                        type="password"
+                        bind:value={newPassword}
+                        class="glass-input"
+                        placeholder="******"
+                    />
+                </div>
+                <div class="actions">
+                    <StyledButton
+                        variant="primary"
+                        on:click={handleChangePassword}
+                        disabled={isLoading || !newPassword}
+                    >
+                        {isLoading
+                            ? $_("common.loading")
+                            : $_("ui.auth.savePasswordBtn")}
+                    </StyledButton>
+                    <button
+                        class="link-btn"
+                        on:click={() => {
+                            isChangePasswordMode = false;
+                            newPassword = "";
+                        }}
+                    >
+                        {$_("ui.auth.cancelChangePasswordBtn")}
+                    </button>
+                </div>
+            </div>
+        {:else if isDeleteMode}
             <!-- DELETE ACCOUNT CONFIRMATION -->
             <div class="delete-zone">
                 <p class="warning-text">{$_("ui.auth.deleteWarning")}</p>
@@ -121,7 +183,7 @@
                         id="delete-password"
                         type="password"
                         bind:value={deletePassword}
-                        class="modal-input danger-input"
+                        class="glass-input danger-input"
                         placeholder="******"
                     />
                 </div>
@@ -164,7 +226,7 @@
                 id="auth-email"
                 type="email"
                 bind:value={email}
-                class="modal-input"
+                class="glass-input"
                 placeholder="name@example.com"
             />
         </div>
@@ -176,7 +238,7 @@
                     id="auth-password"
                     type="password"
                     bind:value={password}
-                    class="modal-input"
+                    class="glass-input"
                     placeholder="******"
                 />
             </div>
@@ -222,20 +284,17 @@
 </div>
 
 <style>
-    .auth-modal {
+    .auth-modal-content {
         display: flex;
         flex-direction: column;
         gap: 16px;
         width: 100%;
-        max-width: 320px;
         margin: 0 auto;
-        /* Додаємо фон та розмиття для самого контенту, оскільки вікно прозоре */
-        background: rgba(30, 30, 30, 0.6);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        backdrop-filter: none;
         padding: 24px;
-        border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
     .title {
         text-align: center;
@@ -259,18 +318,6 @@
         font-size: 0.9em;
         font-weight: bold;
         color: var(--text-secondary);
-    }
-    .modal-input {
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 10px;
-        color: var(--text-primary);
-        font-size: 1em;
-    }
-    .modal-input:focus {
-        outline: none;
-        border-color: var(--text-accent);
     }
     .actions {
         margin-top: 8px;
@@ -307,11 +354,15 @@
         display: flex;
         flex-direction: column;
         gap: 12px;
+        align-items: center;
+        text-align: center;
     }
     .info-row {
         display: flex;
         flex-direction: column;
         gap: 4px;
+        align-items: center;
+        width: 100%;
     }
     .info-row .label {
         font-size: 0.8em;
@@ -339,5 +390,16 @@
     }
     .danger-input {
         border-color: var(--error-color);
+    }
+
+    /* Change Password Zone */
+    .change-password-zone {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 16px;
+        border-radius: 12px;
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
     }
 </style>

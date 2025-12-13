@@ -11,6 +11,20 @@ const contextStack = writable<string[]>(['global']);
 const hotkeyRegistry = new Map<string, Map<string, HotkeyAction>>();
 
 function handleKeydown(event: KeyboardEvent) {
+    // 1. Перевірка на фокус в полях вводу (Global Input Protection)
+    // Якщо користувач друкує, ми не повинні тригерити гарячі клавіші,
+    // окрім Escape (для закриття/скасування).
+    const target = event.target as HTMLElement;
+    const isInputActive =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable;
+
+    if (isInputActive && event.code !== 'Escape') {
+        // Не логуємо це, щоб не засмічувати консоль при кожному натисканні літери
+        return;
+    }
+
     const stack = get(contextStack);
     // Використовуємо event.code для надійної ідентифікації клавіш
     logService.action(`[hotkeyService] handleKeydown: code=${event.code}, stack=`, stack);
@@ -20,7 +34,7 @@ function handleKeydown(event: KeyboardEvent) {
         const contextHotkeys = hotkeyRegistry.get(context);
 
         if (contextHotkeys) {
-            const hotkey = contextHotkeys.get(event.code); // ЗМІНЕНО: з event.key на event.code
+            const hotkey = contextHotkeys.get(event.code);
             if (hotkey && (!hotkey.condition || hotkey.condition())) {
                 logService.action(`[hotkeyService] Executing hotkey '${event.code}' from context '${context}'`);
                 event.preventDefault();
@@ -91,7 +105,7 @@ const hotkeyService = {
     unregister: unregisterContext,
     pushContext,
     popContext,
-    getCurrentContext, // Added this
+    getCurrentContext,
     get a() { // For debugging
         return get(contextStack);
     }
