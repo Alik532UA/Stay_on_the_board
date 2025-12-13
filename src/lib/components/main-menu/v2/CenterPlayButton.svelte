@@ -102,6 +102,8 @@
         animation-name: pulse-in;
         animation-timing-function: linear;
         animation-iteration-count: infinite;
+        border: 3px solid rgba(255, 255, 255, 0.5);
+        /* outline: 1px solid rgba(0, 0, 0, 0.5); */
     }
 
     @keyframes pulse-in {

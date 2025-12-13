@@ -75,35 +75,63 @@
 	<!-- Варіант 5: Конструктор -->
 	<div class="playground-section">
 		<h2>5. Конструктор анімації (Dev Playground)</h2>
-		
+
 		<div class="controls">
 			<div class="control-group">
 				<label for="waveCount">Кількість хвиль: {waveCount}</label>
-				<input id="waveCount" type="range" min="1" max="6" step="1" bind:value={waveCount} />
+				<input
+					id="waveCount"
+					type="range"
+					min="1"
+					max="6"
+					step="1"
+					bind:value={waveCount}
+				/>
 			</div>
 			<div class="control-group">
 				<label for="maxScale">Розмах (Scale): {maxScale}</label>
-				<input id="maxScale" type="range" min="1.1" max="3.0" step="0.1" bind:value={maxScale} />
+				<input
+					id="maxScale"
+					type="range"
+					min="1.1"
+					max="3.0"
+					step="0.1"
+					bind:value={maxScale}
+				/>
 			</div>
 			<div class="control-group">
 				<label for="duration">Швидкість (сек): {duration}s</label>
-				<input id="duration" type="range" min="0.5" max="5.0" step="0.1" bind:value={duration} />
+				<input
+					id="duration"
+					type="range"
+					min="0.5"
+					max="5.0"
+					step="0.1"
+					bind:value={duration}
+				/>
 			</div>
 			<div class="control-group">
 				<label for="maxOpacity">Прозорість: {maxOpacity}</label>
-				<input id="maxOpacity" type="range" min="0.1" max="1.0" step="0.05" bind:value={maxOpacity} />
+				<input
+					id="maxOpacity"
+					type="range"
+					min="0.1"
+					max="1.0"
+					step="0.05"
+					bind:value={maxOpacity}
+				/>
 			</div>
 		</div>
 
 		<div class="center-container dynamic-preview">
-			<button 
-				class="play-btn-circle" 
+			<button
+				class="play-btn-circle"
 				data-testid="dev-menu-center-play-btn"
 			>
 				<div class="play-icon"><SvgIcons name="piece" /></div>
-				
+
 				{#each Array(waveCount) as _, i}
-					<div 
+					<div
 						class="wave dynamic-wave"
 						style="
 							animation-duration: {duration}s;
@@ -146,7 +174,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		border: 1px solid rgba(255,255,255,0.1);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
 	/* --- Стилі кнопки (як на MainMenuV2) --- */
@@ -165,8 +193,8 @@
 		border-radius: 50%;
 		/* Прибрано обводку, фон як у гамбургера */
 		border: none;
-		background: var(--bg-secondary, #23272f); 
-		
+		background: var(--bg-secondary, #23272f);
+
 		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 		cursor: pointer;
 		display: flex;
@@ -242,7 +270,6 @@
 		animation: pulse-in 3s infinite ease-in-out;
 	}
 
-
 	/* --- Playground Section --- */
 	.playground-section {
 		width: 100%;
@@ -250,7 +277,7 @@
 		background: rgba(0, 0, 0, 0.3);
 		padding: 30px;
 		border-radius: 24px;
-		border: 1px solid rgba(255,255,255,0.1);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
