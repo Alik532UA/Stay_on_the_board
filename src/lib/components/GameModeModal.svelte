@@ -10,8 +10,8 @@
   import { logService } from "$lib/services/logService";
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import type { GameModePreset } from "$lib/stores/gameSettingsStore";
-  import { APP_CONFIG } from "$lib/config/appConfig";
   import WipNotice from "./main-menu/WipNotice.svelte";
+  import GameModeButton from "$lib/components/game-modes/GameModeButton.svelte";
 
   let showWipNotice = false;
 
@@ -34,24 +34,13 @@
     goto(`${base}/online`);
   }
 
-  // TODO: Implement navigation for Arena Mode
-  function handleArenaMode() {
-    logService.action('Click: "Arena Mode" (Future Feature)');
-    openWipNotice();
-  }
-
-  // TODO: Implement navigation for Maze Mode
-  function handleMazeMode() {
-    logService.action('Click: "Maze Mode" (Future Feature)');
-    openWipNotice();
-  }
-
   export let scope: string;
   export let extended = false;
   let buttonsNode: HTMLElement;
 
   onMount(() => {
     if (buttonsNode) {
+      // Знаходимо кнопки всередині компонента GameModeButton
       const buttons = Array.from(buttonsNode.querySelectorAll("button"));
       buttons.forEach((btn, index) => {
         const key = `Digit${index + 1}`;
@@ -70,36 +59,7 @@
         intendedGameType: "virtual-player",
       }));
       if (mode === "beginner") {
-        logService.modal(
-          "[GameModeModal] Beginner mode selected. Showing FAQ modal.",
-        );
-        modalStore.showModal({
-          titleKey: "faq.title",
-          dataTestId: "faq-modal",
-          content: { isFaq: true },
-          buttons: [
-            {
-              textKey: "rulesPage.title",
-              onClick: () => {
-                goto(`${base}/rules`);
-                modalStore.closeModal();
-              },
-              customClass: "blue-btn",
-            },
-            {
-              textKey: "modal.ok",
-              primary: true,
-              isHot: true,
-              onClick: () => {
-                logService.modal(
-                  "[FAQModal] OK button clicked. Closing modal and navigating to game.",
-                );
-                modalStore.closeModal();
-                userActionService.navigateToGame();
-              },
-            },
-          ],
-        });
+        showFaqModal();
       } else {
         userActionService.navigateToGame();
         modalStore.closeModal();
@@ -108,36 +68,7 @@
     }
 
     if (mode === "beginner") {
-      logService.modal(
-        "[GameModeModal] Beginner mode selected. Showing FAQ modal.",
-      );
-      modalStore.showModal({
-        titleKey: "faq.title",
-        dataTestId: "faq-modal",
-        content: { isFaq: true },
-        buttons: [
-          {
-            textKey: "rulesPage.title",
-            onClick: () => {
-              goto(`${base}/rules`);
-              modalStore.closeModal();
-            },
-            customClass: "blue-btn",
-          },
-          {
-            textKey: "modal.ok",
-            primary: true,
-            isHot: true,
-            onClick: () => {
-              logService.modal(
-                "[FAQModal] OK button clicked. Closing modal and navigating to game.",
-              );
-              modalStore.closeModal();
-              userActionService.navigateToGame();
-            },
-          },
-        ],
-      });
+      showFaqModal();
     } else {
       logService.modal(
         `[GameModeModal] ${mode} mode selected. Closing current modal and navigating.`,
@@ -146,66 +77,95 @@
       userActionService.navigateToGame();
     }
   }
+
+  function showFaqModal() {
+    logService.modal(
+      "[GameModeModal] Beginner mode selected. Showing FAQ modal.",
+    );
+    modalStore.showModal({
+      titleKey: "faq.title",
+      dataTestId: "faq-modal",
+      content: { isFaq: true },
+      buttons: [
+        {
+          textKey: "rulesPage.title",
+          onClick: () => {
+            goto(`${base}/rules`);
+            modalStore.closeModal();
+          },
+          customClass: "blue-btn",
+        },
+        {
+          textKey: "modal.ok",
+          primary: true,
+          isHot: true,
+          onClick: () => {
+            logService.modal(
+              "[FAQModal] OK button clicked. Closing modal and navigating to game.",
+            );
+            modalStore.closeModal();
+            userActionService.navigateToGame();
+          },
+        },
+      ],
+    });
+  }
 </script>
+
+<!-- FIX: Видалено заголовок "Втримайся" -->
 
 <div class="game-mode-buttons" bind:this={buttonsNode}>
   {#if extended}
     <!-- 1. Online Game (Top Priority) -->
-    <button
-      class="modal-btn-generic"
+    <GameModeButton
+      icon="🌍"
+      text={$_("mainMenu.playOnline")}
+      dataTestId="online-game-btn"
       on:click={handleOnlineGame}
-      data-testid="online-game-btn"
-    >
-      {$_("mainMenu.playOnline")}
-    </button>
+    />
 
-    <hr class="divider" />
+    <div class="divider"></div>
   {/if}
 
   <!-- 2. Single Player Modes -->
-  <!-- Заголовок модального вікна вже містить "Втримайся", тому тут не дублюємо -->
-
-  <button
-    class="modal-btn-generic green-btn"
+  <GameModeButton
+    icon="🐣"
+    text={$_("gameModes.beginner")}
+    dataTestId="beginner-mode-btn"
     on:click={() => selectMode("beginner")}
-    data-testid="beginner-mode-btn"
-  >
-    {$_("gameModes.beginner")}
-  </button>
-  <button
-    class="modal-btn-generic blue-btn"
+  />
+
+  <GameModeButton
+    icon="🧠"
+    text={$_("gameModes.experienced")}
+    dataTestId="experienced-mode-btn"
     on:click={() => selectMode("experienced")}
-    data-testid="experienced-mode-btn"
-  >
-    {$_("gameModes.experienced")}
-  </button>
-  <button
-    class="modal-btn-generic danger-btn"
+  />
+
+  <GameModeButton
+    icon="🔥"
+    text={$_("gameModes.pro")}
+    dataTestId="pro-mode-btn"
     on:click={() => selectMode("pro")}
-    data-testid="pro-mode-btn"
-  >
-    {$_("gameModes.pro")}
-  </button>
+  />
 
   {#if extended}
-    <button
-      class="modal-btn-generic"
+    <GameModeButton
+      icon="⏱️"
+      text={$_("mainMenu.timedGame")}
+      dataTestId="timed-game-btn"
       on:click={() => selectMode("timed")}
-      data-testid="timed-game-btn"
-    >
-      {$_("mainMenu.timedGame")}
-    </button>
+    />
 
-    <hr class="divider" />
+    <div class="divider"></div>
 
     <!-- 3. Local Game -->
-    <button
-      class="modal-btn-generic"
+    <GameModeButton
+      icon="🏠"
+      text={$_("mainMenu.localGame")}
+      dataTestId="local-game-btn"
       on:click={handleLocalGame}
-      data-testid="local-game-btn"
-    >
-      {$_("mainMenu.localGame")}
-    </button>
+    />
   {/if}
 </div>
 
@@ -214,39 +174,33 @@
 {/if}
 
 {#if !extended}
-  <DontShowAgainCheckbox tid="game-mode-modal-dont-show-again-switch" {scope} />
+  <div class="checkbox-wrapper">
+    <DontShowAgainCheckbox
+      modalType="gameMode"
+      tid={`${$modalStore.dataTestId}-dont-show-again-switch`}
+      {scope}
+    />
+  </div>
 {/if}
 
 <style>
   .game-mode-buttons {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding-top: 16px;
+    gap: 12px;
+    width: 100%;
   }
+
   .divider {
-    border: none;
-    border-top: 1px solid var(--border-color);
-    margin: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 8px 0;
+    width: 100%;
   }
 
-  .mode-section-label {
-    font-size: 0.9em;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-secondary);
-    text-align: center;
-    margin-bottom: -8px;
-    font-weight: bold;
-  }
-
-  .mode-section-label.future {
-    opacity: 0.6;
-    margin-top: 8px;
-  }
-
-  .future-btn {
-    opacity: 0.6;
-    border-style: dashed;
+  .checkbox-wrapper {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
   }
 </style>

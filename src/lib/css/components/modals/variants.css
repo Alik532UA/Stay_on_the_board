@@ -1,0 +1,59 @@
+/* === VARIANT: MENU === */
+/* Цей варіант використовується для повноекранних меню (GameMode, Auth тощо) */
+.modal-window.variant-menu {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    box-shadow: none;
+    /* FIX: Дозволяємо скрол, якщо контент високий */
+    max-height: 100vh;
+    height: 100%;
+    overflow-y: auto;
+    align-items: center;
+    /* FIX: Використовуємо flex-start для безпечного скролу */
+    justify-content: flex-start;
+    /* FIX: Дозволяємо взаємодію (скрол) */
+    pointer-events: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+/* Приховуємо скролбар для естетики */
+.modal-window.variant-menu::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+.modal-window.variant-menu::before {
+    display: none;
+}
+
+.modal-window.variant-menu .modal-content {
+    border: none !important;
+    background: transparent;
+    padding: 20px;
+    overflow: visible;
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    /* === FIX: ЦЕНТРУВАННЯ === */
+    /* margin: auto автоматично центрує елемент у флекс-контейнері, 
+     навіть якщо justify-content: flex-start. 
+     Це також безпечно для скролу (не обрізає верх). */
+    margin: auto;
+    flex: 0 1 auto;
+}
+
+/* DevMenu Modal Specific Styles */
+.modal-window.dev-menu-modal-window {
+    max-height: none;
+    height: fit-content;
+}
+
+.modal-window.dev-menu-modal-window .modal-content {
+    max-height: none;
+}
