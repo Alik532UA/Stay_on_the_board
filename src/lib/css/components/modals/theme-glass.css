@@ -1,0 +1,67 @@
+/* src/lib/css/components/modals/theme-glass.css */
+
+/* Overlay Style - Сильніше розмиття */
+.modal-overlay.style-glass {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Window Style - Прозоре, на весь екран */
+.modal-window.style-glass {
+    max-width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+
+    /* Центрування контенту */
+    align-items: center;
+    justify-content: center;
+    /* Центр, якщо контент малий */
+
+    /* Дозволяємо скрол самого вікна, якщо контент великий */
+    overflow-y: auto;
+    pointer-events: auto;
+}
+
+/* Приховуємо скролбар вікна */
+.modal-window.style-glass::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+/* Content Container */
+.modal-window.style-glass .modal-content {
+    width: 100%;
+    max-width: 360px;
+    /* Ширина колонки меню */
+    padding: 20px;
+
+    /* Гнучке позиціонування для скролу */
+    flex: 0 0 auto;
+    /* Не розтягуватись */
+    margin: auto;
+    /* Центрування по вертикалі та горизонталі */
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    /* Прибираємо зайві бордери */
+    border: none;
+    background: transparent;
+}
+
+/* Inputs specific to Glass theme */
+.modal-window.style-glass .glass-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 16px 24px;
+    color: #fff;
+    font-size: 1.1em;
+    width: 100%;
+    backdrop-filter: blur(4px);
+}

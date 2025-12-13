@@ -1,0 +1,79 @@
+/* src/lib/css/components/modals/theme-classic.css */
+
+/* Overlay Style */
+.modal-overlay.style-classic {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+/* Window Style */
+.modal-window.style-classic {
+    background: transparent;
+    /* Фон задається через ::before для opacity */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    border-radius: 24px;
+    max-width: 400px;
+    overflow: hidden;
+    /* Щоб діти не вилазили за радіус */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.modal-window.style-classic::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--bg-secondary);
+    opacity: 0.5;
+    z-index: -1;
+}
+
+/* Header */
+.modal-window.style-classic .modal-header {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.modal-window.style-classic .modal-title {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #fffde7;
+    text-align: center;
+}
+
+.modal-window.style-classic .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 2em;
+    cursor: pointer;
+    padding: 0;
+    width: 44px;
+    height: 44px;
+}
+
+/* Content */
+.modal-window.style-classic .modal-content {
+    padding: 20px 24px;
+    color: var(--text-primary, #fff);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    margin: 0 24px;
+    /* Відступи для рамки всередині */
+}
+
+/* Footer / Buttons */
+.modal-window.style-classic .modal-action-buttons {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}

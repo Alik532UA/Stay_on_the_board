@@ -161,7 +161,7 @@
 
     <!-- 3. Local Game -->
     <GameModeButton
-      icon="🏠"
+      icon="👥"
       text={$_("mainMenu.localGame")}
       dataTestId="local-game-btn"
       on:click={handleLocalGame}
