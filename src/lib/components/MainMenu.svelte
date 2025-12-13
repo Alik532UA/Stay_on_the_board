@@ -113,19 +113,14 @@
     import("./GameModeModal.svelte").then((module) => {
       const GameModeModal = module.default;
       modalStore.showModal({
-        // FIX: Змінено заголовок на "Втримайся"
-        titleKey: `mainMenu.modes.${APP_CONFIG.MODES.SURVIVE}`,
         dataTestId: "game-mode-modal",
         component: GameModeModal,
         props: { extended: true },
-        buttons: [
-          {
-            textKey: "modal.close",
-            onClick: () => modalStore.closeModal(),
-            dataTestId: "modal-btn-modal.close",
-            hotKey: "ESC",
-          },
-        ],
+        variant: "menu",
+        // FIX: Прибираємо кнопки (footer)
+        buttons: [],
+        // FIX: Дозволяємо закриття кліком по фону
+        closeOnOverlayClick: true,
       });
     });
   }
@@ -150,14 +145,11 @@
             dataTestId: "game-mode-modal",
             component: GameModeModal,
             props: { extended: false },
-            buttons: [
-              {
-                textKey: "modal.close",
-                onClick: () => modalStore.closeModal(),
-                dataTestId: "modal-btn-modal.close",
-                hotKey: "ESC",
-              },
-            ],
+            variant: "menu",
+            // FIX: Прибираємо кнопки (footer)
+            buttons: [],
+            // FIX: Дозволяємо закриття кліком по фону
+            closeOnOverlayClick: true,
           });
         });
       } else {

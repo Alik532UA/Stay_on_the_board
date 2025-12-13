@@ -15,19 +15,16 @@
   function handlePlay() {
     logService.action('Click: "Play" (MainMenuV2)');
     modalStore.showModal({
-      // FIX: Змінено заголовок на "Втримайся"
-      titleKey: `mainMenu.modes.${APP_CONFIG.MODES.SURVIVE}`,
+      // Заголовок видаляємо з UI компонента GameModeModal, але залишаємо тут для a11y або логів, якщо потрібно
+      // titleKey: `mainMenu.modes.${APP_CONFIG.MODES.SURVIVE}`,
       dataTestId: "game-mode-modal",
       component: GameModeModal,
       props: { extended: true },
-      buttons: [
-        {
-          textKey: "modal.close",
-          onClick: () => modalStore.closeModal(),
-          dataTestId: "modal-btn-modal.close",
-          hotKey: "ESC",
-        },
-      ],
+      variant: "menu",
+      // FIX: Прибираємо кнопки (footer), щоб відповідати дизайну меню
+      buttons: [],
+      // FIX: Дозволяємо закриття кліком по фону
+      closeOnOverlayClick: true,
     });
   }
 
@@ -38,6 +35,7 @@
       dataTestId: "feedback-modal",
       component: FeedbackModal,
       buttons: [],
+      closeOnOverlayClick: true,
     });
   }
 </script>
