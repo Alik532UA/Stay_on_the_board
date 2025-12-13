@@ -111,7 +111,7 @@ export function performMove(
         lang: (get(appSettingsStore) as AppSettingsState).language || 'uk',
         voiceURI: settings.selectedVoiceURI,
         onEndCallback,
-        force: true // <--- FIX: Примушуємо speakMove говорити, бо ми вже перевірили умови тут
+        force: true
       }
     });
   }
@@ -120,9 +120,11 @@ export function performMove(
 
   if (changes.playerState && changes.playerState.players) {
     const updatedPlayer = changes.playerState.players[playerIndex];
+    // FIX: Додано boardSize у виклик checkAchievements
     rewardsService.checkAchievements({
       score: updatedPlayer.score,
-      gameMode: settings.gameMode || actualGameMode
+      gameMode: settings.gameMode || actualGameMode,
+      boardSize: currentState.boardSize
     });
   }
 

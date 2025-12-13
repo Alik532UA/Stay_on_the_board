@@ -54,17 +54,17 @@ const defaultConfig: LogConfig = {
     [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: false,
     [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
     [LOG_GROUPS.LOGIC_TIME]: false,
-    [LOG_GROUPS.SCORE]: false,
-    [LOG_GROUPS.UI]: true, // УВІМКНЕНО для діагностики UI (кнопки, модалки)
+    [LOG_GROUPS.SCORE]: true, // УВІМКНЕНО: Для перевірки нарахування балів та нагород
+    [LOG_GROUPS.UI]: false, // ВИМКНЕНО: Зменшуємо шум
     [LOG_GROUPS.TOOLTIP]: false,
-    [LOG_GROUPS.ANIMATION]: false,
+    [LOG_GROUPS.ANIMATION]: false, // ВИМКНЕНО: Зменшуємо шум
     [LOG_GROUPS.INIT]: false,
     [LOG_GROUPS.ACTION]: false,
-    [LOG_GROUPS.GAME_MODE]: true, // УВІМКНЕНО для діагностики режимів гри
+    [LOG_GROUPS.GAME_MODE]: true, // УВІМКНЕНО: Для відстеження потоку гри
     [LOG_GROUPS.SPEECH]: false,
     [LOG_GROUPS.VOICE_CONTROL]: false,
     [LOG_GROUPS.TEST_MODE]: false,
-    [LOG_GROUPS.MODAL]: true, // УВІМКНЕНО для діагностики модальних вікон
+    [LOG_GROUPS.MODAL]: false,
     [LOG_GROUPS.ERROR]: true,
 };
 

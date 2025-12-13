@@ -8,7 +8,6 @@
     import { onMount, onDestroy } from "svelte";
     import hotkeyService from "$lib/services/hotkeyService";
 
-    // Imports for Leaderboard
     import {
         leaderboardService,
         type LeaderboardEntry,
@@ -16,8 +15,8 @@
     import { userProfileStore, authService } from "$lib/services/authService";
     import EditableText from "$lib/components/ui/EditableText.svelte";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
+    import type { UnlockedReward, Achievement } from "$lib/types/rewards";
 
-    // Mark unseen as seen when visiting page
     onMount(() => {
         rewardsStore.markAllAsSeen();
         hotkeyService.pushContext("rewards-page");
@@ -30,20 +29,76 @@
 
     $: unlockedMap = $rewardsStore.unlockedRewards;
 
-    // Leaderboard State
+    // --- Leaderboard Logic ---
     let leaders: LeaderboardEntry[] = [];
     let isLoadingLeaders = true;
+    let selectedBoardSize: number | "all" = "all"; // Default to All
+
+    // FIX: Явна типізація для вирішення помилки TS2345
+    const boardSizes: { value: number | "all"; label: string }[] = [
+        { value: "all", label: "Всі" },
+        { value: 3, label: "3x3" },
+        { value: 4, label: "4x4" },
+        { value: 5, label: "5x5" },
+        { value: 6, label: "6x6" },
+        { value: 8, label: "8x8" },
+    ];
 
     async function loadLeaderboard() {
         isLoadingLeaders = true;
-        // ВИПРАВЛЕНО: Передаємо режим 'timed' та розмір дошки 4
-        // У майбутньому тут можна додати селектор розміру дошки
-        leaders = await leaderboardService.getTopPlayers("timed", 4, 10);
+        leaders = await leaderboardService.getTopPlayers(
+            "timed",
+            selectedBoardSize,
+            10,
+        );
         isLoadingLeaders = false;
+    }
+
+    function handleSizeFilter(size: number | "all") {
+        selectedBoardSize = size;
+        loadLeaderboard();
     }
 
     function handleNameChange(e: CustomEvent<string>) {
         authService.updateNickname(e.detail);
+    }
+
+    // --- Achievements Grouping Logic ---
+
+    $: displayAchievements = groupAchievements(ACHIEVEMENTS, unlockedMap);
+
+    function groupAchievements(
+        all: Achievement[],
+        unlocked: Record<string, UnlockedReward>,
+    ) {
+        const groups: Record<
+            string,
+            { achievement: Achievement; unlocked: UnlockedReward[] }
+        > = {};
+        const singles: {
+            achievement: Achievement;
+            unlocked: UnlockedReward | undefined;
+        }[] = [];
+
+        all.forEach((ach) => {
+            if (ach.groupId) {
+                if (!groups[ach.groupId]) {
+                    groups[ach.groupId] = { achievement: ach, unlocked: [] };
+                }
+                if (unlocked[ach.id]) {
+                    groups[ach.groupId].unlocked.push(unlocked[ach.id]);
+                }
+            } else {
+                singles.push({ achievement: ach, unlocked: unlocked[ach.id] });
+            }
+        });
+
+        const groupItems = Object.values(groups).map((g) => ({
+            achievement: g.achievement,
+            unlocked: g.unlocked.length > 0 ? g.unlocked : undefined,
+        }));
+
+        return [...singles, ...groupItems];
     }
 </script>
 
@@ -82,7 +137,21 @@
 
         <!-- Секція 2: Таблиця лідерів -->
         <div class="leaderboard-section">
-            <h2>Топ гравців (Гра на час 4x4)</h2>
+            <div class="lb-header">
+                <h2>Топ гравців</h2>
+                <div class="filter-chips">
+                    {#each boardSizes as size}
+                        <button
+                            class="chip"
+                            class:active={selectedBoardSize === size.value}
+                            on:click={() => handleSizeFilter(size.value)}
+                        >
+                            {size.label}
+                        </button>
+                    {/each}
+                </div>
+            </div>
+
             <div class="leaderboard-table-wrapper">
                 {#if isLoadingLeaders}
                     <div class="loading">Завантаження рейтингу...</div>
@@ -96,6 +165,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Гравець</th>
+                                <th>Дошка</th>
                                 <th>Рахунок</th>
                             </tr>
                         </thead>
@@ -110,6 +180,9 @@
                                                 1}{/if}
                                     </td>
                                     <td class="name">{leader.displayName}</td>
+                                    <td class="board-size"
+                                        >{leader.boardSize || "4x4"}</td
+                                    >
                                     <td class="score">{leader.score}</td>
                                 </tr>
                             {/each}
@@ -124,10 +197,10 @@
         <!-- Секція 3: Досягнення -->
         <h2>Досягнення</h2>
         <div class="rewards-grid">
-            {#each ACHIEVEMENTS as achievement (achievement.id)}
+            {#each displayAchievements as item}
                 <RewardCard
-                    {achievement}
-                    unlockedInfo={unlockedMap[achievement.id]}
+                    achievement={item.achievement}
+                    unlockedInfo={item.unlocked}
                 />
             {/each}
 
@@ -240,6 +313,45 @@
         color: var(--text-secondary);
     }
 
+    /* Leaderboard Header & Filters */
+    .lb-header {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .filter-chips {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        /* Hide scrollbar */
+        scrollbar-width: none;
+    }
+    .filter-chips::-webkit-scrollbar {
+        display: none;
+    }
+
+    .chip {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 6px 12px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        white-space: nowrap;
+        font-size: 0.9em;
+        transition: all 0.2s;
+    }
+
+    .chip.active {
+        background: var(--text-accent);
+        color: var(--bg-secondary);
+        border-color: var(--text-accent);
+        font-weight: bold;
+    }
+
     /* Leaderboard Table */
     .leaderboard-table-wrapper {
         background: var(--bg-secondary);
@@ -290,6 +402,10 @@
         font-weight: bold;
         color: var(--text-accent);
         font-size: 1.1em;
+    }
+    .board-size {
+        color: var(--text-secondary);
+        font-size: 0.9em;
     }
 
     .loading,

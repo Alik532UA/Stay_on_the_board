@@ -4,14 +4,62 @@
     import type { Achievement } from "$lib/types/rewards";
     import type { UnlockedReward } from "$lib/types/rewards";
     import { formatDate } from "$lib/utils/dateUtils";
+    import { customTooltip } from "$lib/actions/customTooltip";
 
     export let achievement: Achievement;
-    export let unlockedInfo: UnlockedReward | undefined = undefined;
+    // unlockedInfo може бути одним об'єктом або масивом об'єктів (якщо це група)
+    export let unlockedInfo: UnlockedReward | UnlockedReward[] | undefined =
+        undefined;
 
-    $: isUnlocked = !!unlockedInfo;
-    $: dateString = unlockedInfo
-        ? formatDate(unlockedInfo.unlockedAt, $locale)
+    // Визначаємо, чи це група нагород
+    $: isGroup = Array.isArray(unlockedInfo);
+
+    // Якщо це група, беремо останню розблоковану для дати
+    $: mainUnlock = isGroup
+        ? (unlockedInfo as UnlockedReward[]).sort(
+              (a, b) => b.unlockedAt - a.unlockedAt,
+          )[0]
+        : (unlockedInfo as UnlockedReward);
+
+    $: isUnlocked = !!mainUnlock;
+
+    $: dateString = mainUnlock
+        ? formatDate(mainUnlock.unlockedAt, $locale)
         : "";
+
+    // Формуємо текст для тултіпа (список варіантів)
+    $: tooltipText = isGroup
+        ? (unlockedInfo as UnlockedReward[])
+              .map((u) => {
+                  // FIX: Прибрано achievement.variantLabel, щоб не дублювати назву першого елемента.
+                  // Парсимо ID кожного конкретного розблокування (наприклад, score_11_timed_4 -> 4)
+                  const parts = u.id.split("_");
+                  const size = parts[parts.length - 1];
+                  return !isNaN(Number(size)) ? `${size}x${size}` : size;
+              })
+              // Сортуємо за зростанням розміру (3x3, 4x4, 5x5...)
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .join(", ")
+        : "";
+
+    // Лейбл для бейджа (кількість або варіант)
+    $: badgeLabel = (() => {
+        if (isGroup) {
+            const rewards = unlockedInfo as UnlockedReward[];
+            if (rewards.length > 1) {
+                return rewards.length; // Показуємо кількість, якщо > 1
+            } else if (rewards.length === 1) {
+                // Якщо 1 елемент в групі, показуємо його варіант
+                const idParts = rewards[0].id.split("_");
+                const size = idParts[idParts.length - 1];
+                return !isNaN(Number(size)) ? `${size}x${size}` : size;
+            }
+        }
+        return achievement.variantLabel; // Для одиночних нагород
+    })();
+
+    // Тултіп показуємо тільки якщо нагород > 1
+    $: showTooltip = isGroup && (unlockedInfo as UnlockedReward[]).length > 1;
 </script>
 
 <div
@@ -35,9 +83,21 @@
             </div>
         {/if}
     </div>
+
     {#if !isUnlocked}
         <div class="lock-overlay">
             <SvgIcons name="lock" />
+        </div>
+    {:else if badgeLabel}
+        <!-- Бейдж з кількістю або варіантом -->
+        <div
+            class="variant-badge"
+            class:count-badge={showTooltip}
+            use:customTooltip={showTooltip
+                ? `Отримано на дошках: ${tooltipText}`
+                : ""}
+        >
+            {badgeLabel}
         </div>
     {/if}
 </div>
@@ -56,7 +116,7 @@
         transition:
             transform 0.2s,
             background 0.2s;
-        opacity: 0.5; /* Default opacity for locked */
+        opacity: 0.5;
         filter: grayscale(0.8);
     }
 
@@ -78,7 +138,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        /* Icon styling handled by SvgIcons global styles or fill/stroke */
         color: var(--accent-color);
     }
 
@@ -107,7 +166,6 @@
         font-style: italic;
     }
 
-    /* Lock overlay for locked cards */
     .lock-overlay {
         position: absolute;
         top: 8px;
@@ -115,5 +173,31 @@
         width: 24px;
         height: 24px;
         opacity: 0.6;
+    }
+
+    .variant-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--text-accent);
+        color: var(--text-accent);
+        font-size: 0.75em;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 6px;
+    }
+
+    .count-badge {
+        background: var(--text-accent);
+        color: var(--bg-secondary);
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        cursor: help;
     }
 </style>

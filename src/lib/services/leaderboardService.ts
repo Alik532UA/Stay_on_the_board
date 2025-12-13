@@ -2,7 +2,6 @@ import {
     getFirestore,
     collection,
     query,
-    where,
     orderBy,
     limit,
     getDocs,
@@ -21,6 +20,7 @@ export interface LeaderboardEntry {
     score: number;
     timestamp: number;
     rank?: number;
+    boardSize?: string; // Додано для відображення в таблиці
 }
 
 const LOCAL_BEST_PREFIX = 'local_best_';
@@ -32,18 +32,10 @@ class LeaderboardService {
         this.db = getFirestore(getFirebaseApp());
     }
 
-    /**
-     * Генерує унікальний ключ для лідерборду.
-     * Приклад: 'timed_4' (режим timed, дошка 4x4)
-     */
     private getLeaderboardKey(mode: string, size: number, variant: string = 'default'): string {
-        return `${mode}_${size}`; // Можна додати variant, якщо потрібно: `${mode}_${variant}_${size}`
+        return `${mode}_${size}`;
     }
 
-    /**
-     * Зберігає результат гри.
-     * Автоматично визначає, чи це новий рекорд.
-     */
     async submitScore(
         score: number,
         context: { mode: string; size: number; variant?: string }
@@ -53,7 +45,7 @@ class LeaderboardService {
 
         logService.score(`[Leaderboard] Processing score: ${score} for key: ${leaderboardKey}`);
 
-        // 1. ЛОКАЛЬНЕ ЗБЕРЕЖЕННЯ (Offline-first)
+        // 1. ЛОКАЛЬНЕ ЗБЕРЕЖЕННЯ
         const localKey = `${LOCAL_BEST_PREFIX}${leaderboardKey}`;
         const currentLocalBest = this.getLocalBestScore(leaderboardKey);
 
@@ -61,10 +53,6 @@ class LeaderboardService {
             localStorage.setItem(localKey, score.toString());
             logService.score(`[Leaderboard] New Local Best Saved: ${score}`);
 
-            // Оновлюємо UI (userProfileStore)
-            // Примітка: userProfileStore зараз заточений під bestTimeScore, 
-            // для масштабування треба буде оновити і його структуру, 
-            // але поки що оновлюємо тільки якщо це timed режим.
             if (mode === 'timed') {
                 userProfileStore.update(s => s ? { ...s, bestTimeScore: score } : null);
             }
@@ -84,10 +72,8 @@ class LeaderboardService {
 
                 if (userDocSnap.exists()) {
                     const userData = userDocSnap.data() as UserDocument;
-                    // Безпечний доступ до вкладеного об'єкта stats
                     currentDbBest = userData.stats?.[leaderboardKey] || 0;
                 } else {
-                    // Ініціалізація користувача, якщо не існує
                     const newUser: Partial<UserDocument> = {
                         displayName: user.displayName || null,
                         isAnonymous: user.isAnonymous,
@@ -99,7 +85,6 @@ class LeaderboardService {
                     transaction.set(userRef, newUser);
                 }
 
-                // Запис в історію (scores collection)
                 const scoreData: ScoreDocument = {
                     uid: user.uid,
                     displayName: user.displayName || null,
@@ -112,9 +97,7 @@ class LeaderboardService {
                 };
                 transaction.set(scoreRef, scoreData);
 
-                // Оновлення рекорду в профілі (users collection)
                 if (score > currentDbBest) {
-                    // Використовуємо dot notation для оновлення конкретного поля в мапі
                     transaction.update(userRef, {
                         [`stats.${leaderboardKey}`]: score,
                         lastActive: Date.now()
@@ -126,7 +109,6 @@ class LeaderboardService {
             });
         } catch (e) {
             logService.error('[Leaderboard] Failed to submit score to cloud', e);
-            // Fallback (спроба записати хоча б через setDoc merge)
             try {
                 await setDoc(userRef, {
                     stats: { [leaderboardKey]: score },
@@ -144,21 +126,29 @@ class LeaderboardService {
     }
 
     /**
-     * Отримує топ гравців для конкретного режиму та розміру дошки.
+     * Отримує топ гравців.
+     * Якщо size === 'all', робить запити для всіх розмірів і об'єднує результати.
      */
     async getTopPlayers(
         mode: string,
-        size: number,
+        size: number | 'all',
         limitCount: number = 10
     ): Promise<LeaderboardEntry[]> {
-        const leaderboardKey = this.getLeaderboardKey(mode, size);
 
+        if (size === 'all') {
+            return this.getAggregatedTopPlayers(mode, limitCount);
+        }
+
+        const leaderboardKey = this.getLeaderboardKey(mode, size);
+        return this.fetchLeaderboard(leaderboardKey, limitCount, `${size}x${size}`);
+    }
+
+    private async fetchLeaderboard(key: string, limitCount: number, sizeLabel: string): Promise<LeaderboardEntry[]> {
         try {
-            // Ми шукаємо в колекції users, сортуючи по вкладеному полю stats.{key}
             const usersRef = collection(this.db, 'users');
             const q = query(
                 usersRef,
-                orderBy(`stats.${leaderboardKey}`, 'desc'),
+                orderBy(`stats.${key}`, 'desc'),
                 limit(limitCount)
             );
 
@@ -167,27 +157,48 @@ class LeaderboardService {
 
             querySnapshot.forEach((doc) => {
                 const data = doc.data() as UserDocument;
-                const score = data.stats?.[leaderboardKey];
+                const score = data.stats?.[key];
 
                 if (score && score > 0) {
                     leaders.push({
                         uid: doc.id,
                         displayName: data.displayName || 'Player',
                         score: score,
-                        timestamp: typeof data.lastActive === 'number' ? data.lastActive : 0
+                        timestamp: typeof data.lastActive === 'number' ? data.lastActive : 0,
+                        boardSize: sizeLabel
                     });
                 }
             });
 
             return leaders;
         } catch (e) {
-            logService.error(`[Leaderboard] Failed to fetch leaders for ${leaderboardKey}`, e);
+            logService.error(`[Leaderboard] Failed to fetch leaders for ${key}`, e);
             return [];
         }
     }
+
+    private async getAggregatedTopPlayers(mode: string, limitCount: number): Promise<LeaderboardEntry[]> {
+        // Розміри дошок, які ми підтримуємо
+        const sizes = [2, 3, 4, 5, 6, 7, 8, 9];
+
+        // Запускаємо запити паралельно
+        const promises = sizes.map(size =>
+            this.fetchLeaderboard(this.getLeaderboardKey(mode, size), limitCount, `${size}x${size}`)
+        );
+
+        const results = await Promise.all(promises);
+
+        // Об'єднуємо всі результати в один масив
+        const allLeaders = results.flat();
+
+        // Сортуємо за очками (DESC)
+        allLeaders.sort((a, b) => b.score - a.score);
+
+        // Беремо топ N
+        return allLeaders.slice(0, limitCount);
+    }
 }
 
-// Для зворотної сумісності зі старим кодом
 const LOCAL_BEST_SCORE_KEY_PREFIX = 'local_best_';
 
 export const leaderboardService = new LeaderboardService();
