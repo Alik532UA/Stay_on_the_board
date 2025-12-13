@@ -8,18 +8,16 @@
     import { onMount, onDestroy } from "svelte";
     import hotkeyService from "$lib/services/hotkeyService";
 
-    // Imports for Leaderboard & Auth
+    // Imports for Leaderboard
     import {
         leaderboardService,
         type LeaderboardEntry,
     } from "$lib/services/leaderboardService";
     import { userProfileStore, authService } from "$lib/services/authService";
-    import { modalStore } from "$lib/stores/modalStore";
-    import AuthModal from "$lib/components/modals/AuthModal.svelte";
     import EditableText from "$lib/components/ui/EditableText.svelte";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
-    import StyledButton from "$lib/components/ui/StyledButton.svelte";
 
+    // Mark unseen as seen when visiting page
     onMount(() => {
         rewardsStore.markAllAsSeen();
         hotkeyService.pushContext("rewards-page");
@@ -32,26 +30,20 @@
 
     $: unlockedMap = $rewardsStore.unlockedRewards;
 
+    // Leaderboard State
     let leaders: LeaderboardEntry[] = [];
     let isLoadingLeaders = true;
 
     async function loadLeaderboard() {
         isLoadingLeaders = true;
-        leaders = await leaderboardService.getTopPlayers(10);
+        // ВИПРАВЛЕНО: Передаємо режим 'timed' та розмір дошки 4
+        // У майбутньому тут можна додати селектор розміру дошки
+        leaders = await leaderboardService.getTopPlayers("timed", 4, 10);
         isLoadingLeaders = false;
     }
 
     function handleNameChange(e: CustomEvent<string>) {
         authService.updateNickname(e.detail);
-    }
-
-    function openAuthModal() {
-        modalStore.showModal({
-            title: "", // Заголовок всередині компонента
-            component: AuthModal,
-            dataTestId: "auth-modal",
-            buttons: [],
-        });
     }
 </script>
 
@@ -86,25 +78,11 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Кнопка збереження прогресу для анонімних користувачів -->
-            {#if $userProfileStore?.isAnonymous}
-                <div class="save-progress-container">
-                    <StyledButton
-                        variant="primary"
-                        on:click={openAuthModal}
-                        dataTestId="save-progress-btn"
-                    >
-                        <span slot="icon"><SvgIcons name="lock" /></span>
-                        Зберегти прогрес
-                    </StyledButton>
-                </div>
-            {/if}
         </div>
 
         <!-- Секція 2: Таблиця лідерів -->
         <div class="leaderboard-section">
-            <h2>Топ гравців (Гра на час)</h2>
+            <h2>Топ гравців (Гра на час 4x4)</h2>
             <div class="leaderboard-table-wrapper">
                 {#if isLoadingLeaders}
                     <div class="loading">Завантаження рейтингу...</div>
@@ -123,7 +101,6 @@
                         </thead>
                         <tbody>
                             {#each leaders as leader, i}
-                                <!-- FIX: Тепер uid існує в типі UserProfile -->
                                 <tr
                                     class:me={leader.uid ===
                                         $userProfileStore?.uid}
@@ -261,10 +238,6 @@
     }
     .pb-name .label {
         color: var(--text-secondary);
-    }
-
-    .save-progress-container {
-        margin-top: 16px;
     }
 
     /* Leaderboard Table */
