@@ -1,6 +1,9 @@
 <script lang="ts">
   import { appSettingsStore } from "$lib/stores/appSettingsStore";
-  import { gameSettingsStore, type GameSettingsState } from "$lib/stores/gameSettingsStore";
+  import {
+    gameSettingsStore,
+    type GameSettingsState,
+  } from "$lib/stores/gameSettingsStore";
   import { userActionService } from "$lib/services/userActionService";
   import { logService } from "$lib/services/logService";
   import { clearCache } from "$lib/utils/cacheManager";
@@ -14,7 +17,7 @@
   $: settings = $appSettingsStore;
   $: gameSettings = $gameSettingsStore;
 
-  const modes: GameModePreset[] = ['beginner', 'experienced', 'pro'];
+  const modes: GameModePreset[] = ["beginner", "experienced", "pro"];
 
   function selectLang(lang: string) {
     logService.ui(`Зміна мови: ${lang}`);
@@ -66,11 +69,19 @@
       </div>
       <hr class="settings-divider" />
       <div class="theme-selector">
-        {#each ['purple', 'green', 'blue', 'gray', 'orange', 'wood'] as style}
+        {#each ["purple", "green", "blue", "gray", "orange", "wood"] as style}
           <div class="theme-style-row" data-style={style}>
-            <button class="theme-btn" data-theme="light" on:click={() => selectTheme(style, "light")}>☀️</button>
+            <button
+              class="theme-btn"
+              data-theme="light"
+              on:click={() => selectTheme(style, "light")}>☀️</button
+            >
             <span class="theme-name">{$_(`mainMenu.themeName.${style}`)}</span>
-            <button class="theme-btn" data-theme="dark" on:click={() => selectTheme(style, "dark")}>🌙</button>
+            <button
+              class="theme-btn"
+              data-theme="dark"
+              on:click={() => selectTheme(style, "dark")}>🌙</button
+            >
           </div>
         {/each}
       </div>
@@ -91,7 +102,8 @@
                 showGameModeModal: true,
                 rememberGameMode: false,
               });
-              if (typeof window !== "undefined") sessionStorage.removeItem("gameMode");
+              if (typeof window !== "undefined")
+                sessionStorage.removeItem("gameMode");
             }}
           >
             {$_("gameModes.choose")}
@@ -99,7 +111,10 @@
           <div class="game-mode-buttons">
             {#each modes as mode}
               <StyledButton
-                variant={gameSettings.rememberGameMode && gameSettings.gameMode === mode ? "primary" : "menu"}
+                variant={gameSettings.rememberGameMode &&
+                gameSettings.gameMode === mode
+                  ? "primary"
+                  : "menu"}
                 on:click={() => userActionService.setGameModePreset(mode)}
               >
                 {$_(`gameModes.${mode}`)}
@@ -118,7 +133,11 @@
       </div>
       <hr class="settings-divider" />
       <div class="settings-actions">
-        <StyledButton variant="menu" on:click={resetSettings} tooltip={$_("settings.resetHint")}>
+        <StyledButton
+          variant="menu"
+          on:click={resetSettings}
+          tooltip={$_("settings.resetHint")}
+        >
           <span>{$_("settings.reset")}</span>
         </StyledButton>
         <StyledButton variant="menu" on:click={handleKeepAppearance}>
@@ -219,7 +238,7 @@
 
   .language-button {
     background: transparent !important;
-    border: 2px solid transparent !important;
+    border: var(--global-border-width) solid transparent !important;
     border-radius: 8px;
     padding: 8px;
     cursor: pointer;

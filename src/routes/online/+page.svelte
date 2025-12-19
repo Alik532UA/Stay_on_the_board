@@ -130,7 +130,7 @@
 
   .name-editor-wrapper {
     background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     border-radius: 12px;
     padding: 8px 16px;
     /* FIX: Зменшено min-width для підтримки вузьких екранів */

@@ -1,17 +1,25 @@
 <script lang="ts">
-  import { userActionService } from '$lib/services/userActionService';
-  import { _ } from 'svelte-i18n';
-  import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
-  import SvgIcons from '../SvgIcons.svelte';
-  import { get } from 'svelte/store';
-  import { isPlayerTurn, isConfirmButtonDisabled, lastComputerMove, lastPlayerMove, isPauseBetweenMoves, distanceRows, previousPlayerColor } from '$lib/stores/derivedState.ts';
-  import { modalStore } from '$lib/stores/modalStore';
-  import DirectionControls from './DirectionControls.svelte';
-  import { getCenterInfoState } from '$lib/utils/centerInfoUtil';
-  import { logService } from '$lib/services/logService.js';
-  import { uiStateStore } from '$lib/stores/uiStateStore';
-  import { voiceControlStore } from '$lib/stores/voiceControlStore';
-  import { debugLogStore } from '$lib/stores/debugLogStore';
+  import { userActionService } from "$lib/services/userActionService";
+  import { _ } from "svelte-i18n";
+  import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
+  import SvgIcons from "../SvgIcons.svelte";
+  import { get } from "svelte/store";
+  import {
+    isPlayerTurn,
+    isConfirmButtonDisabled,
+    lastComputerMove,
+    lastPlayerMove,
+    isPauseBetweenMoves,
+    distanceRows,
+    previousPlayerColor,
+  } from "$lib/stores/derivedState.ts";
+  import { modalStore } from "$lib/stores/modalStore";
+  import DirectionControls from "./DirectionControls.svelte";
+  import { getCenterInfoState } from "$lib/utils/centerInfoUtil";
+  import { logService } from "$lib/services/logService.js";
+  import { uiStateStore } from "$lib/stores/uiStateStore";
+  import { voiceControlStore } from "$lib/stores/voiceControlStore";
+  import { debugLogStore } from "$lib/stores/debugLogStore";
 
   let showDebug = false;
   let clickCount = 0;
@@ -21,10 +29,10 @@
   $: selectedDistance = $uiStateStore?.selectedDistance;
   $: isMoveInProgress = $uiStateStore?.isComputerMoveInProgress;
 
-  $: logService.ui('[ControlsPanelWidget] Reactive change detected', { 
-    selectedDirection, 
-    selectedDistance, 
-    isConfirmButtonDisabled: $isConfirmButtonDisabled 
+  $: logService.ui("[ControlsPanelWidget] Reactive change detected", {
+    selectedDirection,
+    selectedDistance,
+    isConfirmButtonDisabled: $isConfirmButtonDisabled,
   });
 
   $: centerInfoProps = getCenterInfoState({
@@ -34,7 +42,7 @@
     lastPlayerMove: $lastPlayerMove,
     isPlayerTurn: $isPlayerTurn,
     isPauseBetweenMoves: $isPauseBetweenMoves,
-    previousPlayerColor: $previousPlayerColor
+    previousPlayerColor: $previousPlayerColor,
   });
 
   function handleDirection(e: CustomEvent<any>) {
@@ -45,26 +53,26 @@
     logService.action(`Click: "Відстань: ${e.detail}" (ControlsPanelWidget)`);
     userActionService.selectDistance(e.detail);
   }
-  function handleCentral() { 
+  function handleCentral() {
     logService.action('Click: "Центральна кнопка" (ControlsPanelWidget)');
-    if (centerInfoProps.clickable) onConfirmClick(); 
+    if (centerInfoProps.clickable) onConfirmClick();
   }
-  function handleConfirm() { 
+  function handleConfirm() {
     logService.action('Click: "Підтвердити хід" (ControlsPanelWidget)');
-    onConfirmClick(); 
+    onConfirmClick();
   }
-  function handleNoMoves() { 
+  function handleNoMoves() {
     logService.action('Click: "Ходів немає" (ControlsPanelWidget)');
     userActionService.claimNoMoves();
   }
-  
+
   function onConfirmClick() {
     if ($isConfirmButtonDisabled) {
       modalStore.showModal({
-        titleKey: 'modal.confirmMoveHintTitle',
-        contentKey: 'modal.confirmMoveHintContent',
-        buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
-        dataTestId: 'confirm-move-hint-modal'
+        titleKey: "modal.confirmMoveHintTitle",
+        contentKey: "modal.confirmMoveHintContent",
+        buttons: [{ textKey: "modal.ok", primary: true, isHot: true }],
+        dataTestId: "confirm-move-hint-modal",
       });
       return;
     }
@@ -87,9 +95,12 @@
   }
 
   function copyLogs() {
-    const voiceTranscript = document.getElementById('voice-transcript')?.innerText || '';
-    const recognitionError = document.getElementById('recognition-error')?.innerText || '';
-    const generalLogs = document.getElementById('general-logs')?.innerText || '';
+    const voiceTranscript =
+      document.getElementById("voice-transcript")?.innerText || "";
+    const recognitionError =
+      document.getElementById("recognition-error")?.innerText || "";
+    const generalLogs =
+      document.getElementById("general-logs")?.innerText || "";
 
     const fullLog = `---
 Voice Transcript ---
@@ -102,7 +113,7 @@ ${recognitionError}
 ${generalLogs}`;
 
     navigator.clipboard.writeText(fullLog);
-    logService.ui('[ControlsPanelWidget] Copied full debug log to clipboard.');
+    logService.ui("[ControlsPanelWidget] Copied full debug log to clipboard.");
   }
 
   function clearLogs() {
@@ -110,6 +121,70 @@ ${generalLogs}`;
   }
 </script>
 
+{#if $uiStateStore}
+  <div class="game-controls-panel" data-testid="controls-panel">
+    <div
+      class="select-direction-label"
+      on:click={handleLabelClick}
+      on:keydown={handleLabelClick}
+      role="button"
+      tabindex="0"
+    >
+      {$_("gameControls.selectDirectionAndDistance")}
+    </div>
+    <DirectionControls
+      availableDirections={[
+        "up-left",
+        "up",
+        "up-right",
+        "left",
+        null,
+        "right",
+        "down-left",
+        "down",
+        "down-right",
+      ]}
+      distanceRows={$distanceRows}
+      isPlayerTurn={$isPlayerTurn}
+      blockModeEnabled={$gameSettingsStore.blockModeEnabled}
+      isConfirmDisabled={$isConfirmButtonDisabled}
+      {centerInfoProps}
+      {isMoveInProgress}
+      {selectedDirection}
+      {selectedDistance}
+      on:direction={handleDirection}
+      on:distance={handleDistance}
+      on:central={handleCentral}
+      on:confirm={handleConfirm}
+      on:noMoves={handleNoMoves}
+    />
+    {#if showDebug}
+      <div class="debug-panel" data-testid="voice-debug-panel">
+        <div class="debug-controls">
+          <button class="debug-btn" on:click={copyLogs}>Copy</button>
+          <button class="debug-btn" on:click={clearLogs}>Clear</button>
+        </div>
+        <p>Recognized Text:</p>
+        <pre id="voice-transcript">{$voiceControlStore.lastTranscript ||
+            "No speech detected yet."}</pre>
+        {#if $voiceControlStore.recognitionError}
+          <p>Recognition Error Details:</p>
+          <pre id="recognition-error">{JSON.stringify(
+              $voiceControlStore.recognitionError,
+              null,
+              2,
+            )}</pre>
+        {/if}
+        <p>--- General Logs ---</p>
+        <div id="general-logs" class="logs-container">
+          {#each $debugLogStore as log, i (i)}
+            <div class="log-entry">{log}</div>
+          {/each}
+        </div>
+      </div>
+    {/if}
+  </div>
+{/if}
 
 <style>
   .game-controls-panel {
@@ -146,7 +221,7 @@ ${generalLogs}`;
     border-radius: 8px; /* Softer corners */
     font-family: monospace;
     position: relative;
-    border: 1px solid #444;
+    border: var(--global-border-width) solid #444;
     max-height: 400px; /* Limit height */
     overflow-y: auto; /* Allow scrolling */
     font-size: 0.85em;
@@ -190,51 +265,3 @@ ${generalLogs}`;
     border-bottom: none;
   }
 </style>
-
-{#if $uiStateStore}
-<div class="game-controls-panel" data-testid="controls-panel">
-  <div class="select-direction-label" on:click={handleLabelClick} on:keydown={handleLabelClick} role="button" tabindex="0">{$_('gameControls.selectDirectionAndDistance')}</div>
-  <DirectionControls
-    availableDirections={[
-      'up-left', 'up', 'up-right',
-      'left', null, 'right',
-      'down-left', 'down', 'down-right'
-    ]}
-    distanceRows={$distanceRows}
-    isPlayerTurn={$isPlayerTurn}
-    blockModeEnabled={$gameSettingsStore.blockModeEnabled}
-    isConfirmDisabled={$isConfirmButtonDisabled}
-    centerInfoProps={centerInfoProps}
-    isMoveInProgress={isMoveInProgress}
-    selectedDirection={selectedDirection}
-    selectedDistance={selectedDistance}
-    on:direction={handleDirection}
-    on:distance={handleDistance}
-    on:central={handleCentral}
-    on:confirm={handleConfirm}
-    on:noMoves={handleNoMoves}
-  />
-  {#if showDebug}
-    <div class="debug-panel" data-testid="voice-debug-panel">
-      <div class="debug-controls">
-        <button class="debug-btn" on:click={copyLogs}>Copy</button>
-        <button class="debug-btn" on:click={clearLogs}>Clear</button>
-      </div>
-      <p>Recognized Text:</p>
-      <pre id="voice-transcript">{$voiceControlStore.lastTranscript || 'No speech detected yet.'}</pre>
-      {#if $voiceControlStore.recognitionError}
-        <p>Recognition Error Details:</p>
-        <pre id="recognition-error">{JSON.stringify($voiceControlStore.recognitionError, null, 2)}</pre>
-      {/if}
-      <p>--- General Logs ---</p>
-      <div id="general-logs" class="logs-container">
-        {#each $debugLogStore as log, i (i)}
-          <div class="log-entry">{log}</div>
-        {/each}
-      </div>
-    </div>
-  {/if}
-</div>
-{/if}
-
-

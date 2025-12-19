@@ -198,7 +198,7 @@
     }
 
     .delete-zone {
-        border: 1px solid var(--error-color);
+        border: var(--global-border-width) solid var(--error-color);
         background: rgba(244, 67, 54, 0.1);
         padding: 16px;
         border-radius: 12px;

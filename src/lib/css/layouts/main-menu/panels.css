@@ -51,7 +51,7 @@
     background: var(--bg-secondary);
     border-radius: var(--unified-radius);
     box-shadow: var(--unified-shadow);
-    border: 1px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     padding: 20px;
 }
 

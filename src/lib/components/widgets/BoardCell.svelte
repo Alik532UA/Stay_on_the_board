@@ -67,7 +67,7 @@
     top: 50%;
     left: 50%;
     z-index: 2;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: var(--global-border-width) solid rgba(0, 0, 0, 0.2);
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.5);
     transition:

@@ -251,7 +251,7 @@
     .modal-input,
     .modal-textarea {
         background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--border-color);
+        border: var(--global-border-width) solid var(--border-color);
         border-radius: 8px;
         padding: 10px;
         color: var(--text-primary);

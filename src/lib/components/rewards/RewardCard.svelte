@@ -110,7 +110,7 @@
         padding: 16px;
         border-radius: 12px;
         background: var(--bg-secondary);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: var(--global-border-width) solid rgba(255, 255, 255, 0.1);
         position: relative;
         overflow: hidden;
         transition:
@@ -128,7 +128,7 @@
             var(--bg-secondary),
             rgba(255, 255, 255, 0.05)
         );
-        border: 1px solid var(--accent-color);
+        border: var(--global-border-width) solid var(--accent-color);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
@@ -180,7 +180,7 @@
         top: 8px;
         right: 8px;
         background: rgba(255, 255, 255, 0.1);
-        border: 1px solid var(--text-accent);
+        border: var(--global-border-width) solid var(--text-accent);
         color: var(--text-accent);
         font-size: 0.75em;
         font-weight: bold;

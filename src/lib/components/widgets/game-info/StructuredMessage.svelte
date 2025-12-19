@@ -37,7 +37,7 @@
         color: #ffffff;
         font-weight: bold;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: var(--global-border-width) solid rgba(255, 255, 255, 0.3);
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         transition: all 0.3s ease;
     }

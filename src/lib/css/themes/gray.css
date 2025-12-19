@@ -6,12 +6,12 @@
     --text-secondary: #43464e;
     --text-accent: #b0b0b0;
     --border-color: #b0b0b0;
-    --shadow-color: rgba(176,176,176,0.10);
+    --shadow-color: rgba(176, 176, 176, 0.10);
     --cell-light: #bfc4ce;
     --cell-dark: #7a7e87;
     --cell-blocked: #b0b0b0;
     --piece-color: #43464e;
-    --piece-shadow: rgba(67,70,78,0.3);
+    --piece-shadow: rgba(67, 70, 78, 0.3);
     --control-bg: #e0e1e6;
     --control-hover: #b0b0b0;
     --control-selected: #43464e;
@@ -28,7 +28,8 @@
     --warning-action-text: #23272f;
     --info-action-bg: #526d82;
     --info-action-text: #ffffff;
-    --disabled-bg: #e0e1e6; --disabled-text: #7a7e87;
+    --disabled-bg: #e0e1e6;
+    --disabled-text: #7a7e87;
 }
 
 /* Сірий стиль - Темна тема */
@@ -39,12 +40,12 @@
     --text-secondary: #b0b0b0;
     --text-accent: #e0e0e0;
     --border-color: #b0b0b0;
-    --shadow-color: rgba(67,70,78,0.18);
+    --shadow-color: rgba(67, 70, 78, 0.18);
     --cell-light: #7a7e87;
     --cell-dark: #43464e;
     --cell-blocked: #b0b0b0;
     --piece-color: #b0b0b0;
-    --piece-shadow: rgba(176,176,176,0.3);
+    --piece-shadow: rgba(176, 176, 176, 0.3);
     --control-bg: #43464e;
     --control-hover: #b0b0b0;
     --control-selected: #e0e0e0;
@@ -61,21 +62,21 @@
     --warning-action-text: #23272f;
     --info-action-bg: #9db2bf;
     --info-action-text: #23272f;
-    --disabled-bg: #43464e; --disabled-text: #b0b0b0;
+    --disabled-bg: #43464e;
+    --disabled-text: #b0b0b0;
     --toggle-off-bg: #23272f;
 }
 
 /* Gray ефекти */
 [data-style="gray"] .modal-window .modal-content,
 [data-style="gray"] .control-btn,
-[data-style="gray"] .dir-btn,
-[data-style="gray"] .dist-btn,
+
 [data-style="gray"] .board-size-dropdown-btn,
 [data-style="gray"] .board-size-dropdown-option {
     background: var(--bg-secondary);
     backdrop-filter: blur(16px) saturate(1.1);
     -webkit-backdrop-filter: blur(16px) saturate(1.1);
-    border: 1.5px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     box-shadow: 0 4px 24px var(--shadow-color);
     transition: background 0.25s, box-shadow 0.25s, border 0.18s;
 }
@@ -83,10 +84,11 @@
 [data-style="gray"] .control-btn,
 [data-style="gray"] .dir-btn,
 [data-style="gray"] .dist-btn {
-    border: 1.5px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     border-radius: 14px;
     transition: background 0.18s, box-shadow 0.18s, transform 0.15s;
 }
+
 [data-style="gray"] .dir-btn:hover,
 [data-style="gray"] .dist-btn:hover,
 [data-style="gray"] .control-btn:hover {
@@ -94,15 +96,17 @@
     box-shadow: 0 0 12px var(--control-selected);
     transform: scale(1.04);
 }
+
 [data-style="gray"] .dir-btn.active,
 [data-style="gray"] .dist-btn.active,
 [data-style="gray"] .control-btn.selected {
-   color: var(--control-selected-text);
+    color: var(--control-selected-text);
     background: var(--control-selected);
-    color: #fff;
+    /* color: #fff; - Removed redundancy */
     border-color: var(--control-selected);
     box-shadow: 0 0 16px var(--control-selected);
 }
+
 [data-style="gray"] .confirm-btn,
 [data-style="gray"] .no-moves-btn {
     border: none;
@@ -111,9 +115,11 @@
     border-radius: 14px;
     transition: background 0.18s, box-shadow 0.18s, transform 0.15s;
 }
+
 [data-style="gray"] .confirm-btn {
     background: var(--confirm-btn-bg);
 }
+
 [data-style="gray"] .no-moves-btn {
     background: var(--no-moves-btn-bg);
     color: #232323;

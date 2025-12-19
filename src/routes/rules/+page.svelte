@@ -187,7 +187,7 @@
     background: transparent;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border: var(--global-border-width) solid rgba(255, 255, 255, 0.05) !important;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
     border-radius: 24px;
     overflow: hidden;
@@ -231,7 +231,7 @@
   :global(.accordion-content .content-wrapper) {
     padding: 20px 24px;
     background: rgba(0, 0, 0, 0.1); /* 10% opaque black background */
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: var(--global-border-width) solid rgba(255, 255, 255, 0.1);
   }
   /* --- End of Modal-like styling --- */
 
@@ -248,7 +248,7 @@
   .rules-card:not(:first-child) {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: var(--global-border-width) solid rgba(255, 255, 255, 0.1);
   }
 
   .rules-cards-row {
@@ -300,7 +300,8 @@
     background: var(--control-bg, #f0e8f2);
     color: var(--text-primary, #442c2e);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
-    border: 1px solid var(--border-color, rgba(233, 84, 32, 0.3));
+    border: var(--global-border-width) solid
+      var(--border-color, rgba(233, 84, 32, 0.3));
   }
   .dir-btn-visual.center-piece {
     font-size: 1.6em;
@@ -318,7 +319,7 @@
     text-decoration: none;
     color: var(--text-primary);
     background-color: var(--control-bg);
-    border: 1px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     border-radius: 4px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
   }

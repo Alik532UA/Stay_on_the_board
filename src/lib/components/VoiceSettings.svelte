@@ -7,7 +7,7 @@
   import { logService } from "$lib/services/logService.js";
 
   // Визначаємо, чи ми в онлайн режимі
-  $: isOnlineMode = $uiStateStore.intendedGameType === 'online';
+  $: isOnlineMode = $uiStateStore.intendedGameType === "online";
 </script>
 
 <div class="settings-section">
@@ -132,63 +132,65 @@
   <span class="settings-label">{$_("voiceSettings.speakFor")}</span>
   <div class="button-group">
     {#if isOnlineMode}
-        <!-- Кнопки для Онлайн режиму -->
-        <button
+      <!-- Кнопки для Онлайн режиму -->
+      <button
         class:active={$gameSettingsStore.speechFor.onlineMyMove}
         on:click={() => {
-            logService.ui("Speak for MY move toggled");
-            gameSettingsStore.updateSettings({
+          logService.ui("Speak for MY move toggled");
+          gameSettingsStore.updateSettings({
             speechFor: {
-                ...$gameSettingsStore.speechFor,
-                onlineMyMove: !$gameSettingsStore.speechFor.onlineMyMove,
+              ...$gameSettingsStore.speechFor,
+              onlineMyMove: !$gameSettingsStore.speechFor.onlineMyMove,
             },
-            });
+          });
         }}
-        data-testid="speech-for-my-move-btn">{$_("voiceSettings.myMove")}</button
-        >
-        <button
+        data-testid="speech-for-my-move-btn"
+        >{$_("voiceSettings.myMove")}</button
+      >
+      <button
         class:active={$gameSettingsStore.speechFor.onlineOpponentMove}
         on:click={() => {
-            logService.ui("Speak for OPPONENT move toggled");
-            gameSettingsStore.updateSettings({
+          logService.ui("Speak for OPPONENT move toggled");
+          gameSettingsStore.updateSettings({
             speechFor: {
-                ...$gameSettingsStore.speechFor,
-                onlineOpponentMove: !$gameSettingsStore.speechFor.onlineOpponentMove,
+              ...$gameSettingsStore.speechFor,
+              onlineOpponentMove:
+                !$gameSettingsStore.speechFor.onlineOpponentMove,
             },
-            });
+          });
         }}
         data-testid="speech-for-opponent-move-btn"
         >{$_("voiceSettings.opponentMove")}</button
-        >
+      >
     {:else}
-        <!-- Кнопки для Локального/Тренувального режиму -->
-        <button
+      <!-- Кнопки для Локального/Тренувального режиму -->
+      <button
         class:active={$gameSettingsStore.speechFor.player}
         on:click={() => {
-            logService.ui("Speak for player toggled");
-            gameSettingsStore.updateSettings({
+          logService.ui("Speak for player toggled");
+          gameSettingsStore.updateSettings({
             speechFor: {
-                ...$gameSettingsStore.speechFor,
-                player: !$gameSettingsStore.speechFor.player,
+              ...$gameSettingsStore.speechFor,
+              player: !$gameSettingsStore.speechFor.player,
             },
-            });
+          });
         }}
         data-testid="speech-for-player-btn">{$_("voiceSettings.player")}</button
-        >
-        <button
+      >
+      <button
         class:active={$gameSettingsStore.speechFor.computer}
         on:click={() => {
-            logService.ui("Speak for computer toggled");
-            gameSettingsStore.updateSettings({
+          logService.ui("Speak for computer toggled");
+          gameSettingsStore.updateSettings({
             speechFor: {
-                ...$gameSettingsStore.speechFor,
-                computer: !$gameSettingsStore.speechFor.computer,
+              ...$gameSettingsStore.speechFor,
+              computer: !$gameSettingsStore.speechFor.computer,
             },
-            });
+          });
         }}
         data-testid="speech-for-computer-btn"
         >{$_("voiceSettings.computer")}</button
-        >
+      >
     {/if}
   </div>
 </div>
@@ -213,7 +215,7 @@
 
   .button-group button {
     background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: var(--global-border-width) solid rgba(255, 255, 255, 0.2);
     color: white;
     padding: 8px 16px;
     border-radius: 8px;
@@ -231,7 +233,7 @@
 
   .test-voice-button {
     background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: var(--global-border-width) solid rgba(255, 255, 255, 0.2);
     color: white;
     padding: 8px 16px;
     border-radius: 8px;

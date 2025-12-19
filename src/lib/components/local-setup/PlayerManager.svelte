@@ -168,7 +168,7 @@
     height: 40px;
     padding: 0;
     border-radius: 8px;
-    border: 1.5px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     background: var(--bg-primary);
     color: var(--text-primary);
     font-size: 1.5em;
@@ -184,7 +184,7 @@
     flex-grow: 1;
     padding: 10px 14px;
     border-radius: 8px;
-    border: 1.5px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     background: var(--bg-primary);
     color: var(--text-primary);
     font-size: 1em;

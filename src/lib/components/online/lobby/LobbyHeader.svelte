@@ -93,7 +93,7 @@
     }
     .copy-btn {
         background: none;
-        border: 1px solid var(--border-color);
+        border: var(--global-border-width) solid var(--border-color);
         border-radius: 4px;
         cursor: pointer;
         color: var(--text-accent);

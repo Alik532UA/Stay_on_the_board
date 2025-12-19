@@ -2,20 +2,20 @@
   import { onMount } from "svelte";
   import { _ } from "svelte-i18n";
   import { page } from "$app/stores";
-  
+
   // Імпорт вкладок
   import GeneralTab from "./settings/tabs/GeneralTab.svelte";
   import VoiceTab from "./settings/tabs/VoiceTab.svelte";
   import HotkeysTab from "./settings/HotkeysTab.svelte";
 
   // Tabs configuration
-  type Tab = 'general' | 'voice' | 'hotkeys';
-  let activeTab: Tab = 'general';
+  type Tab = "general" | "voice" | "hotkeys";
+  let activeTab: Tab = "general";
 
   onMount(() => {
     // Check URL params for tab selection
-    const tabParam = $page.url.searchParams.get('tab');
-    if (tabParam && ['general', 'voice', 'hotkeys'].includes(tabParam)) {
+    const tabParam = $page.url.searchParams.get("tab");
+    if (tabParam && ["general", "voice", "hotkeys"].includes(tabParam)) {
       activeTab = tabParam as Tab;
     }
   });
@@ -24,47 +24,47 @@
     activeTab = tab;
     // Update URL without reload
     const url = new URL(window.location.href);
-    url.searchParams.set('tab', tab);
-    window.history.replaceState({}, '', url);
+    url.searchParams.set("tab", tab);
+    window.history.replaceState({}, "", url);
   }
 </script>
 
 <div class="settings-container">
   <!-- Tabs Header -->
   <div class="tabs-header">
-    <button 
-      class="tab-btn" 
-      class:active={activeTab === 'general'} 
-      on:click={() => setTab('general')}
+    <button
+      class="tab-btn"
+      class:active={activeTab === "general"}
+      on:click={() => setTab("general")}
       data-testid="settings-tab-general"
     >
-      {$_('settings.tabs.general')}
+      {$_("settings.tabs.general")}
     </button>
-    <button 
-      class="tab-btn" 
-      class:active={activeTab === 'voice'} 
-      on:click={() => setTab('voice')}
+    <button
+      class="tab-btn"
+      class:active={activeTab === "voice"}
+      on:click={() => setTab("voice")}
       data-testid="settings-tab-voice"
     >
-      {$_('settings.tabs.voice')}
+      {$_("settings.tabs.voice")}
     </button>
-    <button 
-      class="tab-btn" 
-      class:active={activeTab === 'hotkeys'} 
-      on:click={() => setTab('hotkeys')}
+    <button
+      class="tab-btn"
+      class:active={activeTab === "hotkeys"}
+      on:click={() => setTab("hotkeys")}
       data-testid="settings-tab-hotkeys"
     >
-      {$_('settings.tabs.hotkeys')}
+      {$_("settings.tabs.hotkeys")}
     </button>
   </div>
 
   <!-- Tab Content -->
   <div class="tab-content">
-    {#if activeTab === 'general'}
+    {#if activeTab === "general"}
       <GeneralTab />
-    {:else if activeTab === 'voice'}
+    {:else if activeTab === "voice"}
       <VoiceTab />
-    {:else if activeTab === 'hotkeys'}
+    {:else if activeTab === "hotkeys"}
       <HotkeysTab />
     {/if}
   </div>
@@ -92,7 +92,7 @@
   .tab-btn {
     background: var(--bg-secondary);
     color: var(--text-secondary);
-    border: 2px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     padding: 10px 24px;
     border-radius: 24px;
     font-weight: bold;

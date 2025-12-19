@@ -16,7 +16,8 @@
 {:else}
   <!-- Фолбек для розробки, щоб бачити, якщо іконка не знайдена -->
   {#if import.meta.env.DEV}
-    <span style="color: red; font-size: 10px; border: 1px solid red;"
+    <span
+      style="color: red; font-size: 10px; border: var(--global-border-width) solid red;"
       >Icon '{name}'?</span
     >
   {/if}

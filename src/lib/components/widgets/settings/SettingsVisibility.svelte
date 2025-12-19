@@ -1,6 +1,7 @@
 <script lang="ts">
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
     import { _ } from "svelte-i18n";
+    import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
     // FIX: Видалено імпорт fitTextAction
     import { get } from "svelte/store";
 
@@ -64,19 +65,17 @@
 </script>
 
 <!-- FIX: Видалено use:fitTextAction -->
-<div
-    class="settings-expander__button-group"
-    class:locked-setting={isCompetitiveMode}
->
-    {#each [$_("settings.visibility.hidden"), $_("settings.visibility.boardOnly"), $_("settings.visibility.withPiece"), $_("settings.visibility.withMoves")] as label, i}
-        <button
-            data-testid="settings-expander-visibility-btn-{i}"
-            class="settings-expander__row-btn"
-            class:active={getIsActive(i, $gameSettingsStore)}
-            on:click={toggleFunctions[i]}
-            disabled={isCompetitiveMode}
-        >
-            {label}
-        </button>
-    {/each}
-</div>
+<ButtonGroup
+    options={[
+        $_("settings.visibility.hidden"),
+        $_("settings.visibility.boardOnly"),
+        $_("settings.visibility.withPiece"),
+        $_("settings.visibility.withMoves"),
+    ].map((label, i) => ({
+        label,
+        active: getIsActive(i, $gameSettingsStore),
+        dataTestId: `settings-expander-visibility-btn-${i}`,
+        onClick: toggleFunctions[i],
+    }))}
+    className={isCompetitiveMode ? "locked-setting" : ""}
+/>
