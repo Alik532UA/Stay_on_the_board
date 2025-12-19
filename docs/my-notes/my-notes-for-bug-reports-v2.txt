@@ -3009,18 +3009,6 @@ data-testid="game-over-modal-header"
 Очікуваний результат: інші елементи плавно займають нову позицію
 (подивись приклад як зроблена анімація data-testid="widget-board-bg-wrapper", там при появі та зникнені всі інші елемент плавно і красиво адаптуються)
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
-🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
-🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
-🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
-🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
-🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
-🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 Наступні елементи чи сторінки не поміщаються в телефоному режимі по ширині і виглядають як відрізані, хоча могли б поміститися без проблем (тобто думаю що мінімальна ширина завелика, її можна зробити меншу і об'єкти будуть теж поміщатися, без завого бокового скролу)
 список:
 елемент: data-testid="game-mode-modal"
@@ -3036,6 +3024,47 @@ data-testid="game-over-modal-header"
 мені подобається ідея з 95vw
 думаю варто знайти цю зміну мінімальну ширину і винести її в окрему змінну, щоб зручно було міняти, щоб коли ми знову захочемо змінити це значення, нам не доводилось шукати в різних місцях це
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+class="settings-expander__button-group locked-setting" - зроблено правильно
+class="settings-expander__button-group settings-expander__button-group--three" - зроблено правильно
+
+class="settings-expander__game-mode-row s-xEklKjomWeHV" - не дуже правильно
+проблеми: 
+завжди в два ряди
+кнопки не красиві, без скруглень, тощо
+
+треба зробити як в 
+
+class="settings-expander__button-group locked-setting"
+class="settings-expander__button-group settings-expander__button-group--three"
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+попередня проблема вирішена!
+
+далі робимо це
+
+в class="settings-expander__options-group"
+є два елементи 
+1. class="settings-expander__label"
+2. class="settings-expander__button-group"
+
+вони в різних рядах, хоча можуть поміститися в один ряд, треба зробити в один ряд, а якщо не поміщається, то вже спрацьовує логіка в два ряди
+
+так само з 
+class="settings-expander__setting-item"
+тут два елемента:
+1. class="settings-expander__toggle-btn s-D-5lNYez-F-W active"
+2. data-testid="settings-expander-voice-settings-btn"
+вони в різних рядах, хоча можуть поміститися в один ряд, треба зробити в один ряд, а якщо не поміщається, то вже спрацьовує логіка в два ряди
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+class="settings-expander__button-group settings-expander__button-group--three"
+Актуальний результат: замаленький розмір шрифта
+Очікуваний результат: розмір шрифта за замовчуванням (як наприклад class="settings-expander__toggle-btn s-D-5lNYez-F-W")
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
@@ -3044,3 +3073,4 @@ data-testid="game-over-modal-header"
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+

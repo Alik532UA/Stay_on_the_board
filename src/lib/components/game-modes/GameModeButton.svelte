@@ -36,6 +36,11 @@
         font-weight: 600;
         backdrop-filter: blur(4px);
         width: 100%;
+        /* FIX: Додано box-sizing, щоб padding не збільшував ширину */
+        box-sizing: border-box;
+        /* FIX: Запобігання виходу за межі */
+        max-width: 100%;
+        min-height: 60px; /* Гарантуємо висоту для кліку */
     }
 
     .menu-item:hover {
@@ -50,5 +55,26 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0; /* Іконка не стискається */
+    }
+
+    .menu-text {
+        /* FIX: Дозволяємо перенос тексту на вузьких екранах */
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.3;
+    }
+
+    /* Адаптивність для дуже вузьких екранів */
+    @media (max-width: 360px) {
+        .menu-item {
+            padding: 12px 16px; /* Зменшуємо відступи */
+            gap: 12px;
+            font-size: 1.1rem;
+        }
+        .menu-icon {
+            width: 24px;
+            font-size: 1.3rem;
+        }
     }
 </style>

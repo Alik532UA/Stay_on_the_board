@@ -8,7 +8,7 @@
   import { _ } from "svelte-i18n";
   import { onMount } from "svelte";
   import { logService } from "$lib/services/logService";
-  import { generateRandomPlayerName } from "$lib/utils/nameGenerator"; // ВИПРАВЛЕНО
+  import { generateRandomPlayerName } from "$lib/utils/nameGenerator";
 
   let playerName = "";
 
@@ -17,8 +17,7 @@
     if (storedName) {
       playerName = storedName;
     } else {
-      // Використовуємо генератор імен гравців
-      playerName = generateRandomPlayerName(); // ВИПРАВЛЕНО
+      playerName = generateRandomPlayerName();
       localStorage.setItem("online_playerName", playerName);
     }
   });
@@ -86,6 +85,8 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    /* FIX: Додано box-sizing для запобігання горизонтальному скролу */
+    box-sizing: border-box;
   }
 
   .header-container {
@@ -108,6 +109,8 @@
     flex-direction: column;
     gap: 24px;
     flex: 1;
+    width: 100%; /* Гарантуємо, що контент не вилазить */
+    box-sizing: border-box;
   }
 
   .player-setup {
@@ -116,6 +119,7 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 10px;
+    width: 100%;
   }
 
   .label {
@@ -129,13 +133,17 @@
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 8px 16px;
-    min-width: 200px;
+    /* FIX: Зменшено min-width для підтримки вузьких екранів */
+    min-width: var(--responsive-min-width, 200px);
+    max-width: 100%;
     display: flex;
     justify-content: center;
+    box-sizing: border-box;
   }
 
   .actions-bar {
     display: flex;
     justify-content: center;
+    width: 100%;
   }
 </style>

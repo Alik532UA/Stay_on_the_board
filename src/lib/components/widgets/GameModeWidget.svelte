@@ -11,20 +11,12 @@
     activeMode === "timed" || activeMode === "local" || activeMode === "online";
 
   // Helper: перевіряє, чи відповідає поточний gameMode legacy пресету
-  // Враховує нові structured presets (virtual-player-*, local-*, online-*)
   function isPresetActive(legacyPreset: string): boolean {
     const currentMode = $gameSettingsStore.gameMode;
     if (!currentMode) return false;
 
-    // Пряме порівняння (legacy presets)
     if (currentMode === legacyPreset) return true;
 
-    // Порівняння з новими structured presets
-    // observer → local-observer
-    // beginner → virtual-player-beginner
-    // experienced → virtual-player-experienced або local-experienced
-    // pro → virtual-player-pro або local-pro
-    // timed → virtual-player-timed
     if (legacyPreset === "observer" && currentMode === "local-observer")
       return true;
     if (
@@ -49,11 +41,8 @@
     return false;
   }
 
-  // Реактивна змінна для ключа опису
   let descriptionKey: string | null = null;
 
-  // Реактивний блок - обчислює ключ опису при зміні gameMode
-  // Svelte відслідковує $gameSettingsStore.gameMode безпосередньо
   $: {
     const currentMode = $gameSettingsStore.gameMode;
     if (!currentMode) {
@@ -80,55 +69,12 @@
     }
     await userActionService.requestRestart();
   }
-
-  function fitTextAction(node: HTMLElement, dependency: any) {
-    const buttons = Array.from(
-      node.querySelectorAll(".settings-expander__row-btn"),
-    ) as HTMLElement[];
-
-    const fit = () => {
-      if (buttons.length === 0) return;
-
-      buttons.forEach((btn) => (btn.style.fontSize = ""));
-
-      tick().then(() => {
-        const initialFontSize = parseFloat(
-          getComputedStyle(buttons[0]).fontSize,
-        );
-        let currentFontSize = initialFontSize;
-
-        const fontSizeStep = 0.5;
-        while (node.scrollWidth > node.clientWidth && currentFontSize > 12) {
-          currentFontSize -= fontSizeStep;
-          buttons.forEach(
-            (btn) => (btn.style.fontSize = `${currentFontSize}px`),
-          );
-        }
-      });
-    };
-
-    const observer = new ResizeObserver(fit);
-    observer.observe(node);
-
-    tick().then(fit);
-
-    return {
-      update(newDependency: any) {
-        tick().then(fit);
-      },
-      destroy() {
-        observer.disconnect();
-      },
-    };
-  }
 </script>
 
 <div class="game-mode-widget">
   <h3 class="widget-title">{$_("gameModes.title")}</h3>
-  <div
-    class="settings-expander__game-mode-row"
-    use:fitTextAction={$_("gameModes.beginner")}
-  >
+
+  <div class="settings-expander__button-group">
     {#if activeMode === "local"}
       <button
         data-testid="settings-game-mode-local-observer"
@@ -193,6 +139,13 @@
 
 <style>
   .game-mode-widget {
+    /* FIX: Додаємо змінні, які використовуються класами кнопок */
+    --button-height: 36px;
+    --button-padding: 4px 8px;
+    --button-border-width: 1.5px;
+    --button-border-radius: 8px;
+    --button-font-size: 1em;
+
     background: var(--bg-secondary);
     border-radius: var(--unified-border-radius);
     border: var(--unified-border);
@@ -202,6 +155,8 @@
       box-shadow 0.25s;
     backdrop-filter: var(--unified-backdrop-filter);
     padding: 16px;
+    box-sizing: border-box;
+    width: 100%;
   }
   .game-mode-widget:hover {
     box-shadow: var(--unified-shadow-hover);
@@ -212,45 +167,6 @@
     margin: 0 0 12px 0;
     text-align: center;
     font-size: 1.1em;
-  }
-  .settings-expander__game-mode-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-  .settings-expander__row-btn {
-    background: var(--control-bg);
-    color: var(--text-primary);
-    border: 1.5px solid #888;
-    border-radius: 8px;
-    padding: 0 10.8px;
-    height: 36px;
-    min-height: 36px;
-    box-sizing: border-box;
-    font-size: 14.4px;
-    font-weight: 600;
-    cursor: pointer;
-    transition:
-      background 0.18s,
-      color 0.18s,
-      border 0.18s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-  }
-  .settings-expander__row-btn:hover,
-  .settings-expander__row-btn:focus {
-    border-color: var(--control-selected);
-    color: var(--text-primary);
-    outline: none;
-  }
-  .settings-expander__row-btn.active {
-    background: var(--control-selected);
-    color: var(--control-selected-text);
-    border-color: var(--control-selected);
-    transform: scale(1.07);
-    z-index: 1;
   }
   .description {
     margin-top: 12px;

@@ -11,7 +11,7 @@
 
     let rooms: RoomSummary[] = [];
     let isLoading = false;
-    let joiningRoomId: string | null = null; // Для відстеження, яку кімнату зараз приєднуємо
+    let joiningRoomId: string | null = null;
     let error: string | null = null;
 
     async function loadRooms() {
@@ -30,10 +30,9 @@
     async function handleJoin(roomId: string) {
         logService.action(`[RoomList] Clicked Join for room: ${roomId}`);
 
-        if (joiningRoomId) return; // Запобігаємо подвійним клікам
+        if (joiningRoomId) return;
         joiningRoomId = roomId;
 
-        // Перевіряємо, чи є ім'я гравця
         const playerName = localStorage.getItem("online_playerName");
         if (!playerName) {
             localStorage.setItem(
@@ -56,7 +55,7 @@
         } catch (e) {
             logService.error("[RoomList] Failed to join room", e);
             alert($_("onlineMenu.errors.joinFailed"));
-            loadRooms(); // Оновлюємо список, можливо кімната вже повна
+            loadRooms();
         } finally {
             joiningRoomId = null;
         }
@@ -64,7 +63,6 @@
 
     onMount(() => {
         loadRooms();
-        // Автооновлення списку кожні 10 секунд
         const interval = setInterval(loadRooms, 10000);
         return () => clearInterval(interval);
     });
@@ -160,6 +158,8 @@
         width: 100%;
         max-width: 800px;
         margin: 0 auto;
+        /* FIX: Додано box-sizing */
+        box-sizing: border-box;
     }
 
     .list-header {
@@ -212,12 +212,16 @@
 
     .rooms-table-wrapper {
         overflow-x: auto;
+        /* FIX: Додано для плавної прокрутки на мобільних */
+        -webkit-overflow-scrolling: touch;
     }
 
     .rooms-table {
         width: 100%;
         border-collapse: collapse;
         color: var(--text-primary);
+        /* FIX: Мінімальна ширина для таблиці, щоб не стискалася занадто сильно */
+        min-width: 400px;
     }
 
     .rooms-table th {

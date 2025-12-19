@@ -23,7 +23,8 @@
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     border-radius: 24px;
     width: 100%;
-    max-width: 400px;
+    /* FIX: Використовуємо змінну для адаптивної ширини */
+    max-width: var(--responsive-max-width);
     max-height: 85vh;
     display: flex;
     flex-direction: column;

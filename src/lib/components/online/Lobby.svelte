@@ -104,7 +104,6 @@
         <div class="lobby-grid">
             <!-- Ліва колонка: Інфо та Гравці -->
             <div class="left-column">
-                <!-- FIX: Передаємо amIHost, щоб дозволити редагування назви кімнати -->
                 <LobbyHeader {room} {roomId} {amIHost} />
 
                 <LobbyPlayerList
@@ -153,6 +152,9 @@
         padding: 20px;
         min-height: 100vh;
         color: var(--text-primary);
+        /* FIX: Додано box-sizing */
+        box-sizing: border-box;
+        width: 100%;
     }
 
     .lobby-grid {
@@ -160,11 +162,20 @@
         grid-template-columns: 1fr 1fr;
         gap: 24px;
         margin-top: 40px;
+        width: 100%;
+    }
+
+    .left-column,
+    .right-column {
+        min-width: 0; /* Запобігає розширенню гріда */
     }
 
     @media (max-width: 768px) {
         .lobby-grid {
             grid-template-columns: 1fr;
+        }
+        .lobby-container {
+            padding: 10px; /* Зменшено відступи для мобільних */
         }
     }
 

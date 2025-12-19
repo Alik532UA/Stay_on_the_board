@@ -8,7 +8,7 @@
     import { logService } from "$lib/services/logService";
     import { _ } from "svelte-i18n";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
-    import { fitTextAction } from "$lib/actions/fitText";
+    // FIX: Видалено імпорт fitTextAction
     import { get } from "svelte/store";
     import { goto } from "$app/navigation";
     import { base } from "$app/paths";
@@ -139,10 +139,8 @@
         <span class="settings-expander__label"
             >{$_("gameControls.blockAfter")}</span
         >
-        <div
-            class="settings-expander__button-group"
-            use:fitTextAction={$gameSettingsStore.blockOnVisitCount}
-        >
+        <!-- FIX: Видалено use:fitTextAction -->
+        <div class="settings-expander__button-group">
             {#each [0, 1, 2, 3] as count}
                 <button
                     data-testid="settings-expander-block-count-btn-{count}"

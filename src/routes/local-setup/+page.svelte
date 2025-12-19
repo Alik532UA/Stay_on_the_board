@@ -4,8 +4,6 @@
   import LocalGameSettings from "$lib/components/local-setup/LocalGameSettings.svelte";
   import { _ } from "svelte-i18n";
   import { onMount } from "svelte";
-  import { get } from "svelte/store";
-  import { testModeStore } from "$lib/stores/testModeStore";
   import { gameService } from "$lib/services/gameService";
   import { getRandomUnusedColor } from "$lib/utils/playerUtils";
   import type { Player } from "$lib/models/player";
@@ -56,6 +54,8 @@
     max-width: 900px;
     margin: 0 auto;
     padding: 1rem;
+    /* FIX: Додано box-sizing */
+    box-sizing: border-box;
   }
 
   .header-container {
@@ -77,6 +77,11 @@
     grid-template-columns: 1fr 1fr;
     gap: 24px;
     align-items: start;
+    width: 100%;
+  }
+
+  .grid-column {
+    min-width: 0; /* Дозволяє грід-елементам стискатися */
   }
 
   /* Адаптивність для мобільних пристроїв */
