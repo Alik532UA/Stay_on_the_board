@@ -43,5 +43,9 @@ export default {
     fetchFailed: "Ophalen van kamers mislukt",
     createFailed: "Kamer maken mislukt",
     joinFailed: "Deelnemen aan kamer mislukt"
-  }
+  },
+  waitingForReturn: "Wachten op terugkeer van {name}...",
+  reconnecting: "Speler probeert opnieuw verbinding te maken. Als ze niet terugkeren, wordt het spel beëindigd of worden ze verwijderd.",
+  leaveRoom: "Spel verlaten",
+  playerDisconnected: "{name} is uit het spel verwijderd."
 };

@@ -15,15 +15,18 @@ import type { ScoreChangesData } from '$lib/types/gameMove';
 import { roomService } from '$lib/services/roomService';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import { notificationService } from '$lib/services/notificationService';
-import type { Room } from '$lib/types/online';
+import type { Room, OnlinePlayer } from '$lib/types/online';
 import { modalStore } from '$lib/stores/modalStore';
 import { endGameService } from '$lib/services/endGameService';
+import { timeService } from '$lib/services/timeService';
 
 // Імпорт нових класів
 import { GameStateReconciler } from './online/GameStateReconciler';
 import { OnlineMatchController } from './online/OnlineMatchController';
 import { OnlineGameEventManager } from './online/OnlineGameEventManager';
 import { OnlineStateSynchronizer } from './online/OnlineStateSynchronizer';
+import { OnlinePresenceManager } from './online/OnlinePresenceManager';
+import ReconnectionModal from '$lib/components/modals/ReconnectionModal.svelte';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
@@ -31,8 +34,10 @@ export class OnlineGameMode extends BaseGameMode {
   private matchController: OnlineMatchController | null = null;
   private eventManager: OnlineGameEventManager | null = null;
   private synchronizer: OnlineStateSynchronizer | null = null;
+  private presenceManager: OnlinePresenceManager | null = null;
 
   private unsubscribeSync: (() => void) | null = null;
+  private unsubscribeRoom: (() => void) | null = null;
 
   private roomId: string | null = null;
   private myPlayerId: string | null = null;
@@ -113,6 +118,63 @@ export class OnlineGameMode extends BaseGameMode {
       this.turnDuration
     );
 
+    // Підписка на оновлення кімнати для PresenceManager та зміни Host
+    this.unsubscribeRoom = roomService.subscribeToRoom(this.roomId, (updatedRoom) => {
+      this.roomData = updatedRoom;
+
+      const wasHost = this.amIHost;
+      this.amIHost = updatedRoom.hostId === this.myPlayerId;
+      if (wasHost !== this.amIHost) {
+        logService.init(`[OnlineGameMode] Host role changed: ${wasHost} -> ${this.amIHost}`);
+        uiStateStore.update(s => ({ ...s, amIHost: this.amIHost }));
+      }
+    });
+
+    // Ініціалізація Presence Manager
+    this.presenceManager = new OnlinePresenceManager({
+      roomId: this.roomId,
+      myPlayerId: this.myPlayerId,
+      isHost: () => this.amIHost,
+      getPlayers: () => this.roomData ? Object.values(this.roomData.players) : []
+    });
+
+    this.presenceManager.onPlayerDisconnect = (playerId, startedAt) => {
+      const player = this.roomData?.players[playerId];
+      const name = player?.name || 'Unknown';
+
+      logService.init(`[OnlineGameMode] Player ${name} disconnected. Pausing game.`);
+      this.stopTurnTimer();
+
+      modalStore.showModal({
+        titleKey: 'onlineMenu.waitingForReturn',
+        titleValues: { name: name },
+        dataTestId: 'reconnection-modal',
+        content: {
+          playerName: name,
+          disconnectStartedAt: startedAt,
+          roomId: this.roomId,
+          myPlayerId: this.myPlayerId
+        },
+        variant: 'standard',
+        component: ReconnectionModal,
+        closable: false
+      });
+    };
+
+    this.presenceManager.onPlayerReconnect = (playerId) => {
+      const currentModal = get(modalStore);
+      const player = this.roomData?.players[playerId];
+      if (player && currentModal.isOpen && currentModal.dataTestId === 'reconnection-modal') {
+        if (currentModal.content && (currentModal.content as any).playerName === player.name) {
+          logService.init(`[OnlineGameMode] Player ${player.name} returned. Resuming game.`);
+          modalStore.closeModal();
+          this.resumeTurnTimer();
+        }
+      }
+    };
+
+    this.presenceManager.start();
+
     try {
       await this.stateSync.initialize(this.roomId);
 
@@ -120,7 +182,6 @@ export class OnlineGameMode extends BaseGameMode {
         this.handleSyncEvent(event);
       });
 
-      // Підписка на події через менеджер
       this.eventManager.setupSubscriptions();
 
       const remoteState = await this.stateSync.pullState();
@@ -164,7 +225,9 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   cleanup(): void {
+    if (this.presenceManager) this.presenceManager.stop();
     if (this.unsubscribeSync) this.unsubscribeSync();
+    if (this.unsubscribeRoom) this.unsubscribeRoom();
     if (this.eventManager) this.eventManager.cleanup();
     if (this.stateSync) this.stateSync.cleanup();
 
@@ -210,7 +273,6 @@ export class OnlineGameMode extends BaseGameMode {
     return 'online';
   }
 
-  // Делегування методів контролеру
   async voteToContinue(): Promise<void> {
     if (this.matchController) {
       await this.matchController.handleContinueRequest();
@@ -297,7 +359,6 @@ export class OnlineGameMode extends BaseGameMode {
       this.turnDuration = remoteState.settings.turnDuration;
     }
 
-    // Запускаємо таймер тільки якщо немає відкритих модалок
     if (!get(modalStore).isOpen) {
       this.startTurn();
     }
@@ -311,11 +372,30 @@ export class OnlineGameMode extends BaseGameMode {
         this.applyRemoteState(event.state);
         break;
       case 'player_left':
-        notificationService.show({ type: 'warning', messageRaw: 'Суперник покинув гру' });
+        const remainingPlayers = this.roomData ? Object.values(this.roomData.players) : [];
+        if (remainingPlayers.length === 1 && remainingPlayers[0].id === this.myPlayerId) {
+          notificationService.show({ type: 'success', messageRaw: 'Всі суперники залишили гру. Ви перемогли!' });
+          endGameService.endGame('modal.gameOverReasonBonus');
+        } else {
+          notificationService.show({ type: 'warning', messageRaw: 'Суперник покинув гру' });
+        }
+
+        modalStore.closeModal();
+        if (!get(modalStore).isOpen) {
+          this.resumeTurnTimer();
+        }
         break;
       case 'connection_lost':
         notificationService.show({ type: 'error', messageRaw: 'Втрачено з\'єднання з сервером' });
         break;
     }
+  }
+
+  private stopTurnTimer() {
+    timeService.pauseTurnTimer();
+  }
+
+  private resumeTurnTimer() {
+    timeService.resumeTurnTimer();
   }
 }

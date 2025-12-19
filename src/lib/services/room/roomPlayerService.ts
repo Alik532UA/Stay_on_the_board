@@ -36,6 +36,15 @@ export class RoomPlayerService {
         });
     }
 
+    async sendHeartbeat(roomId: string, playerId: string): Promise<void> {
+        const roomRef = doc(this.db, 'rooms', roomId);
+        // Ми не оновлюємо глобальне lastActivity, щоб не тригерити зайві ререндери списку кімнат
+        // якщо це не потрібно. Але для простоти поки оновлюємо тільки lastSeen.
+        await updateDoc(roomRef, {
+            [`players.${playerId}.lastSeen`]: Date.now()
+        });
+    }
+
     async leaveRoom(roomId: string, playerId: string): Promise<void> {
         logService.init(`[RoomPlayerService] Leaving room ${roomId} as ${playerId}`);
         const roomRef = doc(this.db, 'rooms', roomId);
