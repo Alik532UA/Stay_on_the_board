@@ -20,7 +20,6 @@ import { modalStore } from '$lib/stores/modalStore';
 import { endGameService } from '$lib/services/endGameService';
 import { timeService } from '$lib/services/timeService';
 
-// Імпорт нових класів
 import { GameStateReconciler } from './online/GameStateReconciler';
 import { OnlineMatchController } from './online/OnlineMatchController';
 import { OnlineGameEventManager } from './online/OnlineGameEventManager';
@@ -106,7 +105,6 @@ export class OnlineGameMode extends BaseGameMode {
       (reason) => endGameService.endGame(reason)
     );
 
-    // Ініціалізація менеджера подій
     this.eventManager = new OnlineGameEventManager(
       this.roomId,
       this.myPlayerId,
@@ -118,60 +116,34 @@ export class OnlineGameMode extends BaseGameMode {
       this.turnDuration
     );
 
-    // Підписка на оновлення кімнати для PresenceManager та зміни Host
+    // --- ПІДПИСКА НА ОНОВЛЕННЯ КІМНАТИ ---
     this.unsubscribeRoom = roomService.subscribeToRoom(this.roomId, (updatedRoom) => {
       this.roomData = updatedRoom;
 
+      // 1. Оновлення ролі хоста
       const wasHost = this.amIHost;
       this.amIHost = updatedRoom.hostId === this.myPlayerId;
       if (wasHost !== this.amIHost) {
         logService.init(`[OnlineGameMode] Host role changed: ${wasHost} -> ${this.amIHost}`);
         uiStateStore.update(s => ({ ...s, amIHost: this.amIHost }));
       }
+
+      // 2. Перевірка на перемогу (якщо всі вийшли)
+      // Це критично важливо, бо коли гравця видаляють з мапи players,
+      // саме цей колбек спрацьовує першим.
+      this.checkForVictory(updatedRoom);
+
+      // 3. Перевірка на відключених гравців (UI Logic - модалка очікування)
+      this.checkDisconnectedPlayers(updatedRoom);
     });
 
-    // Ініціалізація Presence Manager
+    // --- PRESENCE MANAGER ---
     this.presenceManager = new OnlinePresenceManager({
       roomId: this.roomId,
       myPlayerId: this.myPlayerId,
       isHost: () => this.amIHost,
       getPlayers: () => this.roomData ? Object.values(this.roomData.players) : []
     });
-
-    this.presenceManager.onPlayerDisconnect = (playerId, startedAt) => {
-      const player = this.roomData?.players[playerId];
-      const name = player?.name || 'Unknown';
-
-      logService.init(`[OnlineGameMode] Player ${name} disconnected. Pausing game.`);
-      this.stopTurnTimer();
-
-      modalStore.showModal({
-        titleKey: 'onlineMenu.waitingForReturn',
-        titleValues: { name: name },
-        dataTestId: 'reconnection-modal',
-        content: {
-          playerName: name,
-          disconnectStartedAt: startedAt,
-          roomId: this.roomId,
-          myPlayerId: this.myPlayerId
-        },
-        variant: 'standard',
-        component: ReconnectionModal,
-        closable: false
-      });
-    };
-
-    this.presenceManager.onPlayerReconnect = (playerId) => {
-      const currentModal = get(modalStore);
-      const player = this.roomData?.players[playerId];
-      if (player && currentModal.isOpen && currentModal.dataTestId === 'reconnection-modal') {
-        if (currentModal.content && (currentModal.content as any).playerName === player.name) {
-          logService.init(`[OnlineGameMode] Player ${player.name} returned. Resuming game.`);
-          modalStore.closeModal();
-          this.resumeTurnTimer();
-        }
-      }
-    };
 
     this.presenceManager.start();
 
@@ -221,6 +193,77 @@ export class OnlineGameMode extends BaseGameMode {
 
     } catch (error) {
       logService.error('[OnlineGameMode] Initialization failed:', error);
+    }
+  }
+
+  /**
+   * Перевіряє, чи залишився гравець один у кімнаті під час гри.
+   */
+  private checkForVictory(room: Room) {
+    // Перевіряємо тільки якщо гра активна
+    if (room.status !== 'playing') return;
+
+    const players = Object.values(room.players);
+
+    // Якщо я залишився один
+    if (players.length === 1 && players[0].id === this.myPlayerId) {
+      // Перевіряємо, чи ми вже не в стані Game Over, щоб не викликати двічі
+      const uiState = get(uiStateStore);
+      if (uiState.isGameOver) return;
+
+      logService.GAME_MODE('[OnlineGameMode] Victory Check: All opponents left. Declaring victory.');
+
+      // Закриваємо будь-які модалки (наприклад, очікування реконнекту)
+      modalStore.closeModal();
+
+      notificationService.show({ type: 'success', messageRaw: 'Всі суперники залишили гру. Ви перемогли!' });
+
+      // Завершуємо гру з перемогою
+      endGameService.endGame('modal.gameOverReasonBonus');
+    }
+  }
+
+  /**
+   * Перевіряє список гравців на наявність відключених.
+   * Керує відображенням модального вікна очікування.
+   */
+  private checkDisconnectedPlayers(room: Room) {
+    // Якщо гра вже закінчилася, не показуємо модалку очікування
+    if (room.status !== 'playing') return;
+
+    const players = Object.values(room.players);
+    const disconnectedPlayer = players.find(p => p.isDisconnected && p.id !== this.myPlayerId);
+    const currentModal = get(modalStore);
+
+    if (disconnectedPlayer) {
+      // Якщо є відключений гравець і модалка ще не відкрита (або відкрита інша)
+      if (!currentModal.isOpen || currentModal.dataTestId !== 'reconnection-modal') {
+        logService.init(`[OnlineGameMode] Player ${disconnectedPlayer.name} disconnected. Pausing game.`);
+        this.stopTurnTimer();
+
+        modalStore.showModal({
+          titleKey: 'onlineMenu.waitingForReturn',
+          titleValues: { name: disconnectedPlayer.name },
+          dataTestId: 'reconnection-modal',
+          content: {
+            playerName: disconnectedPlayer.name,
+            disconnectStartedAt: disconnectedPlayer.disconnectStartedAt || Date.now(),
+            roomId: this.roomId,
+            myPlayerId: this.myPlayerId
+          },
+          variant: 'standard',
+          component: ReconnectionModal,
+          closable: false,
+          closeOnOverlayClick: false
+        });
+      }
+    } else {
+      // Якщо відключених гравців немає, але модалка відкрита - закриваємо її (гравець повернувся)
+      if (currentModal.isOpen && currentModal.dataTestId === 'reconnection-modal') {
+        logService.init(`[OnlineGameMode] All players connected. Resuming game.`);
+        modalStore.closeModal();
+        this.resumeTurnTimer();
+      }
     }
   }
 
@@ -372,17 +415,12 @@ export class OnlineGameMode extends BaseGameMode {
         this.applyRemoteState(event.state);
         break;
       case 'player_left':
+        // Ця подія приходить від Sync, але основна логіка перемоги тепер в subscribeToRoom.
+        // Тут ми просто показуємо повідомлення, якщо це не перемога.
         const remainingPlayers = this.roomData ? Object.values(this.roomData.players) : [];
-        if (remainingPlayers.length === 1 && remainingPlayers[0].id === this.myPlayerId) {
-          notificationService.show({ type: 'success', messageRaw: 'Всі суперники залишили гру. Ви перемогли!' });
-          endGameService.endGame('modal.gameOverReasonBonus');
-        } else {
-          notificationService.show({ type: 'warning', messageRaw: 'Суперник покинув гру' });
-        }
 
-        modalStore.closeModal();
-        if (!get(modalStore).isOpen) {
-          this.resumeTurnTimer();
+        if (remainingPlayers.length > 1) {
+          notificationService.show({ type: 'warning', messageRaw: 'Гравець покинув гру' });
         }
         break;
       case 'connection_lost':
