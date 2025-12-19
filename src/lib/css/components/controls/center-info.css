@@ -1,0 +1,64 @@
+/* Center Info Button/Display */
+
+#center-info {
+    border: none !important;
+    font-family: 'M PLUS Rounded 1c', sans-serif !important;
+    font-weight: 700;
+}
+
+/* Transparent background for initial state */
+#center-info:not(.confirm-btn-active):not(.computer-move-display):not(.direction-distance-state) {
+    background: transparent !important;
+}
+
+#center-info.computer-move-display {
+    border: none !important;
+    background: orange;
+    color: #fff;
+    font-weight: bold;
+}
+
+#center-info.player-move-display {
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    /* Background color set dynamically */
+}
+
+#center-info.confirm-btn-active {
+    background: #43a047 !important;
+    color: #fff !important;
+    border: 2px solid #43a047 !important;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 0 8px #43a047 !important;
+    transition: background 0.2s, color 0.2s;
+    animation: pulse 2s infinite;
+}
+
+#center-info.confirm-btn-active:hover {
+    background: #2e7d32 !important;
+    border-color: #2e7d32 !important;
+    transform: scale(1.02);
+}
+
+#center-info.direction-distance-state {
+    background: var(--control-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    font-weight: bold;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+    }
+}
