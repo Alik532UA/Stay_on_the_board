@@ -1,0 +1,303 @@
+/* Theme and Top Controls Styles */
+
+#top-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+}
+
+#theme-toggle {
+    display: flex;
+    background: var(--control-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+#theme-toggle button {
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    min-width: 60px;
+}
+
+#theme-toggle button.active {
+    background: var(--control-selected);
+    color: var(--control-selected-text);
+    color: white;
+}
+
+#style-toggle,
+#lang-toggle {
+    display: flex;
+    align-items: center;
+}
+
+#style-toggle select,
+#lang-toggle select {
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--control-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    min-width: 120px;
+}
+
+#style-toggle select:focus,
+#lang-toggle select:focus {
+    outline: none;
+    border-color: var(--control-hover);
+    box-shadow: 0 4px 12px var(--shadow-color), 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Custom Style Dropdown */
+#custom-style-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-dropdown-btn {
+    background: var(--control-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.custom-dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--unified-shadow);
+    z-index: 1000;
+    margin-top: 4px;
+    overflow: hidden;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.custom-dropdown-list.hidden {
+    display: none;
+}
+
+.style-option {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.style-option:last-child {
+    border-bottom: none;
+}
+
+.style-option:hover,
+.style-option.selected {
+    background: var(--control-hover);
+    color: white;
+}
+
+.style-purple {
+    background: #f5f5f5;
+    color: #222;
+    font-weight: 500;
+}
+
+.style-green {
+    background: #e3e6fa;
+    color: #2a2a7a;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.style-blue {
+    background: #222;
+    color: #ffcc00;
+    font-family: 'Consolas', monospace;
+}
+
+.style-gray {
+    background: rgba(255, 255, 255, 0.3);
+    color: #1a1a1a;
+    backdrop-filter: blur(4px);
+}
+
+.style-orange {
+    background: #e8f5e9;
+    color: #388e3c;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+}
+
+/* Theme Dropdown */
+.theme-dropdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background: transparent;
+    box-shadow: none;
+    padding: 24px 32px;
+    border-radius: 18px;
+    /* FIX: Замінено фіксовану min-width на адаптивну */
+    min-width: var(--responsive-min-width, 200px);
+    width: auto;
+    max-width: 95vw;
+}
+
+.theme-dropdown.mobile {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 96vw;
+    /* FIX: Використовуємо змінну для адаптивної ширини */
+    max-width: var(--responsive-max-width, 360px);
+}
+
+.theme-dropdown.desktop {
+    position: absolute;
+    transform: none;
+    width: auto;
+    /* FIX: Використовуємо змінну для адаптивної ширини */
+    max-width: var(--responsive-max-width, 320px);
+}
+
+.theme-dropdown.hidden {
+    display: none !important;
+}
+
+/* Theme Style Rows */
+.theme-style-row {
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+    transition: background 0.25s, box-shadow 0.25s;
+}
+
+.theme-style-row[data-style="purple"] {
+    background: rgba(124, 58, 237, 0.45);
+}
+
+.theme-style-row[data-style="green"] {
+    background: rgba(0, 200, 80, 0.4);
+}
+
+.theme-style-row[data-style="blue"] {
+    background: rgba(33, 150, 243, 0.4);
+}
+
+.theme-style-row[data-style="gray"] {
+    background: rgba(120, 120, 120, 0.22);
+    backdrop-filter: blur(8px);
+}
+
+.theme-style-row[data-style="orange"] {
+    background: rgba(255, 224, 102, 0.45);
+}
+
+.theme-style-row[data-style="wood"] {
+    background: linear-gradient(90deg, #e2c9a0 60%, #c9a063 100%);
+}
+
+.theme-style-row.selected,
+.theme-style-row:focus-within {
+    box-shadow: 0 0 0 3px #ffeb3b99;
+}
+
+/* Theme Buttons */
+.theme-btn {
+    background: rgba(255, 255, 255, 0.4);
+    color: #222;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theme-btn[data-theme="light"] {
+    background: rgba(255, 255, 255, 0.5) !important;
+    color: #222 !important;
+}
+
+.theme-btn[data-theme="dark"] {
+    background: rgba(34, 34, 34, 0.5) !important;
+    color: #fff !important;
+}
+
+.theme-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.theme-btn:hover,
+.theme-btn:focus {
+    background: #ffe066 !important;
+    color: #222 !important;
+    transform: scale(1.08);
+    box-shadow: 0 0 8px #ffe06688;
+}
+
+.theme-name {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    color: #fff;
+    min-width: 110px;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 600px) {
+    #top-controls {
+        top: 10px;
+        right: 10px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    #theme-toggle button {
+        padding: 10px 12px;
+        min-width: 50px;
+        font-size: 0.9em;
+    }
+
+    #style-toggle select,
+    #lang-toggle select {
+        padding: 10px 12px;
+        min-width: 100px;
+        font-size: 0.9em;
+    }
+
+    .theme-dropdown {
+        width: 96vw;
+        max-width: var(--responsive-max-width);
+    }
+}

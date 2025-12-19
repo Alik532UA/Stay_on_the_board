@@ -1,0 +1,139 @@
+/* Panels and Widget Styles */
+
+.score-panel {
+    background: var(--bg-secondary);
+    padding: 16px 24px;
+    border-radius: var(--unified-radius);
+    box-shadow: 0 8px 32px 0 var(--current-player-shadow-color);
+    margin-bottom: var(--unified-spacing);
+    text-align: center;
+}
+
+#online-game-panel {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: var(--unified-radius);
+    box-shadow: var(--unified-shadow);
+    margin-top: var(--unified-spacing);
+}
+
+#board-options {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: var(--unified-radius);
+    box-shadow: var(--unified-shadow);
+    margin-top: var(--unified-spacing);
+    text-align: center;
+}
+
+#ui-panel {
+    margin-top: var(--unified-spacing);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Message Area in UI Panel */
+#message-area {
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    box-shadow: var(--unified-shadow);
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+/* Menu items */
+.menu {
+    background: var(--bg-secondary);
+    border-radius: var(--unified-radius);
+    box-shadow: var(--unified-shadow);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+}
+
+/* Titles */
+.main-menu-title {
+    text-align: center;
+    /* Адаптивний розмір: min 1.8em, бажаний 8% ширини екрану, max 2.8em */
+    font-size: clamp(0.1em, 8vw, 2.8em);
+    font-weight: 800;
+    color: var(--text-accent);
+    margin-bottom: 8px;
+    white-space: nowrap;
+    /* Заборона переносу на новий рядок */
+}
+
+.main-menu-subtitle {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: 400;
+    margin-bottom: 28px;
+    color: var(--text-accent);
+}
+
+.local-game-title {
+    text-align: center;
+    font-size: 2em;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.settings-title {
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--text-accent);
+    margin-bottom: 20px;
+}
+
+/* Utilities */
+.room-code-input {
+    text-transform: uppercase;
+}
+
+.board-size-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.player-names-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.player-name-input {
+    width: 80%;
+    text-align: center;
+}
+
+.error-container {
+    padding: 20px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+/* Visual Controls */
+#visual-controls {
+    margin-top: var(--unified-spacing);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Orange Theme Specifics for Grid */
+[data-style="orange"][data-theme="dark"] #direction-grid {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
