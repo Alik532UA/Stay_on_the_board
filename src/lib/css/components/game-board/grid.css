@@ -3,7 +3,7 @@
 #game-board,
 .game-board {
     display: grid;
-    gap: 2px;
+    gap: 0px;
     padding: 0;
     background: transparent;
     border-radius: 24px;
@@ -89,8 +89,8 @@
     background: none;
     will-change: transform, opacity, height, margin-bottom, width;
     height: auto;
-    padding: 28px 20px 24px 20px;
-    margin-bottom: 32px;
+    padding: 0px;
+    margin-bottom: 8px;
     max-width: 100%;
 }
 
