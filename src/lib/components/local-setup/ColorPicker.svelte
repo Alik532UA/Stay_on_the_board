@@ -121,11 +121,16 @@
   .color-picker {
     position: relative;
     display: inline-block;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
   }
 
   .color-preview {
     width: 40px;
     height: 40px;
+    min-width: 40px;
+    min-height: 40px;
     border-radius: 50%;
     border: var(--global-border-width) solid var(--border-color);
     cursor: pointer;
@@ -133,6 +138,7 @@
       transform 0.2s,
       box-shadow 0.2s;
     /* Видаляємо background, щоб не перекривати inline стилі */
+    padding: 0; /* Видаляємо дефолтний відступ кнопки */
   }
 
   .color-preview:hover {
