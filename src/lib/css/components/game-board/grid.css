@@ -1,0 +1,104 @@
+/* Game Board Grid and Wrapper Styles */
+
+#game-board,
+.game-board {
+    display: grid;
+    gap: 2px;
+    padding: 28px 20px 24px 20px;
+    background: transparent;
+    border-radius: 24px;
+    box-shadow: none;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 340px;
+}
+
+.game-board {
+    position: relative;
+    --cell-size: calc(100% / var(--board-size, 3));
+    display: grid;
+    grid-template-columns: repeat(var(--board-size, 3), 1fr);
+    grid-template-rows: repeat(var(--board-size, 3), 1fr);
+    width: 100%;
+    height: 100%;
+    min-width: 0px;
+    min-height: 0px;
+    background: transparent;
+    border-radius: 24px;
+    box-shadow: none;
+    overflow: visible;
+    margin: 0 auto;
+    transition: background 0.2s, width 0.2s, height 0.2s;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none !important;
+    max-width: 100%;
+}
+
+.game-board--hidden {
+    opacity: 0;
+    transform: scale(0.7);
+    pointer-events: none;
+    height: 0px !important;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.game-board-top-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    padding: 0 8px;
+}
+
+.board-row {
+    display: contents;
+}
+
+/* Adaptive Board Sizing Wrapper */
+.board-bg-wrapper {
+    /* --- Base Constants --- */
+    --min-board-logic-size: 2;
+    --max-board-logic-size: 9;
+    --board-logic-range: calc(var(--max-board-logic-size) - var(--min-board-logic-size));
+
+    /* --- Key Logic: Adaptive Sizing --- */
+    --effective-min-size: min(240px, 50vw);
+    --effective-max-size: min(480px, 95vw);
+
+    /* --- Dynamic Range in Pixels --- */
+    --effective-pixel-range: calc(var(--effective-max-size) - var(--effective-min-size));
+
+    /* --- Final Linear Interpolation Formula --- */
+    --pixel-per-step: calc(var(--effective-pixel-range) / var(--board-logic-range));
+    --final-dynamic-size: calc(var(--effective-min-size) + (var(--board-size, 3) - var(--min-board-logic-size)) * var(--pixel-per-step));
+
+    /* --- Apply Final Size --- */
+    width: var(--final-dynamic-size);
+    height: auto;
+    aspect-ratio: 1 / 1;
+
+    /* --- Other Styles --- */
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: none;
+    will-change: transform, opacity, height, margin-bottom, width;
+    height: auto;
+    margin-bottom: 32px;
+    max-width: 100%;
+}
+
+.board-bg-wrapper.hidden {
+    opacity: 0;
+    transform: scale(0.7);
+    pointer-events: none;
+    width: 0 !important;
+    height: 0px !important;
+    margin-bottom: 0 !important;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), width 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s cubic-bezier(0.4, 0, 0.2, 1), margin-bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}

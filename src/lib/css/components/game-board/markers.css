@@ -1,0 +1,80 @@
+/* Move Markers and Indicators */
+
+/* Available Move Indicator (Text-based Fallback/Old) */
+.board-cell.available-move {
+    position: relative;
+}
+
+.board-cell.available-move::after {
+    content: '\25cf';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: calc(var(--cell-size) * 0.33);
+    color: var(--text-accent);
+}
+
+.board-hidden .board-cell::after {
+    display: none !important;
+}
+
+/* Animated Move Dot */
+.move-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 18%;
+    height: 18%;
+    background: var(--dot-color, #fff);
+    border-radius: 50%;
+    pointer-events: none;
+
+    /* Initial state: invisible */
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.board-cell.available .move-dot {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.move-dot-highlighted {
+    display: none !important;
+}
+
+/* Replay Path Visualization */
+.replay-path-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.replay-path-svg line {
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-opacity 0.4s ease-out;
+}
+
+@keyframes dot-pop-highlighted {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+
+    80% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}

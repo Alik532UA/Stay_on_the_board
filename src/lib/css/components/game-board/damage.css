@@ -1,0 +1,36 @@
+/* Cell Damage and Vignette Effects */
+
+.board-cell[class*="cell-damage-"] {
+    position: relative;
+}
+
+/* Vignette Effect Overlay */
+.board-cell[class*="cell-damage-"]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    transition: background 0.3s ease-out, box-shadow 0.3s ease-out;
+    pointer-events: none;
+    /* Inner shadow for depth */
+    box-shadow: inset 0 0 10px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Damage Levels */
+
+/* Level 1: 40% Transparent Center */
+.cell-damage-1::before {
+    background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 1) 80%);
+}
+
+/* Level 2: 20% Transparent Center */
+.cell-damage-2::before {
+    background: radial-gradient(circle, transparent 30%, rgba(0, 0, 0, 1) 60%);
+}
+
+/* Level 3+: 20% Transparent Center but Darker */
+.cell-damage-3::before,
+.cell-damage-4::before,
+.cell-damage-5::before {
+    background: radial-gradient(circle, transparent 10%, rgba(0, 0, 0, 1) 40%);
+}
