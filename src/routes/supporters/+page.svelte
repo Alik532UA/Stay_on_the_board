@@ -77,6 +77,7 @@
     border: var(--global-border-width) solid
       var(--border-color, rgba(255, 152, 0, 0.3));
     cursor: pointer;
+    text-decoration: none;
     transition: all 0.2s ease;
   }
 
@@ -114,6 +115,8 @@
     font-weight: bold;
     cursor: pointer;
     font-size: 1.2em;
+    display: inline-block;
+    text-decoration: none;
     transition: all 0.2s ease;
     box-shadow: 0 4px 20px rgba(255, 152, 0, 0.3);
   }

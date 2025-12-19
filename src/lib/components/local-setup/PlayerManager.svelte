@@ -169,7 +169,7 @@
     padding: 0;
     border-radius: 8px;
     border: var(--global-border-width) solid var(--border-color);
-    background: var(--bg-primary);
+    background: var(--control-bg);
     color: var(--text-primary);
     font-size: 1.5em;
     cursor: pointer;
@@ -185,7 +185,7 @@
     padding: 10px 14px;
     border-radius: 8px;
     border: var(--global-border-width) solid var(--border-color);
-    background: var(--bg-primary);
+    background: var(--control-bg);
     color: var(--text-primary);
     font-size: 1em;
   }
