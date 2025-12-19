@@ -3059,9 +3059,19 @@ class="settings-expander__button-group settings-expander__button-group--three"
 Актуальний результат: замаленький розмір шрифта
 Очікуваний результат: розмір шрифта за замовчуванням (як наприклад class="settings-expander__toggle-btn s-D-5lNYez-F-W")
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+class="menu-list-centered s-PVAdqNUOD2yJ"
+Актуальний результат: має дивний стиль, бо є зайве блимання під час появи
+Очікуваний результат: треба перевикористати стиль в якому зроблено class="game-mode-buttons s-7ixHSxZNgfWi"
 
+class="game-mode-buttons s-7ixHSxZNgfWi" дуже схожий, теж є прозорість і розмиття, але не має глюку з блиманням і тому ми і перевикористовуємо це
+тобто думаю, що class="game-mode-buttons s-7ixHSxZNgfWi" вже посилається на правильні стилі
+тому треба переробити class="menu-list-centered s-PVAdqNUOD2yJ" щоб теж на правильні стилі посилатися
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+стало краще!
+Але досі стиль кнопки та скрол не такі як в class="modal-content s-CbKqU8tqPnSX"
+повинні всі стилі бути як в class="modal-content s-CbKqU8tqPnSX"
 
+у тебе остання спроба
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
