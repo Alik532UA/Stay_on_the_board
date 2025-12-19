@@ -43,5 +43,9 @@ export default {
     fetchFailed: "Failed to fetch rooms",
     createFailed: "Failed to create room",
     joinFailed: "Failed to join room"
-  }
+  },
+  waitingForReturn: "Waiting for {name} to return...",
+  reconnecting: "Player is attempting to reconnect. If they don't return, the game will end or they will be removed.",
+  leaveRoom: "Leave Game",
+  playerDisconnected: "{name} has been removed from the game."
 };

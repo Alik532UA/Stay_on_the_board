@@ -43,5 +43,9 @@ export default {
     fetchFailed: "Odalar listesi yüklenemedi",
     createFailed: "Oda yaratılamadı",
     joinFailed: "Odağa qoşulıp olamadı"
-  }
+  },
+  waitingForReturn: "{name} keri qaytuvını bekley...",
+  reconnecting: "Oyunçı kene bağlanmağa tırışa. Eger o qaytmasa, oyun bitirilecek ya da o çıqarılacaq.",
+  leaveRoom: "Oyundan çıqmaq",
+  playerDisconnected: "{name} oyundan çıqarıldı."
 };
