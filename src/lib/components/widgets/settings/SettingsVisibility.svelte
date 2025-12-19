@@ -1,12 +1,10 @@
 <script lang="ts">
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
     import { _ } from "svelte-i18n";
-    import { fitTextAction } from "$lib/actions/fitText";
+    // FIX: Видалено імпорт fitTextAction
     import { get } from "svelte/store";
 
     export let isCompetitiveMode = false;
-
-    // Видалено масив icons, оскільки іконки тут не потрібні
 
     const toggleFunctions = [
         () =>
@@ -65,10 +63,10 @@
     }
 </script>
 
+<!-- FIX: Видалено use:fitTextAction -->
 <div
     class="settings-expander__button-group"
     class:locked-setting={isCompetitiveMode}
-    use:fitTextAction={$_("settings.visibility.hidden")}
 >
     {#each [$_("settings.visibility.hidden"), $_("settings.visibility.boardOnly"), $_("settings.visibility.withPiece"), $_("settings.visibility.withMoves")] as label, i}
         <button
@@ -78,7 +76,6 @@
             on:click={toggleFunctions[i]}
             disabled={isCompetitiveMode}
         >
-            <!-- Видалено SvgIcons -->
             {label}
         </button>
     {/each}

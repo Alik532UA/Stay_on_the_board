@@ -22,7 +22,6 @@
 
   onMount(() => {
     if (voiceListContainer) {
-      // Run the check after the DOM has been updated
       setTimeout(updateFadeState, 0);
 
       resizeObserver = new ResizeObserver(updateFadeState);
@@ -110,8 +109,11 @@
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     border-radius: 18px;
-    max-width: 90vw;
+
+    /* FIX: Змінюємо max-width на 95vw для мобільних */
+    max-width: 95vw;
     width: auto;
+
     color: #fff;
     animation: modalFadeIn 0.3s ease-out forwards;
   }
@@ -143,7 +145,7 @@
 
   .voice-settings-container,
   .voice-list-container {
-    min-width: 300px;
+    min-width: 280px; /* Трохи зменшено для вузьких екранів */
     overflow-y: auto;
     flex: 1;
     min-height: 0;

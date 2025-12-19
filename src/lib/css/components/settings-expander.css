@@ -13,6 +13,9 @@
         background 0.25s,
         box-shadow 0.25s;
     backdrop-filter: var(--unified-backdrop-filter);
+    /* FIX: Гарантуємо, що контейнер не вилазить за межі */
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .settings-expander:hover {
@@ -45,6 +48,9 @@
     min-height: var(--summary-height);
     box-sizing: border-box;
     outline: none;
+    /* FIX: Дозволяємо тексту заголовка стискатися */
+    white-space: normal;
+    line-height: 1.2;
 }
 
 .settings-expander__summary.disabled {
@@ -92,6 +98,7 @@
     padding: 0 16px 16px 16px;
 }
 
+/* === FIX: Оновлено для розміщення в один ряд === */
 .settings-expander__setting-item {
     display: flex;
     align-items: center;
@@ -99,6 +106,25 @@
     font-size: 1.08em;
     padding: 0;
     gap: 12px;
+    flex-wrap: wrap;
+    /* Дозволяємо перенос, якщо місця мало */
+}
+
+/* FIX: Спеціальне правило для ToggleButton всередині setting-item */
+/* Це змушує кнопку займати доступне місце, а не 100% ширини */
+.settings-expander__setting-item .settings-expander__toggle-btn {
+    width: auto !important;
+    /* Перебиваємо width: 100% з компонента */
+    flex: 1 1 auto;
+    /* Ростемо і стискаємось */
+    min-width: 140px;
+    /* Мінімальна ширина перед переносом */
+}
+
+/* FIX: Спеціальне правило для квадратної кнопки (Voice Settings) поруч з ToggleButton */
+.settings-expander__setting-item .settings-expander__square-btn {
+    flex: 0 0 auto;
+    /* Не стискати квадратну кнопку */
 }
 
 .settings-expander__label {
@@ -106,18 +132,21 @@
     font-size: 1em;
     text-align: center;
     flex-grow: 1;
+    white-space: normal;
 }
 
 .settings-expander__button-group {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-top: 8px;
+    width: 100%;
+    justify-content: center;
 }
 
 .settings-expander__button-group--three {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .settings-expander__size-adjuster {
@@ -161,12 +190,29 @@
     font-weight: 500;
 }
 
+/* === FIX: Оновлено для розміщення в один ряд === */
 .settings-expander__options-group {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 0 0 12px;
     gap: 12px;
+    flex-wrap: wrap;
+    /* Дозволяємо перенос */
+}
+
+/* FIX: Правило для групи кнопок всередині options-group (наприклад, вибір 1, 2, 3, 4) */
+.settings-expander__options-group .settings-expander__button-group {
+    width: auto;
+    /* Не розтягувати на 100% */
+    margin-top: 0;
+    /* Прибрати відступ зверху */
+    flex: 1 1 auto;
+    /* Займати доступне місце */
+    justify-content: flex-end;
+    /* Притиснути вправо */
+    min-width: 180px;
+    /* Мінімальна ширина перед переносом на новий рядок */
 }
 
 .settings-expander__row-btn {
@@ -174,12 +220,16 @@
     color: var(--text-primary);
     border: var(--button-border-width) solid #888;
     border-radius: var(--button-border-radius);
-    padding: 0 calc(var(--button-height) * 0.3);
+    padding: 0 8px;
     height: var(--button-height);
     min-height: var(--button-height);
+    flex: 1 1 auto;
+    min-width: 60px;
 
     box-sizing: border-box;
-    font-size: calc(var(--button-height) * 0.4);
+
+    /* FIX: Збільшено розмір шрифту до нормального (було calc * 0.4) */
+    font-size: 0.95em;
     font-weight: 600;
     cursor: pointer;
     transition:
@@ -189,7 +239,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    white-space: nowrap;
+
+    white-space: normal;
+    text-align: center;
+    line-height: 1.1;
 }
 
 .settings-expander__row-btn:hover,
@@ -203,7 +256,7 @@
     background: var(--control-selected);
     color: var(--control-selected-text);
     border-color: var(--control-selected);
-    transform: scale(1.07);
+    transform: scale(1.02);
     z-index: 1;
 }
 
@@ -223,6 +276,6 @@
 }
 
 .locked-setting {
-    opacity: 0.2;
+    opacity: 0.5;
     cursor: help;
 }

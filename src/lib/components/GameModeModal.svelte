@@ -189,6 +189,11 @@
     flex-direction: column;
     gap: 12px;
     width: 100%;
+    /* FIX: Додано box-sizing та max-width для запобігання розпиранню */
+    box-sizing: border-box;
+    max-width: 100%;
+    /* Центрування, якщо контейнер ширший за контент */
+    margin: 0 auto;
   }
 
   .divider {
@@ -202,5 +207,7 @@
     margin-top: 20px;
     display: flex;
     justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
   }
 </style>

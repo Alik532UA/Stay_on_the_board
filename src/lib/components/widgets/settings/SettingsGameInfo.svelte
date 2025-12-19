@@ -1,15 +1,15 @@
 <script lang="ts">
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
     import { _ } from "svelte-i18n";
-    import { fitTextAction } from "$lib/actions/fitText";
+    // FIX: Видалено імпорт fitTextAction, оскільки ми використовуємо flex-wrap
 </script>
 
 <h3 class="settings-expander__section-title">
     {$_("settings.gameInfoWidget.title")}
 </h3>
+<!-- FIX: Видалено use:fitTextAction -->
 <div
     class="settings-expander__button-group settings-expander__button-group--three"
-    use:fitTextAction={$_("settings.gameInfoWidget.hidden")}
 >
     <button
         data-testid="settings-expander-game-info-widget-hidden-btn"

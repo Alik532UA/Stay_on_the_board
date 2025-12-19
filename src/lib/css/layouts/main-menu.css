@@ -3,6 +3,8 @@
     padding: 40px 20px;
     color: var(--text-primary);
     background: none !important;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 #main-menu-buttons {
@@ -11,12 +13,10 @@
     gap: 16px;
     margin-top: 40px;
     width: 100%;
-    max-width: 400px;
+    max-width: var(--responsive-max-width, 400px);
     margin-left: auto;
     margin-right: auto;
 }
-
-
 
 .wip-notice-overlay {
     position: fixed;
@@ -25,8 +25,51 @@
     transform: translate(-50%, -50%);
     z-index: 10000;
     width: 90vw;
-    max-width: 400px;
+    /* FIX: Використовуємо змінну для адаптивної ширини */
+    max-width: var(--responsive-max-width, 400px);
 }
+
+
+/* ... (решта стилів без змін до .lang-dropdown) ... */
+
+.lang-dropdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background: transparent;
+    box-shadow: none;
+    padding: 24px 32px;
+    border-radius: 18px;
+    /* FIX: Замінено фіксовану min-width на адаптивну */
+    min-width: var(--responsive-min-width, 200px);
+    max-width: 95vw;
+}
+
+/* ... (решта стилів без змін до .local-game-board) ... */
+
+.local-game-board {
+    margin: 0 auto 24px auto;
+    /* FIX: Замінено фіксовану ширину на адаптивну */
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 1/1;
+    /* Зберігаємо квадратну форму */
+    height: auto;
+    /* Висота підлаштується під ширину */
+    background: #222;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px #0002;
+}
+
+/* ... (решта стилів без змін) ... */
+
+
+
+
+
+
 
 .wip-notice-content {
     position: relative;
@@ -531,19 +574,22 @@ label[for^="blocked-mode-checkbox"] {
 }
 
 /* Дропдаун теми */
+
+
 .theme-dropdown {
-    position: absolute;
-    min-width: 320px;
-    background: none;
-    color: #222;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px 0 var(--shadow-color);
-    border: none;
-    padding: 12px 16px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background: transparent;
+    box-shadow: none;
+    padding: 24px 32px;
+    border-radius: 18px;
+    /* FIX: Замінено фіксовану min-width на адаптивну */
+    min-width: var(--responsive-min-width, 200px);
+    width: auto;
+    max-width: 95vw;
 }
 
 .theme-dropdown.mobile {
@@ -552,14 +598,16 @@ label[for^="blocked-mode-checkbox"] {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 96vw;
-    max-width: 360px;
+    /* FIX: Використовуємо змінну для адаптивної ширини */
+    max-width: var(--responsive-max-width, 360px);
 }
 
 .theme-dropdown.desktop {
     position: absolute;
     transform: none;
     width: auto;
-    max-width: 320px;
+    /* FIX: Використовуємо змінну для адаптивної ширини */
+    max-width: var(--responsive-max-width, 320px);
 }
 
 /* Рядки тем */
@@ -634,7 +682,8 @@ label[for^="blocked-mode-checkbox"] {
 /* Дропдаун мов */
 .lang-dropdown {
     position: absolute;
-    min-width: 180px;
+    /* FIX: Використовуємо змінну для адаптивної ширини */
+    min-width: var(--responsive-min-width);
     background: none;
     color: #222;
     border-radius: 12px;
@@ -765,12 +814,14 @@ label[for^="blocked-mode-checkbox"] {
 
     .theme-dropdown {
         width: 96vw;
-        max-width: 360px;
+        /* FIX: Використовуємо змінну для адаптивної ширини */
+        max-width: var(--responsive-max-width);
     }
 
     .lang-dropdown {
         width: 96vw;
-        max-width: 360px;
+        /* FIX: Використовуємо змінну для адаптивної ширини */
+        max-width: var(--responsive-max-width);
     }
 }
 
@@ -960,14 +1011,16 @@ label[for^="blocked-mode-checkbox"] {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 96vw;
-    max-width: 360px;
+    /* FIX: Використовуємо змінну для адаптивної ширини */
+    max-width: var(--responsive-max-width);
 }
 
 .theme-dropdown.desktop {
     position: absolute;
     transform: none;
     width: auto;
-    max-width: 320px;
+    /* FIX: Використовуємо змінну для адаптивної ширини */
+    max-width: var(--responsive-max-width);
 }
 
 .theme-dropdown.hidden {
