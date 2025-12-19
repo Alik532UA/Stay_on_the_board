@@ -1,0 +1,114 @@
+/* Modal Styles */
+
+.modal,
+.modal-content,
+#modal-content {
+    background: var(--modal-content-bg);
+    border-radius: var(--unified-radius);
+    box-shadow: var(--unified-shadow);
+    border: 1px solid var(--border-color);
+}
+
+#modal-content>.modal-footer:only-child,
+#modal-content:has(> .modal-footer) {
+    border-radius: 0 0 var(--unified-radius) var(--unified-radius);
+}
+
+.modal-footer,
+#modal-content>.modal-footer {
+    padding: 16px 24px 24px;
+    display: flex;
+    gap: var(--modal-footer-gap);
+    justify-content: flex-end;
+    border-top: 1px solid var(--border-color);
+    border-radius: 0 0 var(--unified-radius) var(--unified-radius);
+}
+
+.modal-content-center {
+    text-align: center;
+}
+
+.modal-content-left {
+    text-align: left;
+    line-height: 1.6;
+}
+
+.modal-buttons-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.modal-input-container {
+    margin: 20px 0;
+}
+
+.modal-input {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.modal-input:last-child {
+    margin-bottom: 0;
+}
+
+/* Dev Menu in Modal */
+.dev-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 280px;
+}
+
+.modal-window .dev-menu {
+    position: static;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    width: 100%;
+}
+
+.dev-menu h3 {
+    margin: 0;
+    text-align: center;
+    font-size: 1.5em;
+    color: var(--text-accent);
+}
+
+.dev-version {
+    font-size: 0.7em;
+    opacity: 0.7;
+    margin-left: 8px;
+    font-weight: normal;
+    color: var(--text-accent);
+    cursor: pointer;
+    user-select: none;
+}
+
+.dev-version:hover {
+    text-decoration: underline;
+}
+
+.local-game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}

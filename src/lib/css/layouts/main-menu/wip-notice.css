@@ -1,0 +1,68 @@
+/* WIP Notice Styles */
+.wip-notice-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    width: 90vw;
+    /* FIX: Використовуємо змінну для адаптивної ширини */
+    max-width: var(--responsive-max-width, 400px);
+}
+
+.wip-notice-content {
+    position: relative;
+    background: var(--bg-secondary);
+    color: #fff;
+    padding: 28px 32px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wip-notice-content h3 {
+    font-size: 1.4em;
+    margin: 0 0 12px 0;
+    color: var(--text-accent, #ffbe0b);
+}
+
+.wip-notice-content p {
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+    font-size: 1.05em;
+}
+
+.wip-donate-btn {
+    background: var(--no-moves-btn-bg);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 32px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: all 0.2s ease;
+}
+
+.wip-donate-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px #ff980088;
+}
+
+.wip-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 2em;
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.wip-close-btn:hover {
+    opacity: 1;
+}

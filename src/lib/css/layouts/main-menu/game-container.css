@@ -1,0 +1,88 @@
+/* Game Container and Board Styles */
+
+#game-container,
+#main-menu-container {
+    background: #23272f !important;
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: var(--unified-spacing);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: all 0.3s ease;
+}
+
+/* Для локальної гри робимо фон прозорим */
+#game-container[data-local-game="true"],
+#game-container {
+    background: transparent !important;
+}
+
+#game-container {
+    background: var(--bg-primary);
+}
+
+.local-game-board {
+    margin: 0 auto 24px auto;
+    /* FIX: Замінено фіксовану ширину на адаптивну */
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 1/1;
+    /* Зберігаємо квадратну форму */
+    height: auto;
+    /* Висота підлаштується під ширину */
+    background: #222;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px #0002;
+    /* Fallback height from other rule */
+    min-height: 320px;
+}
+
+.cell {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.game-content-block {
+    width: 100%;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+.screen-overlay-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999;
+    transition: background-color 0.3s, backdrop-filter 0.3s;
+}
+
+.screen-overlay-backdrop.dropdown-backdrop {
+    z-index: 9999;
+}
+
+/* Styles affecting game board controls inside main menu or game */
+.control-btn,
+#center-info,
+.arrow,
+[data-direction] {
+    font-family: 'M PLUS Rounded 1c', sans-serif !important;
+}
+
+.control-btn[data-direction] {
+    font-family: 'M PLUS Rounded 1c', sans-serif !important;
+    font-weight: 700;
+}
+
+#center-info {
+    font-family: 'M PLUS Rounded 1c', sans-serif !important;
+    font-weight: 700;
+}
+
+.computer-move-display .arrow,
+#computer-move-display .arrow {
+    font-family: 'M PLUS Rounded 1c', sans-serif !important;
+    font-weight: 700;
+}
