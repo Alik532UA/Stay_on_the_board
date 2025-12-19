@@ -1,7 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher, onMount, tick } from "svelte";
   import { fade } from "svelte/transition";
-  import { slide } from "svelte/transition";
+  import { scale } from "svelte/transition";
+  import { flip } from "svelte/animate";
   import { columnStyleMode } from "$lib/stores/columnStyleStore";
   import { _ } from "svelte-i18n";
   import { layoutUpdateStore } from "$lib/stores/layoutUpdateStore";
@@ -129,13 +130,14 @@
       style={$columnStyleMode === "flexible"
         ? "padding: 0; background: none; border-radius: 8px; list-style: none; min-height: 80px;"
         : "padding: 16px; background: #222; border-radius: 8px; list-style: none; min-height: 80px;"}
-      transition:slide={{ duration: 500 }}
+      transition:scale={{ duration: 300, start: 0.95 }}
     >
       {#if $columnStyleMode !== "flexible"}
         <b class="dnd-column-header" style="color: #fff;">{col.label}</b>
       {/if}
       {#each col.items as item, j (item.id)}
         <li
+          animate:flip={{ duration: 300 }}
           data-testid="widget-{item.id}"
           class="dnd-item"
           style="padding: 12px; margin: 8px 0; background: none; color: #fff; border-radius: 4px; {$columnStyleMode ===
@@ -147,7 +149,7 @@
           on:pointerdown={$columnStyleMode === "flexible"
             ? (e) => handlePointerDown(e, item, col.id)
             : undefined}
-          transition:slide={{ duration: 500 }}
+          transition:scale={{ duration: 300, start: 0.9 }}
         >
           <div class="dnd-item-content">
             {#if typeof itemContent(item) === "function"}

@@ -229,7 +229,9 @@
   }
   .mode-options-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    /* Use auto-fit to allow wrapping on very small screens, 
+       but ensure items don't get smaller than 80px if possible */
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
     gap: 12px;
     margin-top: 8px;
     width: 100%;

@@ -27,10 +27,11 @@
     }
   }
 
-  function filterWidgets(id: string): boolean {
+  $: settings = $gameSettingsStore;
+
+  $: widgetFilter = (id: string): boolean => {
     if (id === WIDGETS.PLAYER_TURN_INDICATOR) return false;
 
-    const settings = get(gameSettingsStore);
     if (
       id === WIDGETS.TIMER &&
       settings.gameMode !== "timed" &&
@@ -39,10 +40,7 @@
       return false;
     }
     return true;
-  }
+  };
 </script>
 
-<GamePageLayout
-  initLogic={initVirtualPlayerGame}
-  widgetFilter={filterWidgets}
-/>
+<GamePageLayout initLogic={initVirtualPlayerGame} {widgetFilter} />
