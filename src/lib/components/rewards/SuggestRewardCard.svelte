@@ -42,7 +42,7 @@
         padding: 16px;
         border-radius: 12px;
         background: var(--bg-secondary);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: var(--global-border-width) solid rgba(255, 255, 255, 0.1);
         position: relative;
         overflow: hidden;
         transition:

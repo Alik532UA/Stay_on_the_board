@@ -2,7 +2,7 @@
     --button-height: 36px;
     --summary-height: 64px;
     --button-padding: 4px 8px;
-    --button-border-width: 1.5px;
+    --button-border-width: var(--global-border-width);
     --button-border-radius: 8px;
     --button-font-size: 1em;
     background: var(--bg-secondary);
@@ -262,7 +262,7 @@
 
 .settings-expander__divider {
     border: none;
-    border-top: 1.5px solid var(--border-color, #444);
+    border-top: var(--global-border-width) solid var(--border-color, #444);
     margin: 0;
     width: 100%;
 }

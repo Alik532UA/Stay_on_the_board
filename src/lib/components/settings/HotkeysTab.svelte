@@ -1,39 +1,67 @@
 <script lang="ts">
-  import { _ } from 'svelte-i18n';
-  import { gameSettingsStore, type KeybindingAction } from '$lib/stores/gameSettingsStore';
-  import { onMount } from 'svelte';
-  import { customTooltip } from '$lib/actions/customTooltip.js';
-  import { userActionService } from '$lib/services/userActionService';
-  import { isModalOpen } from '$lib/stores/isModalOpenStore';
-  import { get } from 'svelte/store';
+  import { _ } from "svelte-i18n";
+  import {
+    gameSettingsStore,
+    type KeybindingAction,
+  } from "$lib/stores/gameSettingsStore";
+  import { onMount } from "svelte";
+  import { customTooltip } from "$lib/actions/customTooltip.js";
+  import { userActionService } from "$lib/services/userActionService";
+  import { isModalOpen } from "$lib/stores/isModalOpenStore";
+  import { get } from "svelte/store";
 
   let listeningFor: { action: KeybindingAction; index: number } | null = null;
 
   const actionGroups: { title: string; actions: KeybindingAction[] }[] = [
     {
-      title: 'controlsPage.mainMovement',
-      actions: ['up-left', 'up', 'up-right', 'left', 'right', 'down-left', 'down', 'down-right']
+      title: "controlsPage.mainMovement",
+      actions: [
+        "up-left",
+        "up",
+        "up-right",
+        "left",
+        "right",
+        "down-left",
+        "down",
+        "down-right",
+      ],
     },
     {
-      title: 'controlsPage.gameActions',
-      actions: ['confirm', 'no-moves']
+      title: "controlsPage.gameActions",
+      actions: ["confirm", "no-moves"],
     },
     {
-      title: 'controlsPage.gameSettings',
-      actions: ['toggle-block-mode', 'toggle-board', 'increase-board', 'decrease-board', 'toggle-speech', 'auto-hide-board']
+      title: "controlsPage.gameSettings",
+      actions: [
+        "toggle-block-mode",
+        "toggle-board",
+        "increase-board",
+        "decrease-board",
+        "toggle-speech",
+        "auto-hide-board",
+      ],
     },
     {
-      title: 'controlsPage.distanceSelection',
-      actions: ['distance-1', 'distance-2', 'distance-3', 'distance-4', 'distance-5', 'distance-6', 'distance-7', 'distance-8']
+      title: "controlsPage.distanceSelection",
+      actions: [
+        "distance-1",
+        "distance-2",
+        "distance-3",
+        "distance-4",
+        "distance-5",
+        "distance-6",
+        "distance-7",
+        "distance-8",
+      ],
     },
     {
-      title: 'controlsPage.navigation',
-      actions: ['main-menu']
+      title: "controlsPage.navigation",
+      actions: ["main-menu"],
     },
     {
-      title: 'controlsPage.general',
-      actions: ['show-help', 'toggle-theme', 'toggle-language']
-    }
+      title: "controlsPage.general",
+      actions: ["show-help", "toggle-theme", "toggle-language"],
+    },
   ];
 
   $: keybindings = $gameSettingsStore.keybindings;
@@ -70,7 +98,7 @@
     if (get(isModalOpen)) return;
     if (listeningFor) {
       event.preventDefault();
-      if (event.code === 'Escape') {
+      if (event.code === "Escape") {
         listeningFor = null;
         return;
       }
@@ -89,23 +117,23 @@
   }
 
   onMount(() => {
-    window.addEventListener('keydown', handleKeydown);
+    window.addEventListener("keydown", handleKeydown);
     return () => {
-      window.removeEventListener('keydown', handleKeydown);
+      window.removeEventListener("keydown", handleKeydown);
     };
   });
 
   function formatKeyCode(code: string) {
-    if (!code) return 'N/A';
+    if (!code) return "N/A";
     return code
-      .replace(/^Key/, '')
-      .replace(/^Digit/, '')
-      .replace(/^Numpad/, 'NumPad ')
-      .replace('Decimal', '.')
-      .replace('Multiply', '*')
-      .replace('Divide', '/')
-      .replace('Add', '+')
-      .replace('Subtract', '-');
+      .replace(/^Key/, "")
+      .replace(/^Digit/, "")
+      .replace(/^Numpad/, "NumPad ")
+      .replace("Decimal", ".")
+      .replace("Multiply", "*")
+      .replace("Divide", "/")
+      .replace("Add", "+")
+      .replace("Subtract", "-");
   }
 </script>
 
@@ -115,28 +143,39 @@
     <div class="key-grid">
       {#each group.actions as action}
         <div class="key-item">
-          <span class="action-name">{$_(`controlsPage.actions.${action}`)}</span>
+          <span class="action-name">{$_(`controlsPage.actions.${action}`)}</span
+          >
           <div class="key-buttons-container">
             {#each keybindings[action] || [] as key, i}
               <div class="key-button-wrapper">
                 <button
                   class="key-button"
-                  class:listening={listeningFor?.action === action && listeningFor?.index === i}
+                  class:listening={listeningFor?.action === action &&
+                    listeningFor?.index === i}
                   class:conflict={conflicts.has(key)}
                   on:click={() => listenForKey(action, i)}
                 >
                   {listeningFor?.action === action && listeningFor?.index === i
-                    ? $_('controlsPage.pressKey')
+                    ? $_("controlsPage.pressKey")
                     : formatKeyCode(key)}
                 </button>
-                <button class="remove-key-btn" use:customTooltip={$_('controlsPage.removeKey')} on:click={() => removeKey(action, i)}>×</button>
+                <button
+                  class="remove-key-btn"
+                  use:customTooltip={$_("controlsPage.removeKey")}
+                  on:click={() => removeKey(action, i)}>×</button
+                >
               </div>
             {/each}
             {#if (keybindings[action]?.length || 0) < 8}
               {#if listeningFor?.action === action && listeningFor?.index === -1}
-                <span class="press-key-hint">{$_('controlsPage.pressKey') || 'Натисніть клавішу'}</span>
+                <span class="press-key-hint"
+                  >{$_("controlsPage.pressKey") || "Натисніть клавішу"}</span
+                >
               {:else}
-                <button class="add-key-btn" on:click={() => listenForKey(action, -1)}>+</button>
+                <button
+                  class="add-key-btn"
+                  on:click={() => listenForKey(action, -1)}>+</button
+                >
               {/if}
             {/if}
           </div>
@@ -147,10 +186,10 @@
 
   <div class="controls-footer">
     {#if conflicts.size > 0}
-      <p class="conflict-warning">{$_('controlsPage.keyConflict')}</p>
+      <p class="conflict-warning">{$_("controlsPage.keyConflict")}</p>
     {/if}
     <button class="reset-button" on:click={userActionService.resetKeybindings}>
-      {$_('controlsPage.resetToDefaults')}
+      {$_("controlsPage.resetToDefaults")}
     </button>
   </div>
 </div>
@@ -160,7 +199,7 @@
     width: 100%;
     padding-bottom: 40px;
   }
-  
+
   .group-title {
     margin-top: 2rem;
     border-bottom: 1px solid var(--border-color);
@@ -168,31 +207,31 @@
     color: var(--text-primary);
     font-size: 1.2em;
   }
-  
+
   .key-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .key-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem;
-    background: rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     flex-wrap: wrap;
     gap: 10px;
   }
-  
+
   .action-name {
     font-weight: 500;
     flex-shrink: 0;
     margin-right: 1rem;
     color: var(--text-primary);
   }
-  
+
   .key-buttons-container {
     display: flex;
     flex-wrap: wrap;
@@ -201,16 +240,16 @@
     justify-content: flex-end;
     flex-grow: 1;
   }
-  
+
   .key-button-wrapper {
     position: relative;
   }
-  
+
   .key-button {
     min-width: 50px;
     text-align: center;
     padding: 0.5rem 1rem;
-    border: 1px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     background: var(--control-bg);
     color: var(--text-primary);
     border-radius: 6px;
@@ -219,23 +258,23 @@
     font-family: monospace;
     font-size: 0.9em;
   }
-  
+
   .key-button:hover {
     border-color: var(--control-selected);
     color: var(--control-selected);
   }
-  
+
   .key-button.listening {
     background: var(--control-selected);
     color: var(--control-selected-text);
     font-style: italic;
   }
-  
+
   .key-button.conflict {
     border-color: var(--error-color);
     box-shadow: 0 0 5px var(--error-color);
   }
-  
+
   .remove-key-btn {
     position: absolute;
     top: -8px;
@@ -256,16 +295,16 @@
     font-size: 14px;
     line-height: 1;
   }
-  
+
   .key-button-wrapper:hover .remove-key-btn {
     opacity: 1;
   }
-  
+
   .add-key-btn {
     width: 36px;
     height: 36px;
     border-radius: 6px;
-    border: 1px dashed var(--border-color);
+    border: var(--global-border-width) dashed var(--border-color);
     background: transparent;
     color: var(--text-primary);
     font-size: 1.5em;
@@ -274,7 +313,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .add-key-btn:hover {
     border-color: var(--control-selected);
     color: var(--control-selected);
@@ -284,13 +323,13 @@
     margin-top: 3rem;
     text-align: center;
   }
-  
+
   .conflict-warning {
     color: var(--error-color);
     font-weight: bold;
     margin-bottom: 1rem;
   }
-  
+
   .reset-button {
     padding: 0.75rem 1.5rem;
     background: var(--warning-action-bg);
@@ -300,29 +339,39 @@
     font-weight: bold;
     cursor: pointer;
   }
-  
+
   .press-key-hint {
     display: inline-block;
     min-width: 120px;
     padding: 0.6rem 1.2rem;
     background: linear-gradient(90deg, #ffe082 0%, #ffd54f 100%);
     color: #b26a00;
-    border: 2px solid #ffb300;
+    border: var(--global-border-width) solid #ffb300;
     border-radius: 8px;
     text-align: center;
     font-weight: 600;
     font-size: 1.08em;
     box-shadow: 0 2px 12px 0 rgba(255, 193, 7, 0.18);
-    animation: pressKeyPulse 1.2s infinite alternate, fadeIn 0.2s;
+    animation:
+      pressKeyPulse 1.2s infinite alternate,
+      fadeIn 0.2s;
   }
-  
+
   @keyframes pressKeyPulse {
-    from { box-shadow: 0 2px 12px 0 rgba(255, 193, 7, 0.18); }
-    to { box-shadow: 0 4px 24px 0 rgba(255, 193, 7, 0.38); }
+    from {
+      box-shadow: 0 2px 12px 0 rgba(255, 193, 7, 0.18);
+    }
+    to {
+      box-shadow: 0 4px 24px 0 rgba(255, 193, 7, 0.38);
+    }
   }
-  
+
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 </style>

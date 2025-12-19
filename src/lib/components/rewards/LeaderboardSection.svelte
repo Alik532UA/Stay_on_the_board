@@ -122,7 +122,7 @@
 
     .chip {
         background: rgba(255, 255, 255, 0.1);
-        border: 1px solid var(--border-color);
+        border: var(--global-border-width) solid var(--border-color);
         border-radius: 16px;
         padding: 6px 12px;
         color: var(--text-secondary);
@@ -145,7 +145,7 @@
         border-radius: 12px;
         overflow: hidden;
         box-shadow: var(--unified-shadow);
-        border: 1px solid var(--border-color);
+        border: var(--global-border-width) solid var(--border-color);
     }
 
     .leaderboard-table {
@@ -167,7 +167,8 @@
     }
 
     .leaderboard-table tr {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: var(--global-border-width) solid
+            rgba(255, 255, 255, 0.05);
     }
 
     .leaderboard-table tr:last-child {

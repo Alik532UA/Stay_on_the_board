@@ -266,7 +266,7 @@
         right: 20px;
         width: 300px;
         background: #222;
-        border: 1px solid #555;
+        border: var(--global-border-width) solid #555;
         padding: 10px;
         border-radius: 8px;
     }
@@ -276,7 +276,7 @@
         font-family: monospace;
         font-size: 0.8em;
         margin-bottom: 10px;
-        border: 1px solid #444;
+        border: var(--global-border-width) solid #444;
         padding: 5px;
     }
 </style>

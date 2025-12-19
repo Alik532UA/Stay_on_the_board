@@ -59,7 +59,7 @@
         align-items: center;
         gap: 16px;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: var(--global-border-width) solid rgba(255, 255, 255, 0.1);
         pointer-events: auto;
         color: var(--text-primary);
     }

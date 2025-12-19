@@ -1,6 +1,7 @@
 <script lang="ts">
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
     import { _ } from "svelte-i18n";
+    import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
     // FIX: Видалено імпорт fitTextAction, оскільки ми використовуємо flex-wrap
 </script>
 
@@ -8,31 +9,29 @@
     {$_("settings.gameInfoWidget.title")}
 </h3>
 <!-- FIX: Видалено use:fitTextAction -->
-<div
-    class="settings-expander__button-group settings-expander__button-group--three"
->
-    <button
-        data-testid="settings-expander-game-info-widget-hidden-btn"
-        class="settings-expander__row-btn"
-        class:active={$gameSettingsStore.showGameInfoWidget === "hidden"}
-        on:click={() => gameSettingsStore.setGameInfoWidgetState("hidden")}
-    >
-        {$_("settings.gameInfoWidget.hidden")}
-    </button>
-    <button
-        data-testid="settings-expander-game-info-widget-shown-btn"
-        class="settings-expander__row-btn"
-        class:active={$gameSettingsStore.showGameInfoWidget === "shown"}
-        on:click={() => gameSettingsStore.setGameInfoWidgetState("shown")}
-    >
-        {$_("settings.gameInfoWidget.shown")}
-    </button>
-    <button
-        data-testid="settings-expander-game-info-widget-compact-btn"
-        class="settings-expander__row-btn"
-        class:active={$gameSettingsStore.showGameInfoWidget === "compact"}
-        on:click={() => gameSettingsStore.setGameInfoWidgetState("compact")}
-    >
-        {$_("settings.gameInfoWidget.compact")}
-    </button>
-</div>
+<ButtonGroup
+    className="settings-expander__button-group--three"
+    options={[
+        {
+            value: "hidden",
+            label: $_("settings.gameInfoWidget.hidden"),
+            active: $gameSettingsStore.showGameInfoWidget === "hidden",
+            dataTestId: "settings-expander-game-info-widget-hidden-btn",
+            onClick: () => gameSettingsStore.setGameInfoWidgetState("hidden"),
+        },
+        {
+            value: "shown",
+            label: $_("settings.gameInfoWidget.shown"),
+            active: $gameSettingsStore.showGameInfoWidget === "shown",
+            dataTestId: "settings-expander-game-info-widget-shown-btn",
+            onClick: () => gameSettingsStore.setGameInfoWidgetState("shown"),
+        },
+        {
+            value: "compact",
+            label: $_("settings.gameInfoWidget.compact"),
+            active: $gameSettingsStore.showGameInfoWidget === "compact",
+            dataTestId: "settings-expander-game-info-widget-compact-btn",
+            onClick: () => gameSettingsStore.setGameInfoWidgetState("compact"),
+        },
+    ]}
+/>

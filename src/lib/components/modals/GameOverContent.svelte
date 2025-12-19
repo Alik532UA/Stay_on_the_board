@@ -1,22 +1,33 @@
 <script lang="ts">
   import { _ } from "svelte-i18n";
   import ScoreBonusExpander from "../widgets/ScoreBonusExpander.svelte";
-  import type { FinalScoreDetails, PlayerScoreResult } from "$lib/stores/gameOverStore";
+  import type {
+    FinalScoreDetails,
+    PlayerScoreResult,
+  } from "$lib/stores/gameOverStore";
 
   export let content: any;
   export let isCompactScoreMode = true;
 
   // Helper to calculate total bonus
   $: scoreDetails = content?.scoreDetails as FinalScoreDetails;
-  $: totalBonus = scoreDetails ? 
-      (scoreDetails.sizeBonus ?? 0) +
+  $: totalBonus = scoreDetails
+    ? (scoreDetails.sizeBonus ?? 0) +
       (scoreDetails.blockModeBonus ?? 0) +
       (scoreDetails.jumpBonus ?? 0) +
       (scoreDetails.noMovesBonus ?? 0) +
       (scoreDetails.distanceBonus ?? 0) +
-      (scoreDetails.finishBonus ?? 0) : 0;
+      (scoreDetails.finishBonus ?? 0)
+    : 0;
 
-  $: playerScores = content?.playerScores as Array<PlayerScoreResult & { playerName: string; playerColor: string; isWinner: boolean; isLoser: boolean }>;
+  $: playerScores = content?.playerScores as Array<
+    PlayerScoreResult & {
+      playerName: string;
+      playerColor: string;
+      isWinner: boolean;
+      isLoser: boolean;
+    }
+  >;
 </script>
 
 {#if playerScores && playerScores.length > 0}
@@ -72,14 +83,17 @@
   {#if scoreDetails.totalPenalty > 0}
     <div class="score-detail-row penalty" data-testid="total-penalty">
       {$_("modal.scoreDetails.penalty")}
-      <span data-testid="total-penalty-value">-{scoreDetails.totalPenalty}</span>
+      <span data-testid="total-penalty-value">-{scoreDetails.totalPenalty}</span
+      >
     </div>
   {/if}
 
   <div class="final-score-container" class:compact={isCompactScoreMode}>
     {#if isCompactScoreMode}
       <div class="final-score-compact">
-        <span class="final-score-label-inline">{$_("modal.scoreDetails.finalScore")}</span>
+        <span class="final-score-label-inline"
+          >{$_("modal.scoreDetails.finalScore")}</span
+        >
         <span class="final-score-value-inline" data-testid="final-score-value">
           {scoreDetails.totalScore ?? 0}
         </span>
@@ -124,7 +138,8 @@
     gap: 6px;
     width: 100%;
   }
-  .winner-badge, .loser-badge {
+  .winner-badge,
+  .loser-badge {
     margin-right: 10px;
     font-size: 1.2em;
   }
@@ -135,7 +150,7 @@
     color: #ffffff;
     font-weight: bold;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: var(--global-border-width) solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   }
   .score-value {

@@ -146,7 +146,7 @@
 
     .editable-input {
         background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--border-color);
+        border: var(--global-border-width) solid var(--border-color);
         border-radius: 4px;
         padding: 4px 8px;
         color: var(--text-primary);

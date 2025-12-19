@@ -14,14 +14,14 @@
 [data-style="gray"] #main-menu-container {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: var(--global-border-width) solid rgba(255, 255, 255, 0.2);
 }
 
 [data-style="gray"] .modal-button,
 [data-style="gray"] .control-btn {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: var(--global-border-width) solid rgba(255, 255, 255, 0.3);
 }
 
 [data-style="gray"] .modal-button.primary,
@@ -54,7 +54,7 @@
 [data-style="orange"] .modal-button.secondary {
     background: transparent;
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
 }
 
 /* Helper classes */

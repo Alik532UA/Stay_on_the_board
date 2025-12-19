@@ -5,7 +5,7 @@
 .control-btn,
 .modal-button {
     background: var(--control-bg);
-    border: 2px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     border-radius: 12px;
     padding: 12px 20px;
     cursor: pointer;

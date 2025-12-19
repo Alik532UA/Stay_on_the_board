@@ -155,7 +155,7 @@
         padding: 12px;
         background: rgba(0, 0, 0, 0.1);
         border-radius: 12px;
-        border: 1px solid transparent;
+        border: var(--global-border-width) solid transparent;
     }
     .player-card.is-me {
         border-color: var(--text-accent);

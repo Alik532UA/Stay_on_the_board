@@ -5,6 +5,7 @@
   import { _ } from "svelte-i18n";
   import { tick } from "svelte";
   import { uiStateStore } from "$lib/stores/uiStateStore.js";
+  import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
 
   $: activeMode = $gameModeStore.activeMode;
   $: isCompetitiveMode =
@@ -74,58 +75,59 @@
 <div class="game-mode-widget">
   <h3 class="widget-title">{$_("gameModes.title")}</h3>
 
-  <div class="settings-expander__button-group">
-    {#if activeMode === "local"}
-      <button
-        data-testid="settings-game-mode-local-observer"
-        class="settings-expander__row-btn"
-        class:active={isPresetActive("observer")}
-        on:click={() => handlePresetClick("observer")}
-        >{$_("gameModes.observer")}</button
-      >
-      <button
-        data-testid="settings-game-mode-local-experienced"
-        class="settings-expander__row-btn"
-        class:active={isPresetActive("experienced")}
-        on:click={() => handlePresetClick("experienced")}
-        >{$_("gameModes.experienced")}</button
-      >
-      <button
-        data-testid="settings-game-mode-local-pro"
-        class="settings-expander__row-btn"
-        class:active={isPresetActive("pro")}
-        on:click={() => handlePresetClick("pro")}>{$_("gameModes.pro")}</button
-      >
-    {:else}
-      <button
-        data-testid="settings-game-mode-virtual-player-beginner"
-        class="settings-expander__row-btn"
-        class:active={isPresetActive("beginner")}
-        on:click={() => handlePresetClick("beginner")}
-        >{$_("gameModes.beginner")}</button
-      >
-      <button
-        data-testid="settings-game-mode-virtual-player-experienced"
-        class="settings-expander__row-btn"
-        class:active={isPresetActive("experienced")}
-        on:click={() => handlePresetClick("experienced")}
-        >{$_("gameModes.experienced")}</button
-      >
-      <button
-        data-testid="settings-game-mode-virtual-player-pro"
-        class="settings-expander__row-btn"
-        class:active={isPresetActive("pro")}
-        on:click={() => handlePresetClick("pro")}>{$_("gameModes.pro")}</button
-      >
-      <button
-        data-testid="settings-game-mode-virtual-player-timed"
-        class="settings-expander__row-btn"
-        class:active={isPresetActive("timed")}
-        on:click={() => handlePresetClick("timed")}
-        >{$_("gameModes.timed")}</button
-      >
-    {/if}
-  </div>
+  {#if activeMode === "local"}
+    <ButtonGroup
+      options={[
+        {
+          label: $_("gameModes.observer"),
+          active: isPresetActive("observer"),
+          onClick: () => handlePresetClick("observer"),
+          dataTestId: "settings-game-mode-local-observer",
+        },
+        {
+          label: $_("gameModes.experienced"),
+          active: isPresetActive("experienced"),
+          onClick: () => handlePresetClick("experienced"),
+          dataTestId: "settings-game-mode-local-experienced",
+        },
+        {
+          label: $_("gameModes.pro"),
+          active: isPresetActive("pro"),
+          onClick: () => handlePresetClick("pro"),
+          dataTestId: "settings-game-mode-local-pro",
+        },
+      ]}
+    />
+  {:else}
+    <ButtonGroup
+      options={[
+        {
+          label: $_("gameModes.beginner"),
+          active: isPresetActive("beginner"),
+          onClick: () => handlePresetClick("beginner"),
+          dataTestId: "settings-game-mode-virtual-player-beginner",
+        },
+        {
+          label: $_("gameModes.experienced"),
+          active: isPresetActive("experienced"),
+          onClick: () => handlePresetClick("experienced"),
+          dataTestId: "settings-game-mode-virtual-player-experienced",
+        },
+        {
+          label: $_("gameModes.pro"),
+          active: isPresetActive("pro"),
+          onClick: () => handlePresetClick("pro"),
+          dataTestId: "settings-game-mode-virtual-player-pro",
+        },
+        {
+          label: $_("gameModes.timed"),
+          active: isPresetActive("timed"),
+          onClick: () => handlePresetClick("timed"),
+          dataTestId: "settings-game-mode-virtual-player-timed",
+        },
+      ]}
+    />
+  {/if}
   <div
     class="description"
     data-testid="game-mode-description"
@@ -142,7 +144,7 @@
     /* FIX: Додаємо змінні, які використовуються класами кнопок */
     --button-height: 36px;
     --button-padding: 4px 8px;
-    --button-border-width: 1.5px;
+    --button-border-width: var(--global-border-width);
     --button-border-radius: 8px;
     --button-font-size: 1em;
 

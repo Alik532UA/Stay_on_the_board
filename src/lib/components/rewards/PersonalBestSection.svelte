@@ -40,7 +40,7 @@
             rgba(255, 215, 0, 0.1),
             rgba(255, 165, 0, 0.05)
         );
-        border: 1px solid rgba(255, 215, 0, 0.3);
+        border: var(--global-border-width) solid rgba(255, 215, 0, 0.3);
         border-radius: 16px;
         padding: 20px;
         display: flex;

@@ -139,7 +139,7 @@
   :global(.dist-btn),
   :global(.control-btn) {
     border-radius: 16px;
-    border: 1.5px solid var(--border-color, #444);
+    border: var(--global-border-width) solid var(--border-color, #444);
     background: var(--control-bg, #222);
     color: var(--text-primary, #fff);
     cursor: pointer;
@@ -173,7 +173,7 @@
     pointer-events: none;
   }
   :global(.dir-btn.active) {
-    background: var(--control-hover, #ff9800);
+    background: var(--control-selected, #ff9800);
     color: var(--control-selected-text, #fff);
     border-color: var(--control-selected, #ff9800);
     transform: scale(1.1);
@@ -229,7 +229,7 @@
     height: 50px;
     font-size: 1.5em;
     border-radius: 16px;
-    border: 1.5px solid var(--border-color, #444);
+    border: var(--global-border-width) solid var(--border-color, #444);
     background: var(--control-bg, #222);
     color: var(--text-primary, #fff);
     cursor: pointer;
@@ -239,7 +239,7 @@
       transform 0.15s;
   }
   :global(.dist-btn.active) {
-    background: var(--control-hover, #ff9800);
+    background: var(--control-selected, #ff9800);
     color: var(--control-selected-text, #fff);
     border-color: var(--control-selected, #ff9800);
     transform: scale(1.1);

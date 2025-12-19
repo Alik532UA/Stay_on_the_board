@@ -4,7 +4,7 @@
     padding: 20px 24px;
     color: var(--text-primary, #fff);
     background: transparent;
-    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    border: var(--global-border-width) solid rgba(255, 255, 255, 0.2) !important;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
@@ -14,7 +14,7 @@
 /* Glassmorphism Inputs */
 .glass-input {
     background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: var(--global-border-width) solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 16px 24px;
     color: #fff;
@@ -69,7 +69,7 @@
             var(--confirm-action-bg) var(--volume-percentage),
             #3a3f44 var(--volume-percentage));
     border-radius: 7px;
-    border: 1px solid rgba(0, 0, 0, 0.4);
+    border: var(--global-border-width) solid rgba(0, 0, 0, 0.4);
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
@@ -106,7 +106,7 @@
     display: flex;
     justify-content: space-between;
     padding: 8px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: var(--global-border-width) solid rgba(255, 255, 255, 0.08);
     font-size: 1em;
     color: var(--text-secondary);
 }
@@ -193,7 +193,7 @@
     color: #ffffff;
     font-weight: bold;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: var(--global-border-width) solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     white-space: normal;
@@ -241,7 +241,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 0;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: var(--global-border-width) solid var(--border-color);
 }
 
 .player-score-row:last-child {

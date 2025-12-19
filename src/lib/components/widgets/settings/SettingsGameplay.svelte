@@ -8,6 +8,7 @@
     import { logService } from "$lib/services/logService";
     import { _ } from "svelte-i18n";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
+    import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
     // FIX: Видалено імпорт fitTextAction
     import { get } from "svelte/store";
     import { goto } from "$app/navigation";
@@ -140,16 +141,14 @@
             >{$_("gameControls.blockAfter")}</span
         >
         <!-- FIX: Видалено use:fitTextAction -->
-        <div class="settings-expander__button-group">
-            {#each [0, 1, 2, 3] as count}
-                <button
-                    data-testid="settings-expander-block-count-btn-{count}"
-                    class="settings-expander__square-btn"
-                    class:active={$gameSettingsStore.blockOnVisitCount ===
-                        count}
-                    on:click={() => selectBlockCount(count)}>{count + 1}</button
-                >
-            {/each}
-        </div>
+        <ButtonGroup
+            variant="square"
+            options={[0, 1, 2, 3].map((count) => ({
+                label: (count + 1).toString(),
+                active: $gameSettingsStore.blockOnVisitCount === count,
+                dataTestId: `settings-expander-block-count-btn-${count}`,
+                onClick: () => selectBlockCount(count),
+            }))}
+        />
     </div>
 {/if}

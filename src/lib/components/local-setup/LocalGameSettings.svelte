@@ -199,7 +199,7 @@
   .adjust-btn {
     background: var(--control-bg);
     color: var(--text-primary);
-    border: 1.5px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     border-radius: 8px;
     width: 40px;
     height: 40px;
@@ -239,7 +239,7 @@
   .mode-btn {
     background: var(--control-bg);
     color: var(--text-primary);
-    border: 1.5px solid #888;
+    border: var(--global-border-width) solid #888;
     border-radius: 8px;
     padding: 0 10.8px;
     height: 36px;

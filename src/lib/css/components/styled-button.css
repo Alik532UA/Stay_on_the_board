@@ -116,7 +116,7 @@
 /* Variant: Ghost (Transparent/Bordered) - Optional, for future */
 .styled-button--variant-ghost {
   background: transparent;
-  border: 1px solid currentColor;
+  border: var(--global-border-width) solid currentColor;
   box-shadow: none;
 }
 

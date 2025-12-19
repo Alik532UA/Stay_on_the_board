@@ -15,9 +15,12 @@
     let chatContainer: HTMLElement;
 
     onMount(() => {
-        unsubscribe = roomService.subscribeToChat(roomId, (msgs: ChatMessage[]) => {
-            messages = msgs;
-        });
+        unsubscribe = roomService.subscribeToChat(
+            roomId,
+            (msgs: ChatMessage[]) => {
+                messages = msgs;
+            },
+        );
     });
 
     onDestroy(() => {
@@ -77,7 +80,7 @@
         height: 300px;
         background: rgba(0, 0, 0, 0.2);
         border-radius: 12px;
-        border: 1px solid var(--border-color);
+        border: var(--global-border-width) solid var(--border-color);
         overflow: hidden;
     }
 

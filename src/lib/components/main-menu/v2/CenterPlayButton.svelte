@@ -102,7 +102,7 @@
         animation-name: pulse-in;
         animation-timing-function: ease;
         animation-iteration-count: infinite;
-        border: 1px solid rgba(255, 255, 255, 1);
+        border: var(--global-border-width) solid rgba(255, 255, 255, 1);
         /* outline: 1px solid rgba(0, 0, 0, 0.5); */
     }
 

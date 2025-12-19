@@ -106,7 +106,7 @@
   }
   .modal-window {
     background: var(--bg-secondary);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: var(--global-border-width) solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     border-radius: 18px;
 
@@ -205,7 +205,7 @@
     padding: 8px 26px;
     font-size: 1.08em;
     border-radius: 8px;
-    border: 1.5px solid #eee;
+    border: var(--global-border-width) solid #eee;
     background: #fff;
     color: #222;
     cursor: pointer;

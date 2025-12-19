@@ -174,7 +174,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		border: var(--global-border-width) solid rgba(255, 255, 255, 0.1);
 	}
 
 	/* --- Стилі кнопки (як на MainMenuV2) --- */
@@ -277,7 +277,7 @@
 		background: rgba(0, 0, 0, 0.3);
 		padding: 30px;
 		border-radius: 24px;
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		border: var(--global-border-width) solid rgba(255, 255, 255, 0.1);
 		display: flex;
 		flex-direction: column;
 		align-items: center;

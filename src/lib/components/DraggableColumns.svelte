@@ -243,7 +243,7 @@
     padding: 0 !important;
     margin: 0 !important;
     box-shadow: none !important;
-    border: 2px dashed #888;
+    border: var(--global-border-width) dashed #888;
     display: flex;
     flex-direction: column;
     gap: 0px;
@@ -252,7 +252,7 @@
     display: none !important;
   }
   ul.editing-column li {
-    border: 1.5px dashed #888;
+    border: var(--global-border-width) dashed #888;
   }
   .dnd-edit-instruction {
     max-width: 300px;

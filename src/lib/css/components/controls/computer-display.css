@@ -2,7 +2,7 @@
 
 #computer-move-display {
     background: var(--computer-display-bg);
-    border: 2px solid var(--computer-display-border);
+    border: var(--global-border-width) solid var(--computer-display-border);
     border-radius: 12px;
     padding: 15px;
     margin: 20px auto;

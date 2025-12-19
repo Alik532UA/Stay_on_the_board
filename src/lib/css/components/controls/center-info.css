@@ -28,7 +28,7 @@
 #center-info.confirm-btn-active {
     background: #43a047 !important;
     color: #fff !important;
-    border: 2px solid #43a047 !important;
+    border: var(--global-border-width) solid #43a047 !important;
     cursor: pointer;
     font-weight: bold;
     box-shadow: 0 0 8px #43a047 !important;
@@ -45,7 +45,7 @@
 #center-info.direction-distance-state {
     background: var(--control-bg);
     color: var(--text-primary);
-    border: 2px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     font-weight: bold;
 }
 

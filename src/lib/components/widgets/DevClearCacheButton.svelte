@@ -37,7 +37,8 @@
     right: 16px;
     z-index: 1000;
     background: var(--bg-secondary, rgba(255, 255, 255, 0.1));
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.2));
+    border: var(--global-border-width) solid
+      var(--border-color, rgba(255, 255, 255, 0.2));
     border-radius: 8px;
     padding: 8px;
     cursor: pointer;

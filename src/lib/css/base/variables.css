@@ -1,114 +1,113 @@
 /* CSS змінні для тем та стилів */
 :root {
-    /* Класичний стиль - Світла тема (за замовчуванням) */
-    --cell-size: 100px;
-    --bg-primary: #f0f2f5;
-    --bg-secondary: #fff;
-    --text-primary: #333;
-    --text-secondary: #555;
-    --text-accent: #1a237e;
-    --border-color: #bdc3c7;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --cell-light: #F0D9B5;
-    --cell-dark: #B58863;
-    --cell-blocked: #858585;
-    --piece-color: #3a2a22;
-    --piece-shadow: rgba(255, 255, 255, 0.7);
-    --control-bg: #f4f6f7;
-    --control-hover: #3498db;
-    --control-selected: #3f51b5;
-    --computer-display-bg: #e8eaf6;
-    --computer-display-border: #9fa8da;
-    --computer-display-text: #3f51b5;
-    --confirm-btn-bg: #4CAF50;
-    --confirm-btn-hover: #45a049;
-    --no-moves-btn-bg: #ff9800;
-    --no-moves-btn-hover: #f57c00;
-    --debug-btn-bg: #9c27b0;
-    --debug-btn-hover: #7b1fa2;
-    --modal-bg: rgba(0, 0, 0, 0.6);
-    --modal-content-bg: white;
-    --error-color: #d32f2f;
-    --board-hidden-bg: #d2c8b8;
-    --font-family-monospace: 'Fira Mono', monospace;
-    --unified-radius: 18px;
-    --unified-spacing: 24px;
-    --unified-shadow: 0 8px 32px #0008;
-    --modal-header-color: #fff;
-    --modal-body-color: #eee;
-    --modal-footer-gap: 16px;
-    --modal-overlay-bg: rgba(0, 0, 0, 0.4);
-    --positive-score-color: #4CAF50;
-    --confirm-action-bg: #43a047;
-    --confirm-action-text: #ffffff;
-    --warning-action-bg: #ffb300;
-    --warning-action-text: #23272f;
-    --info-action-bg: #9db2bf;
-    --info-action-text: #23272f;
-    --dot-color: #fff;
-    --crown-shadow: #fff8;
-    --control-selected-text: #23272f;
-    --disabled-bg: #43464e;
-    --disabled-text: #b0b0b0;
-    --toggle-off-bg: #23272f;
-    --confirm-btn-text: #fff;
-    --no-moves-btn-text: #fff;
-    --button-text-color: #23272f;
+  /* Класичний стиль - Світла тема (за замовчуванням) */
+  --cell-size: 100px;
+  --bg-primary: #f0f2f5;
+  --bg-secondary: #fff;
+  --text-primary: #333;
+  --text-secondary: #555;
+  --text-accent: #1a237e;
+  --border-color: #bdc3c7;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --cell-light: #F0D9B5;
+  --cell-dark: #B58863;
+  --cell-blocked: #858585;
+  --piece-color: #3a2a22;
+  --piece-shadow: rgba(255, 255, 255, 0.7);
+  --control-bg: #f4f6f7;
+  --control-hover: #3498db;
+  --control-selected: #3f51b5;
+  --computer-display-bg: #e8eaf6;
+  --computer-display-border: #9fa8da;
+  --computer-display-text: #3f51b5;
+  --confirm-btn-bg: #4CAF50;
+  --confirm-btn-hover: #45a049;
+  --no-moves-btn-bg: #ff9800;
+  --no-moves-btn-hover: #f57c00;
+  --debug-btn-bg: #9c27b0;
+  --debug-btn-hover: #7b1fa2;
+  --modal-bg: rgba(0, 0, 0, 0.6);
+  --modal-content-bg: white;
+  --error-color: #d32f2f;
+  --board-hidden-bg: #d2c8b8;
+  --font-family-monospace: 'Fira Mono', monospace;
+  --unified-radius: 18px;
+  --unified-spacing: 24px;
+  --unified-shadow: 0 8px 32px #0008;
+  --modal-header-color: #fff;
+  --modal-body-color: #eee;
+  --modal-footer-gap: 16px;
+  --modal-overlay-bg: rgba(0, 0, 0, 0.4);
+  --positive-score-color: #4CAF50;
+  --confirm-action-bg: #43a047;
+  --confirm-action-text: #ffffff;
+  --warning-action-bg: #ffb300;
+  --warning-action-text: #23272f;
+  --info-action-bg: #9db2bf;
+  --info-action-text: #23272f;
+  --dot-color: #fff;
+  --crown-shadow: #fff8;
+  --control-selected-text: #23272f;
+  --disabled-bg: #43464e;
+  --disabled-text: #b0b0b0;
+  --toggle-off-bg: #23272f;
+  --confirm-btn-text: #fff;
+  --no-moves-btn-text: #fff;
+  --button-text-color: #23272f;
 
-    /* === Уніфіковані стилі для основних елементів інтерфейсу === */
-    --button-height: 44px;
-    /* Уніфіковане скруглення для основних елементів */
-    --unified-border-radius: 24px;
-    /* Уніфікована тінь для основних елементів */
-    --unified-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
-    /* Уніфікована тінь при hover */
-    --unified-shadow-hover: 0 6px 20px 0 rgba(0, 0, 0, 0.5);
-    /* Тінь для динамічних віджетів, що змінюють колір */
-    --dynamic-widget-shadow: 0 0 16px -8px;
-    /* Уніфіковане обведення */
-    --unified-border: 1.5px solid rgba(255, 255, 255, 0.18);
-    /* Уніфікований backdrop-filter */
-    --unified-backdrop-filter: blur(12px);
+  /* === Уніфіковані стилі для основних елементів інтерфейсу === */
+  --button-height: 44px;
+  /* Уніфіковане скруглення для основних елементів */
+  --unified-border-radius: 24px;
+  /* Уніфікована тінь для основних елементів */
+  --unified-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
+  /* Уніфікована тінь при hover */
+  --unified-shadow-hover: 0 6px 20px 0 rgba(0, 0, 0, 0.5);
+  /* Тінь для динамічних віджетів, що змінюють колір */
+  --dynamic-widget-shadow: 0 0 16px -8px;
+  /* Максимальна ширина контейнерів (модалки, меню) - не більше 400px, але і не ширше 95% екрану */
+  --responsive-max-width: min(400px, 95vw);
+  /* Мінімальна ширина для контенту, щоб не ламався на дуже вузьких екранах */
+  --responsive-min-width: 200px;
+  /* Ширина модалок на мобільних */
+  --mobile-modal-width: 95vw;
 
-    /* === АДАПТИВНІ РОЗМІРИ (FIX) === */
-    /* Максимальна ширина контейнерів (модалки, меню) - не більше 400px, але і не ширше 95% екрану */
-    --responsive-max-width: min(400px, 95vw);
-    /* Мінімальна ширина для контенту, щоб не ламався на дуже вузьких екранах */
-    --responsive-min-width: 200px;
-    /* Ширина модалок на мобільних */
-    --mobile-modal-width: 95vw;
+  /* === Глобальне налаштування бордерів === */
+  --global-border-width: 0px;
+  /* Уніфіковане обведення з використанням глобальної змінної */
+  --unified-border: var(--global-border-width) solid rgba(255, 255, 255, 0.18);
 }
 
 /* Класичний стиль - Темна тема */
 [data-theme="dark"] {
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #2d2d2d;
-    --text-primary: #e0e0e0;
-    --text-secondary: #b0b0b0;
-    --text-accent: #64b5f6;
-    --border-color: #555;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --cell-light: #8d6e63;
-    --cell-dark: #5d4037;
-    --cell-blocked: #626262;
-    --piece-color: #ffd54f;
-    --piece-shadow: rgba(0, 0, 0, 0.7);
-    --control-bg: #424242;
-    --control-hover: #1976d2;
-    --control-selected: #64b5f6;
-    --computer-display-bg: #37474f;
-    --computer-display-border: #546e7a;
-    --computer-display-text: #81c784;
-    --confirm-btn-bg: #388e3c;
-    --confirm-btn-hover: #2e7d32;
-    --no-moves-btn-bg: #ff9800;
-    --no-moves-btn-hover: #f57c00;
-    --debug-btn-bg: #9c27b0;
-    --debug-btn-hover: #7b1fa2;
-    --modal-bg: rgba(0, 0, 0, 0.8);
-    --modal-content-bg: #2d2d2d;
-    --error-color: #f44336;
-    --board-hidden-bg: #424242;
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --text-accent: #64b5f6;
+  --border-color: #555;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --cell-light: #8d6e63;
+  --cell-dark: #5d4037;
+  --cell-blocked: #626262;
+  --piece-color: #ffd54f;
+  --piece-shadow: rgba(0, 0, 0, 0.7);
+  --control-bg: #424242;
+  --control-hover: #1976d2;
+  --control-selected: #64b5f6;
+  --computer-display-bg: #37474f;
+  --computer-display-border: #546e7a;
+  --computer-display-text: #81c784;
+  --confirm-btn-bg: #388e3c;
+  --confirm-btn-hover: #2e7d32;
+  --no-moves-btn-bg: #ff9800;
+  --no-moves-btn-hover: #f57c00;
+  --debug-btn-bg: #9c27b0;
+  --debug-btn-hover: #7b1fa2;
+  --modal-bg: rgba(0, 0, 0, 0.8);
+  --modal-content-bg: #2d2d2d;
+  --error-color: #f44336;
+  --board-hidden-bg: #424242;
 }
 
 /*

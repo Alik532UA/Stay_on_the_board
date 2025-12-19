@@ -6,7 +6,7 @@ button,
 .theme-btn,
 .lang-btn {
     background: var(--control-bg);
-    border: 2px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     border-radius: 12px;
     padding: 12px 20px;
     cursor: pointer;
@@ -35,7 +35,7 @@ button:hover,
 input,
 select {
     background: var(--bg-secondary);
-    border: 2px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     border-radius: 8px;
     padding: 12px 16px;
     color: var(--text-primary);

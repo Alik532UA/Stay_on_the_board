@@ -73,7 +73,7 @@
 
   .voice-selection-button {
     background-color: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: var(--global-border-width) solid rgba(255, 255, 255, 0.2);
     color: white;
     padding: 8px 16px;
     border-radius: 12px;

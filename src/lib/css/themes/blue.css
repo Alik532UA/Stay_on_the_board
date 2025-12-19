@@ -6,12 +6,12 @@
     --text-secondary: #3a4a6b;
     --text-accent: #2a5ca7;
     --border-color: #2a5ca7;
-    --shadow-color: rgba(42,92,167,0.10);
+    --shadow-color: rgba(42, 92, 167, 0.10);
     --cell-light: #7a9cc6;
     --cell-dark: #3a4a6b;
     --cell-blocked: #b0c4de;
     --piece-color: #2a5ca7;
-    --piece-shadow: rgba(42,92,167,0.3);
+    --piece-shadow: rgba(42, 92, 167, 0.3);
     --control-bg: #c7d8ed;
     --control-hover: #7a9cc6;
     --control-selected: #2a5ca7;
@@ -29,7 +29,8 @@
     --warning-action-text: #1a2236;
     --info-action-bg: #2a5ca7;
     --info-action-text: #ffffff;
-    --disabled-bg: #c7d8ed; --disabled-text: #3a4a6b;
+    --disabled-bg: #c7d8ed;
+    --disabled-text: #3a4a6b;
 }
 
 /* Синя тема - Темна */
@@ -40,12 +41,12 @@
     --text-secondary: #7a9cc6;
     --text-accent: #5c8edc;
     --border-color: #5c8edc;
-    --shadow-color: rgba(42,92,167,0.22);
+    --shadow-color: rgba(42, 92, 167, 0.22);
     --cell-light: #22335a;
     --cell-dark: #16213a;
     --cell-blocked: #3a4a6b;
     --piece-color: #7a9cc6;
-    --piece-shadow: rgba(42,92,167,0.3);
+    --piece-shadow: rgba(42, 92, 167, 0.3);
     --control-bg: #22335a;
     --control-hover: #3a4a6b;
     --control-selected: #5c8edc;
@@ -63,7 +64,8 @@
     --warning-action-text: #101a2c;
     --info-action-bg: #5c8edc;
     --info-action-text: #ffffff;
-    --disabled-bg: #22335a; --disabled-text: #7a9cc6;
+    --disabled-bg: #22335a;
+    --disabled-text: #7a9cc6;
     --toggle-off-bg: #101a2c;
 }
 
@@ -73,7 +75,7 @@
 }
 
 [data-style="blue"] .control-btn {
-    border: 2px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     background: linear-gradient(145deg, var(--control-bg), #3a5f8a);
 }
 
@@ -104,30 +106,43 @@
 }
 
 @keyframes blueShineDark {
-    0%, 100% { 
+
+    0%,
+    100% {
         text-shadow: 0 0 10px var(--piece-shadow), 0 0 20px var(--piece-color);
         transform: scale(1);
     }
-    50% { 
+
+    50% {
         text-shadow: 0 0 20px var(--piece-shadow), 0 0 40px var(--piece-color), 0 0 60px var(--piece-color);
         transform: scale(1.05);
     }
 }
 
 @keyframes blueShine {
-    0%, 100% { 
+
+    0%,
+    100% {
         text-shadow: 0 0 5px var(--piece-shadow), 0 0 10px var(--piece-color);
         transform: scale(1);
     }
-    50% { 
+
+    50% {
         text-shadow: 0 0 15px var(--piece-shadow), 0 0 30px var(--piece-color), 0 0 45px var(--piece-color);
         transform: scale(1.03);
     }
 }
 
 @keyframes bluePulse {
-    0%, 100% { transform: scale(1.05); }
-    50% { transform: scale(1.1); }
+
+    0%,
+    100% {
+        transform: scale(1.05);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
 }
 
 /* Стилі для стрілок у BLUE темі */

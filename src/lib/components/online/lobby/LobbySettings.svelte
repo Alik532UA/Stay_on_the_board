@@ -201,7 +201,7 @@
         width: 32px;
         height: 32px;
         border-radius: 8px;
-        border: 1px solid var(--border-color);
+        border: var(--global-border-width) solid var(--border-color);
         background: var(--control-bg);
         color: var(--text-primary);
         cursor: pointer;

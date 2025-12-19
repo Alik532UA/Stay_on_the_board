@@ -12,7 +12,7 @@
 #theme-toggle {
     display: flex;
     background: var(--control-bg);
-    border: 2px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 12px var(--shadow-color);
@@ -44,7 +44,7 @@
 #style-toggle select,
 #lang-toggle select {
     padding: 12px 16px;
-    border: 2px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     border-radius: 12px;
     background: var(--control-bg);
     color: var(--text-primary);
@@ -70,7 +70,7 @@
 
 .custom-dropdown-btn {
     background: var(--control-bg);
-    border: 2px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     border-radius: 12px;
     padding: 12px 16px;
     cursor: pointer;
@@ -89,7 +89,7 @@
     left: 0;
     right: 0;
     background: var(--bg-secondary);
-    border: 2px solid var(--border-color);
+    border: var(--global-border-width) solid var(--border-color);
     border-radius: 12px;
     box-shadow: var(--unified-shadow);
     z-index: 1000;
@@ -107,7 +107,7 @@
     padding: 12px 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: var(--global-border-width) solid var(--border-color);
 }
 
 .style-option:last-child {

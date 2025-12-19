@@ -1,13 +1,13 @@
 <script lang="ts">
   export let x = 0;
   export let y = 0;
-  export let content = '';
+  export let content = "";
 
   let tooltipNode: HTMLElement;
   let adjustedX = 0;
   let adjustedY = 0;
 
-  $: if (tooltipNode && content && typeof window !== 'undefined') {
+  $: if (tooltipNode && content && typeof window !== "undefined") {
     const width = tooltipNode.offsetWidth;
     const height = tooltipNode.offsetHeight;
     const safetyMargin = 10;
@@ -16,16 +16,16 @@
     let newY = y;
 
     if (newX + width + safetyMargin > window.innerWidth) {
-        newX = window.innerWidth - width - safetyMargin;
+      newX = window.innerWidth - width - safetyMargin;
     }
     if (newY + height + safetyMargin > window.innerHeight) {
-        newY = window.innerHeight - height - safetyMargin;
+      newY = window.innerHeight - height - safetyMargin;
     }
     if (newX < safetyMargin) {
-        newX = safetyMargin;
+      newX = safetyMargin;
     }
     if (newY < safetyMargin) {
-        newY = safetyMargin;
+      newY = safetyMargin;
     }
     adjustedX = newX;
     adjustedY = newY;
@@ -33,10 +33,13 @@
     adjustedX = x;
     adjustedY = y;
   }
-
 </script>
 
-<div class="tooltip" style="left: {adjustedX}px; top: {adjustedY}px;" bind:this={tooltipNode}>
+<div
+  class="tooltip"
+  style="left: {adjustedX}px; top: {adjustedY}px;"
+  bind:this={tooltipNode}
+>
   {@html content}
 </div>
 
@@ -69,7 +72,7 @@
     justify-content: center;
     height: 20px;
     padding: 0 6px;
-    border: 1px solid var(--border-color, #444);
+    border: var(--global-border-width) solid var(--border-color, #444);
     border-radius: 4px;
     background: var(--bg-primary, #1e1e1e);
     font-weight: bold;

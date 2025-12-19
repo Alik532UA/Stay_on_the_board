@@ -30,7 +30,7 @@
   .settings-expander__toggle-btn {
     background: var(--control-bg);
     color: var(--text-primary);
-    border: var(--button-border-width, 1.5px) solid #888;
+    border: var(--button-border-width, var(--global-border-width)) solid #888;
     border-radius: var(--button-border-radius, 8px);
     padding: 0;
     height: var(--button-height, 44px);
