@@ -16,6 +16,8 @@
   import { playerStore } from "$lib/stores/playerStore";
   import { logService } from "$lib/services/logService.js";
   import { uiStateStore } from "$lib/stores/uiStateStore";
+  import CompactComputerMove from "$lib/components/widgets/game-info/CompactComputerMove.svelte";
+  import StructuredMessage from "$lib/components/widgets/game-info/StructuredMessage.svelte";
 
   // --- Допоміжні функції ---
   function getPlayerColor(players: any[], playerName: string): string | null {
@@ -95,20 +97,20 @@
               type: "STRUCTURED",
               lines: [
                 {
-                  type: "line",
+                  type: "line" as const,
                   parts: [
                     {
-                      type: "text",
+                      type: "text" as const,
                       content: $_("gameBoard.gameInfo.firstMove"),
                     },
                   ],
                 },
                 {
-                  type: "line",
+                  type: "line" as const,
                   parts: [
-                    { type: "text", content: "Зараз ходить: " },
+                    { type: "text" as const, content: "Зараз ходить: " },
                     {
-                      type: "player",
+                      type: "player" as const,
                       name: currentPlayer.name,
                       style: getPlayerNameStyle(
                         $playerStore.players,
@@ -127,16 +129,19 @@
             type: "STRUCTURED",
             lines: [
               {
-                type: "line",
+                type: "line" as const,
                 parts: [
-                  { type: "text", content: $_("gameBoard.gameInfo.firstMove") },
+                  {
+                    type: "text" as const,
+                    content: $_("gameBoard.gameInfo.firstMove"),
+                  },
                 ],
               },
               {
-                type: "line",
+                type: "line" as const,
                 parts: [
                   {
-                    type: "player",
+                    type: "player" as const,
                     name: currentPlayer.name,
                     style: getPlayerNameStyle(
                       $playerStore.players,
@@ -144,7 +149,7 @@
                     ),
                   },
                   {
-                    type: "text",
+                    type: "text" as const,
                     content:
                       ", " +
                       $_(
@@ -205,10 +210,10 @@
           type: "STRUCTURED",
           lines: [
             {
-              type: "line",
+              type: "line" as const,
               parts: [
                 {
-                  type: "player",
+                  type: "player" as const,
                   name: previousPlayer.name,
                   style: getPlayerNameStyle(
                     $playerStore.players,
@@ -216,23 +221,23 @@
                   ),
                 },
                 {
-                  type: "text",
+                  type: "text" as const,
                   content: ` зробив хід: ${direction} на ${$lastPlayerMove.distance}.`,
                 },
               ],
             },
             {
-              type: "line",
+              type: "line" as const,
               parts: [
                 {
-                  type: "player",
+                  type: "player" as const,
                   name: currentPlayer.name,
                   style: getPlayerNameStyle(
                     $playerStore.players,
                     currentPlayer.name,
                   ),
                 },
-                { type: "text", content: " ваша черга робити хід!" },
+                { type: "text" as const, content: " ваша черга робити хід!" },
               ],
             },
           ],
@@ -245,11 +250,11 @@
             type: "STRUCTURED",
             lines: [
               {
-                type: "line",
+                type: "line" as const,
                 parts: [
-                  { type: "text", content: "Хід гравця: " },
+                  { type: "text" as const, content: "Хід гравця: " },
                   {
-                    type: "player",
+                    type: "player" as const,
                     name: currentPlayer.name,
                     style: getPlayerNameStyle(
                       $playerStore.players,
@@ -271,11 +276,11 @@
             type: "STRUCTURED",
             lines: [
               {
-                type: "line",
+                type: "line" as const,
                 parts: [
-                  { type: "text", content: "Зараз ходить: " },
+                  { type: "text" as const, content: "Зараз ходить: " },
                   {
-                    type: "player",
+                    type: "player" as const,
                     name: currentPlayer.name,
                     style: getPlayerNameStyle(
                       $playerStore.players,
@@ -314,25 +319,9 @@
             out:fade={{ duration: 250 }}
           >
             {#if $displayMessage.type === "COMPACT_COMPUTER_MOVE"}
-              <div class="compact-message-line">
-                <span>{$displayMessage.part1}</span>
-                <span class="compact-move-display">{$displayMessage.move}</span>
-              </div>
-              <span>{$displayMessage.part2}</span>
+              <CompactComputerMove message={$displayMessage as any} />
             {:else if $displayMessage.type === "STRUCTURED"}
-              {#each $displayMessage.lines as line}
-                <div class="message-line">
-                  {#each line.parts as part}
-                    {#if part.type === "text"}
-                      <span>{part.content}</span>
-                    {:else if part.type === "player"}
-                      <span class="player-name-plate" style={part.style}
-                        >{part.name}</span
-                      >
-                    {/if}
-                  {/each}
-                </div>
-              {/each}
+              <StructuredMessage lines={$displayMessage.lines} />
             {:else}
               {$displayMessage.content}
             {/if}
@@ -385,46 +374,5 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-  }
-
-  .message-line {
-    text-align: center;
-    width: 100%;
-  }
-
-  :global(.player-name-plate) {
-    display: inline-block;
-    padding: 0px 8px;
-    border-radius: 12px;
-    color: #ffffff;
-    font-weight: bold;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-  }
-
-  :global(.compact-move-display) {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: orange !important;
-    color: #fff !important;
-    font-weight: bold !important;
-    border-radius: 12px;
-    padding: 2px 10px;
-    margin: 0 4px;
-    font-family: "M PLUS Rounded 1c", sans-serif !important;
-    min-width: 40px;
-    min-height: 28px;
-    font-size: 1.1em;
-  }
-
-  .compact-message-line {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
   }
 </style>
