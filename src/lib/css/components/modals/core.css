@@ -33,6 +33,12 @@
     animation: modalFadeIn 0.3s ease-out forwards;
 }
 
+@media (max-width: 480px) {
+    .modal-window {
+        max-width: var(--mobile-modal-width);
+    }
+}
+
 .modal-window::before {
     content: "";
     position: absolute;
