@@ -36,6 +36,7 @@ export default {
     allowGuestSettings: "Musafirlere sozlamalarnı deñiştirmege ruhset bermek"
   },
   chat: {
+    title: "Sohbet",
     placeholder: "Bir şey yazıñız...",
     empty: "Çat boş"
   },

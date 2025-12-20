@@ -36,6 +36,7 @@ export default {
     allowGuestSettings: "Allow guests to change settings"
   },
   chat: {
+    title: "Chat",
     placeholder: "Type a message...",
     empty: "Chat is empty"
   },

@@ -35,12 +35,8 @@
 <style>
     /* Personal Best Card */
     .pb-card {
-        background: linear-gradient(
-            135deg,
-            rgba(255, 215, 0, 0.1),
-            rgba(255, 165, 0, 0.05)
-        );
-        border: var(--global-border-width) solid rgba(255, 215, 0, 0.3);
+        background: rgba(255, 255, 255, 0.03);
+        border: var(--global-border-width) solid rgba(255, 255, 255, 0.1);
         border-radius: 16px;
         padding: 20px;
         display: flex;

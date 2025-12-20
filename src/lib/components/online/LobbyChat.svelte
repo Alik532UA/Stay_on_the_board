@@ -4,6 +4,7 @@
     import { _ } from "svelte-i18n";
     import type { Unsubscribe } from "firebase/firestore";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
+    import SvgIcons from "$lib/components/SvgIcons.svelte";
 
     export let roomId: string;
     export let playerId: string;
@@ -36,7 +37,7 @@
     async function sendMessage() {
         if (!newMessage.trim()) return;
         const text = newMessage.trim();
-        newMessage = ""; // Очищаємо одразу для UX
+        newMessage = "";
         await roomService.sendMessage(roomId, playerId, playerName, text);
     }
 
@@ -67,8 +68,14 @@
             on:keydown={handleKeydown}
             maxlength="100"
         />
-        <StyledButton size="small" variant="primary" on:click={sendMessage}>
-            ➤
+        <StyledButton
+            size="small"
+            variant="primary"
+            on:click={sendMessage}
+            class="send-btn"
+        >
+            <SvgIcons name="arrow-up" width="16" height="16" />
+            <!-- Using arrow as send icon -->
         </StyledButton>
     </div>
 </div>
@@ -77,10 +84,11 @@
     .chat-container {
         display: flex;
         flex-direction: column;
-        height: 300px;
-        background: rgba(0, 0, 0, 0.2);
+        height: 100%;
+        min-height: 250px;
+        max-height: 400px; /* Limit height */
+        background: transparent; /* Wrapper handles background */
         border-radius: 12px;
-        border: var(--global-border-width) solid var(--border-color);
         overflow: hidden;
     }
 
@@ -97,49 +105,74 @@
         text-align: center;
         color: var(--text-secondary);
         font-style: italic;
-        margin-top: 20px;
+        margin-top: auto;
+        margin-bottom: auto;
+        font-size: 0.9em;
+        opacity: 0.7;
     }
 
     .message {
-        max-width: 80%;
+        max-width: 85%;
         padding: 8px 12px;
         border-radius: 12px;
-        background: var(--bg-secondary);
+        background: rgba(255, 255, 255, 0.05); /* Glass child */
         align-self: flex-start;
         font-size: 0.9em;
+        line-height: 1.4;
+        word-break: break-word;
     }
 
     .message.my-message {
         align-self: flex-end;
-        background: var(--control-selected);
-        color: var(--control-selected-text);
+        background: rgba(var(--text-accent-rgb, 255, 215, 0), 0.2);
+        color: var(--text-primary);
+        border: 1px solid rgba(var(--text-accent-rgb, 255, 215, 0), 0.1);
     }
 
     .sender {
-        font-size: 0.75em;
-        opacity: 0.7;
+        font-size: 0.7em;
+        opacity: 0.6;
         margin-bottom: 2px;
     }
 
     .input-area {
         display: flex;
-        padding: 8px;
+        padding: 10px;
         gap: 8px;
-        background: var(--bg-secondary);
-        border-top: 1px solid var(--border-color);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(0, 0, 0, 0.1);
+        align-items: center;
     }
 
     input {
         flex: 1;
-        background: var(--bg-primary);
-        border: 1px solid var(--border-color);
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
         padding: 8px 12px;
         color: var(--text-primary);
+        font-family: inherit;
+        transition: all 0.2s;
     }
 
     input:focus {
         outline: none;
-        border-color: var(--text-accent);
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    input::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+    }
+
+    :global(.send-btn) {
+        width: 36px !important;
+        height: 36px !important;
+        padding: 0 !important;
+        border-radius: 8px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: unset !important;
     }
 </style>

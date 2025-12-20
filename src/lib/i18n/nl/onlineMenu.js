@@ -36,6 +36,7 @@ export default {
     allowGuestSettings: "Gasten toestaan instellingen te wijzigen"
   },
   chat: {
+    title: "Chat",
     placeholder: "Typ een bericht...",
     empty: "Chat is leeg"
   },
