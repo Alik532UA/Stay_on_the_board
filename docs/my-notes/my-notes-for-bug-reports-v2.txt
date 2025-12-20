@@ -3208,6 +3208,9 @@ class="color-preview s-b_QAI1EKiACh"
 Актуальний результат: у другого продовжується гра
 Очікуваний результат: працю по новій схемі
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+await expect(page.getByTestId('main-menu-container')).toBeVisible();
+
+class="center-container s-YtPDSrqiFdp_"
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 

@@ -10,7 +10,7 @@
     const delayStep = duration / waveCount;
 </script>
 
-<div class="center-container">
+<div class="center-container" data-testid="center-container">
     <button
         class="play-btn-circle"
         on:click={onPlay}
