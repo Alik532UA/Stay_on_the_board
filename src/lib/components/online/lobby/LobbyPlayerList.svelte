@@ -78,6 +78,7 @@
         {#each players as player (player.id)}
             {@const status = getPlayerStatus(player)}
             <div
+                style="--player-color: {player.color}"
                 class="player-card"
                 class:is-me={player.id === myPlayerId}
                 class:is-ready={player.isReady}
@@ -255,9 +256,10 @@
     }
 
     .player-card.is-me {
-        background: rgba(33, 150, 243, 0.1); /* Blue tint */
-        border-color: rgba(33, 150, 243, 0.5); /* Blue border */
-        box-shadow: 0 4px 20px rgba(33, 150, 243, 0.15); /* Blue glow */
+        background: color-mix(in srgb, var(--player-color) 10%, transparent);
+        border-color: color-mix(in srgb, var(--player-color) 50%, transparent);
+        box-shadow: 0 4px 20px
+            color-mix(in srgb, var(--player-color) 15%, transparent);
     }
 
     .player-card.is-ready {

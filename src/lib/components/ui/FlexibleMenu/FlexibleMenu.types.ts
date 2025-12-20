@@ -13,4 +13,4 @@ export interface IFlexibleMenuProps {
     dataTestId?: string;
 }
 
-export type MenuPosition = 'top' | 'bottom';
+export type MenuPosition = 'top' | 'bottom' | 'left' | 'right';

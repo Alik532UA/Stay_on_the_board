@@ -269,8 +269,9 @@
         color: var(--text-secondary);
         cursor: pointer;
         padding: 0;
-        width: 32px;
-        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        aspect-ratio: 1/1;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -350,12 +351,19 @@
     }
 
     .send-icon-btn {
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        flex: 0 0 32px; /* Don't grow, don't shrink, fixed basis */
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        aspect-ratio: 1/1;
         border-radius: 50%;
-        background: var(--text-accent);
-        color: #000 !important; /* Force black icon for contrast on accent color */
-        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--text-primary) !important;
         display: flex;
         align-items: center;
         justify-content: center;
