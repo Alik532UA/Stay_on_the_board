@@ -48,6 +48,9 @@ export class GameStateReconciler {
         if (remoteState.scoreState) scoreStore.set(remoteState.scoreState);
 
         if (remoteState.settings) {
+            // FIX: Застосовуємо тільки ті налаштування, які прийшли з сервера і є спільними.
+            // Локальні налаштування (голос, віджети) залишаються без змін, бо їх немає в remoteState.settings
+            // (завдяки змінам в OnlineStateSynchronizer).
             gameSettingsStore.updateSettings(remoteState.settings);
         }
 
@@ -85,10 +88,6 @@ export class GameStateReconciler {
                 modalService.showGameOverModal(remoteState.gameOver!);
             }
         } else {
-            // FIX: Race Condition Protection
-            // If server has no Game Over, but we do locally, check if it's due to a "Finish" vote.
-            // If majority voted "Finish", we expect Game Over soon, so don't clear local state.
-
             const votes = remoteState.noMovesVotes || {};
             const totalPlayers = remoteState.playerState.players.length;
             const majorityThreshold = Math.floor(totalPlayers / 2) + 1;

@@ -8,6 +8,7 @@ import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { animationService } from '$lib/services/animationService';
 import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
+import { scoreStore } from '$lib/stores/scoreStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
 import type { IGameStateSync, GameStateSyncEvent, SyncableGameState } from '$lib/sync/gameStateSync.interface';
 import { createFirebaseGameStateSync } from '$lib/sync/FirebaseGameStateSync';
@@ -51,6 +52,13 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   async initialize(options: { newSize?: number; roomId?: string } = {}): Promise<void> {
+    // FIX: Очищаємо старий стан гри перед початком нової сесії.
+    // Це запобігає відображенню "старої гри" поки завантажується нова.
+    boardStore.set(null);
+    playerStore.set(null);
+    scoreStore.set(null);
+    animationService.reset();
+
     const session = roomService.getSession();
     this.roomId = options.roomId || session.roomId;
     this.myPlayerId = session.playerId;
@@ -368,7 +376,6 @@ export class OnlineGameMode extends BaseGameMode {
   private applyRemoteState(remoteState: SyncableGameState): void {
     this.isApplyingRemoteState = true;
 
-    // FIX: Зберігаємо індекс поточного гравця ДО оновлення стану
     const previousPlayerIndex = get(playerStore)?.currentPlayerIndex;
 
     if (this.reconciler) {
@@ -383,7 +390,6 @@ export class OnlineGameMode extends BaseGameMode {
       this.turnDuration = remoteState.settings.turnDuration;
     }
 
-    // FIX: Перезапускаємо таймер ТІЛЬКИ якщо змінився гравець
     const newPlayerIndex = remoteState.playerState.currentPlayerIndex;
     const isNewTurn = previousPlayerIndex !== newPlayerIndex;
     const isGameActive = !get(uiStateStore).isGameOver;
@@ -391,8 +397,6 @@ export class OnlineGameMode extends BaseGameMode {
     if (isNewTurn && isGameActive && !get(modalStore).isOpen) {
       logService.GAME_MODE(`[OnlineGameMode] Turn changed (${previousPlayerIndex} -> ${newPlayerIndex}). Restarting timer.`);
       this.startTurn();
-    } else {
-      // Якщо це просто оновлення голосування або налаштувань - таймер не чіпаємо
     }
 
     this.isApplyingRemoteState = false;
