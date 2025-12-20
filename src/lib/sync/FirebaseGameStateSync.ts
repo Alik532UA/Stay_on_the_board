@@ -7,6 +7,7 @@ import {
     collection,
     addDoc,
     serverTimestamp,
+    increment, // <--- IMPORTED
     type Unsubscribe,
     type DocumentReference,
     type Firestore
@@ -120,7 +121,6 @@ export class FirebaseGameStateSync implements IGameStateSync {
         }
     }
 
-    // FIX: Реалізація атомарного оновлення голосу
     async updateVote(playerId: string, vote: VoteType): Promise<void> {
         if (!this._roomRef || !this._isConnected) {
             logService.error('[FirebaseGameStateSync] Cannot update vote: not connected');
@@ -128,12 +128,11 @@ export class FirebaseGameStateSync implements IGameStateSync {
         }
 
         try {
-            // Використовуємо Dot Notation для оновлення конкретного поля в мапі
-            // Це запобігає перезапису голосів інших гравців (Race Condition)
             const fieldPath = `gameState.noMovesVotes.${playerId}`;
 
             await updateDoc(this._roomRef, {
                 [fieldPath]: vote,
+                'gameState.version': increment(1), // <--- Increment version to avoid stale state issues
                 updatedAt: serverTimestamp()
             });
 
@@ -213,19 +212,16 @@ export class FirebaseGameStateSync implements IGameStateSync {
                 const data = snapshot.data() as FirebaseRoomDocument;
 
                 if (data.gameState) {
-                    // Приймаємо будь-яке оновлення, навіть якщо версія не змінилася (для голосування)
-                    // Але оновлюємо локальну версію, якщо вона більша
                     if (data.gameState.version >= this._stateVersion) {
                         this._stateVersion = data.gameState.version;
-                    }
+                        const remoteState = GameStateSerializer.deserialize(data.gameState);
 
-                    const remoteState = GameStateSerializer.deserialize(data.gameState);
-
-                    if (remoteState) {
-                        this._notifySubscribers({
-                            type: 'state_updated',
-                            state: remoteState
-                        });
+                        if (remoteState) {
+                            this._notifySubscribers({
+                                type: 'state_updated',
+                                state: remoteState
+                            });
+                        }
                     }
                 }
             },
