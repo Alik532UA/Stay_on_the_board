@@ -40,7 +40,7 @@ export async function enableTestMode(page: Page) {
 export async function startNewGame(page: Page, mode: GameMode = GameMode.Beginner) {
   await page.goto('/');
   await enableTestMode(page);
-  await page.getByTestId('play-btn').click();
+  await page.getByTestId('center-play-btn').click();
 
   await page.getByTestId(mode).click();
 

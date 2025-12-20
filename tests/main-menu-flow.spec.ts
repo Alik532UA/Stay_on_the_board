@@ -23,7 +23,7 @@ test.describe('Кнопка "Головне меню"', () => {
     await test.step('Перевірка, що всі модальні вікна закриті і відображається головне меню', async () => {
       await expect(page.getByTestId('opponent-trapped-modal')).not.toBeVisible();
       await expect(page.getByTestId('game-over-modal')).not.toBeVisible();
-      await expect(page.getByTestId('main-menu-container')).toBeVisible();
+      await expect(page.getByTestId('center-container')).toBeVisible();
     });
   });
 
@@ -50,7 +50,7 @@ test.describe('Кнопка "Головне меню"', () => {
     await test.step('Перевірка, що всі модальні вікна закриті і відображається головне меню', async () => {
       await expect(page.getByTestId('player-no-moves-modal')).not.toBeVisible();
       await expect(page.getByTestId('game-over-modal')).not.toBeVisible();
-      await expect(page.getByTestId('main-menu-container')).toBeVisible();
+      await expect(page.getByTestId('center-container')).toBeVisible();
     });
   });
 
