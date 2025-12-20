@@ -10,6 +10,7 @@ export default {
     typeBug: "Повідомити про проблему",
     typeOther: "Інше",
     typeReward: "Запропонувати нагороду",
+    typeGlobalChat: "Спільний чат",
     pageLabel: "Сторінка (необов'язково)",
     improvementLabel: "Ваша пропозиція",
     rewardLabel: "Опишіть ідею для нагороди та умови її отримання",

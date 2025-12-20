@@ -11,7 +11,7 @@ export default {
   playing: "Playing",
   finished: "Finished",
   noRooms: "No rooms found. {lastInfo}Create the first one!",
-  lastRoomTime: "The last one was created {time} ago. ",
+  lastRoomTime: "Last room was created {time}",
   timeUnits: {
     m: "m",
     h: "h",

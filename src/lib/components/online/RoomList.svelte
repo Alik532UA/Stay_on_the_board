@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { roomService } from "$lib/services/roomService";
     import type { RoomSummary } from "$lib/types/online";
-    import { _ } from "svelte-i18n";
+    import { _, locale } from "svelte-i18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import { goto } from "$app/navigation";
     import { base } from "$app/paths";
@@ -10,6 +10,7 @@
     import { fade, fly } from "svelte/transition";
     import { flip } from "svelte/animate";
     import RoomCard from "./RoomCard.svelte";
+    import { formatDateTime } from "$lib/utils/dateUtils";
 
     let rooms: RoomSummary[] = [];
     let latestCreatedAt: number | undefined;
@@ -30,21 +31,6 @@
         } finally {
             isLoading = false;
         }
-    }
-
-    function getRelativeTimeString(timestamp: number): string {
-        const now = Date.now();
-        const diff = Math.floor((now - timestamp) / 1000); // seconds
-
-        if (diff < 30) return $_("onlineMenu.timeUnits.justNow");
-
-        if (diff < 3600) {
-            const mins = Math.max(1, Math.floor(diff / 60));
-            return `${mins} ${$_("onlineMenu.timeUnits.m")}`;
-        }
-
-        const hours = Math.floor(diff / 3600);
-        return `${hours} ${$_("onlineMenu.timeUnits.h")}`;
     }
 
     async function handleJoin(roomId: string) {
@@ -130,14 +116,19 @@
                 <div class="empty-icon-wrapper">
                     <SvgIcons name="no-moves" />
                 </div>
-                <p data-testid="no-rooms-message">
+                <p
+                    data-testid="no-rooms-message"
+                    style="white-space: pre-line;"
+                >
                     {$_("onlineMenu.noRooms", {
                         values: {
                             lastInfo: latestCreatedAt
-                                ? $_("onlineMenu.lastRoomTime", {
+                                ? "\n" +
+                                  $_("onlineMenu.lastRoomTime", {
                                       values: {
-                                          time: getRelativeTimeString(
+                                          time: formatDateTime(
                                               latestCreatedAt,
+                                              $locale,
                                           ),
                                       },
                                   })

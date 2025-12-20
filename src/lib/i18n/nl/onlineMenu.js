@@ -11,7 +11,7 @@ export default {
   playing: "Spelen",
   finished: "Voltooid",
   noRooms: "Geen kamers gevonden. {lastInfo}Maak de eerste!",
-  lastRoomTime: "De laatste is {time} geleden gemaakt. ",
+  lastRoomTime: "De laatste kamer was {time}",
   timeUnits: {
     m: "m",
     h: "u",

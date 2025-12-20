@@ -11,6 +11,11 @@
     import { logService } from "$lib/services/logService";
     import { onMount } from "svelte";
 
+    // Імпорти для глобального чату
+    import { userStore } from "$lib/services/authService";
+    import AuthModal from "$lib/components/modals/AuthModal.svelte";
+    import GlobalChatModal from "$lib/components/modals/GlobalChatModal.svelte";
+
     export let initialType: FeedbackType | null = null;
 
     let selectedType: FeedbackType | null = initialType;
@@ -30,6 +35,36 @@
     function selectType(type: FeedbackType) {
         logService.ui(`[FeedbackModal] Selected type: ${type}`);
         selectedType = type;
+    }
+
+    // Логіка для кнопки "Спільний чат"
+    function handleGlobalChat() {
+        logService.action('Click: "Global Chat" (FeedbackModal)');
+
+        // Перевірка авторизації (Option 3C)
+        if (!$userStore || $userStore.isAnonymous) {
+            logService.ui(
+                "[FeedbackModal] User not logged in. Redirecting to AuthModal.",
+            );
+            modalStore.showModalAsReplacement({
+                component: AuthModal,
+                dataTestId: "auth-modal",
+                variant: "menu",
+                closeOnOverlayClick: true,
+                // Можна додати повідомлення "Увійдіть, щоб користуватися чатом"
+            });
+        } else {
+            logService.ui(
+                "[FeedbackModal] User logged in. Opening GlobalChatModal.",
+            );
+            modalStore.showModalAsReplacement({
+                component: GlobalChatModal,
+                dataTestId: "global-chat-modal",
+                variant: "standard", // Використовуємо стандартний стиль для чату
+                closeOnOverlayClick: true,
+                customClass: "chat-modal-window", // Для додаткової стилізації якщо треба
+            });
+        }
     }
 
     async function handleSubmit() {
@@ -77,6 +112,7 @@
 
     {#if !selectedType}
         <div class="menu-list">
+            <!-- 1. Запропонувати покращення -->
             <GameModeButton
                 text={$_("ui.feedback.typeImprovement")}
                 dataTestId="fb-type-improvement"
@@ -86,6 +122,8 @@
                     <NotoEmoji name="light_bulb" size="100%" />
                 </div>
             </GameModeButton>
+
+            <!-- 2. Повідомити про проблему -->
             <GameModeButton
                 text={$_("ui.feedback.typeBug")}
                 dataTestId="fb-type-bug"
@@ -93,6 +131,8 @@
             >
                 <div slot="icon"><NotoEmoji name="bug" size="100%" /></div>
             </GameModeButton>
+
+            <!-- 3. Запропонувати нагороду -->
             <GameModeButton
                 text={$_("ui.feedback.typeReward")}
                 dataTestId="fb-type-reward"
@@ -100,6 +140,8 @@
             >
                 <div slot="icon"><NotoEmoji name="trophy" size="100%" /></div>
             </GameModeButton>
+
+            <!-- 4. Інше -->
             <GameModeButton
                 text={$_("ui.feedback.typeOther")}
                 dataTestId="fb-type-other"
@@ -109,8 +151,23 @@
                     <NotoEmoji name="thought_balloon" size="100%" />
                 </div>
             </GameModeButton>
+
+            <!-- Розділювач -->
+            <div class="divider"></div>
+
+            <!-- 5. Спільний чат -->
+            <GameModeButton
+                text={$_("ui.feedback.typeGlobalChat")}
+                dataTestId="fb-type-global-chat"
+                on:click={handleGlobalChat}
+            >
+                <div slot="icon">
+                    <NotoEmoji name="speech_balloon" size="100%" />
+                </div>
+            </GameModeButton>
         </div>
     {:else}
+        <!-- ... (форма без змін) ... -->
         <div class="form-container">
             {#if selectedType === "improvement" || selectedType === "bug"}
                 <div class="form-group">
@@ -240,6 +297,13 @@
         display: flex;
         flex-direction: column;
         gap: 12px;
+        width: 100%;
+    }
+
+    .divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.15);
+        margin: 8px 0;
         width: 100%;
     }
 

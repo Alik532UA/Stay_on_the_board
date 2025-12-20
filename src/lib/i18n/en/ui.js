@@ -10,6 +10,7 @@ export default {
     typeBug: "Report a bug",
     typeOther: "Other",
     typeReward: "Suggest a reward",
+    typeGlobalChat: "Global Chat",
     pageLabel: "Page (optional)",
     improvementLabel: "Your suggestion",
     rewardLabel: "Describe the reward idea and unlock conditions",
@@ -25,21 +26,21 @@ export default {
     titleSave: "Save Progress",
     titleLogin: "Login",
     titleReset: "Password Reset",
-    titleProfile: "My Profile", // New
+    titleProfile: "My Profile",
     emailLabel: "Email",
     passwordLabel: "Password",
-    newPasswordLabel: "New Password", // New
+    newPasswordLabel: "New Password",
     saveBtn: "Register and Save",
     loginBtn: "Login",
     resetBtn: "Send Email",
-    logoutBtn: "Log Out", // New
-    changePasswordBtn: "Change Password", // New
-    savePasswordBtn: "Save New Password", // New
-    cancelChangePasswordBtn: "Cancel Change", // New
-    deleteAccountBtn: "Delete Account", // New
-    confirmDeleteBtn: "Confirm Deletion", // New
-    cancelDeleteBtn: "Cancel", // New
-    deleteWarning: "Warning! This action cannot be undone. All your data and records will be permanently deleted. Enter your password to confirm.", // New
+    logoutBtn: "Log Out",
+    changePasswordBtn: "Change Password",
+    savePasswordBtn: "Save New Password",
+    cancelChangePasswordBtn: "Cancel Change",
+    deleteAccountBtn: "Delete Account",
+    confirmDeleteBtn: "Confirm Deletion",
+    cancelDeleteBtn: "Cancel",
+    deleteWarning: "Warning! This action cannot be undone. All your data and records will be permanently deleted. Enter your password to confirm.",
     switchLogin: "Already have an account? Login",
     switchRegister: "No account? Register",
     forgotPassword: "Forgot password?",

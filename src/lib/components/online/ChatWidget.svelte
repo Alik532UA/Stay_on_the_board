@@ -13,19 +13,23 @@
     export let playerName: string;
     export let playerColor: string = "#ffd700"; // Default gold
 
-    let isOpen = false;
+    // Новий проп для керування режимом відображення
+    export let variant: "floating" | "embedded" = "floating";
+
+    // Якщо embedded, чат завжди відкритий
+    let isOpen = variant === "embedded";
     let messages: ChatMessage[] = [];
     let newMessage = "";
     let unsubscribe: Unsubscribe | null = null;
     let chatContainer: HTMLElement;
     let hasUnread = false;
 
-    // Toggle chat visibility
+    // Toggle chat visibility (тільки для floating)
     function toggleChat() {
+        if (variant === "embedded") return;
         isOpen = !isOpen;
         if (isOpen) {
             hasUnread = false;
-            // Scroll to bottom when opening
             setTimeout(() => {
                 if (chatContainer)
                     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -54,9 +58,7 @@
 
     afterUpdate(() => {
         if (isOpen && chatContainer) {
-            // Auto-scroll only if already near bottom or just opened
-            // Simple fallback: maximize scroll for now
-            // chatContainer.scrollTop = chatContainer.scrollHeight;
+            // Auto-scroll logic can be improved, but keeping simple for now
         }
     });
 
@@ -66,7 +68,6 @@
         newMessage = "";
         await roomService.sendMessage(roomId, playerId, playerName, text);
 
-        // Scroll to bottom after sending
         setTimeout(() => {
             if (chatContainer)
                 chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -81,87 +82,129 @@
 
     function getMessageStyle(msg: ChatMessage) {
         if (msg.senderId !== playerId) return "";
-        // Assume playerColor is hex #RRGGBB. Add alpha for background.
-        // We can just use the hex + alpha suffix if it's 6 digits.
         let bg = playerColor;
         if (bg.startsWith("#") && bg.length === 7) {
-            bg += "33"; // ~20% opacity
+            bg += "33";
         }
-        // Border can be 50% opacity ?
         let border = playerColor;
         if (border.startsWith("#") && border.length === 7) {
-            border += "80"; // ~50% opacity
+            border += "80";
         }
         return `background-color: ${bg}; border-color: ${border};`;
     }
 </script>
 
-<div class="chat-widget-container">
-    {#if isOpen}
-        <div class="chat-window" transition:fly={{ y: 20, duration: 300 }}>
-            <div class="chat-header">
-                <h3>{$_("onlineMenu.chat.title")}</h3>
-                <button
-                    class="close-btn"
-                    on:click={toggleChat}
-                    data-testid="chat-close-btn"
-                >
-                    <SvgIcons name="arrow-down" width="16" height="16" />
-                </button>
-            </div>
+<!-- 
+    Якщо variant="embedded", ми не рендеримо обгортку .chat-widget-container, 
+    а рендеримо .chat-window прямо в потоці документа з класом .embedded
+-->
 
-            <div class="messages-list" bind:this={chatContainer}>
-                {#if messages.length === 0}
-                    <div class="empty-chat">{$_("onlineMenu.chat.empty")}</div>
-                {/if}
-                {#each messages as msg (msg.id)}
-                    <div
-                        class="message"
-                        class:my-message={msg.senderId === playerId}
-                        style={getMessageStyle(msg)}
-                    >
-                        <div class="sender">{msg.senderName}</div>
-                        <div class="text">{msg.text}</div>
-                    </div>
-                {/each}
-            </div>
-
-            <div class="input-area">
-                <input
-                    type="text"
-                    bind:value={newMessage}
-                    placeholder={$_("onlineMenu.chat.placeholder")}
-                    on:keydown={handleKeydown}
-                    maxlength="100"
-                />
-                <button
-                    class="send-icon-btn"
-                    on:click={sendMessage}
-                    data-testid="chat-send-btn"
-                >
-                    <SvgIcons name="arrow-up" width="18" height="18" />
-                </button>
-            </div>
-        </div>
-    {/if}
-
-    <button
-        class="chat-fab"
-        class:unread={hasUnread}
-        on:click={toggleChat}
-        aria-label="Toggle Chat"
-    >
+{#if variant === "floating"}
+    <div class="chat-widget-container">
         {#if isOpen}
-            <SvgIcons name="arrow-down" width="24" height="24" />
-        {:else}
-            <!-- Using NotoEmoji instead of text emoji as per global replacement goal -->
-            <NotoEmoji name="speech_balloon" size="24px" />
+            <div class="chat-window" transition:fly={{ y: 20, duration: 300 }}>
+                <div class="chat-header">
+                    <h3>{$_("onlineMenu.chat.title")}</h3>
+                    <button
+                        class="close-btn"
+                        on:click={toggleChat}
+                        data-testid="chat-close-btn"
+                    >
+                        <SvgIcons name="arrow-down" width="16" height="16" />
+                    </button>
+                </div>
+
+                <div class="messages-list" bind:this={chatContainer}>
+                    {#if messages.length === 0}
+                        <div class="empty-chat">
+                            {$_("onlineMenu.chat.empty")}
+                        </div>
+                    {/if}
+                    {#each messages as msg (msg.id)}
+                        <div
+                            class="message"
+                            class:my-message={msg.senderId === playerId}
+                            style={getMessageStyle(msg)}
+                        >
+                            <div class="sender">{msg.senderName}</div>
+                            <div class="text">{msg.text}</div>
+                        </div>
+                    {/each}
+                </div>
+
+                <div class="input-area">
+                    <input
+                        type="text"
+                        bind:value={newMessage}
+                        placeholder={$_("onlineMenu.chat.placeholder")}
+                        on:keydown={handleKeydown}
+                        maxlength="100"
+                    />
+                    <button
+                        class="send-icon-btn"
+                        on:click={sendMessage}
+                        data-testid="chat-send-btn"
+                    >
+                        <SvgIcons name="arrow-up" width="18" height="18" />
+                    </button>
+                </div>
+            </div>
         {/if}
-        {#if hasUnread}
-            <span class="unread-dot"></span>
-        {/if}
-    </button>
-</div>
+
+        <button
+            class="chat-fab"
+            class:unread={hasUnread}
+            on:click={toggleChat}
+            aria-label="Toggle Chat"
+        >
+            {#if isOpen}
+                <SvgIcons name="arrow-down" width="24" height="24" />
+            {:else}
+                <NotoEmoji name="speech_balloon" size="24px" />
+            {/if}
+            {#if hasUnread}
+                <span class="unread-dot"></span>
+            {/if}
+        </button>
+    </div>
+{:else}
+    <!-- EMBEDDED VARIANT -->
+    <div class="chat-window embedded">
+        <!-- Header is optional in embedded mode, usually handled by modal -->
+        <div class="messages-list" bind:this={chatContainer}>
+            {#if messages.length === 0}
+                <div class="empty-chat">{$_("onlineMenu.chat.empty")}</div>
+            {/if}
+            {#each messages as msg (msg.id)}
+                <div
+                    class="message"
+                    class:my-message={msg.senderId === playerId}
+                    style={getMessageStyle(msg)}
+                >
+                    <div class="sender">{msg.senderName}</div>
+                    <div class="text">{msg.text}</div>
+                </div>
+            {/each}
+        </div>
+
+        <div class="input-area">
+            <input
+                type="text"
+                bind:value={newMessage}
+                placeholder={$_("onlineMenu.chat.placeholder")}
+                on:keydown={handleKeydown}
+                maxlength="100"
+            />
+            <button
+                class="send-icon-btn"
+                on:click={sendMessage}
+                data-testid="chat-send-btn"
+            >
+                <SvgIcons name="arrow-up" width="18" height="18" />
+            </button>
+        </div>
+    </div>
+{/if}
 
 <style>
     .chat-widget-container {
@@ -216,7 +259,7 @@
     .chat-window {
         width: 320px;
         height: 400px;
-        background: rgba(30, 30, 30, 0.95); /* Dark background */
+        background: rgba(30, 30, 30, 0.95);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-radius: 20px;
@@ -226,6 +269,18 @@
         flex-direction: column;
         overflow: hidden;
         transform-origin: bottom right;
+    }
+
+    /* Embedded overrides */
+    .chat-window.embedded {
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        backdrop-filter: none;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        transform: none;
     }
 
     .chat-header {
@@ -295,8 +350,7 @@
     .message.my-message {
         align-self: flex-end;
         color: var(--text-primary);
-        /* Background and border are set dynamically via inline style */
-        border: 1px solid transparent; /* default fallback */
+        border: 1px solid transparent;
     }
 
     .sender {
@@ -336,7 +390,7 @@
         height: 32px;
         min-width: 32px;
         min-height: 32px;
-        flex: 0 0 32px; /* Don't grow, don't shrink, fixed basis */
+        flex: 0 0 32px;
         padding: 0;
         margin: 0;
         box-sizing: border-box;
@@ -353,7 +407,6 @@
         flex-shrink: 0;
     }
 
-    /* Ensure SVG inside inherits color */
     .send-icon-btn :global(svg) {
         fill: currentColor;
     }
@@ -363,9 +416,9 @@
     }
 
     @media (max-width: 480px) {
-        .chat-window {
-            width: calc(100vw - 32px); /* Full width on mobile minus padding */
-            right: 0; /* Align right to container but specific in layout */
+        .chat-window:not(.embedded) {
+            width: calc(100vw - 32px);
+            right: 0;
         }
 
         .chat-widget-container {

@@ -10,6 +10,7 @@ export default {
     typeBug: "Hata bildir",
     typeOther: "Başqa",
     typeReward: "Mukâfat teklif et",
+    typeGlobalChat: "Umumiy Çat",
     pageLabel: "Saife (mecburiy degil)",
     improvementLabel: "Teklifiñiz",
     rewardLabel: "Mukâfat ğayesini ve şartlarını tasvir etiñiz",
@@ -25,21 +26,21 @@ export default {
     titleSave: "İlerlemeyi Saqla",
     titleLogin: "Kiriş",
     titleReset: "Parolnı Yañıla",
-    titleProfile: "Menim Profilim", // New
+    titleProfile: "Menim Profilim",
     emailLabel: "Email",
     passwordLabel: "Parol",
-    newPasswordLabel: "Yañı Parol", // New
+    newPasswordLabel: "Yañı Parol",
     saveBtn: "Qayd ol ve Saqla",
     loginBtn: "Kir",
     resetBtn: "Mektüp Yolla",
-    logoutBtn: "Çıqış", // New
-    changePasswordBtn: "Parolnı Değiştir", // New
-    savePasswordBtn: "Yañı Parolnı Saqla", // New
-    cancelChangePasswordBtn: "Değişimi İptal Et", // New
-    deleteAccountBtn: "Esapnı Silmek", // New
-    confirmDeleteBtn: "Silüvni Tasdıqla", // New
-    cancelDeleteBtn: "İptal", // New
-    deleteWarning: "Diqqat! Bu amel keri qaytarılamaz. Bütün malümatlarıñız ve rekordlarıñız ebediyen silinecek. Tasdıqlamaq içün parolnı kiritiñiz.", // New
+    logoutBtn: "Çıqış",
+    changePasswordBtn: "Parolnı Değiştir",
+    savePasswordBtn: "Yañı Parolnı Saqla",
+    cancelChangePasswordBtn: "Değişimi İptal Et",
+    deleteAccountBtn: "Esapnı Silmek",
+    confirmDeleteBtn: "Silüvni Tasdıqla",
+    cancelDeleteBtn: "İptal",
+    deleteWarning: "Diqqat! Bu amel keri qaytarılamaz. Bütün malümatlarıñız ve rekordlarıñız ebediyen silinecek. Tasdıqlamaq içün parolnı kiritiñiz.",
     switchLogin: "Esabıñız barmı? Kiriş",
     switchRegister: "Esabıñız yoqmı? Qayd ol",
     forgotPassword: "Parolnı unuttıñızmı?",
