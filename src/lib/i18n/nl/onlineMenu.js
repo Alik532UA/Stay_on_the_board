@@ -10,7 +10,10 @@ export default {
   waiting: "Wachten",
   playing: "Spelen",
   finished: "Voltooid",
-  noRooms: "Geen kamers gevonden. {lastInfo}Maak de eerste!",
+  // FIX
+  noRooms: "Geen kamers gevonden.{lastInfo}",
+  // FIX
+  createFirst: " Maak de eerste!",
   lastRoomTime: "De laatste kamer was {time}",
   timeUnits: {
     m: "m",

@@ -26,7 +26,7 @@ export function formatDate(timestamp: number, locale: string | null | undefined)
 
 /**
  * Форматує дату та час.
- * Для української мови додає слово "року".
+ * Для української мови додає слово "року" та "о".
  */
 export function formatDateTime(timestamp: number, locale: string | null | undefined): string {
     const date = new Date(timestamp);
@@ -38,8 +38,8 @@ export function formatDateTime(timestamp: number, locale: string | null | undefi
     let dateString = date.toLocaleDateString(currentLocale, { day: '2-digit', month: '2-digit', year: 'numeric' });
 
     if (currentLocale === 'uk') {
-        // Формат: 20.12.2025 року 21:42
-        return `${dateString} року ${timeString}`;
+        // Формат: 20.12.2025 року, о 21:42
+        return `${dateString} року, о ${timeString}`;
     }
 
     return `${dateString} ${timeString}`;

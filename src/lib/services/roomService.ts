@@ -23,7 +23,7 @@ import { withTimeout } from '$lib/utils/asyncUtils';
 import { roomSessionService } from './room/roomSessionService';
 import { roomPlayerService } from './room/roomPlayerService';
 import { generateRandomRoomName } from '$lib/utils/nameGenerator';
-import { getRandomUnusedColor } from '$lib/utils/playerUtils'; // Додано імпорт
+import { getRandomUnusedColor } from '$lib/utils/playerUtils';
 
 const ROOM_TIMEOUT_MS = 600000;
 const OPERATION_TIMEOUT_MS = 10000;
@@ -42,14 +42,12 @@ class RoomService {
         logService.init(`[RoomService] createRoom START. Host: ${hostName}`);
 
         const hostId = uuidv4();
-
-        // Генеруємо випадковий колір для хоста (список використаних кольорів порожній)
         const hostColor = getRandomUnusedColor([]);
 
         const initialPlayer: OnlinePlayer = {
             id: hostId,
             name: hostName,
-            color: hostColor, // Використовуємо випадковий колір
+            color: hostColor,
             isReady: false,
             joinedAt: Date.now(),
             isOnline: true,
@@ -93,6 +91,15 @@ class RoomService {
                 'Timeout: Failed to connect to Firebase Firestore.'
             );
 
+            // FIX: Зберігаємо час створення останньої кімнати в глобальну статистику
+            // Це дозволяє показувати дату навіть коли всі кімнати видалені
+            if (!isPrivate) {
+                const statsRef = doc(this.db, 'general', 'stats');
+                // Використовуємо catch, щоб помилка статистики не блокувала створення кімнати
+                setDoc(statsRef, { lastRoomCreatedAt: Date.now() }, { merge: true })
+                    .catch(e => console.warn('Failed to update global stats', e));
+            }
+
             roomSessionService.saveSession(roomId, hostId);
             return roomId;
         } catch (error) {
@@ -127,23 +134,30 @@ class RoomService {
                 orderBy('lastActivity', 'desc')
             );
 
-            const querySnapshot = await withTimeout(
-                getDocs(q),
-                OPERATION_TIMEOUT_MS,
-                'Timeout fetching rooms'
-            );
+            // Паралельно отримуємо кімнати та глобальну статистику
+            const [querySnapshot, statsSnap] = await Promise.all([
+                withTimeout(getDocs(q), OPERATION_TIMEOUT_MS, 'Timeout fetching rooms'),
+                getDoc(doc(this.db, 'general', 'stats')).catch(() => null) // Ігноруємо помилки статистики
+            ]);
 
             const rooms: RoomSummary[] = [];
             const now = Date.now();
             const cleanupPromises: Promise<void>[] = [];
-            let latestCreatedAt: number | undefined;
+
+            // Отримуємо збережену дату з глобальної статистики
+            let globalLastCreated = 0;
+            if (statsSnap && statsSnap.exists()) {
+                globalLastCreated = statsSnap.data().lastRoomCreatedAt || 0;
+            }
+
+            let activeRoomsLatestCreated = 0;
 
             querySnapshot.forEach((doc) => {
                 const data = doc.data() as Room;
 
-                // Відстежуємо останню створену публічну кімнату (навіть якщо вона прострочена)
-                if (!latestCreatedAt || data.createdAt > latestCreatedAt) {
-                    latestCreatedAt = data.createdAt;
+                // Відстежуємо найсвіжішу кімнату серед активних
+                if (data.createdAt > activeRoomsLatestCreated) {
+                    activeRoomsLatestCreated = data.createdAt;
                 }
 
                 if (now - data.lastActivity > ROOM_TIMEOUT_MS) {
@@ -164,7 +178,13 @@ class RoomService {
                 Promise.allSettled(cleanupPromises).catch(e => console.error(e));
             }
 
-            return { rooms, latestCreatedAt };
+            // Повертаємо найновішу дату (або з активних, або з глобальної історії)
+            const finalLatestCreatedAt = Math.max(activeRoomsLatestCreated, globalLastCreated);
+
+            return {
+                rooms,
+                latestCreatedAt: finalLatestCreatedAt > 0 ? finalLatestCreatedAt : undefined
+            };
         } catch (error) {
             logService.error('[RoomService] Failed to get rooms:', error);
             return { rooms: [] };
@@ -202,15 +222,13 @@ class RoomService {
             if (Object.keys(roomData.players).length >= MAX_PLAYERS) throw new Error('Room is full');
             if (roomData.status === 'playing') throw new Error('Game already started');
 
-            // Отримуємо список вже зайнятих кольорів
             const usedColors = Object.values(roomData.players).map(p => p.color);
-            // Генеруємо унікальний колір для нового гравця
             const playerColor = getRandomUnusedColor(usedColors);
 
             const newPlayer: OnlinePlayer = {
                 id: playerId,
                 name: playerName,
-                color: playerColor, // Використовуємо випадковий унікальний колір
+                color: playerColor,
                 isReady: false,
                 joinedAt: Date.now(),
                 isOnline: true,

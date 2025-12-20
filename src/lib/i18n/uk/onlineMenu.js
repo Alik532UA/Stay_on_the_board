@@ -10,7 +10,10 @@ export default {
   waiting: "Очікування",
   playing: "У грі",
   finished: "Завершено",
-  noRooms: "Кімнат не знайдено. {lastInfo}Створіть першу!",
+  // FIX: Прибрано хардкод "Створіть першу!" з кінця
+  noRooms: "Кімнат не знайдено.{lastInfo}",
+  // FIX: Додано окремий ключ
+  createFirst: " Створіть першу!",
   lastRoomTime: "Останній раз кімната була {time}",
   timeUnits: {
     m: "хв",

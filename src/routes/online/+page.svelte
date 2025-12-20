@@ -68,7 +68,6 @@
           size="large"
           on:click={openCreateRoomModal}
           dataTestId="create-room-btn"
-          class="create-room-btn-glow"
         >
           <span class="btn-content">
             <span class="plus">+</span>
@@ -174,16 +173,6 @@
     display: flex;
     justify-content: center;
     width: 100%;
-  }
-
-  :global(.create-room-btn-glow) {
-    box-shadow: 0 0 20px rgba(var(--primary-rgb, 33, 150, 243), 0.4);
-    transition: all 0.3s ease;
-  }
-
-  :global(.create-room-btn-glow:hover) {
-    box-shadow: 0 0 30px rgba(var(--primary-rgb, 33, 150, 243), 0.6);
-    transform: scale(1.05);
   }
 
   .btn-content {

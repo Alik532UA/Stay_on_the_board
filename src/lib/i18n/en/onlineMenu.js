@@ -10,7 +10,10 @@ export default {
   waiting: "Waiting",
   playing: "Playing",
   finished: "Finished",
-  noRooms: "No rooms found. {lastInfo}Create the first one!",
+  // FIX: Removed hardcoded suffix
+  noRooms: "No rooms found.{lastInfo}",
+  // FIX: Added separate key
+  createFirst: " Create the first one!",
   lastRoomTime: "Last room was created {time}",
   timeUnits: {
     m: "m",

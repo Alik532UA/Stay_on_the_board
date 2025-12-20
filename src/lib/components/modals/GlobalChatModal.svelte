@@ -3,7 +3,6 @@
     import ChatWidget from "$lib/components/online/ChatWidget.svelte";
     import { userProfileStore } from "$lib/services/authService";
     import { modalStore } from "$lib/stores/modalStore";
-    import StyledButton from "$lib/components/ui/StyledButton.svelte";
 
     // Використовуємо фіксований ID для глобального чату
     const GLOBAL_CHAT_ID = "global-chat";
