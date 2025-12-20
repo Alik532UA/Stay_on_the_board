@@ -34,7 +34,8 @@
       titleKey: "ui.feedback.title",
       dataTestId: "feedback-modal",
       component: FeedbackModal,
-      buttons: [],
+      variant: "menu", // <--- FIX: Використовуємо стиль меню
+      buttons: [], // <--- FIX: Кнопки тепер всередині компонента
       closeOnOverlayClick: true,
     });
   }

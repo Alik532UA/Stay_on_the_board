@@ -65,6 +65,10 @@
         white-space: normal;
         word-break: break-word;
         line-height: 1.3;
+        /* FIX: Додаємо flex: 1, щоб текст займав весь доступний простір */
+        flex: 1;
+        /* FIX: Змінено на center за вашим запитом */
+        text-align: center;
     }
 
     @media (max-width: 360px) {

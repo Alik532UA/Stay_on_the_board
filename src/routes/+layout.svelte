@@ -118,14 +118,9 @@
 			dataTestId: "game-mode-modal",
 			component: GameModeModal,
 			props: { extended: true },
-			buttons: [
-				{
-					textKey: "modal.close",
-					onClick: () => modalStore.closeModal(),
-					dataTestId: "modal-btn-modal.close",
-					hotKey: "ESC",
-				},
-			],
+			variant: "menu", // <--- FIX: Додано variant="menu"
+			buttons: [], // <--- FIX: Прибрано кнопки
+			closeOnOverlayClick: true, // <--- FIX: Додано закриття по кліку
 		});
 	}
 
@@ -135,7 +130,9 @@
 			titleKey: "ui.feedback.title",
 			dataTestId: "feedback-modal",
 			component: FeedbackModal,
-			buttons: [],
+			variant: "menu", // <--- FIX: Додано variant="menu"
+			buttons: [], // <--- FIX: Прибрано кнопки
+			closeOnOverlayClick: true, // <--- FIX: Додано закриття по кліку
 		});
 	}
 
