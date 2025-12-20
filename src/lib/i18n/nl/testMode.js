@@ -1,7 +1,7 @@
 export default {
   random: "Willekeurig",
   manual: "Handmatig",
-  set: "Instellen",
+  set: "✔️",
   title: "Testmodus",
   startPosition: "Startpositie",
   x: "X",

@@ -1,7 +1,7 @@
 export default {
   random: "Tesadüfiy",
   manual: "Qolnen",
-  set: "Qurmaq",
+  set: "✔️",
   title: "Test rejimi",
   startPosition: "Başlanğıç pozitsiyası",
   x: "X",

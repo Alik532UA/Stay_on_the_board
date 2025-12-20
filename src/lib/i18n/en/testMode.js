@@ -1,7 +1,7 @@
 export default {
   random: "Random",
   manual: "Manual",
-  set: "Set",
+  set: "✔️",
   title: "Test Mode",
   startPosition: "Start Position",
   x: "X",

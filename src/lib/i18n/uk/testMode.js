@@ -1,7 +1,7 @@
 export default {
   random: "Випадковий",
   manual: "Ручний",
-  set: "Встановити",
+  set: "✔️",
   title: "Тестовий режим",
   startPosition: "Стартова позиція",
   x: "X",
