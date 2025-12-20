@@ -15,6 +15,12 @@ export class OnlineStateSynchronizer {
      * @param overrides Додаткові поля для оновлення (наприклад, gameOver, noMovesClaim)
      */
     public async syncCurrentState(overrides: Partial<SyncableGameState> = {}): Promise<void> {
+        // FIX: Перевіряємо з'єднання перед спробою синхронізації
+        if (!this.stateSync.isConnected) {
+            // Не логуємо як помилку, бо це нормальна ситуація при ініціалізації
+            return;
+        }
+
         const boardState = get(boardStore);
         const playerState = get(playerStore);
         const scoreState = get(scoreStore);
@@ -31,10 +37,14 @@ export class OnlineStateSynchronizer {
             playerState,
             scoreState,
             settings: {
-                blockModeEnabled: settings.blockModeEnabled,
-                autoHideBoard: settings.autoHideBoard,
                 boardSize: settings.boardSize,
                 turnDuration: settings.turnDuration,
+                blockModeEnabled: settings.blockModeEnabled,
+                blockOnVisitCount: settings.blockOnVisitCount,
+                autoHideBoard: settings.autoHideBoard,
+                showBoard: settings.showBoard,
+                showPiece: settings.showPiece,
+                showMoves: settings.showMoves,
                 settingsLocked: settings.settingsLocked
             },
             gameOver: gameOverState.isGameOver ? gameOverState.gameResult : null,

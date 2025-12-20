@@ -37,21 +37,35 @@ export class OnlinePresenceManager {
     }
 
     public stop(): void {
-        if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
-        if (this.monitorInterval) clearInterval(this.monitorInterval);
-        this.heartbeatInterval = null;
-        this.monitorInterval = null;
+        if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+            this.heartbeatInterval = null;
+        }
+        if (this.monitorInterval) {
+            clearInterval(this.monitorInterval);
+            this.monitorInterval = null;
+        }
     }
 
     private startHeartbeat(): void {
         const send = async () => {
+            // Якщо інтервал вже очищено (stop викликано), не виконуємо запит
+            if (!this.heartbeatInterval) return;
+
             try {
                 await roomPlayerService.sendHeartbeat(this.config.roomId, this.config.myPlayerId);
-            } catch (e) {
-                console.warn("[Presence] Heartbeat failed", e);
+            } catch (e: any) {
+                // Ігноруємо помилку, якщо документ не знайдено (кімната видалена)
+                if (e.code === 'not-found' || e.message?.includes('No document to update')) {
+                    logService.init(`[Presence] Room ${this.config.roomId} not found. Stopping heartbeat.`);
+                    this.stop(); // Зупиняємо, бо кімнати більше немає
+                } else {
+                    console.warn("[Presence] Heartbeat failed", e);
+                }
             }
         };
 
+        // Виконуємо перший раз одразу
         send();
         this.heartbeatInterval = setInterval(send, this.HEARTBEAT_MS);
     }
@@ -75,24 +89,32 @@ export class OnlinePresenceManager {
                     if (timeSinceSeen > this.DISCONNECT_THRESHOLD_MS) {
                         logService.init(`[Presence] Player ${player.name} timed out (${Math.round(timeSinceSeen / 1000)}s). Marking disconnected.`);
 
-                        await roomPlayerService.updatePlayer(this.config.roomId, player.id, {
-                            isDisconnected: true,
-                            disconnectStartedAt: now
-                        });
+                        try {
+                            await roomPlayerService.updatePlayer(this.config.roomId, player.id, {
+                                isDisconnected: true,
+                                disconnectStartedAt: now
+                            });
+                        } catch (e) {
+                            // Ігноруємо помилки оновлення, якщо кімната зникла
+                        }
                     }
                 } else {
                     // 2. Перевірка на повернення
                     if (timeSinceSeen < this.DISCONNECT_THRESHOLD_MS) {
                         logService.init(`[Presence] Player ${player.name} returned! Removing disconnected flag.`);
-                        await roomPlayerService.updatePlayer(this.config.roomId, player.id, {
-                            isDisconnected: false,
-                            disconnectStartedAt: undefined
-                        });
+                        try {
+                            await roomPlayerService.updatePlayer(this.config.roomId, player.id, {
+                                isDisconnected: false,
+                                disconnectStartedAt: undefined
+                            });
+                        } catch (e) { }
                     }
                     // 3. Перевірка на тайм-аут кіку
                     else if (player.disconnectStartedAt && (now - player.disconnectStartedAt > this.KICK_TIMEOUT_MS)) {
                         logService.init(`[Presence] Player ${player.name} kick timer expired (>30s). Kicking from room.`);
-                        await roomPlayerService.leaveRoom(this.config.roomId, player.id);
+                        try {
+                            await roomPlayerService.leaveRoom(this.config.roomId, player.id);
+                        } catch (e) { }
                     }
                 }
             }
