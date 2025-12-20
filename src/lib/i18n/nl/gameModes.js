@@ -32,6 +32,7 @@ export default {
   autoHideBoard: "Verberg bord automatisch",
   changeModeTooltip: "Verander Spelmodus",
   dontShowAgain: "Toon dit venster niet opnieuw",
+  notAvailableInOnline: "In ontwikkeling", // FIX: Added
   description: {
     // Legacy
     observer: "Modus voor het opnemen van live spelzetten. De timer is uitgeschakeld zodat je rustig de zetten van spelers kunt herhalen.",
@@ -56,4 +57,4 @@ export default {
     'online-experienced': "Online spel met automatisch verbergen.",
     'online-pro': "Online spel met automatisch verbergen en celblokkering."
   }
-}; 
+};

@@ -1,7 +1,7 @@
 export default {
   title: "Вибір складності гри",
   choose: "Вибирати",
-  
+
   // Нові основні режими гри
   survive: "Втримайся",
   arena: "Арена",
@@ -32,6 +32,7 @@ export default {
   autoHideBoard: "Автоматично приховувати дошку",
   changeModeTooltip: "Змінити режим гри",
   dontShowAgain: "Більше не показувати це вікно",
+  notAvailableInOnline: "В розробці", // FIX: Додано
   description: {
     // Legacy
     observer: "Режим для запису ходів живої гри. Таймер вимкнено, щоб ви могли спокійно повторювати ходи за гравцями.",
@@ -56,4 +57,4 @@ export default {
     'online-experienced': "Онлайн гра з автоприхованням.",
     'online-pro': "Онлайн гра з автоприхованням та блокуванням клітинок."
   }
-}; 
+};

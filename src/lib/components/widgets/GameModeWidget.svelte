@@ -73,7 +73,8 @@
 <div class="game-mode-widget" data-testid="game-mode-widget">
   {#if activeMode === "online"}
     <div class="online-lock-overlay" data-testid="game-mode-widget-locked">
-      <span>{$_("onlineMenu.hostOnlySettings")}</span>
+      <!-- FIX: Змінено ключ на "В розробці" -->
+      <span>{$_("gameModes.notAvailableInOnline")}</span>
     </div>
   {/if}
 
