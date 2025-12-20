@@ -1,7 +1,8 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
 
-    export let icon: string = ""; // Emoji or text icon
+    // icon prop залишаємо для зворотної сумісності, але пріоритет буде у слота
+    export let icon: string = "";
     export let text: string = "";
     export let dataTestId: string = "";
 
@@ -13,7 +14,10 @@
     on:click={() => dispatch("click")}
     data-testid={dataTestId}
 >
-    <span class="menu-icon">{icon}</span>
+    <span class="menu-icon">
+        <!-- Використовуємо слот, якщо він є, інакше виводимо icon prop -->
+        <slot name="icon">{icon}</slot>
+    </span>
     <span class="menu-text">{text}</span>
 </button>
 
@@ -34,13 +38,9 @@
             background 0.2s;
         font-size: 1.2rem;
         font-weight: 600;
-
-        /* Стандартний backdrop-filter, як у інших елементах */
         backdrop-filter: blur(4px);
         -webkit-backdrop-filter: blur(4px);
-
         width: 100%;
-        /* FIX: box-sizing залишаємо, це важливо для розмірів */
         box-sizing: border-box;
         max-width: 100%;
         min-height: 60px;
@@ -54,6 +54,7 @@
     .menu-icon {
         font-size: 1.5rem;
         width: 32px;
+        height: 32px; /* Фіксуємо висоту для центрування SVG */
         text-align: center;
         display: flex;
         align-items: center;
@@ -65,9 +66,7 @@
         white-space: normal;
         word-break: break-word;
         line-height: 1.3;
-        /* FIX: Додаємо flex: 1, щоб текст займав весь доступний простір */
         flex: 1;
-        /* FIX: Змінено на center за вашим запитом */
         text-align: center;
     }
 
@@ -79,6 +78,7 @@
         }
         .menu-icon {
             width: 24px;
+            height: 24px;
             font-size: 1.3rem;
         }
     }

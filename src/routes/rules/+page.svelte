@@ -1,6 +1,7 @@
 <script>
   import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
   import AccordionSection from "$lib/components/AccordionSection.svelte";
+  import NotoEmoji from "$lib/components/NotoEmoji.svelte";
   import { _ } from "svelte-i18n";
   import { base } from "$app/paths";
 </script>
@@ -17,12 +18,18 @@
   </div>
 
   <AccordionSection isOpen={true}>
-    <span slot="title">🎯 {$_("rulesPage.goalTitle")}</span>
+    <span slot="title">
+      <NotoEmoji name="trophy" size="1.2em" />
+      {$_("rulesPage.goalTitle")}
+    </span>
     <p class="rules-text">{$_("rulesPage.goalText")}</p>
   </AccordionSection>
 
   <AccordionSection>
-    <span slot="title">🧭 {$_("rulesPage.moveProcessTitle")}</span>
+    <span slot="title">
+      <NotoEmoji name="gear" size="1.2em" />
+      {$_("rulesPage.moveProcessTitle")}
+    </span>
     <ol>
       <li>
         <b>{$_("rulesPage.step1")}</b>
@@ -32,7 +39,9 @@
           <div class="dir-btn-visual">↑</div>
           <div class="dir-btn-visual">↗</div>
           <div class="dir-btn-visual">←</div>
-          <div class="dir-btn-visual center-piece">♛</div>
+          <div class="dir-btn-visual center-piece">
+            <NotoEmoji name="crown" size="1.4em" />
+          </div>
           <div class="dir-btn-visual">→</div>
           <div class="dir-btn-visual">↙</div>
           <div class="dir-btn-visual">↓</div>
@@ -45,7 +54,10 @@
   </AccordionSection>
 
   <AccordionSection>
-    <span slot="title">🏆 {$_("rulesPage.winningAndLosing")}</span>
+    <span slot="title">
+      <NotoEmoji name="1st_place_medal" size="1.2em" />
+      {$_("rulesPage.winningAndLosing")}
+    </span>
     <div class="rules-cards-row">
       <div class="rules-card rules-lose">
         <h3>{$_("rulesPage.youLose")}</h3>
@@ -66,7 +78,10 @@
   </AccordionSection>
 
   <AccordionSection>
-    <span slot="title">⚔️ {$_("rulesPage.gameModes")}</span>
+    <span slot="title">
+      <NotoEmoji name="game_die" size="1.2em" />
+      {$_("rulesPage.gameModes")}
+    </span>
     <div class="rules-cards-row">
       <div class="rules-card rules-mode-normal">
         <h3>{$_("rulesPage.normalMode")}</h3>
@@ -80,7 +95,10 @@
   </AccordionSection>
 
   <AccordionSection>
-    <span slot="title">📜 {$_("rulesPage.specialRules")}</span>
+    <span slot="title">
+      <NotoEmoji name="memo" size="1.2em" />
+      {$_("rulesPage.specialRules")}
+    </span>
     <div class="rules-card rules-no-moves">
       <h2>{$_("rulesPage.noMovesButtonTitle")}</h2>
       <p>{$_("rulesPage.noMovesButtonText1")}</p>
@@ -102,7 +120,10 @@
   </AccordionSection>
 
   <AccordionSection>
-    <span slot="title">🔥 {$_("rulesPage.proModeTitle")}</span>
+    <span slot="title">
+      <NotoEmoji name="fire" size="1.2em" />
+      {$_("rulesPage.proModeTitle")}
+    </span>
     <div class="rules-card rules-pro-mode">
       <p>{$_("rulesPage.proModeText")}</p>
       <p><b>{$_("rulesPage.proModeTip")}</b></p>

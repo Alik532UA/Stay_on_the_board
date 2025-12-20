@@ -12,6 +12,7 @@
     getRandomUnusedName,
   } from "$lib/utils/playerUtils";
   import type { Player, BonusHistoryItem } from "$lib/models/player";
+  import NotoEmoji from "$lib/components/NotoEmoji.svelte";
 
   function startGame() {
     logService.action('Click: "Почати гру" (PlayerManager)');
@@ -82,7 +83,11 @@
               })}
             data-testid="player-type-btn-{player.id}"
           >
-            {player.type === "ai" ? "🤖" : "👤"}
+            {#if player.type === "ai"}
+              <NotoEmoji name="robot" size="24px" />
+            {:else}
+              <NotoEmoji name="bust_in_silhouette" size="24px" />
+            {/if}
           </button>
           <input
             type="text"

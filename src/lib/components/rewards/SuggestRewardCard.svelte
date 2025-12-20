@@ -1,9 +1,9 @@
 <script lang="ts">
-    import SvgIcons from "$lib/components/SvgIcons.svelte";
     import { _ } from "svelte-i18n";
     import { modalStore } from "$lib/stores/modalStore";
     import FeedbackModal from "$lib/components/modals/FeedbackModal.svelte";
     import { logService } from "$lib/services/logService";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte"; // Імпорт
 
     function handleClick() {
         logService.action('Click: "Suggest Reward"');
@@ -25,7 +25,8 @@
     data-testid="suggest-reward-card"
 >
     <div class="icon-wrapper">
-        <SvgIcons name="plus" />
+        <!-- Заміна SvgIcons на NotoEmoji -->
+        <NotoEmoji name="plus" size="40px" />
     </div>
     <div class="content">
         <div class="title">{$_("rewards.suggestRewardTitle")}</div>
@@ -34,8 +35,7 @@
 </button>
 
 <style>
-    /* Reusing styles from RewardCard.svelte via copy-paste to ensure visual consistency 
-       without refactoring the original component. */
+    /* Стилі залишаються без змін, крім видалення :global(.suggest-card .icon-wrapper svg) */
     .reward-card {
         display: flex;
         align-items: center;
@@ -53,7 +53,6 @@
         text-align: left;
         width: 100%;
         cursor: pointer;
-        /* Suggest card is always "unlocked" style */
         opacity: 1;
         filter: none;
         background: linear-gradient(
@@ -76,13 +75,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        color: var(--text-accent); /* Use accent color for the plus icon */
-    }
-
-    /* Make the plus icon large */
-    :global(.suggest-card .icon-wrapper svg) {
-        width: 40px;
-        height: 40px;
+        color: var(--text-accent);
     }
 
     .content {

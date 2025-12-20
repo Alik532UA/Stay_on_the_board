@@ -1,5 +1,6 @@
 <script lang="ts">
     import SvgIcons from "$lib/components/SvgIcons.svelte";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte";
     import type { IMenuItem } from "./FlexibleMenu.types";
 
     // Explicitly typing the prop
@@ -20,7 +21,11 @@
         {#if item.icon}
             <SvgIcons name={item.icon} />
         {:else if item.emoji}
-            <span class="emoji">{item.emoji}</span>
+            {#if item.emoji === "🏠" || item.emoji === "🧹" || item.emoji === "☰" || item.emoji === "v2"}
+                {item.emoji}
+            {:else}
+                <NotoEmoji name={item.emoji} size="1em" />
+            {/if}
         {/if}
     </div>
 </button>

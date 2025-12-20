@@ -1,6 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher, tick } from "svelte";
     import { customTooltip } from "$lib/actions/customTooltip";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte";
 
     export let value: string;
     export let placeholder: string = "";
@@ -67,14 +68,14 @@
                 on:mousedown|preventDefault={save}
                 title="Зберегти"
             >
-                ✓
+                <NotoEmoji name="check_mark_button" size="1.1em" />
             </button>
             <button
                 class="icon-btn cancel"
                 on:mousedown|preventDefault={cancel}
                 title="Скасувати"
             >
-                ✕
+                <NotoEmoji name="cross_mark" size="1.1em" />
             </button>
         </div>
     {:else}
@@ -88,7 +89,7 @@
                         use:customTooltip={"Редагувати"}
                         data-testid="{dataTestId}-edit-btn"
                     >
-                        ✏️
+                        <NotoEmoji name="pencil" size="1.1em" />
                     </button>
                     <button
                         class="icon-btn random"
@@ -96,7 +97,7 @@
                         use:customTooltip={"Випадкове ім'я"}
                         data-testid="{dataTestId}-random-btn"
                     >
-                        🎲
+                        <NotoEmoji name="game_die" size="1.1em" />
                     </button>
                 </div>
             {/if}

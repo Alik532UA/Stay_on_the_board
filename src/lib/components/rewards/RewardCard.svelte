@@ -1,20 +1,17 @@
 <script lang="ts">
-    import SvgIcons from "$lib/components/SvgIcons.svelte";
     import { _, locale } from "svelte-i18n";
     import type { Achievement } from "$lib/types/rewards";
     import type { UnlockedReward } from "$lib/types/rewards";
     import { formatDate } from "$lib/utils/dateUtils";
     import { customTooltip } from "$lib/actions/customTooltip";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte"; // Імпорт
 
     export let achievement: Achievement;
-    // unlockedInfo може бути одним об'єктом або масивом об'єктів (якщо це група)
     export let unlockedInfo: UnlockedReward | UnlockedReward[] | undefined =
         undefined;
 
-    // Визначаємо, чи це група нагород
     $: isGroup = Array.isArray(unlockedInfo);
 
-    // Якщо це група, беремо останню розблоковану для дати
     $: mainUnlock = isGroup
         ? (unlockedInfo as UnlockedReward[]).sort(
               (a, b) => b.unlockedAt - a.unlockedAt,
@@ -27,38 +24,31 @@
         ? formatDate(mainUnlock.unlockedAt, $locale)
         : "";
 
-    // Формуємо текст для тултіпа (список варіантів)
     $: tooltipText = isGroup
         ? (unlockedInfo as UnlockedReward[])
               .map((u) => {
-                  // FIX: Прибрано achievement.variantLabel, щоб не дублювати назву першого елемента.
-                  // Парсимо ID кожного конкретного розблокування (наприклад, score_11_timed_4 -> 4)
                   const parts = u.id.split("_");
                   const size = parts[parts.length - 1];
                   return !isNaN(Number(size)) ? `${size}x${size}` : size;
               })
-              // Сортуємо за зростанням розміру (3x3, 4x4, 5x5...)
               .sort((a, b) => parseInt(a) - parseInt(b))
               .join(", ")
         : "";
 
-    // Лейбл для бейджа (кількість або варіант)
     $: badgeLabel = (() => {
         if (isGroup) {
             const rewards = unlockedInfo as UnlockedReward[];
             if (rewards.length > 1) {
-                return rewards.length; // Показуємо кількість, якщо > 1
+                return rewards.length;
             } else if (rewards.length === 1) {
-                // Якщо 1 елемент в групі, показуємо його варіант
                 const idParts = rewards[0].id.split("_");
                 const size = idParts[idParts.length - 1];
                 return !isNaN(Number(size)) ? `${size}x${size}` : size;
             }
         }
-        return achievement.variantLabel; // Для одиночних нагород
+        return achievement.variantLabel;
     })();
 
-    // Тултіп показуємо тільки якщо нагород > 1
     $: showTooltip = isGroup && (unlockedInfo as UnlockedReward[]).length > 1;
 </script>
 
@@ -68,7 +58,8 @@
     data-testid={`reward-card-${achievement.id}`}
 >
     <div class="icon-wrapper">
-        <SvgIcons name={achievement.icon} />
+        <!-- Заміна SvgIcons на NotoEmoji -->
+        <NotoEmoji name={achievement.icon} size="64px" />
     </div>
     <div class="content">
         <div class="title">{$_(achievement.titleKey)}</div>
@@ -86,10 +77,10 @@
 
     {#if !isUnlocked}
         <div class="lock-overlay">
-            <SvgIcons name="lock" />
+            <!-- Заміна SvgIcons на NotoEmoji -->
+            <NotoEmoji name="locked" size="24px" />
         </div>
     {:else if badgeLabel}
-        <!-- Бейдж з кількістю або варіантом -->
         <div
             class="variant-badge"
             class:count-badge={showTooltip}
@@ -103,6 +94,7 @@
 </div>
 
 <style>
+    /* Стилі залишаються без змін */
     .reward-card {
         display: flex;
         align-items: center;
@@ -138,7 +130,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        color: var(--accent-color);
+        /* color: var(--accent-color); - NotoEmoji має свої кольори */
     }
 
     .content {

@@ -6,6 +6,7 @@
     import { roomService, type ChatMessage } from "$lib/services/roomService";
     import type { Unsubscribe } from "firebase/firestore";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte";
 
     export let roomId: string;
     export let playerId: string;
@@ -153,23 +154,8 @@
         {#if isOpen}
             <SvgIcons name="arrow-down" width="24" height="24" />
         {:else}
-            <!-- Using a generic icon or message icon if available. Since user asked for 💬, 
-                  I will check if I have it or something close. 
-                  Checking src/lib/icons/index.ts: 'editing' might look like a pencil, 
-                  but I don't see a clear 'chat' bubble. 
-                  I might need to use 'info' or just text if icon not found.
-                  Wait, I see 'speech-bubble' in my imagination but not in file list. 
-                  I will use 'message-square' if I had it. 
-                  Actually I have 'confirm', 'info', 'copy'.
-                  Let's use a simple SVG inline here for the chat bubble if strict icons required.
-                  OR better: I see emojis used in user request 💬. 
-                  I can use text 💬 if no icon, or add a proper icon later. 
-                  Let's check if I can use 'editing' for now as placeholder? No.
-                  I will use a simple custom SVG inline or the emoji as a fallback if no icon found.
-                  Actually I'll add a new icon if I could, but I can't easily edit new files into icons folder without SVG content.
-                  I'll use the Emoji 💬 for now as requested by user ("кнопка знизу праворуч з 💬").
-              -->
-            <span class="emoji-icon">💬</span>
+            <!-- Using NotoEmoji instead of text emoji as per global replacement goal -->
+            <NotoEmoji name="speech_balloon" size="24px" />
         {/if}
         {#if hasUnread}
             <span class="unread-dot"></span>
@@ -214,11 +200,6 @@
     .chat-fab.unread {
         border-color: var(--text-accent);
         box-shadow: 0 0 0 2px rgba(var(--text-accent-rgb, 255, 215, 0), 0.3);
-    }
-
-    .emoji-icon {
-        font-size: 24px;
-        line-height: 1;
     }
 
     .unread-dot {

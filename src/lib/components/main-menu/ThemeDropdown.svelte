@@ -2,6 +2,7 @@
     import { appSettingsStore } from "$lib/stores/appSettingsStore.js";
     import { logService } from "$lib/services/logService.js";
     import { _ } from "svelte-i18n";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte";
 
     export let onClose: () => void;
 
@@ -23,94 +24,25 @@
     }}
     on:keydown={(e) => e.key === "Escape" && onClose()}
 >
-    <div class="theme-style-row" data-style="purple">
-        <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("purple", "light")}
-            data-testid="theme-purple-light-btn">☀️</button
-        >
-        <span class="theme-name">{$_("mainMenu.themeName.purple")}</span>
-        <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("purple", "dark")}
-            data-testid="theme-purple-dark-btn">🌙</button
-        >
-    </div>
-    <div class="theme-style-row" data-style="green">
-        <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("green", "light")}
-            data-testid="theme-green-light-btn">☀️</button
-        >
-        <span class="theme-name">{$_("mainMenu.themeName.green")}</span>
-        <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("green", "dark")}
-            data-testid="theme-green-dark-btn">🌙</button
-        >
-    </div>
-    <div class="theme-style-row" data-style="blue">
-        <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("blue", "light")}
-            data-testid="theme-blue-light-btn">☀️</button
-        >
-        <span class="theme-name">{$_("mainMenu.themeName.blue")}</span>
-        <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("blue", "dark")}
-            data-testid="theme-blue-dark-btn">🌙</button
-        >
-    </div>
-    <div class="theme-style-row" data-style="gray">
-        <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("gray", "light")}
-            data-testid="theme-gray-light-btn">☀️</button
-        >
-        <span class="theme-name">{$_("mainMenu.themeName.gray")}</span>
-        <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("gray", "dark")}
-            data-testid="theme-gray-dark-btn">🌙</button
-        >
-    </div>
-    <div class="theme-style-row" data-style="orange">
-        <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("orange", "light")}
-            data-testid="theme-orange-light-btn">☀️</button
-        >
-        <span class="theme-name">{$_("mainMenu.themeName.orange")}</span>
-        <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("orange", "dark")}
-            data-testid="theme-orange-dark-btn">🌙</button
-        >
-    </div>
-    <div class="theme-style-row" data-style="wood">
-        <button
-            class="theme-btn"
-            data-theme="light"
-            on:click={() => selectTheme("wood", "light")}
-            data-testid="theme-wood-light-btn">☀️</button
-        >
-        <span class="theme-name">{$_("mainMenu.themeName.wood")}</span>
-        <button
-            class="theme-btn"
-            data-theme="dark"
-            on:click={() => selectTheme("wood", "dark")}
-            data-testid="theme-wood-dark-btn">🌙</button
-        >
-    </div>
+    {#each ["purple", "green", "blue", "gray", "orange", "wood"] as style}
+        <div class="theme-style-row" data-style={style}>
+            <button
+                class="theme-btn"
+                data-theme="light"
+                on:click={() => selectTheme(style, "light")}
+                data-testid={`theme-${style}-light-btn`}
+            >
+                <NotoEmoji name="sun" size="20px" />
+            </button>
+            <span class="theme-name">{$_(`mainMenu.themeName.${style}`)}</span>
+            <button
+                class="theme-btn"
+                data-theme="dark"
+                on:click={() => selectTheme(style, "dark")}
+                data-testid={`theme-${style}-dark-btn`}
+            >
+                <NotoEmoji name="crescent_moon" size="20px" />
+            </button>
+        </div>
+    {/each}
 </div>

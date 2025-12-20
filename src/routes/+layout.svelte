@@ -137,7 +137,11 @@
 	}
 
 	const menuItems: IMenuItem[] = [
-		{ id: "rewards", emoji: "🏆", onClick: () => goto(`${base}/rewards`) },
+		{
+			id: "rewards",
+			emoji: "trophy",
+			onClick: () => goto(`${base}/rewards`),
+		},
 		{
 			id: "donate",
 			icon: "donate",
@@ -152,12 +156,12 @@
 		},
 		{
 			id: "settings",
-			emoji: "⚙️",
+			emoji: "gear",
 			onClick: () => goto(`${base}/settings`),
 		},
 		{
 			id: "feedback",
-			emoji: "💬",
+			emoji: "speech_balloon",
 			onClick: handleFeedback,
 			dataTestId: "feedback-btn",
 		},
@@ -191,12 +195,16 @@
 				},
 				{
 					id: "test-mode-btn",
-					emoji: "🛠️",
+					emoji: "gear",
 					onClick: toggleTestMode,
 					primary: true,
 					isActive: $testModeStore.isEnabled,
 				},
-				{ id: "dev-menu-modal", emoji: "☰", onClick: openDevMenuModal },
+				{
+					id: "dev-menu-modal",
+					emoji: "☰",
+					onClick: openDevMenuModal,
+				},
 				{
 					id: "dev-clear-cache-btn",
 					emoji: "🧹",

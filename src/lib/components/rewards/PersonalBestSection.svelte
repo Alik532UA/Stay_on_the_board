@@ -1,7 +1,7 @@
 <script lang="ts">
-    import SvgIcons from "$lib/components/SvgIcons.svelte";
     import EditableText from "$lib/components/ui/EditableText.svelte";
     import { userProfileStore, authService } from "$lib/services/authService";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte"; // Імпорт
 
     function handleNameChange(e: CustomEvent<string>) {
         authService.updateNickname(e.detail);
@@ -11,7 +11,8 @@
 <div class="personal-best-section">
     <div class="pb-card">
         <div class="pb-icon">
-            <SvgIcons name="stopwatch_gold" />
+            <!-- Заміна SvgIcons на NotoEmoji -->
+            <NotoEmoji name="stopwatch" size="60px" />
         </div>
         <div class="pb-info">
             <div class="pb-label">Мій рекорд (Гра на час)</div>
@@ -33,7 +34,7 @@
 </div>
 
 <style>
-    /* Personal Best Card */
+    /* Стилі залишаються без змін */
     .pb-card {
         background: rgba(255, 255, 255, 0.03);
         border: var(--global-border-width) solid rgba(255, 255, 255, 0.1);
@@ -47,7 +48,10 @@
     .pb-icon {
         width: 60px;
         height: 60px;
-        color: gold;
+        /* color: gold; - NotoEmoji (color) має свої кольори */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .pb-info {
