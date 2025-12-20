@@ -3369,9 +3369,17 @@ class="lang-option"
 Актуальний результат: гострі кути
 Очікуваний результат: скруглити кути, але поверх svg, щоб не змінювати svg
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+сторінка /Stay_on_the_board/online
+data-testid="refresh-rooms-btn"
+знайти проблему з дизайном
+зробити сучасний сильний UI UX
 
+саму сторінку /Stay_on_the_board/online не чіпаємо
+нас цікавить тільки покращення data-testid="refresh-rooms-btn"
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
+src/lib/components/online/RoomList.svelte
+чи не задовгий?
+чи є сенс розділити цей файл?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
