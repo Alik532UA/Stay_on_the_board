@@ -17,7 +17,8 @@ import type {
     SyncableGameState,
     SyncMoveData,
     GameStateSyncCallback,
-    GameStateSyncEvent
+    GameStateSyncEvent,
+    VoteType
 } from './gameStateSync.interface';
 
 import { getFirestoreDb, isFirebaseConfigured } from '$lib/services/firebaseService';
@@ -119,6 +120,29 @@ export class FirebaseGameStateSync implements IGameStateSync {
         }
     }
 
+    // FIX: Реалізація атомарного оновлення голосу
+    async updateVote(playerId: string, vote: VoteType): Promise<void> {
+        if (!this._roomRef || !this._isConnected) {
+            logService.error('[FirebaseGameStateSync] Cannot update vote: not connected');
+            return;
+        }
+
+        try {
+            // Використовуємо Dot Notation для оновлення конкретного поля в мапі
+            // Це запобігає перезапису голосів інших гравців (Race Condition)
+            const fieldPath = `gameState.noMovesVotes.${playerId}`;
+
+            await updateDoc(this._roomRef, {
+                [fieldPath]: vote,
+                updatedAt: serverTimestamp()
+            });
+
+            logService.logicMove(`[FirebaseGameStateSync] Vote updated atomically for ${playerId}: ${vote}`);
+        } catch (error) {
+            logService.error('[FirebaseGameStateSync] Update vote error:', error);
+        }
+    }
+
     async pullState(): Promise<SyncableGameState | null> {
         if (!this._roomRef) return null;
 
@@ -189,16 +213,19 @@ export class FirebaseGameStateSync implements IGameStateSync {
                 const data = snapshot.data() as FirebaseRoomDocument;
 
                 if (data.gameState) {
-                    if (data.gameState.version > this._stateVersion) {
+                    // Приймаємо будь-яке оновлення, навіть якщо версія не змінилася (для голосування)
+                    // Але оновлюємо локальну версію, якщо вона більша
+                    if (data.gameState.version >= this._stateVersion) {
                         this._stateVersion = data.gameState.version;
-                        const remoteState = GameStateSerializer.deserialize(data.gameState);
+                    }
 
-                        if (remoteState) {
-                            this._notifySubscribers({
-                                type: 'state_updated',
-                                state: remoteState
-                            });
-                        }
+                    const remoteState = GameStateSerializer.deserialize(data.gameState);
+
+                    if (remoteState) {
+                        this._notifySubscribers({
+                            type: 'state_updated',
+                            state: remoteState
+                        });
                     }
                 }
             },

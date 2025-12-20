@@ -1,20 +1,12 @@
 // src/lib/sync/LocalGameStateSync.ts
-/**
- * @file Локальна реалізація синхронізації ігрового стану.
- * @description Ця реалізація працює з локальними Svelte stores без
- * зовнішньої синхронізації. Використовується для режимів training,
- * local та virtual-player.
- * 
- * Для онлайн-режиму буде використовуватися FirebaseGameStateSync.
- */
-
 import { get } from 'svelte/store';
 import type {
     IGameStateSync,
     SyncableGameState,
     SyncMoveData,
     GameStateSyncCallback,
-    GameStateSyncEvent
+    GameStateSyncEvent,
+    VoteType
 } from './gameStateSync.interface';
 import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
@@ -23,13 +15,14 @@ import { logService } from '$lib/services/logService';
 
 /**
  * Локальна реалізація синхронізації стану гри.
- * Працює безпосередньо з Svelte stores без зовнішньої синхронізації.
  */
 export class LocalGameStateSync implements IGameStateSync {
     private _sessionId: string | null = null;
     private _isConnected: boolean = false;
     private _subscribers: Set<GameStateSyncCallback> = new Set();
     private _stateVersion: number = 0;
+    // Тимчасове сховище для голосів у локальному режимі (хоча воно не використовується активно)
+    private _localVotes: Record<string, VoteType> = {};
 
     get sessionId(): string | null {
         return this._sessionId;
@@ -43,30 +36,43 @@ export class LocalGameStateSync implements IGameStateSync {
         this._sessionId = sessionId || `local-${Date.now()}`;
         this._isConnected = true;
         this._stateVersion = 0;
+        this._localVotes = {};
         logService.init(`[LocalGameStateSync] Initialized with session: ${this._sessionId}`);
     }
 
     async pushState(state: SyncableGameState): Promise<void> {
-        // Локальна синхронізація: оновлюємо stores напряму
         this._stateVersion++;
 
-        if (state.boardState) {
-            boardStore.set(state.boardState);
-        }
-        if (state.playerState) {
-            playerStore.set(state.playerState);
-        }
-        if (state.scoreState) {
-            scoreStore.set(state.scoreState);
+        if (state.boardState) boardStore.set(state.boardState);
+        if (state.playerState) playerStore.set(state.playerState);
+        if (state.scoreState) scoreStore.set(state.scoreState);
+
+        // Оновлюємо локальні голоси, якщо вони передані
+        if (state.noMovesVotes) {
+            this._localVotes = state.noMovesVotes;
         }
 
-        // Повідомляємо підписників
         this._notifySubscribers({
             type: 'state_updated',
             state: { ...state, version: this._stateVersion, updatedAt: Date.now() }
         });
 
         logService.state(`[LocalGameStateSync] State pushed, version: ${this._stateVersion}`);
+    }
+
+    // FIX: Реалізація updateVote для локального режиму
+    async updateVote(playerId: string, vote: VoteType): Promise<void> {
+        this._localVotes[playerId] = vote;
+        logService.logicMove(`[LocalGameStateSync] Vote updated locally for ${playerId}: ${vote}`);
+
+        // У локальному режимі ми просто імітуємо оновлення стану
+        const currentState = await this.pullState();
+        if (currentState) {
+            this._notifySubscribers({
+                type: 'state_updated',
+                state: currentState
+            });
+        }
     }
 
     async pullState(): Promise<SyncableGameState | null> {
@@ -83,13 +89,12 @@ export class LocalGameStateSync implements IGameStateSync {
             playerState,
             scoreState,
             version: this._stateVersion,
-            updatedAt: Date.now()
+            updatedAt: Date.now(),
+            noMovesVotes: this._localVotes
         };
     }
 
     async pushMove(moveData: SyncMoveData): Promise<void> {
-        // Для локальної гри хід вже оброблений через gameLogicService
-        // Тут просто логуємо для можливого replay
         logService.logicMove(`[LocalGameStateSync] Move pushed:`, moveData);
     }
 
@@ -104,6 +109,7 @@ export class LocalGameStateSync implements IGameStateSync {
         this._subscribers.clear();
         this._isConnected = false;
         this._sessionId = null;
+        this._localVotes = {};
         logService.init(`[LocalGameStateSync] Cleaned up`);
     }
 
@@ -118,7 +124,4 @@ export class LocalGameStateSync implements IGameStateSync {
     }
 }
 
-/**
- * Singleton instance для локальної синхронізації.
- */
 export const localGameStateSync = new LocalGameStateSync();

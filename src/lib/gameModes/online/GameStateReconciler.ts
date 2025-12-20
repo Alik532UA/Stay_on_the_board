@@ -26,21 +26,16 @@ export class GameStateReconciler {
 
     constructor(private myPlayerId: string) { }
 
-    /**
-     * Застосовує віддалений стан до локальних сторів.
-     */
     public apply(remoteState: SyncableGameState): void {
         const currentBoard = get(boardStore);
 
         // 1. Обробка анімацій та черги ходів
         if (currentBoard && remoteState.boardState) {
-            // Якщо історія зменшилась - це рестарт гри
             if (remoteState.boardState.moveHistory.length < currentBoard.moveHistory.length) {
                 logService.GAME_MODE('[Reconciler] Detected game reset. Resetting animation service.');
                 animationService.reset();
             }
 
-            // Якщо з'явилися нові ходи - додаємо в анімацію та озвучуємо
             const oldQueueLength = currentBoard.moveQueue.length;
             const newQueueLength = remoteState.boardState.moveQueue.length;
 
@@ -66,22 +61,18 @@ export class GameStateReconciler {
         // 4. Обробка Game Over
         this.handleGameOver(remoteState);
 
-        // 5. Обробка заяви "Немає ходів"
+        // 5. Обробка заяви "Немає ходів" та голосування
         this.handleNoMovesClaim(remoteState);
 
         // 6. Фіналізація
         availableMovesService.updateAvailableMoves();
     }
 
-    /**
-     * Озвучує хід, якщо його зробив суперник.
-     */
     private handleOpponentVoiceover(move: any) {
         const movePlayerIndex = move.player - 1;
         const myIndex = get(uiStateStore).onlinePlayerIndex;
         const settings = get(gameSettingsStore);
 
-        // Перевіряємо, чи це хід суперника і чи увімкнено озвучення для нього
         if (movePlayerIndex !== myIndex && settings.speechEnabled && settings.speechFor.onlineOpponentMove) {
             logService.speech(`[Reconciler] Speaking opponent move: ${move.direction} ${move.distance}`);
             speakMove(
@@ -89,27 +80,22 @@ export class GameStateReconciler {
                 (get(appSettingsStore) as AppSettingsState).language || 'uk',
                 settings.selectedVoiceURI,
                 undefined,
-                true // force: true, бо ми вже перевірили умови тут
+                true
             );
         }
     }
 
-    /**
-     * Синхронізує стан завершення гри.
-     */
     private handleGameOver(remoteState: SyncableGameState) {
         if (remoteState.gameOver) {
             const currentGameOver = get(gameOverStore);
             uiStateStore.update(s => ({ ...s, isGameOver: true }));
 
-            // Показуємо модалку тільки якщо вона ще не показана
             if (!currentGameOver.isGameOver) {
                 logService.GAME_MODE('[Reconciler] Syncing GameOver state from server');
                 gameOverStore.setGameOver(remoteState.gameOver);
                 modalService.showGameOverModal(remoteState.gameOver!);
             }
         } else {
-            // Якщо на сервері гра активна, а у нас Game Over - скидаємо
             uiStateStore.update(s => ({ ...s, isGameOver: false }));
             const currentGameOver = get(gameOverStore);
             if (currentGameOver.isGameOver) {
@@ -120,9 +106,6 @@ export class GameStateReconciler {
         }
     }
 
-    /**
-     * Обробляє заяву про відсутність ходів та оновлює UI модалки.
-     */
     private handleNoMovesClaim(remoteState: SyncableGameState) {
         // Якщо noMovesClaim зник (став null), а модалка відкрита - закриваємо її
         if (!remoteState.noMovesClaim) {
@@ -136,61 +119,77 @@ export class GameStateReconciler {
 
         const claim = remoteState.noMovesClaim;
 
-        // Якщо це нова заява - показуємо модалку
+        // Якщо це нова заява - відкриваємо модалку
         if (claim.timestamp > this.lastProcessedNoMovesClaim) {
             logService.GAME_MODE('[Reconciler] Processing NoMoves claim. Showing modal for ALL players.');
             this.lastProcessedNoMovesClaim = claim.timestamp;
 
             timeService.stopTurnTimer();
 
-            // Використовуємо 'human' тип, щоб показати "Блискучий аналіз" для всіх (текст нейтральний)
             gameEventBus.dispatch('ShowNoMovesModal', {
                 playerType: 'human',
                 scoreDetails: claim.scoreDetails,
                 boardSize: claim.boardSize,
-                // FIX: Передаємо отримані з сервера playerScores
                 playerScores: claim.playerScores,
                 // @ts-ignore
                 isRemote: true
             });
         }
 
-        // Оновлення стану кнопок у відкритій модалці (відображення "Очікування...")
+        // Оновлюємо стан кнопок (лічильники голосів)
         this.updateModalButtonsState(remoteState);
     }
 
+    /**
+     * Динамічно оновлює текст кнопок у модальному вікні на основі голосів.
+     */
     private updateModalButtonsState(remoteState: SyncableGameState) {
         const currentModal = get(modalStore);
-        if (currentModal.isOpen && currentModal.dataTestId === 'player-no-moves-modal') {
+        // Перевіряємо, чи відкрита потрібна модалка
+        if (currentModal.isOpen && (currentModal.dataTestId === 'player-no-moves-modal' || currentModal.dataTestId === 'opponent-trapped-modal')) {
             const t = get(_);
+            const votes = remoteState.noMovesVotes || {};
+            const totalPlayers = remoteState.playerState.players.length;
+
+            let continueCount = 0;
+            let finishCount = 0;
+
+            Object.values(votes).forEach(v => {
+                if (v === 'continue') continueCount++;
+                if (v === 'finish') finishCount++;
+            });
+
             const newButtons = [...currentModal.buttons];
             let updated = false;
 
             // Кнопка "Продовжити" (індекс 0)
-            if (remoteState.continueRequests && remoteState.continueRequests[this.myPlayerId]) {
-                if (!newButtons[0].disabled) {
-                    newButtons[0] = {
-                        ...newButtons[0],
-                        text: t('modal.waitingForPlayers'),
-                        disabled: true
-                    };
-                    updated = true;
-                }
+            const continueBtnText = `${t('modal.continueGame')} (${continueCount}/${totalPlayers})`;
+            if (newButtons[0].text !== continueBtnText) {
+                newButtons[0] = {
+                    ...newButtons[0],
+                    text: continueBtnText,
+                    textKey: undefined, // FIX: Видаляємо textKey, щоб Modal використовував text
+                    disabled: false
+                };
+                updated = true;
             }
 
             // Кнопка "Завершити" (індекс 1)
-            if (remoteState.finishRequests && remoteState.finishRequests[this.myPlayerId]) {
-                if (!newButtons[1].disabled) {
-                    newButtons[1] = {
-                        ...newButtons[1],
-                        text: t('modal.waitingForPlayers'),
-                        disabled: true
-                    };
-                    updated = true;
-                }
+            const baseFinishText = t('modal.finishGameWithBonus', { values: { bonus: remoteState.noMovesClaim?.boardSize || 0 } });
+            const finishBtnText = `${baseFinishText} (${finishCount}/${totalPlayers})`;
+
+            if (newButtons[1].text !== finishBtnText) {
+                newButtons[1] = {
+                    ...newButtons[1],
+                    text: finishBtnText,
+                    textKey: undefined, // FIX: Видаляємо textKey для надійності
+                    disabled: false
+                };
+                updated = true;
             }
 
             if (updated) {
+                logService.modal(`[Reconciler] Updating modal buttons: Continue=${continueCount}, Finish=${finishCount}`);
                 modalStore.update(s => ({ ...s, buttons: newButtons }));
             }
         }
