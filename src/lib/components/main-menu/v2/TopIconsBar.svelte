@@ -90,7 +90,10 @@
             title={$_("mainMenu.language")}
             data-testid="top-language-btn"
         >
-            <span class="icon-inner">{@html $currentLanguageFlagSvg}</span>
+            <!-- FIX: Додаємо обгортку для SVG прапорця -->
+            <span class="icon-inner flag-icon-inner"
+                >{@html $currentLanguageFlagSvg}</span
+            >
         </button>
     </div>
 
@@ -218,6 +221,15 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    /* FIX: Додаємо стилі для обгортки SVG прапорця */
+    .flag-icon-inner {
+        border-radius: 6px; /* Менше заокруглення для маленьких іконок */
+        overflow: hidden;
+        /* Можливо, варто задати фіксовані розміри, якщо SVG не мають власних */
+        width: 32px; /* Відповідає розміру SVG прапорця */
+        height: 24px; /* Відповідає розміру SVG прапорця */
     }
 
     :global(.icon-inner svg) {
