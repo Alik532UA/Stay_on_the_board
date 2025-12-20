@@ -89,7 +89,6 @@ export class OnlineGameEventManager {
                             boardSize: payload.boardSize,
                             timestamp: Date.now(),
                             isCorrect: true,
-                            // FIX: Передаємо playerScores на сервер
                             playerScores: payload.playerScores
                         }
                     });
@@ -105,7 +104,8 @@ export class OnlineGameEventManager {
                         gameOver: payload,
                         finishRequests: {},
                         continueRequests: {},
-                        noMovesClaim: null
+                        noMovesClaim: null,
+                        noMovesVotes: {} // FIX: Очищаємо голоси тут, разом з відправкою GameOver
                     });
                 }
             })

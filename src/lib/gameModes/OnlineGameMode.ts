@@ -15,7 +15,7 @@ import type { ScoreChangesData } from '$lib/types/gameMove';
 import { roomService } from '$lib/services/roomService';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import { notificationService } from '$lib/services/notificationService';
-import type { Room, OnlinePlayer } from '$lib/types/online';
+import type { Room } from '$lib/types/online';
 import { modalStore } from '$lib/stores/modalStore';
 import { endGameService } from '$lib/services/endGameService';
 import { timeService } from '$lib/services/timeService';
@@ -120,7 +120,6 @@ export class OnlineGameMode extends BaseGameMode {
     this.unsubscribeRoom = roomService.subscribeToRoom(this.roomId, (updatedRoom) => {
       this.roomData = updatedRoom;
 
-      // 1. Оновлення ролі хоста
       const wasHost = this.amIHost;
       this.amIHost = updatedRoom.hostId === this.myPlayerId;
       if (wasHost !== this.amIHost) {
@@ -128,12 +127,7 @@ export class OnlineGameMode extends BaseGameMode {
         uiStateStore.update(s => ({ ...s, amIHost: this.amIHost }));
       }
 
-      // 2. Перевірка на перемогу (якщо всі вийшли)
-      // Це критично важливо, бо коли гравця видаляють з мапи players,
-      // саме цей колбек спрацьовує першим.
       this.checkForVictory(updatedRoom);
-
-      // 3. Перевірка на відключених гравців (UI Logic - модалка очікування)
       this.checkDisconnectedPlayers(updatedRoom);
     });
 
@@ -196,39 +190,23 @@ export class OnlineGameMode extends BaseGameMode {
     }
   }
 
-  /**
-   * Перевіряє, чи залишився гравець один у кімнаті під час гри.
-   */
   private checkForVictory(room: Room) {
-    // Перевіряємо тільки якщо гра активна
     if (room.status !== 'playing') return;
 
     const players = Object.values(room.players);
 
-    // Якщо я залишився один
     if (players.length === 1 && players[0].id === this.myPlayerId) {
-      // Перевіряємо, чи ми вже не в стані Game Over, щоб не викликати двічі
       const uiState = get(uiStateStore);
       if (uiState.isGameOver) return;
 
       logService.GAME_MODE('[OnlineGameMode] Victory Check: All opponents left. Declaring victory.');
-
-      // Закриваємо будь-які модалки (наприклад, очікування реконнекту)
       modalStore.closeModal();
-
       notificationService.show({ type: 'success', messageRaw: 'Всі суперники залишили гру. Ви перемогли!' });
-
-      // Завершуємо гру з перемогою
       endGameService.endGame('modal.gameOverReasonBonus');
     }
   }
 
-  /**
-   * Перевіряє список гравців на наявність відключених.
-   * Керує відображенням модального вікна очікування.
-   */
   private checkDisconnectedPlayers(room: Room) {
-    // Якщо гра вже закінчилася, не показуємо модалку очікування
     if (room.status !== 'playing') return;
 
     const players = Object.values(room.players);
@@ -236,7 +214,6 @@ export class OnlineGameMode extends BaseGameMode {
     const currentModal = get(modalStore);
 
     if (disconnectedPlayer) {
-      // Якщо є відключений гравець і модалка ще не відкрита (або відкрита інша)
       if (!currentModal.isOpen || currentModal.dataTestId !== 'reconnection-modal') {
         logService.init(`[OnlineGameMode] Player ${disconnectedPlayer.name} disconnected. Pausing game.`);
         this.stopTurnTimer();
@@ -258,7 +235,6 @@ export class OnlineGameMode extends BaseGameMode {
         });
       }
     } else {
-      // Якщо відключених гравців немає, але модалка відкрита - закриваємо її (гравець повернувся)
       if (currentModal.isOpen && currentModal.dataTestId === 'reconnection-modal') {
         logService.init(`[OnlineGameMode] All players connected. Resuming game.`);
         modalStore.closeModal();
@@ -316,15 +292,17 @@ export class OnlineGameMode extends BaseGameMode {
     return 'online';
   }
 
+  // --- Voting Methods ---
+
   async voteToContinue(): Promise<void> {
     if (this.matchController) {
-      await this.matchController.handleContinueRequest();
+      await this.matchController.handleVote('continue');
     }
   }
 
   async voteToFinish(): Promise<void> {
     if (this.matchController) {
-      await this.matchController.handleFinishRequest();
+      await this.matchController.handleVote('finish');
     }
   }
 
@@ -415,10 +393,7 @@ export class OnlineGameMode extends BaseGameMode {
         this.applyRemoteState(event.state);
         break;
       case 'player_left':
-        // Ця подія приходить від Sync, але основна логіка перемоги тепер в subscribeToRoom.
-        // Тут ми просто показуємо повідомлення, якщо це не перемога.
         const remainingPlayers = this.roomData ? Object.values(this.roomData.players) : [];
-
         if (remainingPlayers.length > 1) {
           notificationService.show({ type: 'warning', messageRaw: 'Гравець покинув гру' });
         }

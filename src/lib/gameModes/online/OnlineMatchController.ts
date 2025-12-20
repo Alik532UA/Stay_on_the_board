@@ -4,15 +4,11 @@ import { modalService } from '$lib/services/modalService';
 import { navigationService } from '$lib/services/navigationService';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import { logService } from '$lib/services/logService';
-import type { IGameStateSync, SyncableGameState } from '$lib/sync/gameStateSync.interface';
+import type { IGameStateSync, SyncableGameState, VoteType } from '$lib/sync/gameStateSync.interface';
 import { get } from 'svelte/store';
 import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
-import { availableMovesService } from '$lib/services/availableMovesService';
-import { animationService } from '$lib/services/animationService';
-import { gameOverStore } from '$lib/stores/gameOverStore';
-import { modalStore } from '$lib/stores/modalStore';
 import { _ } from 'svelte-i18n';
 
 export class OnlineMatchController {
@@ -33,132 +29,110 @@ export class OnlineMatchController {
         navigationService.goTo(`/online/lobby/${this.roomId}`);
     }
 
-    public async handleContinueRequest(): Promise<void> {
-        logService.GAME_MODE('[MatchController] Vote to CONTINUE game.');
+    /**
+     * Обробляє голос гравця (Продовжити або Завершити).
+     * Дозволяє змінювати голос.
+     */
+    public async handleVote(voteType: VoteType): Promise<void> {
+        logService.GAME_MODE(`[MatchController] Voting to: ${voteType.toUpperCase()}`);
 
-        // Optimistic UI update: Change button text to "Waiting..."
-        const t = get(_);
-        modalStore.update(s => {
-            if (s.isOpen && s.buttons && s.buttons.length > 0) {
-                const newButtons = s.buttons.map((b, i) => {
-                    // Assuming "Continue" is the first button (index 0)
-                    if (i === 0) {
-                        return { ...b, text: t('modal.waitingForPlayers'), disabled: true };
-                    }
-                    return b;
-                });
-                return { ...s, buttons: newButtons };
-            }
-            return s;
-        });
+        // FIX: Використовуємо атомарне оновлення замість pull-modify-push
+        await this.stateSync.updateVote(this.myPlayerId, voteType);
 
+        // Оптимістично перевіряємо консенсус
         const currentState = await this.stateSync.pullState();
-        const currentRequests = currentState?.continueRequests || {};
-        const newRequests = { ...currentRequests, [this.myPlayerId]: true };
-
-        await this.syncState({ continueRequests: newRequests });
-
-        this.checkConsensus({ ...currentState, continueRequests: newRequests } as SyncableGameState);
+        if (currentState) {
+            const currentVotes = currentState.noMovesVotes || {};
+            const optimisticVotes = { ...currentVotes, [this.myPlayerId]: voteType };
+            this.checkConsensus({ ...currentState, noMovesVotes: optimisticVotes } as SyncableGameState);
+        }
     }
 
-    public async handleFinishRequest(): Promise<void> {
-        logService.GAME_MODE('[MatchController] Vote to FINISH game.');
-
-        // Optimistic UI update: Change button text to "Waiting..."
-        const t = get(_);
-        modalStore.update(s => {
-            if (s.isOpen && s.buttons && s.buttons.length > 1) {
-                const newButtons = s.buttons.map((b, i) => {
-                    // Assuming "Finish" is the second button (index 1)
-                    if (i === 1) {
-                        return { ...b, text: t('modal.waitingForPlayers'), disabled: true };
-                    }
-                    return b;
-                });
-                return { ...s, buttons: newButtons };
-            }
-            return s;
-        });
-
-        const currentState = await this.stateSync.pullState();
-        const currentRequests = currentState?.finishRequests || {};
-        const newRequests = { ...currentRequests, [this.myPlayerId]: true };
-
-        await this.syncState({ finishRequests: newRequests });
-
-        this.checkConsensus({ ...currentState, finishRequests: newRequests } as SyncableGameState);
-    }
-
+    /**
+     * Перевіряє, чи набрала якась опція більшість голосів (> 50%).
+     */
     public checkConsensus(state: SyncableGameState) {
-        // 1. Перевірка голосів за ПРОДОВЖЕННЯ
-        if (state.continueRequests) {
-            const requests = state.continueRequests;
-            const allReady = Object.keys(requests).length >= 2;
+        if (!state.noMovesVotes || !state.playerState) return;
 
-            if (allReady) {
-                logService.GAME_MODE('[MatchController] Consensus reached: CONTINUE game.');
+        const votes = state.noMovesVotes;
+        const totalPlayers = state.playerState.players.length;
 
-                // FIX AC #11 & #12: Тільки Хост генерує новий стан дошки ТА гравців і пушить його на сервер.
-                if (this.amIHost) {
-                    logService.GAME_MODE('[MatchController] I am Host. Resetting board/player state and pushing to server.');
+        // Поріг більшості: Math.floor(total / 2) + 1
+        const majorityThreshold = Math.floor(totalPlayers / 2) + 1;
 
-                    // Генеруємо новий стан дошки (логіка взята з resetBoardForContinuation)
-                    const currentBoard = get(boardStore);
-                    if (currentBoard) {
-                        const newBoardState = {
-                            ...currentBoard,
-                            cellVisitCounts: {},
-                            moveHistory: [{
-                                pos: { row: currentBoard.playerRow!, col: currentBoard.playerCol! },
-                                blocked: [] as { row: number; col: number }[], // FIX: Явна типізація
-                                visits: {},
-                                blockModeEnabled: get(gameSettingsStore).blockModeEnabled
-                            }],
-                            moveQueue: [] as any[], // FIX: Явна типізація
-                        };
+        let continueCount = 0;
+        let finishCount = 0;
 
-                        // Оновлюємо локально (щоб Хост бачив зміни миттєво)
-                        this.resetBoardCallback();
-                        this.advancePlayerCallback(); // Це оновлює playerStore локально
+        Object.values(votes).forEach(vote => {
+            if (vote === 'continue') continueCount++;
+            if (vote === 'finish') finishCount++;
+        });
 
-                        // Отримуємо оновлений стан гравців після advancePlayerCallback
-                        const newPlayerState = get(playerStore);
+        logService.GAME_MODE(`[MatchController] Votes: Continue=${continueCount}, Finish=${finishCount}, Threshold=${majorityThreshold}`);
 
-                        // FIX: Explicitly close modal for Host to ensure UI unblocks immediately
-                        gameEventBus.dispatch('CloseModal');
-
-                        // Пушимо повний стан на сервер (включаючи playerState!)
-                        this.syncState({
-                            boardState: newBoardState,
-                            playerState: newPlayerState!, // <--- ВАЖЛИВО: Синхронізуємо зміну черги ходу
-                            continueRequests: {},
-                            finishRequests: {},
-                            noMovesClaim: null
-                        });
-                    }
-                } else {
-                    // Гість просто чекає оновлення від сервера.
-                }
-            }
+        // 1. Перевірка перемоги "Продовжити"
+        if (continueCount >= majorityThreshold) {
+            logService.GAME_MODE('[MatchController] Majority voted to CONTINUE.');
+            this.executeContinueGame();
+            return;
         }
 
-        // 2. Перевірка голосів за ЗАВЕРШЕННЯ
-        if (state.finishRequests) {
-            const requests = state.finishRequests;
-            const allReady = Object.keys(requests).length >= 2;
+        // 2. Перевірка перемоги "Завершити"
+        if (finishCount >= majorityThreshold) {
+            logService.GAME_MODE('[MatchController] Majority voted to FINISH.');
+            this.executeFinishGame(state);
+            return;
+        }
+    }
 
-            if (allReady) {
-                logService.GAME_MODE('[MatchController] Consensus reached: FINISH game.');
+    private executeContinueGame() {
+        // Тільки Хост виконує логіку зміни стану гри, щоб уникнути гонки
+        if (this.amIHost) {
+            logService.GAME_MODE('[MatchController] I am Host. Executing CONTINUE logic.');
 
-                if (!state.gameOver) {
-                    if (this.amIHost) {
-                        // FIX AC #14: Хост ініціює завершення гри локально.
-                        // OnlineGameMode перехопить подію GameOver і відправить її на сервер
-                        // разом з очищенням прапорців (finishRequests).
-                        // Ми НЕ викликаємо syncState тут, щоб уникнути гонки станів.
-                        this.endGameCallback('modal.gameOverReasonBonus');
-                    }
-                }
+            const currentBoard = get(boardStore);
+            if (currentBoard) {
+                const newBoardState = {
+                    ...currentBoard,
+                    cellVisitCounts: {},
+                    moveHistory: [{
+                        pos: { row: currentBoard.playerRow!, col: currentBoard.playerCol! },
+                        blocked: [] as { row: number; col: number }[],
+                        visits: {},
+                        blockModeEnabled: get(gameSettingsStore).blockModeEnabled
+                    }],
+                    moveQueue: [] as any[],
+                };
+
+                // Оновлюємо локально
+                this.resetBoardCallback();
+                this.advancePlayerCallback();
+
+                const newPlayerState = get(playerStore);
+
+                gameEventBus.dispatch('CloseModal');
+
+                // Пушимо новий стан і очищаємо голоси
+                this.syncState({
+                    boardState: newBoardState,
+                    playerState: newPlayerState!,
+                    noMovesVotes: {}, // Очищаємо голоси
+                    noMovesClaim: null
+                });
+            }
+        }
+    }
+
+    private executeFinishGame(state: SyncableGameState) {
+        if (!state.gameOver) {
+            if (this.amIHost) {
+                logService.GAME_MODE('[MatchController] I am Host. Executing FINISH logic.');
+                // Хост ініціює завершення. OnlineGameMode перехопить подію і відправить на сервер.
+                this.endGameCallback('modal.gameOverReasonBonus');
+
+                // FIX: Видалено this.syncState({ noMovesVotes: {} }).
+                // Очищення голосів тепер відбувається в OnlineGameEventManager разом з відправкою GameOver.
+                // Це запобігає Race Condition, коли пустий апдейт перезаписував стан GameOver.
             }
         }
     }

@@ -9,14 +9,18 @@ import type { GameOverPayload, PlayerScoreResult } from '$lib/stores/gameOverSto
  * Дані про заяву "Немає ходів"
  */
 export interface NoMovesClaimPayload {
-    playerId: string; // ID гравця, який зробив заяву
-    scoreDetails: any; // Деталі рахунку
+    playerId: string;
+    scoreDetails: any;
     boardSize: number;
-    timestamp: number; // Для уникнення повторного відкриття
-    isCorrect: boolean; // Чи була заява вірною
-    // FIX: Додаємо масив рахунків для синхронізації вигляду модалки
+    timestamp: number;
+    isCorrect: boolean;
     playerScores?: Array<PlayerScoreResult & { playerName: string; playerColor: string; isWinner?: boolean; isLoser?: boolean }>;
 }
+
+/**
+ * Тип голосу гравця
+ */
+export type VoteType = 'continue' | 'finish';
 
 export interface SyncableGameState {
     boardState: BoardState;
@@ -31,11 +35,8 @@ export interface SyncableGameState {
     // Синхронізація модального вікна "Немає ходів"
     noMovesClaim?: NoMovesClaimPayload | null;
 
-    // Голосування за продовження гри (після NoMoves)
-    continueRequests?: Record<string, boolean>;
-
-    // Голосування за завершення гри з бонусом (після NoMoves)
-    finishRequests?: Record<string, boolean>;
+    // Єдине джерело правди для голосування (PlayerID -> VoteType)
+    noMovesVotes?: Record<string, VoteType>;
 }
 
 export interface SyncMoveData {
@@ -66,6 +67,10 @@ export interface IGameStateSync {
     pushState(state: SyncableGameState): Promise<void>;
     pullState(): Promise<SyncableGameState | null>;
     pushMove(moveData: SyncMoveData): Promise<void>;
+
+    // FIX: Новий метод для атомарного оновлення голосу
+    updateVote(playerId: string, vote: VoteType): Promise<void>;
+
     subscribe(callback: GameStateSyncCallback): () => void;
     cleanup(): Promise<void>;
 }
