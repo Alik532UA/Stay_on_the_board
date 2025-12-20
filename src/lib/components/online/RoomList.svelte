@@ -132,7 +132,7 @@
                                           ),
                                       },
                                   })
-                                : "",
+                                : $_("onlineMenu.createFirst"),
                         },
                     })}
                 </p>
@@ -188,7 +188,6 @@
         font-weight: 600;
     }
 
-    /* Refresh Button - Clean & Modern */
     .refresh-btn {
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -241,7 +240,6 @@
         }
     }
 
-    /* Grid Layout */
     .rooms-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

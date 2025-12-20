@@ -11,7 +11,6 @@
     import { logService } from "$lib/services/logService";
     import { onMount } from "svelte";
 
-    // Імпорти для глобального чату
     import { userStore } from "$lib/services/authService";
     import AuthModal from "$lib/components/modals/AuthModal.svelte";
     import GlobalChatModal from "$lib/components/modals/GlobalChatModal.svelte";
@@ -37,11 +36,9 @@
         selectedType = type;
     }
 
-    // Логіка для кнопки "Спільний чат"
     function handleGlobalChat() {
         logService.action('Click: "Global Chat" (FeedbackModal)');
 
-        // Перевірка авторизації (Option 3C)
         if (!$userStore || $userStore.isAnonymous) {
             logService.ui(
                 "[FeedbackModal] User not logged in. Redirecting to AuthModal.",
@@ -51,7 +48,6 @@
                 dataTestId: "auth-modal",
                 variant: "menu",
                 closeOnOverlayClick: true,
-                // Можна додати повідомлення "Увійдіть, щоб користуватися чатом"
             });
         } else {
             logService.ui(
@@ -60,9 +56,9 @@
             modalStore.showModalAsReplacement({
                 component: GlobalChatModal,
                 dataTestId: "global-chat-modal",
-                variant: "standard", // Використовуємо стандартний стиль для чату
+                variant: "standard",
                 closeOnOverlayClick: true,
-                customClass: "chat-modal-window", // Для додаткової стилізації якщо треба
+                customClass: "chat-modal-window",
             });
         }
     }
@@ -167,7 +163,6 @@
             </GameModeButton>
         </div>
     {:else}
-        <!-- ... (форма без змін) ... -->
         <div class="form-container">
             {#if selectedType === "improvement" || selectedType === "bug"}
                 <div class="form-group">

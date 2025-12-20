@@ -10,8 +10,11 @@ export default {
   waiting: "Beklev",
   playing: "Oyunda",
   finished: "Bitken",
-  noRooms: "Odalar tapılmadı. {lastInfo}Birincisini yaratıñız!",
-  lastRoomTime: "Sonuncısı {time} evel yaratılğan edi. ",
+  // FIX
+  noRooms: "Odalar tapılmadı.{lastInfo}",
+  // FIX
+  createFirst: " Birincisini yaratıñız!",
+  lastRoomTime: "Soñki oda {time} yaratıldı",
   timeUnits: {
     m: "dak",
     h: "saat",
