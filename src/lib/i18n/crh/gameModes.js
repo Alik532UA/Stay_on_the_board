@@ -32,6 +32,7 @@ export default {
   autoHideBoard: "Tahtanı avtomatik gizle",
   changeModeTooltip: "Oyun rejimini deñiştir",
   dontShowAgain: "Bu pencerni bir daa kösterme",
+  notAvailableInOnline: "İşlep Çıqarılmaqta", // FIX: Added
   description: {
     // Legacy
     observer: "Canlı oyun areketlerini yazmaq içün rejim. Vaqıt sayğıçı söndürilgen, böylece oyunçılarnıñ areketlerini tınçlıqnen tekrarlay bilesiñiz.",
@@ -56,4 +57,4 @@ export default {
     'online-experienced': "Avtomatik gizlenme ile online oyun.",
     'online-pro': "Avtomatik gizlenme ve hücre bloklama ile online oyun."
   }
-}; 
+};

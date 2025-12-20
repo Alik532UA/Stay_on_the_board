@@ -32,6 +32,7 @@ export default {
   autoHideBoard: "Automatically hide board",
   changeModeTooltip: "Change Game Mode",
   dontShowAgain: "Don't show this window again",
+  notAvailableInOnline: "In Development", // FIX: Added
   description: {
     // Legacy
     observer: "Mode for recording live game moves. Timer is disabled so you can calmly repeat player moves.",
@@ -56,4 +57,4 @@ export default {
     'online-experienced': "Online game with auto-hiding.",
     'online-pro': "Online game with auto-hiding and cell blocking."
   }
-}; 
+};
