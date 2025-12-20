@@ -1,4 +1,3 @@
-// src/lib/services/userActionService.ts
 import { get } from 'svelte/store';
 import { tick } from 'svelte';
 import { modalStore } from '$lib/stores/modalStore';
@@ -20,8 +19,11 @@ import { navigateToGame } from './uiService';
 
 export const userActionService = {
   selectDirection(direction: Direction): void {
-    logService.logicMove(`[userActionService] setDirection called with: ${direction}`);
     const uiState = get(uiStateStore);
+    // FIX: Блокуємо вибір, якщо гра завершена
+    if (uiState?.isGameOver) return;
+
+    logService.logicMove(`[userActionService] setDirection called with: ${direction}`);
     const boardState = get(boardStore);
     if (!uiState || !boardState) return;
 
@@ -40,12 +42,19 @@ export const userActionService = {
   },
 
   selectDistance(distance: number): void {
+    const uiState = get(uiStateStore);
+    // FIX: Блокуємо вибір, якщо гра завершена
+    if (uiState?.isGameOver) return;
+
     logService.logicMove(`[userActionService] setDistance called with: ${distance}`);
     uiStateStore.update(s => s ? ({ ...s, selectedDistance: distance }) : null);
   },
 
   confirmMove(): void {
     const uiState = get(uiStateStore);
+    // FIX: Блокуємо підтвердження, якщо гра завершена
+    if (uiState?.isGameOver) return;
+
     if (uiState?.selectedDirection && uiState?.selectedDistance) {
       this.executeMove(uiState.selectedDirection, uiState.selectedDistance);
     }
@@ -53,7 +62,8 @@ export const userActionService = {
 
   async executeMove(direction: Direction, distance: number): Promise<void> {
     const uiState = get(uiStateStore);
-    if (uiState?.isComputerMoveInProgress) return;
+    // FIX: Блокуємо виконання, якщо гра завершена або йде хід комп'ютера
+    if (uiState?.isComputerMoveInProgress || uiState?.isGameOver) return;
 
     const activeGameMode = gameModeService.getCurrentMode();
     if (activeGameMode) {
@@ -63,7 +73,8 @@ export const userActionService = {
 
   async claimNoMoves(): Promise<void> {
     const uiState = get(uiStateStore);
-    if (uiState?.isComputerMoveInProgress) return;
+    // FIX: Блокуємо дію, якщо гра завершена
+    if (uiState?.isComputerMoveInProgress || uiState?.isGameOver) return;
 
     const activeGameMode = gameModeService.getCurrentMode();
     if (activeGameMode) {
@@ -155,6 +166,9 @@ export const userActionService = {
   },
 
   async finishWithBonus(reasonKey: string): Promise<void> {
+    // FIX: Перевірка на завершення гри тут теж корисна, хоча основний захист в endGameService
+    if (get(uiStateStore).isGameOver) return;
+
     logService.logicMove('[userActionService] finishWithBonus called with reason:', reasonKey);
     await endGameService.endGame(reasonKey);
   },

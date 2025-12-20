@@ -16,10 +16,17 @@ import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { authService } from './authService';
 import { doc, updateDoc, getFirestore } from 'firebase/firestore';
 import { getFirebaseApp } from './firebaseService';
-import { rewardsService } from './rewardsService'; // Додано імпорт
+import { rewardsService } from './rewardsService';
 
 export const endGameService = {
   async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
+    // FIX: Запобігаємо повторному виклику, якщо гра вже завершена.
+    // Це зупиняє цикл нарахування балів при натисканні Enter.
+    if (get(uiStateStore).isGameOver) {
+      logService.GAME_MODE(`[endGameService] Game already over. Ignoring duplicate call for reason: '${reasonKey}'`);
+      return;
+    }
+
     logService.GAME_MODE(`[endGameService] endGame called with reason: '${reasonKey}'`);
 
     uiStateStore.update(s => s ? ({ ...s, isGameOver: true, gameOverReasonKey: reasonKey, gameOverReasonValues: reasonValues }) : null);
@@ -66,7 +73,6 @@ export const endGameService = {
           size: boardState.boardSize
         });
 
-        // FIX: Перевіряємо досягнення після нарахування фінальних бонусів
         logService.score('[endGameService] Checking achievements with final score...');
         rewardsService.checkAchievements({
           score: finalScoreDetails.totalScore,

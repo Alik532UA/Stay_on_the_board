@@ -36,6 +36,25 @@ class LeaderboardService {
         return `${mode}_${size}`;
     }
 
+    // Метод для генерації читабельного ID на основі часу (як у RoomService)
+    private generateTimestampId(): string {
+        const now = new Date();
+        const pad = (num: number) => num.toString().padStart(2, '0');
+        const padMs = (num: number) => num.toString().padStart(3, '0');
+
+        const year = now.getFullYear();
+        const month = pad(now.getMonth() + 1);
+        const day = pad(now.getDate());
+        const hours = pad(now.getHours());
+        const minutes = pad(now.getMinutes());
+        const seconds = pad(now.getSeconds());
+        const ms = padMs(now.getMilliseconds());
+
+        const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+
+        return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}_${ms}_${randomSuffix}`;
+    }
+
     async submitScore(
         score: number,
         context: { mode: string; size: number; variant?: string }
@@ -63,7 +82,10 @@ class LeaderboardService {
         if (!user) return;
 
         const userRef = doc(this.db, 'users', user.uid);
-        const scoreRef = doc(collection(this.db, 'scores'));
+
+        // FIX: Генеруємо ID на основі часу замість випадкового
+        const scoreId = this.generateTimestampId();
+        const scoreRef = doc(this.db, 'scores', scoreId);
 
         try {
             await runTransaction(this.db, async (transaction) => {
