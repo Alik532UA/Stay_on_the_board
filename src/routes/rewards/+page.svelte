@@ -94,14 +94,14 @@
 
 <style>
     .rewards-page {
-        height: 100vh;
+        /* FIX: Видалено фіксовану висоту та внутрішній скрол */
+        min-height: 100vh;
         padding: 20px;
         display: flex;
         flex-direction: column;
         background: var(--bg-primary);
         color: var(--text-primary);
         box-sizing: border-box;
-        overflow-y: auto;
     }
 
     .content-wrapper {
@@ -111,6 +111,8 @@
         display: flex;
         flex-direction: column;
         gap: 30px;
+        /* Додаємо відступ знизу, щоб контент не прилипав до краю екрану */
+        padding-bottom: 40px;
     }
 
     .header {

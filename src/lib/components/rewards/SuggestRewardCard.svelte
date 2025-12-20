@@ -12,7 +12,9 @@
             dataTestId: "feedback-modal",
             component: FeedbackModal,
             props: { initialType: "reward_suggestion" },
+            variant: "menu",
             buttons: [],
+            closeOnOverlayClick: true,
         });
     }
 </script>
@@ -30,7 +32,6 @@
         <div class="description">{$_("rewards.suggestRewardDescription")}</div>
     </div>
 </button>
-``
 
 <style>
     /* Reusing styles from RewardCard.svelte via copy-paste to ensure visual consistency 

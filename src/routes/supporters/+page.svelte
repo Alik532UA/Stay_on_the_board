@@ -1,6 +1,7 @@
 <script>
   import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
   import { _ } from "svelte-i18n";
+  import { base } from "$app/paths";
 </script>
 
 <div class="supporters-container">
@@ -37,6 +38,21 @@
   >
     {$_("supportersPage.supportButton")}
   </a>
+
+  <div class="qr-code-section">
+    <a
+      href="https://send.monobank.ua/jar/8TPmFKQTCK"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="qr-code-link"
+    >
+      <img
+        src="{base}/qrcode-monobank.svg"
+        alt="Monobank QR Code"
+        class="qr-code-image"
+      />
+    </a>
+  </div>
 </div>
 
 <style>
@@ -107,7 +123,7 @@
 
   .support-btn {
     margin-top: 2rem;
-    background: linear-gradient(90deg, #ff9800 60%, #ffb300 100%);
+    background: linear-gradient(90deg, #4caf50 60%, #45a049 100%);
     color: #fff;
     border: none;
     border-radius: 12px;
@@ -118,11 +134,31 @@
     display: inline-block;
     text-decoration: none;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 20px rgba(255, 152, 0, 0.3);
   }
 
   .support-btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 24px rgba(255, 152, 0, 0.4);
+  }
+
+  .qr-code-section {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .qr-code-image {
+    max-width: 250px;
+    height: auto;
+    border-radius: 16px;
+    background: white;
+    padding: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+    cursor: pointer;
+  }
+
+  .qr-code-image:hover {
+    transform: scale(1.02);
   }
 </style>

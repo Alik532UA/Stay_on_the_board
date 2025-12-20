@@ -6,6 +6,7 @@
     } from "$lib/services/feedbackService";
     import { modalStore } from "$lib/stores/modalStore";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
+    import GameModeButton from "$lib/components/game-modes/GameModeButton.svelte";
     import { logService } from "$lib/services/logService";
     import { onMount } from "svelte";
 
@@ -62,10 +63,9 @@
                 actualResult,
                 expectedResult,
             });
-            // Закриття модалки (Варіант 4A)
             modalStore.closeModal();
         } catch (e) {
-            // Помилка вже оброблена в сервісі (notification), тут просто знімаємо блокування
+            // Помилка вже оброблена в сервісі (notification)
             isSubmitting = false;
         }
     }
@@ -83,29 +83,40 @@
     }
 </script>
 
-<div class="feedback-modal">
+<div class="feedback-modal-container">
+    <!-- Заголовок всередині контенту (Варіант 3A) -->
+    <h2 class="modal-title-menu">{$_("ui.feedback.title")}</h2>
+
     {#if !selectedType}
-        <!-- Крок 1: Вибір типу -->
-        <h3 class="subtitle">{$_("ui.feedback.selectType")}</h3>
-        <div class="buttons-stack">
-            <StyledButton
-                variant="info"
+        <!-- Крок 1: Вибір типу (Варіант 1A + 4A) -->
+        <div class="menu-list">
+            <GameModeButton
+                icon="💡"
+                text={$_("ui.feedback.typeImprovement")}
+                dataTestId="fb-type-improvement"
                 on:click={() => selectType("improvement")}
-            >
-                {$_("ui.feedback.typeImprovement")}
-            </StyledButton>
-            <StyledButton variant="danger" on:click={() => selectType("bug")}>
-                {$_("ui.feedback.typeBug")}
-            </StyledButton>
-            <StyledButton
-                variant="default"
+            />
+            <GameModeButton
+                icon="⚠️"
+                text={$_("ui.feedback.typeBug")}
+                dataTestId="fb-type-bug"
+                on:click={() => selectType("bug")}
+            />
+            <GameModeButton
+                icon="🏆"
+                text={$_("ui.feedback.typeReward")}
+                dataTestId="fb-type-reward"
+                on:click={() => selectType("reward_suggestion")}
+            />
+            <GameModeButton
+                icon="💭"
+                text={$_("ui.feedback.typeOther")}
+                dataTestId="fb-type-other"
                 on:click={() => selectType("other")}
-            >
-                {$_("ui.feedback.typeOther")}
-            </StyledButton>
+            />
         </div>
     {:else}
-        <!-- Крок 2: Форма -->
+        <!-- Крок 2: Форма (Варіант 2A - .glass-input) -->
         <div class="form-container">
             <!-- Спільне поле для Improvement та Bug -->
             {#if selectedType === "improvement" || selectedType === "bug"}
@@ -115,7 +126,7 @@
                         id="fb-page"
                         type="text"
                         bind:value={pageLocation}
-                        class="modal-input"
+                        class="glass-input"
                     />
                 </div>
             {/if}
@@ -129,7 +140,7 @@
                     <textarea
                         id="fb-text"
                         bind:value={textContent}
-                        class="modal-textarea"
+                        class="glass-input textarea-resize"
                         rows="4"
                     ></textarea>
                 </div>
@@ -144,7 +155,7 @@
                     <textarea
                         id="fb-reward"
                         bind:value={textContent}
-                        class="modal-textarea"
+                        class="glass-input textarea-resize"
                         rows="5"
                         placeholder="Наприклад: 'Майстер захисту' - виграти гру, не втративши жодного очка..."
                     ></textarea>
@@ -160,7 +171,7 @@
                     <textarea
                         id="fb-actual"
                         bind:value={actualResult}
-                        class="modal-textarea"
+                        class="glass-input textarea-resize"
                         rows="3"
                     ></textarea>
                 </div>
@@ -171,7 +182,7 @@
                     <textarea
                         id="fb-expected"
                         bind:value={expectedResult}
-                        class="modal-textarea"
+                        class="glass-input textarea-resize"
                         rows="3"
                     ></textarea>
                 </div>
@@ -186,7 +197,7 @@
                     <textarea
                         id="fb-desc"
                         bind:value={textContent}
-                        class="modal-textarea"
+                        class="glass-input textarea-resize"
                         rows="5"
                     ></textarea>
                 </div>
@@ -195,7 +206,7 @@
             <div class="actions-row">
                 <StyledButton
                     variant="default"
-                    size="small"
+                    size="large"
                     on:click={goBack}
                     disabled={isSubmitting}
                 >
@@ -203,6 +214,7 @@
                 </StyledButton>
                 <StyledButton
                     variant="primary"
+                    size="large"
                     on:click={handleSubmit}
                     disabled={isSubmitting}
                 >
@@ -216,61 +228,67 @@
 </div>
 
 <style>
-    .feedback-modal {
+    .feedback-modal-container {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 24px;
         width: 100%;
+        /* Центрування контенту, аналогічно GameModeModal */
+        box-sizing: border-box;
+        max-width: 100%;
+        margin: 0 auto;
     }
-    .subtitle {
+
+    .modal-title-menu {
         text-align: center;
-        color: var(--text-secondary);
-        margin-bottom: 8px;
+        font-size: 1.8em;
+        font-weight: 800;
+        color: #fff;
+        margin: 0 0 8px 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
-    .buttons-stack {
+
+    .menu-list {
         display: flex;
         flex-direction: column;
         gap: 12px;
+        width: 100%;
     }
+
     .form-container {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 20px;
+        width: 100%;
     }
+
     .form-group {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 8px;
         text-align: left;
     }
+
     label {
-        font-size: 0.9em;
-        font-weight: bold;
-        color: var(--text-secondary);
+        font-size: 0.95em;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.8);
+        margin-left: 4px;
     }
-    .modal-input,
-    .modal-textarea {
-        background: rgba(0, 0, 0, 0.2);
-        border: var(--global-border-width) solid var(--border-color);
-        border-radius: 8px;
-        padding: 10px;
-        color: var(--text-primary);
+
+    /* Додаткові стилі для textarea, щоб вона виглядала гарно з класом glass-input */
+    .textarea-resize {
+        resize: vertical;
+        min-height: 80px;
         font-family: inherit;
-        font-size: 1em;
-        width: 100%;
-        box-sizing: border-box;
+        line-height: 1.4;
     }
-    .modal-input:focus,
-    .modal-textarea:focus {
-        outline: none;
-        border-color: var(--control-selected);
-        box-shadow: 0 0 0 2px rgba(var(--control-selected-rgb), 0.2);
-    }
+
     .actions-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 8px;
-        gap: 12px;
+        margin-top: 12px;
+        gap: 16px;
     }
 </style>
