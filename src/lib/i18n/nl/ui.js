@@ -10,6 +10,7 @@ export default {
     typeBug: "Fout melden",
     typeOther: "Anders",
     typeReward: "Beloning voorstellen",
+    typeGlobalChat: "Algemene Chat",
     pageLabel: "Pagina (optioneel)",
     improvementLabel: "Uw suggestie",
     rewardLabel: "Beschrijf het idee en de voorwaarden",
@@ -25,21 +26,21 @@ export default {
     titleSave: "Voortgang Opslaan",
     titleLogin: "Inloggen",
     titleReset: "Wachtwoord Resetten",
-    titleProfile: "Mijn Profiel", // New
+    titleProfile: "Mijn Profiel",
     emailLabel: "E-mail",
     passwordLabel: "Wachtwoord",
-    newPasswordLabel: "Nieuw Wachtwoord", // New
+    newPasswordLabel: "Nieuw Wachtwoord",
     saveBtn: "Registreren en Opslaan",
     loginBtn: "Inloggen",
     resetBtn: "E-mail Verzenden",
-    logoutBtn: "Uitloggen", // New
-    changePasswordBtn: "Wachtwoord Wijzigen", // New
-    savePasswordBtn: "Nieuw Wachtwoord Opslaan", // New
-    cancelChangePasswordBtn: "Wijzigen Annuleren", // New
-    deleteAccountBtn: "Account Verwijderen", // New
-    confirmDeleteBtn: "Verwijderen Bevestigen", // New
-    cancelDeleteBtn: "Annuleren", // New
-    deleteWarning: "Waarschuwing! Deze actie kan niet ongedaan worden gemaakt. Al uw gegevens en records worden permanent verwijderd. Voer uw wachtwoord in om te bevestigen.", // New
+    logoutBtn: "Uitloggen",
+    changePasswordBtn: "Wachtwoord Wijzigen",
+    savePasswordBtn: "Nieuw Wachtwoord Opslaan",
+    cancelChangePasswordBtn: "Wijzigen Annuleren",
+    deleteAccountBtn: "Account Verwijderen",
+    confirmDeleteBtn: "Verwijderen Bevestigen",
+    cancelDeleteBtn: "Annuleren",
+    deleteWarning: "Waarschuwing! Deze actie kan niet ongedaan worden gemaakt. Al uw gegevens en records worden permanent verwijderd. Voer uw wachtwoord in om te bevestigen.",
     switchLogin: "Heb je al een account? Inloggen",
     switchRegister: "Geen account? Registreren",
     forgotPassword: "Wachtwoord vergeten?",

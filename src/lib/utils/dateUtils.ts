@@ -23,3 +23,24 @@ export function formatDate(timestamp: number, locale: string | null | undefined)
 
     return formatted;
 }
+
+/**
+ * Форматує дату та час.
+ * Для української мови додає слово "року".
+ */
+export function formatDateTime(timestamp: number, locale: string | null | undefined): string {
+    const date = new Date(timestamp);
+    const currentLocale = locale || 'en';
+
+    const timeString = date.toLocaleTimeString(currentLocale, { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    // Використовуємо існуючу функцію для дати
+    let dateString = date.toLocaleDateString(currentLocale, { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    if (currentLocale === 'uk') {
+        // Формат: 20.12.2025 року 21:42
+        return `${dateString} року ${timeString}`;
+    }
+
+    return `${dateString} ${timeString}`;
+}

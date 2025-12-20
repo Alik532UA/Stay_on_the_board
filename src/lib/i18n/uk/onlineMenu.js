@@ -11,7 +11,7 @@ export default {
   playing: "У грі",
   finished: "Завершено",
   noRooms: "Кімнат не знайдено. {lastInfo}Створіть першу!",
-  lastRoomTime: "Остання була створена {time} тому. ",
+  lastRoomTime: "Останній раз кімната була {time}",
   timeUnits: {
     m: "хв",
     h: "год",
@@ -55,5 +55,6 @@ export default {
   waitingForReturn: "Очікування повернення {name}...",
   reconnecting: "Гравець намагається відновити з'єднання. Якщо він не повернеться, гру буде завершено або його буде вилучено.",
   leaveRoom: "Вийти з гри",
-  playerDisconnected: "Гравця {name} вилучено з гри."
+  playerDisconnected: "Гравця {name} вилучено з гри.",
+  globalChat: "Спільний чат"
 };
