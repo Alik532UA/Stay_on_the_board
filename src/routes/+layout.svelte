@@ -219,9 +219,9 @@
 	{#if import.meta.env.DEV}
 		<FlexibleMenu
 			items={devMenuItems}
-			position="top"
-			persistenceKey="main-top-menu"
-			dataTestId="flexible-menu-top-wrapper"
+			position="left"
+			persistenceKey="main-left-menu"
+			dataTestId="flexible-menu-left-wrapper"
 		/>
 	{/if}
 
@@ -236,9 +236,9 @@
 	{#if import.meta.env.DEV}
 		<FlexibleMenu
 			items={menuItems}
-			position="bottom"
-			persistenceKey="main-bottom-menu"
-			dataTestId="flexible-menu-bottom-wrapper"
+			position="right"
+			persistenceKey="main-right-menu"
+			dataTestId="flexible-menu-right-wrapper"
 			startOpen={false}
 		/>
 	{/if}
@@ -268,8 +268,9 @@
 	}
 	.test-mode-container {
 		position: fixed;
-		bottom: 60px;
+		top: 50%;
 		right: 10px;
+		transform: translateY(-50%);
 		z-index: 1001;
 	}
 	main {
