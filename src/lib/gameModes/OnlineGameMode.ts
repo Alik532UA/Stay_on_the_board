@@ -368,6 +368,9 @@ export class OnlineGameMode extends BaseGameMode {
   private applyRemoteState(remoteState: SyncableGameState): void {
     this.isApplyingRemoteState = true;
 
+    // FIX: Зберігаємо індекс поточного гравця ДО оновлення стану
+    const previousPlayerIndex = get(playerStore)?.currentPlayerIndex;
+
     if (this.reconciler) {
       this.reconciler.apply(remoteState);
     }
@@ -380,8 +383,16 @@ export class OnlineGameMode extends BaseGameMode {
       this.turnDuration = remoteState.settings.turnDuration;
     }
 
-    if (!get(modalStore).isOpen) {
+    // FIX: Перезапускаємо таймер ТІЛЬКИ якщо змінився гравець
+    const newPlayerIndex = remoteState.playerState.currentPlayerIndex;
+    const isNewTurn = previousPlayerIndex !== newPlayerIndex;
+    const isGameActive = !get(uiStateStore).isGameOver;
+
+    if (isNewTurn && isGameActive && !get(modalStore).isOpen) {
+      logService.GAME_MODE(`[OnlineGameMode] Turn changed (${previousPlayerIndex} -> ${newPlayerIndex}). Restarting timer.`);
       this.startTurn();
+    } else {
+      // Якщо це просто оновлення голосування або налаштувань - таймер не чіпаємо
     }
 
     this.isApplyingRemoteState = false;
