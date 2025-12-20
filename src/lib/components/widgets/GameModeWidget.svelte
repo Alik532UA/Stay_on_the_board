@@ -3,13 +3,10 @@
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
   import { userActionService } from "$lib/services/userActionService.js";
   import { _ } from "svelte-i18n";
-  import { tick } from "svelte";
   import { uiStateStore } from "$lib/stores/uiStateStore.js";
   import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
 
   $: activeMode = $gameModeStore.activeMode;
-  $: isCompetitiveMode =
-    activeMode === "timed" || activeMode === "local" || activeMode === "online";
 
   // Helper: перевіряє, чи відповідає поточний gameMode legacy пресету
   function isPresetActive(legacyPreset: string): boolean {
@@ -62,6 +59,7 @@
   async function handlePresetClick(
     preset: "beginner" | "experienced" | "pro" | "timed" | "observer",
   ) {
+    if (activeMode === "online") return; // Блокуємо клік в онлайні
     userActionService.setGameModePreset(preset);
     if (preset === "timed") {
       uiStateStore.update((s) => ({ ...s, settingsMode: "competitive" }));
@@ -72,7 +70,13 @@
   }
 </script>
 
-<div class="game-mode-widget">
+<div class="game-mode-widget" data-testid="game-mode-widget">
+  {#if activeMode === "online"}
+    <div class="online-lock-overlay" data-testid="game-mode-widget-locked">
+      <span>{$_("onlineMenu.hostOnlySettings")}</span>
+    </div>
+  {/if}
+
   <h3 class="widget-title">{$_("gameModes.title")}</h3>
 
   {#if activeMode === "local"}
@@ -159,6 +163,8 @@
     padding: 16px;
     box-sizing: border-box;
     width: 100%;
+    position: relative; /* Для оверлею */
+    overflow: hidden;
   }
   .game-mode-widget:hover {
     box-shadow: var(--unified-shadow-hover);
@@ -183,5 +189,21 @@
   }
   .description.settings-expander-closed {
     font-size: 18px;
+  }
+
+  .online-lock-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--unified-border-radius);
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
   }
 </style>

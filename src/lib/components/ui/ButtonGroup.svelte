@@ -14,10 +14,7 @@
     export let className: string = "";
 </script>
 
-<div
-    data-testid="widget-settings-expander"
-    class="settings-expander__button-group {className}"
->
+<div class="settings-expander__button-group {className}">
     {#each options as option}
         <button
             data-testid={option.dataTestId}

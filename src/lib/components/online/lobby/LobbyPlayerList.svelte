@@ -63,6 +63,11 @@
         if (!e.detail.trim()) return;
         onUpdatePlayer({ name: e.detail });
     }
+
+    // Helper to safely get initial
+    function getInitial(name: string): string {
+        return name && name.length > 0 ? name[0].toUpperCase() : "?";
+    }
 </script>
 
 <div class="players-section">
@@ -100,7 +105,8 @@
                             class="player-avatar"
                             style="background-color: {player.color}"
                         >
-                            {player.name[0].toUpperCase()}
+                            <!-- FIX: Безпечне отримання ініціалу -->
+                            {getInitial(player.name)}
                         </div>
                     {/if}
 
@@ -108,7 +114,7 @@
                         <div class="player-name-row">
                             <div class="player-name-wrapper-styled">
                                 <EditableText
-                                    value={player.name}
+                                    value={player.name || "Player"}
                                     canEdit={player.id === myPlayerId}
                                     onRandom={generateRandomPlayerName}
                                     on:change={handleNameChange}
