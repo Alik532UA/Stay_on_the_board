@@ -59,7 +59,6 @@
     class="flexible-menu-wrapper position-{position} {isOpen
         ? 'is-open'
         : 'is-closed'}"
-    aria-hidden={!isOpen}
     data-testid={dataTestId}
 >
     <!-- Main Content Panel -->
@@ -80,7 +79,11 @@
             </div>
         </button>
 
-        <div class="menu-grid" data-testid="{position}-menu-grid">
+        <div
+            class="menu-grid"
+            data-testid="{position}-menu-grid"
+            aria-hidden={!isOpen}
+        >
             {#each [0, 1, 2, 3, 4] as i}
                 <div
                     class="menu-slot slot-{i}"
