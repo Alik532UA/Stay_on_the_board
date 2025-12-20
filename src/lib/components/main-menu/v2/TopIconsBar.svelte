@@ -3,12 +3,12 @@
     import { base } from "$app/paths";
     import { _ } from "svelte-i18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte";
     import { logService } from "$lib/services/logService.js";
     import { currentLanguageFlagSvg } from "$lib/stores/derivedState";
     import { modalStore } from "$lib/stores/modalStore";
     import AuthModal from "$lib/components/modals/AuthModal.svelte";
 
-    // Components
     import ThemeDropdown from "$lib/components/main-menu/ThemeDropdown.svelte";
     import LanguageDropdown from "$lib/components/main-menu/LanguageDropdown.svelte";
 
@@ -46,43 +46,39 @@
             dataTestId: "auth-modal",
             buttons: [],
             variant: "menu",
-            closeOnOverlayClick: true, // <--- FIX: Додано для закриття по кліку на фон
+            closeOnOverlayClick: true,
         });
     }
 </script>
 
 <div class="top-icons-bar">
-    <!-- 1. Правила -->
     <button
         class="icon-btn"
         on:click={() => navigateTo("/rules")}
         title={$_("mainMenu.rules")}
         data-testid="top-rules-btn"
     >
-        <span class="emoji">📝</span>
+        <div class="icon-inner"><NotoEmoji name="memo" size="24px" /></div>
     </button>
 
-    <!-- 2. Нагороди -->
     <button
         class="icon-btn"
         on:click={() => navigateTo("/rewards")}
         title={$_("rewards.pageTitle")}
         data-testid="top-rewards-btn"
     >
-        <span class="emoji">🏆</span>
+        <div class="icon-inner"><NotoEmoji name="trophy" size="24px" /></div>
     </button>
 
-    <!-- 3. Налаштування -->
     <button
         class="icon-btn"
         on:click={() => navigateTo("/settings")}
         title={$_("mainMenu.settings")}
         data-testid="top-settings-btn"
     >
-        <span class="emoji">⚙️</span>
+        <div class="icon-inner"><NotoEmoji name="gear" size="24px" /></div>
     </button>
 
-    <!-- 4. Мова -->
     <div class="icon-wrapper">
         <button
             class="icon-btn"
@@ -90,14 +86,12 @@
             title={$_("mainMenu.language")}
             data-testid="top-language-btn"
         >
-            <!-- FIX: Додаємо обгортку для SVG прапорця -->
             <span class="icon-inner flag-icon-inner"
                 >{@html $currentLanguageFlagSvg}</span
             >
         </button>
     </div>
 
-    <!-- 5. Тема -->
     <div class="icon-wrapper">
         <button
             class="icon-btn"
@@ -109,17 +103,15 @@
         </button>
     </div>
 
-    <!-- 6. Керування (Desktop only) -->
     <button
         class="icon-btn desktop-only"
         on:click={() => navigateTo("/settings?tab=hotkeys")}
         title={$_("mainMenu.controls")}
         data-testid="top-controls-btn"
     >
-        <span class="emoji">⌨️</span>
+        <div class="icon-inner"><NotoEmoji name="keyboard" size="24px" /></div>
     </button>
 
-    <!-- 7. Підтримати (Donate) -->
     <button
         class="icon-btn"
         on:click={() => navigateTo("/supporters")}
@@ -129,28 +121,29 @@
         <span class="icon-inner"><SvgIcons name="donate" /></span>
     </button>
 
-    <!-- 8. Зворотній зв'язок -->
     <button
         class="icon-btn"
         on:click={onFeedback}
         title={$_("ui.feedback.title")}
         data-testid="top-feedback-btn"
     >
-        <span class="emoji">💬</span>
+        <div class="icon-inner">
+            <NotoEmoji name="speech_balloon" size="24px" />
+        </div>
     </button>
 
-    <!-- 9. Акаунт (Нова кнопка) -->
     <button
         class="icon-btn"
         on:click={openAuthModal}
         title={$_("mainMenu.account")}
         data-testid="top-account-btn"
     >
-        <span class="emoji">👤</span>
+        <div class="icon-inner">
+            <NotoEmoji name="bust_in_silhouette" size="24px" />
+        </div>
     </button>
 </div>
 
-<!-- Глобальний бекдроп та контейнери для дропдаунів -->
 {#if showThemeDropdown || showLangDropdown}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -210,11 +203,6 @@
         background: rgba(255, 255, 255, 0.1);
     }
 
-    .emoji {
-        font-size: 1.5rem;
-        line-height: 1;
-    }
-
     .icon-inner {
         width: 28px;
         height: 28px;
@@ -223,19 +211,21 @@
         justify-content: center;
     }
 
-    /* FIX: Додаємо стилі для обгортки SVG прапорця */
     .flag-icon-inner {
-        border-radius: 6px; /* Менше заокруглення для маленьких іконок */
+        border-radius: 6px;
         overflow: hidden;
-        /* Можливо, варто задати фіксовані розміри, якщо SVG не мають власних */
-        width: 32px; /* Відповідає розміру SVG прапорця */
-        height: 24px; /* Відповідає розміру SVG прапорця */
+        width: 32px;
+        height: 24px;
     }
 
     :global(.icon-inner svg) {
         width: 100%;
         height: 100%;
-        fill: currentColor;
+        display: block;
+    }
+
+    .flag-icon-inner :global(svg) {
+        object-fit: cover;
     }
 
     .desktop-only {

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n";
   import ScoreBonusExpander from "../widgets/ScoreBonusExpander.svelte";
+  import NotoEmoji from "$lib/components/NotoEmoji.svelte";
   import type {
     FinalScoreDetails,
     PlayerScoreResult,
@@ -9,7 +10,6 @@
   export let content: any;
   export let isCompactScoreMode = true;
 
-  // Helper to calculate total bonus
   $: scoreDetails = content?.scoreDetails as FinalScoreDetails;
   $: totalBonus = scoreDetails
     ? (scoreDetails.sizeBonus ?? 0) +
@@ -31,7 +31,6 @@
 </script>
 
 {#if playerScores && playerScores.length > 0}
-  <!-- Multiplayer Score View -->
   <div class="player-scores-container">
     <h3>Рахунки гравців:</h3>
     {#each playerScores as playerScore}
@@ -42,9 +41,13 @@
       >
         <div class="score-content-wrapper">
           {#if playerScore.isWinner}
-            <span class="winner-badge">🏆</span>
+            <span class="winner-badge"
+              ><NotoEmoji name="trophy" size="1.2em" /></span
+            >
           {:else if playerScore.isLoser}
-            <span class="loser-badge">🐚</span>
+            <span class="loser-badge"
+              ><NotoEmoji name="spiral_shell" size="1.2em" /></span
+            >
           {/if}
 
           <span
@@ -64,7 +67,6 @@
     {/each}
   </div>
 {:else if scoreDetails}
-  <!-- Single Player Score View -->
   <div class="score-details-container" data-testid="score-details-container">
     <div class="score-detail-row" data-testid="base-score">
       {$_("modal.scoreDetails.baseScore")}
@@ -141,7 +143,8 @@
   .winner-badge,
   .loser-badge {
     margin-right: 10px;
-    font-size: 1.2em;
+    display: inline-flex;
+    align-items: center;
   }
   .player-name-plate {
     display: inline-block;

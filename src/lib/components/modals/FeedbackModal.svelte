@@ -7,31 +7,23 @@
     import { modalStore } from "$lib/stores/modalStore";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import GameModeButton from "$lib/components/game-modes/GameModeButton.svelte";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte";
     import { logService } from "$lib/services/logService";
     import { onMount } from "svelte";
 
-    // Props
     export let initialType: FeedbackType | null = null;
 
-    // Стан компонента
     let selectedType: FeedbackType | null = initialType;
     let isSubmitting = false;
 
-    // Поля форми
     let pageLocation = "";
     let textContent = "";
     let actualResult = "";
     let expectedResult = "";
 
     onMount(() => {
-        // Автозаповнення поточної сторінки
         if (typeof window !== "undefined") {
             pageLocation = window.location.pathname;
-        }
-        if (initialType) {
-            logService.ui(
-                `[FeedbackModal] Initialized with type: ${initialType}`,
-            );
         }
     });
 
@@ -43,7 +35,6 @@
     async function handleSubmit() {
         if (isSubmitting) return;
 
-        // Валідація
         if (selectedType === "improvement" && !textContent.trim()) return;
         if (selectedType === "other" && !textContent.trim()) return;
         if (selectedType === "reward_suggestion" && !textContent.trim()) return;
@@ -65,13 +56,11 @@
             });
             modalStore.closeModal();
         } catch (e) {
-            // Помилка вже оброблена в сервісі (notification)
             isSubmitting = false;
         }
     }
 
     function goBack() {
-        // Якщо тип був переданий при ініціалізації, кнопка "Назад" закриває модалку
         if (initialType) {
             modalStore.closeModal();
         } else {
@@ -84,41 +73,45 @@
 </script>
 
 <div class="feedback-modal-container">
-    <!-- Заголовок всередині контенту (Варіант 3A) -->
     <h2 class="modal-title-menu">{$_("ui.feedback.title")}</h2>
 
     {#if !selectedType}
-        <!-- Крок 1: Вибір типу (Варіант 1A + 4A) -->
         <div class="menu-list">
             <GameModeButton
-                icon="💡"
                 text={$_("ui.feedback.typeImprovement")}
                 dataTestId="fb-type-improvement"
                 on:click={() => selectType("improvement")}
-            />
+            >
+                <div slot="icon">
+                    <NotoEmoji name="light_bulb" size="100%" />
+                </div>
+            </GameModeButton>
             <GameModeButton
-                icon="⚠️"
                 text={$_("ui.feedback.typeBug")}
                 dataTestId="fb-type-bug"
                 on:click={() => selectType("bug")}
-            />
+            >
+                <div slot="icon"><NotoEmoji name="bug" size="100%" /></div>
+            </GameModeButton>
             <GameModeButton
-                icon="🏆"
                 text={$_("ui.feedback.typeReward")}
                 dataTestId="fb-type-reward"
                 on:click={() => selectType("reward_suggestion")}
-            />
+            >
+                <div slot="icon"><NotoEmoji name="trophy" size="100%" /></div>
+            </GameModeButton>
             <GameModeButton
-                icon="💭"
                 text={$_("ui.feedback.typeOther")}
                 dataTestId="fb-type-other"
                 on:click={() => selectType("other")}
-            />
+            >
+                <div slot="icon">
+                    <NotoEmoji name="thought_balloon" size="100%" />
+                </div>
+            </GameModeButton>
         </div>
     {:else}
-        <!-- Крок 2: Форма (Варіант 2A - .glass-input) -->
         <div class="form-container">
-            <!-- Спільне поле для Improvement та Bug -->
             {#if selectedType === "improvement" || selectedType === "bug"}
                 <div class="form-group">
                     <label for="fb-page">{$_("ui.feedback.pageLabel")}</label>
@@ -131,7 +124,6 @@
                 </div>
             {/if}
 
-            <!-- Поля для Improvement -->
             {#if selectedType === "improvement"}
                 <div class="form-group">
                     <label for="fb-text"
@@ -146,7 +138,6 @@
                 </div>
             {/if}
 
-            <!-- Поля для Reward Suggestion -->
             {#if selectedType === "reward_suggestion"}
                 <div class="form-group">
                     <label for="fb-reward"
@@ -162,7 +153,6 @@
                 </div>
             {/if}
 
-            <!-- Поля для Bug -->
             {#if selectedType === "bug"}
                 <div class="form-group">
                     <label for="fb-actual"
@@ -188,7 +178,6 @@
                 </div>
             {/if}
 
-            <!-- Поля для Other -->
             {#if selectedType === "other"}
                 <div class="form-group">
                     <label for="fb-desc"
@@ -233,7 +222,6 @@
         flex-direction: column;
         gap: 24px;
         width: 100%;
-        /* Центрування контенту, аналогічно GameModeModal */
         box-sizing: border-box;
         max-width: 100%;
         margin: 0 auto;
@@ -276,7 +264,6 @@
         margin-left: 4px;
     }
 
-    /* Додаткові стилі для textarea, щоб вона виглядала гарно з класом glass-input */
     .textarea-resize {
         resize: vertical;
         min-height: 80px;

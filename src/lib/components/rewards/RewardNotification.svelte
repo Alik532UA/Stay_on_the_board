@@ -1,6 +1,6 @@
 <script lang="ts">
     import { notificationStore } from "$lib/stores/notificationStore";
-    import SvgIcons from "$lib/components/SvgIcons.svelte";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte"; // Імпорт
     import { _ } from "svelte-i18n";
     import { flip } from "svelte/animate";
     import { fly } from "svelte/transition";
@@ -18,7 +18,8 @@
         >
             {#if notification.icon}
                 <div class="icon">
-                    <SvgIcons name={notification.icon} />
+                    <!-- Заміна SvgIcons на NotoEmoji -->
+                    <NotoEmoji name={notification.icon} size="40px" />
                 </div>
             {/if}
             <div class="content">
@@ -36,16 +37,17 @@
 </div>
 
 <style>
+    /* Стилі залишаються без змін */
     .notification-container {
         position: fixed;
         bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
-        flex-direction: column-reverse; /* Newest at bottom if multiple */
+        flex-direction: column-reverse;
         gap: 10px;
-        z-index: 10000; /* Top level */
-        pointer-events: none; /* Allow clicks through */
+        z-index: 10000;
+        pointer-events: none;
         width: 90%;
         max-width: 400px;
     }
@@ -76,7 +78,10 @@
     .icon {
         width: 40px;
         height: 40px;
-        color: gold; /* Default for achievements */
+        /* color: gold; - NotoEmoji має свої кольори */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .content {

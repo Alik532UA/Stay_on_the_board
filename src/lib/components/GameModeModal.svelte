@@ -12,6 +12,7 @@
   import type { GameModePreset } from "$lib/stores/gameSettingsStore";
   import WipNotice from "./main-menu/WipNotice.svelte";
   import GameModeButton from "$lib/components/game-modes/GameModeButton.svelte";
+  import NotoEmoji from "$lib/components/NotoEmoji.svelte";
 
   let showWipNotice = false;
 
@@ -40,7 +41,6 @@
 
   onMount(() => {
     if (buttonsNode) {
-      // Знаходимо кнопки всередині компонента GameModeButton
       const buttons = Array.from(buttonsNode.querySelectorAll("button"));
       buttons.forEach((btn, index) => {
         const key = `Digit${index + 1}`;
@@ -70,18 +70,12 @@
     if (mode === "beginner") {
       showFaqModal();
     } else {
-      logService.modal(
-        `[GameModeModal] ${mode} mode selected. Closing current modal and navigating.`,
-      );
       modalStore.closeModal();
       userActionService.navigateToGame();
     }
   }
 
   function showFaqModal() {
-    logService.modal(
-      "[GameModeModal] Beginner mode selected. Showing FAQ modal.",
-    );
     modalStore.showModal({
       titleKey: "faq.title",
       dataTestId: "faq-modal",
@@ -100,9 +94,6 @@
           primary: true,
           isHot: true,
           onClick: () => {
-            logService.modal(
-              "[FAQModal] OK button clicked. Closing modal and navigating to game.",
-            );
             modalStore.closeModal();
             userActionService.navigateToGame();
           },
@@ -112,60 +103,68 @@
   }
 </script>
 
-<!-- FIX: Видалено заголовок "Втримайся" -->
-
 <div class="game-mode-buttons" bind:this={buttonsNode}>
   {#if extended}
-    <!-- 1. Online Game (Top Priority) -->
+    <!-- 1. Online Game -->
     <GameModeButton
-      icon="🌍"
       text={$_("mainMenu.playOnline")}
       dataTestId="online-game-btn"
       on:click={handleOnlineGame}
-    />
+    >
+      <div slot="icon">
+        <NotoEmoji name="globe_showing_europe_africa" size="100%" />
+      </div>
+    </GameModeButton>
 
     <div class="divider"></div>
   {/if}
 
   <!-- 2. Single Player Modes -->
   <GameModeButton
-    icon="🐣"
     text={$_("gameModes.beginner")}
     dataTestId="beginner-mode-btn"
     on:click={() => selectMode("beginner")}
-  />
+  >
+    <div slot="icon"><NotoEmoji name="hatching_chick" size="100%" /></div>
+  </GameModeButton>
 
   <GameModeButton
-    icon="🧠"
     text={$_("gameModes.experienced")}
     dataTestId="experienced-mode-btn"
     on:click={() => selectMode("experienced")}
-  />
+  >
+    <div slot="icon"><NotoEmoji name="brain" size="100%" /></div>
+  </GameModeButton>
 
   <GameModeButton
-    icon="🔥"
     text={$_("gameModes.pro")}
     dataTestId="pro-mode-btn"
     on:click={() => selectMode("pro")}
-  />
+  >
+    <div slot="icon"><NotoEmoji name="fire" size="100%" /></div>
+  </GameModeButton>
 
   {#if extended}
     <GameModeButton
-      icon="⏱️"
       text={$_("mainMenu.timedGame")}
       dataTestId="timed-game-btn"
       on:click={() => selectMode("timed")}
-    />
+    >
+      <div slot="icon"><NotoEmoji name="stopwatch" size="100%" /></div>
+    </GameModeButton>
 
     <div class="divider"></div>
 
     <!-- 3. Local Game -->
     <GameModeButton
-      icon="👥"
       text={$_("mainMenu.localGame")}
       dataTestId="local-game-btn"
       on:click={handleLocalGame}
-    />
+    >
+      <div slot="icon">
+        <NotoEmoji name="busts_in_silhouette" size="100%" />
+      </div>
+    </GameModeButton>
   {/if}
 </div>
 
@@ -189,10 +188,8 @@
     flex-direction: column;
     gap: 12px;
     width: 100%;
-    /* FIX: Додано box-sizing та max-width для запобігання розпиранню */
     box-sizing: border-box;
     max-width: 100%;
-    /* Центрування, якщо контейнер ширший за контент */
     margin: 0 auto;
   }
 

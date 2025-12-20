@@ -8,10 +8,11 @@ export interface OnlinePlayer {
     isReady: boolean;
     joinedAt: number;
     isOnline: boolean;
-    isWatchingReplay?: boolean; // Нове поле
-    lastSeen?: number; // Timestamp of last heartbeat
-    isDisconnected?: boolean; // True if player missed heartbeats
-    disconnectStartedAt?: number; // Timestamp when disconnect was detected
+    isWatchingReplay?: boolean;
+    lastSeen?: number;
+    isDisconnected?: boolean;
+    disconnectStartedAt?: number;
+} // <--- FIX: Додано закриваючу дужку
 
 export interface Room {
     id: string;

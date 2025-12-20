@@ -62,7 +62,9 @@
               class:active={settings.language === lang.code}
               on:click={() => selectLang(lang.code)}
             >
-              {@html lang.svg}
+              <div class="lang-flag-wrapper">
+                {@html lang.svg}
+              </div>
             </button>
           {/each}
         </div>
@@ -240,9 +242,12 @@
     background: transparent !important;
     border: var(--global-border-width) solid transparent !important;
     border-radius: 8px;
-    padding: 8px;
+    padding: 4px;
     cursor: pointer;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .language-button:hover {
@@ -252,5 +257,22 @@
   .language-button.active {
     border-color: var(--control-selected) !important;
     box-shadow: none !important;
+    background: var(--bg-hover) !important;
+  }
+
+  .lang-flag-wrapper {
+    width: 32px;
+    height: 24px;
+    border-radius: 4px;
+    overflow: hidden;
+    display: block;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .lang-flag-wrapper :global(svg) {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
   }
 </style>

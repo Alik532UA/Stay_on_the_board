@@ -5,12 +5,12 @@
         type LeaderboardEntry,
     } from "$lib/services/leaderboardService";
     import { userProfileStore } from "$lib/services/authService";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte";
 
     let leaders: LeaderboardEntry[] = [];
     let isLoadingLeaders = true;
     let selectedBoardSize: number | "all" = "all";
 
-    // FIX: Додано 2x2 та 9x9
     const boardSizes: { value: number | "all"; label: string }[] = [
         { value: "all", label: "Всі" },
         { value: 2, label: "2x2" },
@@ -18,7 +18,7 @@
         { value: 4, label: "4x4" },
         { value: 5, label: "5x5" },
         { value: 6, label: "6x6" },
-        { value: 7, label: "7x7" }, // Додано 7x7 для повноти
+        { value: 7, label: "7x7" },
         { value: 8, label: "8x8" },
         { value: 9, label: "9x9" },
     ];
@@ -78,8 +78,24 @@
                     {#each leaders as leader, i}
                         <tr class:me={leader.uid === $userProfileStore?.uid}>
                             <td class="rank">
-                                {#if i === 0}🥇{:else if i === 1}🥈{:else if i === 2}🥉{:else}{i +
-                                        1}{/if}
+                                {#if i === 0}
+                                    <NotoEmoji
+                                        name="1st_place_medal"
+                                        size="1.2em"
+                                    />
+                                {:else if i === 1}
+                                    <NotoEmoji
+                                        name="2nd_place_medal"
+                                        size="1.2em"
+                                    />
+                                {:else if i === 2}
+                                    <NotoEmoji
+                                        name="3rd_place_medal"
+                                        size="1.2em"
+                                    />
+                                {:else}
+                                    {i + 1}
+                                {/if}
                             </td>
                             <td class="name">{leader.displayName}</td>
                             <td class="board-size"
@@ -188,6 +204,9 @@
         width: 40px;
         text-align: center;
         font-size: 1.2em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     .score {
         text-align: right;

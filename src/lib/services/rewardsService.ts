@@ -4,13 +4,13 @@ import { get } from 'svelte/store';
 import { logService } from './logService';
 import { notificationService } from './notificationService';
 
-// Базові нагороди (не залежать від дошки)
+// Базові нагороди
 const BASE_ACHIEVEMENTS: Achievement[] = [
   {
     id: 'score_11_any',
     titleKey: 'rewards.score11Any.title',
     descriptionKey: 'rewards.score11Any.description',
-    icon: 'trophy_bronze',
+    icon: 'trophy', // Було trophy_bronze
     condition: (context: RewardConditionContext) => {
       return context.score >= 11;
     }
@@ -19,24 +19,23 @@ const BASE_ACHIEVEMENTS: Achievement[] = [
     id: 'score_5_local',
     titleKey: 'rewards.score5Local.title',
     descriptionKey: 'rewards.score5Local.description',
-    icon: 'handshake',
+    icon: 'busts_in_silhouette', // Замінено з handshake, оскільки його немає в Noto
     condition: (context: RewardConditionContext) => {
       return context.score >= 5 && (context.gameMode === 'local' || context.gameMode?.includes('local'));
     }
   }
 ];
 
-// Генерація нагород для кожного розміру дошки (2x2 ... 9x9)
 const BOARD_SIZES = [2, 3, 4, 5, 6, 7, 8, 9];
 
-// 1. Спринтер Test (11 балів)
+// 1. Спринтер Test
 const SPRINTER_TEST_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
   id: `score_11_timed_${size}`,
   groupId: 'sprinter_test',
   variantLabel: `${size}x${size}`,
   titleKey: 'rewards.score11Timed.title',
   descriptionKey: 'rewards.score11Timed.description',
-  icon: 'stopwatch_gold',
+  icon: 'stopwatch', // Було stopwatch_gold
   condition: (context: RewardConditionContext) => {
     return context.score >= 11 &&
       (context.gameMode === 'timed' || context.gameMode?.includes('timed')) &&
@@ -44,14 +43,14 @@ const SPRINTER_TEST_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
   }
 }));
 
-// 2. Спринтер (111 балів)
+// 2. Спринтер
 const SPRINTER_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
   id: `score_111_timed_${size}`,
   groupId: 'sprinter',
   variantLabel: `${size}x${size}`,
   titleKey: 'rewards.score111Timed.title',
   descriptionKey: 'rewards.score111Timed.description',
-  icon: 'stopwatch_gold',
+  icon: 'stopwatch', // Було stopwatch_gold
   condition: (context: RewardConditionContext) => {
     return context.score >= 111 &&
       (context.gameMode === 'timed' || context.gameMode?.includes('timed')) &&
@@ -59,14 +58,14 @@ const SPRINTER_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
   }
 }));
 
-// 3. Alik (532 бали)
+// 3. Alik
 const ALIK_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
   id: `score_532_timed_${size}`,
   groupId: 'alik',
   variantLabel: `${size}x${size}`,
   titleKey: 'rewards.score532Timed.title',
   descriptionKey: 'rewards.score532Timed.description',
-  icon: 'trophy_bronze', // Можна змінити іконку на щось унікальне, якщо є
+  icon: 'trophy', // Було trophy_bronze
   condition: (context: RewardConditionContext) => {
     return context.score >= 532 &&
       (context.gameMode === 'timed' || context.gameMode?.includes('timed')) &&
@@ -74,7 +73,6 @@ const ALIK_ACHIEVEMENTS: Achievement[] = BOARD_SIZES.map(size => ({
   }
 }));
 
-// Об'єднуємо всі нагороди
 export const ACHIEVEMENTS: Achievement[] = [
   ...BASE_ACHIEVEMENTS,
   ...SPRINTER_TEST_ACHIEVEMENTS,
@@ -89,10 +87,6 @@ class RewardsService {
     rewardsStore.init();
   }
 
-  /**
-   * Перевіряє досягнення.
-   * @param context Контекст гри (рахунок, режим, розмір дошки тощо)
-   */
   checkAchievements(context: { score: number; gameMode: string; boardSize: number }) {
     const state = get(rewardsStore);
 
