@@ -10,7 +10,14 @@ export default {
   waiting: "Wachten",
   playing: "Spelen",
   finished: "Voltooid",
-  noRooms: "Geen kamers gevonden. Maak de eerste!",
+  noRooms: "Geen kamers gevonden. {lastInfo}Maak de eerste!",
+  lastRoomTime: "De laatste is {time} geleden gemaakt. ",
+  timeUnits: {
+    m: "m",
+    h: "u",
+    s: "s",
+    justNow: "zojuist"
+  },
   createRoomTitle: "Kamer Maken",
   roomNamePlaceholder: "Kamernaam (optioneel)",
   privateRoom: "Privékamer (alleen via link)",

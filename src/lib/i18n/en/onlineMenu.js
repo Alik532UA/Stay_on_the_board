@@ -10,7 +10,14 @@ export default {
   waiting: "Waiting",
   playing: "Playing",
   finished: "Finished",
-  noRooms: "No rooms found. Create the first one!",
+  noRooms: "No rooms found. {lastInfo}Create the first one!",
+  lastRoomTime: "The last one was created {time} ago. ",
+  timeUnits: {
+    m: "m",
+    h: "h",
+    s: "s",
+    justNow: "just now"
+  },
   createRoomTitle: "Create Room",
   roomNamePlaceholder: "Room Name (optional)",
   privateRoom: "Private Room (link only)",

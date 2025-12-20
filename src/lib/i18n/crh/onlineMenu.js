@@ -10,7 +10,14 @@ export default {
   waiting: "Beklev",
   playing: "Oyunda",
   finished: "Bitken",
-  noRooms: "Odalar tapılmadı. Birincisini yaratıñız!",
+  noRooms: "Odalar tapılmadı. {lastInfo}Birincisini yaratıñız!",
+  lastRoomTime: "Sonuncısı {time} evel yaratılğan edi. ",
+  timeUnits: {
+    m: "dak",
+    h: "saat",
+    s: "sn",
+    justNow: "şimdi"
+  },
   createRoomTitle: "Oda Yaratuv",
   roomNamePlaceholder: "Oda Adı (istegen)",
   privateRoom: "Gizli Oda (tek bağlantı ile)",

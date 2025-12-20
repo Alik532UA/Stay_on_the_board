@@ -14,7 +14,7 @@
 
   function handlePlay() {
     logService.action('Click: "Play" (MainMenuV2)');
-    modalStore.showModal({
+    modalStore.showModalAsReplacement({
       // Заголовок видаляємо з UI компонента GameModeModal, але залишаємо тут для a11y або логів, якщо потрібно
       // titleKey: `mainMenu.modes.${APP_CONFIG.MODES.SURVIVE}`,
       dataTestId: "game-mode-modal",
@@ -30,7 +30,7 @@
 
   function handleFeedback() {
     logService.action('Click: "Feedback" (MainMenuV2)');
-    modalStore.showModal({
+    modalStore.showModalAsReplacement({
       titleKey: "ui.feedback.title",
       dataTestId: "feedback-modal",
       component: FeedbackModal,
