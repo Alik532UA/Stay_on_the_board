@@ -36,6 +36,7 @@ export default {
     allowGuestSettings: "Дозволити гостям змінювати налаштування"
   },
   chat: {
+    title: "Чат",
     placeholder: "Напишіть повідомлення...",
     empty: "Чат порожній"
   },

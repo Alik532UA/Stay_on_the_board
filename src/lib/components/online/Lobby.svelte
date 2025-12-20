@@ -4,14 +4,15 @@
     import type { Room, OnlinePlayer } from "$lib/types/online";
     import { _ } from "svelte-i18n";
     import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
-    import LobbyChat from "./LobbyChat.svelte";
     import LobbyHeader from "./lobby/LobbyHeader.svelte";
     import LobbyPlayerList from "./lobby/LobbyPlayerList.svelte";
     import LobbySettings from "./lobby/LobbySettings.svelte";
+    import ChatWidget from "./ChatWidget.svelte";
     import { goto, beforeNavigate } from "$app/navigation";
     import { base } from "$app/paths";
     import type { Unsubscribe } from "firebase/firestore";
     import type { GameSettingsState } from "$lib/stores/gameSettingsStore";
+    import { fly, fade } from "svelte/transition";
 
     export let roomId: string;
 
@@ -92,106 +93,140 @@
         ? Object.values(room.players).sort((a, b) => a.joinedAt - b.joinedAt)
         : [];
 
+    $: myPlayer = room && myPlayerId ? room.players[myPlayerId] : null;
+
     $: amIHost = room && myPlayerId ? room.hostId === myPlayerId : false;
     $: canEditSettings = amIHost || (room && room.allowGuestSettings);
-    $: myName = room && myPlayerId ? room.players[myPlayerId]?.name : "Player";
+    $: myName = myPlayer ? myPlayer.name : "Player";
 </script>
 
-<div class="lobby-container" data-testid="lobby-container">
+<div class="lobby-page" data-testid="lobby-container">
     <FloatingBackButton on:click={handleLeave} />
 
     {#if room && myPlayerId}
-        <div class="lobby-grid">
-            <!-- Ліва колонка: Інфо та Гравці -->
-            <div class="left-column">
-                <LobbyHeader {room} {roomId} {amIHost} />
+        <div class="lobby-content" in:fade={{ duration: 300 }}>
+            <div class="lobby-grid">
+                <!-- Ліва колонка: Хедер та Налаштування -->
+                <div
+                    class="column left-column"
+                    in:fly={{ y: 20, duration: 400, delay: 100 }}
+                >
+                    <LobbyHeader {room} {roomId} {amIHost} />
 
-                <LobbyPlayerList
-                    players={playersList}
-                    {myPlayerId}
-                    hostId={room.hostId}
-                    {amIHost}
-                    roomStatus={room.status}
-                    onUpdatePlayer={handleUpdatePlayer}
-                    onToggleReady={toggleReady}
-                    onStartGame={handleStartGame}
-                />
-            </div>
+                    <LobbySettings
+                        {room}
+                        {canEditSettings}
+                        {amIHost}
+                        onUpdateSetting={handleUpdateSetting}
+                        onUpdateRoomSetting={handleUpdateRoomSetting}
+                    />
+                </div>
 
-            <!-- Права колонка: Налаштування та Чат -->
-            <div class="right-column">
-                <LobbySettings
-                    {room}
-                    {canEditSettings}
-                    {amIHost}
-                    onUpdateSetting={handleUpdateSetting}
-                    onUpdateRoomSetting={handleUpdateRoomSetting}
-                />
-
-                <div class="chat-section">
-                    <h3>Чат</h3>
-                    <LobbyChat
-                        {roomId}
-                        playerId={myPlayerId}
-                        playerName={myName}
+                <!-- Права колонка: Гравці -->
+                <div
+                    class="column right-column"
+                    in:fly={{ y: 20, duration: 400, delay: 200 }}
+                >
+                    <LobbyPlayerList
+                        players={playersList}
+                        {myPlayerId}
+                        hostId={room.hostId}
+                        {amIHost}
+                        roomStatus={room.status}
+                        onUpdatePlayer={handleUpdatePlayer}
+                        onToggleReady={toggleReady}
+                        onStartGame={handleStartGame}
                     />
                 </div>
             </div>
+
+            <!-- Floating Chat Widget -->
+            <ChatWidget
+                {roomId}
+                playerId={myPlayerId}
+                playerName={myName}
+                playerColor={myPlayer?.color || "#ffd700"}
+            />
         </div>
     {:else}
-        <div class="loading" data-testid="lobby-loading">
-            {$_("common.loading")}
+        <div class="loading-state" data-testid="lobby-loading">
+            <div class="spinner"></div>
+            <p>{$_("common.loading")}</p>
         </div>
     {/if}
 </div>
 
 <style>
-    .lobby-container {
-        max-width: 1000px;
+    .lobby-page {
+        max-width: 1200px;
         margin: 0 auto;
         padding: 20px;
         min-height: 100vh;
         color: var(--text-primary);
-        /* FIX: Додано box-sizing */
         box-sizing: border-box;
         width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .lobby-content {
+        width: 100%;
+        margin-top: 40px;
     }
 
     .lobby-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 0.8fr 1.2fr; /* Sidebar Left, Main Right */
         gap: 24px;
-        margin-top: 40px;
         width: 100%;
+        align-items: start; /* Align to top */
     }
 
-    .left-column,
-    .right-column {
-        min-width: 0; /* Запобігає розширенню гріда */
+    .column {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        min-width: 0;
     }
 
-    @media (max-width: 768px) {
+    /* Removed chat-wrapper styles since chat is now floating */
+
+    .loading-state {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        color: var(--text-secondary);
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-top-color: var(--text-accent);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @media (max-width: 900px) {
         .lobby-grid {
             grid-template-columns: 1fr;
         }
-        .lobby-container {
-            padding: 10px; /* Зменшено відступи для мобільних */
+
+        .lobby-page {
+            padding: 16px;
         }
-    }
 
-    .chat-section {
-        background: var(--bg-secondary);
-        padding: 20px;
-        border-radius: var(--unified-border-radius);
-        border: var(--unified-border);
-        box-shadow: var(--unified-shadow);
-        margin-bottom: 20px;
-    }
-
-    .loading {
-        text-align: center;
-        margin-top: 50px;
-        font-size: 1.2em;
-        color: var(--text-secondary);
+        .lobby-content {
+            margin-top: 60px; /* Space for fixed back button */
+        }
     }
 </style>
