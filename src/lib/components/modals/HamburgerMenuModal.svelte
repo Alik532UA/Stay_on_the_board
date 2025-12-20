@@ -33,12 +33,10 @@
     }
 
     function handlePlay() {
-        closeMenu();
         if (onPlay) onPlay();
     }
 
     function handleFeedback() {
-        closeMenu();
         if (onFeedback) onFeedback();
     }
 </script>

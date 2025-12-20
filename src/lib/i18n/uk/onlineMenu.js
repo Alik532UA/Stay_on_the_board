@@ -10,7 +10,14 @@ export default {
   waiting: "Очікування",
   playing: "У грі",
   finished: "Завершено",
-  noRooms: "Кімнат не знайдено. Створіть першу!",
+  noRooms: "Кімнат не знайдено. {lastInfo}Створіть першу!",
+  lastRoomTime: "Остання була створена {time} тому. ",
+  timeUnits: {
+    m: "хв",
+    h: "год",
+    s: "сек",
+    justNow: "щойно"
+  },
   createRoomTitle: "Створення кімнати",
   roomNamePlaceholder: "Назва кімнати (необов'язково)",
   privateRoom: "Приватна кімната (тільки за посиланням)",

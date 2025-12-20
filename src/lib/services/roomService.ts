@@ -119,7 +119,7 @@ class RoomService {
         return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}_${ms}_${randomSuffix}`;
     }
 
-    async getPublicRooms(): Promise<RoomSummary[]> {
+    async getPublicRooms(): Promise<{ rooms: RoomSummary[], latestCreatedAt?: number }> {
         try {
             const q = query(
                 collection(this.db, 'rooms'),
@@ -136,9 +136,16 @@ class RoomService {
             const rooms: RoomSummary[] = [];
             const now = Date.now();
             const cleanupPromises: Promise<void>[] = [];
+            let latestCreatedAt: number | undefined;
 
             querySnapshot.forEach((doc) => {
                 const data = doc.data() as Room;
+
+                // Відстежуємо останню створену публічну кімнату (навіть якщо вона прострочена)
+                if (!latestCreatedAt || data.createdAt > latestCreatedAt) {
+                    latestCreatedAt = data.createdAt;
+                }
+
                 if (now - data.lastActivity > ROOM_TIMEOUT_MS) {
                     cleanupPromises.push(deleteDoc(doc.ref));
                     return;
@@ -157,10 +164,10 @@ class RoomService {
                 Promise.allSettled(cleanupPromises).catch(e => console.error(e));
             }
 
-            return rooms;
+            return { rooms, latestCreatedAt };
         } catch (error) {
             logService.error('[RoomService] Failed to get rooms:', error);
-            return [];
+            return { rooms: [] };
         }
     }
 

@@ -12,6 +12,7 @@
     import RoomCard from "./RoomCard.svelte";
 
     let rooms: RoomSummary[] = [];
+    let latestCreatedAt: number | undefined;
     let isLoading = false;
     let joiningRoomId: string | null = null;
     let error: string | null = null;
@@ -20,13 +21,30 @@
         isLoading = true;
         error = null;
         try {
-            rooms = await roomService.getPublicRooms();
+            const result = await roomService.getPublicRooms();
+            rooms = result.rooms;
+            latestCreatedAt = result.latestCreatedAt;
         } catch (e) {
             console.error(e);
             error = $_("onlineMenu.errors.fetchFailed");
         } finally {
             isLoading = false;
         }
+    }
+
+    function getRelativeTimeString(timestamp: number): string {
+        const now = Date.now();
+        const diff = Math.floor((now - timestamp) / 1000); // seconds
+
+        if (diff < 30) return $_("onlineMenu.timeUnits.justNow");
+
+        if (diff < 3600) {
+            const mins = Math.max(1, Math.floor(diff / 60));
+            return `${mins} ${$_("onlineMenu.timeUnits.m")}`;
+        }
+
+        const hours = Math.floor(diff / 3600);
+        return `${hours} ${$_("onlineMenu.timeUnits.h")}`;
     }
 
     async function handleJoin(roomId: string) {
@@ -112,7 +130,21 @@
                 <div class="empty-icon-wrapper">
                     <SvgIcons name="no-moves" />
                 </div>
-                <p data-testid="no-rooms-message">{$_("onlineMenu.noRooms")}</p>
+                <p data-testid="no-rooms-message">
+                    {$_("onlineMenu.noRooms", {
+                        values: {
+                            lastInfo: latestCreatedAt
+                                ? $_("onlineMenu.lastRoomTime", {
+                                      values: {
+                                          time: getRelativeTimeString(
+                                              latestCreatedAt,
+                                          ),
+                                      },
+                                  })
+                                : "",
+                        },
+                    })}
+                </p>
             </div>
         {:else}
             {#each rooms as room (room.id)}
