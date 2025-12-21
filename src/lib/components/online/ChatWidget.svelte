@@ -1,7 +1,7 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
-    import { fade, fly } from "svelte/transition";
+    import { fly } from "svelte/transition";
     import { onMount, onDestroy } from "svelte";
     import { roomService, type ChatMessage } from "$lib/services/roomService";
     import type { Unsubscribe } from "firebase/firestore";
@@ -55,9 +55,13 @@
 </script>
 
 {#if variant === "floating"}
-    <div class="chat-widget-container">
+    <div class="chat-widget-container" data-testid="chat-widget-container">
         {#if isOpen}
-            <div class="chat-window" transition:fly={{ y: 20, duration: 300 }}>
+            <div
+                class="chat-window"
+                transition:fly={{ y: 20, duration: 300 }}
+                data-testid="chat-window"
+            >
                 <div class="chat-header">
                     <h3>{$_("onlineMenu.chat.title")}</h3>
                     <button
@@ -79,6 +83,7 @@
             class:unread={hasUnread}
             on:click={toggleChat}
             aria-label="Toggle Chat"
+            data-testid="chat-toggle-btn"
         >
             {#if isOpen}
                 <SvgIcons name="arrow-down" width="24" height="24" />
@@ -86,13 +91,13 @@
                 <NotoEmoji name="speech_balloon" size="24px" />
             {/if}
             {#if hasUnread}
-                <span class="unread-dot"></span>
+                <span class="unread-dot" data-testid="chat-unread-dot"></span>
             {/if}
         </button>
     </div>
 {:else}
     <!-- EMBEDDED VARIANT -->
-    <div class="chat-window embedded">
+    <div class="chat-window embedded" data-testid="chat-window-embedded">
         <ChatMessagesList {messages} {playerId} {playerColor} />
         <ChatInput on:send={handleSend} />
     </div>
