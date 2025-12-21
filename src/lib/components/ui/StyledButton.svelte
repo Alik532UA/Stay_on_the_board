@@ -21,10 +21,16 @@
    * - `menu`: Uses --control-bg, for Main Menu.
    * - `primary`: Green (Confirm).
    * - `info`: Blue (Info).
+   * - `warning`: Orange (No Moves).
    * - `danger`: Red (Error/Delete).
    */
-  export let variant: "default" | "menu" | "primary" | "info" | "danger" =
-    "default";
+  export let variant:
+    | "default"
+    | "menu"
+    | "primary"
+    | "info"
+    | "warning"
+    | "danger" = "default";
 
   /**
    * The size of the button.

@@ -184,30 +184,30 @@
 		? [
 				{
 					id: "main-menu-link",
-					emoji: "🏠",
+					emoji: "house", // FIX: Changed from 🏠 to house
 					onClick: () => goto(`${base}/`),
 				},
 				{
 					id: "main-menu-v2-link",
-					emoji: "v2",
+					emoji: "fire", // FIX: Changed from rocket to fire (existing emoji)
 					onClick: () => goto(`${base}/test-main-menu-v2`),
 					dataTestId: "top-menu-slot-1",
 				},
 				{
 					id: "test-mode-btn",
-					emoji: "gear",
+					emoji: "gear", // FIX: Changed from 🛠️ to gear
 					onClick: toggleTestMode,
 					primary: true,
 					isActive: $testModeStore.isEnabled,
 				},
 				{
 					id: "dev-menu-modal",
-					emoji: "☰",
+					icon: "hamburger-menu", // FIX: Changed from emoji ☰ to icon
 					onClick: openDevMenuModal,
 				},
 				{
 					id: "dev-clear-cache-btn",
-					emoji: "🧹",
+					icon: "clear-cache", // FIX: Changed from emoji 🧹 to icon
 					onClick: () => clearCache({ keepAppearance: false }),
 				},
 			]
@@ -238,15 +238,13 @@
 		{/if}
 	</main>
 
-	{#if import.meta.env.DEV}
-		<FlexibleMenu
-			items={menuItems}
-			position="right"
-			persistenceKey="main-right-menu"
-			dataTestId="flexible-menu-right-wrapper"
-			startOpen={false}
-		/>
-	{/if}
+	<FlexibleMenu
+		items={menuItems}
+		position="right"
+		persistenceKey="main-right-menu"
+		dataTestId="flexible-menu-right-wrapper"
+		startOpen={false}
+	/>
 </div>
 
 {#if $tooltipStore.isVisible}

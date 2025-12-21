@@ -100,6 +100,19 @@
   filter: brightness(1.1);
 }
 
+/* Variant: Warning (Orange) - Added for No Moves button */
+.styled-button--variant-warning {
+  background: var(--warning-action-bg);
+  color: var(--warning-action-text);
+  box-shadow: 0 2px 12px 0 var(--shadow-color);
+}
+
+.styled-button--variant-warning:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+  filter: brightness(1.1);
+}
+
 /* Variant: Danger (Red) */
 .styled-button--variant-danger {
   background: var(--error-color);

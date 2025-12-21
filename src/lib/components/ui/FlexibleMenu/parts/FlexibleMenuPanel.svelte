@@ -63,6 +63,9 @@
         padding: 0 4px;
         box-sizing: border-box;
         position: relative;
+
+        /* FIX: Явно вмикаємо події миші для панелі, оскільки обгортка має pointer-events: none */
+        pointer-events: auto;
     }
 
     /* Horizontal Panel Sizing */

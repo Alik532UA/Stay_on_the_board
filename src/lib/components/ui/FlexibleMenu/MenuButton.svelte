@@ -21,11 +21,7 @@
         {#if item.icon}
             <SvgIcons name={item.icon} />
         {:else if item.emoji}
-            {#if item.emoji === "🏠" || item.emoji === "🧹" || item.emoji === "☰" || item.emoji === "v2"}
-                {item.emoji}
-            {:else}
-                <NotoEmoji name={item.emoji} size="1em" />
-            {/if}
+            <NotoEmoji name={item.emoji} size="1em" />
         {/if}
     </div>
 </button>
