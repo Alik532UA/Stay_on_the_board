@@ -29,7 +29,6 @@ export function getCenterInfoState({
   lastComputerMove,
   lastPlayerMove,
   isPlayerTurn,
-  isPauseBetweenMoves = false,
   previousPlayerColor = null
 }: {
   selectedDirection: MoveDirectionType | null;
@@ -37,21 +36,20 @@ export function getCenterInfoState({
   lastComputerMove?: { direction?: MoveDirectionType; distance?: number } | null;
   lastPlayerMove?: { direction?: MoveDirectionType; distance?: number } | null;
   isPlayerTurn: boolean;
-  isPauseBetweenMoves?: boolean;
   previousPlayerColor?: string | null;
 }): CenterInfoState {
-  // НАВІЩО: Додано логування для відладки стану центральної кнопки.
-  // Це допоможе швидко діагностувати проблеми з її відображенням у майбутньому.
+  // FIX: Видалено залежність від isPauseBetweenMoves.
+  // Логіка гри оновлюється миттєво, тому UI повинен відображати стан негайно.
+
   logService.ui('[centerInfoUtil] Calculating state', {
     selectedDirection,
     selectedDistance,
     lastComputerMove,
     lastPlayerMove,
-    isPlayerTurn,
-    isPauseBetweenMoves
+    isPlayerTurn
   });
 
-  // Якщо є вибраний хід - показуємо його
+  // 1. Якщо гравець вибрав хід (напрямок + відстань) - показуємо кнопку підтвердження
   if (selectedDirection && selectedDistance) {
     let dir = '';
     if (directionArrows[selectedDirection]) {
@@ -65,7 +63,7 @@ export function getCenterInfoState({
     };
   }
 
-  // Якщо є тільки напрямок
+  // 2. Якщо вибрано тільки напрямок
   if (selectedDirection) {
     let dir = '';
     if (directionArrows[selectedDirection]) {
@@ -79,7 +77,7 @@ export function getCenterInfoState({
     };
   }
 
-  // Якщо є тільки відстань
+  // 3. Якщо вибрано тільки відстань
   if (!selectedDirection && selectedDistance) {
     return {
       class: 'direction-distance-state',
@@ -89,13 +87,9 @@ export function getCenterInfoState({
     };
   }
 
-  // Якщо немає вибраного ходу і є хід комп'ютера
+  // 4. Якщо немає вибору гравця, показуємо останній хід комп'ютера
+  // Це має відбуватися миттєво після оновлення логіки, незалежно від анімації.
   if (!selectedDirection && !selectedDistance && lastComputerMove) {
-    // Якщо зараз пауза між ходами - приховуємо хід комп'ютера
-    // if (isPauseBetweenMoves) {
-    //   return { class: '', content: '', clickable: false, aria: 'Пауза між ходами' };
-    // }
-
     let dir = '';
     let dist = '';
     if (lastComputerMove.direction && directionArrows[lastComputerMove.direction]) {
@@ -104,7 +98,6 @@ export function getCenterInfoState({
     if (typeof lastComputerMove.distance === 'number') {
       dist = String(lastComputerMove.distance);
     }
-    // ВАЖЛИВО: Не змінюйте порядок dir та dist. Це зламає інтерфейс.
     return {
       class: 'computer-move-display',
       content: `${dir}${dist}`,
@@ -113,7 +106,7 @@ export function getCenterInfoState({
     };
   }
 
-  // Якщо немає вибраного ходу і є останній хід гравця (для локальних ігор)
+  // 5. Якщо немає ходу комп'ютера, показуємо останній хід гравця (для локальних ігор)
   if (!selectedDirection && !selectedDistance && !lastComputerMove && lastPlayerMove) {
     let dir = '';
     let dist = '';
@@ -128,14 +121,10 @@ export function getCenterInfoState({
       content: `${dir}${dist}`,
       clickable: false,
       aria: `Останній хід гравця: ${dir}${dist}`,
-      backgroundColor: previousPlayerColor || '#43a047' // Використовуємо колір гравця або зелений за замовчуванням
+      backgroundColor: previousPlayerColor || '#43a047'
     };
   }
 
-  // Якщо немає нічого
-  if (!selectedDirection && !selectedDistance && !lastComputerMove && !lastPlayerMove) {
-    return { class: '', content: '', clickable: false, aria: 'Порожньо' };
-  }
-
-  return { class: '', content: '', clickable: false, aria: '' };
+  // 6. Порожній стан
+  return { class: '', content: '', clickable: false, aria: 'Порожньо' };
 }
