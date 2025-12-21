@@ -10,10 +10,9 @@
     import {
         generateRandomRoomName,
         generateRandomPlayerName,
-    } from "$lib/utils/nameGenerator"; // ВИПРАВЛЕНО
+    } from "$lib/utils/nameGenerator";
 
-    // Ініціалізуємо випадковою назвою одразу
-    let roomName = generateRandomRoomName(); // ВИПРАВЛЕНО
+    let roomName = generateRandomRoomName();
     let isPrivate = false;
     let isCreating = false;
 
@@ -30,29 +29,23 @@
         try {
             let playerName = localStorage.getItem("online_playerName");
             if (!playerName) {
-                playerName = generateRandomPlayerName(); // ВИПРАВЛЕНО
+                playerName = generateRandomPlayerName();
                 localStorage.setItem("online_playerName", playerName);
             }
 
-            logService.init(
-                `[CreateRoomModal] Calling roomService.createRoom...`,
-            );
-
-            const finalRoomName = roomName.trim() || generateRandomRoomName(); // ВИПРАВЛЕНО
-
+            const finalRoomName = roomName.trim() || generateRandomRoomName();
             const roomId = await roomService.createRoom(
                 playerName,
                 isPrivate,
                 finalRoomName,
             );
 
-            logService.init(`[CreateRoomModal] Success. ID: ${roomId}`);
             modalStore.closeModal();
             await goto(`${base}/online/lobby/${roomId}`);
         } catch (e: any) {
             logService.error("[CreateRoomModal] Failed to create room", e);
             const msg = e.message?.includes("Timeout")
-                ? "Не вдалося з'єднатися з сервером. Перевірте інтернет."
+                ? "Не вдалося з'єднатися з сервером."
                 : $_("onlineMenu.errors.createFailed");
             alert(msg);
         } finally {
@@ -61,12 +54,14 @@
     }
 </script>
 
-<div class="create-room-form" data-testid="create-room-form">
+<!-- FIX: Додано data-testid та структуру меню -->
+<div class="create-room-content" data-testid="create-room-content">
+    <h2 class="modal-title-menu">{$_("onlineMenu.createRoomTitle")}</h2>
+
     <div class="form-group">
         <span class="label" data-testid="room-name-label"
             >{$_("onlineMenu.roomName")}</span
         >
-
         <div class="name-editor-wrapper">
             <EditableText
                 value={roomName}
@@ -90,7 +85,17 @@
         </label>
     </div>
 
-    <div class="modal-action-buttons">
+    <div class="actions-column">
+        <StyledButton
+            variant="primary"
+            size="large"
+            on:click={handleCreate}
+            disabled={isCreating}
+            dataTestId="create-room-confirm-btn"
+        >
+            {isCreating ? $_("common.loading") : $_("onlineMenu.create")}
+        </StyledButton>
+
         <StyledButton
             variant="default"
             on:click={() => modalStore.closeModal()}
@@ -98,23 +103,26 @@
         >
             {$_("onlineMenu.cancel")}
         </StyledButton>
-        <StyledButton
-            variant="primary"
-            on:click={handleCreate}
-            disabled={isCreating}
-            dataTestId="create-room-confirm-btn"
-        >
-            {isCreating ? $_("common.loading") : $_("onlineMenu.create")}
-        </StyledButton>
     </div>
 </div>
 
 <style>
-    .create-room-form {
+    .create-room-content {
         display: flex;
         flex-direction: column;
-        gap: 20px;
-        padding: 10px 0;
+        gap: 24px;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .modal-title-menu {
+        text-align: center;
+        font-size: 1.8em;
+        font-weight: 800;
+        color: #fff;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .form-group {
@@ -126,18 +134,19 @@
 
     .label {
         font-weight: bold;
-        color: var(--text-secondary);
+        color: rgba(255, 255, 255, 0.8);
         font-size: 0.9em;
     }
 
     .name-editor-wrapper {
-        background: rgba(0, 0, 0, 0.2);
-        border: var(--global-border-width) solid var(--border-color);
-        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
         padding: 8px 16px;
         width: 100%;
         display: flex;
         justify-content: center;
+        backdrop-filter: blur(4px);
     }
 
     .checkbox-group {
@@ -150,18 +159,20 @@
         align-items: center;
         gap: 10px;
         cursor: pointer;
-        color: var(--text-primary);
+        color: #fff;
+        font-weight: 600;
     }
 
     input[type="checkbox"] {
         width: 20px;
         height: 20px;
         cursor: pointer;
+        accent-color: var(--control-selected);
     }
 
-    .modal-action-buttons {
+    .actions-column {
         display: flex;
-        justify-content: flex-end;
+        flex-direction: column;
         gap: 12px;
         margin-top: 10px;
     }

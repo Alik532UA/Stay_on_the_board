@@ -7,7 +7,7 @@
 	import { _, locale } from "svelte-i18n";
 	import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
 	import { speakText } from "$lib/services/speechService";
-	import { uiStateStore } from "$lib/stores/uiStateStore";
+	import GameOverContent from "$lib/components/modals/GameOverContent.svelte";
 
 	onMount(() => {
 		const unsubscribe = gameEventBus.subscribe(
@@ -32,45 +32,35 @@
 				}
 
 				modalStore.showModal({
-					titleKey,
+					component: GameOverContent,
+					variant: "menu",
 					content: {
 						reason: get(_)(contentKey),
 						scoreDetails: scoreDetails,
-						// FIX: Передаємо playerScores у контент модалки
 						playerScores: playerScores,
 					},
-					buttons: [
-						{
-							textKey: "modal.continueGame",
-							customClass: "green-btn",
-							isHot: true,
-							onClick: () =>
-								userActionService.handleModalAction(
-									"continueAfterNoMoves",
-								),
-							dataTestId: "continue-game-no-moves-btn",
-						},
-						{
-							text: get(_)("modal.finishGameWithBonus", {
-								values: { bonus: boardSize },
-							}),
-							onClick: () =>
-								userActionService.handleModalAction(
-									"finishWithBonus",
-									{ reasonKey: "modal.gameOverReasonBonus" },
-								),
-							dataTestId: "finish-game-with-bonus-btn",
-						},
-						{
-							textKey: "modal.watchReplay",
-							customClass: "blue-btn",
-							onClick: () =>
-								userActionService.handleModalAction(
-									"requestReplay",
-								),
-							dataTestId: `watch-replay-${playerType}-no-moves-btn`,
-						},
-					],
+					// FIX: Передаємо дії як props, а не як buttons
+					props: {
+						titleKey: titleKey,
+						mode: "no-moves",
+						finishText: get(_)("modal.finishGameWithBonus", {
+							values: { bonus: boardSize },
+						}),
+						onContinue: () =>
+							userActionService.handleModalAction(
+								"continueAfterNoMoves",
+							),
+						onFinish: () =>
+							userActionService.handleModalAction(
+								"finishWithBonus",
+								{ reasonKey: "modal.gameOverReasonBonus" },
+							),
+						onWatchReplay: () =>
+							userActionService.handleModalAction(
+								"requestReplay",
+							),
+					},
+					buttons: [], // Кнопки тепер всередині компонента
 					closable: false,
 					dataTestId:
 						playerType === "human"

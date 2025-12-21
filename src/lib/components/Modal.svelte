@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "$lib/css/components/modal.css"; // Імпорт агрегатора
+  import "$lib/css/components/modal.css";
   import { modalState, modalStore } from "$lib/stores/modalStore";
   import { _ } from "svelte-i18n";
   import FAQModal from "./FAQModal.svelte";
@@ -15,7 +15,6 @@
   import { get } from "svelte/store";
   import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
 
-  // New imports
   import ExpertModeVolumeControl from "./modals/parts/ExpertModeVolumeControl.svelte";
   import ModalHeader from "./modals/parts/ModalHeader.svelte";
   import ModalActionButtons from "./modals/parts/ModalActionButtons.svelte";
@@ -34,7 +33,6 @@
   let expertVolume = 0.3;
   let currentModalContext: string | null = null;
 
-  // === ЛОГІКА ВИБОРУ ТЕМИ ===
   $: themeClass =
     $modalState.variant === "menu" ? "style-glass" : "style-classic";
 
@@ -127,12 +125,14 @@
       (e.key === "Enter" || e.key === " ") && onOverlayClick(e as any)}
     data-testid="modal-overlay"
   >
-    {#if $modalState.variant === "menu"}
+    <!-- FIX: Показуємо кнопку "Назад" ТІЛЬКИ якщо дозволено закриття по кліку на фон.
+         Це прибирає кнопку з екранів Game Over та No Moves, змушуючи гравця обирати дію в меню. -->
+    {#if $modalState.variant === "menu" && $modalState.closeOnOverlayClick}
       <FloatingBackButton onClick={() => gameEventBus.dispatch("CloseModal")} />
     {/if}
 
     <div
-      class="modal-window {themeClass}"
+      class="modal-window {themeClass} variant-{$modalState.variant}"
       class:[$modalState.customClass]={$modalState.customClass}
       data-testid={$modalState.dataTestId}
     >
@@ -155,7 +155,8 @@
         bind:this={modalContent}
         data-testid={`${$modalState.dataTestId}-content`}
       >
-        {#if typeof $modalState.content === "object" && $modalState.content && "reason" in $modalState.content}
+        <!-- FIX: Додано перевірку !$modalState.component, щоб уникнути дублювання тексту -->
+        {#if typeof $modalState.content === "object" && $modalState.content && "reason" in $modalState.content && !$modalState.component}
           <p
             class="reason"
             data-testid={`${$modalState.dataTestId}-content-reason`}

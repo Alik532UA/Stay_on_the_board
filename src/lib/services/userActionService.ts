@@ -151,16 +151,14 @@ export const userActionService = {
 
     modalStore.showModal({
       component: ReplayViewer,
+      variant: 'menu', // FIX
+      buttons: [], // FIX
       props: {
         moveHistory,
         boardSize,
-        autoPlayForward: true
+        autoPlayForward: true,
+        onClose: () => gameEventBus.dispatch('CloseModal') // Передаємо колбек
       },
-      titleKey: 'replay.title',
-      buttons: [{
-        textKey: 'modal.close',
-        onClick: () => gameEventBus.dispatch('CloseModal')
-      }],
       dataTestId: 'replay-modal',
     });
   },

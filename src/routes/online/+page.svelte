@@ -32,9 +32,12 @@
 
   function openCreateRoomModal() {
     modalStore.showModal({
-      titleKey: "onlineMenu.createRoomTitle",
+      // titleKey видалено, бо заголовок тепер всередині компонента
       component: CreateRoomModal,
       dataTestId: "create-room-modal",
+      variant: "menu", // FIX: Змінено на menu
+      buttons: [], // FIX: Кнопки прибрано
+      closeOnOverlayClick: true,
     });
   }
 </script>

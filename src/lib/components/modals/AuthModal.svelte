@@ -11,20 +11,17 @@
     let email = "";
     let password = "";
     let deletePassword = "";
-    let newPassword = ""; // Для зміни пароля
+    let newPassword = "";
     let isLoading = false;
 
-    // Sub-modes for Profile view
     let isDeleteMode = false;
     let isChangePasswordMode = false;
 
-    // Визначаємо, чи користувач повноцінно авторизований (не анонім)
     $: isAuthorized = $userStore && !$userStore.isAnonymous;
 
     async function handleSubmit() {
         if (!email) return;
         isLoading = true;
-
         let success = false;
 
         if (mode === "link") {
@@ -45,8 +42,6 @@
 
         isLoading = false;
         if (success) {
-            // Якщо успішно залогінились/прив'язали, модалка не закривається, а показує профіль
-            // Але якщо це було відновлення паролю - закриваємо
             if (mode === "reset") modalStore.closeModal();
         }
     }
@@ -68,7 +63,6 @@
 
     async function handleChangePassword() {
         if (!newPassword || newPassword.length < 6) {
-            // Можна додати валідацію тут або покластися на authService
             return;
         }
         isLoading = true;
@@ -81,7 +75,8 @@
     }
 </script>
 
-<div class="auth-modal-content">
+<!-- FIX: Додано data-testid -->
+<div class="auth-modal-content" data-testid="auth-modal-content">
     {#if isAuthorized}
         <UserProfile
             bind:isDeleteMode
