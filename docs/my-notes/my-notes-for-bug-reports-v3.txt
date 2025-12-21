@@ -195,7 +195,13 @@ data-testid="voice-settings-speak-for-group"
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 Це все в налаштуваннях ми додали, але шукай на всіх сторінках де можна додати data-testid
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+знайшов елементи де немає data-testid
+class="color-preview s-b_QAI1EKiACh"
+class="color-option palette-button s-b_QAI1EKiACh"
+class="color-option s-b_QAI1EKiACh"
 
+зробити data-testid для них
+і пошукати ще де можна додати!
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
