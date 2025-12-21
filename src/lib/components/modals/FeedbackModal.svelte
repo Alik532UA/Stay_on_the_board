@@ -5,15 +5,16 @@
         type FeedbackType,
     } from "$lib/services/feedbackService";
     import { modalStore } from "$lib/stores/modalStore";
-    import StyledButton from "$lib/components/ui/StyledButton.svelte";
-    import GameModeButton from "$lib/components/game-modes/GameModeButton.svelte";
-    import NotoEmoji from "$lib/components/NotoEmoji.svelte";
     import { logService } from "$lib/services/logService";
     import { onMount } from "svelte";
 
     import { userStore } from "$lib/services/authService";
     import AuthModal from "$lib/components/modals/AuthModal.svelte";
     import GlobalChatModal from "$lib/components/modals/GlobalChatModal.svelte";
+
+    // FIX: Import new sub-components
+    import FeedbackMenu from "./feedback/FeedbackMenu.svelte";
+    import FeedbackForm from "./feedback/FeedbackForm.svelte";
 
     export let initialType: FeedbackType | null = null;
 
@@ -31,7 +32,8 @@
         }
     });
 
-    function selectType(type: FeedbackType) {
+    function selectType(e: CustomEvent<FeedbackType>) {
+        const type = e.detail;
         logService.ui(`[FeedbackModal] Selected type: ${type}`);
         selectedType = type;
     }
@@ -107,164 +109,18 @@
     <h2 class="modal-title-menu">{$_("ui.feedback.title")}</h2>
 
     {#if !selectedType}
-        <div class="menu-list">
-            <!-- 1. Запропонувати покращення -->
-            <GameModeButton
-                text={$_("ui.feedback.typeImprovement")}
-                dataTestId="fb-type-improvement"
-                on:click={() => selectType("improvement")}
-            >
-                <div slot="icon">
-                    <NotoEmoji name="light_bulb" size="100%" />
-                </div>
-            </GameModeButton>
-
-            <!-- 2. Повідомити про проблему -->
-            <GameModeButton
-                text={$_("ui.feedback.typeBug")}
-                dataTestId="fb-type-bug"
-                on:click={() => selectType("bug")}
-            >
-                <div slot="icon"><NotoEmoji name="bug" size="100%" /></div>
-            </GameModeButton>
-
-            <!-- 3. Запропонувати нагороду -->
-            <GameModeButton
-                text={$_("ui.feedback.typeReward")}
-                dataTestId="fb-type-reward"
-                on:click={() => selectType("reward_suggestion")}
-            >
-                <div slot="icon"><NotoEmoji name="trophy" size="100%" /></div>
-            </GameModeButton>
-
-            <!-- 4. Інше -->
-            <GameModeButton
-                text={$_("ui.feedback.typeOther")}
-                dataTestId="fb-type-other"
-                on:click={() => selectType("other")}
-            >
-                <div slot="icon">
-                    <NotoEmoji name="thought_balloon" size="100%" />
-                </div>
-            </GameModeButton>
-
-            <!-- Розділювач -->
-            <div class="divider"></div>
-
-            <!-- 5. Спільний чат -->
-            <GameModeButton
-                text={$_("ui.feedback.typeGlobalChat")}
-                dataTestId="fb-type-global-chat"
-                on:click={handleGlobalChat}
-            >
-                <div slot="icon">
-                    <NotoEmoji name="speech_balloon" size="100%" />
-                </div>
-            </GameModeButton>
-        </div>
+        <FeedbackMenu on:select={selectType} on:globalChat={handleGlobalChat} />
     {:else}
-        <div class="form-container">
-            {#if selectedType === "improvement" || selectedType === "bug"}
-                <div class="form-group">
-                    <label for="fb-page">{$_("ui.feedback.pageLabel")}</label>
-                    <input
-                        id="fb-page"
-                        type="text"
-                        bind:value={pageLocation}
-                        class="glass-input"
-                    />
-                </div>
-            {/if}
-
-            {#if selectedType === "improvement"}
-                <div class="form-group">
-                    <label for="fb-text"
-                        >{$_("ui.feedback.improvementLabel")} *</label
-                    >
-                    <textarea
-                        id="fb-text"
-                        bind:value={textContent}
-                        class="glass-input textarea-resize"
-                        rows="4"
-                    ></textarea>
-                </div>
-            {/if}
-
-            {#if selectedType === "reward_suggestion"}
-                <div class="form-group">
-                    <label for="fb-reward"
-                        >{$_("ui.feedback.rewardLabel")} *</label
-                    >
-                    <textarea
-                        id="fb-reward"
-                        bind:value={textContent}
-                        class="glass-input textarea-resize"
-                        rows="5"
-                        placeholder="Наприклад: 'Майстер захисту' - виграти гру, не втративши жодного очка..."
-                    ></textarea>
-                </div>
-            {/if}
-
-            {#if selectedType === "bug"}
-                <div class="form-group">
-                    <label for="fb-actual"
-                        >{$_("ui.feedback.actualResultLabel")} *</label
-                    >
-                    <textarea
-                        id="fb-actual"
-                        bind:value={actualResult}
-                        class="glass-input textarea-resize"
-                        rows="3"
-                    ></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="fb-expected"
-                        >{$_("ui.feedback.expectedResultLabel")} *</label
-                    >
-                    <textarea
-                        id="fb-expected"
-                        bind:value={expectedResult}
-                        class="glass-input textarea-resize"
-                        rows="3"
-                    ></textarea>
-                </div>
-            {/if}
-
-            {#if selectedType === "other"}
-                <div class="form-group">
-                    <label for="fb-desc"
-                        >{$_("ui.feedback.descriptionLabel")} *</label
-                    >
-                    <textarea
-                        id="fb-desc"
-                        bind:value={textContent}
-                        class="glass-input textarea-resize"
-                        rows="5"
-                    ></textarea>
-                </div>
-            {/if}
-
-            <div class="actions-row">
-                <StyledButton
-                    variant="default"
-                    size="large"
-                    on:click={goBack}
-                    disabled={isSubmitting}
-                >
-                    ← {$_("ui.goBack")}
-                </StyledButton>
-                <StyledButton
-                    variant="primary"
-                    size="large"
-                    on:click={handleSubmit}
-                    disabled={isSubmitting}
-                >
-                    {isSubmitting
-                        ? $_("common.loading")
-                        : $_("ui.feedback.submit")}
-                </StyledButton>
-            </div>
-        </div>
+        <FeedbackForm
+            {selectedType}
+            bind:pageLocation
+            {isSubmitting}
+            bind:textContent
+            bind:actualResult
+            bind:expectedResult
+            on:back={goBack}
+            on:submit={handleSubmit}
+        />
     {/if}
 </div>
 
@@ -286,55 +142,5 @@
         color: #fff;
         margin: 0 0 8px 0;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .menu-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        width: 100%;
-    }
-
-    .divider {
-        height: 1px;
-        background: rgba(255, 255, 255, 0.15);
-        margin: 8px 0;
-        width: 100%;
-    }
-
-    .form-container {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        width: 100%;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        text-align: left;
-    }
-
-    label {
-        font-size: 0.95em;
-        font-weight: 700;
-        color: rgba(255, 255, 255, 0.8);
-        margin-left: 4px;
-    }
-
-    .textarea-resize {
-        resize: vertical;
-        min-height: 80px;
-        font-family: inherit;
-        line-height: 1.4;
-    }
-
-    .actions-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 12px;
-        gap: 16px;
     }
 </style>
