@@ -17,8 +17,8 @@ import { roomService } from '$lib/services/roomService';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import { notificationService } from '$lib/services/notificationService';
 import type { Room } from '$lib/types/online';
-import { modalStore } from '$lib/stores/modalStore';
 import { endGameService } from '$lib/services/endGameService';
+import { modalStore, type ModalState } from '$lib/stores/modalStore'; // FIX: Added import
 
 import { GameStateReconciler } from './online/GameStateReconciler';
 import { OnlineMatchController } from './online/OnlineMatchController';
@@ -50,87 +50,97 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   async initialize(options: { newSize?: number; roomId?: string } = {}): Promise<void> {
+    this.resetLocalStores();
+
+    if (!this.initializeSession(options.roomId)) {
+      return;
+    }
+
+    await this.fetchRoomData();
+    if (!this.roomData) return;
+
+    this.determineRole();
+    this.applyRoomSettings();
+    this.initializeControllers();
+    this.setupSubscriptions();
+    this.startPresence();
+
+    await this.syncInitialState(options.newSize);
+  }
+
+  private resetLocalStores() {
     boardStore.set(null);
     playerStore.set(null);
     scoreStore.set(null);
     animationService.reset();
+  }
 
+  private initializeSession(optionRoomId?: string): boolean {
     const session = roomService.getSession();
-    this.roomId = options.roomId || session.roomId;
+    this.roomId = optionRoomId || session.roomId;
     this.myPlayerId = session.playerId;
 
     if (!this.roomId || !this.myPlayerId) {
       logService.error('[OnlineGameMode] Missing roomId or playerId. Cannot initialize.');
-      return;
+      return false;
     }
+    return true;
+  }
 
-    this.roomData = await roomService.getRoom(this.roomId);
-    if (this.roomData) {
-      this.amIHost = this.roomData.hostId === this.myPlayerId;
-      this.myPlayerIndex = this.amIHost ? 0 : 1;
-
-      uiStateStore.update(s => ({
-        ...s,
-        amIHost: this.amIHost,
-        onlinePlayerIndex: this.myPlayerIndex,
-        intendedGameType: 'online'
-      }));
-
-      if (this.roomData.settings) {
-        this.isApplyingRemoteState = true;
-        gameSettingsStore.updateSettings({
-          ...this.roomData.settings,
-          settingsLocked: this.roomData.settingsLocked
-        });
-        if (this.roomData.settings.turnDuration) {
-          this.turnDuration = this.roomData.settings.turnDuration;
-        }
-        this.isApplyingRemoteState = false;
-      }
-
-      logService.init(`[OnlineGameMode] Role determined. Host: ${this.amIHost}, Index: ${this.myPlayerIndex}`);
-    } else {
+  private async fetchRoomData() {
+    this.roomData = await roomService.getRoom(this.roomId!);
+    if (!this.roomData) {
       logService.error('[OnlineGameMode] Could not fetch room data');
-      return;
     }
+  }
 
+  private determineRole() {
+    if (!this.roomData || !this.myPlayerId) return;
+    this.amIHost = this.roomData.hostId === this.myPlayerId;
+    this.myPlayerIndex = this.amIHost ? 0 : 1;
+
+    uiStateStore.update(s => ({
+      ...s,
+      amIHost: this.amIHost,
+      onlinePlayerIndex: this.myPlayerIndex,
+      intendedGameType: 'online'
+    }));
+
+    logService.init(`[OnlineGameMode] Role determined. Host: ${this.amIHost}, Index: ${this.myPlayerIndex}`);
+  }
+
+  private applyRoomSettings() {
+    if (this.roomData && this.roomData.settings) {
+      this.isApplyingRemoteState = true;
+      gameSettingsStore.updateSettings({
+        ...this.roomData.settings,
+        settingsLocked: this.roomData.settingsLocked
+      });
+      if (this.roomData.settings.turnDuration) {
+        this.turnDuration = this.roomData.settings.turnDuration;
+      }
+      this.isApplyingRemoteState = false;
+    }
+  }
+
+  private initializeControllers() {
     this.stateSync = createFirebaseGameStateSync();
-    this.reconciler = new GameStateReconciler(this.myPlayerId);
+    this.reconciler = new GameStateReconciler(this.myPlayerId!);
     this.synchronizer = new OnlineStateSynchronizer(this.stateSync);
 
     this.matchController = new OnlineMatchController(
-      this.roomId,
-      this.myPlayerId,
+      this.roomId!,
+      this.myPlayerId!,
       this.amIHost,
       this.stateSync,
       () => this.resetBoardForContinuation(),
       () => this.advanceToNextPlayer(),
-      // FIX: Обробка завершення гри з урахуванням ініціатора
-      (reason: string, initiatorId?: string) => {
-        let specificPlayerIndex: number | undefined;
-
-        if (initiatorId && this.roomData) {
-          // Логіка: У createOnlinePlayers Хост завжди має індекс 0, Гість - 1.
-          // Ми використовуємо це знання для мапінгу UUID на індекс.
-          if (initiatorId === this.roomData.hostId) {
-            specificPlayerIndex = 0;
-          } else {
-            // Перевіряємо, чи є цей ID серед гравців (щоб уникнути помилок з невідомими ID)
-            const isGuest = Object.values(this.roomData.players).some(p => p.id === initiatorId);
-            if (isGuest) {
-              specificPlayerIndex = 1;
-            }
-          }
-        }
-
-        logService.GAME_MODE(`[OnlineGameMode] Ending game. Reason: ${reason}, Initiator: ${initiatorId}, Mapped Index: ${specificPlayerIndex}`);
-        endGameService.endGame(reason, null, specificPlayerIndex);
-      }
+      (reason: string, initiatorId?: string) => this.handleGameEnd(reason, initiatorId)
     );
 
     this.eventManager = new OnlineGameEventManager(
-      this.roomId,
-      this.myPlayerId,
+      this.roomId!,
+      this.myPlayerId!,
       this.matchController,
       {
         onSyncState: (overrides: Partial<SyncableGameState>) => this.synchronizer?.syncCurrentState(overrides),
@@ -139,40 +149,57 @@ export class OnlineGameMode extends BaseGameMode {
       this.turnDuration
     );
 
-    this.unsubscribeRoom = roomService.subscribeToRoom(this.roomId, (updatedRoom) => {
-      this.roomData = updatedRoom;
+    this.presenceManager = new OnlinePresenceManager({
+      roomId: this.roomId!,
+      myPlayerId: this.myPlayerId!,
+      isHost: () => this.amIHost,
+      getPlayers: () => this.roomData ? Object.values(this.roomData.players) : []
+    });
+  }
 
+  private handleGameEnd(reason: string, initiatorId?: string) {
+    let specificPlayerIndex: number | undefined;
+
+    if (initiatorId && this.roomData) {
+      if (initiatorId === this.roomData.hostId) {
+        specificPlayerIndex = 0;
+      } else {
+        const isGuest = Object.values(this.roomData.players).some(p => p.id === initiatorId);
+        if (isGuest) {
+          specificPlayerIndex = 1;
+        }
+      }
+    }
+
+    logService.GAME_MODE(`[OnlineGameMode] Ending game. Reason: ${reason}, Initiator: ${initiatorId}, Mapped Index: ${specificPlayerIndex}`);
+    endGameService.endGame(reason, null, specificPlayerIndex);
+  }
+
+  private setupSubscriptions() {
+    this.unsubscribeRoom = roomService.subscribeToRoom(this.roomId!, (updatedRoom) => {
+      this.roomData = updatedRoom;
       const wasHost = this.amIHost;
       this.amIHost = updatedRoom.hostId === this.myPlayerId;
       if (wasHost !== this.amIHost) {
         logService.init(`[OnlineGameMode] Host role changed: ${wasHost} -> ${this.amIHost}`);
         uiStateStore.update(s => ({ ...s, amIHost: this.amIHost }));
       }
-
-      // DELEGATION: Використовуємо методи контролерів замість локальної логіки
       this.matchController?.checkForVictory(updatedRoom);
       this.presenceManager?.handleRoomUpdate(updatedRoom);
     });
+  }
 
-    this.presenceManager = new OnlinePresenceManager({
-      roomId: this.roomId,
-      myPlayerId: this.myPlayerId,
-      isHost: () => this.amIHost,
-      getPlayers: () => this.roomData ? Object.values(this.roomData.players) : []
-    });
+  private startPresence() {
+    this.presenceManager?.start();
+  }
 
-    this.presenceManager.start();
-
+  private async syncInitialState(newSize?: number) {
     try {
-      await this.stateSync.initialize(this.roomId);
+      await this.stateSync!.initialize(this.roomId!);
+      this.unsubscribeSync = this.stateSync!.subscribe((event) => this.handleSyncEvent(event));
+      this.eventManager!.setupSubscriptions();
 
-      this.unsubscribeSync = this.stateSync.subscribe((event) => {
-        this.handleSyncEvent(event);
-      });
-
-      this.eventManager.setupSubscriptions();
-
-      const remoteState = await this.stateSync.pullState();
+      const remoteState = await this.stateSync!.pullState();
 
       if (remoteState) {
         logService.GAME_MODE('[OnlineGameMode] Loaded existing state from server');
@@ -182,27 +209,18 @@ export class OnlineGameMode extends BaseGameMode {
           logService.GAME_MODE('[OnlineGameMode] I am Host. Initializing new game state.');
           const playersConfig = this.getPlayersConfiguration();
           gameService.initializeNewGame({
-            size: options.newSize,
+            size: newSize,
             players: playersConfig,
           });
-          await this.synchronizer.syncCurrentState();
+          await this.synchronizer!.syncCurrentState();
         } else {
           logService.GAME_MODE('[OnlineGameMode] I am Guest. Waiting for Host to initialize state...');
         }
       }
 
-      gameSettingsStore.updateSettings({
-        speechRate: 1.6,
-        shortSpeech: true,
-        speechFor: {
-          player: false,
-          computer: true,
-          onlineMyMove: false,
-          onlineOpponentMove: true
-        },
-      });
-
+      this.applyLocalSettings();
       animationService.initialize();
+
       if (get(boardStore)) {
         this.startTurn();
       }
@@ -210,6 +228,19 @@ export class OnlineGameMode extends BaseGameMode {
     } catch (error) {
       logService.error('[OnlineGameMode] Initialization failed:', error);
     }
+  }
+
+  private applyLocalSettings() {
+    gameSettingsStore.updateSettings({
+      speechRate: 1.6,
+      shortSpeech: true,
+      speechFor: {
+        player: false,
+        computer: true,
+        onlineMyMove: false,
+        onlineOpponentMove: true
+      },
+    });
   }
 
   cleanup(): void {
@@ -261,15 +292,12 @@ export class OnlineGameMode extends BaseGameMode {
     return 'online';
   }
 
-  // --- Voting Methods ---
-
   async voteToContinue(): Promise<void> {
     if (this.matchController) {
       await this.matchController.handleVote('continue');
     }
   }
 
-  // FIX: Оновлено для використання updateFinishRequest
   async voteToFinish(reasonKey?: string): Promise<void> {
     if (this.stateSync && this.myPlayerId) {
       logService.GAME_MODE(`[OnlineGameMode] Requesting finish (Cash Out).`);
@@ -357,7 +385,9 @@ export class OnlineGameMode extends BaseGameMode {
     const isNewTurn = previousPlayerIndex !== newPlayerIndex;
     const isGameActive = !get(uiStateStore).isGameOver;
 
-    if (isNewTurn && isGameActive && !get(modalStore).isOpen) {
+    // FIX: Explicitly cast get(modalStore) to ModalState to fix TS error
+    const currentModalState = get(modalStore) as ModalState;
+    if (isNewTurn && isGameActive && !currentModalState.isOpen) {
       logService.GAME_MODE(`[OnlineGameMode] Turn changed (${previousPlayerIndex} -> ${newPlayerIndex}). Restarting timer.`);
       this.startTurn();
     }

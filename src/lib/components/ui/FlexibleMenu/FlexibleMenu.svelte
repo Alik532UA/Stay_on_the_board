@@ -75,11 +75,10 @@
         z-index: var(--menu-z-index);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
+        /* FIX: Прибрано глобальний pointer-events: none для wrapper, 
+           тепер це керується на рівні компонентів (Panel та Trigger), 
+           щоб уникнути проблем з кліками */
         pointer-events: none;
-    }
-
-    .flexible-menu-wrapper * {
-        pointer-events: auto;
     }
 
     /* --- Positioning Logic --- */

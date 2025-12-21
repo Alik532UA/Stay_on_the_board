@@ -1,15 +1,13 @@
 /**
  * @file Manages settings related to a specific game session.
  * @description This store is the SSoT for all game-related settings.
- * It is initialized with default values and can be updated by other services,
- * like the SettingsPersistenceService which handles loading settings from localStorage.
  */
-// src/lib/stores/gameSettingsStore.ts
 import { writable, get } from 'svelte/store';
 import { logService } from '../services/logService';
-import { uiStateStore } from './uiStateStore.js';
-import { boardStore } from './boardStore.ts';
-import { availableMovesService } from '../services/availableMovesService.ts';
+import { uiStateStore } from './uiStateStore';
+import { boardStore } from './boardStore';
+import { availableMovesService } from '../services/availableMovesService';
+import { syncGameModeLogic } from '$lib/logic/settingsLogic';
 
 // Re-export types for backward compatibility
 export type {
@@ -22,88 +20,32 @@ export type {
   GameSettingsState
 } from './gameSettingsTypes';
 
-// Import types and defaults from extracted files
 import type { GameModePreset, GameSettingsState } from './gameSettingsTypes';
-import { defaultGameSettings, defaultKeybindings } from './gameSettingsDefaults';
+import { defaultGameSettings } from './gameSettingsDefaults';
 import { presetConfigurations } from './gameSettingsPresets';
 
-// Re-export defaults for backward compatibility
 export { defaultGameSettings } from './gameSettingsDefaults';
 
 function createGameSettingsStore() {
-  // The store is now initialized with the default settings.
-  // The SettingsPersistenceService is responsible for loading persisted data
-  // and updating the store via the `set` method.
   const { subscribe, set, update } = writable<GameSettingsState>(defaultGameSettings);
 
-  const syncGameMode = (state: GameSettingsState): GameSettingsState => {
-    // Блокуємо синхронізацію для: lockSettings, timed преsets, або базового local пресету
-    if (state.lockSettings || state.gameMode === 'timed' || state.gameMode === 'local' || state.gameMode?.includes('timed')) {
-      return state;
-    }
-
-    // Визначаємо контекст гри (local або virtual-player)
-    const intendedGameType = get(uiStateStore).intendedGameType;
-    const isLocalGameContext = intendedGameType === 'local';
-    const isVirtualPlayerContext = intendedGameType === 'virtual-player';
-    const isOnlineContext = intendedGameType === 'online';
-
-    // Блокуємо синхронізацію, якщо пресет не відповідає контексту
-    // (наприклад, local-observer в virtual-player контексті)
-    if (state.gameMode) {
-      const currentPrefix = state.gameMode.split('-')[0];
-      const expectedPrefix = intendedGameType;
-      if (currentPrefix !== expectedPrefix && ['local', 'virtual', 'online'].includes(currentPrefix)) {
-        // Пресет не відповідає контексту - не змінюємо
-        return state;
-      }
-    }
-
-    let newMode: GameModePreset | null = null;
-
-    if (isLocalGameContext) {
-      // Local game presets
-      if (!state.autoHideBoard) {
-        newMode = 'local-observer';
-      } else {
-        newMode = state.blockModeEnabled ? 'local-pro' : 'local-experienced';
-      }
-    } else if (isVirtualPlayerContext) {
-      // Virtual-player presets
-      if (!state.autoHideBoard) {
-        newMode = 'virtual-player-beginner';
-      } else {
-        newMode = state.blockModeEnabled ? 'virtual-player-pro' : 'virtual-player-experienced';
-      }
-    } else if (isOnlineContext) {
-      // Online presets (майбутнє)
-      if (!state.autoHideBoard) {
-        newMode = 'online-beginner';
-      } else {
-        newMode = state.blockModeEnabled ? 'online-pro' : 'online-experienced';
-      }
-    }
-
-    if (newMode && state.gameMode !== newMode) {
-      logService.GAME_MODE(`[syncGameMode] Context: ${intendedGameType}, Current: ${state.gameMode}, New: ${newMode}`);
-      state.gameMode = newMode;
-    }
-
-    return state;
+  // Helper wrapper to apply sync logic using current UI state
+  const applySync = (state: GameSettingsState): GameSettingsState => {
+    const uiState = get(uiStateStore);
+    return syncGameModeLogic(state, uiState);
   };
 
   const methods = {
-    set, // Expose the set method to allow the persistence service to overwrite the state.
+    set,
     updateSettings: (newSettings: Partial<GameSettingsState>) => {
       logService.state('[GameSettingsStore] updateSettings called with:', newSettings);
       update(state => {
         let updatedState = { ...state, ...newSettings };
-        updatedState = syncGameMode(updatedState);
+        updatedState = applySync(updatedState);
         return updatedState;
       });
     },
     resetSettings: () => {
-      // Now reset just sets the defaults, persistence is handled elsewhere.
       logService.action('[GameSettingsStore] Resetting settings to default.');
       set(defaultGameSettings);
     },
@@ -154,7 +96,7 @@ function createGameSettingsStore() {
     toggleAutoHideBoard: () => {
       update(state => {
         let updatedState = { ...state, autoHideBoard: !state.autoHideBoard };
-        updatedState = syncGameMode(updatedState);
+        updatedState = applySync(updatedState);
         return updatedState;
       });
     },
@@ -162,7 +104,7 @@ function createGameSettingsStore() {
     toggleBlockMode: () => {
       update(state => {
         let updatedState = { ...state, blockModeEnabled: !state.blockModeEnabled };
-        updatedState = syncGameMode(updatedState);
+        updatedState = applySync(updatedState);
         return updatedState;
       });
       boardStore.resetCellVisitCounts();

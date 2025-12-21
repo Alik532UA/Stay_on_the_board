@@ -54,6 +54,9 @@
         padding: 0;
         -webkit-tap-highlight-color: transparent;
         z-index: -1;
+
+        /* FIX: Явно вмикаємо події миші для кнопки перемикання */
+        pointer-events: auto;
     }
     .toggle-trigger:focus,
     .toggle-trigger:active {

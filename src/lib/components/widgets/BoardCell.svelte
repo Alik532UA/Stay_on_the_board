@@ -1,22 +1,21 @@
 <script lang="ts">
+  import { isCellBlocked, getDamageClass } from "$lib/utils/boardUtils";
+  import { createEventDispatcher } from "svelte";
+  import type { GameSettingsState } from "$lib/stores/gameSettingsStore";
+
   export let rowIdx: number;
   export let colIdx: number;
   export let visualCellVisitCounts: Record<string, number>;
-  export let gameSettings: any;
+  export let gameSettings: GameSettingsState;
   export let isAvailable: boolean;
   export let isPenalty = false;
-  export const visualPosition: { row: number | null; col: number | null } = {
-    row: null,
-    col: null,
-  };
-  export const boardState: any = {};
-  export const gameState: any = {};
-  import { isCellBlocked, getDamageClass } from "$lib/utils/boardUtils.ts";
-  import { createEventDispatcher } from "svelte";
+
   const dispatch = createEventDispatcher();
+
   function onCellRightClick(event: MouseEvent) {
     dispatch("cellRightClick", { event, row: rowIdx, col: colIdx });
   }
+
   $: blocked = isCellBlocked(
     rowIdx,
     colIdx,

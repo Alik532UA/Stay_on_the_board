@@ -1,8 +1,8 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
+    import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import { _ } from "svelte-i18n";
-    import { customTooltip } from "$lib/actions/customTooltip.js";
     import { voiceControlStore } from "$lib/stores/voiceControlStore";
 
     export let confirmDisabled: boolean = false;
@@ -20,45 +20,50 @@
 </script>
 
 <div class="action-btns">
-    <button
-        class="confirm-btn {confirmDisabled ? 'disabled' : ''}"
-        on:click={() => !disabled && dispatch("confirm")}
-        use:customTooltip={$_("gameControls.confirm")}
-        data-testid="confirm-move-btn"
-        {disabled}
+    <StyledButton
+        variant="primary"
+        size="large"
+        disabled={confirmDisabled || disabled}
+        on:click={() => dispatch("confirm")}
+        tooltip={$_("gameControls.confirm")}
+        dataTestId="confirm-move-btn"
+        style="width: 90%;"
     >
-        <SvgIcons name="confirm" />
+        <span slot="icon"><SvgIcons name="confirm" /></span>
         {$_("gameControls.confirm")}
-    </button>
+    </StyledButton>
 
     {#if blockModeEnabled}
-        <button
-            class="no-moves-btn"
-            on:click={() => !disabled && dispatch("noMoves")}
-            use:customTooltip={$_("gameControls.noMovesTitle")}
-            data-testid="no-moves-btn"
+        <StyledButton
+            variant="warning"
+            size="large"
             {disabled}
+            on:click={() => dispatch("noMoves")}
+            tooltip={$_("gameControls.noMovesTitle")}
+            dataTestId="no-moves-btn"
+            style="width: 90%;"
         >
-            <SvgIcons name="no-moves" />
+            <span slot="icon"><SvgIcons name="no-moves" /></span>
             {$_("gameControls.noMovesTitle")}
-        </button>
+        </StyledButton>
     {/if}
 
     {#if !isIos}
-        <button
-            class="voice-btn"
-            on:click={() => !disabled && dispatch("voiceCommand")}
-            use:customTooltip={voiceButtonTooltip}
-            data-testid="voice-command-btn"
-            class:active={$voiceControlStore.lastTranscript !== ""}
+        <StyledButton
+            variant="info"
+            size="large"
             disabled={!isVoiceSupported || disabled}
-            style={$voiceControlStore.lastTranscript !== ""
+            on:click={() => dispatch("voiceCommand")}
+            tooltip={voiceButtonTooltip}
+            dataTestId="voice-command-btn"
+            class={$voiceControlStore.lastTranscript !== "" ? "active" : ""}
+            style="width: 90%; {$voiceControlStore.lastTranscript !== ''
                 ? voiceButtonStyle
-                : ""}
+                : ''}"
         >
-            <SvgIcons name="microphone" />
+            <span slot="icon"><SvgIcons name="microphone" /></span>
             {$_("gameControls.voiceCommand")}
-        </button>
+        </StyledButton>
     {/if}
 </div>
 
