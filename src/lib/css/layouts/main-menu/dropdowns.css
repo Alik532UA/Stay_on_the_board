@@ -8,10 +8,8 @@
     z-index: 1000;
     background: transparent;
     box-shadow: none;
-    padding: 24px 32px;
+    padding: 16px;
     border-radius: 18px;
-    /* FIX: Використовуємо змінну для адаптивної ширини */
-    min-width: var(--responsive-min-width, 200px);
     width: auto;
     max-width: 95vw;
 }
@@ -20,7 +18,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 64px;
+    gap: 32px;
 }
 
 .lang-dropdown.hidden {
@@ -43,11 +41,7 @@
     transform: scale(1.1);
 }
 
-.lang-option.selected,
-.lang-option:focus {
-    background: var(--control-selected, #ff9800);
-    color: #fff;
-}
+
 
 .lang-option span {
     display: block;
@@ -83,9 +77,8 @@
 }
 
 .lang-dropdown svg {
-    width: 96px !important;
-    height: 72px !important;
     display: block;
+    /* Видалено примусовий розмір, щоб компонент міг сам його визначати */
 }
 
 /* Overlays and Backdrops */

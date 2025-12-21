@@ -2,7 +2,7 @@
   "name": "your-move",
   "description": "A multi-game platform with 'Survive', 'Arena', and 'Maze' modes.",
   "private": true,
-  "version": "0.5.599",
+  "version": "0.5.600",
   "type": "module",
   "scripts": {
     "test": "playwright test",
