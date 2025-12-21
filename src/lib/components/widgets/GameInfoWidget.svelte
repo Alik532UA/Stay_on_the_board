@@ -6,7 +6,6 @@
     lastComputerMove,
     lastPlayerMove,
     isPlayerTurn,
-    isPauseBetweenMoves,
     isGameOver,
     isFirstMove,
   } from "$lib/stores/derivedState.ts";
@@ -14,32 +13,15 @@
   import { fade, slide } from "svelte/transition";
   import { quintOut } from "svelte/easing";
   import { playerStore } from "$lib/stores/playerStore";
-  import { logService } from "$lib/services/logService.js";
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import CompactComputerMove from "$lib/components/widgets/game-info/CompactComputerMove.svelte";
   import StructuredMessage from "$lib/components/widgets/game-info/StructuredMessage.svelte";
 
-  // --- Допоміжні функції ---
-  function getPlayerColor(players: any[], playerName: string): string | null {
-    const player = players.find((p) => p.name === playerName);
-    return player ? player.color : null;
-  }
-
-  function getPlayerNameStyle(players: any[], playerName: string): string {
-    const color = getPlayerColor(players, playerName);
-    return color ? `background-color: ${color};` : "";
-  }
-
-  const directionArrows: Record<string, string> = {
-    "up-left": "↖",
-    up: "↑",
-    "up-right": "↗",
-    left: "←",
-    right: "→",
-    "down-left": "↙",
-    down: "↓",
-    "down-right": "↘",
-  };
+  // FIX: Import the new factory
+  import {
+    createGameInfoMessage,
+    type GameInfoContext,
+  } from "$lib/services/game-info/gameInfoMessageFactory";
 
   const isCompact = derived(
     gameSettingsStore,
@@ -71,234 +53,21 @@
       $gameSettings,
       $uiState,
     ]) => {
-      if (!$playerStore) return { type: "SIMPLE", content: "" };
+      // FIX: Delegate message creation to factory
+      const context: GameInfoContext = {
+        playerState: $playerStore,
+        isGameOver: $isGameOver,
+        isFirstMove: $isFirstMove,
+        lastComputerMove: $lastComputerMove,
+        lastPlayerMove: $lastPlayerMove,
+        isPlayerTurn: $isPlayerTurn,
+        translate: $_,
+        isCompact: $isCompact,
+        gameSettings: $gameSettings,
+        uiState: $uiState,
+      };
 
-      const humanPlayersCount = $playerStore.players.filter(
-        (p: any) => p.type === "human",
-      ).length;
-      const isLocalGame = humanPlayersCount > 1;
-      const currentPlayer =
-        $playerStore.players[$playerStore.currentPlayerIndex];
-
-      if ($isGameOver)
-        return { type: "SIMPLE", content: $_("gameBoard.gameInfo.gameOver") };
-
-      if ($isFirstMove) {
-        // FIX: Покращена логіка для першого ходу в онлайні
-        if ($uiState.intendedGameType === "online") {
-          if ($isPlayerTurn) {
-            return {
-              type: "SIMPLE",
-              content: `${$_("gameBoard.gameInfo.firstMove")}\n${$_("gameBoard.gameInfo.yourTurnToMakeAMove")}`,
-            };
-          } else {
-            // Показуємо ім'я суперника
-            return {
-              type: "STRUCTURED",
-              lines: [
-                {
-                  type: "line" as const,
-                  parts: [
-                    {
-                      type: "text" as const,
-                      content: $_("gameBoard.gameInfo.firstMove"),
-                    },
-                  ],
-                },
-                {
-                  type: "line" as const,
-                  parts: [
-                    { type: "text" as const, content: "Зараз ходить: " },
-                    {
-                      type: "player" as const,
-                      name: currentPlayer.name,
-                      style: getPlayerNameStyle(
-                        $playerStore.players,
-                        currentPlayer.name,
-                      ),
-                    },
-                  ],
-                },
-              ],
-            };
-          }
-        }
-
-        if (isLocalGame) {
-          return {
-            type: "STRUCTURED",
-            lines: [
-              {
-                type: "line" as const,
-                parts: [
-                  {
-                    type: "text" as const,
-                    content: $_("gameBoard.gameInfo.firstMove"),
-                  },
-                ],
-              },
-              {
-                type: "line" as const,
-                parts: [
-                  {
-                    type: "player" as const,
-                    name: currentPlayer.name,
-                    style: getPlayerNameStyle(
-                      $playerStore.players,
-                      currentPlayer.name,
-                    ),
-                  },
-                  {
-                    type: "text" as const,
-                    content:
-                      ", " +
-                      $_(
-                        "gameBoard.gameInfo.yourTurnToMakeAMove",
-                      ).toLowerCase(),
-                  },
-                ],
-              },
-            ],
-          };
-        }
-
-        let message = `${$_("gameBoard.gameInfo.firstMove")}\n`;
-        if ($gameSettings.gameMode !== "beginner") {
-          message += `${$_("gameBoard.gameInfo.rememberPieceLocation")}\n`;
-        }
-        message += $_("gameBoard.gameInfo.yourTurnToMakeAMove");
-        return { type: "SIMPLE", content: message };
-      }
-
-      // ... (логіка lastComputerMove без змін) ...
-      if ($lastComputerMove) {
-        const directionKey = $lastComputerMove.direction.replace(
-          /-(\w)/g,
-          (_: string, c: string) => c.toUpperCase(),
-        );
-        const direction = $_(`gameBoard.directions.${directionKey}`);
-        const distance = $lastComputerMove.distance;
-
-        if ($isCompact) {
-          return {
-            type: "COMPACT_COMPUTER_MOVE",
-            part1: $_("gameBoard.gameInfo.computerMadeMovePart1"),
-            move: `${directionArrows[$lastComputerMove.direction] || "?"}${distance}`,
-            part2: $_("gameBoard.gameInfo.computerMadeMovePart2"),
-          };
-        }
-        return {
-          type: "SIMPLE",
-          content: $_("gameBoard.gameInfo.computerMadeMove", {
-            values: { direction, distance },
-          }),
-        };
-      }
-
-      // ... (логіка lastPlayerMove без змін) ...
-      if ($lastPlayerMove && isLocalGame) {
-        const previousPlayerIndex =
-          ($playerStore.currentPlayerIndex + $playerStore.players.length - 1) %
-          $playerStore.players.length;
-        const previousPlayer = $playerStore.players[previousPlayerIndex];
-        const directionKey = $lastPlayerMove.direction.replace(
-          /-(\w)/g,
-          (_: string, c: string) => c.toUpperCase(),
-        );
-        const direction = $_(`gameBoard.directions.${directionKey}`);
-        return {
-          type: "STRUCTURED",
-          lines: [
-            {
-              type: "line" as const,
-              parts: [
-                {
-                  type: "player" as const,
-                  name: previousPlayer.name,
-                  style: getPlayerNameStyle(
-                    $playerStore.players,
-                    previousPlayer.name,
-                  ),
-                },
-                {
-                  type: "text" as const,
-                  content: ` зробив хід: ${direction} на ${$lastPlayerMove.distance}.`,
-                },
-              ],
-            },
-            {
-              type: "line" as const,
-              parts: [
-                {
-                  type: "player" as const,
-                  name: currentPlayer.name,
-                  style: getPlayerNameStyle(
-                    $playerStore.players,
-                    currentPlayer.name,
-                  ),
-                },
-                { type: "text" as const, content: " ваша черга робити хід!" },
-              ],
-            },
-          ],
-        };
-      }
-
-      if ($isPlayerTurn) {
-        if (isLocalGame) {
-          return {
-            type: "STRUCTURED",
-            lines: [
-              {
-                type: "line" as const,
-                parts: [
-                  { type: "text" as const, content: "Хід гравця: " },
-                  {
-                    type: "player" as const,
-                    name: currentPlayer.name,
-                    style: getPlayerNameStyle(
-                      $playerStore.players,
-                      currentPlayer.name,
-                    ),
-                  },
-                ],
-              },
-            ],
-          };
-        }
-        return { type: "SIMPLE", content: $_("gameBoard.gameInfo.playerTurn") };
-      }
-
-      if (!$isPlayerTurn) {
-        if ($uiState.intendedGameType === "online") {
-          // FIX: Показуємо ім'я того, хто ходить
-          return {
-            type: "STRUCTURED",
-            lines: [
-              {
-                type: "line" as const,
-                parts: [
-                  { type: "text" as const, content: "Зараз ходить: " },
-                  {
-                    type: "player" as const,
-                    name: currentPlayer.name,
-                    style: getPlayerNameStyle(
-                      $playerStore.players,
-                      currentPlayer.name,
-                    ),
-                  },
-                ],
-              },
-            ],
-          };
-        }
-        return {
-          type: "SIMPLE",
-          content: $_("gameBoard.gameInfo.computerTurn"),
-        };
-      }
-
-      return { type: "SIMPLE", content: $_("gameBoard.gameInfo.gameStarted") };
+      return createGameInfoMessage(context);
     },
   );
 </script>
