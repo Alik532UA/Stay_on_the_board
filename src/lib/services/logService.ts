@@ -37,7 +37,8 @@ export const LOG_GROUPS = {
     VOICE_CONTROL: 'voice_control',
     TEST_MODE: 'test_mode',
     MODAL: 'modal',
-    ERROR: 'error'
+    ERROR: 'error',
+    HOTKEY: 'hotkey' // НОВА ГРУПА
 } as const;
 
 export type LogGroup = typeof LOG_GROUPS[keyof typeof LOG_GROUPS];
@@ -54,18 +55,19 @@ const defaultConfig: LogConfig = {
     [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: false,
     [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
     [LOG_GROUPS.LOGIC_TIME]: false,
-    [LOG_GROUPS.SCORE]: false,
+    [LOG_GROUPS.SCORE]: true,
     [LOG_GROUPS.UI]: false,
     [LOG_GROUPS.TOOLTIP]: false,
     [LOG_GROUPS.ANIMATION]: false,
     [LOG_GROUPS.INIT]: false,
-    [LOG_GROUPS.ACTION]: false, // ВИМКНЕНО: Прибираємо шум від гарячих клавіш
-    [LOG_GROUPS.GAME_MODE]: true, // ВАЖЛИВО: Логіка голосування
+    [LOG_GROUPS.ACTION]: true,
+    [LOG_GROUPS.GAME_MODE]: true,
     [LOG_GROUPS.SPEECH]: false,
     [LOG_GROUPS.VOICE_CONTROL]: false,
     [LOG_GROUPS.TEST_MODE]: false,
-    [LOG_GROUPS.MODAL]: true, // ВАЖЛИВО: Оновлення кнопок
+    [LOG_GROUPS.MODAL]: false,
     [LOG_GROUPS.ERROR]: true,
+    [LOG_GROUPS.HOTKEY]: false, // ВИМКНЕНО ЗА ЗАМОВЧУВАННЯМ
 };
 
 const STORAGE_KEY = 'logConfig';
@@ -123,6 +125,7 @@ const styles: Record<LogGroup, string> = {
     [LOG_GROUPS.TEST_MODE]: 'color: #FBC02D; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;',
     [LOG_GROUPS.MODAL]: 'color: #673AB7; font-weight: bold;',
     [LOG_GROUPS.ERROR]: 'color: #F44336; font-weight: bold;',
+    [LOG_GROUPS.HOTKEY]: 'color: #607D8B; font-style: italic;', // Стиль для хоткеїв
 };
 
 function log(group: LogGroup, message: string, ...data: unknown[]): void {
@@ -160,6 +163,7 @@ export const logService = {
     testMode: (message: string, ...data: unknown[]) => log(LOG_GROUPS.TEST_MODE, message, ...data),
     modal: (message: string, ...data: unknown[]) => log(LOG_GROUPS.MODAL, message, ...data),
     error: (message: string, ...data: unknown[]) => log(LOG_GROUPS.ERROR, message, ...data),
+    hotkey: (message: string, ...data: unknown[]) => log(LOG_GROUPS.HOTKEY, message, ...data), // Новий метод
     info: (message: string, ...data: unknown[]) => log(LOG_GROUPS.INIT, message, ...data),
     forceEnableLogging: (): void => {
         if (!isForceEnabled) {
@@ -200,7 +204,7 @@ if (isBrowser) {
         localStorage.setItem('force-logging', 'true');
         isForceEnabled = true;
         initializeDeveloperTools();
-        console.log('Production logging enabled. Refresh the page for full effect. Use setLogLevels({...}) to configure.');
+        console.log('Production logging enabled. Refresh the page for full effect. Use setLogLevels({ ... }) to configure.');
         debugLogStore.add('[INFO] Production logging enabled.');
     };
 }

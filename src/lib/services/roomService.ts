@@ -92,12 +92,11 @@ class RoomService {
             );
 
             // FIX: Зберігаємо час створення останньої кімнати в глобальну статистику
-            // Це дозволяє показувати дату навіть коли всі кімнати видалені
             if (!isPrivate) {
                 const statsRef = doc(this.db, 'general', 'stats');
-                // Використовуємо catch, щоб помилка статистики не блокувала створення кімнати
+                // FIX: Додано типізацію (e: any) для виправлення помилки TS7011
                 setDoc(statsRef, { lastRoomCreatedAt: Date.now() }, { merge: true })
-                    .catch(e => console.warn('Failed to update global stats', e));
+                    .catch((e: any) => console.warn('Failed to update global stats', e));
             }
 
             roomSessionService.saveSession(roomId, hostId);
@@ -134,17 +133,15 @@ class RoomService {
                 orderBy('lastActivity', 'desc')
             );
 
-            // Паралельно отримуємо кімнати та глобальну статистику
             const [querySnapshot, statsSnap] = await Promise.all([
                 withTimeout(getDocs(q), OPERATION_TIMEOUT_MS, 'Timeout fetching rooms'),
-                getDoc(doc(this.db, 'general', 'stats')).catch(() => null) // Ігноруємо помилки статистики
+                getDoc(doc(this.db, 'general', 'stats')).catch((): null => null)
             ]);
 
             const rooms: RoomSummary[] = [];
             const now = Date.now();
             const cleanupPromises: Promise<void>[] = [];
 
-            // Отримуємо збережену дату з глобальної статистики
             let globalLastCreated = 0;
             if (statsSnap && statsSnap.exists()) {
                 globalLastCreated = statsSnap.data().lastRoomCreatedAt || 0;
@@ -155,7 +152,6 @@ class RoomService {
             querySnapshot.forEach((doc) => {
                 const data = doc.data() as Room;
 
-                // Відстежуємо найсвіжішу кімнату серед активних
                 if (data.createdAt > activeRoomsLatestCreated) {
                     activeRoomsLatestCreated = data.createdAt;
                 }
@@ -178,7 +174,6 @@ class RoomService {
                 Promise.allSettled(cleanupPromises).catch(e => console.error(e));
             }
 
-            // Повертаємо найновішу дату (або з активних, або з глобальної історії)
             const finalLatestCreatedAt = Math.max(activeRoomsLatestCreated, globalLastCreated);
 
             return {

@@ -12,8 +12,6 @@ const hotkeyRegistry = new Map<string, Map<string, HotkeyAction>>();
 
 function handleKeydown(event: KeyboardEvent) {
     // 1. Перевірка на фокус в полях вводу (Global Input Protection)
-    // Якщо користувач друкує, ми не повинні тригерити гарячі клавіші,
-    // окрім Escape (для закриття/скасування).
     const target = event.target as HTMLElement;
     const isInputActive =
         target.tagName === 'INPUT' ||
@@ -21,13 +19,12 @@ function handleKeydown(event: KeyboardEvent) {
         target.isContentEditable;
 
     if (isInputActive && event.code !== 'Escape') {
-        // Не логуємо це, щоб не засмічувати консоль при кожному натисканні літери
         return;
     }
 
     const stack = get(contextStack);
-    // Використовуємо event.code для надійної ідентифікації клавіш
-    logService.action(`[hotkeyService] handleKeydown: code=${event.code}, stack=`, stack);
+    // Використовуємо hotkey лог для дебагу натискань
+    logService.hotkey(`[hotkeyService] handleKeydown: code=${event.code}, stack=`, stack);
 
     for (let i = stack.length - 1; i >= 0; i--) {
         const context = stack[i];
@@ -36,16 +33,16 @@ function handleKeydown(event: KeyboardEvent) {
         if (contextHotkeys) {
             const hotkey = contextHotkeys.get(event.code);
             if (hotkey && (!hotkey.condition || hotkey.condition())) {
+                // Тут залишаємо ACTION, бо це реальна дія користувача, яка спрацювала
                 logService.action(`[hotkeyService] Executing hotkey '${event.code}' from context '${context}'`);
                 event.preventDefault();
                 event.stopPropagation();
                 hotkey.action(event);
-                // Stop after finding and executing the first matching hotkey
                 return;
             }
         }
     }
-    logService.action(`[hotkeyService] No action found for key '${event.code}' in any active context.`);
+    logService.hotkey(`[hotkeyService] No action found for key '${event.code}' in any active context.`);
 }
 
 function setup() {
@@ -59,17 +56,20 @@ function registerHotkey(context: string, key: string, action: (event?: KeyboardE
     if (!hotkeyRegistry.has(context)) {
         hotkeyRegistry.set(context, new Map());
     }
-    logService.action(`[hotkeyService] Registering hotkey '${key}' for context '${context}'`);
+    // Змінено на hotkey
+    logService.hotkey(`[hotkeyService] Registering hotkey '${key}' for context '${context}'`);
     hotkeyRegistry.get(context)!.set(key, { action, condition });
 }
 
 function unregisterContext(context: string) {
-    logService.action(`[hotkeyService] Unregistering all hotkeys for context '${context}'`);
+    // Змінено на hotkey
+    logService.hotkey(`[hotkeyService] Unregistering all hotkeys for context '${context}'`);
     hotkeyRegistry.delete(context);
 }
 
 function pushContext(context: string) {
-    logService.action(`[hotkeyService] Pushing new context: '${context}'`);
+    // Змінено на hotkey
+    logService.hotkey(`[hotkeyService] Pushing new context: '${context}'`);
     contextStack.update(stack => [...stack, context]);
 }
 
@@ -77,14 +77,13 @@ function popContext(context?: string) {
     contextStack.update(stack => {
         if (stack.length > 1) {
             const topOfStack = stack[stack.length - 1];
-            // If a context is provided, only pop if it's the one on top.
             if (context && context !== topOfStack) {
-                logService.action(`[hotkeyService] Tried to pop context '${context}' but '${topOfStack}' is on top. Aborting.`);
+                logService.hotkey(`[hotkeyService] Tried to pop context '${context}' but '${topOfStack}' is on top. Aborting.`);
                 return stack;
             }
             const newStack = [...stack];
             const poppedContext = newStack.pop()!;
-            logService.action(`[hotkeyService] Popping context: '${poppedContext}'`);
+            logService.hotkey(`[hotkeyService] Popping context: '${poppedContext}'`);
             unregisterContext(poppedContext);
             return newStack;
         }
@@ -97,7 +96,6 @@ function getCurrentContext() {
     return stack[stack.length - 1];
 }
 
-// Immediately activate the service when the module is imported
 setup();
 
 const hotkeyService = {
@@ -106,7 +104,7 @@ const hotkeyService = {
     pushContext,
     popContext,
     getCurrentContext,
-    get a() { // For debugging
+    get a() {
         return get(contextStack);
     }
 };
