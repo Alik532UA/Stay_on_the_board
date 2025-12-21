@@ -10,7 +10,8 @@ import {
     setDoc
 } from 'firebase/firestore';
 import { getFirebaseApp } from './firebaseService';
-import { authService, userProfileStore } from './authService';
+import { authService } from './authService';
+import { userProfileStore } from './auth/userProfileService';
 import { logService } from './logService';
 import type { ScoreDocument, UserDocument } from '$lib/types/firebaseSchema';
 

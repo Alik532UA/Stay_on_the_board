@@ -1,10 +1,7 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
-    import {
-        authService,
-        userStore,
-        userProfileStore,
-    } from "$lib/services/authService";
+    import { authService, userStore } from "$lib/services/authService";
+    import { userProfileStore } from "$lib/services/auth/userProfileService";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import EditableText from "$lib/components/ui/EditableText.svelte";
     import { generateRandomPlayerName } from "$lib/utils/nameGenerator";

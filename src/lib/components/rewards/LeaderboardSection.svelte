@@ -4,7 +4,7 @@
         leaderboardService,
         type LeaderboardEntry,
     } from "$lib/services/leaderboardService";
-    import { userProfileStore } from "$lib/services/authService";
+    import { userProfileStore } from "$lib/services/auth/userProfileService";
     import NotoEmoji from "$lib/components/NotoEmoji.svelte";
 
     let leaders: LeaderboardEntry[] = [];

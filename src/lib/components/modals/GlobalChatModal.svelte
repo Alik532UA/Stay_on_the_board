@@ -1,7 +1,7 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
     import ChatWidget from "$lib/components/online/ChatWidget.svelte";
-    import { userProfileStore } from "$lib/services/authService";
+    import { userProfileStore } from "$lib/services/auth/userProfileService";
     import { modalStore } from "$lib/stores/modalStore";
 
     // Використовуємо фіксований ID для глобального чату
