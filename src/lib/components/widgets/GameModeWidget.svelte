@@ -1,39 +1,36 @@
 <script lang="ts">
-  import { gameModeStore } from "$lib/stores/gameModeStore.js";
-  import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
-  import { userActionService } from "$lib/services/userActionService.js";
+  import { gameModeStore } from "$lib/stores/gameModeStore";
+  import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
+  import { userActionService } from "$lib/services/userActionService";
   import { _ } from "svelte-i18n";
-  import { uiStateStore } from "$lib/stores/uiStateStore.js";
+  import { uiStateStore } from "$lib/stores/uiStateStore";
   import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
 
   $: activeMode = $gameModeStore.activeMode;
+  // FIX: Явно витягуємо gameMode для реактивності
+  $: currentMode = $gameSettingsStore.gameMode;
 
   // Helper: перевіряє, чи відповідає поточний gameMode legacy пресету
-  function isPresetActive(legacyPreset: string): boolean {
-    const currentMode = $gameSettingsStore.gameMode;
-    if (!currentMode) return false;
+  // FIX: Додано аргумент mode для забезпечення реактивності
+  function isPresetActive(legacyPreset: string, mode: string | null): boolean {
+    if (!mode) return false;
 
-    if (currentMode === legacyPreset) return true;
+    if (mode === legacyPreset) return true;
 
-    if (legacyPreset === "observer" && currentMode === "local-observer")
-      return true;
-    if (
-      legacyPreset === "beginner" &&
-      currentMode === "virtual-player-beginner"
-    )
+    if (legacyPreset === "observer" && mode === "local-observer") return true;
+    if (legacyPreset === "beginner" && mode === "virtual-player-beginner")
       return true;
     if (
       legacyPreset === "experienced" &&
-      (currentMode === "virtual-player-experienced" ||
-        currentMode === "local-experienced")
+      (mode === "virtual-player-experienced" || mode === "local-experienced")
     )
       return true;
     if (
       legacyPreset === "pro" &&
-      (currentMode === "virtual-player-pro" || currentMode === "local-pro")
+      (mode === "virtual-player-pro" || mode === "local-pro")
     )
       return true;
-    if (legacyPreset === "timed" && currentMode === "virtual-player-timed")
+    if (legacyPreset === "timed" && mode === "virtual-player-timed")
       return true;
 
     return false;
@@ -42,7 +39,6 @@
   let descriptionKey: string | null = null;
 
   $: {
-    const currentMode = $gameSettingsStore.gameMode;
     if (!currentMode) {
       descriptionKey = null;
     } else if (
@@ -59,7 +55,7 @@
   async function handlePresetClick(
     preset: "beginner" | "experienced" | "pro" | "timed" | "observer",
   ) {
-    if (activeMode === "online") return; // Блокуємо клік в онлайні
+    if (activeMode === "online") return;
     userActionService.setGameModePreset(preset);
     if (preset === "timed") {
       uiStateStore.update((s) => ({ ...s, settingsMode: "competitive" }));
@@ -68,12 +64,60 @@
     }
     await userActionService.requestRestart();
   }
+
+  // FIX: Опції тепер залежать від currentMode через аргумент функції
+  $: localOptions = [
+    {
+      label: $_("gameModes.observer"),
+      active: isPresetActive("observer", currentMode),
+      onClick: () => handlePresetClick("observer"),
+      dataTestId: "settings-game-mode-local-observer",
+    },
+    {
+      label: $_("gameModes.experienced"),
+      active: isPresetActive("experienced", currentMode),
+      onClick: () => handlePresetClick("experienced"),
+      dataTestId: "settings-game-mode-local-experienced",
+    },
+    {
+      label: $_("gameModes.pro"),
+      active: isPresetActive("pro", currentMode),
+      onClick: () => handlePresetClick("pro"),
+      dataTestId: "settings-game-mode-local-pro",
+    },
+  ];
+
+  $: virtualPlayerOptions = [
+    {
+      label: $_("gameModes.beginner"),
+      active: isPresetActive("beginner", currentMode),
+      onClick: () => handlePresetClick("beginner"),
+      dataTestId: "settings-game-mode-virtual-player-beginner",
+    },
+    {
+      label: $_("gameModes.experienced"),
+      active: isPresetActive("experienced", currentMode),
+      onClick: () => handlePresetClick("experienced"),
+      dataTestId: "settings-game-mode-virtual-player-experienced",
+    },
+    {
+      label: $_("gameModes.pro"),
+      active: isPresetActive("pro", currentMode),
+      onClick: () => handlePresetClick("pro"),
+      dataTestId: "settings-game-mode-virtual-player-pro",
+    },
+    {
+      label: $_("gameModes.timed"),
+      active: isPresetActive("timed", currentMode),
+      onClick: () => handlePresetClick("timed"),
+      dataTestId: "settings-game-mode-virtual-player-timed",
+    },
+  ];
 </script>
 
 <div class="game-mode-widget" data-testid="game-mode-widget">
   {#if activeMode === "online"}
     <div class="online-lock-overlay" data-testid="game-mode-widget-locked">
-      <!-- FIX: Змінено ключ на "В розробці" -->
       <span>{$_("gameModes.notAvailableInOnline")}</span>
     </div>
   {/if}
@@ -81,57 +125,9 @@
   <h3 class="widget-title">{$_("gameModes.title")}</h3>
 
   {#if activeMode === "local"}
-    <ButtonGroup
-      options={[
-        {
-          label: $_("gameModes.observer"),
-          active: isPresetActive("observer"),
-          onClick: () => handlePresetClick("observer"),
-          dataTestId: "settings-game-mode-local-observer",
-        },
-        {
-          label: $_("gameModes.experienced"),
-          active: isPresetActive("experienced"),
-          onClick: () => handlePresetClick("experienced"),
-          dataTestId: "settings-game-mode-local-experienced",
-        },
-        {
-          label: $_("gameModes.pro"),
-          active: isPresetActive("pro"),
-          onClick: () => handlePresetClick("pro"),
-          dataTestId: "settings-game-mode-local-pro",
-        },
-      ]}
-    />
+    <ButtonGroup options={localOptions} />
   {:else}
-    <ButtonGroup
-      options={[
-        {
-          label: $_("gameModes.beginner"),
-          active: isPresetActive("beginner"),
-          onClick: () => handlePresetClick("beginner"),
-          dataTestId: "settings-game-mode-virtual-player-beginner",
-        },
-        {
-          label: $_("gameModes.experienced"),
-          active: isPresetActive("experienced"),
-          onClick: () => handlePresetClick("experienced"),
-          dataTestId: "settings-game-mode-virtual-player-experienced",
-        },
-        {
-          label: $_("gameModes.pro"),
-          active: isPresetActive("pro"),
-          onClick: () => handlePresetClick("pro"),
-          dataTestId: "settings-game-mode-virtual-player-pro",
-        },
-        {
-          label: $_("gameModes.timed"),
-          active: isPresetActive("timed"),
-          onClick: () => handlePresetClick("timed"),
-          dataTestId: "settings-game-mode-virtual-player-timed",
-        },
-      ]}
-    />
+    <ButtonGroup options={virtualPlayerOptions} />
   {/if}
   <div
     class="description"
@@ -146,7 +142,6 @@
 
 <style>
   .game-mode-widget {
-    /* FIX: Додаємо змінні, які використовуються класами кнопок */
     --button-height: 36px;
     --button-padding: 4px 8px;
     --button-border-width: var(--global-border-width);
@@ -164,7 +159,7 @@
     padding: 16px;
     box-sizing: border-box;
     width: 100%;
-    position: relative; /* Для оверлею */
+    position: relative;
     overflow: hidden;
   }
   .game-mode-widget:hover {
