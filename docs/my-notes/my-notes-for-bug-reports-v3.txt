@@ -95,7 +95,7 @@ src\lib\components\widgets\ScorePanelWidget.svelte
 може розділити на декілька логічних файлів?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 роби commit
-ще є файли які було б добре розділити?
+ще є файли який було б добре зробити decompase?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 data-testid="left-menu-toggle-trigger"
 змістилось після наших минулих змін
