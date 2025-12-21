@@ -1,7 +1,7 @@
 <script lang="ts">
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import "$lib/css/components/modal.css";
-    import "$lib/css/layouts/main-menu.css";
+    /* FIX: Видалено імпорт видаленого файлу main-menu.css */
     import SvgIcons from "$lib/components/SvgIcons.svelte";
 
     let keys: string[] = [];
@@ -119,7 +119,7 @@
         <h2>2. Main Menu Buttons</h2>
         <p>Note: Legacy requires #main-menu-buttons wrapper.</p>
         <div class="grid-header">
-            <div>Legacy (main-menu.css)</div>
+            <div>Legacy (main-menu.css - REMOVED)</div>
             <div>New (StyledButton)</div>
         </div>
 
@@ -127,11 +127,12 @@
         <div class="row">
             <div class="cell">
                 <div id="main-menu-buttons" style="margin:0; width: auto;">
+                    <!-- Стилі видалено, кнопка буде виглядати як дефолтна -->
                     <button
                         class="modal-button secondary"
                         on:click={() => logClick("Legacy Menu")}
                     >
-                        Menu Button
+                        Menu Button (Legacy)
                     </button>
                 </div>
             </div>
@@ -150,6 +151,7 @@
         <div class="row">
             <div class="cell">
                 <div id="main-menu-buttons" style="margin:0; width: auto;">
+                    <!-- Стилі видалено -->
                     <button
                         class="modal-button secondary"
                         on:click={() => logClick("Legacy Menu Icon")}
