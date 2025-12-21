@@ -4,7 +4,6 @@
   import { customTooltip } from "$lib/actions/customTooltip.js";
   import { logService } from "$lib/services/logService.js";
 
-  // Додаємо опціональний проп для кастомної дії
   export let onClick: (() => void) | undefined = undefined;
 
   function handleClick() {
@@ -62,15 +61,18 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 0;
   }
   .floating-back-btn:hover {
     background: rgba(0, 0, 0, 0.4);
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   }
+
+  /* FIX: Виправлено розмір іконки. 200% було забагато. */
   .floating-back-btn svg {
-    width: 200%;
-    height: 200%;
+    width: 28px;
+    height: 28px;
     flex-shrink: 0;
   }
 </style>

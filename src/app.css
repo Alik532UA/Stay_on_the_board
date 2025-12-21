@@ -10,22 +10,10 @@
 @import url('./lib/css/themes/wood.css');
 @import url('./lib/css/components/game-board.css');
 @import url('./lib/css/components/controls.css');
-@import url('./lib/css/layouts/main-menu.css');
-/* FIX: Додаємо імпорт стилів для кнопок налаштувань, щоб вони були доступні в GameModeWidget */
+/* ВИДАЛЕНО: @import url('./lib/css/layouts/main-menu.css'); - Старе меню видалено */
 @import url('./lib/css/components/settings-expander.css');
 
-/* Імпорт шрифту M PLUS Rounded 1c */
-
-/* Базові змінні та налаштування */
-
-/* Теми */
-
-/* Компоненти */
-
-/* Макети */
-
 /* === FIX: Глобальне скидання box-sizing === */
-/* Це гарантує, що padding не додається до ширини 100%, запобігаючи горизонтальному скролу */
 *,
 *::before,
 *::after {
@@ -41,7 +29,6 @@ body {
     color: var(--text-primary);
     transition: background 0.5s ease, color 0.5s ease;
     min-height: 100vh;
-    /* Запобігаємо горизонтальному скролу на рівні тіла */
     overflow-x: hidden;
     width: 100%;
 }
@@ -117,9 +104,6 @@ h1 {
 #board-options label {
     margin: 0 10px;
     font-weight: bold;
-}
-
-#board-options label {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -128,7 +112,6 @@ h1 {
     cursor: pointer;
     transition: background-color 0.3s ease;
     color: var(--text-primary);
-    font-weight: bold;
 }
 
 #board-options label:hover {
@@ -165,19 +148,16 @@ h1 {
     font-family: 'M PLUS Rounded 1c', sans-serif !important;
 }
 
-/* Спеціальні стилі для стрілок у кнопках напрямку */
 .control-btn[data-direction] {
     font-family: 'M PLUS Rounded 1c', sans-serif !important;
     font-weight: 700;
 }
 
-/* Стилі для center-info зі стрілками */
 #center-info {
     font-family: 'M PLUS Rounded 1c', sans-serif !important;
     font-weight: 700;
 }
 
-/* Стилі для стрілок у комп'ютерних ходах */
 .computer-move-display .arrow,
 #computer-move-display .arrow {
     font-family: 'M PLUS Rounded 1c', sans-serif !important;
@@ -222,11 +202,9 @@ h1 {
 .game-content-block {
     width: 100%;
     max-width: 480px;
-    /* Максимальна ширина для великих екранів */
     margin-left: auto;
     margin-right: auto;
     box-sizing: border-box;
-    /* Включаємо padding та border у розрахунок ширини */
 }
 
 /* Утилітарний клас для затемнення та розмиття фону */
@@ -237,7 +215,6 @@ h1 {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: 9999;
-    /* z-index нижчий, ніж у дропдаунів */
     transition: background-color 0.3s, backdrop-filter 0.3s;
 }
 
