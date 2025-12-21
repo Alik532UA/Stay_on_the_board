@@ -8,11 +8,11 @@
 
   export let value = "#ffffff";
   export let isOpen = false;
+  // FIX: Додано проп для data-testid
+  export let dataTestId = "color-picker";
 
-  // Змінна для поточного значення кольору
   let currentValue = value;
 
-  // 8 готових кольорів + центральна кнопка для палітри
   const predefinedColors = [
     "#00bbf9", // голубий
     "#f4a261", // помаранчевий
@@ -24,33 +24,20 @@
     "#e63946", // червоний
   ];
 
-  // Реактивний блок для оновлення при зміні value
   $: {
-    console.log("ColorPicker: value prop changed to", value);
     currentValue = value;
-    console.log("ColorPicker: currentValue updated to", currentValue);
   }
 
   function selectColor(color: string) {
     logService.action(`Click: "Вибір кольору: ${color}" (ColorPicker)`);
-    console.log("ColorPicker: selectColor called with", color);
-    console.log("ColorPicker: current value before update", value);
-
-    // Оновлюємо значення та диспатчимо подію
     value = color;
-    console.log("ColorPicker: value after assignment", value);
-
     dispatch("change", { value: color });
-    console.log("ColorPicker: change event dispatched with", color);
-
-    // Закриваємо дропдаун після вибору
     isOpen = false;
   }
 
   function openColorPicker() {
     logService.action('Click: "Відкрити палітру кольорів" (ColorPicker)');
     isOpen = false;
-    // Відкриваємо нативний color picker
     const input = document.createElement("input");
     input.type = "color";
     input.value = value;
@@ -65,7 +52,6 @@
     isOpen = !isOpen;
   }
 
-  // Закриваємо дропдаун при кліку поза ним
   function handleClickOutside(event: MouseEvent) {
     if (!(event.target as Element).closest(".color-picker")) {
       isOpen = false;
@@ -75,17 +61,18 @@
 
 <svelte:window on:click={handleClickOutside} />
 
-<div class="color-picker">
+<div class="color-picker" data-testid="{dataTestId}-container">
   <button
     class="color-preview"
     style="background-color: {currentValue}"
     on:click={toggleDropdown}
     use:customTooltip={"Обрати колір"}
     aria-label="Обрати колір гравця"
+    data-testid="{dataTestId}-trigger"
   ></button>
 
   {#if isOpen}
-    <div class="color-dropdown">
+    <div class="color-dropdown" data-testid="{dataTestId}-dropdown">
       <div class="color-grid">
         {#each predefinedColors.slice(0, 4) as color}
           <button
@@ -94,12 +81,14 @@
             on:click={() => selectColor(color)}
             use:customTooltip={`Обрати ${color}`}
             aria-label="Обрати колір {color}"
+            data-testid="{dataTestId}-option-{color}"
           ></button>
         {/each}
         <button
           class="color-option palette-button"
           on:click={openColorPicker}
           use:customTooltip={"Відкрити палітру кольорів"}
+          data-testid="{dataTestId}-palette-btn"
         >
           <SvgIcons name="theme" />
         </button>
@@ -110,6 +99,7 @@
             on:click={() => selectColor(color)}
             use:customTooltip={`Обрати ${color}`}
             aria-label="Обрати колір {color}"
+            data-testid="{dataTestId}-option-{color}"
           ></button>
         {/each}
       </div>
@@ -137,8 +127,7 @@
     transition:
       transform 0.2s,
       box-shadow 0.2s;
-    /* Видаляємо background, щоб не перекривати inline стилі */
-    padding: 0; /* Видаляємо дефолтний відступ кнопки */
+    padding: 0;
   }
 
   .color-preview:hover {

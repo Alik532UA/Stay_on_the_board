@@ -69,8 +69,10 @@
     <div class="player-list">
       {#each $playerStore.players as player (player.id)}
         <div class="player-row">
+          <!-- FIX: Передаємо унікальний dataTestId -->
           <ColorPicker
             value={player.color}
+            dataTestId="player-color-picker-{player.id}"
             on:change={(e) =>
               updatePlayer(player.id, { color: e.detail.value })}
           />
@@ -211,7 +213,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0; /* Prevent the button from shrinking */
+    flex-shrink: 0;
     align-self: center;
   }
   .remove-player-btn:disabled {

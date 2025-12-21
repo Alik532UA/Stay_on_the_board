@@ -26,6 +26,7 @@
         placeholder={$_("onlineMenu.chat.placeholder")}
         on:keydown={handleKeydown}
         maxlength="100"
+        data-testid="chat-input-field"
     />
     <button
         class="send-icon-btn"
