@@ -5,64 +5,13 @@
     type KeybindingAction,
   } from "$lib/stores/gameSettingsStore";
   import { onMount } from "svelte";
-  import { customTooltip } from "$lib/actions/customTooltip.js";
   import { userActionService } from "$lib/services/userActionService";
   import { isModalOpen } from "$lib/stores/isModalOpenStore";
   import { get } from "svelte/store";
+  import KeybindingButton from "./KeybindingButton.svelte";
+  import { actionGroups } from "$lib/config/hotkeyConfig";
 
   let listeningFor: { action: KeybindingAction; index: number } | null = null;
-
-  const actionGroups: { title: string; actions: KeybindingAction[] }[] = [
-    {
-      title: "controlsPage.mainMovement",
-      actions: [
-        "up-left",
-        "up",
-        "up-right",
-        "left",
-        "right",
-        "down-left",
-        "down",
-        "down-right",
-      ],
-    },
-    {
-      title: "controlsPage.gameActions",
-      actions: ["confirm", "no-moves"],
-    },
-    {
-      title: "controlsPage.gameSettings",
-      actions: [
-        "toggle-block-mode",
-        "toggle-board",
-        "increase-board",
-        "decrease-board",
-        "toggle-speech",
-        "auto-hide-board",
-      ],
-    },
-    {
-      title: "controlsPage.distanceSelection",
-      actions: [
-        "distance-1",
-        "distance-2",
-        "distance-3",
-        "distance-4",
-        "distance-5",
-        "distance-6",
-        "distance-7",
-        "distance-8",
-      ],
-    },
-    {
-      title: "controlsPage.navigation",
-      actions: ["main-menu"],
-    },
-    {
-      title: "controlsPage.general",
-      actions: ["show-help", "toggle-theme", "toggle-language"],
-    },
-  ];
 
   $: keybindings = $gameSettingsStore.keybindings;
 
@@ -122,19 +71,6 @@
       window.removeEventListener("keydown", handleKeydown);
     };
   });
-
-  function formatKeyCode(code: string) {
-    if (!code) return "N/A";
-    return code
-      .replace(/^Key/, "")
-      .replace(/^Digit/, "")
-      .replace(/^Numpad/, "NumPad ")
-      .replace("Decimal", ".")
-      .replace("Multiply", "*")
-      .replace("Divide", "/")
-      .replace("Add", "+")
-      .replace("Subtract", "-");
-  }
 </script>
 
 <div class="hotkeys-tab">
@@ -147,24 +83,14 @@
           >
           <div class="key-buttons-container">
             {#each keybindings[action] || [] as key, i}
-              <div class="key-button-wrapper">
-                <button
-                  class="key-button"
-                  class:listening={listeningFor?.action === action &&
-                    listeningFor?.index === i}
-                  class:conflict={conflicts.has(key)}
-                  on:click={() => listenForKey(action, i)}
-                >
-                  {listeningFor?.action === action && listeningFor?.index === i
-                    ? $_("controlsPage.pressKey")
-                    : formatKeyCode(key)}
-                </button>
-                <button
-                  class="remove-key-btn"
-                  use:customTooltip={$_("controlsPage.removeKey")}
-                  on:click={() => removeKey(action, i)}>×</button
-                >
-              </div>
+              <KeybindingButton
+                keyName={key}
+                isListening={listeningFor?.action === action &&
+                  listeningFor?.index === i}
+                hasConflict={conflicts.has(key)}
+                on:click={() => listenForKey(action, i)}
+                on:remove={() => removeKey(action, i)}
+              />
             {/each}
             {#if (keybindings[action]?.length || 0) < 8}
               {#if listeningFor?.action === action && listeningFor?.index === -1}
@@ -239,65 +165,6 @@
     align-items: center;
     justify-content: flex-end;
     flex-grow: 1;
-  }
-
-  .key-button-wrapper {
-    position: relative;
-  }
-
-  .key-button {
-    min-width: 50px;
-    text-align: center;
-    padding: 0.5rem 1rem;
-    border: var(--global-border-width) solid var(--border-color);
-    background: var(--control-bg);
-    color: var(--text-primary);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: monospace;
-    font-size: 0.9em;
-  }
-
-  .key-button:hover {
-    border-color: var(--control-selected);
-    color: var(--control-selected);
-  }
-
-  .key-button.listening {
-    background: var(--control-selected);
-    color: var(--control-selected-text);
-    font-style: italic;
-  }
-
-  .key-button.conflict {
-    border-color: var(--error-color);
-    box-shadow: 0 0 5px var(--error-color);
-  }
-
-  .remove-key-btn {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: none;
-    background: var(--error-color);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s;
-    font-size: 14px;
-    line-height: 1;
-  }
-
-  .key-button-wrapper:hover .remove-key-btn {
-    opacity: 1;
   }
 
   .add-key-btn {

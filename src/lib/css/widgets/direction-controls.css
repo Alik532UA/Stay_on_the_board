@@ -1,0 +1,184 @@
+/* Global styles for shared button appearance in Direction Controls */
+
+.dir-btn,
+.dist-btn,
+.control-btn {
+  border-radius: 16px;
+  border: var(--global-border-width) solid var(--border-color, #444);
+  background: var(--control-bg, #222);
+  color: var(--text-primary, #fff);
+  cursor: pointer;
+  transition:
+    background 0.25s,
+    box-shadow 0.25s,
+    color 0.2s,
+    transform 0.15s,
+    border-color 0.25s;
+  box-shadow: 0 2px 16px 0 var(--shadow-color, #0002);
+  backdrop-filter: blur(6px);
+  outline: none;
+  position: relative;
+  z-index: 1;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 2em;
+  width: 70px;
+  height: 70px;
+  font-family: "M PLUS Rounded 1c", sans-serif !important;
+}
+
+.dir-btn:disabled,
+.dist-btn:disabled,
+.control-btn:disabled,
+.confirm-btn:disabled,
+.no-moves-btn:disabled,
+.voice-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.dir-btn.active {
+  background: var(--control-selected, #ff9800);
+  color: var(--control-selected-text, #fff);
+  border-color: var(--control-selected, #ff9800);
+  transform: scale(1.1);
+  box-shadow: 0 4px 24px 0 var(--shadow-color, #0004);
+}
+
+.control-btn.center-info.confirm-btn-active {
+  background: #43a047 !important;
+  color: #fff !important;
+}
+
+#center-info {
+  border: none !important;
+  font-family: "M PLUS Rounded 1c", sans-serif !important;
+}
+
+#center-info:not(.confirm-btn-active):not(.computer-move-display):not(.direction-distance-state) {
+  background: transparent !important;
+}
+
+#center-info.confirm-btn-active {
+  background: #43a047 !important;
+  color: #fff !important;
+  border-color: #43a047 !important;
+  animation: pulse-green 1.5s infinite !important;
+  cursor: pointer !important;
+}
+
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 0 0 #43a047;
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(67, 160, 71, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 #43a047;
+  }
+}
+
+#center-info.confirm-btn-active:hover {
+  background: #2e7d32 !important;
+  border-color: #2e7d32 !important;
+  transform: scale(1.02);
+}
+
+#center-info.computer-move-display {
+  background: orange !important;
+  color: #fff !important;
+  font-weight: bold !important;
+  border: none !important;
+  cursor: default !important;
+}
+
+.dist-btn {
+  width: 50px;
+  height: 50px;
+  font-size: 1.5em;
+  border-radius: 16px;
+  border: var(--global-border-width) solid var(--border-color, #444);
+  background: var(--control-bg, #222);
+  color: var(--text-primary, #fff);
+  cursor: pointer;
+  transition:
+    background 0.25s,
+    color 0.2s,
+    transform 0.15s;
+}
+
+.dist-btn.active {
+  background: var(--control-selected, #ff9800);
+  color: var(--control-selected-text, #fff);
+  border-color: var(--control-selected, #ff9800);
+  transform: scale(1.1);
+}
+
+.confirm-btn,
+.no-moves-btn,
+.voice-btn {
+  background: #43a047cc;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  min-height: 52px;
+  width: 90%;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    background 0.25s,
+    transform 0.15s;
+}
+
+.confirm-btn.disabled {
+  background: rgba(85, 85, 85, 0.3);
+  color: #999;
+  cursor: pointer;
+}
+
+.confirm-btn:not(.disabled):hover {
+  background: #2e7d32;
+  transform: scale(1.02);
+}
+
+.no-moves-btn {
+  background: #ffb300;
+  color: #222;
+}
+
+.no-moves-btn:hover {
+  background: #f57c00;
+  transform: scale(1.02);
+}
+
+.voice-btn {
+  background: #00bcd4;
+  color: #fff;
+}
+
+.voice-btn:hover {
+  background: #0097a7;
+  transform: scale(1.02);
+}
+
+.voice-btn.active {
+  background: #e53935;
+  color: #fff;
+}
+
+.voice-btn:disabled {
+  background: #757575;
+  cursor: not-allowed;
+}
+
+.voice-btn:disabled:hover {
+  background: #757575;
+  transform: none;
+}
