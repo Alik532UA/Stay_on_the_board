@@ -75,30 +75,26 @@
     }
   }
 
-  function showFaqModal() {
+  // FIX: Додано ключове слово async, щоб дозволити використання await всередині
+  async function showFaqModal() {
+    // Для чистоти коду виносимо імпорт в змінну
+    const FAQModal = (await import("./FAQModal.svelte")).default;
+
     modalStore.showModal({
-      titleKey: "faq.title",
       dataTestId: "faq-modal",
-      content: { isFaq: true },
-      buttons: [
-        {
-          textKey: "rulesPage.title",
-          onClick: () => {
-            goto(`${base}/rules`);
-            modalStore.closeModal();
-          },
-          customClass: "blue-btn",
+      component: FAQModal,
+      variant: "menu",
+      buttons: [],
+      props: {
+        onOk: () => {
+          modalStore.closeModal();
+          userActionService.navigateToGame();
         },
-        {
-          textKey: "modal.ok",
-          primary: true,
-          isHot: true,
-          onClick: () => {
-            modalStore.closeModal();
-            userActionService.navigateToGame();
-          },
+        onRules: () => {
+          goto(`${base}/rules`);
+          modalStore.closeModal();
         },
-      ],
+      },
     });
   }
 </script>

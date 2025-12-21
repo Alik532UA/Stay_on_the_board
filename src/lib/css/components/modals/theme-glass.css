@@ -3,7 +3,7 @@
 /* Overlay: Прозоріший або інший ефект, якщо треба */
 .modal-overlay.style-glass {
     /* Можна змінити прозорість, якщо треба */
-    background: rgba(0, 0, 0, 0.6) !important;
+    background: rgba(0, 0, 0, 0.8) !important;
 }
 
 /* Window: Контейнер на весь екран */

@@ -8,6 +8,7 @@ import { speakText } from './speechService';
 import type { Player } from '$lib/models/player';
 import type { GameOverPayload, PlayerScoreResult, FinalScoreDetails } from '$lib/stores/gameOverStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
+import GameOverContent from '$lib/components/modals/GameOverContent.svelte';
 
 interface GameOverModalContent {
   reasonKey: string;
@@ -58,41 +59,33 @@ function showGameOverModal(payload: GameOverPayload) {
     speakText(title, lang, voiceURI, undefined);
   }
 
+  // FIX: Використовуємо variant="menu" і передаємо колбеки через props
   modalStore.showModal({
-    titleKey: titleKey,
     content: content,
-    props: { winners: winners.map((w: Player) => w.name).join(', ') },
+    component: GameOverContent,
+    variant: 'menu',
+    buttons: [], // Кнопки тепер всередині компонента
     closable: false,
     closeOnOverlayClick: false,
     dataTestId: 'game-over-modal',
-    buttons: [
-      {
-        textKey: 'modal.playAgain',
-        primary: true,
-        onClick: () => {
-          gameEventBus.dispatch('ReplayGame');
-          const uiState = get(uiStateStore);
-          if (uiState.intendedGameType !== 'online') {
-            modalStore.closeAllModals();
-          }
-        },
-        dataTestId: 'play-again-btn'
+    props: {
+      titleKey,
+      titleValues: { winners: winners.map((w: Player) => w.name).join(', '), winnerName: winners[0]?.name },
+      mode: 'game-over',
+      onPlayAgain: () => {
+        gameEventBus.dispatch('ReplayGame');
+        const uiState = get(uiStateStore);
+        if (uiState.intendedGameType !== 'online') {
+          modalStore.closeAllModals();
+        }
       },
-      {
-        textKey: 'modal.watchReplay',
-        onClick: () => {
-          gameEventBus.dispatch('RequestReplay');
-        },
-        dataTestId: 'watch-replay-btn'
+      onWatchReplay: () => {
+        gameEventBus.dispatch('RequestReplay');
       },
-      {
-        textKey: 'modal.mainMenu',
-        onClick: () => {
-          navigationService.goToMainMenu();
-        },
-        dataTestId: 'game-over-main-menu-btn'
+      onMainMenu: () => {
+        navigationService.goToMainMenu();
       }
-    ]
+    }
   });
 }
 
@@ -123,7 +116,7 @@ function showBoardResizeModal(newSize: number) {
 export const modalService = {
   showModal: modalStore.showModal,
   closeModal: modalStore.closeModal,
-  closeAllModals: modalStore.closeAllModals, // FIX: Додано експорт
+  closeAllModals: modalStore.closeAllModals,
   showGameOverModal,
   showBoardResizeModal,
   subscribe: modalStore.subscribe
