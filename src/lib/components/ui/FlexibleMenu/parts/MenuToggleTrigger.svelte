@@ -74,7 +74,7 @@
     /* Position-Specific Toggle Styles */
 
     /* Bottom: Trigger on Top */
-    .position-bottom .toggle-trigger {
+    .toggle-trigger.position-bottom {
         width: 80px;
         height: 48px;
         top: 0;
@@ -89,7 +89,7 @@
     }
 
     /* Top: Trigger on Bottom */
-    .position-top .toggle-trigger {
+    .toggle-trigger.position-top {
         width: 80px;
         height: 48px;
         bottom: 0;
@@ -104,7 +104,7 @@
     }
 
     /* Left: Trigger on Right */
-    .position-left .toggle-trigger {
+    .toggle-trigger.position-left {
         width: 48px;
         height: 80px;
         right: 0;
@@ -120,7 +120,7 @@
     }
 
     /* Right: Trigger on Left */
-    .position-right .toggle-trigger {
+    .toggle-trigger.position-right {
         width: 48px;
         height: 80px;
         left: 0;
