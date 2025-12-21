@@ -2,38 +2,30 @@
     import { _ } from "svelte-i18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import { fade, fly } from "svelte/transition";
-    import { onMount, onDestroy, afterUpdate } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import { roomService, type ChatMessage } from "$lib/services/roomService";
     import type { Unsubscribe } from "firebase/firestore";
-    import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import NotoEmoji from "$lib/components/NotoEmoji.svelte";
+    import ChatMessagesList from "./chat/ChatMessagesList.svelte";
+    import ChatInput from "./chat/ChatInput.svelte";
 
     export let roomId: string;
     export let playerId: string;
     export let playerName: string;
     export let playerColor: string = "#ffd700"; // Default gold
-
-    // Новий проп для керування режимом відображення
     export let variant: "floating" | "embedded" = "floating";
 
-    // Якщо embedded, чат завжди відкритий
     let isOpen = variant === "embedded";
     let messages: ChatMessage[] = [];
-    let newMessage = "";
     let unsubscribe: Unsubscribe | null = null;
-    let chatContainer: HTMLElement;
     let hasUnread = false;
 
-    // Toggle chat visibility (тільки для floating)
+    // Toggle chat visibility (only for floating)
     function toggleChat() {
         if (variant === "embedded") return;
         isOpen = !isOpen;
         if (isOpen) {
             hasUnread = false;
-            setTimeout(() => {
-                if (chatContainer)
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 50);
         }
     }
 
@@ -56,48 +48,11 @@
         if (unsubscribe) unsubscribe();
     });
 
-    afterUpdate(() => {
-        if (isOpen && chatContainer) {
-            // Auto-scroll logic can be improved, but keeping simple for now
-        }
-    });
-
-    async function sendMessage() {
-        if (!newMessage.trim()) return;
-        const text = newMessage.trim();
-        newMessage = "";
+    async function handleSend(e: CustomEvent<string>) {
+        const text = e.detail;
         await roomService.sendMessage(roomId, playerId, playerName, text);
-
-        setTimeout(() => {
-            if (chatContainer)
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-        }, 50);
-    }
-
-    function handleKeydown(e: KeyboardEvent) {
-        if (e.key === "Enter") {
-            sendMessage();
-        }
-    }
-
-    function getMessageStyle(msg: ChatMessage) {
-        if (msg.senderId !== playerId) return "";
-        let bg = playerColor;
-        if (bg.startsWith("#") && bg.length === 7) {
-            bg += "33";
-        }
-        let border = playerColor;
-        if (border.startsWith("#") && border.length === 7) {
-            border += "80";
-        }
-        return `background-color: ${bg}; border-color: ${border};`;
     }
 </script>
-
-<!-- 
-    Якщо variant="embedded", ми не рендеримо обгортку .chat-widget-container, 
-    а рендеримо .chat-window прямо в потоці документа з класом .embedded
--->
 
 {#if variant === "floating"}
     <div class="chat-widget-container">
@@ -114,40 +69,8 @@
                     </button>
                 </div>
 
-                <div class="messages-list" bind:this={chatContainer}>
-                    {#if messages.length === 0}
-                        <div class="empty-chat">
-                            {$_("onlineMenu.chat.empty")}
-                        </div>
-                    {/if}
-                    {#each messages as msg (msg.id)}
-                        <div
-                            class="message"
-                            class:my-message={msg.senderId === playerId}
-                            style={getMessageStyle(msg)}
-                        >
-                            <div class="sender">{msg.senderName}</div>
-                            <div class="text">{msg.text}</div>
-                        </div>
-                    {/each}
-                </div>
-
-                <div class="input-area">
-                    <input
-                        type="text"
-                        bind:value={newMessage}
-                        placeholder={$_("onlineMenu.chat.placeholder")}
-                        on:keydown={handleKeydown}
-                        maxlength="100"
-                    />
-                    <button
-                        class="send-icon-btn"
-                        on:click={sendMessage}
-                        data-testid="chat-send-btn"
-                    >
-                        <SvgIcons name="arrow-up" width="18" height="18" />
-                    </button>
-                </div>
+                <ChatMessagesList {messages} {playerId} {playerColor} />
+                <ChatInput on:send={handleSend} />
             </div>
         {/if}
 
@@ -170,39 +93,8 @@
 {:else}
     <!-- EMBEDDED VARIANT -->
     <div class="chat-window embedded">
-        <!-- Header is optional in embedded mode, usually handled by modal -->
-        <div class="messages-list" bind:this={chatContainer}>
-            {#if messages.length === 0}
-                <div class="empty-chat">{$_("onlineMenu.chat.empty")}</div>
-            {/if}
-            {#each messages as msg (msg.id)}
-                <div
-                    class="message"
-                    class:my-message={msg.senderId === playerId}
-                    style={getMessageStyle(msg)}
-                >
-                    <div class="sender">{msg.senderName}</div>
-                    <div class="text">{msg.text}</div>
-                </div>
-            {/each}
-        </div>
-
-        <div class="input-area">
-            <input
-                type="text"
-                bind:value={newMessage}
-                placeholder={$_("onlineMenu.chat.placeholder")}
-                on:keydown={handleKeydown}
-                maxlength="100"
-            />
-            <button
-                class="send-icon-btn"
-                on:click={sendMessage}
-                data-testid="chat-send-btn"
-            >
-                <SvgIcons name="arrow-up" width="18" height="18" />
-            </button>
-        </div>
+        <ChatMessagesList {messages} {playerId} {playerColor} />
+        <ChatInput on:send={handleSend} />
     </div>
 {/if}
 
@@ -318,101 +210,6 @@
     .close-btn:hover {
         background: rgba(255, 255, 255, 0.1);
         color: var(--text-primary);
-    }
-
-    .messages-list {
-        flex: 1;
-        overflow-y: auto;
-        padding: 16px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .empty-chat {
-        margin: auto;
-        color: var(--text-secondary);
-        font-style: italic;
-        font-size: 0.9em;
-    }
-
-    .message {
-        max-width: 85%;
-        padding: 8px 12px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.08);
-        align-self: flex-start;
-        font-size: 0.9rem;
-        line-height: 1.4;
-        word-break: break-word;
-    }
-
-    .message.my-message {
-        align-self: flex-end;
-        color: var(--text-primary);
-        border: 1px solid transparent;
-    }
-
-    .sender {
-        font-size: 0.7em;
-        opacity: 0.6;
-        margin-bottom: 4px;
-    }
-
-    .input-area {
-        padding: 12px;
-        background: rgba(0, 0, 0, 0.2);
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-
-    input {
-        flex: 1;
-        background: rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        padding: 8px 12px;
-        color: var(--text-primary);
-        font-size: 0.9rem;
-        transition: all 0.2s;
-    }
-
-    input:focus {
-        outline: none;
-        border-color: var(--text-accent);
-        background: rgba(0, 0, 0, 0.5);
-    }
-
-    .send-icon-btn {
-        width: 32px;
-        height: 32px;
-        min-width: 32px;
-        min-height: 32px;
-        flex: 0 0 32px;
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-        aspect-ratio: 1/1;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: var(--text-primary) !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: transform 0.2s;
-        flex-shrink: 0;
-    }
-
-    .send-icon-btn :global(svg) {
-        fill: currentColor;
-    }
-
-    .send-icon-btn:hover {
-        transform: scale(1.1);
     }
 
     @media (max-width: 480px) {
