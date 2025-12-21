@@ -39,9 +39,8 @@ export interface BoardResizePayload {
  */
 export interface ShowNoMovesModalPayload {
   playerType: 'human' | 'computer';
-  scoreDetails: any; // Можна уточнити тип, якщо він експортується
+  scoreDetails: any; // Можна уточнити тип, якщо він експортується (FinalScoreDetails)
   boardSize: number;
-  // FIX: Додаємо опціональний масив рахунків гравців для мультиплеєра
   playerScores?: Array<PlayerScoreResult & { playerName: string; playerColor: string; isWinner?: boolean; isLoser?: boolean }>;
 }
 
@@ -109,10 +108,10 @@ export interface GameEventPayloads {
   ShowNoMovesModal: ShowNoMovesModalPayload;
   new_move_added: NewMoveAddedPayload;
 
-  // Legacy/Other Events (можна додати за потреби)
-  GameStateChanged: any;
-  PlayerTurnStarted: any;
-  PlayerTurnEnded: any;
+  // Legacy/Other Events (Типізовано як словник замість any для безпеки)
+  GameStateChanged: Record<string, unknown>;
+  PlayerTurnStarted: Record<string, unknown>;
+  PlayerTurnEnded: Record<string, unknown>;
 }
 
 export type GameEventType = keyof GameEventPayloads;
