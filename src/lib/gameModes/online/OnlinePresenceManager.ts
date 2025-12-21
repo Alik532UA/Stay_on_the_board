@@ -1,6 +1,10 @@
 import { roomPlayerService } from "$lib/services/room/roomPlayerService";
 import { logService } from "$lib/services/logService";
-import type { OnlinePlayer } from "$lib/types/online";
+import type { OnlinePlayer, Room } from "$lib/types/online";
+import { modalStore } from '$lib/stores/modalStore';
+import { timeService } from '$lib/services/timeService';
+import ReconnectionModal from '$lib/components/modals/ReconnectionModal.svelte';
+import { get } from 'svelte/store';
 
 type DisconnectHandler = (playerId: string, disconnectStartedAt: number) => void;
 type ReconnectHandler = (playerId: string) => void;
@@ -19,11 +23,7 @@ export class OnlinePresenceManager {
     // Config constants
     private readonly HEARTBEAT_MS = 5000;
     private readonly MONITOR_MS = 2000;
-
-    // Час без активності, після якого гравець вважається "відключеним" (показ модалки)
     private readonly DISCONNECT_THRESHOLD_MS = 15000;
-
-    // Час після початку відключення, через який гравця видаляють з кімнати
     private readonly KICK_TIMEOUT_MS = 30000;
 
     public onPlayerDisconnect: DisconnectHandler | null = null;
@@ -47,45 +47,78 @@ export class OnlinePresenceManager {
         }
     }
 
+    // Новий метод для обробки оновлень кімнати (для клієнтів і хоста)
+    public handleRoomUpdate(room: Room): void {
+        if (room.status !== 'playing') return;
+
+        const players = Object.values(room.players);
+        const disconnectedPlayer = players.find(p => p.isDisconnected && p.id !== this.config.myPlayerId);
+        const currentModal = get(modalStore);
+
+        if (disconnectedPlayer) {
+            if (!currentModal.isOpen || currentModal.dataTestId !== 'reconnection-modal') {
+                logService.init(`[PresenceManager] Player ${disconnectedPlayer.name} disconnected. Pausing game.`);
+                timeService.pauseTurnTimer();
+
+                modalStore.showModal({
+                    titleKey: 'onlineMenu.waitingForReturn',
+                    titleValues: { name: disconnectedPlayer.name },
+                    dataTestId: 'reconnection-modal',
+                    content: {
+                        playerName: disconnectedPlayer.name,
+                        disconnectStartedAt: disconnectedPlayer.disconnectStartedAt || Date.now(),
+                        roomId: this.config.roomId,
+                        myPlayerId: this.config.myPlayerId
+                    },
+                    variant: 'standard',
+                    component: ReconnectionModal,
+                    closable: false,
+                    closeOnOverlayClick: false
+                });
+            }
+        } else {
+            if (currentModal.isOpen && currentModal.dataTestId === 'reconnection-modal') {
+                logService.init(`[PresenceManager] All players connected. Resuming game.`);
+                modalStore.closeModal();
+                timeService.resumeTurnTimer();
+            }
+        }
+    }
+
     private startHeartbeat(): void {
         const send = async () => {
-            // Якщо інтервал вже очищено (stop викликано), не виконуємо запит
             if (!this.heartbeatInterval) return;
 
             try {
                 await roomPlayerService.sendHeartbeat(this.config.roomId, this.config.myPlayerId);
             } catch (e: any) {
-                // Ігноруємо помилку, якщо документ не знайдено (кімната видалена)
                 if (e.code === 'not-found' || e.message?.includes('No document to update')) {
                     logService.init(`[Presence] Room ${this.config.roomId} not found. Stopping heartbeat.`);
-                    this.stop(); // Зупиняємо, бо кімнати більше немає
+                    this.stop();
                 } else {
                     console.warn("[Presence] Heartbeat failed", e);
                 }
             }
         };
 
-        // Виконуємо перший раз одразу
         send();
         this.heartbeatInterval = setInterval(send, this.HEARTBEAT_MS);
     }
 
     private startMonitoring(): void {
         this.monitorInterval = setInterval(async () => {
-            if (!this.config.isHost()) return; // Тільки Хост моніторить стан інших
+            if (!this.config.isHost()) return;
 
             const now = Date.now();
             const players = this.config.getPlayers();
 
             for (const player of players) {
-                // Не перевіряємо себе
                 if (player.id === this.config.myPlayerId) continue;
 
                 const lastSeen = player.lastSeen || player.joinedAt;
                 const timeSinceSeen = now - lastSeen;
 
                 if (!player.isDisconnected) {
-                    // 1. Виявлення відключення
                     if (timeSinceSeen > this.DISCONNECT_THRESHOLD_MS) {
                         logService.init(`[Presence] Player ${player.name} timed out (${Math.round(timeSinceSeen / 1000)}s). Marking disconnected.`);
 
@@ -94,12 +127,9 @@ export class OnlinePresenceManager {
                                 isDisconnected: true,
                                 disconnectStartedAt: now
                             });
-                        } catch (e) {
-                            // Ігноруємо помилки оновлення, якщо кімната зникла
-                        }
+                        } catch (e) { }
                     }
                 } else {
-                    // 2. Перевірка на повернення
                     if (timeSinceSeen < this.DISCONNECT_THRESHOLD_MS) {
                         logService.init(`[Presence] Player ${player.name} returned! Removing disconnected flag.`);
                         try {
@@ -109,7 +139,6 @@ export class OnlinePresenceManager {
                             });
                         } catch (e) { }
                     }
-                    // 3. Перевірка на тайм-аут кіку
                     else if (player.disconnectStartedAt && (now - player.disconnectStartedAt > this.KICK_TIMEOUT_MS)) {
                         logService.init(`[Presence] Player ${player.name} kick timer expired (>30s). Kicking from room.`);
                         try {
