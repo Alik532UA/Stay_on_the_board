@@ -9,7 +9,7 @@
     lastPlayerMove,
     distanceRows,
     previousPlayerColor,
-  } from "$lib/stores/derivedState"; // FIX: Removed isPauseBetweenMoves import
+  } from "$lib/stores/derivedState";
   import { modalStore } from "$lib/stores/modalStore";
   import DirectionControls from "./DirectionControls.svelte";
   import { getCenterInfoState } from "$lib/utils/centerInfoUtil";
@@ -32,7 +32,6 @@
     isConfirmButtonDisabled: $isConfirmButtonDisabled,
   });
 
-  // FIX: Removed isPauseBetweenMoves from props
   $: centerInfoProps = getCenterInfoState({
     selectedDirection: selectedDirection,
     selectedDistance,
@@ -120,12 +119,14 @@ ${generalLogs}`;
 
 {#if $uiStateStore}
   <div class="game-controls-panel" data-testid="controls-panel">
+    <!-- FIX: Додано data-testid для заголовка, який вмикає дебаг -->
     <div
       class="select-direction-label"
       on:click={handleLabelClick}
       on:keydown={handleLabelClick}
       role="button"
       tabindex="0"
+      data-testid="controls-panel-title"
     >
       {$_("gameControls.selectDirectionAndDistance")}
     </div>

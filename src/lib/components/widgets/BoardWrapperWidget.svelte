@@ -1,24 +1,27 @@
-<!--
-ВАЖЛИВО! Архітектурний принцип: пауза (затримка) після ходу гравця реалізується лише у візуалізації дошки (animationStore),
-логіка гри та center-info оновлюються миттєво і не залежать від цієї паузи. Це гарантує SoC, SSoT, UDF.
--->
 <script lang="ts">
-  import { gameSettingsStore, type GameSettingsState } from '$lib/stores/gameSettingsStore.js';
-  import { modalStore } from '$lib/stores/modalStore';
-  import { slide } from 'svelte/transition';
-  import { quintOut } from 'svelte/easing';
-  import { animationStore } from '$lib/stores/animationStore.js';
-  import { visualPosition, visualCellVisitCounts, currentPlayer, availableMoves } from '$lib/stores/derivedState.ts';
-  import { derived, get } from 'svelte/store';
-  import BoardCell from './BoardCell.svelte';
-  import PlayerPiece from './PlayerPiece.svelte';
-  import { logService } from '$lib/services/logService.js';
-  import { isCellBlocked } from '$lib/utils/boardUtils.ts';
-  import { boardStore } from '$lib/stores/boardStore';
-  import { uiStateStore } from '$lib/stores/uiStateStore';
-  import BoardHiddenInfoWidget from './BoardHiddenInfoWidget.svelte';
+  import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
+  import { modalStore } from "$lib/stores/modalStore";
+  import { slide } from "svelte/transition";
+  import { quintOut } from "svelte/easing";
+  import { animationStore } from "$lib/stores/animationStore.js";
+  import {
+    visualPosition,
+    visualCellVisitCounts,
+    availableMoves,
+    currentPlayer,
+  } from "$lib/stores/derivedState.ts";
+  import { derived, get } from "svelte/store";
+  import BoardCell from "./BoardCell.svelte";
+  import PlayerPiece from "./PlayerPiece.svelte";
+  import { logService } from "$lib/services/logService.js";
+  import { isCellBlocked } from "$lib/utils/boardUtils.ts";
+  import { boardStore } from "$lib/stores/boardStore";
+  import { uiStateStore } from "$lib/stores/uiStateStore";
+  import BoardHiddenInfoWidget from "./BoardHiddenInfoWidget.svelte";
 
-  const boardSize = derived(boardStore, $boardStore => $boardStore ? Number($boardStore.boardSize) : 0);
+  const boardSize = derived(boardStore, ($boardStore) =>
+    $boardStore ? Number($boardStore.boardSize) : 0,
+  );
 
   function slideAndScale(node: HTMLElement, params: any) {
     const slideTransition = slide(node, params);
@@ -26,16 +29,19 @@
       duration: params.duration,
       easing: params.easing,
       css: (t: number, u: number) => {
-        const originalCss = slideTransition.css ? slideTransition.css(t, u) : '';
-        // Svelte's slide transition can produce a unitless `min-height: 0`, which causes a warning.
-        // This replacement ensures the value has units.
-        const fixedCss = originalCss.replace(/min-height:\s*0;?/, 'min-height: 0px;');
+        const originalCss = slideTransition.css
+          ? slideTransition.css(t, u)
+          : "";
+        const fixedCss = originalCss.replace(
+          /min-height:\s*0;?/,
+          "min-height: 0px;",
+        );
         return `
           ${fixedCss}
           transform-origin: top center;
           transform: scale(${t});
         `;
-      }
+      },
     };
   }
 
@@ -45,25 +51,23 @@
       return (
         $gameSettingsStore.showMoves &&
         !$animationStore.isAnimating &&
-        $currentPlayer?.type === 'human'
+        $currentPlayer?.type === "human"
       );
-    }
+    },
   );
 
-  
-
   function showBoardClickHint(e: Event) {
-    if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+    if (e && typeof e.stopPropagation === "function") e.stopPropagation();
     modalStore.showModal({
-      titleKey: 'modal.boardClickTitle',
-      contentKey: 'modal.boardClickContent',
-      buttons: [{ textKey: 'modal.ok', primary: true, isHot: true }],
-      dataTestId: 'board-click-modal'
+      titleKey: "modal.boardClickTitle",
+      contentKey: "modal.boardClickContent",
+      buttons: [{ textKey: "modal.ok", primary: true, isHot: true }],
+      dataTestId: "board-click-modal",
     });
   }
 
   function handleBoardWrapperKeyDown(event: KeyboardEvent) {
-    if (event.code === 'Enter' || event.code === 'Space') {
+    if (event.code === "Enter" || event.code === "Space") {
       showBoardClickHint(event);
     }
   }
@@ -73,7 +77,7 @@
   $: if (!$gameSettingsStore.showBoard && $uiStateStore.showBoardHiddenInfo) {
     setTimeout(() => {
       showHiddenInfoWidget = true;
-    }, 500); // Delay matches the board's disappearance animation
+    }, 500);
   } else {
     showHiddenInfoWidget = false;
   }
@@ -82,21 +86,28 @@
     event.preventDefault();
     const $boardState = get(boardStore);
     const $settings = get(gameSettingsStore);
-    if ($boardState && $settings.blockModeEnabled && !(row === $boardState.playerRow && col === $boardState.playerCol)) {
+    if (
+      $boardState &&
+      $settings.blockModeEnabled &&
+      !(row === $boardState.playerRow && col === $boardState.playerCol)
+    ) {
       const visualCounts = get(visualCellVisitCounts) as Record<string, number>;
       const blocked = isCellBlocked(row, col, visualCounts, $settings);
-      logService.ui(`${blocked ? 'Розблокування' : 'Блокування'} клітинки [${row},${col}]`);
+      logService.ui(
+        `${blocked ? "Розблокування" : "Блокування"} клітинки [${row},${col}]`,
+      );
     }
   }
 
   $: if ($gameSettingsStore.showBoard && $uiStateStore.showBoardHiddenInfo) {
-    uiStateStore.update(s => ({ ...s, showBoardHiddenInfo: false }));
+    uiStateStore.update((s) => ({ ...s, showBoardHiddenInfo: false }));
   }
 </script>
 
 {#if $boardStore}
   {#key $boardStore.boardSize}
     {#if $gameSettingsStore.showBoard}
+      <!-- FIX: Додано data-testid для обгортки дошки -->
       <div
         class="board-bg-wrapper game-content-block"
         style="--board-size: {$boardSize}"
@@ -106,11 +117,21 @@
         tabindex="0"
         aria-label="Ігрове поле"
         transition:slideAndScale={{ duration: 500, easing: quintOut }}
+        data-testid="board-wrapper"
       >
-        <div class="game-board" style="--board-size: {$boardSize}" role="grid" data-testid="game-board">
+        <div
+          class="game-board"
+          style="--board-size: {$boardSize}"
+          role="grid"
+          data-testid="game-board"
+        >
           {#each Array($boardSize) as _, rowIdx (rowIdx)}
             {#each Array($boardSize) as _, colIdx (colIdx)}
-              {@const move = $showAvailableMoves ? $availableMoves.find(m => m.row === rowIdx && m.col === colIdx) : undefined}
+              {@const move = $showAvailableMoves
+                ? $availableMoves.find(
+                    (m) => m.row === rowIdx && m.col === colIdx,
+                  )
+                : undefined}
               <BoardCell
                 {rowIdx}
                 {colIdx}
@@ -118,11 +139,12 @@
                 gameSettings={$gameSettingsStore}
                 isAvailable={!!move}
                 isPenalty={move?.isPenalty || false}
-                on:cellRightClick={(e) => onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
+                on:cellRightClick={(e) =>
+                  onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
               />
             {/each}
           {/each}
-          
+
           {#if $gameSettingsStore.showPiece && $visualPosition.row !== null && $visualPosition.col !== null}
             <PlayerPiece
               row={$visualPosition.row}
@@ -132,12 +154,13 @@
           {/if}
         </div>
       </div>
-    {:else}
-      {#if showHiddenInfoWidget}
-        <div transition:slide={{ duration: 400, easing: quintOut }}>
-          <BoardHiddenInfoWidget />
-        </div>
-      {/if}
+    {:else if showHiddenInfoWidget}
+      <div
+        transition:slide={{ duration: 400, easing: quintOut }}
+        data-testid="board-hidden-info-container"
+      >
+        <BoardHiddenInfoWidget />
+      </div>
     {/if}
   {/key}
 {/if}
@@ -145,4 +168,3 @@
 <style>
   /* Стилі залишаються без змін */
 </style>
-

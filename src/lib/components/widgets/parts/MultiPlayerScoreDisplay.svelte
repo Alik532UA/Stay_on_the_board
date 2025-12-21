@@ -4,7 +4,6 @@
     import { customTooltip } from "$lib/actions/customTooltip.js";
     import type { ScoreState } from "$lib/stores/scoreStore";
     import type { Player } from "$lib/models/player";
-    import type { BonusHistoryItem } from "$lib/models/player";
 
     export let players: Player[] = [];
     export let scoreStore: ScoreState;
@@ -53,10 +52,15 @@
     }
 </script>
 
-<div class="score-display-multiplayer">
+<!-- FIX: Додано data-testid для контейнера -->
+<div
+    class="score-display-multiplayer"
+    data-testid="multiplayer-score-container"
+>
     <div class="score-label-multiplayer">{$_("gameBoard.scoreLabel")}</div>
     {#each players as player}
-        <div class="score-row">
+        <!-- FIX: Додано data-testid для рядка гравця -->
+        <div class="score-row" data-testid={`score-row-${player.id}`}>
             <span
                 class="player-name-plate"
                 style={getPlayerNameStyle(player.name)}>{player.name}</span
@@ -71,10 +75,15 @@
                     role="button"
                     tabindex="0"
                     use:customTooltip={"Натисніть для перегляду деталей балів"}
+                    data-testid={`score-value-${player.id}`}
                     >{player.score}</span
                 >
                 {#if player.roundScore && player.roundScore > 0}
-                    <span class="round-score">+{player.roundScore}</span>
+                    <span
+                        class="round-score"
+                        data-testid={`round-score-${player.id}`}
+                        >+{player.roundScore}</span
+                    >
                 {/if}
             </div>
         </div>
@@ -88,7 +97,9 @@
                     (e.key === "Enter" || e.key === " ") && showPenaltyInfo()}
                 use:customTooltip={$_("gameBoard.penaltyHint")}
                 role="button"
-                tabindex="0">Штраф: -{scoreStore.penaltyPoints}</span
+                tabindex="0"
+                data-testid="penalty-display"
+                >Штраф: -{scoreStore.penaltyPoints}</span
             >
         </div>
     {/if}
