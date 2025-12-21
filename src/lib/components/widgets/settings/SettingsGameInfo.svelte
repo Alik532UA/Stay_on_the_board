@@ -2,15 +2,19 @@
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
     import { _ } from "svelte-i18n";
     import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
-    // FIX: Видалено імпорт fitTextAction, оскільки ми використовуємо flex-wrap
 </script>
 
-<h3 class="settings-expander__section-title">
+<h3
+    class="settings-expander__section-title"
+    data-testid="settings-game-info-title"
+>
     {$_("settings.gameInfoWidget.title")}
 </h3>
-<!-- FIX: Видалено use:fitTextAction -->
+
+<!-- FIX: Додано dataTestId для контейнера групи -->
 <ButtonGroup
     className="settings-expander__button-group--three"
+    dataTestId="settings-game-info-group"
     options={[
         {
             value: "hidden",

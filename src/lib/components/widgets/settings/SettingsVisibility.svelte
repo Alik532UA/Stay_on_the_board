@@ -2,7 +2,6 @@
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
     import { _ } from "svelte-i18n";
     import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
-    // FIX: Видалено імпорт fitTextAction
     import { get } from "svelte/store";
 
     export let isCompetitiveMode = false;
@@ -64,7 +63,7 @@
     }
 </script>
 
-<!-- FIX: Видалено use:fitTextAction -->
+<!-- FIX: Додано dataTestId для контейнера групи -->
 <ButtonGroup
     options={[
         $_("settings.visibility.hidden"),
@@ -78,4 +77,5 @@
         onClick: toggleFunctions[i],
     }))}
     className={isCompetitiveMode ? "locked-setting" : ""}
+    dataTestId="settings-visibility-group"
 />

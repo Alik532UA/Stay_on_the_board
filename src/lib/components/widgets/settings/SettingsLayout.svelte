@@ -8,9 +8,16 @@
     import SvgIcons from "$lib/components/SvgIcons.svelte";
 </script>
 
-<div class="settings-expander__setting-item">
+<!-- FIX: Додано data-testid для контейнера -->
+<div
+    class="settings-expander__setting-item"
+    data-testid="settings-layout-container"
+>
     <span class="settings-expander__label">{$_("ui.moveMenuItems")}</span>
-    <div style="display: flex; gap: 12px;">
+    <div
+        style="display: flex; gap: 12px;"
+        data-testid="settings-layout-buttons"
+    >
         <button
             data-testid="settings-expander-column-style-fixed-btn"
             class="settings-expander__square-btn"

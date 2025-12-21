@@ -1,25 +1,13 @@
 <script lang="ts">
   import { gameModeStore } from "$lib/stores/gameModeStore";
-  import { goto } from "$app/navigation";
-  import { base } from "$app/paths";
-  import { userActionService } from "$lib/services/userActionService";
-  import { modalStore } from "$lib/stores/modalStore";
-  import { _ } from "svelte-i18n";
-  import { openVoiceSettingsModal } from "$lib/stores/uiStore";
-  import { uiStateStore } from "$lib/stores/uiStateStore";
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
+  import { userActionService } from "$lib/services/userActionService";
+  import { _ } from "svelte-i18n";
+  import { uiStateStore } from "$lib/stores/uiStateStore";
   import SvgIcons from "../SvgIcons.svelte";
-  import { get } from "svelte/store";
   import { onMount, tick } from "svelte";
-  import { columnStyleMode } from "$lib/stores/columnStyleStore";
-  import VoiceSettingsModalWrapper from "$lib/components/VoiceSettingsModalWrapper.svelte";
-  import { slide } from "svelte/transition";
   import { layoutStore } from "$lib/stores/layoutStore";
   import { logService } from "$lib/services/logService";
-  import ToggleButton from "../ToggleButton.svelte";
-  import { blurOnClick } from "$lib/utils/actions";
-  import { customTooltip } from "$lib/actions/customTooltip.js";
-  import { gameModeService } from "$lib/services/gameModeService";
   import { boardStore } from "$lib/stores/boardStore";
   import { layoutUpdateStore } from "$lib/stores/layoutUpdateStore";
   import { dev } from "$app/environment";
@@ -78,10 +66,6 @@
     }
   }
 
-  // FIX: Логіка блокування
-  // Якщо settingsLocked == true, то блокуємо ВСІМ (і хосту, і гостю).
-  // Якщо settingsLocked == false, то дозволяємо ВСІМ.
-  // Також блокуємо в timed режимі.
   $: isCompetitiveMode =
     $gameModeStore.activeMode === "timed" ||
     ($gameModeStore.activeMode === "local" &&
@@ -92,7 +76,11 @@
 </script>
 
 {#if $boardStore}
-  <div class="settings-expander {isOpen ? 'open' : ''}">
+  <!-- FIX: Додано data-testid для головного контейнера -->
+  <div
+    class="settings-expander {isOpen ? 'open' : ''}"
+    data-testid="settings-expander-widget"
+  >
     <div
       data-testid="settings-expander-summary"
       class="settings-expander__summary"
@@ -122,6 +110,7 @@
       class="settings-expander__content"
       bind:this={contentRef}
       style="max-height: {contentHeight}px; opacity: {isOpen ? 1 : 0};"
+      data-testid="settings-expander-content"
     >
       <SettingsBoardSize />
       <SettingsVisibility {isCompetitiveMode} />

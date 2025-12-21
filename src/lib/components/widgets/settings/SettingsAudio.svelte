@@ -18,7 +18,11 @@
     }
 </script>
 
-<div class="settings-expander__setting-item">
+<!-- FIX: Додано data-testid для контейнера -->
+<div
+    class="settings-expander__setting-item"
+    data-testid="settings-audio-container"
+>
     <ToggleButton
         label={$_("gameControls.speech")}
         checked={speechEnabled}
