@@ -1,6 +1,7 @@
 <script lang="ts">
     import EditableText from "$lib/components/ui/EditableText.svelte";
-    import { userProfileStore, authService } from "$lib/services/authService";
+    import { userProfileStore } from "$lib/services/auth/userProfileService";
+    import { authService } from "$lib/services/authService";
     import NotoEmoji from "$lib/components/NotoEmoji.svelte"; // Імпорт
 
     function handleNameChange(e: CustomEvent<string>) {

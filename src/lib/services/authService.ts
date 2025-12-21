@@ -2,7 +2,6 @@ import {
     getAuth,
     signInAnonymously,
     onAuthStateChanged,
-    updateProfile,
     linkWithCredential,
     EmailAuthProvider,
     signInWithEmailAndPassword,
@@ -10,42 +9,20 @@ import {
     signOut,
     reauthenticateWithCredential,
     deleteUser,
-    updatePassword, // Додано
+    updatePassword,
     type User
 } from 'firebase/auth';
 import { getFirebaseApp } from './firebaseService';
-import { writable, get } from 'svelte/store';
+import { writable } from 'svelte/store';
 import { logService } from './logService';
-import { doc, setDoc, getFirestore, getDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getFirestore, deleteDoc } from 'firebase/firestore';
 import { notificationService } from './notificationService';
 import { rewardsStore } from '$lib/stores/rewardsStore';
-import { appVersion } from '$lib/stores/versionStore';
+import { userProfileService } from './auth/userProfileService';
 
-export interface UserProfile {
-    uid: string;
-    displayName: string | null;
-    bestTimeScore: number;
-    isAnonymous: boolean;
-}
-
+// Re-export needed types or stores if we want to keep backward compatibility strictly,
+// BUT for this refactor we will update consumers to import from userProfileService directly.
 export const userStore = writable<User | null>(null);
-
-const getInitialProfile = (): UserProfile => {
-    if (typeof localStorage === 'undefined') {
-        return { uid: 'local', displayName: null, bestTimeScore: 0, isAnonymous: true };
-    }
-    const localName = localStorage.getItem('online_playerName');
-    const displayName = (localName === 'Player' || !localName) ? null : localName;
-
-    return {
-        uid: 'local',
-        displayName: displayName,
-        bestTimeScore: parseInt(localStorage.getItem('local_best_time_score') || '0'),
-        isAnonymous: true
-    };
-};
-
-export const userProfileStore = writable<UserProfile | null>(getInitialProfile());
 
 class AuthService {
     private auth;
@@ -60,7 +37,7 @@ class AuthService {
             if (user) {
                 logService.init(`[AuthService] User logged in: ${user.uid} (Anon: ${user.isAnonymous})`);
                 userStore.set(user);
-                await this.syncUserProfile(user);
+                await userProfileService.syncUserProfile(user);
             } else {
                 logService.init('[AuthService] No user logged in. Signing in anonymously...');
                 userStore.set(null);
@@ -90,7 +67,7 @@ class AuthService {
             // FIX: Примусово оновлюємо userStore, щоб UI миттєво відреагував на зміну isAnonymous
             userStore.set(result.user);
 
-            await this.syncUserProfile(result.user);
+            await userProfileService.syncUserProfile(result.user);
 
             notificationService.show({
                 type: 'success',
@@ -106,7 +83,7 @@ class AuthService {
 
     async loginEmailPassword(email: string, pass: string) {
         try {
-            this.clearLocalUserData();
+            userProfileService.clearLocalUserData();
             await signInWithEmailAndPassword(this.auth, email, pass);
             logService.action(`[AuthService] Logged in as ${email}`);
             return true;
@@ -122,14 +99,8 @@ class AuthService {
             await signOut(this.auth);
             logService.action('[AuthService] Logged out');
 
-            this.clearLocalUserData();
-
-            userProfileStore.set({
-                uid: 'local',
-                displayName: null,
-                bestTimeScore: 0,
-                isAnonymous: true
-            });
+            userProfileService.clearLocalUserData();
+            userProfileService.resetLocalProfile();
             rewardsStore.reset();
 
             notificationService.show({ type: 'info', messageRaw: 'Ви вийшли з акаунту.' });
@@ -140,7 +111,6 @@ class AuthService {
         }
     }
 
-    // === NEW: Change Password ===
     async changePassword(newPassword: string): Promise<boolean> {
         const user = this.auth.currentUser;
         if (!user) return false;
@@ -160,14 +130,6 @@ class AuthService {
         }
     }
 
-    private clearLocalUserData() {
-        if (typeof localStorage === 'undefined') return;
-        logService.init('[AuthService] Clearing local user data...');
-        localStorage.removeItem('local_best_time_score');
-        localStorage.removeItem('sotb_rewards');
-        localStorage.removeItem('online_playerName');
-    }
-
     async deleteAccount(password: string): Promise<boolean> {
         const user = this.auth.currentUser;
         if (!user || !user.email) return false;
@@ -183,7 +145,7 @@ class AuthService {
             await deleteUser(user);
             logService.action('[AuthService] User deleted from Auth');
 
-            this.clearLocalUserData();
+            userProfileService.clearLocalUserData();
 
             notificationService.show({ type: 'success', messageRaw: 'Акаунт успішно видалено.' });
             return true;
@@ -210,106 +172,10 @@ class AuthService {
         }
     }
 
+    // Proxy method if needed, or consumers should use userProfileService directly
     async updateNickname(name: string) {
-        const nameToSave = (name && name.trim() !== '' && name !== 'Player') ? name : null;
-
-        userProfileStore.update(s => s ? { ...s, displayName: nameToSave } : null);
-
-        if (typeof localStorage !== 'undefined') {
-            if (nameToSave) {
-                localStorage.setItem('online_playerName', nameToSave);
-            } else {
-                localStorage.removeItem('online_playerName');
-            }
-        }
-
         const user = this.auth.currentUser;
-        if (!user) return;
-
-        try {
-            await updateProfile(user, { displayName: nameToSave });
-            const userRef = doc(this.db, 'users', user.uid);
-
-            await setDoc(userRef, {
-                displayName: nameToSave,
-                lastActive: Date.now()
-            }, { merge: true });
-
-            logService.action(`[AuthService] Nickname updated to ${nameToSave}`);
-        } catch (error) {
-            logService.error('[AuthService] Update profile error', error);
-        }
-    }
-
-    private async syncUserProfile(user: User) {
-        const userRef = doc(this.db, 'users', user.uid);
-
-        rewardsStore.syncWithCloud(user.uid);
-
-        try {
-            const snap = await getDoc(userRef);
-
-            const localBest = typeof localStorage !== 'undefined' ? parseInt(localStorage.getItem('local_best_time_score') || '0') : 0;
-            const localNameRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('online_playerName') : null;
-            const localName = (localNameRaw === 'Player') ? null : localNameRaw;
-
-            if (snap.exists()) {
-                const data = snap.data();
-                const cloudBest = data.bestTimeScore || 0;
-                const cloudName = data.displayName || null;
-
-                const finalBest = Math.max(localBest, cloudBest);
-
-                const updates: any = { lastActive: Date.now() };
-                if (localBest > cloudBest) updates.bestTimeScore = localBest;
-
-                if (!cloudName && localName) updates.displayName = localName;
-
-                await setDoc(userRef, updates, { merge: true });
-
-                if (cloudBest > localBest && typeof localStorage !== 'undefined') {
-                    localStorage.setItem('local_best_time_score', cloudBest.toString());
-                }
-                if (cloudName && typeof localStorage !== 'undefined') {
-                    localStorage.setItem('online_playerName', cloudName);
-                }
-
-                userProfileStore.set({
-                    uid: user.uid,
-                    displayName: cloudName || localName,
-                    bestTimeScore: finalBest,
-                    isAnonymous: user.isAnonymous
-                });
-            } else {
-                const currentVersion = get(appVersion);
-                const initialData = {
-                    displayName: localName,
-                    bestTimeScore: localBest,
-                    createdAt: Date.now(),
-                    lastActive: Date.now(),
-                    createdVersion: currentVersion || 'unknown'
-                };
-                await setDoc(userRef, initialData);
-
-                userProfileStore.set({
-                    uid: user.uid,
-                    displayName: localName,
-                    bestTimeScore: localBest,
-                    isAnonymous: user.isAnonymous
-                });
-            }
-        } catch (e) {
-            logService.error('[AuthService] Sync profile failed', e);
-            const localBest = typeof localStorage !== 'undefined' ? parseInt(localStorage.getItem('local_best_time_score') || '0') : 0;
-            const localName = typeof localStorage !== 'undefined' ? localStorage.getItem('online_playerName') : null;
-
-            userProfileStore.set({
-                uid: user.uid,
-                displayName: localName === 'Player' ? null : localName,
-                bestTimeScore: localBest,
-                isAnonymous: user.isAnonymous
-            });
-        }
+        await userProfileService.updateNickname(name, user);
     }
 
     private handleAuthError(error: any) {
