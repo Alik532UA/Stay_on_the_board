@@ -7,7 +7,7 @@ import {
     collection,
     addDoc,
     serverTimestamp,
-    increment, // <--- IMPORTED
+    increment,
     type Unsubscribe,
     type DocumentReference,
     type Firestore
@@ -132,13 +132,35 @@ export class FirebaseGameStateSync implements IGameStateSync {
 
             await updateDoc(this._roomRef, {
                 [fieldPath]: vote,
-                'gameState.version': increment(1), // <--- Increment version to avoid stale state issues
+                'gameState.version': increment(1),
                 updatedAt: serverTimestamp()
             });
 
             logService.logicMove(`[FirebaseGameStateSync] Vote updated atomically for ${playerId}: ${vote}`);
         } catch (error) {
             logService.error('[FirebaseGameStateSync] Update vote error:', error);
+        }
+    }
+
+    // FIX: Реалізація атомарного оновлення запиту на завершення
+    async updateFinishRequest(playerId: string, requested: boolean): Promise<void> {
+        if (!this._roomRef || !this._isConnected) {
+            logService.error('[FirebaseGameStateSync] Cannot update finish request: not connected');
+            return;
+        }
+
+        try {
+            const fieldPath = `gameState.finishRequests.${playerId}`;
+
+            await updateDoc(this._roomRef, {
+                [fieldPath]: requested,
+                'gameState.version': increment(1),
+                updatedAt: serverTimestamp()
+            });
+
+            logService.logicMove(`[FirebaseGameStateSync] Finish request updated atomically for ${playerId}: ${requested}`);
+        } catch (error) {
+            logService.error('[FirebaseGameStateSync] Update finish request error:', error);
         }
     }
 

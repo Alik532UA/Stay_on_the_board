@@ -31,7 +31,8 @@ export default {
   gameOverReasonBlocked: "Siz bloklanğan hücrege basmağa tırıştıñız.",
   gameOverReasonPlayerOut: "{playerName} tahta sınırlarından tışına çıqtı.",
   gameOverReasonPlayerBlocked: "{playerName} bloklanğan hücrege basmağa tırıştı.",
-  gameOverReasonCashOut: "Siz oyunnı bitirip esabıñıznı almağa qarar berdiñiz.",
+  // FIX: Updated text
+  gameOverReasonCashOut: "{playerName} oyunnı erkenden bitirdi.",
   gameOverReasonBonus: "Siz oyunnı bitirip bonusnı almağa qarar berdiñiz.",
   gameOverReasonTimeUp: "Vaqıt bitti.",
   scoreDetails: {

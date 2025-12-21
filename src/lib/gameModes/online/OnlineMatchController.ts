@@ -19,7 +19,8 @@ export class OnlineMatchController {
         private stateSync: IGameStateSync,
         private resetBoardCallback: () => void,
         private advancePlayerCallback: () => void,
-        private endGameCallback: (reason: string) => void
+        // FIX: Оновлено сигнатуру колбеку для прийому ID ініціатора
+        private endGameCallback: (reason: string, initiatorId?: string) => void
     ) { }
 
     public async handleRestartRequest(): Promise<void> {
@@ -52,6 +53,19 @@ export class OnlineMatchController {
      * Перевіряє, чи набрала якась опція більшість голосів (> 50%).
      */
     public checkConsensus(state: SyncableGameState) {
+        // FIX: Перевірка запитів на завершення (Cash Out)
+        if (state.finishRequests) {
+            // Знаходимо ID гравця, який ініціював завершення
+            const initiatorEntry = Object.entries(state.finishRequests).find(([_, requested]) => requested);
+
+            if (initiatorEntry) {
+                const [initiatorId] = initiatorEntry;
+                logService.GAME_MODE(`[MatchController] Finish request detected from ${initiatorId}.`);
+                this.executeFinishGame(state, 'modal.gameOverReasonCashOut', initiatorId);
+                return;
+            }
+        }
+
         if (!state.noMovesVotes || !state.playerState) return;
 
         const votes = state.noMovesVotes;
@@ -80,7 +94,7 @@ export class OnlineMatchController {
         // 2. Перевірка перемоги "Завершити"
         if (finishCount >= majorityThreshold) {
             logService.GAME_MODE('[MatchController] Majority voted to FINISH.');
-            this.executeFinishGame(state);
+            this.executeFinishGame(state, 'modal.gameOverReasonBonus');
             return;
         }
     }
@@ -123,16 +137,12 @@ export class OnlineMatchController {
         }
     }
 
-    private executeFinishGame(state: SyncableGameState) {
+    private executeFinishGame(state: SyncableGameState, reason: string, initiatorId?: string) {
         if (!state.gameOver) {
             if (this.amIHost) {
-                logService.GAME_MODE('[MatchController] I am Host. Executing FINISH logic.');
+                logService.GAME_MODE(`[MatchController] I am Host. Executing FINISH logic. Reason: ${reason}, Initiator: ${initiatorId}`);
                 // Хост ініціює завершення. OnlineGameMode перехопить подію і відправить на сервер.
-                this.endGameCallback('modal.gameOverReasonBonus');
-
-                // FIX: Видалено this.syncState({ noMovesVotes: {} }).
-                // Очищення голосів тепер відбувається в OnlineGameEventManager разом з відправкою GameOver.
-                // Це запобігає Race Condition, коли пустий апдейт перезаписував стан GameOver.
+                this.endGameCallback(reason, initiatorId);
             }
         }
     }

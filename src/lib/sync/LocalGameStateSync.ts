@@ -21,7 +21,6 @@ export class LocalGameStateSync implements IGameStateSync {
     private _isConnected: boolean = false;
     private _subscribers: Set<GameStateSyncCallback> = new Set();
     private _stateVersion: number = 0;
-    // Тимчасове сховище для голосів у локальному режимі (хоча воно не використовується активно)
     private _localVotes: Record<string, VoteType> = {};
 
     get sessionId(): string | null {
@@ -47,7 +46,6 @@ export class LocalGameStateSync implements IGameStateSync {
         if (state.playerState) playerStore.set(state.playerState);
         if (state.scoreState) scoreStore.set(state.scoreState);
 
-        // Оновлюємо локальні голоси, якщо вони передані
         if (state.noMovesVotes) {
             this._localVotes = state.noMovesVotes;
         }
@@ -60,12 +58,10 @@ export class LocalGameStateSync implements IGameStateSync {
         logService.state(`[LocalGameStateSync] State pushed, version: ${this._stateVersion}`);
     }
 
-    // FIX: Реалізація updateVote для локального режиму
     async updateVote(playerId: string, vote: VoteType): Promise<void> {
         this._localVotes[playerId] = vote;
         logService.logicMove(`[LocalGameStateSync] Vote updated locally for ${playerId}: ${vote}`);
 
-        // У локальному режимі ми просто імітуємо оновлення стану
         const currentState = await this.pullState();
         if (currentState) {
             this._notifySubscribers({
@@ -73,6 +69,12 @@ export class LocalGameStateSync implements IGameStateSync {
                 state: currentState
             });
         }
+    }
+
+    // FIX: Заглушка для локального режиму
+    async updateFinishRequest(playerId: string, requested: boolean): Promise<void> {
+        logService.logicMove(`[LocalGameStateSync] Finish request updated locally for ${playerId}: ${requested}`);
+        // У локальному режимі це не критично, бо ми не використовуємо цей механізм
     }
 
     async pullState(): Promise<SyncableGameState | null> {

@@ -102,7 +102,7 @@ export class OnlineGameEventManager {
                     logService.GAME_MODE('[OnlineEventManager] Local GameOver detected. Syncing to server.');
                     this.callbacks.onSyncState({
                         gameOver: payload,
-                        finishRequests: {},
+                        finishRequests: {}, // FIX: Очищаємо запити на завершення
                         continueRequests: {},
                         noMovesClaim: null,
                         noMovesVotes: {} // FIX: Очищаємо голоси тут, разом з відправкою GameOver

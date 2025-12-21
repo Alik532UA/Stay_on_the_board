@@ -32,7 +32,8 @@ export default {
   gameOverReasonBlocked: "Je probeerde naar een geblokkeerde cel te gaan.",
   gameOverReasonPlayerOut: "{playerName} ging van het bord af.",
   gameOverReasonPlayerBlocked: "{playerName} probeerde op een geblokkeerde cel te stappen.",
-  gameOverReasonCashOut: "Je hebt besloten het spel te beëindigen en je score te innen.",
+  // FIX: Updated text
+  gameOverReasonCashOut: "{playerName} heeft het spel vroegtijdig beëindigd.",
   gameOverReasonBonus: "Je hebt besloten het spel te beëindigen en een bonus te claimen.",
 
   scoreDetails: {

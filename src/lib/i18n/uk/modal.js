@@ -32,7 +32,8 @@ export default {
   gameOverReasonBlocked: "Гравець спробував стати на заблоковану клітинку.",
   gameOverReasonPlayerOut: "{playerName} вийшов(-ла) за межі дошки.",
   gameOverReasonPlayerBlocked: "{playerName} спробував(-ла) стати на заблоковану клітинку.",
-  gameOverReasonCashOut: "Гру завершено за згодою гравців.",
+  // FIX: Оновлено текст для відображення імені гравця
+  gameOverReasonCashOut: "{playerName} достроково завершив гру.",
   gameOverReasonBonus: "Гру завершено з отриманням бонусу.",
   gameOverReasonTimeUp: "Час вийшов.",
   scoreDetails: {
