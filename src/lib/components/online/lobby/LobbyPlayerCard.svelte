@@ -224,11 +224,6 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .card-right {
-        /* No specific styles needed for containing div, 
-           but kept for consistency with original structure */
-    }
-
     .status-indicator {
         display: flex;
         align-items: center;
