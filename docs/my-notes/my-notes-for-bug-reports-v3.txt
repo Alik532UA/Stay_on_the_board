@@ -140,9 +140,46 @@ data-testid="settings-game-mode-virtual-player-timed"
 
 але логічно все запускається
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+сторінка Stay_on_the_board/settings?tab=voice
+class="settings-card s-6OwYbi9t07Ie"
+Актуальний результат: різні стилі кнопок (якісь скруглені, а деякі прямокутні)
+Очікуваний результат: всі кнопки мають однаковий стиль
+
+покращити UI UX class="settings-expander__button-group "
+мені подобається стиль class="control-group s-rNWcKXZ04m3F" з Stay_on_the_board/online/lobby
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+сторінка Stay_on_the_board/settings?tab=general
+class="settings-section s-Tg6FjmA7jaGB"
+Актуальний результат: була логіка вибору за замовчуванням режиму (зав'язана на чекбоксі "запам'ятати цей вибір")
+Очікуваний результат: наразі ця логіка з чекбосом була скасована, як налідок class="settings-section s-Tg6FjmA7jaGB" більше не потрібна
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+сторінка Stay_on_the_board/settings?tab=voice
+class="settings-card s-6OwYbi9t07Ie"
+class="button-group-container  s-8hbBxEgqz5uk"
+кожному контейнеру треба стоврити унікальний data-testid
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+сторінка Stay_on_the_board/settings?tab=voice
+class="settings-card s-6OwYbi9t07Ie"
+мені подобається стиль
+data-testid="voice-settings-speed-group"
+data-testid="voice-settings-order-group"
+data-testid="voice-settings-speak-for-group"
+
+треба зробити цей стиль для всії радіокнопок які ми зможемо знайти...
+наприклад:
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+мені подобається стиль class="control-group s-rNWcKXZ04m3F" з Stay_on_the_board/online/lobby
+треба зробити цей стиль для class="settings-expander__size-adjuster" в Stay_on_the_board/game/virtual-player
 
+class="settings-expander__size-adjuster" треба створити data-testid
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+а ми всі ці проблеми з дизайном вирішуємо дублюванням коду чи ми грамотно виносимо в окремий компонент і перевикористовуємо його?
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+сторінка Stay_on_the_board/online/lobby/*
+class="control-group s-rNWcKXZ04m3F" теж буде перевикористовувати цей компонент? чи там своя незалежна копія?
+
+class="control-group s-rNWcKXZ04m3F" треба створити data-testid
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦

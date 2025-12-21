@@ -4,7 +4,6 @@
     gameSettingsStore,
     type GameSettingsState,
   } from "$lib/stores/gameSettingsStore";
-  import { userActionService } from "$lib/services/userActionService";
   import { logService } from "$lib/services/logService";
   import { clearCache } from "$lib/utils/cacheManager";
   import { _ } from "svelte-i18n";
@@ -12,13 +11,10 @@
   import { languages } from "$lib/constants";
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
   import ToggleButton from "$lib/components/ToggleButton.svelte";
-  import type { GameModePreset } from "$lib/stores/gameSettingsStore";
   import NotoEmoji from "$lib/components/NotoEmoji.svelte";
 
   $: settings = $appSettingsStore;
   $: gameSettings = $gameSettingsStore;
-
-  const modes: GameModePreset[] = ["beginner", "experienced", "pro"];
 
   function selectLang(lang: string) {
     logService.ui(`Зміна мови: ${lang}`);
@@ -98,39 +94,8 @@
   <!-- Column 2: Gameplay -->
   <div class="grid-column" data-testid="settings-column-game">
     <div class="settings-card">
-      <div class="settings-section">
-        <span class="settings-label">{$_("settings.gameMode")}</span>
-        <div class="settings-button-group">
-          <StyledButton
-            variant={!gameSettings.rememberGameMode ? "primary" : "menu"}
-            on:click={() => {
-              gameSettingsStore.updateSettings({
-                gameMode: null,
-                showGameModeModal: true,
-                rememberGameMode: false,
-              });
-              if (typeof window !== "undefined")
-                sessionStorage.removeItem("gameMode");
-            }}
-          >
-            {$_("gameModes.choose")}
-          </StyledButton>
-          <div class="game-mode-buttons">
-            {#each modes as mode}
-              <StyledButton
-                variant={gameSettings.rememberGameMode &&
-                gameSettings.gameMode === mode
-                  ? "primary"
-                  : "menu"}
-                on:click={() => userActionService.setGameModePreset(mode)}
-              >
-                {$_(`gameModes.${mode}`)}
-              </StyledButton>
-            {/each}
-          </div>
-        </div>
-      </div>
-      <hr class="settings-divider" />
+      <!-- FIX: Видалено секцію вибору режиму гри за замовчуванням -->
+
       <div class="settings-option">
         <ToggleButton
           label={$_("settings.showDifficultyWarningModal")}
@@ -207,24 +172,7 @@
     margin: 8px 0;
   }
 
-  .settings-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .settings-button-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .game-mode-buttons {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  /* FIX: Видалено стилі .settings-section, .settings-button-group, .game-mode-buttons */
 
   .settings-option {
     display: flex;
@@ -281,7 +229,7 @@
     object-fit: cover;
   }
 
-  /* === Theme Selector Styles (Restored & Isolated) === */
+  /* === Theme Selector Styles === */
   .theme-selector {
     display: flex;
     flex-direction: column;
