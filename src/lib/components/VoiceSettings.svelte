@@ -123,12 +123,14 @@
 
 <div class="settings-section">
   <span class="settings-label">{$_("voiceSettings.speed")}</span>
-  <ButtonGroup options={speedOptions} />
+  <!-- FIX: Додано dataTestId для контейнера -->
+  <ButtonGroup options={speedOptions} dataTestId="voice-settings-speed-group" />
 </div>
 
 <div class="settings-section">
   <span class="settings-label">{$_("voiceSettings.order")}</span>
-  <ButtonGroup options={orderOptions} />
+  <!-- FIX: Додано dataTestId для контейнера -->
+  <ButtonGroup options={orderOptions} dataTestId="voice-settings-order-group" />
 </div>
 
 <div class="settings-section">
@@ -161,17 +163,25 @@
 
 <div class="settings-section">
   <span class="settings-label">{$_("voiceSettings.speakFor")}</span>
-  <ButtonGroup options={speakForOptions} />
+  <!-- FIX: Додано dataTestId для контейнера -->
+  <ButtonGroup
+    options={speakForOptions}
+    dataTestId="voice-settings-speak-for-group"
+  />
 </div>
 
 <style>
   .settings-section {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
 
   .settings-label {
     display: block;
-    font-weight: bold;
-    margin-bottom: 8px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+    font-size: 0.95em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 </style>
