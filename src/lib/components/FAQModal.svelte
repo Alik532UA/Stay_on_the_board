@@ -33,9 +33,16 @@
 
 <!-- FIX: Додано data-testid та структуру меню -->
 <div class="faq-content" data-testid="faq-content">
-  <h2 class="modal-title-menu">{$_("faq.title")}</h2>
+  <h2
+    class="modal-title-menu"
+    data-testid="faq-modal-title"
+    data-i18n-key="faq.title"
+  >
+    {$_("faq.title")}
+  </h2>
 
-  <div class="faq-list">
+  <!-- FIX: Додано data-testid="faq-list" -->
+  <div class="faq-list" data-testid="faq-list">
     {#each faqItems as item, i}
       <details class="faq-item" open={i === 0}>
         <summary>
@@ -86,6 +93,10 @@
     flex-direction: column;
     gap: 20px;
     width: 100%;
+    /* FIX: Обмежуємо висоту та ховаємо зовнішній скрол */
+    height: 100%;
+    max-height: 80vh; /* Залишаємо місце для відступів модалки */
+    overflow: hidden;
   }
 
   .modal-title-menu {
@@ -95,6 +106,7 @@
     color: #fff;
     margin: 0;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0; /* Заголовок не стискається */
   }
 
   .faq-list {
@@ -102,6 +114,26 @@
     border-radius: 16px;
     padding: 0 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+
+    /* FIX: Вмикаємо внутрішній скрол */
+    overflow-y: auto;
+    flex: 1; /* Займає весь доступний простір */
+    min-height: 0; /* Важливо для роботи скролу у Flexbox */
+
+    /* Стилізація скролбару */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
+
+  .faq-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  .faq-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .faq-list::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
   }
 
   .faq-item {
@@ -153,5 +185,6 @@
     flex-direction: column;
     gap: 12px;
     margin-top: 10px;
+    flex-shrink: 0; /* Кнопки не стискаються */
   }
 </style>

@@ -45,7 +45,7 @@ export async function startNewGame(page: Page, mode: GameMode = GameMode.Beginne
   await page.getByTestId(mode).click();
 
   if (mode === GameMode.Beginner) {
-    await page.getByTestId('faq-modal-modal.ok-btn').click();
+    await page.getByTestId('faq-modal-ok-btn').click();
   }
 
   await page.waitForURL('**/game/virtual-player');
