@@ -14,6 +14,7 @@
 
 <div
     class="lang-dropdown"
+    data-testid="lang-dropdown"
     role="menu"
     tabindex="0"
     on:click={(e) => {
@@ -32,7 +33,6 @@
                 <!-- FIX: Використовуємо глобальний стиль для примусового розміру SVG -->
                 {@html lang.svg}
             </div>
-            <span class="lang-code">{lang.code.toUpperCase()}</span>
         </button>
     {/each}
 </div>
@@ -41,38 +41,26 @@
     .lang-dropdown {
         background: transparent;
         padding: 16px;
-        border-radius: 18px;
-        width: 100%;
-        min-width: 200px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
+        gap: 32px; /* Збільшено відступи між прапорами */
     }
 
     .lang-option {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 8px 16px;
+        background: transparent;
+        border: none;
+        padding: 4px;
         cursor: pointer;
-        transition:
-            transform 0.2s ease,
-            background 0.2s;
+        transition: transform 0.2s ease;
         display: flex;
         align-items: center;
-        justify-content: space-between; /* Прапор зліва, текст справа */
-        width: 100%;
-        max-width: 240px;
-        backdrop-filter: blur(4px);
-        height: 56px; /* Фіксована висота для стабільності */
-        box-sizing: border-box;
+        justify-content: center;
+        width: auto;
     }
 
     .lang-option:hover {
         transform: scale(1.05);
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.3);
     }
 
     .lang-option:active {
@@ -80,15 +68,15 @@
     }
 
     .flag-icon-wrapper {
-        border-radius: 4px;
+        border-radius: 8px; /* Більше заокруглення для великих прапорів */
         overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 48px;
-        height: 36px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        flex-shrink: 0; /* Запобігає стисненню */
+        width: 112px; /* Значно більші прапори */
+        height: 84px;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Додано тінь для об'єму */
     }
 
     /* FIX: Примусово розтягуємо SVG на всю ширину обгортки */
@@ -97,13 +85,5 @@
         height: 100% !important;
         object-fit: cover;
         display: block;
-    }
-
-    .lang-code {
-        font-weight: 800;
-        color: #fff;
-        font-size: 1.1rem;
-        letter-spacing: 1px;
-        margin-left: 16px;
     }
 </style>
