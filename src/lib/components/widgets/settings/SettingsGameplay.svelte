@@ -9,7 +9,6 @@
     import { _ } from "svelte-i18n";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
     import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
-    // FIX: Видалено імпорт fitTextAction
     import { get } from "svelte/store";
     import { goto } from "$app/navigation";
     import { base } from "$app/paths";
@@ -140,9 +139,8 @@
         <span class="settings-expander__label"
             >{$_("gameControls.blockAfter")}</span
         >
-        <!-- FIX: Видалено use:fitTextAction -->
+        <!-- FIX: Видалено variant="square", оскільки ButtonGroup тепер має єдиний стиль -->
         <ButtonGroup
-            variant="square"
             options={[0, 1, 2, 3].map((count) => ({
                 label: (count + 1).toString(),
                 active: $gameSettingsStore.blockOnVisitCount === count,
