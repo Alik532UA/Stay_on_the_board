@@ -30,17 +30,24 @@
     }
 </script>
 
-<div class="messages-list" bind:this={chatContainer}>
+<!-- FIX: Додано data-testid для контейнера списку -->
+<div
+    class="messages-list"
+    bind:this={chatContainer}
+    data-testid="chat-messages-list"
+>
     {#if messages.length === 0}
-        <div class="empty-chat">
+        <div class="empty-chat" data-testid="chat-empty-message">
             {$_("onlineMenu.chat.empty")}
         </div>
     {/if}
     {#each messages as msg (msg.id)}
+        <!-- FIX: Додано data-testid для повідомлення -->
         <div
             class="message"
             class:my-message={msg.senderId === playerId}
             style={getMessageStyle(msg)}
+            data-testid="chat-message-{msg.id}"
         >
             <div class="sender">{msg.senderName}</div>
             <div class="text">{msg.text}</div>

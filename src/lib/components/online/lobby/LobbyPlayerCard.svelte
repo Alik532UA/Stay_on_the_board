@@ -1,7 +1,5 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
-    import { flip } from "svelte/animate";
-    import { fly } from "svelte/transition";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import ColorPicker from "$lib/components/local-setup/ColorPicker.svelte";
     import EditableText from "$lib/components/ui/EditableText.svelte";
@@ -81,8 +79,10 @@
     <div class="card-left">
         {#if isMe}
             <div class="avatar-wrapper is-me">
+                <!-- FIX: Передаємо унікальний dataTestId -->
                 <ColorPicker
                     value={player.color}
+                    dataTestId="lobby-player-color-picker-{player.id}"
                     on:change={handleColorChange}
                 />
             </div>
@@ -222,6 +222,11 @@
         background: rgba(255, 255, 255, 0.1);
         color: var(--text-secondary);
         border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-right {
+        /* No specific styles needed for containing div, 
+           but kept for consistency with original structure */
     }
 
     .status-indicator {

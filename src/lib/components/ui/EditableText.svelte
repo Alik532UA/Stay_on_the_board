@@ -53,6 +53,7 @@
 <div class="editable-text-container" data-testid={dataTestId}>
     {#if isEditing}
         <div class="edit-mode">
+            <!-- FIX: Додано data-testid для інпуту та кнопок редагування -->
             <input
                 bind:this={inputRef}
                 type="text"
@@ -62,11 +63,13 @@
                 on:keydown={handleKeydown}
                 on:blur={save}
                 class="editable-input"
+                data-testid="{dataTestId}-input"
             />
             <button
                 class="icon-btn save"
                 on:mousedown|preventDefault={save}
                 title="Зберегти"
+                data-testid="{dataTestId}-save-btn"
             >
                 <NotoEmoji name="check_mark_button" size="1.1em" />
             </button>
@@ -74,13 +77,18 @@
                 class="icon-btn cancel"
                 on:mousedown|preventDefault={cancel}
                 title="Скасувати"
+                data-testid="{dataTestId}-cancel-btn"
             >
                 <NotoEmoji name="cross_mark" size="1.1em" />
             </button>
         </div>
     {:else}
         <div class="view-mode">
-            <span class="text-value" title={value}>{value}</span>
+            <span
+                class="text-value"
+                title={value}
+                data-testid="{dataTestId}-display">{value}</span
+            >
             {#if canEdit}
                 <div class="actions">
                     <button
