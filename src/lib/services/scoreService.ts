@@ -20,8 +20,17 @@ export function calculateFinalScore(
   const { penaltyPoints, movesInBlockMode, jumpedBlockedCells, noMovesBonus, distanceBonus } = scoreState;
   const { boardSize } = boardState;
 
+  // FIX: Виправлено логіку для локального режиму.
+  // Тепер ми повертаємо суму балів гравців, а не тільки бонуси поточного ходу.
   if (gameMode === 'local') {
-    const totalScore = (distanceBonus || 0) + jumpedBlockedCells - penaltyPoints;
+    // У локальному режимі "рахунок" - це сума балів усіх гравців (або переможця, залежно від контексту).
+    // Але FinalScoreDetails зазвичай використовується для відображення результату ОДНОГО гравця (в синглплеєрі).
+    // Для мультиплеєра ми використовуємо playerScores в модалці.
+    // Тим не менш, щоб заповнити структуру коректно:
+
+    // Знаходимо гравця з найбільшим рахунком для "totalScore"
+    const maxScore = Math.max(...players.map(p => p.score + (p.roundScore || 0)));
+
     return {
       baseScore: 0,
       totalPenalty: penaltyPoints,
@@ -31,7 +40,7 @@ export function calculateFinalScore(
       noMovesBonus: 0,
       finishBonus: 0,
       distanceBonus: distanceBonus || 0,
-      totalScore
+      totalScore: maxScore // Повертаємо максимальний рахунок серед гравців
     };
   }
 
@@ -174,7 +183,10 @@ export function calculateMoveScore(
 
 export function determineWinner(playerState: PlayerState, reasonKey: string, losingPlayerIndex: number | null = null): { winners: Player[], winningPlayerIndex: number, loser: Player | null } {
   logService.GAME_MODE('[scoreService] determineWinner called', { losingPlayerIndex });
-  const scores = playerState.players.map(p => p.score);
+
+  // FIX: Враховуємо roundScore при визначенні переможця
+  const scores = playerState.players.map(p => p.score + (p.roundScore || 0));
+
   let maxScore = -Infinity;
   for (let i = 0; i < scores.length; i++) {
     if (i !== losingPlayerIndex) {
@@ -191,8 +203,6 @@ export function determineWinner(playerState: PlayerState, reasonKey: string, los
     }
   }
 
-  // User Requirement 2C: If there is a tie (multiple winners), we declare NO winners.
-  // We only have a winner if there is strictly one player with the highest score.
   if (winners.length > 1) {
     winners.length = 0; // Clear the array
     logService.GAME_MODE('[scoreService] Tie detected. No winners declared (Option 2C).');

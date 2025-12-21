@@ -2,17 +2,14 @@
   import { userActionService } from "$lib/services/userActionService";
   import { _ } from "svelte-i18n";
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
-  import SvgIcons from "../SvgIcons.svelte";
-  import { get } from "svelte/store";
   import {
     isPlayerTurn,
     isConfirmButtonDisabled,
     lastComputerMove,
     lastPlayerMove,
-    isPauseBetweenMoves,
     distanceRows,
     previousPlayerColor,
-  } from "$lib/stores/derivedState.ts";
+  } from "$lib/stores/derivedState"; // FIX: Removed isPauseBetweenMoves import
   import { modalStore } from "$lib/stores/modalStore";
   import DirectionControls from "./DirectionControls.svelte";
   import { getCenterInfoState } from "$lib/utils/centerInfoUtil";
@@ -35,13 +32,13 @@
     isConfirmButtonDisabled: $isConfirmButtonDisabled,
   });
 
+  // FIX: Removed isPauseBetweenMoves from props
   $: centerInfoProps = getCenterInfoState({
     selectedDirection: selectedDirection,
     selectedDistance,
     lastComputerMove: $lastComputerMove,
     lastPlayerMove: $lastPlayerMove,
     isPlayerTurn: $isPlayerTurn,
-    isPauseBetweenMoves: $isPauseBetweenMoves,
     previousPlayerColor: $previousPlayerColor,
   });
 
