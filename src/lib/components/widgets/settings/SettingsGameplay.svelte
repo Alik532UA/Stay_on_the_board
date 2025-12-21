@@ -106,6 +106,7 @@
         (isCompetitiveMode ? showCompetitiveModeModal() : () => {})}
     role="button"
     tabindex={isCompetitiveMode ? 0 : -1}
+    data-testid="auto-hide-board-container"
 >
     <ToggleButton
         label={$_("gameModes.autoHideBoard")}
@@ -124,6 +125,7 @@
         (isCompetitiveMode ? showCompetitiveModeModal() : () => {})}
     role="button"
     tabindex={isCompetitiveMode ? 0 : -1}
+    data-testid="block-mode-container"
 >
     <ToggleButton
         label={$_("gameControls.blockMode")}
@@ -135,12 +137,16 @@
     />
 </div>
 {#if $gameSettingsStore.blockModeEnabled}
-    <div class="settings-expander__options-group">
+    <div
+        class="settings-expander__options-group"
+        data-testid="block-count-options-container"
+    >
         <span class="settings-expander__label"
             >{$_("gameControls.blockAfter")}</span
         >
-        <!-- FIX: Видалено variant="square", оскільки ButtonGroup тепер має єдиний стиль -->
+        <!-- FIX: Додано dataTestId для контейнера групи -->
         <ButtonGroup
+            dataTestId="settings-block-count-group"
             options={[0, 1, 2, 3].map((count) => ({
                 label: (count + 1).toString(),
                 active: $gameSettingsStore.blockOnVisitCount === count,
