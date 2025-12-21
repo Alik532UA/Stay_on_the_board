@@ -1,107 +1,136 @@
-<script>
+<script lang="ts">
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
   import { uiStateStore } from "$lib/stores/uiStateStore.js";
   import { _ } from "svelte-i18n";
   import ToggleButton from "./ToggleButton.svelte";
+  import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
+  import StyledButton from "$lib/components/ui/StyledButton.svelte";
   import { speakTestPhrase } from "$lib/services/speechService";
   import { logService } from "$lib/services/logService.js";
 
   // Визначаємо, чи ми в онлайн режимі
   $: isOnlineMode = $uiStateStore.intendedGameType === "online";
+
+  // Опції для швидкості
+  $: speedOptions = [1, 1.2, 1.4, 1.6, 1.8, 2].map((rate) => ({
+    label: `x${rate}`,
+    active: $gameSettingsStore.speechRate === rate,
+    onClick: () => {
+      logService.ui(`Speech rate changed to ${rate}`);
+      gameSettingsStore.updateSettings({ speechRate: rate });
+      speakTestPhrase();
+    },
+    dataTestId: `speech-rate-${rate}-btn`,
+  }));
+
+  // Опції для порядку озвучення
+  $: orderOptions = [
+    {
+      label: $_("voiceSettings.dist_dir"),
+      active: $gameSettingsStore.speechOrder === "dist_dir",
+      onClick: () => {
+        logService.ui("Speech order changed to dist_dir");
+        gameSettingsStore.updateSettings({ speechOrder: "dist_dir" });
+      },
+      dataTestId: "speech-order-dist-dir-btn",
+    },
+    {
+      label: $_("voiceSettings.dir_dist"),
+      active: $gameSettingsStore.speechOrder === "dir_dist",
+      onClick: () => {
+        logService.ui("Speech order changed to dir_dist");
+        gameSettingsStore.updateSettings({ speechOrder: "dir_dist" });
+      },
+      dataTestId: "speech-order-dir-dist-btn",
+    },
+  ];
+
+  // Опції для "Озвучувати для"
+  $: speakForOptions = isOnlineMode
+    ? [
+        {
+          label: $_("voiceSettings.myMove"),
+          active: $gameSettingsStore.speechFor.onlineMyMove,
+          onClick: () => {
+            logService.ui("Speak for MY move toggled");
+            gameSettingsStore.updateSettings({
+              speechFor: {
+                ...$gameSettingsStore.speechFor,
+                onlineMyMove: !$gameSettingsStore.speechFor.onlineMyMove,
+              },
+            });
+          },
+          dataTestId: "speech-for-my-move-btn",
+        },
+        {
+          label: $_("voiceSettings.opponentMove"),
+          active: $gameSettingsStore.speechFor.onlineOpponentMove,
+          onClick: () => {
+            logService.ui("Speak for OPPONENT move toggled");
+            gameSettingsStore.updateSettings({
+              speechFor: {
+                ...$gameSettingsStore.speechFor,
+                onlineOpponentMove:
+                  !$gameSettingsStore.speechFor.onlineOpponentMove,
+              },
+            });
+          },
+          dataTestId: "speech-for-opponent-move-btn",
+        },
+      ]
+    : [
+        {
+          label: $_("voiceSettings.player"),
+          active: $gameSettingsStore.speechFor.player,
+          onClick: () => {
+            logService.ui("Speak for player toggled");
+            gameSettingsStore.updateSettings({
+              speechFor: {
+                ...$gameSettingsStore.speechFor,
+                player: !$gameSettingsStore.speechFor.player,
+              },
+            });
+          },
+          dataTestId: "speech-for-player-btn",
+        },
+        {
+          label: $_("voiceSettings.computer"),
+          active: $gameSettingsStore.speechFor.computer,
+          onClick: () => {
+            logService.ui("Speak for computer toggled");
+            gameSettingsStore.updateSettings({
+              speechFor: {
+                ...$gameSettingsStore.speechFor,
+                computer: !$gameSettingsStore.speechFor.computer,
+              },
+            });
+          },
+          dataTestId: "speech-for-computer-btn",
+        },
+      ];
 </script>
 
 <div class="settings-section">
-  <button
-    class="test-voice-button"
+  <StyledButton
+    variant="menu"
     on:click={() => speakTestPhrase()}
-    data-testid="voice-settings-test-voice-btn"
+    dataTestId="voice-settings-test-voice-btn"
+    style="width: 100%;"
   >
     {$_("voiceSettings.testVoice")}
-  </button>
+  </StyledButton>
 </div>
 
 <div class="settings-section">
   <span class="settings-label">{$_("voiceSettings.speed")}</span>
-  <div class="button-group">
-    <button
-      class:active={$gameSettingsStore.speechRate === 1}
-      on:click={() => {
-        logService.ui("Speech rate changed to 1");
-        gameSettingsStore.updateSettings({ speechRate: 1 });
-        speakTestPhrase();
-      }}
-      data-testid="speech-rate-1-btn">x1</button
-    >
-    <button
-      class:active={$gameSettingsStore.speechRate === 1.2}
-      on:click={() => {
-        logService.ui("Speech rate changed to 1.2");
-        gameSettingsStore.updateSettings({ speechRate: 1.2 });
-        speakTestPhrase();
-      }}
-      data-testid="speech-rate-1.2-btn">x1.2</button
-    >
-    <button
-      class:active={$gameSettingsStore.speechRate === 1.4}
-      on:click={() => {
-        logService.ui("Speech rate changed to 1.4");
-        gameSettingsStore.updateSettings({ speechRate: 1.4 });
-        speakTestPhrase();
-      }}
-      data-testid="speech-rate-1.4-btn">x1.4</button
-    >
-    <button
-      class:active={$gameSettingsStore.speechRate === 1.6}
-      on:click={() => {
-        logService.ui("Speech rate changed to 1.6");
-        gameSettingsStore.updateSettings({ speechRate: 1.6 });
-        speakTestPhrase();
-      }}
-      data-testid="speech-rate-1.6-btn">x1.6</button
-    >
-    <button
-      class:active={$gameSettingsStore.speechRate === 1.8}
-      on:click={() => {
-        logService.ui("Speech rate changed to 1.8");
-        gameSettingsStore.updateSettings({ speechRate: 1.8 });
-        speakTestPhrase();
-      }}
-      data-testid="speech-rate-1.8-btn">x1.8</button
-    >
-    <button
-      class:active={$gameSettingsStore.speechRate === 2}
-      on:click={() => {
-        logService.ui("Speech rate changed to 2");
-        gameSettingsStore.updateSettings({ speechRate: 2 });
-        speakTestPhrase();
-      }}
-      data-testid="speech-rate-2-btn">x2</button
-    >
-  </div>
+  <ButtonGroup options={speedOptions} />
 </div>
+
 <div class="settings-section">
   <span class="settings-label">{$_("voiceSettings.order")}</span>
-  <div class="button-group">
-    <button
-      class:active={$gameSettingsStore.speechOrder === "dist_dir"}
-      on:click={() => {
-        logService.ui("Speech order changed to dist_dir");
-        gameSettingsStore.updateSettings({ speechOrder: "dist_dir" });
-      }}
-      data-testid="speech-order-dist-dir-btn"
-      >{$_("voiceSettings.dist_dir")}</button
-    >
-    <button
-      class:active={$gameSettingsStore.speechOrder === "dir_dist"}
-      on:click={() => {
-        logService.ui("Speech order changed to dir_dist");
-        gameSettingsStore.updateSettings({ speechOrder: "dir_dist" });
-      }}
-      data-testid="speech-order-dir-dist-btn"
-      >{$_("voiceSettings.dir_dist")}</button
-    >
-  </div>
+  <ButtonGroup options={orderOptions} />
 </div>
+
 <div class="settings-section">
   <ToggleButton
     label={$_("voiceSettings.shortSpeech")}
@@ -115,6 +144,7 @@
     dataTestId="short-speech-toggle-btn"
   />
 </div>
+
 <div class="settings-section">
   <ToggleButton
     label={$_("voiceSettings.speakModalTitles")}
@@ -128,71 +158,10 @@
     dataTestId="speak-modal-titles-toggle-btn"
   />
 </div>
+
 <div class="settings-section">
   <span class="settings-label">{$_("voiceSettings.speakFor")}</span>
-  <div class="button-group">
-    {#if isOnlineMode}
-      <!-- Кнопки для Онлайн режиму -->
-      <button
-        class:active={$gameSettingsStore.speechFor.onlineMyMove}
-        on:click={() => {
-          logService.ui("Speak for MY move toggled");
-          gameSettingsStore.updateSettings({
-            speechFor: {
-              ...$gameSettingsStore.speechFor,
-              onlineMyMove: !$gameSettingsStore.speechFor.onlineMyMove,
-            },
-          });
-        }}
-        data-testid="speech-for-my-move-btn"
-        >{$_("voiceSettings.myMove")}</button
-      >
-      <button
-        class:active={$gameSettingsStore.speechFor.onlineOpponentMove}
-        on:click={() => {
-          logService.ui("Speak for OPPONENT move toggled");
-          gameSettingsStore.updateSettings({
-            speechFor: {
-              ...$gameSettingsStore.speechFor,
-              onlineOpponentMove:
-                !$gameSettingsStore.speechFor.onlineOpponentMove,
-            },
-          });
-        }}
-        data-testid="speech-for-opponent-move-btn"
-        >{$_("voiceSettings.opponentMove")}</button
-      >
-    {:else}
-      <!-- Кнопки для Локального/Тренувального режиму -->
-      <button
-        class:active={$gameSettingsStore.speechFor.player}
-        on:click={() => {
-          logService.ui("Speak for player toggled");
-          gameSettingsStore.updateSettings({
-            speechFor: {
-              ...$gameSettingsStore.speechFor,
-              player: !$gameSettingsStore.speechFor.player,
-            },
-          });
-        }}
-        data-testid="speech-for-player-btn">{$_("voiceSettings.player")}</button
-      >
-      <button
-        class:active={$gameSettingsStore.speechFor.computer}
-        on:click={() => {
-          logService.ui("Speak for computer toggled");
-          gameSettingsStore.updateSettings({
-            speechFor: {
-              ...$gameSettingsStore.speechFor,
-              computer: !$gameSettingsStore.speechFor.computer,
-            },
-          });
-        }}
-        data-testid="speech-for-computer-btn"
-        >{$_("voiceSettings.computer")}</button
-      >
-    {/if}
-  </div>
+  <ButtonGroup options={speakForOptions} />
 </div>
 
 <style>
@@ -204,41 +173,5 @@
     display: block;
     font-weight: bold;
     margin-bottom: 8px;
-  }
-
-  .button-group {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    flex-wrap: wrap;
-  }
-
-  .button-group button {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: var(--global-border-width) solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    flex-grow: 1;
-    text-align: center;
-  }
-
-  .button-group button.active {
-    background-color: var(--text-accent, #ffbe0b);
-    color: #000;
-    font-weight: bold;
-  }
-
-  .test-voice-button {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: var(--global-border-width) solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    width: 100%;
   }
 </style>
