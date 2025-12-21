@@ -23,7 +23,11 @@
   export let onContinue: (() => void) | undefined = undefined;
   export let onFinish: (() => void) | undefined = undefined;
 
+  // Prop для ідентифікації в тестах
+  export let dataTestId: string = "game-over-modal";
+
   // Тексти для динамічних кнопок (наприклад, з кількістю голосів)
+
   export let continueText: string | undefined = undefined;
   export let finishText: string | undefined = undefined;
 
@@ -51,11 +55,21 @@
 
 <div class="game-over-content" data-testid="game-over-content">
   <!-- Заголовок -->
-  <h2 class="modal-title-menu">{$_(titleKey, { values: titleValues })}</h2>
+  <h2
+    class="modal-title-menu"
+    data-testid={`${dataTestId}-title`}
+    data-i18n-key={titleKey}
+  >
+    {$_(titleKey, { values: titleValues })}
+  </h2>
 
   <!-- Причина (текст) -->
   {#if typeof content === "object" && content && "reason" in content}
-    <p class="reason-text" data-testid="game-over-reason">
+    <p
+      class="reason-text"
+      data-testid={`${dataTestId}-content-reason`}
+      data-i18n-key={content.reasonKey}
+    >
       {content.reason}
     </p>
   {/if}

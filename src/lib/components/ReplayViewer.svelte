@@ -68,7 +68,13 @@
 
 <!-- FIX: Додано data-testid та структуру меню -->
 <div class="replay-viewer-content" data-testid="replay-viewer-content">
-  <h2 class="modal-title-menu">{$_("replay.title")}</h2>
+  <h2
+    class="modal-title-menu"
+    data-testid="replay-modal-title"
+    data-i18n-key="replay.title"
+  >
+    {$_("replay.title")}
+  </h2>
 
   <div
     class="board-bg-wrapper game-content-block"

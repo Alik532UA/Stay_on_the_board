@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { setBoardSize, startNewGame, setBlockMode, BlockModeState, makeMove, getScoreByTestId, expectScoreToBeZeroOrNegative } from './utils';
 
 test.describe('хепі флоу', () => {
-  
+
   test.beforeEach(async ({ page }) => {
     // await startNewGame(page);
     // await setBoardSize(page, 2);
@@ -34,9 +34,9 @@ test.describe('хепі флоу', () => {
     });
 
     await test.step('Перегляд та закриття запису гри', async () => {
-      await page.getByTestId('watch-replay-computer-no-moves-btn').click();  
+      await page.getByTestId('watch-replay-btn').click();
       await expect(page.getByTestId('replay-modal')).toBeVisible();
-      await page.getByTestId('replay-modal-modal.close-btn').click();
+      await page.getByTestId('replay-close-btn').click();
     });
 
     await test.step('Повернення до модального вікна "Суперник у пастці!" та продовження гри', async () => {
@@ -69,9 +69,9 @@ test.describe('хепі флоу', () => {
     });
 
     await test.step('Перегляд та закриття запису гри після "Блискучого аналізу"', async () => {
-      await page.getByTestId('watch-replay-human-no-moves-btn').click();
+      await page.getByTestId('watch-replay-btn').click();
       await expect(page.getByTestId('replay-modal')).toBeVisible();
-      await page.getByTestId('replay-modal-modal.close-btn').click();
+      await page.getByTestId('replay-close-btn').click();
     });
 
     let scoreBeforeBonus: number;
@@ -89,14 +89,14 @@ test.describe('хепі флоу', () => {
       // await page.waitForTimeout(7777777); // пауза
       expect(scoreAfterBonus).toBeGreaterThan(scoreBeforeBonus);
     });
-    
+
     // await page.waitForTimeout(7777777); // пауза
 
     await test.step('Перегляд фінального запису гри та початок нової гри', async () => {
       await page.getByTestId('watch-replay-btn').click();
       await expect(page.getByTestId('replay-modal')).toBeVisible();
       await expect(page.getByTestId('limit-path-toggle')).toBeVisible();
-      await page.getByTestId('replay-modal-modal.close-btn').click();
+      await page.getByTestId('replay-close-btn').click();
       await page.getByTestId('play-again-btn').click();
       await expectScoreToBeZeroOrNegative(page, 'score-value');
     });
@@ -121,7 +121,7 @@ test.describe('хепі флоу', () => {
       await expectScoreToBeZeroOrNegative(page, 'score-value');
     });
 
-    
+
     await test.step('Гравець змінює розмір дошки та робить хід на заблоковану клітинку', async () => {
       await setBoardSize(page, 5);
       await page.getByTestId('test-mode-dir-btn-up-right').click();
@@ -142,7 +142,7 @@ test.describe('хепі флоу', () => {
       await expect(page.getByTestId('replay-next-step-btn')).toBeVisible();
       await expect(page.getByTestId('limit-path-toggle')).toBeVisible();
       await expect(page.getByTestId('replay-next-step-btn')).toBeVisible();
-      await page.getByTestId('replay-modal-modal.close-btn').click();
+      await page.getByTestId('replay-close-btn').click();
       await page.getByTestId('play-again-btn').click();
       await expectScoreToBeZeroOrNegative(page, 'score-value');
     });
