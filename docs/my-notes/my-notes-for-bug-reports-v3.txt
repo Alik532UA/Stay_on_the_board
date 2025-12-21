@@ -124,6 +124,24 @@ commit
 data-testid="left-menu-panel"
 кнопки не працюють, треба fix
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Stay_on_the_board/game/virtual-player
+Новачок
+Розбійник
+Потужний
+Гра на час
+
+працює логічно, але UI не працює, тобто кнопка візуально не перемикається і не стає візуально вибраною
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+data-testid="settings-game-mode-virtual-player-beginner"
+data-testid="settings-game-mode-virtual-player-experienced"
+data-testid="settings-game-mode-virtual-player-pro"
+data-testid="settings-game-mode-virtual-player-timed"
+досі UI не працює, треба fix
+
+але логічно все запускається
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+
+🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 

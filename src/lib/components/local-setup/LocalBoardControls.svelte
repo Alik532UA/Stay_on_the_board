@@ -3,36 +3,26 @@
     import { _ } from "svelte-i18n";
     import { logService } from "$lib/services/logService.js";
 
-    // НАВІЩО: Тепер компонент працює виключно з gameSettingsStore,
-    // що відповідає принципу SSoT.
     $: settings = $gameSettingsStore;
+    // FIX: Явно витягуємо gameMode для реактивності
+    $: currentMode = settings.gameMode;
 
     // Helper: перевіряє, чи відповідає поточний gameMode legacy пресету
-    // Враховує нові structured presets (local-observer, local-experienced, local-pro)
-    function isPresetActive(legacyPreset: string) {
-        const currentMode = settings.gameMode;
-        if (!currentMode) return false;
+    // FIX: Додано аргумент mode
+    function isPresetActive(legacyPreset: string, mode: string | null) {
+        if (!mode) return false;
 
-        // Пряме порівняння (legacy presets)
-        if (currentMode === legacyPreset) return true;
+        if (mode === legacyPreset) return true;
 
-        // Порівняння з новими structured presets для local режиму
-        if (legacyPreset === "observer" && currentMode === "local-observer")
+        if (legacyPreset === "observer" && mode === "local-observer")
             return true;
-        if (
-            legacyPreset === "experienced" &&
-            currentMode === "local-experienced"
-        )
+        if (legacyPreset === "experienced" && mode === "local-experienced")
             return true;
-        if (legacyPreset === "pro" && currentMode === "local-pro") return true;
+        if (legacyPreset === "pro" && mode === "local-pro") return true;
 
         return false;
     }
 
-    /**
-     * Оновлює налаштування розміру дошки в store
-     * @param {number} increment - Крок зміни (+1 або -1)
-     */
     function changeBoardSize(increment: number) {
         logService.action(
             `Click: "Змінити розмір дошки: ${increment > 0 ? "+" : ""}${increment}" (LocalBoardControls)`,
@@ -73,7 +63,7 @@
         <div class="mode-options-grid">
             <button
                 class="mode-btn"
-                class:active={isPresetActive("observer")}
+                class:active={isPresetActive("observer", currentMode)}
                 on:click={() => gameSettingsStore.applyPreset("observer")}
                 data-testid="local-setup-mode-observer"
             >
@@ -81,7 +71,7 @@
             </button>
             <button
                 class="mode-btn"
-                class:active={isPresetActive("experienced")}
+                class:active={isPresetActive("experienced", currentMode)}
                 on:click={() => gameSettingsStore.applyPreset("experienced")}
                 data-testid="local-setup-mode-experienced"
             >
@@ -89,7 +79,7 @@
             </button>
             <button
                 class="mode-btn"
-                class:active={isPresetActive("pro")}
+                class:active={isPresetActive("pro", currentMode)}
                 on:click={() => gameSettingsStore.applyPreset("pro")}
                 data-testid="local-setup-mode-pro"
             >
