@@ -10,6 +10,8 @@ import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { _ } from 'svelte-i18n';
+import type { Room } from '$lib/types/online';
+import { endGameService } from '$lib/services/endGameService';
 
 export class OnlineMatchController {
     constructor(
@@ -46,6 +48,25 @@ export class OnlineMatchController {
             const currentVotes = currentState.noMovesVotes || {};
             const optimisticVotes = { ...currentVotes, [this.myPlayerId]: voteType };
             this.checkConsensus({ ...currentState, noMovesVotes: optimisticVotes } as SyncableGameState);
+        }
+    }
+
+    public checkForVictory(room: Room) {
+        if (room.status !== 'playing') return;
+
+        const players = Object.values(room.players);
+
+        if (players.length === 1 && players[0].id === this.myPlayerId) {
+            // Перевіряємо, чи гра ще не завершена локально
+            // (можливо, ми вже показали екран перемоги)
+            // if (get(uiStateStore).isGameOver) return; // Це можна перевірити всередині endGameService або тут, якщо додати store
+
+            logService.GAME_MODE('[MatchController] Victory Check: All opponents left. Declaring victory.');
+            modalService.closeAllModals();
+            notificationService.show({ type: 'success', messageRaw: 'Всі суперники залишили гру. Ви перемогли!' });
+
+            // Викликаємо сервіс завершення гри напряму, оскільки це локальна перемога (всі інші пішли)
+            endGameService.endGame('modal.gameOverReasonBonus');
         }
     }
 

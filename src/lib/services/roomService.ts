@@ -1,40 +1,22 @@
-import {
-    collection,
-    setDoc,
-    getDocs,
-    doc,
-    deleteDoc,
-    query,
-    where,
-    orderBy,
-    getDoc,
-    updateDoc,
-    onSnapshot,
-    type Unsubscribe
-} from 'firebase/firestore';
-import { getFirestoreDb } from './firebaseService';
 import { logService } from './logService';
 import type { Room, RoomSummary, OnlinePlayer } from '$lib/types/online';
 import type { GameSettingsState } from '$lib/stores/gameSettingsStore';
 import { defaultGameSettings } from '$lib/stores/gameSettingsStore';
 import { v4 as uuidv4 } from 'uuid';
 import { chatService, type ChatMessage } from './chatService';
-import { withTimeout } from '$lib/utils/asyncUtils';
 import { roomSessionService } from './room/roomSessionService';
 import { roomPlayerService } from './room/roomPlayerService';
 import { generateRandomRoomName } from '$lib/utils/nameGenerator';
 import { getRandomUnusedColor } from '$lib/utils/playerUtils';
+import { roomFirestoreService } from './room/roomFirestoreService';
+import type { Unsubscribe } from 'firebase/firestore';
 
 const ROOM_TIMEOUT_MS = 600000;
-const OPERATION_TIMEOUT_MS = 10000;
 const MAX_PLAYERS = 8;
 
 export type { ChatMessage };
 
 class RoomService {
-    private get db() {
-        return getFirestoreDb();
-    }
 
     // --- Room CRUD ---
 
@@ -83,19 +65,12 @@ class RoomService {
 
         try {
             const roomId = this.generateTimestampId();
-            const roomRef = doc(this.db, 'rooms', roomId);
 
-            await withTimeout(
-                setDoc(roomRef, roomData),
-                OPERATION_TIMEOUT_MS,
-                'Timeout: Failed to connect to Firebase Firestore.'
-            );
+            await roomFirestoreService.createRoomDoc(roomId, roomData);
 
-            // FIX: Зберігаємо час створення останньої кімнати в глобальну статистику
             if (!isPrivate) {
-                const statsRef = doc(this.db, 'general', 'stats');
-                // FIX: Додано типізацію (e: any) для виправлення помилки TS7011
-                setDoc(statsRef, { lastRoomCreatedAt: Date.now() }, { merge: true })
+                // FIX: Виправлення TS7011 через catch у самому сервісі або тут
+                roomFirestoreService.updateStatsDoc({ lastRoomCreatedAt: Date.now() })
                     .catch((e: any) => console.warn('Failed to update global stats', e));
             }
 
@@ -127,24 +102,15 @@ class RoomService {
 
     async getPublicRooms(): Promise<{ rooms: RoomSummary[], latestCreatedAt?: number }> {
         try {
-            const q = query(
-                collection(this.db, 'rooms'),
-                where('isPrivate', '==', false),
-                orderBy('lastActivity', 'desc')
-            );
-
-            const [querySnapshot, statsSnap] = await Promise.all([
-                withTimeout(getDocs(q), OPERATION_TIMEOUT_MS, 'Timeout fetching rooms'),
-                getDoc(doc(this.db, 'general', 'stats')).catch((): null => null)
-            ]);
+            const [querySnapshot, statsData] = await roomFirestoreService.getPublicRoomsQuerySnapshot();
 
             const rooms: RoomSummary[] = [];
             const now = Date.now();
             const cleanupPromises: Promise<void>[] = [];
 
             let globalLastCreated = 0;
-            if (statsSnap && statsSnap.exists()) {
-                globalLastCreated = statsSnap.data().lastRoomCreatedAt || 0;
+            if (statsData) {
+                globalLastCreated = statsData.lastRoomCreatedAt || 0;
             }
 
             let activeRoomsLatestCreated = 0;
@@ -157,7 +123,7 @@ class RoomService {
                 }
 
                 if (now - data.lastActivity > ROOM_TIMEOUT_MS) {
-                    cleanupPromises.push(deleteDoc(doc.ref));
+                    cleanupPromises.push(roomFirestoreService.deleteRoomDoc(doc.ref));
                     return;
                 }
                 rooms.push({
@@ -189,24 +155,18 @@ class RoomService {
     async joinRoom(roomId: string, playerName: string): Promise<string> {
         logService.init(`[RoomService] joinRoom START. Room: ${roomId}`);
         const playerId = uuidv4();
-        const roomRef = doc(this.db, 'rooms', roomId);
 
         try {
-            const roomSnap = await withTimeout(
-                getDoc(roomRef),
-                OPERATION_TIMEOUT_MS,
-                'Timeout connecting to room'
-            );
+            const roomData = await roomFirestoreService.getRoomDoc(roomId);
 
-            if (!roomSnap.exists()) throw new Error('Room not found');
+            if (!roomData) throw new Error('Room not found');
 
-            const roomData = roomSnap.data() as Room;
             const existingSession = roomSessionService.getSession();
 
             if (existingSession.roomId === roomId && existingSession.playerId && roomData.players[existingSession.playerId]) {
                 logService.init(`[RoomService] Reconnecting as existing player`);
                 if (roomData.players[existingSession.playerId].name !== playerName) {
-                    await updateDoc(roomRef, {
+                    await roomFirestoreService.updateRoomDoc(roomId, {
                         [`players.${existingSession.playerId}.name`]: playerName,
                         lastActivity: Date.now()
                     });
@@ -230,14 +190,10 @@ class RoomService {
                 isWatchingReplay: false
             };
 
-            await withTimeout(
-                updateDoc(roomRef, {
-                    [`players.${playerId}`]: newPlayer,
-                    lastActivity: Date.now()
-                }),
-                OPERATION_TIMEOUT_MS,
-                'Timeout joining room'
-            );
+            await roomFirestoreService.updateRoomDoc(roomId, {
+                [`players.${playerId}`]: newPlayer,
+                lastActivity: Date.now()
+            }, true); // use timeout
 
             roomSessionService.saveSession(roomId, playerId);
             return playerId;
@@ -249,12 +205,7 @@ class RoomService {
 
     async getRoom(roomId: string): Promise<Room | null> {
         try {
-            const roomRef = doc(this.db, 'rooms', roomId);
-            const roomSnap = await getDoc(roomRef);
-            if (roomSnap.exists()) {
-                return { ...roomSnap.data(), id: roomSnap.id } as Room;
-            }
-            return null;
+            return await roomFirestoreService.getRoomDocSimple(roomId);
         } catch (error) {
             logService.error('[RoomService] Failed to get room:', error);
             return null;
@@ -262,26 +213,27 @@ class RoomService {
     }
 
     subscribeToRoom(roomId: string, callback: (room: Room) => void): Unsubscribe {
-        const roomRef = doc(this.db, 'rooms', roomId);
-        return onSnapshot(roomRef, (doc) => {
-            if (doc.exists()) {
-                callback({ ...doc.data(), id: doc.id } as Room);
-            } else {
-                logService.init(`[RoomService] Room ${roomId} deleted`);
+        return roomFirestoreService.subscribeToRoom(
+            roomId,
+            (room) => {
+                if (room) {
+                    callback(room);
+                } else {
+                    logService.init(`[RoomService] Room ${roomId} deleted`);
+                }
+            },
+            (error) => {
+                logService.error('[RoomService] Subscribe error:', error);
             }
-        }, (error) => {
-            logService.error('[RoomService] Subscribe error:', error);
-        });
+        );
     }
 
     // --- Game Flow ---
 
     async startGame(roomId: string): Promise<void> {
-        const roomRef = doc(this.db, 'rooms', roomId);
-        const roomSnap = await getDoc(roomRef);
-        if (!roomSnap.exists()) return;
+        const roomData = await roomFirestoreService.getRoomDocSimple(roomId);
+        if (!roomData) return;
 
-        const roomData = roomSnap.data() as Room;
         const players = { ...roomData.players };
 
         Object.keys(players).forEach(id => {
@@ -289,7 +241,7 @@ class RoomService {
             players[id].isWatchingReplay = false;
         });
 
-        await updateDoc(roomRef, {
+        await roomFirestoreService.updateRoomDoc(roomId, {
             status: 'playing',
             gameState: null,
             players: players,
@@ -298,11 +250,9 @@ class RoomService {
     }
 
     async returnToLobby(roomId: string, playerId: string): Promise<void> {
-        const roomRef = doc(this.db, 'rooms', roomId);
-        const roomSnap = await getDoc(roomRef);
-        if (!roomSnap.exists()) return;
+        const roomData = await roomFirestoreService.getRoomDocSimple(roomId);
+        if (!roomData) return;
 
-        const roomData = roomSnap.data() as Room;
         const updates: Record<string, any> = {
             [`players.${playerId}.isReady`]: true,
             [`players.${playerId}.isWatchingReplay`]: false,
@@ -321,11 +271,10 @@ class RoomService {
             updates['status'] = 'finished';
         }
 
-        await updateDoc(roomRef, updates);
+        await roomFirestoreService.updateRoomDoc(roomId, updates);
     }
 
     async updateRoomSettings(roomId: string, settings: Partial<GameSettingsState> & { allowGuestSettings?: boolean }): Promise<void> {
-        const roomRef = doc(this.db, 'rooms', roomId);
         const updates: Record<string, any> = { lastActivity: Date.now() };
 
         for (const [key, value] of Object.entries(settings)) {
@@ -340,12 +289,11 @@ class RoomService {
             updates['settingsLocked'] = settings.settingsLocked;
         }
 
-        await updateDoc(roomRef, updates);
+        await roomFirestoreService.updateRoomDoc(roomId, updates);
     }
 
     async renameRoom(roomId: string, newName: string): Promise<void> {
-        const roomRef = doc(this.db, 'rooms', roomId);
-        await updateDoc(roomRef, {
+        await roomFirestoreService.updateRoomDoc(roomId, {
             name: newName,
             lastActivity: Date.now()
         });

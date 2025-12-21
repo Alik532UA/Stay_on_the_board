@@ -19,14 +19,12 @@ import { notificationService } from '$lib/services/notificationService';
 import type { Room } from '$lib/types/online';
 import { modalStore } from '$lib/stores/modalStore';
 import { endGameService } from '$lib/services/endGameService';
-import { timeService } from '$lib/services/timeService';
 
 import { GameStateReconciler } from './online/GameStateReconciler';
 import { OnlineMatchController } from './online/OnlineMatchController';
 import { OnlineGameEventManager } from './online/OnlineGameEventManager';
 import { OnlineStateSynchronizer } from './online/OnlineStateSynchronizer';
 import { OnlinePresenceManager } from './online/OnlinePresenceManager';
-import ReconnectionModal from '$lib/components/modals/ReconnectionModal.svelte';
 
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
@@ -151,8 +149,9 @@ export class OnlineGameMode extends BaseGameMode {
         uiStateStore.update(s => ({ ...s, amIHost: this.amIHost }));
       }
 
-      this.checkForVictory(updatedRoom);
-      this.checkDisconnectedPlayers(updatedRoom);
+      // DELEGATION: Використовуємо методи контролерів замість локальної логіки
+      this.matchController?.checkForVictory(updatedRoom);
+      this.presenceManager?.handleRoomUpdate(updatedRoom);
     });
 
     this.presenceManager = new OnlinePresenceManager({
@@ -210,59 +209,6 @@ export class OnlineGameMode extends BaseGameMode {
 
     } catch (error) {
       logService.error('[OnlineGameMode] Initialization failed:', error);
-    }
-  }
-
-  private checkForVictory(room: Room) {
-    if (room.status !== 'playing') return;
-
-    const players = Object.values(room.players);
-
-    if (players.length === 1 && players[0].id === this.myPlayerId) {
-      const uiState = get(uiStateStore);
-      if (uiState.isGameOver) return;
-
-      logService.GAME_MODE('[OnlineGameMode] Victory Check: All opponents left. Declaring victory.');
-      modalStore.closeModal();
-      notificationService.show({ type: 'success', messageRaw: 'Всі суперники залишили гру. Ви перемогли!' });
-      endGameService.endGame('modal.gameOverReasonBonus');
-    }
-  }
-
-  private checkDisconnectedPlayers(room: Room) {
-    if (room.status !== 'playing') return;
-
-    const players = Object.values(room.players);
-    const disconnectedPlayer = players.find(p => p.isDisconnected && p.id !== this.myPlayerId);
-    const currentModal = get(modalStore);
-
-    if (disconnectedPlayer) {
-      if (!currentModal.isOpen || currentModal.dataTestId !== 'reconnection-modal') {
-        logService.init(`[OnlineGameMode] Player ${disconnectedPlayer.name} disconnected. Pausing game.`);
-        this.stopTurnTimer();
-
-        modalStore.showModal({
-          titleKey: 'onlineMenu.waitingForReturn',
-          titleValues: { name: disconnectedPlayer.name },
-          dataTestId: 'reconnection-modal',
-          content: {
-            playerName: disconnectedPlayer.name,
-            disconnectStartedAt: disconnectedPlayer.disconnectStartedAt || Date.now(),
-            roomId: this.roomId,
-            myPlayerId: this.myPlayerId
-          },
-          variant: 'standard',
-          component: ReconnectionModal,
-          closable: false,
-          closeOnOverlayClick: false
-        });
-      }
-    } else {
-      if (currentModal.isOpen && currentModal.dataTestId === 'reconnection-modal') {
-        logService.init(`[OnlineGameMode] All players connected. Resuming game.`);
-        modalStore.closeModal();
-        this.resumeTurnTimer();
-      }
     }
   }
 
@@ -434,13 +380,5 @@ export class OnlineGameMode extends BaseGameMode {
         notificationService.show({ type: 'error', messageRaw: 'Втрачено з\'єднання з сервером' });
         break;
     }
-  }
-
-  private stopTurnTimer() {
-    timeService.pauseTurnTimer();
-  }
-
-  private resumeTurnTimer() {
-    timeService.resumeTurnTimer();
   }
 }
