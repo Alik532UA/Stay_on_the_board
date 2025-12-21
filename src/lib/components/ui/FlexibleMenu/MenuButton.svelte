@@ -21,6 +21,8 @@
         {#if item.icon}
             <SvgIcons name={item.icon} />
         {:else if item.emoji}
+            <!-- FIX: Прибрано хардкод перевірки на конкретні емодзі. 
+                 Тепер компонент очікує валідну назву для NotoEmoji. -->
             <NotoEmoji name={item.emoji} size="1em" />
         {/if}
     </div>
@@ -61,18 +63,13 @@
         font-size: 32px; /* Good default for emoji */
     }
 
-    /* Primary (Central) Button Styling - will be overridden/enhanced by parent if needed, 
-       but basic "primary" style can be here */
+    /* Primary (Central) Button Styling */
     .menu-button.primary {
-        /* The specific positioning and large circle shape will likely be handled 
-           by the parent grid/layout to ensure it breaks out of the flow properly,
-           but we can give it the visual style here */
         background: var(--control-bg, #444);
         color: var(--text-color, #fff);
         border-radius: 50%;
         width: 64px; /* Fixed size for the FAB */
         height: 64px;
-        /* Box shadow for depth */
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 

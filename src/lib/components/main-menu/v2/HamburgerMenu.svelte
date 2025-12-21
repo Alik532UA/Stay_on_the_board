@@ -12,27 +12,25 @@
         modalStore.showModal({
             component: HamburgerMenuModal,
             dataTestId: "hamburger-menu-modal",
-            // Передаємо колбеки як props у компонент
             props: {
                 onPlay,
                 onFeedback,
             },
-            // ВАЖЛИВО: Використовуємо той самий варіант, що і GameModeModal
             variant: "menu",
-            buttons: [], // Кнопок у футері немає
+            buttons: [],
             closeOnOverlayClick: true,
         });
     }
 </script>
 
-<!-- Кнопка Гамбургер (справа внизу) -->
 <button
     class="hamburger-btn"
     on:click={openMenu}
     data-testid="hamburger-menu-btn"
     aria-label="Menu"
 >
-    <SvgIcons name="hamburger-menu" />
+    <!-- FIX: Явно задаємо розмір іконки, щоб вона не була маленькою -->
+    <SvgIcons name="hamburger-menu" width="32px" height="32px" />
 </button>
 
 <style>
@@ -53,6 +51,7 @@
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
         transition: transform 0.2s;
+        padding: 0; /* Прибираємо паддінги, щоб центрування працювало коректно */
     }
 
     .hamburger-btn:hover {

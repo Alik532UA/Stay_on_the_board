@@ -29,142 +29,81 @@
             data-testid={`lang-option-${lang.code}`}
         >
             <div class="flag-icon-wrapper">
+                <!-- FIX: Використовуємо глобальний стиль для примусового розміру SVG -->
                 {@html lang.svg}
             </div>
+            <span class="lang-code">{lang.code.toUpperCase()}</span>
         </button>
     {/each}
 </div>
 
 <style>
     .lang-dropdown {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1000;
         background: transparent;
-        box-shadow: none;
-        padding: 24px 32px;
+        padding: 16px;
         border-radius: 18px;
-        /* FIX: Використовуємо змінну для адаптивної ширини */
-        min-width: var(--responsive-min-width, 200px);
-        width: auto;
-        max-width: 95vw;
-    }
-
-    .lang-dropdown {
+        width: 100%;
+        min-width: 200px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 64px;
-    }
-
-    .lang-dropdown.hidden {
-        display: none !important;
+        gap: 12px;
     }
 
     .lang-option {
-        background: transparent;
-        border: none;
-        border-radius: 8px;
-        padding: 4px 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 8px 16px;
         cursor: pointer;
         transition:
             transform 0.2s ease,
             background 0.2s;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between; /* Прапор зліва, текст справа */
+        width: 100%;
+        max-width: 240px;
+        backdrop-filter: blur(4px);
+        height: 56px; /* Фіксована висота для стабільності */
+        box-sizing: border-box;
     }
 
     .lang-option:hover {
-        transform: scale(1.1);
+        transform: scale(1.05);
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
     }
 
-    .lang-option.selected,
-    .lang-option:focus {
-        background: var(--control-selected, #ff9800);
-        color: #fff;
+    .lang-option:active {
+        transform: scale(0.98);
     }
 
-    .lang-option span {
-        display: block;
-    }
-
-    /* FIX: Застосовуємо border-radius та overflow: hidden до обгортки SVG */
     .flag-icon-wrapper {
-        border-radius: 8px; /* Заокруглення кутів */
-        overflow: hidden; /* Приховуємо надлишок */
-        display: flex; /* Для коректного центрування SVG */
+        border-radius: 4px;
+        overflow: hidden;
+        display: flex;
         align-items: center;
         justify-content: center;
-        /* Можливо, варто задати фіксовані розміри, якщо SVG не мають власних */
-        width: 96px; /* Відповідає розміру SVG нижче */
-        height: 72px; /* Відповідає розміру SVG нижче */
+        width: 48px;
+        height: 36px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        flex-shrink: 0; /* Запобігає стисненню */
     }
 
-    .lang-dropdown button {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0;
-        margin: 0;
-        cursor: pointer;
-        transition: transform 0.15s;
-    }
-
-    .lang-dropdown button:focus,
-    .lang-dropdown button:hover {
-        outline: none;
-        transform: scale(1.08);
-    }
-
-    .lang-dropdown svg {
-        width: 96px !important;
-        height: 72px !important;
+    /* FIX: Примусово розтягуємо SVG на всю ширину обгортки */
+    .flag-icon-wrapper :global(svg) {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover;
         display: block;
     }
 
-    /* Overlays and Backdrops */
-    .dropdown-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        z-index: 9998;
-        transition: opacity 0.2s;
-    }
-
-    .dropdown-overlay.dark {
-        background: rgba(24, 16, 32, 0.38);
-    }
-
-    .dropdown-overlay.light {
-        background: rgba(255, 255, 255, 0.32);
-    }
-
-    .dropdown-overlay.hidden {
-        display: none !important;
-    }
-
-    .dropdown-backdrop {
-        z-index: 9999;
-    }
-
-    /* Ensure dropdowns are above overlays */
-    .theme-dropdown,
-    .lang-dropdown,
-    .wip-notice-overlay {
-        z-index: 10000;
-    }
-
-    @media (max-width: 600px) {
-        .lang-dropdown {
-            width: 96vw;
-            max-width: var(--responsive-max-width);
-        }
+    .lang-code {
+        font-weight: 800;
+        color: #fff;
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+        margin-left: 16px;
     }
 </style>
