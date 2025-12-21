@@ -87,7 +87,12 @@ Evelyn переміг!
 Jack достроково завершив гру
 "
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
-
+src\lib\services\roomService.ts
+src\lib\gameModes\OnlineGameMode.ts
+src\lib\components\Modal.svelte
+src\lib\components\widgets\ScorePanelWidget.svelte
+чи ці файли не задовгі? чи можна це покращати, але не міняючі та НЕ скорочуюючі логіку
+може розділити на декілька логічних файлів?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
