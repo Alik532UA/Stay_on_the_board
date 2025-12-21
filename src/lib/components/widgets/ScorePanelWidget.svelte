@@ -102,7 +102,8 @@
   }
 
   async function cashOutAndEndGame() {
-    await userActionService.finishWithBonus("modal.gameOverReasonCashOut");
+    // FIX: Використовуємо voteToFinish для коректної роботи в онлайн режимі
+    await userActionService.voteToFinish("modal.gameOverReasonCashOut");
   }
 </script>
 

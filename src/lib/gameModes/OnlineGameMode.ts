@@ -52,8 +52,6 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   async initialize(options: { newSize?: number; roomId?: string } = {}): Promise<void> {
-    // FIX: Очищаємо старий стан гри перед початком нової сесії.
-    // Це запобігає відображенню "старої гри" поки завантажується нова.
     boardStore.set(null);
     playerStore.set(null);
     scoreStore.set(null);
@@ -98,7 +96,6 @@ export class OnlineGameMode extends BaseGameMode {
       return;
     }
 
-    // Ініціалізація компонентів
     this.stateSync = createFirebaseGameStateSync();
     this.reconciler = new GameStateReconciler(this.myPlayerId);
     this.synchronizer = new OnlineStateSynchronizer(this.stateSync);
@@ -110,7 +107,27 @@ export class OnlineGameMode extends BaseGameMode {
       this.stateSync,
       () => this.resetBoardForContinuation(),
       () => this.advanceToNextPlayer(),
-      (reason) => endGameService.endGame(reason)
+      // FIX: Обробка завершення гри з урахуванням ініціатора
+      (reason: string, initiatorId?: string) => {
+        let specificPlayerIndex: number | undefined;
+
+        if (initiatorId && this.roomData) {
+          // Логіка: У createOnlinePlayers Хост завжди має індекс 0, Гість - 1.
+          // Ми використовуємо це знання для мапінгу UUID на індекс.
+          if (initiatorId === this.roomData.hostId) {
+            specificPlayerIndex = 0;
+          } else {
+            // Перевіряємо, чи є цей ID серед гравців (щоб уникнути помилок з невідомими ID)
+            const isGuest = Object.values(this.roomData.players).some(p => p.id === initiatorId);
+            if (isGuest) {
+              specificPlayerIndex = 1;
+            }
+          }
+        }
+
+        logService.GAME_MODE(`[OnlineGameMode] Ending game. Reason: ${reason}, Initiator: ${initiatorId}, Mapped Index: ${specificPlayerIndex}`);
+        endGameService.endGame(reason, null, specificPlayerIndex);
+      }
     );
 
     this.eventManager = new OnlineGameEventManager(
@@ -118,13 +135,12 @@ export class OnlineGameMode extends BaseGameMode {
       this.myPlayerId,
       this.matchController,
       {
-        onSyncState: (overrides) => this.synchronizer?.syncCurrentState(overrides),
+        onSyncState: (overrides: Partial<SyncableGameState>) => this.synchronizer?.syncCurrentState(overrides),
         isApplyingRemoteState: () => this.isApplyingRemoteState
       },
       this.turnDuration
     );
 
-    // --- ПІДПИСКА НА ОНОВЛЕННЯ КІМНАТИ ---
     this.unsubscribeRoom = roomService.subscribeToRoom(this.roomId, (updatedRoom) => {
       this.roomData = updatedRoom;
 
@@ -139,7 +155,6 @@ export class OnlineGameMode extends BaseGameMode {
       this.checkDisconnectedPlayers(updatedRoom);
     });
 
-    // --- PRESENCE MANAGER ---
     this.presenceManager = new OnlinePresenceManager({
       roomId: this.roomId,
       myPlayerId: this.myPlayerId,
@@ -308,9 +323,11 @@ export class OnlineGameMode extends BaseGameMode {
     }
   }
 
-  async voteToFinish(): Promise<void> {
-    if (this.matchController) {
-      await this.matchController.handleVote('finish');
+  // FIX: Оновлено для використання updateFinishRequest
+  async voteToFinish(reasonKey?: string): Promise<void> {
+    if (this.stateSync && this.myPlayerId) {
+      logService.GAME_MODE(`[OnlineGameMode] Requesting finish (Cash Out).`);
+      await this.stateSync.updateFinishRequest(this.myPlayerId, true);
     }
   }
 

@@ -31,7 +31,8 @@ export default {
   gameOverReasonBlocked: "You tried to move to a blocked cell.",
   gameOverReasonPlayerOut: "{playerName} went off the board.",
   gameOverReasonPlayerBlocked: "{playerName} tried to move to a blocked cell.",
-  gameOverReasonCashOut: "You decided to end the game and cash out your score.",
+  // FIX: Updated text
+  gameOverReasonCashOut: "{playerName} ended the game early.",
   gameOverReasonBonus: "You decided to end the game and claim a bonus.",
   gameOverReasonTimeUp: "Time is up.",
   scoreDetails: {

@@ -37,6 +37,9 @@ export interface SyncableGameState {
 
     // Єдине джерело правди для голосування (PlayerID -> VoteType)
     noMovesVotes?: Record<string, VoteType>;
+
+    // FIX: Запити на завершення гри (Cash Out)
+    finishRequests?: Record<string, boolean>;
 }
 
 export interface SyncMoveData {
@@ -68,8 +71,11 @@ export interface IGameStateSync {
     pullState(): Promise<SyncableGameState | null>;
     pushMove(moveData: SyncMoveData): Promise<void>;
 
-    // FIX: Новий метод для атомарного оновлення голосу
+    // Метод для атомарного оновлення голосу
     updateVote(playerId: string, vote: VoteType): Promise<void>;
+
+    // FIX: Метод для атомарного оновлення запиту на завершення
+    updateFinishRequest(playerId: string, requested: boolean): Promise<void>;
 
     subscribe(callback: GameStateSyncCallback): () => void;
     cleanup(): Promise<void>;

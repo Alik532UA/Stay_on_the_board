@@ -192,8 +192,10 @@
               data-i18n-key={$modalState.titleKey}
             >
               {#if $i18nReady && $modalState.titleKey}
+                <!-- FIX: Використовуємо titleValues, якщо вони є, інакше content -->
                 {$_($modalState.titleKey, {
-                  values: $modalState.content as any,
+                  values:
+                    $modalState.titleValues || ($modalState.content as any),
                 })}
               {:else}
                 {$modalState.title}
@@ -232,9 +234,11 @@
         {/if}
 
         {#if $modalState.component}
+          <!-- FIX: Явно передаємо content у компонент -->
           <svelte:component
             this={$modalState.component as any}
             {...$modalState.props}
+            content={$modalState.content}
             dataTestId={$modalState.dataTestId}
             scope={currentModalContext}
           />

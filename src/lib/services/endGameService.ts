@@ -19,15 +19,15 @@ import { getFirebaseApp } from './firebaseService';
 import { rewardsService } from './rewardsService';
 
 export const endGameService = {
-  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null): Promise<void> {
+  // FIX: Додано параметр specificPlayerIndex для явного вказання гравця, що програв/ініціював завершення
+  async endGame(reasonKey: string, reasonValues: Record<string, any> | null = null, specificPlayerIndex?: number): Promise<void> {
     // FIX: Запобігаємо повторному виклику, якщо гра вже завершена.
-    // Це зупиняє цикл нарахування балів при натисканні Enter.
     if (get(uiStateStore).isGameOver) {
       logService.GAME_MODE(`[endGameService] Game already over. Ignoring duplicate call for reason: '${reasonKey}'`);
       return;
     }
 
-    logService.GAME_MODE(`[endGameService] endGame called with reason: '${reasonKey}'`);
+    logService.GAME_MODE(`[endGameService] endGame called with reason: '${reasonKey}', specificPlayerIndex: ${specificPlayerIndex}`);
 
     uiStateStore.update(s => s ? ({ ...s, isGameOver: true, gameOverReasonKey: reasonKey, gameOverReasonValues: reasonValues }) : null);
     timeService.stopGameTimer();
@@ -87,18 +87,33 @@ export const endGameService = {
     scoreStore.set(initialScoreState);
 
     const finalPlayerState = get(playerStore)!;
-    const { winners, loser } = determineWinner(finalPlayerState, reasonKey, playerState.currentPlayerIndex);
+
+    // FIX: Визначаємо індекс гравця для логіки перемоги/поразки.
+    const playerIndexForLogic = specificPlayerIndex !== undefined ? specificPlayerIndex : playerState.currentPlayerIndex;
+
+    const { winners, loser } = determineWinner(finalPlayerState, reasonKey, playerIndexForLogic);
 
     let finalReasonKey = reasonKey;
     const finalReasonValues = { ...reasonValues };
 
-    if ((gameType === 'local' || gameType === 'online') && loser) {
-      if (reasonKey === 'modal.gameOverReasonOut') {
-        finalReasonKey = 'modal.gameOverReasonPlayerOut';
-      } else if (reasonKey === 'modal.gameOverReasonBlocked') {
-        finalReasonKey = 'modal.gameOverReasonPlayerBlocked';
+    // Логіка формування повідомлення про причину завершення
+    if (gameType === 'local' || gameType === 'online') {
+      // Якщо це Cash Out (дострокове завершення), додаємо ім'я ініціатора
+      if (reasonKey === 'modal.gameOverReasonCashOut') {
+        const initiator = finalPlayerState.players[playerIndexForLogic];
+        if (initiator) {
+          finalReasonValues.playerName = initiator.name;
+        }
       }
-      finalReasonValues.playerName = loser.name;
+      // Якщо є переможений (вихід за межі, блокування), додаємо його ім'я
+      else if (loser) {
+        if (reasonKey === 'modal.gameOverReasonOut') {
+          finalReasonKey = 'modal.gameOverReasonPlayerOut';
+        } else if (reasonKey === 'modal.gameOverReasonBlocked') {
+          finalReasonKey = 'modal.gameOverReasonPlayerBlocked';
+        }
+        finalReasonValues.playerName = loser.name;
+      }
     }
 
     const gameOverPayload = {
