@@ -59,6 +59,10 @@
 							userActionService.handleModalAction(
 								"requestReplay",
 							),
+						dataTestId:
+							playerType === "human"
+								? "player-no-moves-modal"
+								: "opponent-trapped-modal",
 					},
 					buttons: [], // Кнопки тепер всередині компонента
 					closable: false,
