@@ -40,13 +40,21 @@
 
 <div class="simple-modal-content" data-testid={`${dataTestId}-content`}>
     {#if titleKey || title}
-        <h2 class="modal-title-menu" data-testid={`${dataTestId}-title`}>
+        <h2
+            class="modal-title-menu"
+            data-testid={`${dataTestId}-title`}
+            data-i18n-key={titleKey}
+        >
             {titleKey ? $_(titleKey, { values: titleValues }) : title}
         </h2>
     {/if}
 
     {#if contentKey || content}
-        <p class="message-text" data-testid={`${dataTestId}-message`}>
+        <p
+            class="message-text"
+            data-testid={`${dataTestId}-message`}
+            data-i18n-key={contentKey}
+        >
             {contentKey ? $_(contentKey, { values: contentValues }) : content}
         </p>
     {/if}

@@ -73,6 +73,7 @@ function showGameOverModal(payload: GameOverPayload) {
       titleKey,
       titleValues: { winners: winners.map((w: Player) => w.name).join(', '), winnerName: winners[0]?.name },
       mode: 'game-over',
+      dataTestId: 'game-over-modal',
       onPlayAgain: () => {
         gameEventBus.dispatch('ReplayGame');
         const uiState = get(uiStateStore);
