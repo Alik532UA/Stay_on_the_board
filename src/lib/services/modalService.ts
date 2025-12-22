@@ -9,6 +9,7 @@ import type { Player } from '$lib/models/player';
 import type { GameOverPayload, PlayerScoreResult, FinalScoreDetails } from '$lib/stores/gameOverStore';
 import { uiStateStore } from '$lib/stores/uiStateStore';
 import GameOverContent from '$lib/components/modals/GameOverContent.svelte';
+import SimpleModalContent from '$lib/components/modals/SimpleModalContent.svelte';
 
 interface GameOverModalContent {
   reasonKey: string;
@@ -91,25 +92,28 @@ function showGameOverModal(payload: GameOverPayload) {
 
 function showBoardResizeModal(newSize: number) {
   modalStore.showModal({
-    titleKey: 'modal.resetScoreTitle',
-    contentKey: 'modal.boardResizeContent',
-    props: { newSize },
-    buttons: [
-      {
-        textKey: 'modal.confirm',
-        primary: true,
-        onClick: () => {
-          gameEventBus.dispatch('BoardResizeConfirmed', { newSize });
+    component: SimpleModalContent,
+    variant: 'menu',
+    dataTestId: 'board-resize-confirm-modal',
+    props: {
+      titleKey: 'modal.resetScoreTitle',
+      contentKey: 'modal.boardResizeContent',
+      actions: [
+        {
+          labelKey: 'modal.confirm',
+          variant: 'primary',
+          onClick: () => {
+            gameEventBus.dispatch('BoardResizeConfirmed', { newSize });
+          },
+          dataTestId: 'board-resize-confirm-btn'
         },
-        dataTestId: 'board-resize-confirm-btn'
-      },
-      {
-        textKey: 'modal.cancel',
-        onClick: () => modalStore.closeModal(),
-        dataTestId: 'board-resize-cancel-btn'
-      }
-    ],
-    dataTestId: 'board-resize-confirm-modal'
+        {
+          labelKey: 'modal.cancel',
+          onClick: () => modalStore.closeModal(),
+          dataTestId: 'board-resize-cancel-btn'
+        }
+      ]
+    }
   });
 }
 

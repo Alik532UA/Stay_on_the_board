@@ -1,6 +1,7 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
     import { modalStore } from "$lib/stores/modalStore";
+    import SimpleModalContent from "../../modals/SimpleModalContent.svelte";
     import { customTooltip } from "$lib/actions/customTooltip.js";
     import type { ScoreState } from "$lib/stores/scoreStore";
 
@@ -9,19 +10,43 @@
 
     function showScoreInfo() {
         modalStore.showModal({
-            titleKey: "modal.scoreInfoTitle",
-            contentKey: "modal.scoreInfoContent",
-            buttons: [{ textKey: "modal.ok", primary: true, isHot: true }],
+            component: SimpleModalContent,
+            variant: "menu",
             dataTestId: "score-info-modal",
+            props: {
+                titleKey: "modal.scoreInfoTitle",
+                contentKey: "modal.scoreInfoContent",
+                actions: [
+                    {
+                        labelKey: "modal.ok",
+                        variant: "primary",
+                        isHot: true,
+                        onClick: () => modalStore.closeModal(),
+                        dataTestId: "score-info-ok-btn",
+                    },
+                ],
+            },
         });
     }
 
     function showPenaltyInfo() {
         modalStore.showModal({
-            titleKey: "gameBoard.penaltyInfoTitle",
-            contentKey: "gameBoard.penaltyHint",
-            buttons: [{ textKey: "modal.ok", primary: true, isHot: true }],
+            component: SimpleModalContent,
+            variant: "menu",
             dataTestId: "penalty-info-modal",
+            props: {
+                titleKey: "gameBoard.penaltyInfoTitle",
+                contentKey: "gameBoard.penaltyHint",
+                actions: [
+                    {
+                        labelKey: "modal.ok",
+                        variant: "primary",
+                        isHot: true,
+                        onClick: () => modalStore.closeModal(),
+                        dataTestId: "penalty-info-ok-btn",
+                    },
+                ],
+            },
         });
     }
 </script>

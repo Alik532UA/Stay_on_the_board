@@ -12,6 +12,7 @@
   } from "$lib/stores/derivedState";
   import { modalStore } from "$lib/stores/modalStore";
   import DirectionControls from "./DirectionControls.svelte";
+  import SimpleModalContent from "$lib/components/modals/SimpleModalContent.svelte";
   import { getCenterInfoState } from "$lib/utils/centerInfoUtil";
   import { logService } from "$lib/services/logService.js";
   import { uiStateStore } from "$lib/stores/uiStateStore";
@@ -65,10 +66,22 @@
   function onConfirmClick() {
     if ($isConfirmButtonDisabled) {
       modalStore.showModal({
-        titleKey: "modal.confirmMoveHintTitle",
-        contentKey: "modal.confirmMoveHintContent",
-        buttons: [{ textKey: "modal.ok", primary: true, isHot: true }],
+        component: SimpleModalContent,
+        variant: "menu",
         dataTestId: "confirm-move-hint-modal",
+        props: {
+          titleKey: "modal.confirmMoveHintTitle",
+          contentKey: "modal.confirmMoveHintContent",
+          actions: [
+            {
+              labelKey: "modal.ok",
+              variant: "primary",
+              isHot: true,
+              onClick: () => modalStore.closeModal(),
+              dataTestId: "confirm-move-hint-ok-btn",
+            },
+          ],
+        },
       });
       return;
     }

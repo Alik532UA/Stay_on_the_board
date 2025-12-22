@@ -12,6 +12,7 @@
     import { get } from "svelte/store";
     import { goto } from "$app/navigation";
     import { base } from "$app/paths";
+    import SimpleModalContent from "$lib/components/modals/SimpleModalContent.svelte";
 
     export let isCompetitiveMode = false;
 
@@ -33,17 +34,27 @@
             "Click: on a locked setting in competitive mode (SettingsGameplay)",
         );
         modalStore.showModal({
-            titleKey: "modal.competitiveModeLockTitle",
+            component: SimpleModalContent,
+            variant: "menu",
             dataTestId: "competitive-mode-modal",
-            contentKey: "modal.competitiveModeLockContent",
-            buttons: [
-                {
-                    textKey: "modal.goToTraining",
-                    primary: true,
-                    onClick: goToTrainingOnClick,
-                },
-                { textKey: "modal.stay", onClick: modalStore.closeModal },
-            ],
+            props: {
+                titleKey: "modal.competitiveModeLockTitle",
+                contentKey: "modal.competitiveModeLockContent",
+                actions: [
+                    {
+                        labelKey: "modal.goToTraining",
+                        variant: "primary",
+                        isHot: true,
+                        onClick: goToTrainingOnClick,
+                        dataTestId: "go-to-training-btn",
+                    },
+                    {
+                        labelKey: "modal.stay",
+                        onClick: () => modalStore.closeModal(),
+                        dataTestId: "stay-in-competitive-btn",
+                    },
+                ],
+            },
             closeOnOverlayClick: true,
         });
     }
@@ -54,34 +65,35 @@
         );
         if (count > 0 && get(gameSettingsStore).showDifficultyWarningModal) {
             modalStore.showModal({
-                titleKey: "modal.expertModeTitle",
+                component: SimpleModalContent,
+                variant: "menu",
                 dataTestId: "expert-mode-modal",
-                contentKey: "modal.expertModeContent",
-                buttons: [
-                    {
-                        textKey: "modal.expertModeConfirm",
-                        primary: true,
-                        isHot: true,
-                        onClick: () => {
-                            gameSettingsStore.updateSettings({
-                                blockOnVisitCount: count,
-                            });
-                            modalStore.closeModal();
-                        },
-                    },
-                    {
-                        textKey: "modal.expertModeCancel",
-                        onClick: modalStore.closeModal,
-                    },
-                ],
-                closeOnOverlayClick: true,
                 props: {
+                    titleKey: "modal.expertModeTitle",
+                    contentKey: "modal.expertModeContent",
                     showDontShowAgain: true,
-                    dontShowAgainBinding: () =>
-                        gameSettingsStore.updateSettings({
-                            showDifficultyWarningModal: false,
-                        }),
+                    dontShowAgainType: "expertMode",
+                    actions: [
+                        {
+                            labelKey: "modal.expertModeConfirm",
+                            variant: "primary",
+                            isHot: true,
+                            onClick: () => {
+                                gameSettingsStore.updateSettings({
+                                    blockOnVisitCount: count,
+                                });
+                                modalStore.closeModal();
+                            },
+                            dataTestId: "expert-mode-confirm-btn",
+                        },
+                        {
+                            labelKey: "modal.expertModeCancel",
+                            onClick: () => modalStore.closeModal(),
+                            dataTestId: "expert-mode-cancel-btn",
+                        },
+                    ],
                 },
+                closeOnOverlayClick: true,
             });
         } else {
             gameSettingsStore.updateSettings({ blockOnVisitCount: count });

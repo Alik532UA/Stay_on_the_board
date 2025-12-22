@@ -8,9 +8,10 @@
   function showExplanation() {
     modalStore.showModal({
       component: BoardHiddenExplanationModal,
-      titleKey: "modal.boardHiddenExplanationTitle",
+      variant: "menu",
       dataTestId: "board-hidden-explanation-modal",
-      buttons: [{ textKey: "modal.ok", primary: true, isHot: true }],
+      buttons: [],
+      closeOnOverlayClick: true,
     });
   }
 

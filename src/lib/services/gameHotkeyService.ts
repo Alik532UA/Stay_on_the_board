@@ -5,6 +5,7 @@ import { logService } from './logService';
 import { showArrowKeyHintModal } from './arrowKeyHintService';
 import { modalStore } from '../stores/modalStore';
 import { _ } from 'svelte-i18n';
+import SimpleModalContent from '../components/modals/SimpleModalContent.svelte';
 
 let unsubscribeGameSettings: (() => void) | null = null;
 let registeredGameActionHandlers: Partial<Record<KeybindingAction, (event?: KeyboardEvent) => void>> = {};
@@ -15,36 +16,40 @@ function showKeyConflictModal(key: string, actions: KeybindingAction[]) {
     const t = get(_);
 
     modalStore.showModal({
-        titleKey: 'modal.keyConflictTitle',
-        contentKey: 'modal.keyConflictContent',
-        content: { key },
-        buttons: actions.map(action => ({
-            text: t(`gameControls.${action}`),
-            primary: true,
-            onClick: () => {
-                logService.action(`[gameHotkeyService] User resolved conflict for '${key}'. Chose action: ${action}`);
+        component: SimpleModalContent,
+        variant: 'menu',
+        dataTestId: 'key-conflict-modal',
+        props: {
+            titleKey: 'modal.keyConflictTitle',
+            contentKey: 'modal.keyConflictContent',
+            contentValues: { key },
+            actions: actions.map(action => ({
+                label: t(`gameControls.${action}`),
+                variant: 'primary',
+                onClick: () => {
+                    logService.action(`[gameHotkeyService] User resolved conflict for '${key}'. Chose action: ${action}`);
 
-                const settings = get(gameSettingsStore);
-                const newKeybindings = { ...settings.keybindings };
+                    const settings = get(gameSettingsStore);
+                    const newKeybindings = { ...settings.keybindings };
 
-                actions.forEach(conflictingAction => {
-                    if (conflictingAction !== action) {
-                        const keys = newKeybindings[conflictingAction];
-                        if (keys) {
-                            newKeybindings[conflictingAction] = keys.filter(k => k !== key);
+                    actions.forEach(conflictingAction => {
+                        if (conflictingAction !== action) {
+                            const keys = newKeybindings[conflictingAction];
+                            if (keys) {
+                                newKeybindings[conflictingAction] = keys.filter(k => k !== key);
+                            }
                         }
-                    }
-                });
+                    });
 
-                gameSettingsStore.updateSettings({
-                    keybindings: newKeybindings,
-                    keyConflictResolution: { ...settings.keyConflictResolution, [key]: action }
-                });
+                    gameSettingsStore.updateSettings({
+                        keybindings: newKeybindings,
+                        keyConflictResolution: { ...settings.keyConflictResolution, [key]: action }
+                    });
 
-                modalStore.closeModal();
-            }
-        })),
-        dataTestId: 'key-conflict-modal'
+                    modalStore.closeModal();
+                }
+            }))
+        }
     });
 }
 

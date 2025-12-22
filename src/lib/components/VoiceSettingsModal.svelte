@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
+  import { logService } from "$lib/services/logService";
+  import { modalStore } from "$lib/stores/modalStore";
   import { _ } from "svelte-i18n";
   import VoiceSettings from "./VoiceSettings.svelte";
   import VoiceList from "./VoiceList.svelte";
-
-  export let close = () => {};
+  import StyledButton from "$lib/components/ui/StyledButton.svelte";
 
   let showFade = false;
   let voiceListContainer: HTMLDivElement | null = null;
@@ -42,101 +43,61 @@
 </script>
 
 <div
-  class="modal-overlay"
-  on:click={close}
-  on:keydown={(e) => {
-    if (e.key === "Enter" || e.key === " ") close();
-  }}
-  role="button"
-  tabindex="0"
-  aria-label={$_("voiceSettings.close")}
+  class="voice-settings-modal-content"
+  data-testid="voice-settings-modal-content"
 >
-  <div
-    class="modal-window"
-    data-testid="voice-settings-modal"
-    tabindex="0"
-    on:click={(e) => e.stopPropagation()}
-    on:keydown={(e) => {
-      if (e.key === "Escape") close();
-    }}
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="voice-settings-title"
-  >
-    <div class="modal-header">
-      <h2 class="modal-title" id="voice-settings-title">
-        {$_("voiceSettings.title")}
-      </h2>
+  <h2 class="modal-title-menu" id="voice-settings-title">
+    {$_("voiceSettings.title")}
+  </h2>
+
+  <div class="voice-settings-body">
+    <div class="voice-settings-container">
+      <VoiceSettings />
     </div>
-    <div class="modal-body">
-      <div class="voice-settings-container">
-        <VoiceSettings />
-      </div>
-      <hr class="divider-h" />
-      <div class="divider-v"></div>
-      <div
-        class="voice-list-container"
-        class:fade-bottom={showFade}
-        bind:this={voiceListContainer}
-        on:scroll={updateFadeState}
-      >
-        <VoiceList />
-      </div>
+    <hr class="divider-h" />
+    <div class="divider-v"></div>
+    <div
+      class="voice-list-container"
+      class:fade-bottom={showFade}
+      bind:this={voiceListContainer}
+      on:scroll={updateFadeState}
+    >
+      <VoiceList />
     </div>
-    <div class="modal-footer">
-      <button
-        class="modal-btn-generic primary"
-        on:click={close}
-        data-testid="voice-settings-save-footer-btn">{$_("common.save")}</button
-      >
-    </div>
+  </div>
+
+  <div class="actions-column">
+    <StyledButton
+      variant="primary"
+      size="large"
+      on:click={() => modalStore.closeModal()}
+      dataTestId="voice-settings-save-footer-btn"
+    >
+      {$_("common.save")}
+    </StyledButton>
   </div>
 </div>
 
 <style>
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(30, 16, 40, 0.45);
-    backdrop-filter: blur(8px);
-    z-index: 1001;
+  .voice-settings-modal-content {
     display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .modal-window {
-    background: var(--bg-secondary);
-    border: var(--global-border-width) solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    border-radius: 18px;
-
-    /* FIX: Змінюємо max-width на 95vw для мобільних */
+    flex-direction: column;
+    gap: 20px;
+    width: 600px;
     max-width: 95vw;
-    width: auto;
+    box-sizing: border-box;
+  }
 
+  .modal-title-menu {
+    text-align: center;
+    font-size: 1.8em;
+    font-weight: 800;
     color: #fff;
-    animation: modalFadeIn 0.3s ease-out forwards;
-  }
-  @keyframes modalFadeIn {
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-  .modal-header {
-    padding: 16px 24px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .modal-title {
-    font-size: 1.5em;
-    font-weight: 700;
     margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
-  .modal-body {
+  .voice-settings-body {
     padding: 24px;
     max-height: 60vh;
     display: flex;
@@ -145,7 +106,7 @@
 
   .voice-settings-container,
   .voice-list-container {
-    min-width: 280px; /* Трохи зменшено для вузьких екранів */
+    min-width: 280px;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
@@ -185,7 +146,7 @@
   }
 
   @media (min-width: 801px) {
-    .modal-body {
+    .voice-settings-body {
       flex-direction: row;
     }
     .divider-h {
@@ -196,24 +157,9 @@
     }
   }
 
-  .modal-footer {
-    padding: 16px 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    text-align: right;
-  }
-  .modal-btn-generic {
-    padding: 8px 26px;
-    font-size: 1.08em;
-    border-radius: 8px;
-    border: var(--global-border-width) solid #eee;
-    background: #fff;
-    color: #222;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  .modal-btn-generic.primary {
-    background: #4caf50;
-    color: #fff;
-    border-color: #388e3c;
+  .actions-column {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
   }
 </style>

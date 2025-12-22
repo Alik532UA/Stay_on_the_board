@@ -1,5 +1,6 @@
 <script lang="ts">
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
+  import SimpleModalContent from "$lib/components/modals/SimpleModalContent.svelte";
   import { modalStore } from "$lib/stores/modalStore";
   import { slide } from "svelte/transition";
   import { quintOut } from "svelte/easing";
@@ -59,10 +60,22 @@
   function showBoardClickHint(e: Event) {
     if (e && typeof e.stopPropagation === "function") e.stopPropagation();
     modalStore.showModal({
-      titleKey: "modal.boardClickTitle",
-      contentKey: "modal.boardClickContent",
-      buttons: [{ textKey: "modal.ok", primary: true, isHot: true }],
+      component: SimpleModalContent,
+      variant: "menu",
       dataTestId: "board-click-modal",
+      props: {
+        titleKey: "modal.boardClickTitle",
+        contentKey: "modal.boardClickContent",
+        actions: [
+          {
+            labelKey: "modal.ok",
+            variant: "primary",
+            isHot: true,
+            onClick: () => modalStore.closeModal(),
+            dataTestId: "board-click-ok-btn",
+          },
+        ],
+      },
     });
   }
 

@@ -1,5 +1,6 @@
 import { modalStore } from '$lib/stores/modalStore';
 import hotkeyService from './hotkeyService';
+import SimpleModalContent from '../components/modals/SimpleModalContent.svelte';
 
 let hasShownArrowKeyHint = false;
 
@@ -16,17 +17,22 @@ export function showArrowKeyHintModal() {
   };
 
   modalStore.showModal({
-    titleKey: 'modal.arrowKeyHintTitle',
-    contentKey: 'modal.arrowKeyHintContent',
-    buttons: [
-      {
-        textKey: 'modal.ok',
-        primary: true,
-        isHot: true,
-        onClick: closeModal,
-      },
-    ],
+    component: SimpleModalContent,
+    variant: 'menu',
     dataTestId: 'arrow-key-hint-modal',
+    props: {
+      titleKey: 'modal.arrowKeyHintTitle',
+      contentKey: 'modal.arrowKeyHintContent',
+      actions: [
+        {
+          labelKey: 'modal.ok',
+          variant: 'primary',
+          isHot: true,
+          onClick: closeModal,
+          dataTestId: 'arrow-key-hint-ok-btn'
+        }
+      ]
+    }
   });
 
   hotkeyService.register(context, 'Enter', closeModal);
