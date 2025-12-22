@@ -2,7 +2,8 @@
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
     import { userActionService } from "$lib/services/userActionService";
     import { logService } from "$lib/services/logService";
-    import { openVoiceSettingsModal } from "$lib/stores/uiStore";
+    import { modalStore } from "$lib/stores/modalStore";
+    import VoiceSettingsModal from "../../VoiceSettingsModal.svelte";
     import { _ } from "svelte-i18n";
     import { blurOnClick } from "$lib/utils/actions";
     import { customTooltip } from "$lib/actions/customTooltip.js";
@@ -14,7 +15,12 @@
     function openVoiceSettings(e: MouseEvent) {
         logService.action('Click: "Voice Settings" (SettingsAudio)');
         e.stopPropagation();
-        openVoiceSettingsModal();
+        modalStore.showModal({
+            component: VoiceSettingsModal,
+            variant: "menu",
+            dataTestId: "voice-settings-modal",
+            closeOnOverlayClick: true,
+        });
     }
 </script>
 

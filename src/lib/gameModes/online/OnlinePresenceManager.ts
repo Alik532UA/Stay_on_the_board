@@ -61,17 +61,15 @@ export class OnlinePresenceManager {
                 timeService.pauseTurnTimer();
 
                 modalStore.showModal({
-                    titleKey: 'onlineMenu.waitingForReturn',
-                    titleValues: { name: disconnectedPlayer.name },
+                    component: ReconnectionModal,
+                    variant: 'menu',
                     dataTestId: 'reconnection-modal',
-                    content: {
+                    props: {
                         playerName: disconnectedPlayer.name,
                         disconnectStartedAt: disconnectedPlayer.disconnectStartedAt || Date.now(),
                         roomId: this.config.roomId,
                         myPlayerId: this.config.myPlayerId
                     },
-                    variant: 'standard',
-                    component: ReconnectionModal,
                     closable: false,
                     closeOnOverlayClick: false
                 });

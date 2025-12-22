@@ -326,9 +326,26 @@ C:\Users\ozapolnov\Documents\code\study\Stay_on_the_board\git_diff_HEAD.txt
 яка твоя незалежна думка щодо цієї проблеми?
 Чи цієї проблеми немає?
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+новий стиль:
+data-testid="game-over-modal-content"
+data-testid="opponent-trapped-modal-content"
+data-testid="game-over-modal-content"
+data-testid="voice-settings-speed-group"
+data-testid="voice-settings-order-group"
+data-testid="voice-settings-speak-for-group"
+
+старий стиль:
+data-testid="board-resize-confirm-modal"
+
+знайди та напиши список цих модальних вікон які мають старий стиль
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
+Вікнам зі старим стилем треба переїхати на новий стиль
 
+приклад нового стилю:
+data-testid="game-over-modal-content"
+data-testid="opponent-trapped-modal-content"
+data-testid="game-over-modal-content"
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦
 
 🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦

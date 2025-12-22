@@ -1,6 +1,5 @@
 <script lang="ts">
-  import VoiceSettingsModal from "$lib/components/VoiceSettingsModal.svelte";
-  import { uiState, closeVoiceSettingsModal } from "$lib/stores/uiStore";
+  import { uiState } from "$lib/stores/uiStore";
   import { appSettingsStore } from "$lib/stores/appSettingsStore.js";
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
   import { get } from "svelte/store";
@@ -106,10 +105,6 @@
 <div class="game-layout-container" data-testid="game-page-layout">
   <slot />
 </div>
-
-{#if $uiState.isVoiceSettingsModalOpen}
-  <VoiceSettingsModal close={closeVoiceSettingsModal} />
-{/if}
 
 <PlayerColorProvider />
 

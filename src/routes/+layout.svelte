@@ -169,14 +169,14 @@
 
 	function openDevMenuModal() {
 		modalStore.showModal({
-			titleKey: "Dev Menu Modal",
 			component: DevMenu,
+			variant: "menu",
 			dataTestId: "dev-menu-modal",
-			customClass: "dev-menu-modal-window",
 			props: {
 				onClose: () => modalStore.closeModal(),
 				versionNumber: $appVersion,
 			},
+			closeOnOverlayClick: true,
 		});
 	}
 

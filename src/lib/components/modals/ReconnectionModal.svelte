@@ -35,16 +35,16 @@
     }
 </script>
 
-<div class="reconnection-modal">
-    <div class="loader-container">
-        <div class="pulse-loader"></div>
-    </div>
-
-    <h3>
+<div class="reconnection-content" data-testid="reconnection-modal-content">
+    <h2 class="modal-title-menu">
         {$_("onlineMenu.waitingForReturn", {
             values: { name: content.playerName },
         })}
-    </h3>
+    </h2>
+
+    <div class="loader-container">
+        <div class="pulse-loader"></div>
+    </div>
 
     <div class="timer">
         {timeRemaining}s
@@ -54,7 +54,7 @@
         {$_("onlineMenu.reconnecting")}
     </p>
 
-    <div class="actions">
+    <div class="actions-column">
         <button class="leave-btn" on:click={leaveGame}>
             {$_("onlineMenu.leaveRoom")}
         </button>
@@ -62,22 +62,37 @@
 </div>
 
 <style>
-    .reconnection-modal {
+    .reconnection-content {
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 16px;
-        padding: 20px;
-        background: var(--bg-secondary);
-        border-radius: var(--unified-border-radius);
-        color: var(--text-primary);
+        gap: 20px;
+        width: 100%;
     }
 
-    h3 {
+    .modal-title-menu {
+        text-align: center;
+        font-size: 1.8em;
+        font-weight: 800;
+        color: #fff;
         margin: 0;
-        font-size: 1.2em;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .actions-column {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .timer {
+        font-size: 3em;
         font-weight: bold;
+        color: var(--warning-action-bg);
+        font-family: var(--font-family-monospace);
     }
 
     .timer {
@@ -90,10 +105,6 @@
     .status-text {
         color: var(--text-secondary);
         margin: 0;
-    }
-
-    .actions {
-        margin-top: 10px;
     }
 
     .leave-btn {
