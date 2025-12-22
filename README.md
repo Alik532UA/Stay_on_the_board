@@ -55,7 +55,7 @@ npm run dev
 ## Архітектурні принципи
 
 Детальний опис архітектурних принципів проєкту:
-[docs/ai/architecture-principles.md](docs/ai/architecture-principles.md)
+[docs/development/ARCHITECTURE.md](docs/development/ARCHITECTURE.md)
 
 - Single Source of Truth (SSoT)
 - Unidirectional Data Flow
@@ -79,7 +79,7 @@ import { modalService } from '$lib/services/modalService.js';
 // Відкрити модальне вікно
 modalService.showModal({
   titleKey: 'modal.title',
-  content: 'Текст повідомлення',
+  contentKey: 'modal.content', // Рекомендується використовувати ключі перекладу
   buttons: [
     { textKey: 'modal.ok', primary: true, onClick: modalService.closeModal }
   ]
@@ -115,7 +115,7 @@ logService.subscribe(logs => { /* ... */ });
 import { speakText, loadAndGetVoices, filterVoicesByLang, langMap } from '$lib/services/speechService.js';
 
 // Озвучити текст
-speakText('Ваш хід', langMap.uk, null);
+speakText('Ваш хід', 'uk', null);
 
 // Завантажити голоси
 loadAndGetVoices().then(voices => { /* ... */ });
@@ -131,10 +131,10 @@ const ukVoices = filterVoicesByLang(voices, 'uk');
 
 ### Приклад підключення store
 ```js
-import { gameState } from '$lib/stores/gameState.js';
+import { gameStore } from '$lib/stores/gameStore.ts';
 
 // Підписка на стан гри
-const unsubscribe = gameState.subscribe(state => {
+const unsubscribe = gameStore.subscribe(state => {
   // ...
 });
 ```
@@ -142,13 +142,14 @@ const unsubscribe = gameState.subscribe(state => {
 ### Таблиця відповідності store → тип стану
 | Store                | Тип стану         | Опис                                      |
 |----------------------|-------------------|--------------------------------------------|
-| `gameState`          | Гра               | Основний стан гри: позиція, хід, рахунок   |
-| `appSettingsStore`      | Налаштування      | Всі налаштування користувача та гри        |
-| `playerInputStore`   | Ввід гравця       | Поточний вибір напрямку/відстані           |
+| `gameStore`          | Гра               | Основний стан гри: режим                   |
+| `boardStore`          | Дошка             | Позиція фігури, заблоковані клітинки       |
+| `appSettingsStore`      | Налаштування      | Всі налаштування застосунку                |
+| `gameSettingsStore`   | Налаштування гри  | Налаштування поточної сесії                |
 | `replayStore`        | Повтор            | Стан перегляду запису гри                  |
 | `logService`         | Логування         | Логи дій, помилок, подій                   |
-| `modalService`       | Модальні вікна    | Стан та вміст поточного модального вікна   |
+| `modalStore`         | Модальні вікна    | Стан та вміст поточного модального вікна   |
 | `layoutStore`        | Розташування      | Розташування віджетів на сторінці          |
-| `columnStyleMode`    | UI/стиль          | Режим редагування/фіксації колонок         |
+| `rewardsStore`       | Нагороди          | Стан нагород та досягнень                  |
 
 --- 
