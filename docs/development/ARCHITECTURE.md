@@ -14,8 +14,8 @@ last-reviewed: 2025-08-07
 
 **Пов'язані документи:**
 - [Onboarding для розробників](ONBOARDING.md)
-- [Архітектура ігрового циклу та потоку даних](architecture/GAME_LOGIC_AND_DATA_FLOW.md)
-- [Патерни асинхронної візуалізації стану](architecture/PATTERNS-asynchronous-state-visualization.md)
+- [Архітектура ігрового циклу та потоку даних](../architecture/game-logic-and-data-flow.md)
+- [Патерни асинхронної візуалізації стану](../architecture/PATTERNS-asynchronous-state-visualization.md)
 
 Цей документ описує основні архітектурні принципи, структуру стану та потік даних у застосунку.
 
