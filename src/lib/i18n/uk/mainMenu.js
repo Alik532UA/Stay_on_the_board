@@ -1,5 +1,5 @@
 export default {
-  title: "Твій Хід",
+  title: "MindStep",
   menu: "Меню",
   training: "Тренування",
   virtualPlayer: "Грати",

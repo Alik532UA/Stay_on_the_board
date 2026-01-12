@@ -1,5 +1,5 @@
 export default {
-  title: "Your Move", // Rebranding
+  title: "MindStep",
   menu: "Menu",
   training: "Training",
   virtualPlayer: "Play",

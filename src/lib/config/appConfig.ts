@@ -5,7 +5,7 @@
 
 export const APP_CONFIG = {
     // Змініть це значення, якщо потрібно перейменувати платформу
-    NAME: "Your Move",
+    NAME: "MindStep",
 
     // Версія конфігурації (для майбутніх міграцій)
     CONFIG_VERSION: 1,

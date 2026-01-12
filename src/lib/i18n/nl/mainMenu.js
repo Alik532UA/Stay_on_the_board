@@ -1,5 +1,5 @@
 export default {
-  title: "Jouw Zet", // Rebranding
+  title: "MindStep", // Rebranding
   menu: "Menu",
   training: "Training",
   virtualPlayer: "Spelen",

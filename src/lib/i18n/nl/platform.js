@@ -1,3 +1,3 @@
 export default {
-  name: "Jouw Zet"
+  name: "MindStep"
 };

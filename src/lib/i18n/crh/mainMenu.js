@@ -1,5 +1,5 @@
 export default {
-  title: "Señiñ Yürüşiñ", // Rebranding
+  title: "MindStep", // Rebranding
   menu: "Menü",
   training: "İdman",
   virtualPlayer: "Oyna",

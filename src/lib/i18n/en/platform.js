@@ -1,3 +1,3 @@
 export default {
-  name: "Your Move"
+  name: "MindStep"
 };
