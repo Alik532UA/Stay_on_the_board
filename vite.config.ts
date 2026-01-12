@@ -7,10 +7,10 @@ import { VitePWA, type ManifestOptions, type Display } from 'vite-plugin-pwa';
 const base = process.env.VITE_BASE_PATH || '/';
 
 const manifest: Partial<ManifestOptions> = {
-	name: 'Твій Хід',
-	short_name: 'StayBoard',
+	name: 'MindStep',
+	short_name: 'MindStep',
 	description: 'Стратегічна гра на витривалість та просторову уяву',
-	start_url: '/Stay_on_the_board/',
+	start_url: '/MindStep/',
 	display: 'standalone' as Display,
 	background_color: '#222',
 	theme_color: '#222',
@@ -53,6 +53,6 @@ export default defineConfig({
 		sourcemap: true,
 	},
 	test: {
-    include: ['tests/**/*.test.ts']
-  }
+		include: ['tests/**/*.test.ts']
+	}
 });
