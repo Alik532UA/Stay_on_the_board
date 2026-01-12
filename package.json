@@ -1,8 +1,8 @@
 {
-  "name": "your-move",
+  "name": "mindstep",
   "description": "A multi-game platform with 'Survive', 'Arena', and 'Maze' modes.",
   "private": true,
-  "version": "0.5.605",
+  "version": "0.5.606",
   "type": "module",
   "scripts": {
     "test": "playwright test",

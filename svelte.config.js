@@ -3,7 +3,7 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 // Видаляємо залежність від змінної оточення
 // const base = process.env.VITE_BASE_PATH || '';
-const base = '/Stay_on_the_board'; // <-- Жорстко прописуємо шлях
+const base = '/MindStep'; // <-- Жорстко прописуємо шлях
 
 // /**
 //  * Кастомний препроцесор для автоматичного додавання data-testid
