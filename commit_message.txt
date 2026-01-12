@@ -1,0 +1,3 @@
+refactor: Rename project to MindStep
+
+Refactored the project name from "Stay on the Board" to "MindStep" across the entire codebase. This includes updates to documentation, configuration files, user-facing text, and internal references to align with the new branding.

@@ -21,11 +21,11 @@
 
 1.  Клонуйте репозиторій:
     ```bash
-    git clone https://github.com/your-username/Stay_on_the_board.git
+    git clone https://github.com/your-username/MindStep.git
     ```
 2.  Перейдіть до директорії проєкту:
     ```bash
-    cd Stay_on_the_board
+    cd MindStep
     ```
 3.  Встановіть всі залежності:
     ```bash

@@ -12,7 +12,7 @@ export const APP_CONFIG = {
 
     // Налаштування режимів
     MODES: {
-        SURVIVE: 'survive', // Поточний режим "Stay on the Board"
+        SURVIVE: 'survive', // Поточний режим "MindStep"
         ARENA: 'arena',     // Майбутній режим
         MAZE: 'maze'        // Майбутній режим
     }

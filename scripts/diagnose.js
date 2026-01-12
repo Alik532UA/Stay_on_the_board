@@ -9,7 +9,7 @@ import { execSync, spawn } from 'child_process';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
-console.log('🔍 Діагностика сайту Stay on the Board...\n');
+console.log('🔍 Діагностика сайту MindStep...\n');
 
 // Функція для перевірки файлу
 function checkFile(path, description) {
@@ -100,7 +100,7 @@ console.log('\n📦 Перевірка залежностей:');
 try {
   const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
   const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
-  
+
   const criticalDeps = ['svelte', '@sveltejs/kit', 'vite'];
   for (const dep of criticalDeps) {
     if (deps[dep]) {
