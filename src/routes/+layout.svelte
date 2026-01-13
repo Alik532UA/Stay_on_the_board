@@ -238,13 +238,15 @@
 		{/if}
 	</main>
 
-	<FlexibleMenu
-		items={menuItems}
-		position="right"
-		persistenceKey="main-right-menu"
-		dataTestId="flexible-menu-right-wrapper"
-		startOpen={false}
-	/>
+	{#if import.meta.env.DEV}
+		<FlexibleMenu
+			items={menuItems}
+			position="right"
+			persistenceKey="main-right-menu"
+			dataTestId="flexible-menu-right-wrapper"
+			startOpen={false}
+		/>
+	{/if}
 </div>
 
 {#if $tooltipStore.isVisible}
