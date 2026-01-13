@@ -144,13 +144,13 @@
 		},
 		{
 			id: "donate",
-			icon: "donate",
+			emoji: "coins",
 			dataTestId: "donate-btn",
 			onClick: () => goto(`${base}/supporters`),
 		},
 		{
 			id: "play",
-			icon: "piece",
+			emoji: "crown",
 			onClick: handlePlayVirtualPlayer,
 			primary: true,
 		},
@@ -202,12 +202,12 @@
 				},
 				{
 					id: "dev-menu-modal",
-					icon: "hamburger-menu", // FIX: Changed from emoji ☰ to icon
+					emoji: "menu", // FIX: Changed from hamburger-menu icon to menu emoji (mapped to Lucide)
 					onClick: openDevMenuModal,
 				},
 				{
 					id: "dev-clear-cache-btn",
-					icon: "clear-cache", // FIX: Changed from emoji 🧹 to icon
+					emoji: "broom", // FIX: Changed from clear-cache icon to broom emoji (mapped to Lucide Eraser)
 					onClick: () => clearCache({ keepAppearance: false }),
 				},
 			]

@@ -33,7 +33,8 @@ import {
     GraduationCap,
     HelpCircle,
     Languages,
-    Palette
+    Palette,
+    Menu
 } from 'lucide-svelte';
 
 export const lucideMap: Record<string, any> = {
@@ -75,5 +76,6 @@ export const lucideMap: Record<string, any> = {
     'graduation_cap': GraduationCap,
     'help_circle': HelpCircle,
     'languages': Languages,
-    'palette': Palette
+    'palette': Palette,
+    'menu': Menu
 };
