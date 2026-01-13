@@ -1,6 +1,7 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
+    import NotoEmoji from "$lib/components/NotoEmoji.svelte";
 
     export let onPlay: () => void;
 
@@ -18,7 +19,7 @@
         aria-label={$_("mainMenu.virtualPlayer")}
     >
         <div class="play-icon">
-            <SvgIcons name="piece" />
+            <NotoEmoji name="crown" size="100%" />
         </div>
 
         <!-- Хвилі анімації -->

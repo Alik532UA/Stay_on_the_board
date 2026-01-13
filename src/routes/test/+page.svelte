@@ -1,5 +1,6 @@
 <script lang="ts">
 	import SvgIcons from "$lib/components/SvgIcons.svelte";
+	import NotoEmoji from "$lib/components/NotoEmoji.svelte";
 	import { onMount } from "svelte";
 
 	// Параметри для динамічного налаштування (5-й варіант)
@@ -23,7 +24,9 @@
 			<p>Класичний подвійний пульс, що звужується до кнопки.</p>
 			<div class="center-container">
 				<button class="play-btn-circle inward-1">
-					<div class="play-icon"><SvgIcons name="piece" /></div>
+					<div class="play-icon">
+						<NotoEmoji name="crown" size="100%" />
+					</div>
 					<!-- Використовуємо HTML елементи для хвиль, щоб мати повний контроль -->
 					<div class="wave"></div>
 					<div class="wave" style="animation-delay: 1s;"></div>
@@ -37,7 +40,9 @@
 			<p>Хвилі починаються дуже далеко (Scale 2.2).</p>
 			<div class="center-container">
 				<button class="play-btn-circle inward-2">
-					<div class="play-icon"><SvgIcons name="piece" /></div>
+					<div class="play-icon">
+						<NotoEmoji name="crown" size="100%" />
+					</div>
 					<div class="wave"></div>
 					<div class="wave" style="animation-delay: 1s;"></div>
 				</button>
@@ -50,7 +55,9 @@
 			<p>3 хвилі, швидший темп, постійний рух.</p>
 			<div class="center-container">
 				<button class="play-btn-circle inward-3">
-					<div class="play-icon"><SvgIcons name="piece" /></div>
+					<div class="play-icon">
+						<NotoEmoji name="crown" size="100%" />
+					</div>
 					<div class="wave"></div>
 					<div class="wave" style="animation-delay: 0.66s;"></div>
 					<div class="wave" style="animation-delay: 1.33s;"></div>
@@ -64,7 +71,9 @@
 			<p>Дуже повільне, ледь помітне "дихання" всередину.</p>
 			<div class="center-container">
 				<button class="play-btn-circle inward-4">
-					<div class="play-icon"><SvgIcons name="piece" /></div>
+					<div class="play-icon">
+						<NotoEmoji name="crown" size="100%" />
+					</div>
 					<div class="wave"></div>
 					<div class="wave" style="animation-delay: 1.5s;"></div>
 				</button>

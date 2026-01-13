@@ -1,6 +1,7 @@
 <script lang="ts">
   import { writable } from "svelte/store";
   import SvgIcons from "./SvgIcons.svelte";
+  import NotoEmoji from "./NotoEmoji.svelte";
   import ReplayControls from "./ReplayControls.svelte";
   import {
     replayPosition as calculateReplayPosition,
@@ -128,7 +129,9 @@
             (100 / boardSize)}%; left: {$replayPosition.col *
             (100 / boardSize)}%; z-index: 10;"
         >
-          <div class="piece-container"><SvgIcons name="piece" /></div>
+          <div class="piece-container">
+            <NotoEmoji name="crown" size="100%" />
+          </div>
         </div>
       {/if}
     </div>

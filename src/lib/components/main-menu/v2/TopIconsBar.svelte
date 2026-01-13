@@ -86,9 +86,9 @@
             title={$_("mainMenu.language")}
             data-testid="top-language-btn"
         >
-            <span class="icon-inner flag-icon-inner"
-                >{@html $currentLanguageFlagSvg}</span
-            >
+            <div class="icon-inner">
+                <NotoEmoji name="languages" size="24px" class="inline-icon" />
+            </div>
         </button>
     </div>
 
@@ -99,7 +99,9 @@
             title={$_("mainMenu.theme")}
             data-testid="top-theme-btn"
         >
-            <span class="icon-inner"><SvgIcons name="theme" /></span>
+            <div class="icon-inner">
+                <NotoEmoji name="palette" size="24px" />
+            </div>
         </button>
     </div>
 
@@ -118,7 +120,7 @@
         title={$_("mainMenu.donate")}
         data-testid="top-donate-btn"
     >
-        <span class="icon-inner"><SvgIcons name="donate" /></span>
+        <div class="icon-inner"><NotoEmoji name="coin" size="24px" /></div>
     </button>
 
     <button
@@ -211,21 +213,10 @@
         justify-content: center;
     }
 
-    .flag-icon-inner {
-        border-radius: 6px;
-        overflow: hidden;
-        width: 32px;
-        height: 24px;
-    }
-
     :global(.icon-inner svg) {
         width: 100%;
         height: 100%;
         display: block;
-    }
-
-    .flag-icon-inner :global(svg) {
-        object-fit: cover;
     }
 
     .desktop-only {
