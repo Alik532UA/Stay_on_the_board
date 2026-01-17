@@ -35,6 +35,7 @@ export default {
   // FIX: Оновлено текст для відображення імені гравця
   gameOverReasonCashOut: "{playerName} достроково завершив гру.",
   gameOverReasonBonus: "Гру завершено з отриманням бонусу.",
+  gameOverReasonOpponentsLeft: "Всі суперники покинули гру.",
   gameOverReasonTimeUp: "Час вийшов.",
   scoreDetails: {
     baseScore: "Базовий рахунок:",

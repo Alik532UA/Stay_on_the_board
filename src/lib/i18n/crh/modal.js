@@ -34,6 +34,7 @@ export default {
   // FIX: Updated text
   gameOverReasonCashOut: "{playerName} oyunnı erkenden bitirdi.",
   gameOverReasonBonus: "Siz oyunnı bitirip bonusnı almağa qarar berdiñiz.",
+  gameOverReasonOpponentsLeft: "Bütün raqipler oyundan çıqtı.",
   gameOverReasonTimeUp: "Vaqıt bitti.",
   scoreDetails: {
     baseScore: "Esap:",

@@ -1,5 +1,4 @@
 import { roomService } from '$lib/services/roomService';
-import { notificationService } from '$lib/services/notificationService';
 import { modalService } from '$lib/services/modalService';
 import { navigationService } from '$lib/services/navigationService';
 import { gameEventBus } from '$lib/services/gameEventBus';
@@ -14,6 +13,12 @@ import type { Room } from '$lib/types/online';
 import { endGameService } from '$lib/services/endGameService';
 
 export class OnlineMatchController {
+    // FIX: Захисний період після початку гри для запобігання race condition
+    private gameStartedAt: number = Date.now();
+    private readonly VICTORY_CHECK_GRACE_PERIOD_MS = 2000; // 2 секунди
+    // FIX: Прапорець для запобігання дублюванню перемоги
+    private victoryDeclared: boolean = false;
+
     constructor(
         private roomId: string,
         private myPlayerId: string,
@@ -23,7 +28,9 @@ export class OnlineMatchController {
         private advancePlayerCallback: () => void,
         // FIX: Оновлено сигнатуру колбеку для прийому ID ініціатора
         private endGameCallback: (reason: string, initiatorId?: string) => void
-    ) { }
+    ) {
+        this.gameStartedAt = Date.now();
+    }
 
     public async handleRestartRequest(): Promise<void> {
         logService.GAME_MODE('[MatchController] Restart requested. Returning to lobby.');
@@ -54,19 +61,28 @@ export class OnlineMatchController {
     public checkForVictory(room: Room) {
         if (room.status !== 'playing') return;
 
+        // FIX: Якщо перемогу вже оголошено - виходимо
+        if (this.victoryDeclared) return;
+
+        // FIX: Захисний період після початку гри для запобігання race condition
+        const timeSinceStart = Date.now() - this.gameStartedAt;
+        if (timeSinceStart < this.VICTORY_CHECK_GRACE_PERIOD_MS) {
+            logService.GAME_MODE(`[MatchController] Victory check skipped (grace period: ${Math.round(timeSinceStart / 1000)}s < ${this.VICTORY_CHECK_GRACE_PERIOD_MS / 1000}s)`);
+            return;
+        }
+
         const players = Object.values(room.players);
 
         if (players.length === 1 && players[0].id === this.myPlayerId) {
-            // Перевіряємо, чи гра ще не завершена локально
-            // (можливо, ми вже показали екран перемоги)
-            // if (get(uiStateStore).isGameOver) return; // Це можна перевірити всередині endGameService або тут, якщо додати store
+            // FIX: Встановлюємо прапорець щоб запобігти повторним викликам
+            this.victoryDeclared = true;
 
             logService.GAME_MODE('[MatchController] Victory Check: All opponents left. Declaring victory.');
             modalService.closeAllModals();
-            notificationService.show({ type: 'success', messageRaw: 'Всі суперники залишили гру. Ви перемогли!' });
 
-            // Викликаємо сервіс завершення гри напряму, оскільки це локальна перемога (всі інші пішли)
-            endGameService.endGame('modal.gameOverReasonBonus');
+            // FIX: Використовуємо стандартну систему завершення гри з новим reasonKey.
+            // Сповіщення та модальне вікно формуються endGameService.
+            endGameService.endGame('modal.gameOverReasonOpponentsLeft');
         }
     }
 

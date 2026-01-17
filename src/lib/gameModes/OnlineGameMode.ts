@@ -14,6 +14,7 @@ import type { IGameStateSync, GameStateSyncEvent, SyncableGameState } from '$lib
 import { createFirebaseGameStateSync } from '$lib/sync/FirebaseGameStateSync';
 import type { ScoreChangesData } from '$lib/types/gameMove';
 import { roomService } from '$lib/services/roomService';
+import { roomPlayerService } from '$lib/services/room/roomPlayerService';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import { notificationService } from '$lib/services/notificationService';
 import type { Room } from '$lib/types/online';
@@ -264,6 +265,12 @@ export class OnlineGameMode extends BaseGameMode {
     }
 
     await super.handlePlayerMove(direction, distance, onEndCallback);
+
+    // Implicit Heartbeat: Хід підтверджує присутність. Не чекаємо завершення.
+    if (this.roomId && this.myPlayerId) {
+        roomPlayerService.sendHeartbeat(this.roomId, this.myPlayerId).catch(() => {});
+    }
+
     await this.synchronizer?.syncCurrentState();
   }
 

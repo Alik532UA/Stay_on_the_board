@@ -6,32 +6,46 @@
 
     export let content: {
         playerName: string;
+        opponentId: string;
         disconnectStartedAt: number;
         roomId: string;
         myPlayerId: string;
     };
 
-    const TIMEOUT_SECONDS = 30;
+    const TIMEOUT_SECONDS = 15; // Змінено на 15 секунд згідно з вимогами
     let timeRemaining = TIMEOUT_SECONDS;
     let interval: ReturnType<typeof setInterval>;
+    let startTime: number;
 
     function updateTimer() {
-        const elapsed = (Date.now() - content.disconnectStartedAt) / 1000;
+        if (!startTime) return;
+        const elapsed = (Date.now() - startTime) / 1000;
         timeRemaining = Math.max(0, Math.ceil(TIMEOUT_SECONDS - elapsed));
     }
 
     onMount(() => {
+        // ... (код onMount без змін) ...
+        if (typeof content.disconnectStartedAt === 'number' && !isNaN(content.disconnectStartedAt) && content.disconnectStartedAt > 0) {
+            startTime = content.disconnectStartedAt;
+        } else {
+            console.warn('[ReconnectionModal] Invalid disconnectStartedAt, using Date.now()', content.disconnectStartedAt);
+            startTime = Date.now();
+        }
+
         updateTimer();
         interval = setInterval(updateTimer, 500);
     });
-
-    onDestroy(() => {
-        if (interval) clearInterval(interval);
-    });
+    
+    // ... onDestroy ...
 
     async function leaveGame() {
         await roomPlayerService.leaveRoom(content.roomId, content.myPlayerId);
         navigationService.goTo("/online");
+    }
+
+    async function kickPlayer() {
+        // Видаляємо опонента з кімнати. Це спровокує логіку "Opponents Left" -> Перемога.
+        await roomPlayerService.leaveRoom(content.roomId, content.opponentId);
     }
 </script>
 
@@ -55,6 +69,11 @@
     </p>
 
     <div class="actions-column">
+        {#if timeRemaining === 0}
+            <button class="kick-btn" on:click={kickPlayer}>
+                {$_("onlineMenu.kickPlayer") || "Видалити гравця (Перемога)"}
+            </button>
+        {/if}
         <button class="leave-btn" on:click={leaveGame}>
             {$_("onlineMenu.leaveRoom")}
         </button>
@@ -62,6 +81,7 @@
 </div>
 
 <style>
+    /* ... (стилі без змін) ... */
     .reconnection-content {
         display: flex;
         flex-direction: column;
@@ -70,6 +90,33 @@
         gap: 20px;
         width: 100%;
     }
+
+    /* ... */
+
+    .kick-btn {
+        background: var(--primary-color, #4CAF50);
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.1em;
+        transition: all 0.2s;
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    .kick-btn:hover {
+        background: var(--primary-color-dark, #388E3C);
+        transform: scale(1.05);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* ... (решта стилів) ... */
 
     .modal-title-menu {
         text-align: center;

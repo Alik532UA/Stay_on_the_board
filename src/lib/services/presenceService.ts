@@ -55,6 +55,20 @@ class PresenceService {
             last_changed: serverTimestamp()
         });
     }
+
+    /**
+     * Підписується на зміни статусів всіх гравців у кімнаті.
+     */
+    subscribeToRoomPresence(roomId: string, callback: (statuses: Record<string, { state: string, last_changed: number }>) => void): () => void {
+        const roomStatusRef = ref(this.rtdb, `/status/${roomId}`);
+        
+        const unsubscribe = onValue(roomStatusRef, (snapshot) => {
+            const val = snapshot.val();
+            callback(val || {});
+        });
+
+        return unsubscribe;
+    }
 }
 
 export const presenceService = new PresenceService();

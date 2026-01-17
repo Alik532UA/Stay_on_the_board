@@ -49,26 +49,30 @@ export type LogGroup = typeof LOG_GROUPS[keyof typeof LOG_GROUPS];
 export type LogConfig = Record<LogGroup, boolean>;
 
 const defaultConfig: LogConfig = {
-    [LOG_GROUPS.STATE]: false,
-    [LOG_GROUPS.PIECE]: false,
-    [LOG_GROUPS.LOGIC_MOVE]: false,
+    [LOG_GROUPS.LOGIC_GENERAL]: false,
+    [LOG_GROUPS.LOGIC_BOARD]: false,
+    [LOG_GROUPS.LOGIC_WIN]: false,
     [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: false,
     [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
     [LOG_GROUPS.LOGIC_TIME]: false,
-    [LOG_GROUPS.SCORE]: true,
+    [LOG_GROUPS.SCORE]: false, // DEBUG: Off
     [LOG_GROUPS.UI]: false,
     [LOG_GROUPS.TOOLTIP]: false,
-    [LOG_GROUPS.ANIMATION]: false,
-    [LOG_GROUPS.INIT]: false,
-    [LOG_GROUPS.ACTION]: true,
-    [LOG_GROUPS.GAME_MODE]: true,
+    [LOG_GROUPS.ANIMATION]: false, // DEBUG: Off
+    [LOG_GROUPS.INIT]: true, // DEBUG: On
+    [LOG_GROUPS.ACTION]: false, // DEBUG: Off
+    [LOG_GROUPS.GAME_MODE]: true, // DEBUG: On
     [LOG_GROUPS.SPEECH]: false,
     [LOG_GROUPS.VOICE_CONTROL]: false,
+    [LOG_GROUPS.STATE]: false,
+    [LOG_GROUPS.PIECE]: false,
+    [LOG_GROUPS.LOGIC_MOVE]: false,
     [LOG_GROUPS.TEST_MODE]: false,
     [LOG_GROUPS.MODAL]: false,
     [LOG_GROUPS.ERROR]: true,
-    [LOG_GROUPS.HOTKEY]: false, // ВИМКНЕНО ЗА ЗАМОВЧУВАННЯМ
+    [LOG_GROUPS.HOTKEY]: false
 };
+
 
 const STORAGE_KEY = 'logConfig';
 

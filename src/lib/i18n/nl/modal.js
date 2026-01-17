@@ -35,6 +35,7 @@ export default {
   // FIX: Updated text
   gameOverReasonCashOut: "{playerName} heeft het spel vroegtijdig beëindigd.",
   gameOverReasonBonus: "Je hebt besloten het spel te beëindigen en een bonus te claimen.",
+  gameOverReasonOpponentsLeft: "Alle tegenstanders hebben het spel verlaten.",
 
   scoreDetails: {
     baseScore: "Basisscore:",

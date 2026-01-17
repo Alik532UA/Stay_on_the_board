@@ -34,6 +34,7 @@ export default {
   // FIX: Updated text
   gameOverReasonCashOut: "{playerName} ended the game early.",
   gameOverReasonBonus: "You decided to end the game and claim a bonus.",
+  gameOverReasonOpponentsLeft: "All opponents have left the game.",
   gameOverReasonTimeUp: "Time is up.",
   scoreDetails: {
     baseScore: "Base score:",
