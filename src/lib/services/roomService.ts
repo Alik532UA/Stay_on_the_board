@@ -100,79 +100,88 @@ class RoomService {
         return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}_${ms}_${randomSuffix}`;
     }
 
+    private processRoomsSnapshot(querySnapshot: any): { rooms: RoomSummary[], latestCreatedAt?: number } {
+        const rooms: RoomSummary[] = [];
+        const now = Date.now();
+        const cleanupPromises: Promise<void>[] = [];
+        let activeRoomsLatestCreated = 0;
+
+        querySnapshot.forEach((doc: any) => {
+            const data = doc.data() as Room;
+
+            if (data.createdAt > activeRoomsLatestCreated) {
+                activeRoomsLatestCreated = data.createdAt;
+            }
+
+            if (now - data.lastActivity > ROOM_TIMEOUT_MS) {
+                cleanupPromises.push(roomFirestoreService.deleteRoomDoc(doc.ref));
+                return;
+            }
+            
+            const allPlayers = Object.values(data.players || {});
+            
+            const activePlayers = allPlayers.filter(p => {
+                const lastSeen = p.lastSeen || p.joinedAt;
+                const isNotStale = (now - lastSeen) < 120000; 
+                return !p.isDisconnected && isNotStale;
+            });
+            
+            if (data.status === 'playing' && activePlayers.length === 0) {
+                 // logService.init(`[RoomService] Hiding zombie room ${data.name} (playing, 0 active players).`);
+                 return;
+            }
+
+            if (allPlayers.length > 0) {
+                rooms.push({
+                    id: doc.id,
+                    name: data.name,
+                    status: data.status,
+                    playerCount: allPlayers.length,
+                    maxPlayers: MAX_PLAYERS,
+                    isPrivate: data.isPrivate
+                });
+            }
+        });
+
+        if (cleanupPromises.length > 0) {
+            Promise.allSettled(cleanupPromises).catch(e => console.error(e));
+        }
+
+        return {
+            rooms,
+            latestCreatedAt: activeRoomsLatestCreated > 0 ? activeRoomsLatestCreated : undefined
+        };
+    }
+
     async getPublicRooms(): Promise<{ rooms: RoomSummary[], latestCreatedAt?: number }> {
         try {
             const [querySnapshot, statsData] = await roomFirestoreService.getPublicRoomsQuerySnapshot();
-
-            const rooms: RoomSummary[] = [];
-            const now = Date.now();
-            const cleanupPromises: Promise<void>[] = [];
-
-            let globalLastCreated = 0;
-            if (statsData) {
-                globalLastCreated = statsData.lastRoomCreatedAt || 0;
-            }
-
-            let activeRoomsLatestCreated = 0;
-
-            querySnapshot.forEach((doc) => {
-                const data = doc.data() as Room;
-
-                if (data.createdAt > activeRoomsLatestCreated) {
-                    activeRoomsLatestCreated = data.createdAt;
-                }
-
-                if (now - data.lastActivity > ROOM_TIMEOUT_MS) {
-                    cleanupPromises.push(roomFirestoreService.deleteRoomDoc(doc.ref));
-                    return;
-                }
-                
-                const allPlayers = Object.values(data.players || {});
-                
-                // Вважаємо гравця активним, якщо він явно не відключений (isDisconnected)
-                // Додатково: якщо гравець "завис" (немає активності > 2 хвилин), теж не рахуємо його активним для Лобі
-                const activePlayers = allPlayers.filter(p => {
-                    const lastSeen = p.lastSeen || p.joinedAt;
-                    // 120 секунд толерантності для відображення в лобі. 
-                    // Це не впливає на саму гру, лише на видимість у списку.
-                    const isNotStale = (now - lastSeen) < 120000; 
-                    return !p.isDisconnected && isNotStale;
-                });
-                
-                // Якщо гра йде, але немає активних гравців (всі відключені), не показуємо кімнату в лобі.
-                // Це приховує "зомбі" ігри, де всі вийшли або вилетіли, але кімната ще існує для reconnect.
-                if (data.status === 'playing' && activePlayers.length === 0) {
-                     logService.init(`[RoomService] Hiding zombie room ${data.name} (playing, 0 active players).`);
-                     return;
-                }
-
-                // Показуємо кімнату, якщо в ній є хоча б один гравець (навіть якщо він тимчасово відключений)
-                if (allPlayers.length > 0) {
-                    rooms.push({
-                        id: doc.id,
-                        name: data.name,
-                        status: data.status,
-                        playerCount: allPlayers.length, // Disconnected гравці теж займають місце
-                        maxPlayers: MAX_PLAYERS,
-                        isPrivate: data.isPrivate
-                    });
-                }
-            });
-
-            if (cleanupPromises.length > 0) {
-                Promise.allSettled(cleanupPromises).catch(e => console.error(e));
-            }
-
-            const finalLatestCreatedAt = Math.max(activeRoomsLatestCreated, globalLastCreated);
+            const result = this.processRoomsSnapshot(querySnapshot);
+            
+            let globalLastCreated = statsData?.lastRoomCreatedAt || 0;
+            const finalLatestCreatedAt = Math.max(result.latestCreatedAt || 0, globalLastCreated);
 
             return {
-                rooms,
+                rooms: result.rooms,
                 latestCreatedAt: finalLatestCreatedAt > 0 ? finalLatestCreatedAt : undefined
             };
         } catch (error) {
             logService.error('[RoomService] Failed to get rooms:', error);
             return { rooms: [] };
         }
+    }
+
+    subscribeToPublicRooms(callback: (data: { rooms: RoomSummary[], latestCreatedAt?: number }) => void): Unsubscribe {
+        return roomFirestoreService.subscribeToPublicRooms(
+            (snapshot) => {
+                const result = this.processRoomsSnapshot(snapshot);
+                callback(result);
+            },
+            (error) => {
+                logService.error('[RoomService] Subscribe public rooms error:', error);
+                callback({ rooms: [] });
+            }
+        );
     }
 
     async joinRoom(roomId: string, playerName: string): Promise<string> {

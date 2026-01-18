@@ -63,6 +63,15 @@ class RoomFirestoreService {
         return [querySnapshot, statsData];
     }
 
+    subscribeToPublicRooms(callback: (snapshot: QuerySnapshot<DocumentData>) => void, errorCallback: (error: any) => void): Unsubscribe {
+        const q = query(
+            collection(this.db, 'rooms'),
+            where('isPrivate', '==', false),
+            orderBy('lastActivity', 'desc')
+        );
+        return onSnapshot(q, callback, errorCallback);
+    }
+
     async deleteRoomDoc(ref: any): Promise<void> {
         await deleteDoc(ref);
     }

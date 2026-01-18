@@ -17,20 +17,30 @@
     let isLoading = false;
     let joiningRoomId: string | null = null;
     let error: string | null = null;
+    let unsubscribe: (() => void) | undefined;
 
-    async function loadRooms() {
+    function subscribe() {
+        if (unsubscribe) unsubscribe();
+        
         isLoading = true;
         error = null;
+        
         try {
-            const result = await roomService.getPublicRooms();
-            rooms = result.rooms;
-            latestCreatedAt = result.latestCreatedAt;
+            unsubscribe = roomService.subscribeToPublicRooms((data) => {
+                rooms = data.rooms;
+                latestCreatedAt = data.latestCreatedAt;
+                isLoading = false;
+            });
         } catch (e) {
             console.error(e);
             error = $_("onlineMenu.errors.fetchFailed");
-        } finally {
             isLoading = false;
         }
+    }
+
+    // Зберігаємо для сумісності з кнопкою, хоча оновлення автоматичне
+    function loadRooms() {
+        subscribe();
     }
 
     async function handleJoin(roomId: string) {
@@ -61,16 +71,17 @@
         } catch (e) {
             logService.error("[RoomList] Failed to join room", e);
             alert($_("onlineMenu.errors.joinFailed"));
-            loadRooms();
+            // loadRooms(); // Не потрібно, бо підписка сама оновить список
         } finally {
             joiningRoomId = null;
         }
     }
 
     onMount(() => {
-        loadRooms();
-        const interval = setInterval(loadRooms, 10000);
-        return () => clearInterval(interval);
+        subscribe();
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     });
 </script>
 
