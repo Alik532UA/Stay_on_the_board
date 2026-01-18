@@ -61,5 +61,11 @@ export default {
   kickPlayer: "Speler Kicken",
   reconnecting: "Speler probeert opnieuw verbinding te maken. Als ze niet terugkeren, wordt het spel beëindigd of worden ze verwijderd.",
   leaveRoom: "Spel verlaten",
-  playerDisconnected: "{name} is uit het spel verwijderd."
+  playerDisconnected: "{name} is uit het spel verwijderd.",
+  abandonedGame: {
+    title: "Verlaten Online Spel",
+    message: "Je hebt een actief spel verlaten. Wil je terugkeren of het definitief verlaten?",
+    return: "Terug naar Spel",
+    leave: "Spel Verlaten"
+  }
 };

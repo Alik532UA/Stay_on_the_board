@@ -61,5 +61,11 @@ export default {
   kickPlayer: "Oyunçını Çıqarmaq",
   reconnecting: "Oyunçı kene bağlanmağa tırışa. Eger o qaytmasa, oyun bitirilecek ya da o çıqarılacaq.",
   leaveRoom: "Oyundan çıqmaq",
-  playerDisconnected: "{name} oyundan çıqarıldı."
+  playerDisconnected: "{name} oyundan çıqarıldı.",
+  abandonedGame: {
+    title: "Qaldırılğan Onlayn Oyun",
+    message: "Faal oyunnı terk ettiñiz. Keri qaytmağa isteysiñizmi ya da onı temelli terk etesizmi?",
+    return: "Oyunğa Qaytmaq",
+    leave: "Oyunnı Bitirmek"
+  }
 };

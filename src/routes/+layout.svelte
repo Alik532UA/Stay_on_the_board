@@ -10,6 +10,7 @@
 	import Modal from "$lib/components/Modal.svelte";
 	import { modalStore } from "$lib/stores/modalStore";
 	import { afterNavigate, goto } from "$app/navigation";
+	import { page } from "$app/stores";
 	import { logService } from "$lib/services/logService.js";
 	import TestModeWidget from "$lib/components/widgets/TestModeWidget.svelte";
 	import { tooltipStore } from "$lib/stores/tooltipStore";
@@ -81,20 +82,47 @@
 		if (unsubscribeTestMode) unsubscribeTestMode();
 	});
 
-	async function checkOnlineSession() {
+	// Reactive check for online session on every navigation
+	$: if ($page) {
+		checkOnlineSession($page.url.pathname);
+	}
+
+	async function checkOnlineSession(currentPath: string) {
 		const session = roomService.getSession();
+
 		if (session.roomId && session.playerId) {
-			logService.init(
-				`[Layout] Found active session for room ${session.roomId}`,
-			);
-			const path = window.location.pathname;
 			const basePath = base || "";
-			if (
-				path === basePath + "/" ||
-				path === basePath + "/online" ||
-				path === basePath + "/online/"
-			) {
-				goto(`${base}/online/lobby/${session.roomId}`);
+
+			// Safe zones where we DO NOT show the modal
+			const isLobby = currentPath.includes(
+				`${basePath}/online/lobby/${session.roomId}`,
+			);
+			const isGame = currentPath.includes(`${basePath}/game/online`);
+
+			const isSafeZone = isLobby || isGame;
+
+			logService.init(
+				`[Layout] checkOnlineSession: path=${currentPath}, roomId=${session.roomId}, isSafeZone=${isSafeZone} (Lobby=${isLobby}, Game=${isGame})`,
+			);
+
+			if (!isSafeZone) {
+				// Determine if we should show the modal
+				modalStore.showModal({
+					titleKey: "onlineMenu.abandonedGame.title",
+					dataTestId: "abandoned-game-modal",
+					component: (
+						await import(
+							"$lib/components/modals/AbandonedGameModal.svelte"
+						)
+					).default,
+					props: {
+						roomId: session.roomId,
+						playerId: session.playerId,
+					},
+					variant: "menu",
+					closeOnOverlayClick: false,
+					buttons: [],
+				});
 			}
 		}
 	}

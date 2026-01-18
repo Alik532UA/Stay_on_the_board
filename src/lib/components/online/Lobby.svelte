@@ -28,12 +28,17 @@
         myPlayerId = session.playerId;
 
         if (!myPlayerId) {
+            // No player ID in session, cannot join.
+            roomService.clearSession();
             goto(`${base}/online`);
             return;
         }
 
         unsubscribe = roomService.subscribeToRoom(roomId, (updatedRoom) => {
             if (!updatedRoom) {
+                // Room does not exist anymore (expired or deleted)
+                // We MUST clear the session to prevent auto-rejoin loops or "Abandoned Game" modals
+                roomService.clearSession();
                 goto(`${base}/online`);
                 return;
             }
@@ -46,18 +51,23 @@
     });
 
     beforeNavigate(async ({ to, cancel }) => {
-        logService.ui('[Lobby] beforeNavigate:', { routeId: to?.route.id, pathname: to?.url?.pathname });
-        
-        const isGameRoute = to?.route.id === "/game/online" || to?.url?.pathname?.includes('/game/online');
+        logService.ui("[Lobby] beforeNavigate:", {
+            routeId: to?.route.id,
+            pathname: to?.url?.pathname,
+        });
+
+        const isGameRoute =
+            to?.route.id === "/game/online" ||
+            to?.url?.pathname?.includes("/game/online");
 
         if (isGameRoute) {
-            logService.ui('[Lobby] Navigating to game. Not leaving room.');
+            logService.ui("[Lobby] Navigating to game. Not leaving room.");
             return;
         }
         if (isLeaving) return;
 
         if (myPlayerId && roomId) {
-            logService.ui('[Lobby] Navigating away. Leaving room.');
+            logService.ui("[Lobby] Navigating away. Leaving room.");
             isLeaving = true;
             roomService.leaveRoom(roomId, myPlayerId);
         }

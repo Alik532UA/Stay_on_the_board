@@ -14,7 +14,7 @@
     let roomId = "";
     let myPlayerId = "";
 
-    const unsub = reconnectionStore.subscribe(state => {
+    const unsub = reconnectionStore.subscribe((state) => {
         players = state.players;
         roomId = state.roomId;
         myPlayerId = state.myPlayerId;
@@ -26,7 +26,7 @@
             timeRemaining = 0;
             return;
         }
-        const minDeadline = Math.min(...players.map(p => p.deadline));
+        const minDeadline = Math.min(...players.map((p) => p.deadline));
         const now = Date.now();
         timeRemaining = Math.max(0, Math.ceil((minDeadline - now) / 1000));
     }
@@ -35,7 +35,7 @@
         interval = setInterval(updateTimer, 500);
         updateTimer();
     });
-    
+
     onDestroy(() => {
         if (interval) clearInterval(interval);
         unsub();
@@ -51,49 +51,52 @@
         if (!roomId) return;
         // Kick all disconnected players
         for (const p of players) {
-             await roomPlayerService.leaveRoom(roomId, p.id);
+            await roomPlayerService.leaveRoom(roomId, p.id);
         }
-    }
-    
-    function extendWait() {
-        players.forEach(p => {
-            reconnectionStore.extendDeadline(p.id, 15);
-        });
-        updateTimer();
     }
 </script>
 
 <div class="reconnection-content" data-testid="reconnection-modal-content">
-    <h2 class="modal-title-menu">
+    <h2 class="modal-title-menu" data-testid="reconnection-title">
         {$_("onlineMenu.waitingForPlayersList")}
     </h2>
 
-    <div class="players-list">
+    <div class="players-list" data-testid="reconnection-players-list">
         {#each players as player (player.id)}
-            <div class="player-item">
+            <div
+                class="player-item"
+                data-testid="reconnection-player-{player.id}"
+            >
                 <span class="player-name">{player.name}</span>
             </div>
         {/each}
     </div>
 
-    <div class="timer">
-        {timeRemaining}s
-    </div>
+    {#if timeRemaining > 0}
+        <div class="timer" data-testid="reconnection-timer">
+            {timeRemaining}
+        </div>
+    {/if}
 
-    <div class="loader-container">
+    <div class="loader-container" data-testid="reconnection-loader">
         <div class="pulse-loader"></div>
     </div>
 
-    <div class="actions-column">
-        <button class="action-btn continue-btn" on:click={extendWait} disabled={timeRemaining > 0}>
-            {$_("onlineMenu.continueWaiting")}
-        </button>
-        
-        <button class="action-btn kick-btn" on:click={kickPlayers} disabled={timeRemaining > 0}>
+    <div class="actions-column" data-testid="reconnection-actions">
+        <button
+            class="action-btn kick-btn"
+            on:click={kickPlayers}
+            disabled={timeRemaining > 0}
+            data-testid="reconnection-kick-btn"
+        >
             {$_("onlineMenu.kickPlayer")}
         </button>
-        
-        <button class="action-btn leave-btn" on:click={leaveGame} disabled={timeRemaining > 0}>
+
+        <button
+            class="action-btn leave-btn"
+            on:click={leaveGame}
+            data-testid="reconnection-leave-btn"
+        >
             {$_("onlineMenu.leaveRoom")}
         </button>
     </div>
@@ -170,23 +173,23 @@
     }
 
     .continue-btn {
-        background: var(--primary-color, #4CAF50);
+        background: var(--primary-color, #4caf50);
         color: white;
     }
 
     .continue-btn:not(:disabled):hover {
-         background: var(--primary-color-dark, #388E3C);
-         transform: scale(1.02);
+        background: var(--primary-color-dark, #388e3c);
+        transform: scale(1.02);
     }
 
     .kick-btn {
-        background: var(--warning-color, #FF9800);
+        background: var(--warning-color, #ff9800);
         color: white;
     }
-    
+
     .kick-btn:not(:disabled):hover {
-         background: #F57C00;
-         transform: scale(1.02);
+        background: #f57c00;
+        transform: scale(1.02);
     }
 
     .leave-btn {
@@ -208,14 +211,23 @@
         opacity: 0.6;
         animation: pulse 1.5s infinite ease-in-out;
     }
-    
+
     .loader-container {
         margin: 10px 0;
     }
 
     @keyframes pulse {
-        0% { transform: scale(0.8); opacity: 0.6; }
-        50% { transform: scale(1.1); opacity: 0.3; }
-        100% { transform: scale(0.8); opacity: 0.6; }
+        0% {
+            transform: scale(0.8);
+            opacity: 0.6;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.3;
+        }
+        100% {
+            transform: scale(0.8);
+            opacity: 0.6;
+        }
     }
 </style>

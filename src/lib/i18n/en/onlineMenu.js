@@ -61,5 +61,11 @@ export default {
   kickPlayer: "Kick Player",
   reconnecting: "Player is attempting to reconnect. If they don't return, the game will end or they will be removed.",
   leaveRoom: "Leave Game",
-  playerDisconnected: "{name} has been removed from the game."
+  playerDisconnected: "{name} has been removed from the game.",
+  abandonedGame: {
+    title: "Abandoned Online Game",
+    message: "You have left an active game. Do you want to return or leave it permanently?",
+    return: "Return to Game",
+    leave: "Leave Game"
+  }
 };
