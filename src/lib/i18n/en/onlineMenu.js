@@ -56,6 +56,9 @@ export default {
     joinFailed: "Failed to join room"
   },
   waitingForReturn: "Waiting for {name} to return...",
+  waitingForPlayersList: "Waiting for Players",
+  continueWaiting: "Continue Waiting",
+  kickPlayer: "Kick Player",
   reconnecting: "Player is attempting to reconnect. If they don't return, the game will end or they will be removed.",
   leaveRoom: "Leave Game",
   playerDisconnected: "{name} has been removed from the game."

@@ -46,7 +46,7 @@ export class RoomPlayerService {
     }
 
     async leaveRoom(roomId: string, playerId: string): Promise<void> {
-        logService.init(`[RoomPlayerService] Leaving room ${roomId} as ${playerId}`);
+        logService.init(`[RoomPlayerService] leaveRoom CALLED for ${roomId} by ${playerId}`);
         const roomRef = doc(this.db, 'rooms', roomId);
 
         roomSessionService.clearSession();
@@ -63,9 +63,15 @@ export class RoomPlayerService {
 
             if (players[playerId]) {
                 delete players[playerId];
+                logService.init(`[RoomPlayerService] Removed player from map. Checking remaining...`);
 
-                if (Object.keys(players).length === 0) {
-                    logService.init(`[RoomPlayerService] Room empty, deleting room.`);
+                const remainingPlayers = Object.values(players);
+                const activePlayers = remainingPlayers.filter(p => !p.isDisconnected);
+                
+                logService.init(`[RoomPlayerService] Remaining: ${remainingPlayers.length}, Active: ${activePlayers.length}`);
+
+                if (activePlayers.length === 0) {
+                    logService.init(`[RoomPlayerService] Room empty or only disconnected players left, deleting room.`);
                     await deleteDoc(roomRef);
                 } else {
                     const updates: Record<string, any> = {
@@ -74,12 +80,15 @@ export class RoomPlayerService {
                     };
 
                     if (roomData.hostId === playerId) {
-                        const nextHostId = Object.keys(players)[0];
-                        updates.hostId = nextHostId;
-                        logService.init(`[RoomPlayerService] Host migrated to ${nextHostId}`);
+                        // Шукаємо нового хоста серед активних гравців
+                        // Якщо активних немає (хоча activePlayers.length > 0 гарантує це), беремо першого зі списку
+                        const nextHost = activePlayers[0] || remainingPlayers[0];
+                        if (nextHost) {
+                             updates.hostId = nextHost.id;
+                             logService.init(`[RoomPlayerService] Host migrated to ${nextHost.id}`);
+                        }
                     }
 
-                    const remainingPlayers = Object.values(players);
                     const allRemainingReady = remainingPlayers.length > 0 && remainingPlayers.every(p => p.isReady);
 
                     if (allRemainingReady && roomData.status === 'finished') {

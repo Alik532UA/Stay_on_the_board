@@ -126,14 +126,35 @@ class RoomService {
                     cleanupPromises.push(roomFirestoreService.deleteRoomDoc(doc.ref));
                     return;
                 }
-                rooms.push({
-                    id: doc.id,
-                    name: data.name,
-                    status: data.status,
-                    playerCount: Object.keys(data.players || {}).length,
-                    maxPlayers: MAX_PLAYERS,
-                    isPrivate: data.isPrivate
+                
+                const allPlayers = Object.values(data.players || {});
+                
+                // Вважаємо гравця активним, якщо він явно не відключений (isDisconnected)
+                // Додатково: якщо гравець "завис" (немає активності > 2 хвилин), теж не рахуємо його активним для Лобі
+                const activePlayers = allPlayers.filter(p => {
+                    const lastSeen = p.lastSeen || p.joinedAt;
+                    // 120 секунд толерантності для відображення в лобі. 
+                    // Це не впливає на саму гру, лише на видимість у списку.
+                    const isNotStale = (now - lastSeen) < 120000; 
+                    return !p.isDisconnected && isNotStale;
                 });
+                
+                // DEBUG LOG
+                if (data.status === 'playing') {
+                     logService.init(`[RoomService] Room ${data.name} (playing): Total=${allPlayers.length}, Active=${activePlayers.length}.`);
+                }
+
+                // Показуємо кімнату тільки якщо в ній є активні гравці
+                if (activePlayers.length > 0) {
+                    rooms.push({
+                        id: doc.id,
+                        name: data.name,
+                        status: data.status,
+                        playerCount: activePlayers.length,
+                        maxPlayers: MAX_PLAYERS,
+                        isPrivate: data.isPrivate
+                    });
+                }
             });
 
             if (cleanupPromises.length > 0) {
@@ -212,15 +233,14 @@ class RoomService {
         }
     }
 
-    subscribeToRoom(roomId: string, callback: (room: Room) => void): Unsubscribe {
+    subscribeToRoom(roomId: string, callback: (room: Room | null) => void): Unsubscribe {
         return roomFirestoreService.subscribeToRoom(
             roomId,
             (room) => {
-                if (room) {
-                    callback(room);
-                } else {
-                    logService.init(`[RoomService] Room ${roomId} deleted`);
+                if (!room) {
+                    logService.init(`[RoomService] Room ${roomId} deleted or not found`);
                 }
+                callback(room);
             },
             (error) => {
                 logService.error('[RoomService] Subscribe error:', error);

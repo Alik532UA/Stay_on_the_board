@@ -3,85 +3,103 @@
     import { onDestroy, onMount } from "svelte";
     import { roomPlayerService } from "$lib/services/room/roomPlayerService";
     import { navigationService } from "$lib/services/navigationService";
+    import { reconnectionStore } from "$lib/stores/reconnectionStore";
+    import type { DisconnectedPlayer } from "$lib/stores/reconnectionStore";
 
-    export let content: {
-        playerName: string;
-        opponentId: string;
-        disconnectStartedAt: number;
-        roomId: string;
-        myPlayerId: string;
-    };
+    export let content: any = {}; // Deprecated, using store
 
-    const TIMEOUT_SECONDS = 15; // Змінено на 15 секунд згідно з вимогами
-    let timeRemaining = TIMEOUT_SECONDS;
+    let players: DisconnectedPlayer[] = [];
+    let timeRemaining = 0;
     let interval: ReturnType<typeof setInterval>;
-    let startTime: number;
+    let roomId = "";
+    let myPlayerId = "";
+
+    const unsub = reconnectionStore.subscribe(state => {
+        players = state.players;
+        roomId = state.roomId;
+        myPlayerId = state.myPlayerId;
+        updateTimer();
+    });
 
     function updateTimer() {
-        if (!startTime) return;
-        const elapsed = (Date.now() - startTime) / 1000;
-        timeRemaining = Math.max(0, Math.ceil(TIMEOUT_SECONDS - elapsed));
+        if (players.length === 0) {
+            timeRemaining = 0;
+            return;
+        }
+        const minDeadline = Math.min(...players.map(p => p.deadline));
+        const now = Date.now();
+        timeRemaining = Math.max(0, Math.ceil((minDeadline - now) / 1000));
     }
 
     onMount(() => {
-        // ... (код onMount без змін) ...
-        if (typeof content.disconnectStartedAt === 'number' && !isNaN(content.disconnectStartedAt) && content.disconnectStartedAt > 0) {
-            startTime = content.disconnectStartedAt;
-        } else {
-            console.warn('[ReconnectionModal] Invalid disconnectStartedAt, using Date.now()', content.disconnectStartedAt);
-            startTime = Date.now();
-        }
-
-        updateTimer();
         interval = setInterval(updateTimer, 500);
+        updateTimer();
     });
     
-    // ... onDestroy ...
+    onDestroy(() => {
+        if (interval) clearInterval(interval);
+        unsub();
+    });
 
     async function leaveGame() {
-        await roomPlayerService.leaveRoom(content.roomId, content.myPlayerId);
+        if (!roomId || !myPlayerId) return;
+        await roomPlayerService.leaveRoom(roomId, myPlayerId);
         navigationService.goTo("/online");
     }
 
-    async function kickPlayer() {
-        // Видаляємо опонента з кімнати. Це спровокує логіку "Opponents Left" -> Перемога.
-        await roomPlayerService.leaveRoom(content.roomId, content.opponentId);
+    async function kickPlayers() {
+        if (!roomId) return;
+        // Kick all disconnected players
+        for (const p of players) {
+             await roomPlayerService.leaveRoom(roomId, p.id);
+        }
+    }
+    
+    function extendWait() {
+        players.forEach(p => {
+            reconnectionStore.extendDeadline(p.id, 15);
+        });
+        updateTimer();
     }
 </script>
 
 <div class="reconnection-content" data-testid="reconnection-modal-content">
     <h2 class="modal-title-menu">
-        {$_("onlineMenu.waitingForReturn", {
-            values: { name: content.playerName },
-        })}
+        {$_("onlineMenu.waitingForPlayersList")}
     </h2>
 
-    <div class="loader-container">
-        <div class="pulse-loader"></div>
+    <div class="players-list">
+        {#each players as player (player.id)}
+            <div class="player-item">
+                <span class="player-name">{player.name}</span>
+            </div>
+        {/each}
     </div>
 
     <div class="timer">
         {timeRemaining}s
     </div>
 
-    <p class="status-text">
-        {$_("onlineMenu.reconnecting")}
-    </p>
+    <div class="loader-container">
+        <div class="pulse-loader"></div>
+    </div>
 
     <div class="actions-column">
-        {#if timeRemaining === 0}
-            <button class="kick-btn" on:click={kickPlayer}>
-                {$_("onlineMenu.kickPlayer") || "Видалити гравця (Перемога)"}
-            </button>
-        {/if}
-        <button class="leave-btn" on:click={leaveGame}>
+        <button class="action-btn continue-btn" on:click={extendWait} disabled={timeRemaining > 0}>
+            {$_("onlineMenu.continueWaiting")}
+        </button>
+        
+        <button class="action-btn kick-btn" on:click={kickPlayers} disabled={timeRemaining > 0}>
+            {$_("onlineMenu.kickPlayer")}
+        </button>
+        
+        <button class="action-btn leave-btn" on:click={leaveGame} disabled={timeRemaining > 0}>
             {$_("onlineMenu.leaveRoom")}
         </button>
     </div>
 </div>
 
 <style>
-    /* ... (стилі без змін) ... */
     .reconnection-content {
         display: flex;
         flex-direction: column;
@@ -91,33 +109,6 @@
         width: 100%;
     }
 
-    /* ... */
-
-    .kick-btn {
-        background: var(--primary-color, #4CAF50);
-        color: #fff;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 1.1em;
-        transition: all 0.2s;
-        animation: fadeIn 0.5s ease-in;
-    }
-    
-    .kick-btn:hover {
-        background: var(--primary-color-dark, #388E3C);
-        transform: scale(1.05);
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* ... (решта стилів) ... */
-
     .modal-title-menu {
         text-align: center;
         font-size: 1.8em;
@@ -125,6 +116,25 @@
         color: #fff;
         margin: 0;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .players-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+    .player-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 10px 15px;
+        border-radius: 8px;
+        color: #fff;
+        font-weight: bold;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .actions-column {
@@ -142,30 +152,50 @@
         font-family: var(--font-family-monospace);
     }
 
-    .timer {
-        font-size: 3em;
+    .action-btn {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
         font-weight: bold;
-        color: var(--warning-action-bg);
-        font-family: var(--font-family-monospace);
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        font-size: 1.1em;
     }
 
-    .status-text {
-        color: var(--text-secondary);
-        margin: 0;
+    .action-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        filter: grayscale(1);
+    }
+
+    .continue-btn {
+        background: var(--primary-color, #4CAF50);
+        color: white;
+    }
+
+    .continue-btn:not(:disabled):hover {
+         background: var(--primary-color-dark, #388E3C);
+         transform: scale(1.02);
+    }
+
+    .kick-btn {
+        background: var(--warning-color, #FF9800);
+        color: white;
+    }
+    
+    .kick-btn:not(:disabled):hover {
+         background: #F57C00;
+         transform: scale(1.02);
     }
 
     .leave-btn {
         background: transparent;
         border: 2px solid var(--error-color);
         color: var(--error-color);
-        padding: 8px 16px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: all 0.2s;
     }
 
-    .leave-btn:hover {
+    .leave-btn:not(:disabled):hover {
         background: var(--error-color);
         color: #fff;
     }
@@ -178,19 +208,14 @@
         opacity: 0.6;
         animation: pulse 1.5s infinite ease-in-out;
     }
+    
+    .loader-container {
+        margin: 10px 0;
+    }
 
     @keyframes pulse {
-        0% {
-            transform: scale(0.8);
-            opacity: 0.6;
-        }
-        50% {
-            transform: scale(1.1);
-            opacity: 0.3;
-        }
-        100% {
-            transform: scale(0.8);
-            opacity: 0.6;
-        }
+        0% { transform: scale(0.8); opacity: 0.6; }
+        50% { transform: scale(1.1); opacity: 0.3; }
+        100% { transform: scale(0.8); opacity: 0.6; }
     }
 </style>

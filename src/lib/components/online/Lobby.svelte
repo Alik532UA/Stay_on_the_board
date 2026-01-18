@@ -14,6 +14,8 @@
     import type { GameSettingsState } from "$lib/stores/gameSettingsStore";
     import { fly, fade } from "svelte/transition";
 
+    import { logService } from "$lib/services/logService"; // Import logService
+
     export let roomId: string;
 
     let room: Room | null = null;
@@ -31,6 +33,10 @@
         }
 
         unsubscribe = roomService.subscribeToRoom(roomId, (updatedRoom) => {
+            if (!updatedRoom) {
+                goto(`${base}/online`);
+                return;
+            }
             room = updatedRoom;
 
             if (room.status === "playing") {
@@ -40,10 +46,18 @@
     });
 
     beforeNavigate(async ({ to, cancel }) => {
-        if (to?.route.id === "/game/online") return;
+        logService.ui('[Lobby] beforeNavigate:', { routeId: to?.route.id, pathname: to?.url?.pathname });
+        
+        const isGameRoute = to?.route.id === "/game/online" || to?.url?.pathname?.includes('/game/online');
+
+        if (isGameRoute) {
+            logService.ui('[Lobby] Navigating to game. Not leaving room.');
+            return;
+        }
         if (isLeaving) return;
 
         if (myPlayerId && roomId) {
+            logService.ui('[Lobby] Navigating away. Leaving room.');
             isLeaving = true;
             roomService.leaveRoom(roomId, myPlayerId);
         }

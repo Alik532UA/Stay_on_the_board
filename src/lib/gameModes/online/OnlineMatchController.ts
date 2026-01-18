@@ -73,6 +73,8 @@ export class OnlineMatchController {
 
         const players = Object.values(room.players);
 
+        // Перемога зараховується ТІЛЬКИ якщо інші гравці фізично покинули кімнату (були видалені зі списку players)
+        // Логіку очікування відключених гравців (isDisconnected) обробляє OnlinePresenceManager та ReconnectionModal.
         if (players.length === 1 && players[0].id === this.myPlayerId) {
             // FIX: Встановлюємо прапорець щоб запобігти повторним викликам
             this.victoryDeclared = true;

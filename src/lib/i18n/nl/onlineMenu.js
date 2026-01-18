@@ -56,6 +56,9 @@ export default {
     joinFailed: "Deelnemen aan kamer mislukt"
   },
   waitingForReturn: "Wachten op terugkeer van {name}...",
+  waitingForPlayersList: "Wachten op Spelers",
+  continueWaiting: "Blijf Wachten",
+  kickPlayer: "Speler Kicken",
   reconnecting: "Speler probeert opnieuw verbinding te maken. Als ze niet terugkeren, wordt het spel beëindigd of worden ze verwijderd.",
   leaveRoom: "Spel verlaten",
   playerDisconnected: "{name} is uit het spel verwijderd."

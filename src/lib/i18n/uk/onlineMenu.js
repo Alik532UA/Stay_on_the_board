@@ -56,6 +56,9 @@ export default {
     joinFailed: "Не вдалося приєднатися до кімнати"
   },
   waitingForReturn: "Очікування повернення {name}...",
+  waitingForPlayersList: "Очікування Гравців",
+  continueWaiting: "Продовжити чекати",
+  kickPlayer: "Кікнути гравця",
   reconnecting: "Гравець намагається відновити з'єднання. Якщо він не повернеться, гру буде завершено або його буде вилучено.",
   leaveRoom: "Вийти з гри",
   playerDisconnected: "Гравця {name} вилучено з гри.",

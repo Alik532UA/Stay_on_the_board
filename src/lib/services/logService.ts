@@ -22,6 +22,9 @@ if (isBrowser && localStorage.getItem('force-logging') === 'true') {
 export const LOG_GROUPS = {
     STATE: 'state',
     PIECE: 'piece',
+    LOGIC_GENERAL: 'logic_general',
+    LOGIC_BOARD: 'logic_board',
+    LOGIC_WIN: 'logic_win',
     LOGIC_MOVE: 'logic_move',
     LOGIC_VIRTUAL_PLAYER: 'logic_virtual_player',
     LOGIC_AVAILABILITY: 'logic_availability',
@@ -38,7 +41,7 @@ export const LOG_GROUPS = {
     TEST_MODE: 'test_mode',
     MODAL: 'modal',
     ERROR: 'error',
-    HOTKEY: 'hotkey' // НОВА ГРУПА
+    HOTKEY: 'hotkey'
 } as const;
 
 export type LogGroup = typeof LOG_GROUPS[keyof typeof LOG_GROUPS];
@@ -55,13 +58,13 @@ const defaultConfig: LogConfig = {
     [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: false,
     [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
     [LOG_GROUPS.LOGIC_TIME]: false,
-    [LOG_GROUPS.SCORE]: false, // DEBUG: Off
-    [LOG_GROUPS.UI]: false,
+    [LOG_GROUPS.SCORE]: false,
+    [LOG_GROUPS.UI]: true, // DEBUG: Enabled for navigation debugging
     [LOG_GROUPS.TOOLTIP]: false,
-    [LOG_GROUPS.ANIMATION]: false, // DEBUG: Off
-    [LOG_GROUPS.INIT]: true, // DEBUG: On
-    [LOG_GROUPS.ACTION]: false, // DEBUG: Off
-    [LOG_GROUPS.GAME_MODE]: true, // DEBUG: On
+    [LOG_GROUPS.ANIMATION]: false,
+    [LOG_GROUPS.INIT]: true, // DEBUG: Enabled
+    [LOG_GROUPS.ACTION]: false,
+    [LOG_GROUPS.GAME_MODE]: true, // DEBUG: Enabled
     [LOG_GROUPS.SPEECH]: false,
     [LOG_GROUPS.VOICE_CONTROL]: false,
     [LOG_GROUPS.STATE]: false,
@@ -69,7 +72,7 @@ const defaultConfig: LogConfig = {
     [LOG_GROUPS.LOGIC_MOVE]: false,
     [LOG_GROUPS.TEST_MODE]: false,
     [LOG_GROUPS.MODAL]: false,
-    [LOG_GROUPS.ERROR]: true,
+    [LOG_GROUPS.ERROR]: true, // DEBUG: Always on
     [LOG_GROUPS.HOTKEY]: false
 };
 
@@ -113,6 +116,9 @@ let logConfig = loadConfig();
 const styles: Record<LogGroup, string> = {
     [LOG_GROUPS.STATE]: 'color: #9C27B0; font-weight: bold;',
     [LOG_GROUPS.PIECE]: 'color: #795548; font-weight: bold;',
+    [LOG_GROUPS.LOGIC_GENERAL]: 'color: #607D8B;',
+    [LOG_GROUPS.LOGIC_BOARD]: 'color: #795548;',
+    [LOG_GROUPS.LOGIC_WIN]: 'color: #FFC107; font-weight: bold;',
     [LOG_GROUPS.LOGIC_MOVE]: 'color: #03A9F4; font-weight: bold;',
     [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: 'color: #2962FF; font-weight: bold;',
     [LOG_GROUPS.LOGIC_AVAILABILITY]: 'color: #64B5F6; font-weight: bold;',
@@ -129,7 +135,7 @@ const styles: Record<LogGroup, string> = {
     [LOG_GROUPS.TEST_MODE]: 'color: #FBC02D; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;',
     [LOG_GROUPS.MODAL]: 'color: #673AB7; font-weight: bold;',
     [LOG_GROUPS.ERROR]: 'color: #F44336; font-weight: bold;',
-    [LOG_GROUPS.HOTKEY]: 'color: #607D8B; font-style: italic;', // Стиль для хоткеїв
+    [LOG_GROUPS.HOTKEY]: 'color: #607D8B; font-style: italic;',
 };
 
 function log(group: LogGroup, message: string, ...data: unknown[]): void {
@@ -167,7 +173,7 @@ export const logService = {
     testMode: (message: string, ...data: unknown[]) => log(LOG_GROUPS.TEST_MODE, message, ...data),
     modal: (message: string, ...data: unknown[]) => log(LOG_GROUPS.MODAL, message, ...data),
     error: (message: string, ...data: unknown[]) => log(LOG_GROUPS.ERROR, message, ...data),
-    hotkey: (message: string, ...data: unknown[]) => log(LOG_GROUPS.HOTKEY, message, ...data), // Новий метод
+    hotkey: (message: string, ...data: unknown[]) => log(LOG_GROUPS.HOTKEY, message, ...data),
     info: (message: string, ...data: unknown[]) => log(LOG_GROUPS.INIT, message, ...data),
     forceEnableLogging: (): void => {
         if (!isForceEnabled) {

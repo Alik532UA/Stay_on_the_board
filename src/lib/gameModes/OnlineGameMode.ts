@@ -27,6 +27,8 @@ import { OnlineGameEventManager } from './online/OnlineGameEventManager';
 import { OnlineStateSynchronizer } from './online/OnlineStateSynchronizer';
 import { OnlinePresenceManager } from './online/OnlinePresenceManager';
 
+import { navigationService } from '$lib/services/navigationService';
+
 export class OnlineGameMode extends BaseGameMode {
   private stateSync: IGameStateSync | null = null;
   private reconciler: GameStateReconciler | null = null;
@@ -58,7 +60,31 @@ export class OnlineGameMode extends BaseGameMode {
     }
 
     await this.fetchRoomData();
-    if (!this.roomData) return;
+    if (!this.roomData) {
+        logService.error('[OnlineGameMode] Room data missing. Redirecting to menu.');
+        navigationService.goTo('/online');
+        return;
+    }
+
+    // SCENARIO 1 FIX: Перевірка на "мертву" кімнату при вході/реконнекті
+    if (this.roomData.status === 'playing') {
+        const now = Date.now();
+        const players = Object.values(this.roomData.players);
+        const activeOpponents = players.filter(p => {
+            if (p.id === this.myPlayerId) return false;
+            const lastSeen = p.lastSeen || p.joinedAt;
+            const isActiveRecently = (now - lastSeen) < 60000;
+            return !p.isDisconnected && isActiveRecently;
+        });
+
+        if (activeOpponents.length === 0 && players.length > 1) { // >1 щоб ігнорувати тестові соло-старти якщо такі можливі
+             logService.GAME_MODE('[OnlineGameMode] No active opponents found upon join. Ending game.');
+             endGameService.endGame('modal.gameOverReasonOpponentsLeft');
+             // Ми не повертаємось тут, бо endGame запустить процес виходу, 
+             // але краще зупинити подальшу ініціалізацію
+             return; 
+        }
+    }
 
     this.determineRole();
     this.applyRoomSettings();
@@ -178,6 +204,16 @@ export class OnlineGameMode extends BaseGameMode {
 
   private setupSubscriptions() {
     this.unsubscribeRoom = roomService.subscribeToRoom(this.roomId!, (updatedRoom) => {
+      if (!updatedRoom) {
+        logService.GAME_MODE('[OnlineGameMode] Room deleted while playing.');
+        const isGameOver = get(uiStateStore).isGameOver;
+        if (!isGameOver) {
+             // Кімнату видалено (ймовірно всі опоненти вийшли)
+             endGameService.endGame('modal.gameOverReasonOpponentsLeft');
+        }
+        return;
+      }
+
       this.roomData = updatedRoom;
       const wasHost = this.amIHost;
       this.amIHost = updatedRoom.hostId === this.myPlayerId;

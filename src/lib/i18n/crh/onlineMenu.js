@@ -56,6 +56,9 @@ export default {
     joinFailed: "Odağa qoşulıp olamadı"
   },
   waitingForReturn: "{name} keri qaytuvını bekley...",
+  waitingForPlayersList: "Oyunçılar Beklenile",
+  continueWaiting: "Beklemege Devam Etmek",
+  kickPlayer: "Oyunçını Çıqarmaq",
   reconnecting: "Oyunçı kene bağlanmağa tırışa. Eger o qaytmasa, oyun bitirilecek ya da o çıqarılacaq.",
   leaveRoom: "Oyundan çıqmaq",
   playerDisconnected: "{name} oyundan çıqarıldı."
