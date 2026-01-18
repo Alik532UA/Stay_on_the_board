@@ -25,6 +25,7 @@ import type {
 import { getFirestoreDb, isFirebaseConfigured } from '$lib/services/firebaseService';
 import { logService } from '$lib/services/logService';
 import { GameStateSerializer } from './GameStateSerializer';
+import { networkStatsStore } from '$lib/stores/networkStatsStore';
 
 interface FirebaseRoomDocument {
     gameState: any; // Serialized state
@@ -115,6 +116,7 @@ export class FirebaseGameStateSync implements IGameStateSync {
                 updatedAt: serverTimestamp()
             });
 
+            networkStatsStore.recordWrite('GameStateSync:pushState', finalState);
             logService.state(`[FirebaseGameStateSync] State pushed, version: ${this._stateVersion}`);
         } catch (error) {
             logService.error('[FirebaseGameStateSync] Push state error:', error);
@@ -136,6 +138,7 @@ export class FirebaseGameStateSync implements IGameStateSync {
                 updatedAt: serverTimestamp()
             });
 
+            networkStatsStore.recordWrite('GameStateSync:updateVote', { playerId, vote });
             logService.logicMove(`[FirebaseGameStateSync] Vote updated atomically for ${playerId}: ${vote}`);
         } catch (error) {
             logService.error('[FirebaseGameStateSync] Update vote error:', error);
@@ -158,6 +161,7 @@ export class FirebaseGameStateSync implements IGameStateSync {
                 updatedAt: serverTimestamp()
             });
 
+            networkStatsStore.recordWrite('GameStateSync:updateFinishRequest', { playerId, requested });
             logService.logicMove(`[FirebaseGameStateSync] Finish request updated atomically for ${playerId}: ${requested}`);
         } catch (error) {
             logService.error('[FirebaseGameStateSync] Update finish request error:', error);
@@ -192,6 +196,7 @@ export class FirebaseGameStateSync implements IGameStateSync {
                 createdAt: serverTimestamp()
             });
 
+            networkStatsStore.recordWrite('GameStateSync:pushMove', moveData);
             logService.logicMove('[FirebaseGameStateSync] Move pushed:', moveData);
         } catch (error) {
             logService.error('[FirebaseGameStateSync] Push move error:', error);
@@ -232,6 +237,7 @@ export class FirebaseGameStateSync implements IGameStateSync {
                 }
 
                 const data = snapshot.data() as FirebaseRoomDocument;
+                networkStatsStore.recordRead('GameStateSync:Snapshot', data);
 
                 if (data.gameState) {
                     if (data.gameState.version >= this._stateVersion) {

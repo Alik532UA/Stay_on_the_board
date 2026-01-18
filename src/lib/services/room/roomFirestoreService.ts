@@ -17,6 +17,7 @@ import {
 import { getFirestoreDb } from '../firebaseService';
 import type { Room } from '$lib/types/online';
 import { withTimeout } from '$lib/utils/asyncUtils';
+import { networkStatsStore } from '$lib/stores/networkStatsStore';
 
 const OPERATION_TIMEOUT_MS = 10000;
 
@@ -111,7 +112,9 @@ class RoomFirestoreService {
             this.getRoomRef(roomId),
             (doc) => {
                 if (doc.exists()) {
-                    callback({ ...doc.data(), id: doc.id } as Room);
+                    const data = doc.data();
+                    networkStatsStore.recordRead('RoomSubscription', data);
+                    callback({ ...data, id: doc.id } as Room);
                 } else {
                     callback(null);
                 }

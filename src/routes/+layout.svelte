@@ -27,6 +27,7 @@
 	import GameModeModal from "$lib/components/GameModeModal.svelte";
 	import DevMenu from "$lib/components/main-menu/DevMenu.svelte";
 	import FeedbackModal from "$lib/components/modals/FeedbackModal.svelte";
+	import NetworkMonitorWidget from "$lib/components/widgets/test-mode/NetworkMonitorWidget.svelte";
 
 	import { roomService } from "$lib/services/roomService";
 	import "$lib/services/commandService";
@@ -263,6 +264,10 @@
 	<div class="test-mode-container" data-testid="test-mode-widget-container">
 		<TestModeWidget />
 	</div>
+{/if}
+
+{#if import.meta.env.DEV}
+	<NetworkMonitorWidget />
 {/if}
 
 <style>

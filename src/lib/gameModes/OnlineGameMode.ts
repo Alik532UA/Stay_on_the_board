@@ -20,6 +20,7 @@ import { notificationService } from '$lib/services/notificationService';
 import type { Room } from '$lib/types/online';
 import { endGameService } from '$lib/services/endGameService';
 import { modalStore, type ModalState } from '$lib/stores/modalStore'; // FIX: Added import
+import { networkStatsStore } from '$lib/stores/networkStatsStore';
 
 import { GameStateReconciler } from './online/GameStateReconciler';
 import { OnlineMatchController } from './online/OnlineMatchController';
@@ -54,6 +55,11 @@ export class OnlineGameMode extends BaseGameMode {
 
   async initialize(options: { newSize?: number; roomId?: string } = {}): Promise<void> {
     this.resetLocalStores();
+
+    // Start tracking network stats for this session
+    if (import.meta.env.DEV) {
+        networkStatsStore.startSession();
+    }
 
     if (!this.initializeSession(options.roomId)) {
       return;
@@ -310,6 +316,10 @@ export class OnlineGameMode extends BaseGameMode {
     if (this.unsubscribeRoom) this.unsubscribeRoom();
     if (this.eventManager) this.eventManager.cleanup();
     if (this.stateSync) this.stateSync.cleanup();
+
+    if (import.meta.env.DEV) {
+        networkStatsStore.stopSession();
+    }
 
     super.cleanup();
     logService.GAME_MODE('[OnlineGameMode] Cleaned up');

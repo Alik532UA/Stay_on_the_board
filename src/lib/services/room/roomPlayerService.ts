@@ -3,6 +3,7 @@ import { getFirestoreDb } from '$lib/services/firebaseService';
 import { logService } from '$lib/services/logService';
 import type { OnlinePlayer, Room } from '$lib/types/online';
 import { roomSessionService } from './roomSessionService';
+import { networkStatsStore } from '$lib/stores/networkStatsStore';
 
 export class RoomPlayerService {
     private get db() {
@@ -18,31 +19,38 @@ export class RoomPlayerService {
         }
 
         await updateDoc(roomRef, updates);
+        networkStatsStore.recordWrite('RoomPlayer:updatePlayer', updates);
     }
 
     async toggleReady(roomId: string, playerId: string, isReady: boolean): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
-        await updateDoc(roomRef, {
+        const updates = {
             [`players.${playerId}.isReady`]: isReady,
             lastActivity: Date.now()
-        });
+        };
+        await updateDoc(roomRef, updates);
+        networkStatsStore.recordWrite('RoomPlayer:toggleReady', updates);
     }
 
     async setWatchingReplay(roomId: string, playerId: string, isWatching: boolean): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
-        await updateDoc(roomRef, {
+        const updates = {
             [`players.${playerId}.isWatchingReplay`]: isWatching,
             lastActivity: Date.now()
-        });
+        };
+        await updateDoc(roomRef, updates);
+        networkStatsStore.recordWrite('RoomPlayer:setWatchingReplay', updates);
     }
 
     async sendHeartbeat(roomId: string, playerId: string): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
         // Ми не оновлюємо глобальне lastActivity, щоб не тригерити зайві ререндери списку кімнат
         // якщо це не потрібно. Але для простоти поки оновлюємо тільки lastSeen.
-        await updateDoc(roomRef, {
+        const updates = {
             [`players.${playerId}.lastSeen`]: Date.now()
-        });
+        };
+        await updateDoc(roomRef, updates);
+        networkStatsStore.recordWrite('RoomPlayer:Heartbeat', updates);
     }
 
     async leaveRoom(roomId: string, playerId: string): Promise<void> {
