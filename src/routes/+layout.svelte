@@ -20,6 +20,7 @@
 	import hotkeyService from "$lib/services/hotkeyService";
 	import { i18nReady } from "$lib/i18n/init.js";
 	import RewardNotification from "$lib/components/rewards/RewardNotification.svelte";
+	import ErrorBoundary from "$lib/components/ErrorBoundary.svelte";
 
 	// Imports for Menus
 	import FlexibleMenu from "$lib/components/ui/FlexibleMenu/FlexibleMenu.svelte";
@@ -221,54 +222,59 @@
 
 <RewardNotification />
 
-<div class="app">
-	{#if import.meta.env.DEV}
-		<FlexibleMenu
-			items={devMenuItems}
-			position="left"
-			persistenceKey="main-left-menu"
-			dataTestId="flexible-menu-left-wrapper"
-		/>
-	{/if}
-
-	<main>
-		{#if $i18nReady}
-			<slot />
-		{:else}
-			<div class="loading-screen">Loading...</div>
+<ErrorBoundary>
+	<div class="app">
+		{#if import.meta.env.DEV}
+			<FlexibleMenu
+				items={devMenuItems}
+				position="left"
+				persistenceKey="main-left-menu"
+				dataTestId="flexible-menu-left-wrapper"
+			/>
 		{/if}
-	</main>
 
-	{#if import.meta.env.DEV}
-		<FlexibleMenu
-			items={menuItems}
-			position="right"
-			persistenceKey="main-right-menu"
-			dataTestId="flexible-menu-right-wrapper"
-			startOpen={false}
+		<main>
+			{#if $i18nReady}
+				<slot />
+			{:else}
+				<div class="loading-screen">Loading...</div>
+			{/if}
+		</main>
+
+		{#if import.meta.env.DEV}
+			<FlexibleMenu
+				items={menuItems}
+				position="right"
+				persistenceKey="main-right-menu"
+				dataTestId="flexible-menu-right-wrapper"
+				startOpen={false}
+			/>
+		{/if}
+	</div>
+
+	{#if $tooltipStore.isVisible}
+		<Tooltip
+			content={$tooltipStore.content}
+			x={$tooltipStore.x}
+			y={$tooltipStore.y}
 		/>
 	{/if}
-</div>
+	<Modal />
+	<ModalManager />
 
-{#if $tooltipStore.isVisible}
-	<Tooltip
-		content={$tooltipStore.content}
-		x={$tooltipStore.x}
-		y={$tooltipStore.y}
-	/>
-{/if}
-<Modal />
-<ModalManager />
+	{#if $testModeStore.isEnabled}
+		<div
+			class="test-mode-container"
+			data-testid="test-mode-widget-container"
+		>
+			<TestModeWidget />
+		</div>
+	{/if}
 
-{#if $testModeStore.isEnabled}
-	<div class="test-mode-container" data-testid="test-mode-widget-container">
-		<TestModeWidget />
-	</div>
-{/if}
-
-{#if import.meta.env.DEV}
-	<NetworkMonitorWidget />
-{/if}
+	{#if import.meta.env.DEV}
+		<NetworkMonitorWidget />
+	{/if}
+</ErrorBoundary>
 
 <style>
 	.app {
