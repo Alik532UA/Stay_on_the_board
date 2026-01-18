@@ -66,6 +66,30 @@ export class OnlineGameMode extends BaseGameMode {
         return;
     }
 
+    // SCENARIO: Player reloaded page into a game where everyone else left
+    if (this.roomData.status !== 'waiting') {
+        const otherPlayers = Object.values(this.roomData.players).filter(p => p.id !== this.myPlayerId);
+        if (otherPlayers.length === 0) {
+             logService.GAME_MODE('[OnlineGameMode] Cannot resume: Room is empty (only me left) and game started/finished.');
+             // Якщо ми залишились одні, то грати ні з ким.
+             // Можна показати Game Over, але оскільки ми тільки зайшли, краще просто вийти.
+             // Але щоб користувач зрозумів, що сталось, краще показати Game Over.
+             
+             // Однак, ми ще не ініціалізували контролери, тому endGame може працювати некоректно якщо залежить від них.
+             // Але endGameService залежить від сторів, які ми ще не заповнили (resetLocalStores був вище).
+             
+             // Тому краще просто перенаправити в лобі з повідомленням (через notificationService, якщо можливо, або просто мовчки).
+             // Або, оскільки ми хочемо "не повертати до гри", то навігація - найкращий варіант.
+             
+             // Але щоб видалити "зомбі" гравця з кімнати (щоб вона нарешті видалилась), треба викликати leaveRoom.
+             if (this.roomId && this.myPlayerId) {
+                 await roomPlayerService.leaveRoom(this.roomId, this.myPlayerId);
+             }
+             navigationService.goTo('/online');
+             return;
+        }
+    }
+
     // SCENARIO 1 FIX: Перевірка на "мертву" кімнату при вході/реконнекті
     if (this.roomData.status === 'playing') {
         const now = Date.now();

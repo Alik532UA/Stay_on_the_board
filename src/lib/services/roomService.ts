@@ -187,6 +187,18 @@ class RoomService {
             const existingSession = roomSessionService.getSession();
 
             if (existingSession.roomId === roomId && existingSession.playerId && roomData.players[existingSession.playerId]) {
+                // Перевірка: чи є сенс повертатися?
+                const otherPlayers = Object.values(roomData.players).filter(p => p.id !== existingSession.playerId);
+                
+                // Якщо гра йде/завершена, але я єдиний в списку гравців - значить всі інші вийшли остаточно.
+                if (roomData.status !== 'waiting' && otherPlayers.length === 0) {
+                     logService.init(`[RoomService] Reconnect aborted: Room is empty (only me left) and game started/finished.`);
+                     roomSessionService.clearSession();
+                     // Можна також викликати leaveRoom, щоб почистити за собою, але це не обов'язково
+                     await roomPlayerService.leaveRoom(roomId, existingSession.playerId);
+                     throw new Error('Game ended because all opponents left.');
+                }
+
                 logService.init(`[RoomService] Reconnecting as existing player`);
                 if (roomData.players[existingSession.playerId].name !== playerName) {
                     await roomFirestoreService.updateRoomDoc(roomId, {
