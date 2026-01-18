@@ -16,6 +16,7 @@ export default {
   errorTitle: "Onjuiste Bewering!",
   playAgain: "Opnieuw spelen",
   continueGame: "Doorgaan",
+  leaveLobby: "Lobby Verlaten",
   finishGameWithBonus: "Beëindigen (+{bonus} punten)",
   keyConflictTitle: "Toetskeuze",
   keyConflictContent: "De toets '{key}' is toegewezen aan meerdere acties. Kies welke je nu wilt uitvoeren. Je keuze wordt opgeslagen voor toekomstige toetsaanslagen.",

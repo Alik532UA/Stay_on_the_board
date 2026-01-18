@@ -17,6 +17,7 @@ export default {
   playAgain: "Грати ще раз",
   continueGame: "Продовжити",
   waitingForPlayers: "Очікування інших гравців...",
+  leaveLobby: "Вийти з лобі",
   finishGameWithBonus: "Завершити (+{bonus} балів)",
   keyConflictTitle: "Вибір дії для клавіші",
   keyConflictContent: "Клавіша '{key}' призначена для кількох дій. Будь ласка, виберіть, яку з них виконати зараз. Ваш вибір буде збережено для майбутніх натискань.",

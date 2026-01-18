@@ -16,6 +16,7 @@ export default {
   errorTitle: "Hatalı beyanat!",
   playAgain: "Kene oyna",
   continueGame: "Devam et",
+  leaveLobby: "Lobbi Terva Etmek",
   finishGameWithBonus: "Bitir (+{bonus} bal)",
   keyConflictTitle: "Düğme seçimi",
   keyConflictContent: "'{key}' düğmesi birqaç areket içün tayin etilgen. Lütfen, hangisini şimdi yapacaqsıñıznı saylañız. Seçimiñiz kelecek basuvlar içün saqlanacaq.",

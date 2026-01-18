@@ -16,6 +16,7 @@ export default {
   errorTitle: "Mistaken Claim!",
   playAgain: "Play Again",
   continueGame: "Continue",
+  leaveLobby: "Leave Lobby",
   finishGameWithBonus: "Finish (+{bonus} points)",
   keyConflictTitle: "Key Choice",
   keyConflictContent: "The key '{key}' is assigned to multiple actions. Please choose which one to perform now. Your choice will be saved for future presses.",

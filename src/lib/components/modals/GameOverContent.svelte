@@ -20,6 +20,7 @@
   export let onPlayAgain: (() => void) | undefined = undefined;
   export let onWatchReplay: (() => void) | undefined = undefined;
   export let onMainMenu: (() => void) | undefined = undefined;
+  export let onLeaveLobby: (() => void) | undefined = undefined;
   export let onContinue: (() => void) | undefined = undefined;
   export let onFinish: (() => void) | undefined = undefined;
 
@@ -211,6 +212,17 @@
         dataTestId="watch-replay-btn"
       >
         {$_("modal.watchReplay")}
+      </StyledButton>
+    {/if}
+
+    <!-- Кнопка виходу з лобі (тільки для Online) -->
+    {#if onLeaveLobby}
+      <StyledButton
+        variant="danger"
+        on:click={onLeaveLobby}
+        dataTestId="leave-lobby-btn"
+      >
+        {$_("modal.leaveLobby")}
       </StyledButton>
     {/if}
 

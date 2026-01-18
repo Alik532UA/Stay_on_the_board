@@ -1,6 +1,8 @@
 import { modalStore, type ModalState } from '$lib/stores/modalStore';
 import { navigationService } from './navigationService';
 import { gameEventBus } from './gameEventBus';
+import { roomService } from './roomService';
+import { roomPlayerService } from './room/roomPlayerService';
 import { get } from 'svelte/store';
 import { _, locale } from 'svelte-i18n';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
@@ -84,9 +86,22 @@ function showGameOverModal(payload: GameOverPayload) {
       onWatchReplay: () => {
         gameEventBus.dispatch('RequestReplay');
       },
-      onMainMenu: () => {
+      onMainMenu: async () => {
+        if (gameType === 'online') {
+          const session = roomService.getSession();
+          if (session.roomId && session.playerId) {
+             await roomPlayerService.leaveRoom(session.roomId, session.playerId);
+          }
+        }
         navigationService.goToMainMenu();
-      }
+      },
+      onLeaveLobby: gameType === 'online' ? async () => {
+        const session = roomService.getSession();
+        if (session.roomId && session.playerId) {
+            await roomPlayerService.leaveRoom(session.roomId, session.playerId);
+        }
+        navigationService.goTo('/online');
+      } : undefined
     }
   });
 }

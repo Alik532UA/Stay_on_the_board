@@ -139,18 +139,13 @@ class RoomService {
                     return !p.isDisconnected && isNotStale;
                 });
                 
-                // DEBUG LOG
-                if (data.status === 'playing') {
-                     logService.init(`[RoomService] Room ${data.name} (playing): Total=${allPlayers.length}, Active=${activePlayers.length}.`);
-                }
-
-                // Показуємо кімнату тільки якщо в ній є активні гравці
-                if (activePlayers.length > 0) {
+                // Показуємо кімнату, якщо в ній є хоча б один гравець (навіть якщо він тимчасово відключений)
+                if (allPlayers.length > 0) {
                     rooms.push({
                         id: doc.id,
                         name: data.name,
                         status: data.status,
-                        playerCount: activePlayers.length,
+                        playerCount: allPlayers.length, // Disconnected гравці теж займають місце
                         maxPlayers: MAX_PLAYERS,
                         isPrivate: data.isPrivate
                     });

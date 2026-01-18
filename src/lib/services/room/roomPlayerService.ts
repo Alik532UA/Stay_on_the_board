@@ -70,8 +70,8 @@ export class RoomPlayerService {
                 
                 logService.init(`[RoomPlayerService] Remaining: ${remainingPlayers.length}, Active: ${activePlayers.length}`);
 
-                if (activePlayers.length === 0) {
-                    logService.init(`[RoomPlayerService] Room empty or only disconnected players left, deleting room.`);
+                if (remainingPlayers.length === 0) {
+                    logService.init(`[RoomPlayerService] Room empty, deleting room.`);
                     await deleteDoc(roomRef);
                 } else {
                     const updates: Record<string, any> = {
@@ -80,8 +80,7 @@ export class RoomPlayerService {
                     };
 
                     if (roomData.hostId === playerId) {
-                        // Шукаємо нового хоста серед активних гравців
-                        // Якщо активних немає (хоча activePlayers.length > 0 гарантує це), беремо першого зі списку
+                        // Шукаємо нового хоста серед активних гравців, або беремо будь-кого, хто залишився
                         const nextHost = activePlayers[0] || remainingPlayers[0];
                         if (nextHost) {
                              updates.hostId = nextHost.id;
