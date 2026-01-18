@@ -6,8 +6,6 @@
     import { reconnectionStore } from "$lib/stores/reconnectionStore";
     import type { DisconnectedPlayer } from "$lib/stores/reconnectionStore";
 
-    export let content: any = {}; // Deprecated, using store
-
     let players: DisconnectedPlayer[] = [];
     let timeRemaining = 0;
     let interval: ReturnType<typeof setInterval>;
@@ -170,16 +168,6 @@
         opacity: 0.5;
         cursor: not-allowed;
         filter: grayscale(1);
-    }
-
-    .continue-btn {
-        background: var(--primary-color, #4caf50);
-        color: white;
-    }
-
-    .continue-btn:not(:disabled):hover {
-        background: var(--primary-color-dark, #388e3c);
-        transform: scale(1.02);
     }
 
     .kick-btn {

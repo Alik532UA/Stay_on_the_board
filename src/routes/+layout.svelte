@@ -48,9 +48,6 @@
 			testModeEnabled = state.isEnabled;
 		});
 
-		// Check for active online session
-		checkOnlineSession();
-
 		// Subscribe to version changes to show update notice
 		const unsubscribeVersion = appVersion.subscribe((serverVersion) => {
 			const localVersion = localStorage.getItem(APP_VERSION_KEY);

@@ -1,7 +1,5 @@
 <script>
-  import VoiceSettingsModal from '$lib/components/VoiceSettingsModal.svelte';
-  import { closeModal } from '$lib/stores/modalStore';
+  import VoiceSettingsModal from "$lib/components/VoiceSettingsModal.svelte";
 </script>
 
-<VoiceSettingsModal close={closeModal} on:close={closeModal} /> 
-
+<VoiceSettingsModal />
