@@ -58,12 +58,12 @@ const defaultConfig: LogConfig = {
     [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: false,
     [LOG_GROUPS.LOGIC_AVAILABILITY]: false,
     [LOG_GROUPS.LOGIC_TIME]: false,
-    [LOG_GROUPS.SCORE]: false,
-    [LOG_GROUPS.UI]: true, // DEBUG: Enabled for navigation debugging
+    [LOG_GROUPS.SCORE]: true, // DEBUG: Enabled
+    [LOG_GROUPS.UI]: true, // DEBUG: Enabled
     [LOG_GROUPS.TOOLTIP]: false,
     [LOG_GROUPS.ANIMATION]: false,
     [LOG_GROUPS.INIT]: true, // DEBUG: Enabled
-    [LOG_GROUPS.ACTION]: false,
+    [LOG_GROUPS.ACTION]: true, // DEBUG: Enabled
     [LOG_GROUPS.GAME_MODE]: true, // DEBUG: Enabled
     [LOG_GROUPS.SPEECH]: false,
     [LOG_GROUPS.VOICE_CONTROL]: false,
@@ -71,7 +71,7 @@ const defaultConfig: LogConfig = {
     [LOG_GROUPS.PIECE]: false,
     [LOG_GROUPS.LOGIC_MOVE]: false,
     [LOG_GROUPS.TEST_MODE]: false,
-    [LOG_GROUPS.MODAL]: false,
+    [LOG_GROUPS.MODAL]: true, // DEBUG: Enabled
     [LOG_GROUPS.ERROR]: true, // DEBUG: Always on
     [LOG_GROUPS.HOTKEY]: false
 };

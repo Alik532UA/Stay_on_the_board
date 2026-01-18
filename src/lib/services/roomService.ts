@@ -139,6 +139,13 @@ class RoomService {
                     return !p.isDisconnected && isNotStale;
                 });
                 
+                // Якщо гра йде, але немає активних гравців (всі відключені), не показуємо кімнату в лобі.
+                // Це приховує "зомбі" ігри, де всі вийшли або вилетіли, але кімната ще існує для reconnect.
+                if (data.status === 'playing' && activePlayers.length === 0) {
+                     logService.init(`[RoomService] Hiding zombie room ${data.name} (playing, 0 active players).`);
+                     return;
+                }
+
                 // Показуємо кімнату, якщо в ній є хоча б один гравець (навіть якщо він тимчасово відключений)
                 if (allPlayers.length > 0) {
                     rooms.push({
