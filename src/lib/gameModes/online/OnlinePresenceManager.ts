@@ -1,4 +1,3 @@
-import { roomFirestoreService } from "$lib/services/room/roomFirestoreService";
 import { roomPlayerService } from "$lib/services/room/roomPlayerService";
 import { presenceService } from "$lib/services/presenceService";
 import { logService } from "$lib/services/logService";
@@ -26,16 +25,17 @@ export class OnlinePresenceManager {
     private monitorInterval: NodeJS.Timeout | null = null;
     private unsubscribeFromRtdb: (() => void) | null = null;
     private unsubscribeFromStore: (() => void) | null = null;
-    private presenceStatuses: Record<string, { state: string, last_changed: number }> = {};
+    // Статуси з RTDB (швидке джерело правди для disconnect)
+    private rtStatuses: Record<string, { state: string, last_changed: number }> = {};
+    // Кеш імен гравців для випадків коли гравець вже видалений з кімнати
+    private playerNamesCache: Record<string, string> = {};
 
     // Config constants
-    private readonly HEARTBEAT_MS = 25000;
+    private readonly HEARTBEAT_MS = 5000; // Швидкий heartbeat для своєчасного виявлення disconnect
     private readonly MONITOR_MS = 2000;
-    // FIX: Збільшуємо поріг таймауту для Firestore до 60с, щоб уникнути хибних спрацьовувань через лаги
-    private readonly DISCONNECT_THRESHOLD_MS = 60000;
+    private readonly DISCONNECT_THRESHOLD_MS = 60000; // Fallback таймаут якщо RTDB не працює
     private readonly KICK_TIMEOUT_MS = 30000;
-    // FIX: Grace period для уникнення помилкового disconnect при старті гри
-    private readonly PRESENCE_GRACE_PERIOD_MS = 4000;
+    private readonly PRESENCE_GRACE_PERIOD_MS = 4000; // Grace period при старті гри
     private readonly startedAt: number = Date.now();
 
     public onPlayerDisconnect: DisconnectHandler | null = null;
@@ -53,6 +53,7 @@ export class OnlinePresenceManager {
             const isGameOver = get(uiStateStore).isGameOver;
 
             if (isGameOver) {
+                // Якщо гра завершена, закриваємо модалку очікування
                 if (isReconnectionModalOpen) {
                     logService.presence(`[Presence] Game Over. Closing ReconnectionModal.`);
                     modalStore.closeModal();
@@ -79,50 +80,63 @@ export class OnlinePresenceManager {
             }
         });
     }
-    
+
     public start(): void {
-        logService.presence(`[Presence] Starting... Grace period of ${this.PRESENCE_GRACE_PERIOD_MS}ms is active.`);
+        logService.presence(`[Presence] Starting... Grace period: ${this.PRESENCE_GRACE_PERIOD_MS}ms`);
         this.startHeartbeat();
         this.startRealtimePresence();
-
-        // Після закінчення пільгового періоду, просто логуємо це
-        setTimeout(() => {
-            logService.presence('[Presence] Grace period ended. Real-time presence checks are now active.');
-        }, this.PRESENCE_GRACE_PERIOD_MS);
+        this.startMonitoring();
     }
 
     public stop(): void {
-    // ...
+        logService.presence('[Presence] Stopping...');
+
+        if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+            this.heartbeatInterval = null;
+        }
+        if (this.monitorInterval) {
+            clearInterval(this.monitorInterval);
+            this.monitorInterval = null;
+        }
+        if (this.unsubscribeFromRtdb) {
+            this.unsubscribeFromRtdb();
+            this.unsubscribeFromRtdb = null;
+        }
+        if (this.unsubscribeFromStore) {
+            this.unsubscribeFromStore();
+            this.unsubscribeFromStore = null;
+        }
+        reconnectionStore.reset();
+
+        // Встановлюємо офлайн при виході
+        presenceService.setOffline(this.config.roomId, this.config.myPlayerId).catch(() => { });
     }
 
+    /**
+     * Підписка на RTDB для миттєвого виявлення disconnect.
+     * RTDB onDisconnect спрацьовує коли клієнт втрачає з'єднання (закриває вкладку, мережа падає).
+     */
     private startRealtimePresence(): void {
-        // ... (trackPresence call)
+        // 1. Реєструємо себе в RTDB (trackPresence встановлює onDisconnect тригер)
+        presenceService.trackPresence(this.config.roomId, this.config.myPlayerId);
 
-        this.unsubscribeFromRtdb = roomFirestoreService.subscribeToPresence(
+        // 2. Підписуємось на зміни статусів ВСІХ гравців у кімнаті через RTDB
+        // Це КЛЮЧОВА підписка - вона миттєво отримує оновлення коли хтось відключається
+        this.unsubscribeFromRtdb = presenceService.subscribeToRoomPresence(
             this.config.roomId,
             (statuses) => {
+                this.rtStatuses = statuses;
+                logService.presence(`[Presence] RTDB Update: ${JSON.stringify(statuses)}`);
+
                 const timeSinceStart = Date.now() - this.startedAt;
                 if (timeSinceStart < this.PRESENCE_GRACE_PERIOD_MS) {
-                    logService.presence('[Presence] Skipping real-time check during grace period.');
+                    logService.presence('[Presence] Skipping RTDB check during grace period.');
                     return;
                 }
-                
-                const newStatuses: Record<string, { state: string, last_changed: number }> = {};
-                
-                Object.entries(statuses).forEach(([playerId, data]) => {
-                    const isOnline = !data.isDisconnected && (Date.now() - (data.lastSeen || 0) < 15000); // 15 сек толерантність
-                    
-                    newStatuses[playerId] = {
-                        state: isOnline ? 'online' : 'offline',
-                        last_changed: data.updatedAt || Date.now()
-                    };
-                });
-
-                this.presenceStatuses = newStatuses;
-                // logService.GAME_MODE(`[Presence] Firestore Presence Update: ${JSON.stringify(newStatuses)}`);
 
                 // МИТТЄВА РЕАКЦІЯ: Якщо суперник став offline, додаємо в стор
-                Object.entries(newStatuses).forEach(([playerId, status]) => {
+                Object.entries(statuses).forEach(([playerId, status]) => {
                     if (playerId !== this.config.myPlayerId) {
                         if (status.state === 'offline') {
                             this.triggerDisconnect(playerId, status.last_changed);
@@ -136,15 +150,32 @@ export class OnlinePresenceManager {
     }
 
     private triggerDisconnect(playerId: string, timestamp: number): void {
-    // ...
-    }
+        const players = this.config.getPlayers();
+        let player = players.find(p => p.id === playerId);
 
+        let playerName: string;
+        if (player) {
+            playerName = player.name;
+            this.playerNamesCache[playerId] = playerName;
+        } else if (this.playerNamesCache[playerId]) {
+            playerName = this.playerNamesCache[playerId];
+            logService.presence(`[Presence] triggerDisconnect: Player ${playerId} not in room, using cached name: ${playerName}`);
+        } else {
+            logService.presence(`[Presence] triggerDisconnect: Player ${playerId} not found. Skipping.`);
+            return;
+        }
+
+        logService.presence(`[Presence] Player ${playerName} disconnected. Adding to reconnectionStore.`);
+        reconnectionStore.addPlayer({ id: playerId, name: playerName });
+    }
 
     private triggerReconnect(playerId: string): void {
         reconnectionStore.removePlayer(playerId);
     }
 
-    // Метод для обробки оновлень кімнати з Firestore (як запасний варіант)
+    /**
+     * Обробка оновлень кімнати з Firestore (запасний варіант та кешування імен)
+     */
     public handleRoomUpdate(room: Room): void {
         if (room.status !== 'playing') return;
 
@@ -152,58 +183,57 @@ export class OnlinePresenceManager {
         if (timeSinceStart < this.PRESENCE_GRACE_PERIOD_MS) return;
 
         const players = Object.values(room.players);
-        
+        const currentPlayerIds = new Set(players.map(p => p.id));
+
+        // Кешуємо імена гравців
+        players.forEach(p => {
+            if (p.id !== this.config.myPlayerId) {
+                this.playerNamesCache[p.id] = p.name;
+            }
+        });
+
         // Перевіряємо всіх гравців
         players.forEach(p => {
-             if (p.id === this.config.myPlayerId) return;
+            if (p.id === this.config.myPlayerId) return;
 
-             if (p.isDisconnected) {
-                 const presenceStatus = this.presenceStatuses[p.id];
-                 const isPresenceOnline = presenceStatus && presenceStatus.state === 'online';
+            if (p.isDisconnected) {
+                const rtStatus = this.rtStatuses[p.id];
+                const isRtOnline = rtStatus && rtStatus.state === 'online';
 
-                 if (!isPresenceOnline) {
-                     this.triggerDisconnect(p.id, p.disconnectStartedAt || Date.now());
-                 } else {
-                     logService.presence(`[Presence] Main doc says disconnected, but Presence subcollection says online for ${p.name}. Trusting Presence subcollection.`);
-                     this.triggerReconnect(p.id);
-                 }
-             } else {
-                 // Firestore says connected. Check RTDB just in case? 
-                 // Ні, тут ми довіряємо Firestore або RTDB (вони повинні бути синхронізовані монітором).
-                 // Але якщо ми раніше додали його в стор як offline, а тут він online, треба прибрати.
-                 
-                 // Але Firestore оновлюється повільно. RTDB швидше.
-                 // Краще покладатися на RTDB колбек для повернення.
-             }
+                if (!isRtOnline) {
+                    this.triggerDisconnect(p.id, p.disconnectStartedAt || Date.now());
+                } else {
+                    logService.presence(`[Presence] Firestore says disconnected, but RTDB says online for ${p.name}. Trusting RTDB.`);
+                    this.triggerReconnect(p.id);
+                }
+            } else {
+                // Гравець online за даними Firestore - видаляємо з reconnectionStore якщо він там є
+                this.triggerReconnect(p.id);
+            }
         });
-        
-        // Також перевіряємо, чи є в сторі гравці, які вже повернулися за даними Firestore
+
+        // Перевіряємо чи хтось зник з кімнати
         const state = get(reconnectionStore);
         state.players.forEach(p => {
-            const roomPlayer = players.find(rp => rp.id === p.id);
-            // Якщо в кімнаті гравець позначений як не disconnected і RTDB теж каже online (або немає даних)
-            if (roomPlayer && !roomPlayer.isDisconnected) {
-                 const presenceStatus = this.presenceStatuses[p.id];
-                 const isPresenceOnline = presenceStatus && presenceStatus.state === 'online';
-                 if (isPresenceOnline) {
-                     this.triggerReconnect(p.id);
-                 }
+            if (!currentPlayerIds.has(p.id)) {
+                logService.presence(`[Presence] Player ${p.name} left the room completely. Removing from store.`);
+                reconnectionStore.removePlayer(p.id);
+                delete this.playerNamesCache[p.id];
             }
         });
     }
 
     private startHeartbeat(): void {
-        logService.presence(`[PresenceManager] Starting heartbeat for player ${this.config.myPlayerId}`);
-        
+        logService.presence(`[Presence] Starting heartbeat for ${this.config.myPlayerId}`);
+
         const send = async () => {
             if (!this.heartbeatInterval) return;
 
             try {
-                // Fast Heartbeat (every 25s) -> Presence Subcollection
                 await roomPlayerService.sendHeartbeat(this.config.roomId, this.config.myPlayerId);
             } catch (e: any) {
                 if (e.code === 'not-found' || e.message?.includes('No document to update')) {
-                    logService.presence(`[Presence] Room ${this.config.roomId} not found. Stopping heartbeat.`);
+                    logService.presence(`[Presence] Room not found. Stopping heartbeat.`);
                     this.stop();
                 } else {
                     console.warn("[Presence] Heartbeat failed", e);
@@ -215,5 +245,86 @@ export class OnlinePresenceManager {
         this.heartbeatInterval = setInterval(send, this.HEARTBEAT_MS);
     }
 
+    /**
+     * Моніторинг виконується ТІЛЬКИ хостом.
+     * Оновлює isDisconnected в головному документі кімнати на основі RTDB статусів.
+     */
+    private startMonitoring(): void {
+        if (!this.config.isHost()) {
+            logService.presence(`[Presence] Skipping monitoring (not host)`);
+            return;
+        }
 
+        logService.presence(`[Presence] Starting monitoring as host`);
+
+        this.monitorInterval = setInterval(async () => {
+            if (!this.config.isHost()) return;
+
+            const timeSinceStart = Date.now() - this.startedAt;
+            if (timeSinceStart < this.PRESENCE_GRACE_PERIOD_MS) return;
+
+            const now = Date.now();
+            const players = this.config.getPlayers();
+
+            for (const player of players) {
+                if (player.id === this.config.myPlayerId) continue;
+
+                const lastSeen = player.lastSeen || player.joinedAt;
+                const timeSinceSeen = now - lastSeen;
+
+                // Статус з RTDB
+                const rtStatus = this.rtStatuses[player.id];
+                const isRtOffline = rtStatus && rtStatus.state === 'offline';
+                const isRtOnline = rtStatus && rtStatus.state === 'online';
+
+                if (!player.isDisconnected) {
+                    // Якщо RTDB каже ONLINE - довіряємо
+                    if (isRtOnline) continue;
+
+                    // Вважаємо відключеним якщо:
+                    // 1. RTDB каже Offline
+                    // 2. АБО таймаут без сигналу RTDB
+                    const shouldMarkDisconnected = isRtOffline || timeSinceSeen > this.DISCONNECT_THRESHOLD_MS;
+
+                    if (shouldMarkDisconnected) {
+                        const reason = isRtOffline ? 'RTDB Offline' : `Timeout (${Math.round(timeSinceSeen / 1000)}s)`;
+                        logService.presence(`[Presence] Marking ${player.name} as disconnected. Reason: ${reason}`);
+
+                        try {
+                            await roomPlayerService.updatePlayer(this.config.roomId, player.id, {
+                                isDisconnected: true,
+                                disconnectStartedAt: now
+                            });
+                        } catch (e) {
+                            logService.error(`[Presence] Failed to mark player disconnected`, e);
+                        }
+                    }
+                } else {
+                    // Гравець вже позначений як disconnected
+
+                    // Перевіряємо чи повернувся
+                    if (isRtOnline || timeSinceSeen < (this.DISCONNECT_THRESHOLD_MS / 2)) {
+                        logService.presence(`[Presence] Player ${player.name} returned! Removing disconnected flag.`);
+                        try {
+                            await roomPlayerService.updatePlayer(this.config.roomId, player.id, {
+                                isDisconnected: false,
+                                disconnectStartedAt: undefined
+                            });
+                        } catch (e) {
+                            logService.error(`[Presence] Failed to mark player connected`, e);
+                        }
+                    }
+                    // Перевіряємо чи пора кікати
+                    else if (player.disconnectStartedAt && (now - player.disconnectStartedAt > this.KICK_TIMEOUT_MS)) {
+                        logService.presence(`[Presence] Player ${player.name} kick timer expired (>${this.KICK_TIMEOUT_MS / 1000}s). Kicking.`);
+                        try {
+                            await roomPlayerService.leaveRoom(this.config.roomId, player.id);
+                        } catch (e) {
+                            logService.error(`[Presence] Failed to kick player`, e);
+                        }
+                    }
+                }
+            }
+        }, this.MONITOR_MS);
+    }
 }

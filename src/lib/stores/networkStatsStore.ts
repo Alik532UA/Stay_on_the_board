@@ -39,7 +39,7 @@ function createNetworkStatsStore() {
         startSession: () => {
             if (timerInterval) clearInterval(timerInterval);
             set({ ...initialState, isTracking: true });
-            
+
             timerInterval = setInterval(() => {
                 update(s => ({ ...s, elapsedSeconds: s.elapsedSeconds + 1 }));
             }, 1000);
@@ -54,26 +54,26 @@ function createNetworkStatsStore() {
         recordRead: (source: string, data: any) => {
             const size = estimateSize(data);
             update(s => {
-                // if (!s.isTracking) return s; // Remove restriction
+                const event = { type: 'read' as const, size, source, timestamp: Date.now() };
                 return {
                     ...s,
                     reads: s.reads + 1,
                     bytesReceived: s.bytesReceived + size,
                     lastActivity: Date.now(),
-                    recentEvents: [{ type: 'read', size, source, timestamp: Date.now() }, ...s.recentEvents].slice(0, 20)
+                    recentEvents: [event, ...s.recentEvents].slice(0, 20)
                 };
             });
         },
         recordWrite: (source: string, data: any) => {
             const size = estimateSize(data);
             update(s => {
-                // if (!s.isTracking) return s; // Remove restriction
+                const event = { type: 'write' as const, size, source, timestamp: Date.now() };
                 return {
                     ...s,
                     writes: s.writes + 1,
                     bytesSent: s.bytesSent + size,
                     lastActivity: Date.now(),
-                    recentEvents: [{ type: 'write', size, source, timestamp: Date.now() }, ...s.recentEvents].slice(0, 20)
+                    recentEvents: [event, ...s.recentEvents].slice(0, 20)
                 };
             });
         }

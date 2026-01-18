@@ -103,6 +103,11 @@ class RoomFirestoreService {
         await setDoc(presenceRef, { ...data, updatedAt: Date.now() }, { merge: true });
     }
 
+    async deletePresenceDoc(roomId: string, playerId: string): Promise<void> {
+        const presenceRef = doc(this.db, 'rooms', roomId, 'presence', playerId);
+        await deleteDoc(presenceRef);
+    }
+
     subscribeToPresence(roomId: string, callback: (presence: Record<string, any>) => void): Unsubscribe {
         const q = collection(this.db, 'rooms', roomId, 'presence');
         return onSnapshot(q, (snapshot) => {

@@ -5,6 +5,7 @@ import type { OnlinePlayer, Room } from '$lib/types/online';
 import { roomSessionService } from './roomSessionService';
 import { networkStatsStore } from '$lib/stores/networkStatsStore';
 import { roomFirestoreService } from './roomFirestoreService';
+import { presenceService } from '$lib/services/presenceService';
 
 export class RoomPlayerService {
     private get db() {
@@ -63,6 +64,11 @@ export class RoomPlayerService {
         logService.init(`[RoomPlayerService] leaveRoom CALLED for ${roomId} by ${playerId}`);
         const roomRef = doc(this.db, 'rooms', roomId);
 
+        // ВАЖЛИВО: Одразу позначаємо себе як offline для швидкого сповіщення інших гравців
+        await presenceService.setOffline(roomId, playerId).catch(e => {
+            logService.presence(`[RoomPlayerService] Failed to set offline: ${e}`);
+        });
+
         roomSessionService.clearSession();
 
         try {
@@ -81,7 +87,7 @@ export class RoomPlayerService {
 
                 const remainingPlayers = Object.values(players);
                 const activePlayers = remainingPlayers.filter(p => !p.isDisconnected);
-                
+
                 logService.init(`[RoomPlayerService] Remaining: ${remainingPlayers.length}, Active: ${activePlayers.length}`);
 
                 if (remainingPlayers.length === 0) {
@@ -97,8 +103,8 @@ export class RoomPlayerService {
                         // Шукаємо нового хоста серед активних гравців, або беремо будь-кого, хто залишився
                         const nextHost = activePlayers[0] || remainingPlayers[0];
                         if (nextHost) {
-                             updates.hostId = nextHost.id;
-                             logService.init(`[RoomPlayerService] Host migrated to ${nextHost.id}`);
+                            updates.hostId = nextHost.id;
+                            logService.init(`[RoomPlayerService] Host migrated to ${nextHost.id}`);
                         }
                     }
 
