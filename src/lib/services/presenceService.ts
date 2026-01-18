@@ -1,3 +1,4 @@
+import { roomFirestoreService } from './room/roomFirestoreService';
 import {
     ref,
     onValue,
@@ -16,30 +17,41 @@ class PresenceService {
 
     /**
      * Починає відстеження присутності гравця в кімнаті.
-     * Автоматично встановлює статус 'offline' при розриві з'єднання.
+     * Автоматично встановлює статус 'offline' при розриві з'єднання в RTDB та Firestore.
      */
     trackPresence(roomId: string, playerId: string) {
         const userStatusDatabaseRef = ref(this.rtdb, `/status/${roomId}/${playerId}`);
-
-        // Спеціальне посилання Firebase, яке показує статус з'єднання клієнта з сервером
         const connectedRef = ref(this.rtdb, '.info/connected');
 
         onValue(connectedRef, (snapshot) => {
             if (snapshot.val() === false) {
+                // Встановлюємо флаг відключення у Firestore, якщо з'єднання з RTDB було втрачено.
+                // Це не onDisconnect, а реальна втрата зв'язку.
+                roomFirestoreService.updatePresenceDoc(roomId, playerId, { isDisconnected: true });
                 return;
             }
 
             // Якщо ми підключилися:
+            const rtdbOnDisconnect = onDisconnect(userStatusDatabaseRef);
+            
             // 1. Реєструємо дію "на випадок відключення" (onDisconnect)
-            onDisconnect(userStatusDatabaseRef).set({
+            // Спочатку для RTDB
+            rtdbOnDisconnect.set({
                 state: 'offline',
                 last_changed: serverTimestamp()
             }).then(() => {
+                // Потім для Firestore
+                roomFirestoreService.updatePresenceDoc(roomId, playerId, { isDisconnected: true });
+
                 // 2. Встановлюємо поточний статус "online"
+                // Спочатку для RTDB
                 set(userStatusDatabaseRef, {
                     state: 'online',
                     last_changed: serverTimestamp()
                 });
+                // Потім для Firestore
+                roomFirestoreService.updatePresenceDoc(roomId, playerId, { isDisconnected: false });
+                
                 logService.init(`[PresenceService] Tracking presence for ${playerId} in ${roomId}`);
             });
         });
@@ -50,10 +62,13 @@ class PresenceService {
      */
     async setOffline(roomId: string, playerId: string) {
         const userStatusDatabaseRef = ref(this.rtdb, `/status/${roomId}/${playerId}`);
+        // Оновлюємо RTDB
         await set(userStatusDatabaseRef, {
             state: 'offline',
             last_changed: serverTimestamp()
         });
+        // Оновлюємо Firestore
+        await roomFirestoreService.updatePresenceDoc(roomId, playerId, { isDisconnected: true });
     }
 
     /**

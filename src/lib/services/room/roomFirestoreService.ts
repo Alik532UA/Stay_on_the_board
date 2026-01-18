@@ -98,6 +98,22 @@ class RoomFirestoreService {
         return null;
     }
 
+    async updatePresenceDoc(roomId: string, playerId: string, data: any): Promise<void> {
+        const presenceRef = doc(this.db, 'rooms', roomId, 'presence', playerId);
+        await setDoc(presenceRef, { ...data, updatedAt: Date.now() }, { merge: true });
+    }
+
+    subscribeToPresence(roomId: string, callback: (presence: Record<string, any>) => void): Unsubscribe {
+        const q = collection(this.db, 'rooms', roomId, 'presence');
+        return onSnapshot(q, (snapshot) => {
+            const presenceData: Record<string, any> = {};
+            snapshot.forEach(doc => {
+                presenceData[doc.id] = doc.data();
+            });
+            callback(presenceData);
+        });
+    }
+
     async updateRoomDoc(roomId: string, updates: any, useTimeout: boolean = false): Promise<void> {
         const promise = updateDoc(this.getRoomRef(roomId), updates);
         if (useTimeout) {

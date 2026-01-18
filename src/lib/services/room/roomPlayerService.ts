@@ -4,6 +4,7 @@ import { logService } from '$lib/services/logService';
 import type { OnlinePlayer, Room } from '$lib/types/online';
 import { roomSessionService } from './roomSessionService';
 import { networkStatsStore } from '$lib/stores/networkStatsStore';
+import { roomFirestoreService } from './roomFirestoreService';
 
 export class RoomPlayerService {
     private get db() {
@@ -12,10 +13,10 @@ export class RoomPlayerService {
 
     async updatePlayer(roomId: string, playerId: string, data: Partial<OnlinePlayer>): Promise<void> {
         const roomRef = doc(this.db, 'rooms', roomId);
-        const updates: Record<string, any> = { lastActivity: Date.now() };
+        const updates: { [key: string]: any } = {};
 
-        for (const [key, value] of Object.entries(data)) {
-            updates[`players.${playerId}.${key}`] = value;
+        for (const key in data) {
+            updates[`players.${playerId}.${key}`] = (data as any)[key];
         }
 
         await updateDoc(roomRef, updates);
@@ -43,14 +44,19 @@ export class RoomPlayerService {
     }
 
     async sendHeartbeat(roomId: string, playerId: string): Promise<void> {
+        // Fast Heartbeat -> Presence Subcollection
+        await roomFirestoreService.updatePresenceDoc(roomId, playerId, { lastSeen: Date.now(), isDisconnected: false });
+        networkStatsStore.recordWrite('RoomPlayer:FastHeartbeat', { lastSeen: Date.now() });
+    }
+
+    async updateLobbyPresence(roomId: string, playerId: string): Promise<void> {
+        // Slow Heartbeat -> Main Room Doc (for Lobby visibility)
         const roomRef = doc(this.db, 'rooms', roomId);
-        // Ми не оновлюємо глобальне lastActivity, щоб не тригерити зайві ререндери списку кімнат
-        // якщо це не потрібно. Але для простоти поки оновлюємо тільки lastSeen.
         const updates = {
             [`players.${playerId}.lastSeen`]: Date.now()
         };
         await updateDoc(roomRef, updates);
-        networkStatsStore.recordWrite('RoomPlayer:Heartbeat', updates);
+        networkStatsStore.recordWrite('RoomPlayer:LobbyHeartbeat', updates);
     }
 
     async leaveRoom(roomId: string, playerId: string): Promise<void> {

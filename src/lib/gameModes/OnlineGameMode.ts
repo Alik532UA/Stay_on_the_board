@@ -21,6 +21,8 @@ import type { Room } from '$lib/types/online';
 import { endGameService } from '$lib/services/endGameService';
 import { modalStore, type ModalState } from '$lib/stores/modalStore'; // FIX: Added import
 import { networkStatsStore } from '$lib/stores/networkStatsStore';
+import { reconnectionStore } from '$lib/stores/reconnectionStore'; // Added import
+
 
 import { GameStateReconciler } from './online/GameStateReconciler';
 import { OnlineMatchController } from './online/OnlineMatchController';
@@ -47,6 +49,7 @@ export class OnlineGameMode extends BaseGameMode {
   private myPlayerIndex: number = -1;
   private isApplyingRemoteState: boolean = false;
   private roomData: Room | null = null;
+  private hostMonitoringInterval: NodeJS.Timeout | null = null;
 
   constructor() {
     super();
@@ -96,33 +99,70 @@ export class OnlineGameMode extends BaseGameMode {
         }
     }
 
-    // SCENARIO 1 FIX: Перевірка на "мертву" кімнату при вході/реконнекті
-    if (this.roomData.status === 'playing') {
-        const now = Date.now();
-        const players = Object.values(this.roomData.players);
-        const activeOpponents = players.filter(p => {
-            if (p.id === this.myPlayerId) return false;
-            const lastSeen = p.lastSeen || p.joinedAt;
-            const isActiveRecently = (now - lastSeen) < 60000;
-            return !p.isDisconnected && isActiveRecently;
-        });
-
-        if (activeOpponents.length === 0 && players.length > 1) { // >1 щоб ігнорувати тестові соло-старти якщо такі можливі
-             logService.GAME_MODE('[OnlineGameMode] No active opponents found upon join. Ending game.');
-             endGameService.endGame('modal.gameOverReasonOpponentsLeft');
-             // Ми не повертаємось тут, бо endGame запустить процес виходу, 
-             // але краще зупинити подальшу ініціалізацію
-             return; 
-        }
-    }
-
     this.determineRole();
     this.applyRoomSettings();
     this.initializeControllers();
     this.setupSubscriptions();
     this.startPresence();
 
+    if (this.amIHost) {
+      this.startHostLogic();
+    }
+
     await this.syncInitialState(options.newSize);
+  }
+
+  private startHostLogic(): void {
+    logService.GAME_MODE('[Host] Starting host-specific logic.');
+
+    const KICK_TIMEOUT_MS = 30000;
+    const GRACE_PERIOD_MS = 4000;
+    const MONITOR_INTERVAL_MS = 3000;
+
+    // 1. Одноразова перевірка на "мертву кімнату" після пільгового періоду
+    setTimeout(() => {
+      if (!this.roomData) return;
+      
+      const opponents = Object.values(this.roomData.players).filter(p => p.id !== this.myPlayerId);
+      if (opponents.length === 0) {
+        logService.GAME_MODE('[Host] No opponents found after grace period. Skipping check for dead room.');
+        return;
+      }
+      
+      // Використовуємо reconnectionStore як джерело правди про відключених гравців
+      const disconnectedOpponents = get(reconnectionStore).players.filter(p => opponents.some(o => o.id === p.id));
+
+      if (disconnectedOpponents.length === 0) {
+        logService.GAME_MODE(`[Host] All ${opponents.length} opponent(s) are active after grace period. Game continues.`);
+        return;
+      }
+
+      if (disconnectedOpponents.length === opponents.length) {
+        logService.GAME_MODE(`[Host] All ${opponents.length} opponent(s) are disconnected after grace period. Ending game.`);
+        endGameService.endGame('modal.gameOverReasonOpponentsLeft');
+      } else {
+        logService.GAME_MODE(`[Host] ${opponents.length - disconnectedOpponents.length} opponent(s) are active after grace period. Game continues.`);
+      }
+
+    }, GRACE_PERIOD_MS + 500); // +500ms щоб гарантовано виконалось після того, як presenceManager оновить стор
+
+    // 2. Періодична перевірка для кіка гравців, що довго відключені
+    this.hostMonitoringInterval = setInterval(() => {
+      const disconnectedPlayers = get(reconnectionStore).players;
+      if (disconnectedPlayers.length === 0) return;
+
+      const now = Date.now();
+      disconnectedPlayers.forEach(player => {
+        if (now - player.disconnectStart > KICK_TIMEOUT_MS) {
+          logService.GAME_MODE(`[Host] Player ${player.name} has been disconnected for >${KICK_TIMEOUT_MS / 1000}s. Kicking.`);
+          roomPlayerService.leaveRoom(this.roomId!, player.id).catch(err => {
+            logService.error(`[Host] Failed to kick player ${player.id}`, err);
+          });
+          // reconnectionStore.removePlayer(player.id) буде викликано автоматично,
+          // коли оновиться roomData і гравець зникне зі списку.
+        }
+      });
+    }, MONITOR_INTERVAL_MS);
   }
 
   private resetLocalStores() {
@@ -210,7 +250,11 @@ export class OnlineGameMode extends BaseGameMode {
       roomId: this.roomId!,
       myPlayerId: this.myPlayerId!,
       isHost: () => this.amIHost,
-      getPlayers: () => this.roomData ? Object.values(this.roomData.players) : []
+      getPlayers: () => this.roomData ? Object.values(this.roomData.players) : [],
+      onAllOpponentsLeft: () => {
+        logService.GAME_MODE('[OnlineGameMode] Received onAllOpponentsLeft event. Ending game.');
+        endGameService.endGame('modal.gameOverReasonOpponentsLeft');
+      }
     });
   }
 
@@ -311,6 +355,7 @@ export class OnlineGameMode extends BaseGameMode {
   }
 
   cleanup(): void {
+    if (this.hostMonitoringInterval) clearInterval(this.hostMonitoringInterval);
     if (this.presenceManager) this.presenceManager.stop();
     if (this.unsubscribeSync) this.unsubscribeSync();
     if (this.unsubscribeRoom) this.unsubscribeRoom();

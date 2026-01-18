@@ -344,14 +344,37 @@ class RoomService {
 
     // --- Delegations ---
 
-    getSession = roomSessionService.getSession.bind(roomSessionService);
-    clearSession = roomSessionService.clearSession.bind(roomSessionService);
-    updatePlayer = roomPlayerService.updatePlayer.bind(roomPlayerService);
-    toggleReady = roomPlayerService.toggleReady.bind(roomPlayerService);
-    setWatchingReplay = roomPlayerService.setWatchingReplay.bind(roomPlayerService);
-    leaveRoom = roomPlayerService.leaveRoom.bind(roomPlayerService);
-    sendMessage = chatService.sendMessage.bind(chatService);
-    subscribeToChat = chatService.subscribeToChat.bind(chatService);
+    getSession(): { roomId: string | null, playerId: string | null } {
+        return roomSessionService.getSession();
+    }
+
+    clearSession(): void {
+        roomSessionService.clearSession();
+    }
+
+    async updatePlayer(roomId: string, playerId: string, data: Partial<OnlinePlayer>): Promise<void> {
+        return roomPlayerService.updatePlayer(roomId, playerId, data);
+    }
+
+    async toggleReady(roomId: string, playerId: string, isReady: boolean): Promise<void> {
+        return roomPlayerService.toggleReady(roomId, playerId, isReady);
+    }
+
+    async setWatchingReplay(roomId: string, playerId: string, isWatching: boolean): Promise<void> {
+        return roomPlayerService.setWatchingReplay(roomId, playerId, isWatching);
+    }
+
+    async leaveRoom(roomId: string, playerId: string): Promise<void> {
+        return roomPlayerService.leaveRoom(roomId, playerId);
+    }
+
+    async sendMessage(roomId: string, senderId: string, senderName: string, text: string): Promise<void> {
+        return chatService.sendMessage(roomId, senderId, senderName, text);
+    }
+
+    subscribeToChat(roomId: string, callback: (messages: ChatMessage[]) => void): Unsubscribe {
+        return chatService.subscribeToChat(roomId, callback);
+    }
 }
 
 export const roomService = new RoomService();
