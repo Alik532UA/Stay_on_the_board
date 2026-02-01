@@ -141,10 +141,10 @@ export const distanceRows = derived(availableDistances, $availableDistances => {
   return chunk(dists, 4);
 });
 
-export const currentLanguageFlagSvg = derived(
+export const currentLanguageFlagComponent = derived(
   appSettingsStore,
   $appSettingsStore => {
-    return languages.find(lang => lang.code === $appSettingsStore.language)?.svg || languages[0].svg;
+    return languages.find(lang => lang.code === $appSettingsStore.language)?.component || languages[0].component;
   }
 );
 

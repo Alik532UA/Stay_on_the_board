@@ -30,8 +30,7 @@
             data-testid={`lang-option-${lang.code}`}
         >
             <div class="flag-icon-wrapper">
-                <!-- FIX: Використовуємо глобальний стиль для примусового розміру SVG -->
-                {@html lang.svg}
+                <svelte:component this={lang.component} />
             </div>
         </button>
     {/each}

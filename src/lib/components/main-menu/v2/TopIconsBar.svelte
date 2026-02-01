@@ -5,7 +5,7 @@
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import NotoEmoji from "$lib/components/NotoEmoji.svelte";
     import { logService } from "$lib/services/logService.js";
-    import { currentLanguageFlagSvg } from "$lib/stores/derivedState";
+    import { currentLanguageFlagComponent } from "$lib/stores/derivedState";
     import { modalStore } from "$lib/stores/modalStore";
     import AuthModal from "$lib/components/modals/AuthModal.svelte";
 
