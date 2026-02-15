@@ -22,13 +22,18 @@ export const defaultAppSettings: AppSettingsState = {
 function loadAppSettings(): AppSettingsState {
   if (!isBrowser) return defaultAppSettings;
   try {
-    const rawSettings = {
+    const rawSettings: Record<string, string | null> = {
       theme: localStorage.getItem('theme'),
       style: localStorage.getItem('style'),
       language: localStorage.getItem('language'),
     };
 
-    const result = AppSettingsSchema.safeParse(rawSettings);
+    // Remove null values so Zod can use defaults
+    const filteredSettings = Object.fromEntries(
+      Object.entries(rawSettings).filter(([_, v]) => v !== null)
+    );
+
+    const result = AppSettingsSchema.safeParse(filteredSettings);
     if (result.success) {
       return result.data;
     } else {

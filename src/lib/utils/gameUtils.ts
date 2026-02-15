@@ -5,5 +5,5 @@ export interface Move {
   col: number;
   direction: Direction;
   distance: number;
-  isPenalty?: boolean;
+  isPenalty: boolean;
 }

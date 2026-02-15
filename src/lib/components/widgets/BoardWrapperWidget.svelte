@@ -19,6 +19,11 @@
   import { boardStore } from "$lib/stores/boardStore";
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import BoardHiddenInfoWidget from "./BoardHiddenInfoWidget.svelte";
+  import StaticGridLayer from "./parts/StaticGridLayer.svelte";
+  import EffectsLayer from "./parts/EffectsLayer.svelte";
+  import InteractionLayer from "./parts/InteractionLayer.svelte";
+  import PiecesLayer from "./parts/PiecesLayer.svelte";
+  import InputLayer from "./parts/InputLayer.svelte";
 
   const boardSize = derived(boardStore, ($boardStore) =>
     $boardStore ? Number($boardStore.boardSize) : 0,
@@ -138,33 +143,31 @@
           role="grid"
           data-testid="game-board"
         >
-          {#each Array($boardSize) as _, rowIdx (rowIdx)}
-            {#each Array($boardSize) as _, colIdx (colIdx)}
-              {@const move = $showAvailableMoves
-                ? $availableMoves.find(
-                    (m) => m.row === rowIdx && m.col === colIdx,
-                  )
-                : undefined}
-              <BoardCell
-                {rowIdx}
-                {colIdx}
-                visualCellVisitCounts={$visualCellVisitCounts}
-                gameSettings={$gameSettingsStore}
-                isAvailable={!!move}
-                isPenalty={move?.isPenalty || false}
-                on:cellRightClick={(e) =>
-                  onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
-              />
-            {/each}
-          {/each}
+          <StaticGridLayer boardSize={$boardSize} />
+          
+          <EffectsLayer 
+            boardSize={$boardSize} 
+            visualCellVisitCounts={$visualCellVisitCounts} 
+            gameSettings={$gameSettingsStore} 
+          />
 
-          {#if $gameSettingsStore.showPiece && $visualPosition.row !== null && $visualPosition.col !== null}
-            <PlayerPiece
-              row={$visualPosition.row}
-              col={$visualPosition.col}
-              boardSize={$boardSize}
-            />
-          {/if}
+          <InteractionLayer 
+            boardSize={$boardSize}
+            availableMoves={$availableMoves}
+            showMoves={$showAvailableMoves}
+          />
+
+          <PiecesLayer 
+            row={$visualPosition.row} 
+            col={$visualPosition.col} 
+            boardSize={$boardSize} 
+            showPiece={$gameSettingsStore.showPiece}
+          />
+
+          <InputLayer 
+            boardSize={$boardSize} 
+            on:cellRightClick={(e) => onCellRightClick(e.detail.event, e.detail.row, e.detail.col)}
+          />
         </div>
       </div>
     {:else if showHiddenInfoWidget}

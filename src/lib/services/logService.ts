@@ -174,6 +174,22 @@ function baseLog(group: LogGroup, level: LogLevel, message: string, ...data: unk
 type LoggerMethods = {
     [K in LogGroup]: (message: string, ...data: unknown[]) => void;
 } & {
+    // CamelCase аліаси для TypeScript
+    logicAvailability: (message: string, ...data: unknown[]) => void;
+    logicMove: (message: string, ...data: unknown[]) => void;
+    logicVirtualPlayer: (message: string, ...data: unknown[]) => void;
+    testMode: (message: string, ...data: unknown[]) => void;
+    voiceControl: (message: string, ...data: unknown[]) => void;
+    // snake_case аліаси для TypeScript (задоволення svelte-check)
+    logic_availability: (message: string, ...data: unknown[]) => void;
+    logic_move: (message: string, ...data: unknown[]) => void;
+    logic_virtual_player: (message: string, ...data: unknown[]) => void;
+    test_mode: (message: string, ...data: unknown[]) => void;
+    voice_control: (message: string, ...data: unknown[]) => void;
+    game_mode: (message: string, ...data: unknown[]) => void;
+    // UPPER_CASE аліаси (Legacy)
+    GAME_MODE: (message: string, ...data: unknown[]) => void;
+} & {
     info: (message: string, ...data: unknown[]) => void;
     error: (message: string, ...data: unknown[]) => void;
     forceEnableLogging: () => void;
@@ -204,22 +220,23 @@ const loggerProxy = new Proxy({} as LoggerMethods, {
             return (msg: string, ...data: unknown[]) => baseLog(LOG_GROUPS.ERROR, 'error', msg, ...data);
         }
 
-        // Спеціальний мапінг для існуючих методів (CamelCase -> snake_case)
-        const camelToSnake = (str: string) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-        let groupName = prop as LogGroup;
-
-        // Перевірка на CamelCase (наприклад, logicVirtualPlayer -> logic_virtual_player)
-        if (!(Object.values(LOG_GROUPS) as string[]).includes(prop)) {
-            const snakeCandidate = camelToSnake(prop) as LogGroup;
-            if ((Object.values(LOG_GROUPS) as string[]).includes(snakeCandidate)) {
-                groupName = snakeCandidate;
-            }
-        }
-
-        // Якщо група існує, повертаємо функцію логування
-        if ((Object.values(LOG_GROUPS) as string[]).includes(groupName)) {
+        // Перевірка на точний збіг (наприклад, GAME_MODE або game_mode)
+        const groups = Object.values(LOG_GROUPS) as string[];
+        if (groups.includes(prop.toLowerCase())) {
+            const groupName = prop.toLowerCase() as LogGroup;
             const level: LogLevel = groupName === LOG_GROUPS.ERROR ? 'error' : 'info';
             return (msg: string, ...data: unknown[]) => baseLog(groupName, level, msg, ...data);
+        }
+
+        // Спеціальний мапінг для існуючих методів (CamelCase -> snake_case)
+        const camelToSnake = (str: string) => str.replace(/[A-Z]/g, (letter, offset) => {
+            return (offset > 0 ? '_' : '') + letter.toLowerCase();
+        });
+
+        const snakeCandidate = camelToSnake(prop) as LogGroup;
+        if (groups.includes(snakeCandidate)) {
+            const level: LogLevel = snakeCandidate === LOG_GROUPS.ERROR ? 'error' : 'info';
+            return (msg: string, ...data: unknown[]) => baseLog(snakeCandidate, level, msg, ...data);
         }
 
         // Fallback для невідомих властивостей
