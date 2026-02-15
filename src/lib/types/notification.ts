@@ -7,6 +7,7 @@ export interface Notification {
     type: NotificationType;
     titleKey?: string; // Translation key
     messageKey?: string; // Translation key
+    messageValues?: Record<string, any>;
     messageRaw?: string; // Fallback plain text
     icon?: string;
     duration?: number; // ms, default 3000

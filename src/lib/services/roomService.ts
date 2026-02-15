@@ -10,6 +10,7 @@ import { generateRandomRoomName } from '$lib/utils/nameGenerator';
 import { getRandomUnusedColor } from '$lib/utils/playerUtils';
 import { roomFirestoreService } from './room/roomFirestoreService';
 import type { Unsubscribe } from 'firebase/firestore';
+import { errorHandlerService } from './errorHandlerService';
 
 const ROOM_TIMEOUT_MS = 600000;
 const MAX_PLAYERS = 8;
@@ -77,7 +78,7 @@ class RoomService {
             roomSessionService.saveSession(roomId, hostId);
             return roomId;
         } catch (error) {
-            logService.error('[RoomService] Failed to create room:', error);
+            errorHandlerService.handle(error, { context: 'RoomService:CreateRoom' });
             throw error;
         }
     }
@@ -166,7 +167,7 @@ class RoomService {
                 latestCreatedAt: finalLatestCreatedAt > 0 ? finalLatestCreatedAt : undefined
             };
         } catch (error) {
-            logService.error('[RoomService] Failed to get rooms:', error);
+            errorHandlerService.handle(error, { context: 'RoomService:GetPublicRooms', showToast: false });
             return { rooms: [] };
         }
     }
@@ -178,7 +179,7 @@ class RoomService {
                 callback(result);
             },
             (error) => {
-                logService.error('[RoomService] Subscribe public rooms error:', error);
+                errorHandlerService.handle(error, { context: 'RoomService:SubscribePublicRooms', showToast: false });
                 callback({ rooms: [] });
             }
         );
@@ -242,7 +243,7 @@ class RoomService {
             roomSessionService.saveSession(roomId, playerId);
             return playerId;
         } catch (error) {
-            logService.error('[RoomService] Failed to join room:', error);
+            errorHandlerService.handle(error, { context: 'RoomService:JoinRoom' });
             throw error;
         }
     }
@@ -251,7 +252,7 @@ class RoomService {
         try {
             return await roomFirestoreService.getRoomDocSimple(roomId);
         } catch (error) {
-            logService.error('[RoomService] Failed to get room:', error);
+            errorHandlerService.handle(error, { context: 'RoomService:GetRoom', showToast: false });
             return null;
         }
     }
@@ -266,7 +267,7 @@ class RoomService {
                 callback(room);
             },
             (error) => {
-                logService.error('[RoomService] Subscribe error:', error);
+                errorHandlerService.handle(error, { context: 'RoomService:SubscribeRoom', showToast: false });
             }
         );
     }

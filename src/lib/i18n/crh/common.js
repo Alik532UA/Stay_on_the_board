@@ -1,4 +1,5 @@
 export default {
-  loading: "Yükleniyor...",
-  save: "Saqla"
+  loading: "Yüklenmekte...",
+  save: "Saqla",
+  errorOccurred: "Bir hata oluştı. Lütfen soñra tekrar deñeñiz."
 };

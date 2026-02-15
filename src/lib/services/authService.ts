@@ -19,6 +19,7 @@ import { doc, getFirestore, deleteDoc } from 'firebase/firestore';
 import { notificationService } from './notificationService';
 import { rewardsStore } from '$lib/stores/rewardsStore';
 import { userProfileService } from './auth/userProfileService';
+import { errorHandlerService } from './errorHandlerService';
 
 // Re-export needed types or stores if we want to keep backward compatibility strictly,
 // BUT for this refactor we will update consumers to import from userProfileService directly.
@@ -50,7 +51,7 @@ class AuthService {
         try {
             await signInAnonymously(this.auth);
         } catch (error) {
-            logService.error('[AuthService] Anonymous sign in error', error);
+            errorHandlerService.handle(error, { context: 'AuthService:SignInAnonymously' });
         }
     }
 
@@ -75,8 +76,7 @@ class AuthService {
             });
             return true;
         } catch (error: any) {
-            logService.error('[AuthService] Link account error', error);
-            this.handleAuthError(error);
+            this.handleAuthError(error, 'AuthService:LinkAccount');
             return false;
         }
     }
@@ -88,8 +88,7 @@ class AuthService {
             logService.action(`[AuthService] Logged in as ${email}`);
             return true;
         } catch (error: any) {
-            logService.error('[AuthService] Login error', error);
-            this.handleAuthError(error);
+            this.handleAuthError(error, 'AuthService:Login');
             return false;
         }
     }
@@ -106,7 +105,7 @@ class AuthService {
             notificationService.show({ type: 'info', messageRaw: 'Ви вийшли з акаунту.' });
             return true;
         } catch (error) {
-            logService.error('[AuthService] Logout error', error);
+            errorHandlerService.handle(error, { context: 'AuthService:Logout' });
             return false;
         }
     }
@@ -124,8 +123,7 @@ class AuthService {
             });
             return true;
         } catch (error: any) {
-            logService.error('[AuthService] Change password error', error);
-            this.handleAuthError(error);
+            this.handleAuthError(error, 'AuthService:ChangePassword');
             return false;
         }
     }
@@ -150,8 +148,7 @@ class AuthService {
             notificationService.show({ type: 'success', messageRaw: 'Акаунт успішно видалено.' });
             return true;
         } catch (error: any) {
-            logService.error('[AuthService] Delete account error', error);
-            this.handleAuthError(error);
+            this.handleAuthError(error, 'AuthService:DeleteAccount');
             return false;
         }
     }
@@ -166,8 +163,7 @@ class AuthService {
             });
             return true;
         } catch (error: any) {
-            logService.error('[AuthService] Reset password error', error);
-            this.handleAuthError(error);
+            this.handleAuthError(error, 'AuthService:ResetPassword');
             return false;
         }
     }
@@ -178,7 +174,7 @@ class AuthService {
         await userProfileService.updateNickname(name, user);
     }
 
-    private handleAuthError(error: any) {
+    private handleAuthError(error: any, context: string) {
         let msg = 'Сталася помилка авторизації.';
         if (error.code === 'auth/email-already-in-use') msg = 'Ця пошта вже використовується іншим акаунтом.';
         if (error.code === 'auth/weak-password') msg = 'Пароль занадто слабкий (мінімум 6 символів).';
@@ -188,7 +184,10 @@ class AuthService {
         if (error.code === 'auth/credential-already-in-use') msg = 'Ця пошта вже прив\'язана до іншого акаунту.';
         if (error.code === 'auth/requires-recent-login') msg = 'Для цієї дії потрібно увійти заново.';
 
-        notificationService.show({ type: 'error', messageRaw: msg });
+        errorHandlerService.handle(error, { 
+            context, 
+            userMessageRaw: msg
+        });
     }
 
     getCurrentUser() {

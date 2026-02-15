@@ -9,6 +9,7 @@ import { getDatabase, type Database } from 'firebase/database';
 import { getAnalytics, type Analytics, isSupported } from 'firebase/analytics';
 import { browser } from '$app/environment';
 import { logService } from './logService';
+import { errorHandlerService } from './errorHandlerService';
 
 // Firebase конфігурація з змінних середовища Vite
 const firebaseConfig = {
@@ -33,10 +34,9 @@ let analytics: Analytics | null = null;
 export function isFirebaseConfigured(): boolean {
     const isConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
     if (!isConfigured) {
-        logService.error('[FirebaseService] Missing configuration. Check .env file.', {
-            hasApiKey: !!firebaseConfig.apiKey,
-            hasProjectId: !!firebaseConfig.projectId,
-            projectId: firebaseConfig.projectId // Безпечно логувати ID проекту
+        errorHandlerService.handle('Missing configuration. Check .env file.', {
+            context: 'FirebaseService',
+            showToast: false // Don't annoy user with config errors if they are not critical yet
         });
     } else {
         // Логуємо один раз при перевірці, щоб знати, що конфіг є
@@ -66,7 +66,7 @@ function initializeFirebase(): FirebaseApp {
         logService.init('[FirebaseService] App initialized successfully');
         return app;
     } catch (e) {
-        logService.error('[FirebaseService] Failed to initialize app', e);
+        errorHandlerService.handle(e, { context: 'FirebaseService', userMessageKey: 'common.errorOccurred' });
         throw e;
     }
 }

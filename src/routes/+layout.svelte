@@ -33,6 +33,8 @@
 
 	import { roomService } from "$lib/services/roomService";
 	import "$lib/services/commandService";
+	import ToastContainer from "$lib/components/ui/ToastContainer.svelte";
+	import { errorHandlerService } from "$lib/services/errorHandlerService";
 
 	let showUpdateNotice = false;
 	const APP_VERSION_KEY = "app_version";
@@ -43,6 +45,7 @@
 	onMount(() => {
 		// Centralized initialization
 		appInitializationService.initialize();
+		errorHandlerService.initGlobalHandlers();
 
 		unsubscribeTestMode = testModeStore.subscribe((state) => {
 			testModeEnabled = state.isEnabled;
@@ -286,6 +289,7 @@
 	{/if}
 	<Modal />
 	<ModalManager />
+	<ToastContainer />
 
 	{#if $testModeStore.isEnabled}
 		<div
