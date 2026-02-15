@@ -10,6 +10,7 @@ import { playerStore } from '$lib/stores/playerStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import type { Room } from '$lib/types/online';
 import { endGameService } from '$lib/services/endGameService';
+import type { MoveQueueItem } from '$lib/types/gameMove';
 
 export class OnlineMatchController {
     // FIX: Захисний період після початку гри для запобігання race condition
@@ -153,7 +154,7 @@ export class OnlineMatchController {
                         visits: {},
                         blockModeEnabled: get(gameSettingsStore).blockModeEnabled
                     }],
-                    moveQueue: [] as any[],
+                    moveQueue: [] as MoveQueueItem[],
                 };
 
                 // Оновлюємо локально

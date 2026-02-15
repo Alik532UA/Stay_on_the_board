@@ -1,15 +1,22 @@
 import { boardStore } from './boardStore';
+import type { BoardState } from './boardStore';
 import { playerStore } from './playerStore';
+import type { PlayerState } from './playerStore';
 import { uiStateStore } from './uiStateStore';
-import { animationStore, initialState as initialAnimationState } from './animationStore';
-import { timerStore } from './timerStore';
-import { appSettingsStore } from './appSettingsStore';
+import type { UiState } from '$lib/types/uiState';
+import { timerState } from './timerState.svelte';
+import { animationState } from './animationState.svelte';
 import { availableMovesStore } from './availableMovesStore';
-import { languages } from '$lib/constants';
 import type { MoveDirectionType } from '$lib/models/Piece';
+import type { Move } from '$lib/utils/gameUtils';
+
+// Інтерфейс для Svelte 4 store (subscribe-only)
+interface Subscribable<T> {
+    subscribe: (fn: (v: T) => void) => (() => void);
+}
 
 // Допоміжна функція для створення реактивного стану зі стору Svelte 4
-function fromStore<T>(store: any, initialValue: T) {
+function fromStore<T>(store: Subscribable<T>, initialValue: T) {
     let state = $state<T>(initialValue);
     store.subscribe((v: T) => {
         state = v;
@@ -19,14 +26,13 @@ function fromStore<T>(store: any, initialValue: T) {
     };
 }
 
-// Реактивні джерела ( Runes-версії існуючих сторів )
-const board = fromStore(boardStore, null);
-const player = fromStore(playerStore, null);
-const ui = fromStore(uiStateStore, null);
-const animation = fromStore(animationStore, initialAnimationState);
-const timer = fromStore(timerStore, {});
-const appSettings = fromStore(appSettingsStore, {});
-const availableMovesVal = fromStore(availableMovesStore, []);
+// Реактивні джерела
+// Стори з Runes SSoT — читаємо напряму (без bridge)
+// Стори без Runes SSoT — читаємо через fromStore (bridge)
+const board = fromStore<BoardState | null>(boardStore, null);
+const player = fromStore<PlayerState | null>(playerStore, null);
+const ui = fromStore<UiState>(uiStateStore, {} as UiState);
+const availableMovesVal = fromStore<Move[]>(availableMovesStore, []);
 
 const oppositeDirections: Record<string, string> = {
     'up': 'down', 'down': 'up',
@@ -134,7 +140,7 @@ export const derivedState = {
 
     get visualPosition() {
         const boardStoreVal = board.current;
-        const animationStoreVal = animation.current;
+        const animationStoreVal = animationState.state;
 
         if (!boardStoreVal) return { row: null, col: null };
 
@@ -154,7 +160,11 @@ export const derivedState = {
         } else if (animationStoreVal.animationQueue.length > 0) {
             const nextMove = animationStoreVal.animationQueue[0];
             if (nextMove.to && nextMove.direction && nextMove.distance) {
-                return calculateStartPosition(nextMove as any);
+                return calculateStartPosition({
+                    direction: nextMove.direction,
+                    distance: nextMove.distance,
+                    to: nextMove.to
+                });
             }
         }
 
@@ -163,7 +173,7 @@ export const derivedState = {
 
     get visualCellVisitCounts() {
         const boardStoreVal = board.current;
-        const animationStoreVal = animation.current;
+        const animationStoreVal = animationState.state;
         const vPos = this.visualPosition;
 
         if (!boardStoreVal) return {};
@@ -205,7 +215,7 @@ export const derivedState = {
     },
 
     get remainingTime() {
-        return (timer.current as any).remainingTime ?? 0;
+        return timerState.state.remainingTime ?? 0;
     },
 
     get isGameOver() {

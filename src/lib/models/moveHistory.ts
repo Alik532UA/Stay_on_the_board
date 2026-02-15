@@ -3,6 +3,6 @@
 export interface MoveHistoryEntry {
   pos: { row: number, col: number };
   blocked: { row: number, col: number }[];
-  visits?: any;
+  visits?: Record<string, number>;
   blockModeEnabled?: boolean;
 }

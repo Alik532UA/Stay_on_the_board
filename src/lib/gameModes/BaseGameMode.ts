@@ -9,7 +9,7 @@ import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import { sideEffectService, type SideEffect } from '$lib/services/sideEffectService';
 import { Piece, type MoveDirectionType } from '../models/Piece';
-import type { GameMoveResult, SuccessfulMoveResult, ScoreChangesData } from '$lib/types/gameMove';
+import type { GameMoveResult, SuccessfulMoveResult, ScoreChangesData, MoveQueueItem } from '$lib/types/gameMove';
 import { logService } from '$lib/services/logService';
 import { animationService } from '$lib/services/animationService';
 import { endGameService } from '$lib/services/endGameService';
@@ -59,11 +59,11 @@ export abstract class BaseGameMode implements IGameMode {
   async continueAfterNoMoves(): Promise<void> {
     logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
     this.resetBoardForContinuation();
-    
+
     // Специфічна логіка: після "немає ходів" зазвичай хід повертається до людини
     const playerState = get(playerStore);
     const humanPlayerIndex = playerState?.players.findIndex(p => p.type === 'human');
-    
+
     if (humanPlayerIndex !== undefined && humanPlayerIndex !== -1) {
       playerStore.update(s => s ? { ...s, currentPlayerIndex: humanPlayerIndex } : null);
       logService.GAME_MODE('continueAfterNoMoves: Хід повернуто гравцю-людині.', { humanPlayerIndex });
@@ -83,7 +83,7 @@ export abstract class BaseGameMode implements IGameMode {
     const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
 
     playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
-    
+
     const nextPlayer = get(playerStore)?.players[nextPlayerIndex];
     logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer?.type} (індекс ${nextPlayerIndex}).`);
 
@@ -124,7 +124,7 @@ export abstract class BaseGameMode implements IGameMode {
         visits: {},
         blockModeEnabled: settings.blockModeEnabled
       }],
-      moveQueue: [] as any[],
+      moveQueue: [] as MoveQueueItem[],
     };
 
     boardStore.update(s => s ? ({ ...s, ...continuationData }) : null);
@@ -134,11 +134,11 @@ export abstract class BaseGameMode implements IGameMode {
       const playerState = get(playerStore);
       const scoreState = get(scoreStore);
       if (playerState && scoreState) {
-        const engineState = { 
-          ...boardState, 
+        const engineState = {
+          ...boardState,
           ...continuationData,
-          ...playerState, 
-          ...scoreState 
+          ...playerState,
+          ...scoreState
         };
         this.engine = new GameEngine(engineState, settings);
       }
@@ -178,9 +178,9 @@ export abstract class BaseGameMode implements IGameMode {
     this.engine.updateSettings(get(gameSettingsStore));
 
     const moveResult = this.engine.performMove(
-      direction, 
-      distance, 
-      playerState.currentPlayerIndex, 
+      direction,
+      distance,
+      playerState.currentPlayerIndex,
       this.getModeName()
     );
 
@@ -189,7 +189,7 @@ export abstract class BaseGameMode implements IGameMode {
       boardStore.update(s => s ? ({ ...s, ...moveResult.changes!.boardState }) : null);
       playerStore.update(s => s ? ({ ...s, ...moveResult.changes!.playerState }) : null);
       scoreStore.update(s => s ? ({ ...s, ...moveResult.changes!.scoreState }) : null);
-      
+
       // Event-Driven UI: Повідомляємо про успішний хід
       gameEventBus.dispatch('GAME_MOVE_SUCCESS', {
         direction,
@@ -206,9 +206,9 @@ export abstract class BaseGameMode implements IGameMode {
         gameEventBus.dispatch('new_move_added', newMove);
       }
 
-      await this.applyScoreChanges({ 
-        bonusPoints: moveResult.bonusPoints || 0, 
-        penaltyPoints: moveResult.penaltyPoints || 0 
+      await this.applyScoreChanges({
+        bonusPoints: moveResult.bonusPoints || 0,
+        penaltyPoints: moveResult.penaltyPoints || 0
       });
 
       // Обробка побічних ефектів (TTS)
@@ -219,8 +219,8 @@ export abstract class BaseGameMode implements IGameMode {
       if (settings.speechEnabled) {
         const uiState = get(uiStateStore);
         if (uiState.intendedGameType === 'online') {
-          shouldSpeak = playerState.currentPlayerIndex === uiState.onlinePlayerIndex 
-            ? settings.speechFor.onlineMyMove 
+          shouldSpeak = playerState.currentPlayerIndex === uiState.onlinePlayerIndex
+            ? settings.speechFor.onlineMyMove
             : settings.speechFor.onlineOpponentMove;
         } else {
           shouldSpeak = (currentPlayer.isComputer && settings.speechFor.computer) ||

@@ -1,7 +1,14 @@
 // src/lib/stores/animationStore.ts
+// Bridge pattern: writable-обгортка для Svelte 4 компонентів.
+// SSoT — animationState.svelte.ts (Runes).
+//
+// ВАЖЛИВО: Анімації — це ВИКЛЮЧНО візуальний шар.
+// Вони НЕ впливають на ігрову логіку та center-info.
+
 import { writable } from 'svelte/store';
 import { logService } from '../services/logService';
 import type { MoveDirectionType } from '$lib/models/Piece';
+import { animationState } from './animationState.svelte';
 
 if (typeof global !== 'undefined' && !global.requestAnimationFrame) {
   global.requestAnimationFrame = (cb: FrameRequestCallback): number => setTimeout(cb, 0) as unknown as number;
@@ -29,24 +36,30 @@ export interface AnimationState {
   isComputerMoveCompleted: boolean;
 }
 
-export const initialState: AnimationState = {
-  isAnimating: false,
-  gameId: Date.now(),
-  currentAnimation: null,
-  visualMoveQueue: [],
-  animationQueue: [],
-  isPlayingAnimation: false,
-  isComputerMoveCompleted: true,
-};
+export const initialState: AnimationState = animationState.getInitialState();
 
-const { subscribe, set, update } = writable<AnimationState>(initialState);
+function createAnimationStore() {
+  const { subscribe, set: svelteSet } = writable<AnimationState>(animationState.state);
 
-export const animationStore = {
-  subscribe,
-  update,
-  set,
-  reset: () => {
-    logService.animation('AnimationStore: reset()');
-    set(initialState);
-  }
-};
+  const syncStore = () => {
+    svelteSet(animationState.state);
+  };
+
+  return {
+    subscribe,
+    update: (fn: (s: AnimationState) => AnimationState) => {
+      animationState.update(fn);
+      syncStore();
+    },
+    set: (value: AnimationState) => {
+      animationState.state = value;
+      syncStore();
+    },
+    reset: () => {
+      animationState.reset();
+      syncStore();
+    }
+  };
+}
+
+export const animationStore = createAnimationStore();

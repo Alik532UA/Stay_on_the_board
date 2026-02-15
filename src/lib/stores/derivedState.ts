@@ -110,7 +110,7 @@ export const remainingTime = derived(
 
 export const turnTimeLimit = derived(
   timerStore,
-  $timerStore => ($timerStore as any).turnTimeLeft ?? 0
+  $timerStore => $timerStore.turnTimeLeft ?? 0
 );
 
 export const isGameOver = derived(
