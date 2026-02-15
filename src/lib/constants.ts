@@ -3,7 +3,7 @@ import { flags } from '$lib/icons/flags';
 import type { ComponentType, SvelteComponent } from 'svelte';
 
 export interface Language {
-  code: string;
+  code: 'uk' | 'en' | 'crh' | 'nl';
   component: ComponentType<SvelteComponent>;
 }
 

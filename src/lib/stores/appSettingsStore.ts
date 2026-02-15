@@ -7,14 +7,11 @@
 import { writable } from 'svelte/store';
 import { logService } from '../services/logService';
 import { debounce } from '$lib/utils/debounce';
+import { AppSettingsSchema, type AppSettings } from '$lib/schemas/appSettingsSchema';
 
 const isBrowser = typeof window !== 'undefined';
 
-export type AppSettingsState = {
-  language: string;
-  theme: string;
-  style: string;
-};
+export type AppSettingsState = AppSettings;
 
 export const defaultAppSettings: AppSettingsState = {
   language: 'uk',
@@ -25,10 +22,19 @@ export const defaultAppSettings: AppSettingsState = {
 function loadAppSettings(): AppSettingsState {
   if (!isBrowser) return defaultAppSettings;
   try {
-    const theme = localStorage.getItem('theme') || defaultAppSettings.theme;
-    const style = localStorage.getItem('style') || defaultAppSettings.style;
-    const language = localStorage.getItem('language') || defaultAppSettings.language;
-    return { theme, style, language };
+    const rawSettings = {
+      theme: localStorage.getItem('theme'),
+      style: localStorage.getItem('style'),
+      language: localStorage.getItem('language'),
+    };
+
+    const result = AppSettingsSchema.safeParse(rawSettings);
+    if (result.success) {
+      return result.data;
+    } else {
+      logService.error('App settings validation failed, using defaults:', result.error.format());
+      return defaultAppSettings;
+    }
   } catch (e) {
     logService.error('Failed to load app settings from localStorage', e);
     return defaultAppSettings;

@@ -10,6 +10,7 @@ import { VirtualPlayerGameMode } from '$lib/gameModes/VirtualPlayerGameMode';
 import { OnlineGameMode } from '$lib/gameModes/OnlineGameMode'; // Import OnlineGameMode
 import { logService } from './logService';
 import { timerStore } from '$lib/stores/timerStore';
+import { GameModePresetSchema } from '$lib/schemas/gameSettingsSchema';
 
 class GameModeService {
   private modes: Map<string, BaseGameMode> = new Map();
@@ -33,7 +34,14 @@ class GameModeService {
    * @param options Додаткові параметри ініціалізації (наприклад, roomId для онлайн гри).
    */
   public initializeGameMode(modeName: string | null = null, applyPresetSettings: boolean = true, options: any = {}) {
-    const name = modeName || get(gameSettingsStore).gameMode;
+    let name = modeName || get(gameSettingsStore).gameMode;
+
+    // Валідація назви пресету
+    const validationResult = GameModePresetSchema.safeParse(name);
+    if (!validationResult.success && name !== null) {
+        logService.error(`[GameModeService] Invalid game mode preset: "${name}". Falling back to default.`);
+        name = 'beginner';
+    }
 
     const presetToModeMap: Record<string, string> = {
       'virtual-player-beginner': 'training',

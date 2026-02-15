@@ -5,7 +5,7 @@
 
     export let onClose: () => void;
 
-    function selectLang(lang: string) {
+    function selectLang(lang: "uk" | "en" | "crh" | "nl") {
         logService.action(`Click: "Мова: ${lang}" (LanguageDropdown)`);
         appSettingsStore.updateSettings({ language: lang });
         onClose();

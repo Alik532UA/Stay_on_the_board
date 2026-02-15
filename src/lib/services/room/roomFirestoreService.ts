@@ -18,6 +18,8 @@ import { getFirestoreDb } from '../firebaseService';
 import type { Room } from '$lib/types/online';
 import { withTimeout } from '$lib/utils/asyncUtils';
 import { networkStatsStore } from '$lib/stores/networkStatsStore';
+import { RoomSchema } from '$lib/schemas/onlineSchema';
+import { logService } from '$lib/services/logService';
 
 const OPERATION_TIMEOUT_MS = 10000;
 
@@ -28,6 +30,15 @@ class RoomFirestoreService {
 
     private getRoomRef(roomId: string) {
         return doc(this.db, 'rooms', roomId);
+    }
+
+    private validateRoom(data: any, id: string): Room | null {
+        const result = RoomSchema.safeParse({ ...data, id });
+        if (!result.success) {
+            logService.error(`[RoomFirestoreService] Room validation failed for ID ${id}:`, result.error.format());
+            return { ...data, id } as Room; // Fallback to raw data for now to avoid breaking everything
+        }
+        return result.data as Room;
     }
 
     async createRoomDoc(roomId: string, roomData: any): Promise<void> {
@@ -84,7 +95,7 @@ class RoomFirestoreService {
             'Timeout connecting to room'
         );
         if (roomSnap.exists()) {
-            return { ...roomSnap.data(), id: roomSnap.id } as Room;
+            return this.validateRoom(roomSnap.data(), roomSnap.id);
         }
         return null;
     }
@@ -93,7 +104,7 @@ class RoomFirestoreService {
     async getRoomDocSimple(roomId: string): Promise<Room | null> {
         const roomSnap = await getDoc(this.getRoomRef(roomId));
         if (roomSnap.exists()) {
-            return { ...roomSnap.data(), id: roomSnap.id } as Room;
+            return this.validateRoom(roomSnap.data(), roomSnap.id);
         }
         return null;
     }
@@ -135,7 +146,7 @@ class RoomFirestoreService {
                 if (doc.exists()) {
                     const data = doc.data();
                     networkStatsStore.recordRead('RoomSubscription', data);
-                    callback({ ...data, id: doc.id } as Room);
+                    callback(this.validateRoom(data, doc.id));
                 } else {
                     callback(null);
                 }

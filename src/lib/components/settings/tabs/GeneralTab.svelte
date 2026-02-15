@@ -16,14 +16,17 @@
   $: settings = $appSettingsStore;
   $: gameSettings = $gameSettingsStore;
 
-  function selectLang(lang: string) {
+  function selectLang(lang: "uk" | "en" | "crh" | "nl") {
     logService.ui(`Зміна мови: ${lang}`);
     appSettingsStore.updateSettings({ language: lang });
     localStorage.setItem("language", lang);
     locale.set(lang);
   }
 
-  function selectTheme(style: string, theme: string) {
+  function selectTheme(
+    style: "purple" | "green" | "blue" | "gray" | "orange" | "wood", 
+    theme: "light" | "dark"
+  ) {
     logService.ui(`Зміна теми: ${style}, ${theme}`);
     appSettingsStore.updateSettings({ style, theme });
   }
@@ -68,7 +71,7 @@
       </div>
       <hr class="settings-divider" />
       <div class="theme-selector">
-        {#each ["purple", "green", "blue", "gray", "orange", "wood"] as style}
+        {#each ["purple", "green", "blue", "gray", "orange", "wood"] as const as style}
           <div class="theme-style-row" data-style={style}>
             <button
               class="theme-btn"

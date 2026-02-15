@@ -6,11 +6,16 @@
 
     export let onClose: () => void;
 
-    function selectTheme(style: string, theme: string) {
+    function selectTheme(
+        style: "purple" | "green" | "blue" | "gray" | "orange" | "wood", 
+        theme: "light" | "dark"
+    ) {
         logService.action(`Click: "Тема: ${style} ${theme}" (ThemeDropdown)`);
         appSettingsStore.updateSettings({ style, theme });
         onClose();
     }
+
+    const styles = ["purple", "green", "blue", "gray", "orange", "wood"] as const;
 </script>
 
 <div
@@ -24,7 +29,7 @@
     }}
     on:keydown={(e) => e.key === "Escape" && onClose()}
 >
-    {#each ["purple", "green", "blue", "gray", "orange", "wood"] as style}
+    {#each styles as style}
         <div class="theme-style-row" data-style={style}>
             <button
                 class="theme-btn"
