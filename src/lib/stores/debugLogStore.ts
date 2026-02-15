@@ -1,31 +1,22 @@
 // src/lib/stores/debugLogStore.ts
-/**
- * @file Store для зберігання дебаг-логів.
- */
+// Bridge pattern: writable-обгортка для Svelte 4.
+// SSoT — debugLogState.svelte.ts (Runes).
 
 import { writable } from 'svelte/store';
+import { debugLogState } from './debugLogState.svelte';
 
-const logs = writable<string[]>([]);
+const { subscribe, set: svelteSet } = writable<string[]>(debugLogState.state);
 
-function createLogStore() {
-    const { subscribe, update, set } = logs;
+const syncStore = () => { svelteSet(debugLogState.state); };
 
-    return {
-        subscribe,
-        add: (message: string): void => {
-            update(currentLogs => {
-                const newLogs = [...currentLogs, message];
-                // Keep the last 100 logs to prevent memory issues
-                if (newLogs.length > 100) {
-                    return newLogs.slice(newLogs.length - 100);
-                }
-                return newLogs;
-            });
-        },
-        clear: (): void => {
-            set([]);
-        }
-    };
-}
-
-export const debugLogStore = createLogStore();
+export const debugLogStore = {
+    subscribe,
+    add: (message: string) => {
+        debugLogState.add(message);
+        syncStore();
+    },
+    clear: () => {
+        debugLogState.clear();
+        syncStore();
+    }
+};

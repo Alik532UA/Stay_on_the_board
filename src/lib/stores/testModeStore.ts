@@ -1,8 +1,11 @@
 // src/lib/stores/testModeStore.ts
-import { writable, get } from 'svelte/store';
-import { logService } from '$lib/services/logService';
+// Bridge pattern: writable-обгортка для Svelte 4.
+// SSoT — testModeState.svelte.ts (Runes).
 
-export type PositionMode = 'random' | 'predictable' | 'manual'; // predictable = 0,0
+import { writable } from 'svelte/store';
+import { testModeState } from './testModeState.svelte';
+
+export type PositionMode = 'random' | 'predictable' | 'manual';
 export type ComputerMoveMode = 'random' | 'manual';
 
 export interface TestModeState {
@@ -27,42 +30,23 @@ export const initialState: TestModeState = {
   },
 };
 
-const store = writable<TestModeState>(initialState);
+const { subscribe, set: svelteSet } = writable<TestModeState>(testModeState.state);
 
-// НАВІЩО: Створюємо єдину функцію для керування станом тестового режиму.
-// Це забезпечує SSoT та SoC. Вся логіка, пов'язана зі зміною цього стану,
-// інкапсульована тут, а не розпорошена по UI компонентах.
+const syncStore = () => { svelteSet(testModeState.state); };
+
 export function toggleTestMode() {
-  store.update(state => {
-    const isEnabled = !state.isEnabled;
-    logService.testMode(`Test mode toggled: ${isEnabled ? 'ON' : 'OFF'}`);
-
-    if (isEnabled) {
-      // Встановлюємо значення за замовчуванням для ввімкненого режиму
-      return {
-        ...state,
-        isEnabled: true,
-        startPositionMode: 'manual',
-        manualStartPosition: { x: 0, y: 0 },
-        computerMoveMode: 'manual',
-        manualComputerMove: { direction: 'down', distance: 1 }
-      };
-    } else {
-      // Повертаємо до стандартних значень для вимкненого режиму
-      return {
-        ...state,
-        isEnabled: false,
-        startPositionMode: 'random',
-        manualStartPosition: null,
-        computerMoveMode: 'random',
-        manualComputerMove: { direction: null, distance: null }
-      };
-    }
-  });
+  testModeState.toggle();
+  syncStore();
 }
 
 export const testModeStore = {
-  subscribe: store.subscribe,
-  update: store.update,
-  set: store.set
+  subscribe,
+  update: (fn: (s: TestModeState) => TestModeState) => {
+    testModeState.update(fn);
+    syncStore();
+  },
+  set: (value: TestModeState) => {
+    testModeState.state = value;
+    syncStore();
+  }
 };

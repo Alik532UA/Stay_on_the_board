@@ -6,7 +6,7 @@ import { uiStateStore } from './uiStateStore';
 import type { UiState } from '$lib/types/uiState';
 import { timerState } from './timerState.svelte';
 import { animationState } from './animationState.svelte';
-import { availableMovesStore } from './availableMovesStore';
+import { availableMovesState } from './availableMovesState.svelte';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import type { Move } from '$lib/utils/gameUtils';
 
@@ -30,7 +30,6 @@ function fromStore<T>(store: Subscribable<T>, initialValue: T) {
 // Стори з Runes SSoT — читаємо напряму (без bridge)
 // Стори без Runes SSoT — читаємо через fromStore (bridge)
 const ui = fromStore<UiState>(uiStateStore, {} as UiState);
-const availableMovesVal = fromStore<Move[]>(availableMovesStore, []);
 
 const oppositeDirections: Record<string, string> = {
     'up': 'down', 'down': 'up',
@@ -209,7 +208,7 @@ export const derivedState = {
     },
 
     get availableMoves() {
-        return availableMovesVal.current;
+        return availableMovesState.state;
     },
 
     get remainingTime() {

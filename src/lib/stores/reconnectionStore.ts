@@ -1,66 +1,44 @@
-import { writable, derived } from 'svelte/store';
+// src/lib/stores/reconnectionStore.ts
+// Bridge pattern: writable-обгортка для Svelte 4.
+// SSoT — reconnectionState.svelte.ts (Runes).
+
+import { writable } from 'svelte/store';
+import { reconnectionState } from './reconnectionState.svelte';
 
 export interface DisconnectedPlayer {
     id: string;
     name: string;
     disconnectStart: number;
-    deadline: number; // Timestamp when they can be kicked
+    deadline: number;
 }
-
-interface ReconnectionState {
-    roomId: string;
-    myPlayerId: string;
-    players: DisconnectedPlayer[];
-}
-
-const initialState: ReconnectionState = {
-    roomId: '',
-    myPlayerId: '',
-    players: []
-};
 
 function createReconnectionStore() {
-    const { subscribe, set, update } = writable<ReconnectionState>(initialState);
+    const { subscribe, set: svelteSet } = writable(reconnectionState.state);
+
+    const syncStore = () => { svelteSet(reconnectionState.state); };
 
     return {
         subscribe,
         init: (roomId: string, myPlayerId: string) => {
-            set({ roomId, myPlayerId, players: [] });
+            reconnectionState.init(roomId, myPlayerId);
+            syncStore();
         },
         addPlayer: (player: { id: string; name: string }, timeoutSeconds: number = 15) => {
-            update(state => {
-                const exists = state.players.find(p => p.id === player.id);
-                if (exists) return state;
-
-                const now = Date.now();
-                return {
-                    ...state,
-                    players: [...state.players, {
-                        id: player.id,
-                        name: player.name,
-                        disconnectStart: now,
-                        deadline: now + (timeoutSeconds * 1000)
-                    }]
-                };
-            });
+            reconnectionState.addPlayer(player, timeoutSeconds);
+            syncStore();
         },
         removePlayer: (playerId: string) => {
-            update(state => ({
-                ...state,
-                players: state.players.filter(p => p.id !== playerId)
-            }));
+            reconnectionState.removePlayer(playerId);
+            syncStore();
         },
         extendDeadline: (playerId: string, seconds: number) => {
-            update(state => ({
-                ...state,
-                players: state.players.map(p => 
-                    p.id === playerId 
-                        ? { ...p, deadline: p.deadline + (seconds * 1000) }
-                        : p
-                )
-            }));
+            reconnectionState.extendDeadline(playerId, seconds);
+            syncStore();
         },
-        reset: () => set(initialState)
+        reset: () => {
+            reconnectionState.reset();
+            syncStore();
+        }
     };
 }
 

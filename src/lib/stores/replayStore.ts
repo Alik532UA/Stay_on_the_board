@@ -1,51 +1,25 @@
 // src/lib/stores/replayStore.ts
-/**
- * @file Store для функціональності replay гри.
- */
+// Bridge pattern: writable-обгортка для Svelte 4.
+// SSoT — replayStoreState.svelte.ts (Runes).
 
 import { writable } from 'svelte/store';
 import type { MoveHistoryEntry } from '$lib/models/moveHistory';
+import { replayStateRune } from './replayStoreState.svelte';
 
-export type AutoPlayDirection = 'paused' | 'forward' | 'backward';
+export type { AutoPlayDirection, ReplayState } from './replayStoreState.svelte';
 
-export interface ReplayState {
-    isReplayMode: boolean;
-    moveHistory: MoveHistoryEntry[];
-    boardSize: number;
-    replayCurrentStep: number;
-    autoPlayDirection: AutoPlayDirection;
-    limitReplayPath: boolean;
-}
+const { subscribe, set: svelteSet } = writable(replayStateRune.state);
 
-const initialState: ReplayState = {
-    isReplayMode: false,
-    moveHistory: [],
-    boardSize: 4,
-    replayCurrentStep: 0,
-    autoPlayDirection: 'paused',
-    limitReplayPath: true,
-};
-
-const { subscribe, update } = writable<ReplayState>(initialState);
+const syncStore = () => { svelteSet(replayStateRune.state); };
 
 export const replayStore = {
     subscribe,
     startReplay: (moveHistory: MoveHistoryEntry[], boardSize: number): void => {
-        update(state => ({
-            ...state,
-            isReplayMode: true,
-            moveHistory,
-            boardSize,
-            replayCurrentStep: 0,
-            autoPlayDirection: 'paused'
-        }));
+        replayStateRune.startReplay(moveHistory, boardSize);
+        syncStore();
     },
     stopReplay: (): void => {
-        update(state => ({
-            ...state,
-            isReplayMode: false,
-            moveHistory: [],
-            autoPlayDirection: 'paused'
-        }));
+        replayStateRune.stopReplay();
+        syncStore();
     }
 };
