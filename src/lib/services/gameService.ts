@@ -2,7 +2,6 @@ import { get } from 'svelte/store';
 import { boardStore, type BoardState } from '$lib/stores/boardStore';
 import { playerStore, type PlayerState } from '$lib/stores/playerStore';
 import { scoreStore, type ScoreState } from '$lib/stores/scoreStore';
-import { uiStateStore, type UiState } from '$lib/stores/uiStateStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { testModeStore } from '$lib/stores/testModeStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
@@ -14,7 +13,8 @@ import { animationService } from './animationService';
 import { logService } from './logService';
 import { DEFAULT_PLAYER_NAMES } from '$lib/config/defaultPlayers';
 import { getRandomUnusedColor } from '$lib/utils/playerUtils';
-import { initialUIState } from '$lib/stores/uiStateStore';
+import { initialUIState, uiStateStore, type UiState } from '$lib/stores/uiStateStore';
+import { uiEffectsStore } from '$lib/stores/uiEffectsStore';
 
 export const gameService = {
   initializeNewGame(config: {
@@ -22,6 +22,10 @@ export const gameService = {
     players?: Player[];
   } = {}) {
     logService.init('[GameService] initializeNewGame: Створення нового ігрового стану...', config);
+
+    // Ініціалізація слухачів подій для UI сторів
+    uiStateStore.initEventListeners();
+    uiEffectsStore.initEventListeners();
 
     // FIX: Спочатку скидаємо анімацію, щоб очистити черги і таймери.
     // Це запобігає конфліктам між старими анімаціями і новим станом дошки.

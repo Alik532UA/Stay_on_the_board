@@ -55,6 +55,28 @@ export interface NewMoveAddedPayload {
 }
 
 /**
+ * Payload для успішного ходу.
+ */
+export interface GameMoveSuccessPayload {
+  direction: MoveDirectionType;
+  distance: number;
+  playerIndex: number;
+  bonusPoints: number;
+  penaltyPoints: number;
+  newPosition: { row: number; col: number };
+}
+
+/**
+ * Payload для невдалого ходу.
+ */
+export interface GameMoveFailurePayload {
+  direction: MoveDirectionType;
+  distance: number;
+  playerIndex: number;
+  reason: string | undefined;
+}
+
+/**
  * Всі типи подій гри та їх payloads.
  */
 export interface GameEventPayloads {
@@ -107,6 +129,12 @@ export interface GameEventPayloads {
   BoardResizeConfirmed: BoardResizePayload;
   ShowNoMovesModal: ShowNoMovesModalPayload;
   new_move_added: NewMoveAddedPayload;
+
+  // New Event-Driven UI Events
+  GAME_MOVE_SUCCESS: GameMoveSuccessPayload;
+  GAME_MOVE_FAILURE: GameMoveFailurePayload;
+  GAME_TURN_SWITCHED: { nextPlayerIndex: number; playerType: string };
+  UI_REQUEST_HIDE_BOARD: { delay: number };
 
   // Legacy/Other Events (Типізовано як словник замість any для безпеки)
   GameStateChanged: Record<string, unknown>;

@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import { dev } from '$app/environment';
+import { gameEventBus } from '$lib/services/gameEventBus';
 
 export interface UiState {
   showBoardHiddenInfo: boolean;
@@ -46,6 +47,7 @@ export const initialUIState: UiState = {
 
 function createUiStateStore() {
   const { subscribe, set, update } = writable<UiState>(initialUIState);
+  let unsubscribers: (() => void)[] = [];
 
   return {
     subscribe,
@@ -58,6 +60,54 @@ function createUiStateStore() {
         return { ...state, isGameOver: true, gameOverReasonKey: reasonKey, gameOverReasonValues: reasonValues };
       });
     },
+    /**
+     * Ініціалізує слухачів подій для автоматичного оновлення стану.
+     */
+    initEventListeners: () => {
+      // Очищаємо старі підписки, якщо вони були
+      unsubscribers.forEach(u => u());
+      unsubscribers = [];
+
+      // 1. Слухаємо успішний хід
+      unsubscribers.push(
+        gameEventBus.subscribe('GAME_MOVE_SUCCESS', (payload) => {
+          update(s => s ? ({
+            ...s,
+            selectedDirection: null,
+            selectedDistance: null,
+            isFirstMove: false,
+            lastMove: {
+              direction: payload.direction,
+              distance: payload.distance,
+              player: payload.playerIndex
+            }
+          }) : null);
+        })
+      );
+
+      // 2. Слухаємо помилку ходу
+      unsubscribers.push(
+        gameEventBus.subscribe('GAME_MOVE_FAILURE', () => {
+          update(s => s ? ({
+            ...s,
+            selectedDirection: null,
+            selectedDistance: null,
+            lastMove: null
+          }) : null);
+        })
+      );
+
+      // 3. Слухаємо завершення гри (скидання вибору)
+      unsubscribers.push(
+        gameEventBus.subscribe('GameOver', () => {
+          update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null }) : null);
+        })
+      );
+    },
+    destroy: () => {
+      unsubscribers.forEach(u => u());
+      unsubscribers = [];
+    }
   };
 }
 

@@ -4,7 +4,6 @@ import { tick } from 'svelte';
 import { aiService } from '$lib/services/aiService';
 import type { IGameMode } from './gameMode.interface';
 import type { Player } from '$lib/models/player';
-import * as gameLogicService from '$lib/services/gameLogicService';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
@@ -71,9 +70,6 @@ export abstract class BaseGameMode implements IGameMode {
     } else {
       await this.advanceToNextPlayer();
     }
-
-    // Очищаємо старий вибір
-    uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null, lastMove: null }) : null);
 
     this.startTurn();
     gameEventBus.dispatch('CloseModal', undefined);
@@ -189,17 +185,20 @@ export abstract class BaseGameMode implements IGameMode {
     );
 
     if (moveResult.success && moveResult.changes) {
-      // МИТТЄВЕ оновлення сторів (для center-info та логіки)
+      // МИТТЄВЕ оновлення сторів (для логіки)
       boardStore.update(s => s ? ({ ...s, ...moveResult.changes!.boardState }) : null);
       playerStore.update(s => s ? ({ ...s, ...moveResult.changes!.playerState }) : null);
       scoreStore.update(s => s ? ({ ...s, ...moveResult.changes!.scoreState }) : null);
       
-      uiStateStore.update(s => s ? ({ 
-        ...s, 
-        selectedDirection: null, 
-        selectedDistance: null,
-        lastMove: { direction, distance, player: playerState.currentPlayerIndex } 
-      }) : null);
+      // Event-Driven UI: Повідомляємо про успішний хід
+      gameEventBus.dispatch('GAME_MOVE_SUCCESS', {
+        direction,
+        distance,
+        playerIndex: playerState.currentPlayerIndex,
+        bonusPoints: moveResult.bonusPoints || 0,
+        penaltyPoints: moveResult.penaltyPoints || 0,
+        newPosition: moveResult.newPosition!
+      });
 
       const newMove = moveResult.changes.boardState.moveQueue!.slice(-1)[0];
       if (newMove) {
@@ -242,30 +241,28 @@ export abstract class BaseGameMode implements IGameMode {
         });
       }
 
-      await this.onPlayerMoveSuccess(moveResult as SuccessfulMoveResult);
+      await this.onPlayerMoveSuccess();
     } else {
-      // Для помилок ходу (вихід за межі тощо) ми поки залишаємо стару логіку обробки в GameMode
-      // але використовуємо інформацію з двигуна, якщо вона є.
+      // Event-Driven UI: Повідомляємо про помилку
+      gameEventBus.dispatch('GAME_MOVE_FAILURE', {
+        direction,
+        distance,
+        playerIndex: playerState.currentPlayerIndex,
+        reason: moveResult.reason
+      });
       await this.onPlayerMoveFailure(moveResult.reason, direction, distance);
     }
   }
 
-  protected async onPlayerMoveSuccess(moveResult: SuccessfulMoveResult): Promise<void> {
+  protected async onPlayerMoveSuccess(): Promise<void> {
     const playerState = get(playerStore);
     const currentPlayer = playerState!.players[playerState!.currentPlayerIndex];
 
     if (currentPlayer.type === 'human') {
       const settings = get(gameSettingsStore);
       if (settings.autoHideBoard) {
-        uiEffectsStore.autoHideBoard(0);
+        gameEventBus.dispatch('UI_REQUEST_HIDE_BOARD', { delay: 0 });
       }
-    }
-
-    uiStateStore.update(s => s ? ({ ...s, isFirstMove: false }) : null);
-
-    if (moveResult.sideEffects && moveResult.sideEffects.length > 0) {
-      logService.GAME_MODE('[BaseGameMode] Executing side effects for move...', moveResult.sideEffects);
-      moveResult.sideEffects.forEach((effect: SideEffect) => sideEffectService.execute(effect));
     }
 
     await this.advanceToNextPlayer();
@@ -305,8 +302,6 @@ export abstract class BaseGameMode implements IGameMode {
 
     gameEventBus.dispatch('new_move_added', finalMoveForAnimation);
 
-    uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null, lastMove: null }) : null);
-
     if (reason === 'out_of_bounds') {
       await endGameService.endGame('modal.gameOverReasonOut');
     } else if (reason === 'blocked_cell') {
@@ -325,6 +320,8 @@ export abstract class BaseGameMode implements IGameMode {
     logService.GAME_MODE(`[${this.constructor.name}] cleanup called`);
     timeService.stopGameTimer();
     timeService.stopTurnTimer();
+    uiStateStore.destroy();
+    uiEffectsStore.destroy();
   }
 
   pauseTimers(): void {

@@ -2,6 +2,7 @@ import { writable, get } from 'svelte/store';
 import { gameSettingsStore } from './gameSettingsStore.js';
 import { logService } from '$lib/services/logService.js';
 import { uiStateStore } from './uiStateStore.js';
+import { gameEventBus } from '$lib/services/gameEventBus';
 
 /**
  * Store для централізованого керування побічними ефектами UI (таймери, затримки, автоприховування тощо).
@@ -9,6 +10,7 @@ import { uiStateStore } from './uiStateStore.js';
 
 function createUiEffectsStore() {
   let autoHideTimeout: ReturnType<typeof setTimeout> | null = null;
+  let unsubscribers: (() => void)[] = [];
 
   /**
    * Автоматично приховати дошку після зміни позиції фігури.
@@ -40,7 +42,19 @@ function createUiEffectsStore() {
 
   return {
     autoHideBoard,
-    cancelAllEffects
+    cancelAllEffects,
+    initEventListeners: () => {
+      unsubscribers.forEach(u => u());
+      unsubscribers = [
+        gameEventBus.subscribe('UI_REQUEST_HIDE_BOARD', (payload) => {
+          autoHideBoard(payload.delay);
+        })
+      ];
+    },
+    destroy: () => {
+      unsubscribers.forEach(u => u());
+      unsubscribers = [];
+    }
   };
 }
 

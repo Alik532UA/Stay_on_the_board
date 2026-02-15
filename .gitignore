@@ -1,10 +1,17 @@
-.private
+# Private documentation (separate repository)
+/.private/
 /.temp/
+
+# Gemini service files
+.gemini_commit_log.txt
+.gemini_diff_stat.txt
+.gemini_old_presence.txt
 
 # Generated files
 /node_modules
 /.svelte-kit
 /build
+bundle-stats.html
 
 # Log files
 npm-debug.log*
@@ -20,9 +27,6 @@ yarn-error.log*
 .env.*
 !.env.example
 
-# Build artifacts
-bundle-stats.html
-
 # OS files
 .DS_Store
 
@@ -30,12 +34,8 @@ bundle-stats.html
 /test-reports/
 
 # Playwright
-node_modules/
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 /.vite/
-
-# Private documentation (separate repository)
-/.private/
