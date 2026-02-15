@@ -211,9 +211,9 @@ h1 {
 .screen-overlay-backdrop {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background-color: var(--modal-overlay-bg);
+    backdrop-filter: blur(var(--modal-overlay-blur));
+    -webkit-backdrop-filter: blur(var(--modal-overlay-blur));
     z-index: 9999;
     transition: background-color 0.3s, backdrop-filter 0.3s;
 }
@@ -222,9 +222,9 @@ h1 {
 :root .modal-overlay,
 [data-style] .modal-overlay,
 [data-theme] .modal-overlay {
-    background: rgba(0, 0, 0, 0.45) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
+    background: var(--modal-overlay-bg) !important;
+    backdrop-filter: blur(var(--modal-overlay-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--modal-overlay-blur)) !important;
 }
 
 .hidden {

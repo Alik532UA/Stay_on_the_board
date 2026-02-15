@@ -3,7 +3,7 @@
 /* Overlay: Прозоріший або інший ефект, якщо треба */
 .modal-overlay.style-glass {
     /* Можна змінити прозорість, якщо треба */
-    background: rgba(0, 0, 0, 0.8) !important;
+    background: var(--modal-overlay-bg-glass) !important;
 }
 
 /* Window: Контейнер на весь екран */
@@ -64,7 +64,7 @@
 
 /* Специфічні стилі для інпутів у скляному режимі */
 .modal-window.style-glass .glass-input {
-    background: rgba(255, 255, 255, 0.1);
-    border: var(--global-border-width) solid rgba(255, 255, 255, 0.1);
+    background: var(--glass-bg);
+    border: var(--global-border-width) solid var(--glass-border);
     backdrop-filter: blur(4px);
 }

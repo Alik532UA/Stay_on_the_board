@@ -37,7 +37,11 @@
   --modal-header-color: #fff;
   --modal-body-color: #eee;
   --modal-footer-gap: 16px;
-  --modal-overlay-bg: rgba(0, 0, 0, 0.4);
+  --modal-overlay-bg: rgba(0, 0, 0, 0.45);
+  --modal-overlay-bg-glass: rgba(0, 0, 0, 0.8);
+  --modal-overlay-blur: 8px;
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.1);
   --positive-score-color: #4CAF50;
   --confirm-action-bg: #43a047;
   --confirm-action-text: #ffffff;
