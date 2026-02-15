@@ -1,7 +1,6 @@
 // src/lib/services/aiService.ts
 import { get } from 'svelte/store';
 import { logService } from './logService';
-import { calculateAvailableMoves } from './availableMovesService';
 import type { MoveDirectionType } from '../models/Piece';
 import type { BoardState } from '$lib/stores/boardStore';
 import type { PlayerState } from '$lib/stores/playerStore';
@@ -9,11 +8,28 @@ import type { UiState } from '$lib/stores/uiStateStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 
 class AiService {
-  public getComputerMove(
+  private worker: Worker | null = null;
+
+  constructor() {
+    // Ініціалізуємо воркер тільки в браузері
+    if (typeof window !== 'undefined') {
+      try {
+        // Використовуємо Vite-синтаксис для воркерів
+        this.worker = new Worker(new URL('../workers/ai.worker.ts', import.meta.url), {
+          type: 'module'
+        });
+        logService.init('AiService: Web Worker успішно ініціалізовано');
+      } catch (error) {
+        logService.error('AiService: Помилка ініціалізації Web Worker', error);
+      }
+    }
+  }
+
+  public async getComputerMove(
     boardState: BoardState, 
     playerState: PlayerState, 
     uiState: UiState
-  ): { direction: MoveDirectionType; distance: number } | null {
+  ): Promise<{ direction: MoveDirectionType; distance: number } | null> {
     if (!boardState || !playerState || !uiState) return null;
 
     logService.testMode('aiService: отримано стан', { boardState, playerState, uiState });
@@ -23,7 +39,31 @@ class AiService {
       return uiState.testModeOverrides.nextComputerMove;
     }
 
-    logService.testMode('aiService: виконується випадковий хід');
+    // Якщо воркер доступний, використовуємо його
+    if (this.worker) {
+      return new Promise((resolve) => {
+        const settings = get(gameSettingsStore);
+        
+        const handleMessage = (e: MessageEvent) => {
+          this.worker?.removeEventListener('message', handleMessage);
+          logService.logicVirtualPlayer('getComputerMove (worker): отримано хід', e.data);
+          resolve(e.data);
+        };
+
+        this.worker?.addEventListener('message', handleMessage);
+        
+        logService.logicVirtualPlayer('getComputerMove (worker): надсилаю запит у воркер');
+        this.worker?.postMessage({
+          boardState,
+          playerState,
+          settings
+        });
+      });
+    }
+
+    // Фолбек на синхронний розрахунок (якщо воркер не завантажився)
+    logService.testMode('aiService: воркер недоступний, виконується синхронний випадковий хід');
+    const { calculateAvailableMoves } = await import('./availableMovesService');
     const availableMoves = calculateAvailableMoves(boardState, playerState, get(gameSettingsStore));
 
     if (availableMoves.length === 0) {
@@ -33,9 +73,6 @@ class AiService {
 
     const randomIndex = Math.floor(Math.random() * availableMoves.length);
     const randomMove = availableMoves[randomIndex];
-    
-    logService.logicVirtualPlayer('getComputerMove: знайдено доступні ходи', availableMoves);
-    logService.logicVirtualPlayer('getComputerMove: обрано випадковий хід', randomMove);
     
     return randomMove;
   }

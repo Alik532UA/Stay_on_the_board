@@ -342,7 +342,7 @@ export abstract class BaseGameMode implements IGameMode {
     const uiState = get(uiStateStore);
     if (!boardState || !playerState || !uiState) return;
 
-    const computerMove = aiService.getComputerMove(boardState, playerState, uiState);
+    const computerMove = await aiService.getComputerMove(boardState, playerState, uiState);
     logService.GAME_MODE('triggerComputerMove: Результат getComputerMove:', computerMove);
 
     if (computerMove) {
