@@ -50,7 +50,12 @@ export default {
     yourScore: "Your score:",
     playerScore: "{playerName}: {score} points",
     bonusPoints: "Bonus Points:",
-    bonusScore: "Bonus points: +{bonus}"
+    bonusScore: "Bonus points: +{bonus}",
+    title: "Current scores {playerName}",
+    distanceBonusLabel: "Distance bonus: +{bonus}",
+    jumpBonusLabel: "Jump bonus: +{bonus}",
+    reversePenaltyLabel: "Reverse move penalty: -{penalty}",
+    totalSum: "Total score: {total}"
   },
   boardClickTitle: "How to control the game?",
   boardClickContent: "The game is controlled not on the board, but with the control panel. Use the arrows to select a direction and the number buttons to select a distance. The board is only for observing the moves.",

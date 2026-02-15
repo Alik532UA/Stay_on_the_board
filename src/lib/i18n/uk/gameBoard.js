@@ -32,7 +32,11 @@ export default {
     computerMadeMovePart1: "Комп'ютер зробив хід:",
     computerMadeMovePart2: "Тепер ваша черга робити хід",
     pauseBetweenMoves: "Пауза між ходами...",
-    gameOver: "Гра завершена"
+    gameOver: "Гра завершена",
+    nowTurn: "Зараз ходить",
+    playerMadeMove: "{player} зробив хід: {direction} на {distance}.",
+    nextTurnPrompt: "{player} ваша черга робити хід!",
+    playerTurnLabel: "Хід гравця"
   },
   directions: {
     upLeft: "по діагоналі вгору-вліво",

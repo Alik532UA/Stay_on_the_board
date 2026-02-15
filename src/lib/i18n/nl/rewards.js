@@ -2,6 +2,8 @@
 export default {
     pageTitle: "Beloningen",
     unlockedOn: "Ontgrendeld: {date}",
+    suggestRewardTitle: "Beloning voorstellen",
+    suggestRewardDescription: "Heb je een idee voor een prestatie? Laat het ons weten!",
     score11Any: {
         title: "Beginner",
         description: "Scoor 11 punten in elke modus."

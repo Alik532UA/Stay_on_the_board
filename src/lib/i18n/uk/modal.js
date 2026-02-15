@@ -51,7 +51,12 @@ export default {
     yourScore: "Ваш рахунок:",
     playerScore: "{playerName}: {score} балів",
     bonusPoints: "Бонусні бали:",
-    bonusScore: "Бонусні бали: +{bonus}"
+    bonusScore: "Бонусні бали: +{bonus}",
+    title: "Поточні бали {playerName}",
+    distanceBonusLabel: "Бонус за відстань: +{bonus}",
+    jumpBonusLabel: "Бонус за перестрибування: +{bonus}",
+    reversePenaltyLabel: "Штраф за зворотній хід: -{penalty}",
+    totalSum: "Загальна сума балів: {total}"
   },
   boardClickTitle: "Як керувати грою?",
   boardClickContent: "Керування грою відбувається не на дошці, а за допомогою панелі керування. Використовуйте стрілки для вибору напрямку та кнопки з цифрами для вибору відстані. Дошка слугує лише для спостереження за ходами.",

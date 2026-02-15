@@ -14,6 +14,8 @@ export default {
   language: "Мова",
   donate: "Підтримати проєкт",
   account: "Акаунт", // Додано
+  themeDropdown: "Вибір теми",
+  languageDropdown: "Вибір мови",
   lang: {
     uk: "Українська",
     en: "English",

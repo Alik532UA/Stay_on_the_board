@@ -10,5 +10,6 @@ export default {
   scoreLabel: "Рахунок ({playerName})",
   // Нові ключі для повідомлень про гру
   gameStarted: "Гра почалась!\n{playerName} ваша черга робити хід",
-  playerMadeMove: "{playerName} зробив хід: {direction} на {distance}.\n{nextPlayerName} ваша черга робити хід!"
+  playerMadeMove: "{playerName} зробив хід: {direction} на {distance}.\n{nextPlayerName} ваша черга робити хід!",
+  togglePlayerType: "Змінити тип (Гравець/ШІ)"
 }; 

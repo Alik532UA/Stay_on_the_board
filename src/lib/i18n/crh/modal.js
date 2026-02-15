@@ -50,7 +50,12 @@ export default {
     yourScore: "Siziñ esabıñız:",
     playerScore: "{playerName}: {score} bal",
     bonusPoints: "Bonus ballar:",
-    bonusScore: "Bonus ballar: +{bonus}"
+    bonusScore: "Bonus ballar: +{bonus}",
+    title: "Mevcut ballarnı {playerName}",
+    distanceBonusLabel: "Mesafe içün bonus: +{bonus}",
+    jumpBonusLabel: "Atlama içün bonus: +{bonus}",
+    reversePenaltyLabel: "Keri adımlar içün ceza: -{penalty}",
+    totalSum: "Yekün esap: {total}"
   },
   boardClickTitle: "Oyun nasıl idare etilir?",
   boardClickContent: "Oyun tahtada degil, idare paneli vastasınen idare etile. Yönelişni saylamaq içün oqlarnı ve mesafeni saylamaq içün raqamlı döğmelerni qullanıñız. Tahta tek areketlerni közetmek içündür.",

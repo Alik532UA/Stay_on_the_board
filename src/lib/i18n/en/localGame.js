@@ -10,5 +10,6 @@ export default {
   scoreLabel: "Score ({playerName})",
   // New keys for game messages
   gameStarted: "Game started!\n{playerName} your turn to make a move",
-  playerMadeMove: "{playerName} made a move: {direction} by {distance}.\n{nextPlayerName} your turn to make a move!"
+  playerMadeMove: "{playerName} made a move: {direction} by {distance}.\n{nextPlayerName} your turn to make a move!",
+  togglePlayerType: "Toggle Player/AI"
 }; 

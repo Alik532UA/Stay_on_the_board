@@ -34,7 +34,11 @@ bitir`,
     computerMadeMovePart1: "Kompyuter areket yaptı:",
     computerMadeMovePart2: "Endi sıra sizde areket yapmaq",
     pauseBetweenMoves: "Arekteler arası mola...",
-    gameOver: "Oyun bitken"
+    gameOver: "Oyun bitken",
+    nowTurn: "Nevbet kimsede",
+    playerMadeMove: "{player} areket yaptı: {direction} {distance}.",
+    nextTurnPrompt: "{player} areket yapma sırası sizde!",
+    playerTurnLabel: "Oyunçı sırası"
   },
   directions: {
     upLeft: "diagonal yuqarı-solğa",

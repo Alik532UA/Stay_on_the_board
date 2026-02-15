@@ -32,7 +32,11 @@ export default {
     computerMadeMovePart1: "Computer moved:",
     computerMadeMovePart2: "Now your turn to move",
     pauseBetweenMoves: "Pause between moves...",
-    gameOver: "Game over"
+    gameOver: "Game over",
+    nowTurn: "Now moving",
+    playerMadeMove: "{player} made a move: {direction} for {distance}.",
+    nextTurnPrompt: "{player} your turn to make a move!",
+    playerTurnLabel: "Player turn"
   },
   directions: {
     upLeft: "diagonally up-left",

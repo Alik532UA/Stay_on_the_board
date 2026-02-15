@@ -31,7 +31,11 @@ export default {
     computerMadeMovePart1: "Computer verplaatste:",
     computerMadeMovePart2: "Nu jouw beurt om te zetten",
     pauseBetweenMoves: "Pauze tussen zetten...",
-    gameOver: "Spel voorbij"
+    gameOver: "Spel voorbij",
+    nowTurn: "Nu aan de beurt",
+    playerMadeMove: "{player} deed een zet: {direction} over {distance}.",
+    nextTurnPrompt: "{player} jouw beurt om een zet te doen!",
+    playerTurnLabel: "Beurt van speler"
   },
   directions: {
     upLeft: "diagonaal naar boven-links",

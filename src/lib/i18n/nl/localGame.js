@@ -10,5 +10,6 @@ export default {
   scoreLabel: "Score ({playerName})",
   // Nieuwe sleutels voor spelmeldingen
   gameStarted: "Spel gestart!\n{playerName} jouw beurt om een zet te doen",
-  playerMadeMove: "{playerName} deed een zet: {direction} met {distance}.\n{nextPlayerName} jouw beurt om een zet te doen!"
+  playerMadeMove: "{playerName} deed een zet: {direction} met {distance}.\n{nextPlayerName} jouw beurt om een zet te doen!",
+  togglePlayerType: "Type speler wijzigen (Speler/AI)"
 }; 

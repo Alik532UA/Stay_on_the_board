@@ -13,6 +13,9 @@ export default {
   theme: "Tema",
   language: "Til",
   donate: "Layiheni destekle",
+  account: "Esap",
+  themeDropdown: "Mevzunı saylam",
+  languageDropdown: "Tilni saylam",
   lang: {
     uk: "Ukrain tili",
     en: "İnglizce",

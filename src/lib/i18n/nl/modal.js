@@ -51,7 +51,12 @@ export default {
     yourScore: "Jouw score:",
     playerScore: "{playerName}: {score} punten",
     bonusPoints: "Bonuspunten:",
-    bonusScore: "Bonuspunten: +{bonus}"
+    bonusScore: "Bonuspunten: +{bonus}",
+    title: "Huidige scores {playerName}",
+    distanceBonusLabel: "Afstand bonus: +{bonus}",
+    jumpBonusLabel: "Springbonus: +{bonus}",
+    reversePenaltyLabel: "Straf voor omgekeerde zet: -{penalty}",
+    totalSum: "Totale score: {total}"
   },
   boardClickTitle: "Hoe bestuur je het spel?",
   boardClickContent: "Het spel wordt niet op het bord bestuurd, maar met het bedieningspaneel. Gebruik de pijlen om een richting te kiezen en de nummer knoppen om een afstand te kiezen. Het bord is alleen om de zetten te observeren.",

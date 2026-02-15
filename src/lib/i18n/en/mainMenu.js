@@ -13,6 +13,9 @@ export default {
   theme: "Theme",
   language: "Language",
   donate: "Support the project",
+  account: "Account",
+  themeDropdown: "Select Theme",
+  languageDropdown: "Select Language",
   lang: {
     uk: "Ukrainian",
     en: "English",

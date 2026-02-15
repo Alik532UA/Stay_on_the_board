@@ -13,6 +13,9 @@ export default {
   theme: "Thema",
   language: "Taal",
   donate: "Steun het project",
+  account: "Account",
+  themeDropdown: "Selecteer Thema",
+  languageDropdown: "Selecteer Taal",
   lang: {
     uk: "Oekraïens",
     en: "Engels",

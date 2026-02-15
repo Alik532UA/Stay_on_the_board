@@ -2,6 +2,8 @@
 export default {
     pageTitle: "Rewards",
     unlockedOn: "Unlocked: {date}",
+    suggestRewardTitle: "Suggest a Reward",
+    suggestRewardDescription: "Have an idea for an achievement? Tell us!",
     score11Any: {
         title: "Beginner",
         description: "Score 11 points in any mode."

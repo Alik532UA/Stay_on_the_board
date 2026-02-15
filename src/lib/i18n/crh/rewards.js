@@ -2,6 +2,8 @@
 export default {
     pageTitle: "Mukâfatlar",
     unlockedOn: "Açıldı: {date}",
+    suggestRewardTitle: "Mükâfat teklif et",
+    suggestRewardDescription: "Bir qazanma fikriñiz barmı? Bizge aytıñız!",
     score11Any: {
         title: "Yañı başlağan",
         description: "Erlangi bir rejimde 11 puan toplamaq."
