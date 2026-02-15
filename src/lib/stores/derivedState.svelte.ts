@@ -2,34 +2,13 @@ import { boardState } from './boardState.svelte';
 import type { BoardState } from './boardStore';
 import { playerState } from './playerState.svelte';
 import type { PlayerState } from './playerStore';
-import { uiStateStore } from './uiStateStore';
+import { uiState } from './uiState.svelte';
 import type { UiState } from '$lib/types/uiState';
 import { timerState } from './timerState.svelte';
 import { animationState } from './animationState.svelte';
 import { availableMovesState } from './availableMovesState.svelte';
 import type { MoveDirectionType } from '$lib/models/Piece';
 import type { Move } from '$lib/utils/gameUtils';
-
-// Інтерфейс для Svelte 4 store (subscribe-only)
-interface Subscribable<T> {
-    subscribe: (fn: (v: T) => void) => (() => void);
-}
-
-// Допоміжна функція для створення реактивного стану зі стору Svelte 4
-function fromStore<T>(store: Subscribable<T>, initialValue: T) {
-    let state = $state<T>(initialValue);
-    store.subscribe((v: T) => {
-        state = v;
-    });
-    return {
-        get current() { return state; }
-    };
-}
-
-// Реактивні джерела
-// Стори з Runes SSoT — читаємо напряму (без bridge)
-// Стори без Runes SSoT — читаємо через fromStore (bridge)
-const ui = fromStore<UiState>(uiStateStore, {} as UiState);
 
 const oppositeDirections: Record<string, string> = {
     'up': 'down', 'down': 'up',
@@ -66,18 +45,18 @@ function calculateStartPosition(move: { direction: MoveDirectionType, distance: 
 
 export const derivedState = {
     get lastComputerMove() {
-        const uiState = ui.current;
+        const uiStateVal = uiState.state;
         const playerStoreVal = playerState.state;
         const boardStoreVal = boardState.state;
 
         if (!playerStoreVal) return null;
 
-        if (uiState?.lastMove) {
-            const p = playerStoreVal.players[uiState.lastMove.player];
+        if (uiStateVal?.lastMove) {
+            const p = playerStoreVal.players[uiStateVal.lastMove.player];
             if (p?.type === 'ai' || p?.type === 'computer') {
                 return {
-                    direction: uiState.lastMove.direction,
-                    distance: uiState.lastMove.distance
+                    direction: uiStateVal.lastMove.direction,
+                    distance: uiStateVal.lastMove.distance
                 };
             }
         }
@@ -95,18 +74,18 @@ export const derivedState = {
     },
 
     get lastPlayerMove() {
-        const uiState = ui.current;
+        const uiStateVal = uiState.state;
         const playerStoreVal = playerState.state;
         const boardStoreVal = boardState.state;
 
         if (!playerStoreVal) return null;
 
-        if (uiState?.lastMove) {
-            const p = playerStoreVal.players[uiState.lastMove.player];
+        if (uiStateVal?.lastMove) {
+            const p = playerStoreVal.players[uiStateVal.lastMove.player];
             if (p?.type === 'human') {
                 return {
-                    direction: uiState.lastMove.direction,
-                    distance: uiState.lastMove.distance
+                    direction: uiStateVal.lastMove.direction,
+                    distance: uiStateVal.lastMove.distance
                 };
             }
         }
@@ -124,12 +103,15 @@ export const derivedState = {
     },
 
     get isPlayerTurn() {
-        if (!playerState.state) return false;
-        const currentPlayerIndex = playerState.state.currentPlayerIndex;
-        const currentPlayer = playerState.state.players[currentPlayerIndex];
+        const pState = playerState.state;
+        if (!pState) return false;
 
-        if (ui.current?.intendedGameType === 'online') {
-            return ui.current.onlinePlayerIndex === currentPlayerIndex;
+        const currentPlayerIndex = pState.currentPlayerIndex;
+        const currentPlayer = pState.players[currentPlayerIndex];
+        const uiStateVal = uiState.state;
+
+        if (uiStateVal?.intendedGameType === 'online') {
+            return uiStateVal.onlinePlayerIndex === currentPlayerIndex;
         }
 
         return currentPlayer?.type === 'human';
@@ -216,6 +198,6 @@ export const derivedState = {
     },
 
     get isGameOver() {
-        return ui.current?.isGameOver ?? false;
+        return uiState.state?.isGameOver ?? false;
     }
 };

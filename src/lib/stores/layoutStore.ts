@@ -1,49 +1,17 @@
 // src/lib/stores/layoutStore.ts
-/**
- * @file Store для керування розташуванням віджетів.
- */
+// Bridge pattern: writable-обгортка для Svelte 4.
+// SSoT — layoutState.svelte.ts (Runes).
 
 import { writable } from 'svelte/store';
 import { logService } from '../services/logService';
+import { layoutStateRune, defaultLayout } from './layoutState.svelte';
+import type { Layout, LayoutColumn } from './layoutState.svelte';
+
+// Re-export types та constants
+export { WIDGETS, defaultLayout } from './layoutState.svelte';
+export type { WidgetId, Layout, LayoutColumn } from './layoutState.svelte';
 
 const isBrowser = typeof window !== 'undefined';
-
-export const WIDGETS = {
-    BOARD_HIDDEN_INFO: 'board-hidden-info',
-    TOP_ROW: 'game-board-top-row',
-    SCORE_PANEL: 'score-panel',
-    BOARD_WRAPPER: 'board-bg-wrapper',
-    CONTROLS_PANEL: 'game-controls-panel',
-    SETTINGS_EXPANDER: 'settings-expander',
-    GAME_INFO: 'game-info-widget',
-    PLAYER_TURN_INDICATOR: 'player-turn-indicator',
-    TIMER: 'timer-widget',
-    GAME_MODE: 'game-mode-widget',
-} as const;
-
-export type WidgetId = typeof WIDGETS[keyof typeof WIDGETS];
-
-export interface LayoutColumn {
-    id: string;
-    widgets: WidgetId[];
-}
-
-export type Layout = LayoutColumn[];
-
-const defaultLayout: Layout = [
-    {
-        id: 'column-1',
-        widgets: [WIDGETS.TOP_ROW, WIDGETS.GAME_INFO, WIDGETS.PLAYER_TURN_INDICATOR, WIDGETS.BOARD_WRAPPER, WIDGETS.SCORE_PANEL],
-    },
-    {
-        id: 'column-2',
-        widgets: [WIDGETS.CONTROLS_PANEL],
-    },
-    {
-        id: 'column-3',
-        widgets: [WIDGETS.TIMER, WIDGETS.GAME_MODE, WIDGETS.SETTINGS_EXPANDER],
-    },
-];
 
 function loadLayout(): Layout {
     if (!isBrowser) return defaultLayout;
@@ -58,7 +26,8 @@ function loadLayout(): Layout {
     return defaultLayout;
 }
 
-const { subscribe, set, update } = writable<Layout>(loadLayout());
+// Ініціалізація SSoT з localStorage
+layoutStateRune.state = loadLayout();
 
 function saveLayout(layout: Layout): void {
     if (isBrowser) {
@@ -66,14 +35,31 @@ function saveLayout(layout: Layout): void {
     }
 }
 
-subscribe(saveLayout);
+const { subscribe, set: svelteSet } = writable<Layout>(layoutStateRune.state);
+
+const syncStore = () => { svelteSet(layoutStateRune.state); };
+
+// Зберігаємо в localStorage при кожній зміні
+const originalSubscribe = subscribe;
 
 export const layoutStore = {
-    subscribe,
-    set,
-    update,
+    subscribe: (fn: (v: Layout) => void) => {
+        const unsub = originalSubscribe(fn);
+        return unsub;
+    },
+    set: (value: Layout) => {
+        layoutStateRune.state = value;
+        saveLayout(value);
+        syncStore();
+    },
+    update: (fn: (s: Layout) => Layout) => {
+        layoutStateRune.update(fn);
+        saveLayout(layoutStateRune.state);
+        syncStore();
+    },
     resetLayout: (): void => {
-        set(defaultLayout);
+        layoutStateRune.reset();
         saveLayout(defaultLayout);
+        syncStore();
     },
 };

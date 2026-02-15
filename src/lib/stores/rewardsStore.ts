@@ -1,21 +1,22 @@
+// src/lib/stores/rewardsStore.ts
+// Bridge pattern: writable-обгортка для Svelte 4.
+// SSoT — rewardsState.svelte.ts (Runes).
+
 import { writable, get } from 'svelte/store';
 import type { RewardsState, UnlockedReward } from '$lib/types/rewards';
 import { logService } from '$lib/services/logService';
 import { getFirestore, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getFirebaseApp } from '$lib/services/firebaseService';
+import { rewardsState } from './rewardsState.svelte';
 
 const STORAGE_KEY = 'sotb_rewards';
 
-const defaultState: RewardsState = {
-    unlockedRewards: {},
-    hasUnseenRewards: false
-};
-
 function createRewardsStore() {
-    const { subscribe, set, update } = writable<RewardsState>(defaultState);
+    const { subscribe, set: svelteSet } = writable<RewardsState>(rewardsState.state);
 
-    // Допоміжна функція для отримання DB
+    const syncStore = () => { svelteSet(rewardsState.state); };
+
     const getDb = () => {
         try {
             return getFirestore(getFirebaseApp());
@@ -24,7 +25,7 @@ function createRewardsStore() {
         }
     };
 
-    return {
+    const store = {
         subscribe,
 
         init: () => {
@@ -34,10 +35,11 @@ function createRewardsStore() {
                 const stored = localStorage.getItem(STORAGE_KEY);
                 if (stored) {
                     const parsed = JSON.parse(stored);
-                    set({
+                    rewardsState.state = {
                         unlockedRewards: parsed.unlockedRewards || {},
                         hasUnseenRewards: parsed.hasUnseenRewards || false
-                    });
+                    };
+                    syncStore();
                     logService.info('[RewardsStore] Loaded state from localStorage');
                 }
             } catch (e) {
@@ -46,8 +48,8 @@ function createRewardsStore() {
         },
 
         unlock: (rewardId: string) => {
-            update(state => {
-                if (state.unlockedRewards[rewardId]) return state; // Вже відкрито
+            rewardsState.update(state => {
+                if (state.unlockedRewards[rewardId]) return state;
 
                 const newReward: UnlockedReward = {
                     id: rewardId,
@@ -63,25 +65,22 @@ function createRewardsStore() {
                     hasUnseenRewards: true
                 };
 
-                // 1. Зберігаємо локально
+                // Зберігаємо локально
                 if (typeof window !== 'undefined') {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
                 }
 
-                // 2. Зберігаємо в хмару (якщо є юзер)
+                // Зберігаємо в хмару
                 const auth = getAuth(getFirebaseApp());
                 const user = auth.currentUser;
                 const db = getDb();
 
                 if (user && db) {
                     const userRef = doc(db, 'users', user.uid);
-                    // Використовуємо setDoc з merge, щоб оновити тільки поле unlockedRewards
-                    // Ми використовуємо dot notation для оновлення конкретного ключа в мапі
                     const updateData = {
                         [`unlockedRewards.${rewardId}`]: newReward
                     };
                     updateDoc(userRef, updateData).catch(err => {
-                        // Якщо документа немає, створюємо його (рідкісний кейс, але можливий)
                         if (err.code === 'not-found') {
                             setDoc(userRef, { unlockedRewards: { [rewardId]: newReward } }, { merge: true });
                         } else {
@@ -93,22 +92,20 @@ function createRewardsStore() {
                 logService.info(`[RewardsStore] Unlocked reward: ${rewardId}`);
                 return newState;
             });
+            syncStore();
         },
 
         markAllAsSeen: () => {
-            update(state => {
+            rewardsState.update(state => {
                 const newState = { ...state, hasUnseenRewards: false };
                 if (typeof window !== 'undefined') {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
                 }
                 return newState;
             });
+            syncStore();
         },
 
-        /**
-         * Синхронізує локальні нагороди з хмарними.
-         * Викликається при вході користувача.
-         */
         syncWithCloud: async (uid: string) => {
             const db = getDb();
             if (!db) return;
@@ -117,46 +114,40 @@ function createRewardsStore() {
 
             try {
                 const snap = await getDoc(userRef);
-                const localState = get(rewardsStore);
+                const localState = rewardsState.state;
                 let remoteRewards: Record<string, UnlockedReward> = {};
 
                 if (snap.exists()) {
                     remoteRewards = snap.data().unlockedRewards || {};
                 }
 
-                // Злиття: об'єднуємо локальні та віддалені
-                // Якщо нагорода є і там і там, беремо ту, що отримана раніше
                 const mergedRewards = { ...localState.unlockedRewards };
                 let hasChangesToUpload = false;
 
-                // 1. Додаємо хмарні до локальних
                 for (const [id, reward] of Object.entries(remoteRewards)) {
                     if (!mergedRewards[id]) {
                         mergedRewards[id] = reward;
                     } else {
-                        // Конфлікт: залишаємо найстарішу дату
                         if (reward.unlockedAt < mergedRewards[id].unlockedAt) {
                             mergedRewards[id] = reward;
                         }
                     }
                 }
 
-                // 2. Перевіряємо, чи є локальні, яких немає в хмарі (щоб залити їх)
                 for (const id of Object.keys(mergedRewards)) {
                     if (!remoteRewards[id]) {
                         hasChangesToUpload = true;
                     }
                 }
 
-                // Оновлюємо стор
                 const newState = {
                     ...localState,
                     unlockedRewards: mergedRewards
                 };
-                set(newState);
+                rewardsState.state = newState;
+                syncStore();
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
 
-                // Якщо були нові локальні нагороди, відправляємо повний список в хмару
                 if (hasChangesToUpload) {
                     await setDoc(userRef, { unlockedRewards: mergedRewards }, { merge: true });
                     logService.action('[RewardsStore] Synced local rewards to cloud.');
@@ -170,12 +161,15 @@ function createRewardsStore() {
         },
 
         reset: () => {
-            set(defaultState);
+            rewardsState.reset();
+            syncStore();
             if (typeof window !== 'undefined') {
                 localStorage.removeItem(STORAGE_KEY);
             }
         }
     };
+
+    return store;
 }
 
 export const rewardsStore = createRewardsStore();

@@ -1,13 +1,15 @@
 /**
  * @file Manages global application settings.
- * @description This store handles settings that are not tied to a specific game session,
- * such as language, theme, and visual style. The settings are persisted in localStorage.
+ * @description This store handles settings that are not tied to a specific game session.
+ * Bridge pattern: writable-обгортка для Svelte 4.
+ * SSoT — appSettingsState.svelte.ts (Runes).
  */
 // src/lib/stores/appSettingsStore.ts
 import { writable } from 'svelte/store';
 import { logService } from '../services/logService';
 import { debounce } from '$lib/utils/debounce';
 import { AppSettingsSchema, type AppSettings } from '$lib/schemas/appSettingsSchema';
+import { appSettingsState } from './appSettingsState.svelte';
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -28,7 +30,6 @@ function loadAppSettings(): AppSettingsState {
       language: localStorage.getItem('language'),
     };
 
-    // Remove null values so Zod can use defaults
     const filteredSettings = Object.fromEntries(
       Object.entries(rawSettings).filter(([_, v]) => v !== null)
     );
@@ -53,9 +54,13 @@ function saveAppSettings(settings: AppSettingsState) {
   localStorage.setItem('language', settings.language);
 }
 
+// Ініціалізація SSoT з localStorage
+appSettingsState.state = loadAppSettings();
+
 function createAppSettingsStore() {
-  const initialState = loadAppSettings();
-  const { subscribe, set, update } = writable<AppSettingsState>(initialState);
+  const { subscribe, set: svelteSet } = writable<AppSettingsState>(appSettingsState.state);
+
+  const syncStore = () => { svelteSet(appSettingsState.state); };
 
   return {
     subscribe,
@@ -69,10 +74,17 @@ function createAppSettingsStore() {
       });
     },
     updateSettings: (newSettings: Partial<AppSettingsState>) => {
-      update(state => ({ ...state, ...newSettings }));
+      appSettingsState.updateSettings(newSettings);
+      syncStore();
     },
-    set,
-    reset: () => set(defaultAppSettings),
+    set: (value: AppSettingsState) => {
+      appSettingsState.state = value;
+      syncStore();
+    },
+    reset: () => {
+      appSettingsState.reset();
+      syncStore();
+    },
   };
 }
 

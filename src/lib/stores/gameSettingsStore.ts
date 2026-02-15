@@ -1,6 +1,7 @@
 /**
  * @file Manages settings related to a specific game session.
- * @description This store is the SSoT for all game-related settings.
+ * @description Bridge pattern: writable-обгортка для Svelte 4.
+ * SSoT — gameSettingsState.svelte.ts (Runes).
  */
 import { writable, get } from 'svelte/store';
 import { logService } from '../services/logService';
@@ -8,6 +9,7 @@ import { uiStateStore } from './uiStateStore';
 import { boardStore } from './boardStore';
 import { availableMovesService } from '../services/availableMovesService';
 import { syncGameModeLogic } from '$lib/logic/settingsLogic';
+import { gameSettingsState } from './gameSettingsState.svelte';
 
 // Re-export types for backward compatibility
 export type {
@@ -27,7 +29,9 @@ import { presetConfigurations } from './gameSettingsPresets';
 export { defaultGameSettings } from './gameSettingsDefaults';
 
 function createGameSettingsStore() {
-  const { subscribe, set, update } = writable<GameSettingsState>(defaultGameSettings);
+  const { subscribe, set: svelteSet } = writable<GameSettingsState>(gameSettingsState.state);
+
+  const syncStore = () => { svelteSet(gameSettingsState.state); };
 
   // Helper wrapper to apply sync logic using current UI state
   const applySync = (state: GameSettingsState): GameSettingsState => {
@@ -36,25 +40,31 @@ function createGameSettingsStore() {
   };
 
   const methods = {
-    set,
+    set: (value: GameSettingsState) => {
+      gameSettingsState.state = value;
+      syncStore();
+    },
     updateSettings: (newSettings: Partial<GameSettingsState>) => {
       logService.state('[GameSettingsStore] updateSettings called with:', newSettings);
-      update(state => {
+      gameSettingsState.update(state => {
         let updatedState = { ...state, ...newSettings };
         updatedState = applySync(updatedState);
         return updatedState;
       });
+      syncStore();
     },
     resetSettings: () => {
       logService.action('[GameSettingsStore] Resetting settings to default.');
-      set(defaultGameSettings);
+      gameSettingsState.state = defaultGameSettings;
+      syncStore();
     },
     resetKeybindings: () => {
-      update(state => ({ ...state, keybindings: defaultGameSettings.keybindings }));
+      gameSettingsState.update(state => ({ ...state, keybindings: defaultGameSettings.keybindings }));
+      syncStore();
     },
     toggleShowBoard: (forceState?: boolean) => {
       logService.state('[GameSettingsStore] toggleShowBoard called', { forceState });
-      update(state => {
+      gameSettingsState.update(state => {
         if (typeof forceState === 'boolean') {
           const newSettings: Partial<GameSettingsState> = { ...state, showBoard: forceState };
           if (!forceState) {
@@ -77,14 +87,16 @@ function createGameSettingsStore() {
           showMoves: newShowBoard
         };
       });
+      syncStore();
     },
     toggleShowMoves: () => {
       logService.state('[GameSettingsStore] toggleShowMoves called');
-      update(state => ({ ...state, showMoves: !state.showMoves }))
+      gameSettingsState.update(state => ({ ...state, showMoves: !state.showMoves }));
+      syncStore();
     },
     toggleShowPiece: () => {
       logService.state('[GameSettingsStore] toggleShowPiece called');
-      update(state => {
+      gameSettingsState.update(state => {
         const newShowPieceState = !state.showPiece;
         const newSettings: Partial<GameSettingsState> = { ...state, showPiece: newShowPieceState };
         if (!newShowPieceState) {
@@ -92,25 +104,34 @@ function createGameSettingsStore() {
         }
         return newSettings as GameSettingsState;
       });
+      syncStore();
     },
     toggleAutoHideBoard: () => {
-      update(state => {
+      gameSettingsState.update(state => {
         let updatedState = { ...state, autoHideBoard: !state.autoHideBoard };
         updatedState = applySync(updatedState);
         return updatedState;
       });
+      syncStore();
     },
-    setGameInfoWidgetState: (newState: 'hidden' | 'shown' | 'compact') => update(state => ({ ...state, showGameInfoWidget: newState })),
+    setGameInfoWidgetState: (newState: 'hidden' | 'shown' | 'compact') => {
+      gameSettingsState.update(state => ({ ...state, showGameInfoWidget: newState }));
+      syncStore();
+    },
     toggleBlockMode: () => {
-      update(state => {
+      gameSettingsState.update(state => {
         let updatedState = { ...state, blockModeEnabled: !state.blockModeEnabled };
         updatedState = applySync(updatedState);
         return updatedState;
       });
+      syncStore();
       boardStore.resetCellVisitCounts();
       availableMovesService.updateAvailableMoves();
     },
-    toggleSpeech: () => update(state => ({ ...state, speechEnabled: !state.speechEnabled })),
+    toggleSpeech: () => {
+      gameSettingsState.update(state => ({ ...state, speechEnabled: !state.speechEnabled }));
+      syncStore();
+    },
 
     applyPreset: (preset: GameModePreset) => {
       logService.GAME_MODE(`[GameSettingsStore] Applying preset: "${preset}"`);
@@ -122,7 +143,7 @@ function createGameSettingsStore() {
         return;
       }
 
-      const currentState = get(gameSettingsStore);
+      const currentState = gameSettingsState.state;
 
       if (presetSettings.blockModeEnabled !== undefined && presetSettings.blockModeEnabled !== currentState.blockModeEnabled) {
         boardStore.resetCellVisitCounts();

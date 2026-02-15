@@ -1,31 +1,48 @@
+// src/lib/stores/notificationStore.ts
+// Bridge pattern: writable-обгортка для Svelte 4.
+// SSoT — notificationState.svelte.ts (Runes).
+
 import { writable } from 'svelte/store';
 import { v4 as uuidv4 } from 'uuid';
 import type { Notification } from '$lib/types/notification';
+import { notificationState } from './notificationState.svelte';
 
 function createNotificationStore() {
-    const { subscribe, update, set } = writable<Notification[]>([]);
+    const { subscribe, set: svelteSet } = writable<Notification[]>(notificationState.state);
+
+    const syncStore = () => { svelteSet(notificationState.state); };
 
     return {
         subscribe,
         add: (notificationData: Omit<Notification, 'id'>) => {
             const id = uuidv4();
             const notification: Notification = { ...notificationData, id };
-            
-            update(n => [...n, notification]);
 
+            notificationState.add(notification);
+            syncStore();
+
+            // Побічний ефект (таймер) залишається в bridge
             const duration = notification.duration ?? 5000;
             if (duration > 0) {
                 setTimeout(() => {
-                    update(n => n.filter(item => item.id !== id));
+                    notificationState.remove(id);
+                    syncStore();
                 }, duration);
             }
             return id;
         },
         remove: (id: string) => {
-            update(n => n.filter(item => item.id !== id));
+            notificationState.remove(id);
+            syncStore();
         },
-        update, // Added for backward compatibility with existing service
-        clear: () => set([])
+        update: (fn: (s: Notification[]) => Notification[]) => {
+            notificationState.state = fn(notificationState.state);
+            syncStore();
+        },
+        clear: () => {
+            notificationState.clear();
+            syncStore();
+        }
     };
 }
 

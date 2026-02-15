@@ -1,47 +1,37 @@
+// src/lib/stores/networkStatsStore.ts
+// Bridge pattern: writable-обгортка для Svelte 4.
+// SSoT — networkStatsState.svelte.ts (Runes).
+
 import { writable } from 'svelte/store';
+import { networkStatsState } from './networkStatsState.svelte';
 
-export interface NetworkStats {
-    reads: number;
-    writes: number;
-    bytesReceived: number; // Approximate
-    bytesSent: number; // Approximate
-    lastActivity: number | null;
-    recentEvents: Array<{ type: 'read' | 'write', size: number, source: string, timestamp: number }>;
-    elapsedSeconds: number;
-    isTracking: boolean;
-}
-
-const initialState: NetworkStats = {
-    reads: 0,
-    writes: 0,
-    bytesReceived: 0,
-    bytesSent: 0,
-    lastActivity: null,
-    recentEvents: [],
-    elapsedSeconds: 0,
-    isTracking: false
-};
+export type { NetworkStats } from './networkStatsState.svelte';
 
 let timerInterval: ReturnType<typeof setInterval> | null = null;
 
 function createNetworkStatsStore() {
-    const { subscribe, update, set } = writable<NetworkStats>(initialState);
+    const { subscribe, set: svelteSet } = writable(networkStatsState.state);
+
+    const syncStore = () => { svelteSet(networkStatsState.state); };
 
     return {
         subscribe,
         reset: () => {
-            update(s => ({
-                ...initialState,
-                isTracking: s.isTracking, // Keep tracking state
-                elapsedSeconds: 0 // Reset time
-            }));
+            networkStatsState.reset();
+            syncStore();
         },
         startSession: () => {
             if (timerInterval) clearInterval(timerInterval);
-            set({ ...initialState, isTracking: true });
+            networkStatsState.state = {
+                reads: 0, writes: 0, bytesReceived: 0, bytesSent: 0,
+                lastActivity: null, recentEvents: [], elapsedSeconds: 0,
+                isTracking: true
+            };
+            syncStore();
 
             timerInterval = setInterval(() => {
-                update(s => ({ ...s, elapsedSeconds: s.elapsedSeconds + 1 }));
+                networkStatsState.update(s => ({ ...s, elapsedSeconds: s.elapsedSeconds + 1 }));
+                syncStore();
             }, 1000);
         },
         stopSession: () => {
@@ -49,11 +39,12 @@ function createNetworkStatsStore() {
                 clearInterval(timerInterval);
                 timerInterval = null;
             }
-            update(s => ({ ...s, isTracking: false }));
+            networkStatsState.update(s => ({ ...s, isTracking: false }));
+            syncStore();
         },
-        recordRead: (source: string, data: any) => {
+        recordRead: (source: string, data: unknown) => {
             const size = estimateSize(data);
-            update(s => {
+            networkStatsState.update(s => {
                 const event = { type: 'read' as const, size, source, timestamp: Date.now() };
                 return {
                     ...s,
@@ -63,10 +54,11 @@ function createNetworkStatsStore() {
                     recentEvents: [event, ...s.recentEvents].slice(0, 20)
                 };
             });
+            syncStore();
         },
-        recordWrite: (source: string, data: any) => {
+        recordWrite: (source: string, data: unknown) => {
             const size = estimateSize(data);
-            update(s => {
+            networkStatsState.update(s => {
                 const event = { type: 'write' as const, size, source, timestamp: Date.now() };
                 return {
                     ...s,
@@ -76,11 +68,12 @@ function createNetworkStatsStore() {
                     recentEvents: [event, ...s.recentEvents].slice(0, 20)
                 };
             });
+            syncStore();
         }
     };
 }
 
-function estimateSize(obj: any): number {
+function estimateSize(obj: unknown): number {
     try {
         return new TextEncoder().encode(JSON.stringify(obj)).length;
     } catch (e) {
