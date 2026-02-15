@@ -60,7 +60,7 @@
               on:click={() => selectLang(lang.code)}
             >
               <div class="lang-flag-wrapper">
-                {@html lang.svg}
+                <svelte:component this={lang.component} />
               </div>
             </button>
           {/each}

@@ -9,8 +9,6 @@ test.describe('хепі флоу', () => {
   });
 
   test('хепі флоу 1', { tag: ['@inProgress', '@HF-1'] }, async ({ page }) => {
-    // test.setTimeout(1000 * 60 * 120); // 120 minutes
-
     await test.step('Початок гри та налаштування дошки', async () => {
       await startNewGame(page);
       await setBoardSize(page, 3);

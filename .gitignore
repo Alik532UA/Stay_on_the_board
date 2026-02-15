@@ -1,3 +1,6 @@
+.private
+/.temp/
+
 # Generated files
 /node_modules
 /.svelte-kit

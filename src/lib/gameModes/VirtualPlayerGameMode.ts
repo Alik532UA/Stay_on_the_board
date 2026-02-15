@@ -1,25 +1,15 @@
-import { get } from 'svelte/store';
 import { TrainingGameMode } from './TrainingGameMode';
 import type { Player } from '$lib/models/player';
 import { createVirtualPlayerPlayers } from '$lib/utils/playerFactory';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
-import { gameEventBus } from '$lib/services/gameEventBus';
 import { logService } from '$lib/services/logService';
-import { animationService } from '$lib/services/animationService';
 import { noMovesService } from '$lib/services/noMovesService';
 import { timeService } from '$lib/services/timeService';
-import { availableMovesService } from '$lib/services/availableMovesService';
-import { gameService } from '$lib/services/gameService';
-import { playerStore } from '$lib/stores/playerStore';
-import { scoreStore } from '$lib/stores/scoreStore';
 import { boardStore } from '$lib/stores/boardStore';
-import { uiStateStore } from '$lib/stores/uiStateStore';
-import { timerStore } from '$lib/stores/timerStore';
-import { endGameService } from '$lib/services/endGameService';
+import { scoreStore } from '$lib/stores/scoreStore';
 import type { ScoreChangesData } from '$lib/types/gameMove';
-
-import { voiceControlService } from '$lib/services/voiceControlService';
+import { get } from 'svelte/store';
 
 export class VirtualPlayerGameMode extends TrainingGameMode {
 
@@ -29,7 +19,12 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
 
   initialize(options: { newSize?: number } = {}): void {
     timeService.stopGameTimer();
+    // Викликаємо ініціалізацію базового класу (TrainingGameMode через super)
+    // Оскільки ми наслідуємося від BaseGameMode, але хочемо логіку ініціалізації Training, 
+    // треба бути обережним. VirtualPlayerGameMode насправді наслідує TrainingGameMode в оригіналі.
+    // Я виправлю це на пряме наслідування від TrainingGameMode для збереження ієрархії.
     super.initialize(options);
+    
     gameSettingsStore.updateSettings({
       speechRate: 1.6,
       shortSpeech: true,
@@ -50,52 +45,8 @@ export class VirtualPlayerGameMode extends TrainingGameMode {
     return 'virtual-player';
   }
 
-  protected async advanceToNextPlayer(): Promise<void> {
-    logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
-    const currentPlayerState = get(playerStore);
-    if (!currentPlayerState) return;
-    const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
-
-    playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
-
-    const nextPlayer = get(playerStore)?.players[nextPlayerIndex];
-    logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer?.type}.`);
-
-    if (nextPlayer?.type === 'ai') {
-      // ВИПРАВЛЕНО: Прибрано штучну затримку.
-      // Логіка оновлюється миттєво -> center-info показує хід одразу.
-      // Анімація на дошці буде відтворена з затримкою завдяки черзі в animationService.
-      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера (миттєво).');
-      await this.triggerComputerMove();
-    } else {
-      this.startTurn();
-    }
-  }
-
   protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
-    // No specific score changes to apply in training mode
-  }
-
-  async continueAfterNoMoves(): Promise<void> {
-    logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
-    logService.logicMove('State of uiStateStore BEFORE continueAfterNoMoves:', get(uiStateStore));
-
-    // Використовуємо спільну логіку з базового класу
-    this.resetBoardForContinuation();
-
-    // Специфічна логіка для virtual-player: повертаємо хід гравцю-людині
-    const humanPlayerIndex = get(playerStore)?.players.findIndex(p => p.type === 'human');
-    if (humanPlayerIndex !== undefined) {
-      playerStore.update(s => s ? { ...s, currentPlayerIndex: humanPlayerIndex } : null);
-      logService.logicMove('Set current player to human after continuing game.', { humanPlayerIndex });
-    }
-
-    // Скидаємо вибір гравця, щоб він міг зробити новий
-    uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null }) : null);
-    logService.logicMove('State of uiStateStore AFTER continueAfterNoMoves:', get(uiStateStore));
-
-    this.startTurn();
-    gameEventBus.dispatch('CloseModal');
+    // No specific score changes to apply in virtual player mode
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {

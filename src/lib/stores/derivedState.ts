@@ -55,11 +55,28 @@ function calculateStartPosition(move: { direction: MoveDirectionType, distance: 
 }
 
 export const lastComputerMove = derived(
-  [boardStore, playerStore],
-  ([$boardStore, $playerStore]) => {
-    if (!$boardStore || !$playerStore || $boardStore.moveQueue.length === 0) return null;
+  [uiStateStore, playerStore, boardStore],
+  ([$uiStateStore, $playerStore, $boardStore]) => {
+    if (!$playerStore) return null;
+
+    // Пріоритет 1: uiStateStore (найсвіжіші дані від GameEngine)
+    if ($uiStateStore?.lastMove) {
+      const player = $playerStore.players[$uiStateStore.lastMove.player];
+      // ПІДТРИМКА ОБОХ ТИПІВ: 'ai' та 'computer'
+      if (player?.type === 'ai' || player?.type === 'computer') {
+        return {
+          direction: $uiStateStore.lastMove.direction,
+          distance: $uiStateStore.lastMove.distance
+        };
+      }
+      return null;
+    }
+
+    // Пріоритет 2: moveQueue (fallback)
+    if (!$boardStore || $boardStore.moveQueue.length === 0) return null;
     const lastMove = $boardStore.moveQueue[$boardStore.moveQueue.length - 1];
-    if (lastMove && $playerStore.players[lastMove.player - 1]?.type === 'ai') {
+    const player = $playerStore.players[lastMove.player - 1];
+    if (player?.type === 'ai' || player?.type === 'computer') {
       return {
         direction: lastMove.direction,
         distance: lastMove.distance
@@ -70,11 +87,27 @@ export const lastComputerMove = derived(
 );
 
 export const lastPlayerMove = derived(
-  [boardStore, playerStore],
-  ([$boardStore, $playerStore]) => {
-    if (!$boardStore || !$playerStore || $boardStore.moveQueue.length === 0) return null;
+  [uiStateStore, playerStore, boardStore],
+  ([$uiStateStore, $playerStore, $boardStore]) => {
+    if (!$playerStore) return null;
+
+    // Пріоритет 1: uiStateStore
+    if ($uiStateStore?.lastMove) {
+      const player = $playerStore.players[$uiStateStore.lastMove.player];
+      if (player?.type === 'human') {
+        return {
+          direction: $uiStateStore.lastMove.direction,
+          distance: $uiStateStore.lastMove.distance
+        };
+      }
+      return null;
+    }
+
+    // Пріоритет 2: moveQueue
+    if (!$boardStore || $boardStore.moveQueue.length === 0) return null;
     const lastMove = $boardStore.moveQueue[$boardStore.moveQueue.length - 1];
-    if (lastMove && $playerStore.players[lastMove.player - 1]?.type === 'human') {
+    const player = $playerStore.players[lastMove.player - 1];
+    if (player?.type === 'human') {
       return {
         direction: lastMove.direction,
         distance: lastMove.distance

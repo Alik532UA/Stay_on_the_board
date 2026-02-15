@@ -1,4 +1,30 @@
-// test.setTimeout(1000 * 60 * 120); // 120 minutes
+// Робить перший хід у грі
+export async function makeFirstMove(page: Page) {
+  // A specific instance of makeMove for convenience
+  // Робимо хід
+  await makeMove(page, 'right', 1, false);
+  // Перевіряємо, що рахунок більший за 0
+  await expectScoreToBePositive(page, 'score-value');
+}
+
+// Отримує числове значення рахунку за data-testid
+export async function getScoreByTestId(page: Page, testId: string): Promise<number> {
+  const scoreElement = page.getByTestId(testId);
+  const scoreText = await scoreElement.innerText();
+  return parseInt(scoreText, 10);
+}
+
+// Перевіряє, що рахунок за testId є додатнім
+export async function expectScoreToBePositive(page: Page, testId: string) {
+  const score = await getScoreByTestId(page, testId);
+  expect(score).toBeGreaterThan(0);
+}
+
+// Перевіряє, що рахунок за testId є нульовим або від'ємним
+export async function expectScoreToBeZeroOrNegative(page: Page, testId: string) {
+  const score = await getScoreByTestId(page, testId);
+  expect(score).toBeLessThanOrEqual(0);
+} test.setTimeout(1000 * 60 * 120); // 120 minutes
 // await page.waitForTimeout(7777777); // Додаємо паузу
 
 import { test, expect, type Page, type Locator } from '@playwright/test';
@@ -81,64 +107,14 @@ export async function setBlockMode(page: Page, state: BlockModeState) {
   }
 }
 
-// Робить хід гравця
-export async function makeMove(page: Page, direction: string, distance: number, expectComputerMove = true) {
-  // Клікаємо на кнопку напрямку
-  await page.getByTestId(`dir-btn-${direction}`).click();
-  // Клікаємо на кнопку дистанції
-  await page.getByTestId(`dist-btn-${distance}`).click();
-
-  // НАВІЩО: Додаємо явне очікування, що кнопка стала активною (не має класу 'disabled').
-  // Це робить тест більш надійним і переносить точку відмови ближче до реальної причини проблеми.
-  await expect(page.getByTestId('confirm-move-btn')).not.toHaveClass(/disabled/);
-
-  // Клікаємо на кнопку підтвердження ходу
-  await page.getByTestId('confirm-move-btn').click();
-  // Якщо очікується хід комп'ютера, перевіряємо його видимість
-  if (expectComputerMove) {
-    await expectVisibleWithModalCheck(page, page.locator('.control-btn.center-info.computer-move-display'));
-  }
-}
-
-// Робить перший хід у грі
-export async function makeFirstMove(page: Page) {
-  // A specific instance of makeMove for convenience
-  // Робимо хід
-  await makeMove(page, 'right', 1, false);
-  // Перевіряємо, що рахунок більший за 0
-  await expectScoreToBePositive(page, 'score-value');
-}
-
-// Отримує числове значення рахунку за data-testid
-export async function getScoreByTestId(page: Page, testId: string): Promise<number> {
-  const scoreElement = page.getByTestId(testId);
-  const scoreText = await scoreElement.innerText();
-  return parseInt(scoreText, 10);
-}
-
-// Перевіряє, що рахунок за testId є додатнім
-export async function expectScoreToBePositive(page: Page, testId: string) {
-  const score = await getScoreByTestId(page, testId);
-  expect(score).toBeGreaterThan(0);
-}
-
-// Перевіряє, що рахунок за testId є нульовим або від'ємним
-export async function expectScoreToBeZeroOrNegative(page: Page, testId: string) {
-  const score = await getScoreByTestId(page, testId);
-  expect(score).toBeLessThanOrEqual(0);
-}
-
 /**
  * Покращена перевірка видимості, яка у випадку помилки додає інформацію про активне модальне вікно.
- * @param {Page} page - Поточна сторінка Playwright.
- * @param {Locator} locator - Локатор елемента, який потрібно перевірити.
- * @param {number} [timeout=5000] - Таймаут для очікування.
  */
 export async function expectVisibleWithModalCheck(page: Page, locator: Locator, timeout = 5000) {
   try {
     await expect(locator).toBeVisible({ timeout });
   } catch (error) {
-    // Якщо основна перевірка не вдалася, перевіряємо наявність модального вікна
+    // Перевіряємо наявність модального вікна для діагностики
     const modalContext = await page.evaluate(() => {
       // @ts-ignore
       const service = window.modalService;
@@ -153,8 +129,31 @@ export async function expectVisibleWithModalCheck(page: Page, locator: Locator, 
       enhancedError.stack = error.stack;
       throw enhancedError;
     } else {
-      // Якщо модального вікна немає, просто прокидаємо оригінальну помилку
       throw error;
     }
+  }
+}
+
+// Робить хід гравця
+export async function makeMove(page: Page, direction: string, distance: number, expectComputerMove = true) {
+  // Клікаємо на кнопку напрямку
+  await page.getByTestId(`dir-btn-${direction}`).click();
+  // Клікаємо на кнопку дистанції
+  await page.getByTestId(`dist-btn-${distance}`).click();
+
+  // НАВІЩО: Додаємо явне очікування, що кнопка стала активною (не має класу 'disabled').
+  // Це робить тест більш надійним і переносить точку відмови ближче до реальної причини проблеми.
+  await expect(page.getByTestId('confirm-move-btn')).not.toHaveClass(/disabled/);
+
+  // Клікаємо на кнопку підтвердження ходу
+  await page.getByTestId('confirm-move-btn').click();
+
+  // Якщо очікується хід комп'ютера, перевіряємо його видимість
+  // ВАЖЛИВО: Це має відбуватися одразу після підтвердження ходу гравця, 
+  // до того як будуть вибрані нові напрямок/дистанція для наступного ходу.
+  if (expectComputerMove) {
+    const computerMoveBtn = page.getByTestId('center-info-btn');
+    await expectVisibleWithModalCheck(page, computerMoveBtn);
+    await expect(computerMoveBtn).toHaveClass(/computer-move-display/);
   }
 }

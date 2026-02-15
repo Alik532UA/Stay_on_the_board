@@ -51,7 +51,7 @@ export interface MoveResult {
         boardState: Partial<BoardState>;
         playerState: Partial<PlayerState>;
         scoreState: Partial<ScoreState>;
-        uiState: Partial<UiState>;
+        uiState?: Partial<UiState>;
     };
     newPosition?: { row: number; col: number };
     bonusPoints?: number;

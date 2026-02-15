@@ -1,20 +1,16 @@
 import { get } from 'svelte/store';
 import { BaseGameMode } from './BaseGameMode';
-import type { Player, BonusHistoryItem } from '$lib/models/player';
+import type { Player } from '$lib/models/player';
 import { createTrainingPlayers } from '$lib/utils/playerFactory';
-import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { gameOverStore } from '$lib/stores/gameOverStore';
 import { gameEventBus } from '$lib/services/gameEventBus';
 import { logService } from '$lib/services/logService';
 import { animationService } from '$lib/services/animationService';
 import { noMovesService } from '$lib/services/noMovesService';
 import { timeService } from '$lib/services/timeService';
-import { availableMovesService } from '$lib/services/availableMovesService';
 import { gameService } from '$lib/services/gameService';
-import { playerStore } from '$lib/stores/playerStore';
 import { scoreStore } from '$lib/stores/scoreStore';
 import { boardStore } from '$lib/stores/boardStore';
-import { uiStateStore } from '$lib/stores/uiStateStore';
 import type { ScoreChangesData } from '$lib/types/gameMove';
 
 export class TrainingGameMode extends BaseGameMode {
@@ -23,6 +19,7 @@ export class TrainingGameMode extends BaseGameMode {
       size: options.newSize,
       players: this.getPlayersConfiguration(),
     });
+    this.initEngine();
     animationService.initialize();
     this.startTurn();
   }
@@ -35,66 +32,8 @@ export class TrainingGameMode extends BaseGameMode {
     return 'training';
   }
 
-  protected async advanceToNextPlayer(): Promise<void> {
-    logService.GAME_MODE('advanceToNextPlayer: Передача ходу наступному гравцю.');
-    const currentPlayerState = get(playerStore);
-    if (!currentPlayerState) return;
-    const nextPlayerIndex = (currentPlayerState.currentPlayerIndex + 1) % currentPlayerState.players.length;
-
-    playerStore.update(s => s ? { ...s, currentPlayerIndex: nextPlayerIndex } : null);
-
-    const nextPlayer = get(playerStore)?.players[nextPlayerIndex];
-    logService.GAME_MODE(`advanceToNextPlayer: Наступний гравець: ${nextPlayer?.type}.`);
-
-    if (nextPlayer?.type === 'ai') {
-      // ВИПРАВЛЕНО: Прибрано штучну затримку (await setTimeout).
-      // Логіка повинна відпрацювати миттєво, щоб оновити center-info.
-      // Візуальна пауза забезпечується чергою в animationService.
-      logService.GAME_MODE('advanceToNextPlayer: Запуск ходу комп\'ютера (миттєво).');
-      await this.triggerComputerMove();
-    } else {
-      this.startTurn();
-    }
-  }
-
   protected async applyScoreChanges(scoreChanges: ScoreChangesData): Promise<void> {
     // No specific score changes to apply in training mode
-  }
-
-  async continueAfterNoMoves(): Promise<void> {
-    logService.GAME_MODE(`[${this.constructor.name}] continueAfterNoMoves called`);
-    const boardState = get(boardStore);
-    if (!boardState) return;
-
-    logService.logicMove('State of uiStateStore BEFORE continueAfterNoMoves:', get(uiStateStore));
-
-    boardStore.update(s => {
-      if (!s) return null;
-      return {
-        ...s,
-        cellVisitCounts: {},
-        moveHistory: [{ pos: { row: s.playerRow!, col: s.playerCol! }, blocked: [], visits: {}, blockModeEnabled: get(gameSettingsStore).blockModeEnabled }],
-        moveQueue: [],
-      };
-    });
-    availableMovesService.updateAvailableMoves();
-
-    gameOverStore.resetGameOverState();
-    animationService.reset();
-
-    // Явно повертаємо хід гравцю-людині
-    const humanPlayerIndex = get(playerStore)?.players.findIndex(p => p.type === 'human');
-    if (humanPlayerIndex !== undefined) {
-      playerStore.update(s => s ? { ...s, currentPlayerIndex: humanPlayerIndex } : null);
-      logService.logicMove('Set current player to human after continuing game.', { humanPlayerIndex });
-    }
-
-    // Скидаємо вибір гравця, щоб він міг зробити новий
-    uiStateStore.update(s => s ? ({ ...s, selectedDirection: null, selectedDistance: null }) : null);
-    logService.logicMove('State of uiStateStore AFTER continueAfterNoMoves:', get(uiStateStore));
-
-    this.startTurn();
-    gameEventBus.dispatch('CloseModal');
   }
 
   async handleNoMoves(playerType: 'human' | 'computer'): Promise<void> {
