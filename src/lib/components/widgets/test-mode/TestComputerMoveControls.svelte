@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import {
         testModeStore,
         type ComputerMoveMode,
@@ -55,14 +55,14 @@
 </script>
 
 <div class="test-mode-control-group">
-    <h4 class="test-mode-group-title">{$_("testMode.computerMove")}</h4>
+    <h4 class="test-mode-group-title">{$t("testMode.computerMove")}</h4>
     <div class="test-mode-btn-group">
         <button
             class="test-mode-row-btn"
             on:click={() => setComputerMoveMode("random")}
             class:active={$testModeStore.computerMoveMode === "random"}
             data-testid="test-mode-computer-move-random-btn"
-            >{$_("testMode.random")}</button
+            >{$t("testMode.random")}</button
         >
     </div>
     <div class="test-mode-directions-3x3">
@@ -118,7 +118,7 @@
     </div>
     <div class="test-mode-manual-move-controls">
         <div class="test-mode-input-group">
-            <label for="manualDist">{$_("testMode.distance")}</label>
+            <label for="manualDist">{$t("testMode.distance")}</label>
             <input
                 id="manualDist"
                 class="test-mode-input"
@@ -133,7 +133,7 @@
             class="test-mode-square-btn"
             on:click={setManualMoveProperties}
             data-testid="test-mode-set-move-dist-btn"
-            >{$_("testMode.set")}</button
+            >{$t("testMode.set")}</button
         >
     </div>
 </div>

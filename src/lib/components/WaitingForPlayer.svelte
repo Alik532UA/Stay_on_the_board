@@ -1,8 +1,8 @@
-<script>
-import { _ } from 'svelte-i18n';
+<script lang="ts">
+  import { t } from "$lib/i18n/typedI18n";
 </script>
+
 <div class="waiting-for-player">
-  <h2>{$_('waitingForPlayer.title')}</h2>
+  <h2>{$t("waitingForPlayer.title")}</h2>
   <!-- Додайте тут розмітку очікування -->
 </div>
-// New key needed: waitingForPlayer.title 

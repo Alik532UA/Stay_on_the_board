@@ -1,7 +1,7 @@
 <script lang="ts">
   import { derived } from "svelte/store";
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import {
     lastComputerMove,
     lastPlayerMove,
@@ -36,7 +36,7 @@
       lastComputerMove,
       lastPlayerMove,
       isPlayerTurn,
-      _,
+      t,
       isCompact,
       gameSettingsStore,
       uiStateStore,
@@ -48,7 +48,7 @@
       $lastComputerMove,
       $lastPlayerMove,
       $isPlayerTurn,
-      $_,
+      $t,
       $isCompact,
       $gameSettings,
       $uiState,
@@ -61,7 +61,7 @@
         lastComputerMove: $lastComputerMove,
         lastPlayerMove: $lastPlayerMove,
         isPlayerTurn: $isPlayerTurn,
-        translate: $_,
+        translate: $t,
         isCompact: $isCompact,
         gameSettings: $gameSettings,
         uiState: $uiState,

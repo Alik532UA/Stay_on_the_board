@@ -1,6 +1,6 @@
 <script lang="ts">
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { logService } from "$lib/services/logService.js";
     import Stepper from "$lib/components/ui/Stepper.svelte";
     import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
@@ -37,19 +37,19 @@
     // Формуємо опції для ButtonGroup
     $: modeOptions = [
         {
-            label: $_("gameModes.observer"),
+            label: $t("gameModes.observer"),
             active: isPresetActive("observer", currentMode),
             onClick: () => gameSettingsStore.applyPreset("observer"),
             dataTestId: "local-setup-mode-observer",
         },
         {
-            label: $_("gameModes.experienced"),
+            label: $t("gameModes.experienced"),
             active: isPresetActive("experienced", currentMode),
             onClick: () => gameSettingsStore.applyPreset("experienced"),
             dataTestId: "local-setup-mode-experienced",
         },
         {
-            label: $_("gameModes.pro"),
+            label: $t("gameModes.pro"),
             active: isPresetActive("pro", currentMode),
             onClick: () => gameSettingsStore.applyPreset("pro"),
             dataTestId: "local-setup-mode-pro",
@@ -60,7 +60,7 @@
 <div class="settings-list-group">
     <!-- Керування розміром дошки -->
     <div class="setting-item">
-        <span class="setting-label">{$_("settings.boardSizeLabel")}</span>
+        <span class="setting-label">{$t("settings.boardSizeLabel")}</span>
 
         <Stepper
             value={`${settings.boardSize}x${settings.boardSize}`}
@@ -75,7 +75,7 @@
 
     <!-- Вибір режиму гри -->
     <div class="setting-item mode-selector">
-        <span class="setting-label">{$_("gameModes.title")}</span>
+        <span class="setting-label">{$t("gameModes.title")}</span>
 
         <!-- FIX: Використовуємо ButtonGroup замість ручної верстки -->
         <ButtonGroup

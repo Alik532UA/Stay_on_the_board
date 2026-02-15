@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import { fly } from "svelte/transition";
     import { onMount, onDestroy } from "svelte";
@@ -63,7 +63,7 @@
                 data-testid="chat-window"
             >
                 <div class="chat-header">
-                    <h3>{$_("onlineMenu.chat.title")}</h3>
+                    <h3>{$t("onlineMenu.chat.title")}</h3>
                     <button
                         class="close-btn"
                         on:click={toggleChat}

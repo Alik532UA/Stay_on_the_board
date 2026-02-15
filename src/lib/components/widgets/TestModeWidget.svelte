@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { onMount } from "svelte";
   import { logService } from "$lib/services/logService.js";
 
@@ -13,7 +13,7 @@
 </script>
 
 <div class="test-mode-widget">
-  <h3 class="test-mode-widget-title">{$_("testMode.title")}</h3>
+  <h3 class="test-mode-widget-title">{$t("testMode.title")}</h3>
 
   <TestStartPositionControls />
 

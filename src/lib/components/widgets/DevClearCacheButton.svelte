@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import SvgIcons from "../SvgIcons.svelte";
   import { clearCache } from "$lib/utils/cacheManager.js";
   import { customTooltip } from "$lib/actions/customTooltip.js";
@@ -23,7 +23,7 @@
 {#if import.meta.env.DEV}
   <button
     class="dev-clear-cache-button"
-    use:customTooltip={`${$_("gameBoard.clearCache")}`}
+    use:customTooltip={`${$t("gameBoard.clearCache")}`}
     on:click={handleClearCache}
   >
     <SvgIcons name="clear-cache" />

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { customTooltip } from "$lib/actions/customTooltip.js";
 
     export let keyName: string;
@@ -27,11 +27,11 @@
         class:conflict={hasConflict}
         on:click
     >
-        {isListening ? $_("controlsPage.pressKey") : formatKeyCode(keyName)}
+        {isListening ? $t("controlsPage.pressKey") : formatKeyCode(keyName)}
     </button>
     <button
         class="remove-key-btn"
-        use:customTooltip={$_("controlsPage.removeKey")}
+        use:customTooltip={$t("controlsPage.removeKey")}
         on:click|stopPropagation={() => {
             /* Event handled by parent via custom event or direct loop */
         }}

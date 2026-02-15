@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import { modalStore } from "$lib/stores/modalStore";
 
@@ -8,13 +8,13 @@
 
 <div class="board-explanation-content" data-testid={`${dataTestId}-content`}>
     <h2 class="modal-title-menu" data-testid={`${dataTestId}-title`}>
-        {$_("modal.boardHiddenExplanationTitle")}
+        {$t("modal.boardHiddenExplanationTitle")}
     </h2>
 
     <div class="message-text">
-        <p>{$_("modal.boardHiddenExplanation.p1")}</p>
-        <p>{$_("modal.boardHiddenExplanation.p2")}</p>
-        <p>{$_("modal.boardHiddenExplanation.p3")}</p>
+        <p>{$t("modal.boardHiddenExplanation.p1")}</p>
+        <p>{$t("modal.boardHiddenExplanation.p2")}</p>
+        <p>{$t("modal.boardHiddenExplanation.p3")}</p>
     </div>
 
     <div class="actions-column">
@@ -24,7 +24,7 @@
             on:click={() => modalStore.closeModal()}
             dataTestId={`${dataTestId}-ok-btn`}
         >
-            {$_("modal.ok")}
+            {$t("modal.ok")}
         </StyledButton>
     </div>
 </div>

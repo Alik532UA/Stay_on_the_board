@@ -1,6 +1,6 @@
 <script lang="ts">
   import { navigationService } from "$lib/services/navigationService.js";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import SvgIcons from "../SvgIcons.svelte";
   import { showGameInfoModal } from "$lib/utils/uiHelpers.js";
   import { hotkeyTooltip } from "$lib/actions/hotkeyTooltip.js";
@@ -37,7 +37,7 @@
 <div class="game-board-top-row">
   <button
     class="main-menu-btn"
-    use:hotkeyTooltip={{ title: $_("gameBoard.mainMenu"), key: "ESC" }}
+    use:hotkeyTooltip={{ title: $t("gameBoard.mainMenu"), key: "ESC" }}
     on:click={handleMainMenuClick}
     data-testid="top-row-main-menu-btn"
   >
@@ -46,7 +46,7 @@
   {#if $page.route.id?.includes("/game/local")}
     <button
       class="main-menu-btn"
-      use:customTooltip={$_("tooltips.localGameSettings")}
+      use:customTooltip={$t("tooltips.localGameSettings")}
       on:click={handleLocalSetupClick}
       data-testid="local-game-settings-btn"
     >
@@ -55,7 +55,7 @@
   {/if}
   <button
     class="main-menu-btn"
-    use:hotkeyTooltip={{ title: $_("faq.title"), key: "I" }}
+    use:hotkeyTooltip={{ title: $t("faq.title"), key: "I" }}
     on:click={showGameInfoModal}
     data-testid="game-info-btn"
   >

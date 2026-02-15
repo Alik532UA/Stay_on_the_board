@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import SvgIcons from "../../SvgIcons.svelte";
 
     export let expertVolume: number = 0.3;
@@ -19,7 +19,7 @@
         step="0.01"
         bind:value={expertVolume}
         class="volume-slider"
-        aria-label={$_("voiceSettings.volume")}
+        aria-label={$t("voiceSettings.volume")}
         data-testid="expert-mode-volume-slider"
     />
     <span
@@ -29,7 +29,7 @@
         ><SvgIcons name="boxing-glove-pictogram-1" /></span
     >
     <span class="volume-label" data-testid="expert-mode-volume-label"
-        >{$_("voiceSettings.volumeLabel")}: {volumePercentage.toFixed(0)}%</span
+        >{$t("voiceSettings.volumeLabel")}: {volumePercentage.toFixed(0)}%</span
     >
 </div>
 

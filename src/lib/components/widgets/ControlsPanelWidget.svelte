@@ -1,6 +1,6 @@
 <script lang="ts">
   import { userActionService } from "$lib/services/userActionService";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
   import {
     isPlayerTurn,
@@ -70,11 +70,11 @@
         variant: "menu",
         dataTestId: "confirm-move-hint-modal",
         props: {
-          titleKey: "modal.confirmMoveHintTitle",
-          contentKey: "modal.confirmMoveHintContent",
+          titleKey: "modal.confirmMoveHintTitle" as const,
+          contentKey: "modal.confirmMoveHintContent" as const,
           actions: [
             {
-              labelKey: "modal.ok",
+              labelKey: "modal.ok" as const,
               variant: "primary",
               isHot: true,
               onClick: () => modalStore.closeModal(),
@@ -141,7 +141,7 @@ ${generalLogs}`;
       tabindex="0"
       data-testid="controls-panel-title"
     >
-      {$_("gameControls.selectDirectionAndDistance")}
+      {$t("gameControls.selectDirectionAndDistance")}
     </div>
     <DirectionControls
       availableDirections={[

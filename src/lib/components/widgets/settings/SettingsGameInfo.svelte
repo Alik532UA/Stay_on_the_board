@@ -1,6 +1,6 @@
 <script lang="ts">
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
 </script>
 
@@ -8,7 +8,7 @@
     class="settings-expander__section-title"
     data-testid="settings-game-info-title"
 >
-    {$_("settings.gameInfoWidget.title")}
+    {$t("settings.gameInfoWidget.title")}
 </h3>
 
 <!-- FIX: Додано dataTestId для контейнера групи -->
@@ -18,21 +18,21 @@
     options={[
         {
             value: "hidden",
-            label: $_("settings.gameInfoWidget.hidden"),
+            label: $t("settings.gameInfoWidget.hidden"),
             active: $gameSettingsStore.showGameInfoWidget === "hidden",
             dataTestId: "settings-expander-game-info-widget-hidden-btn",
             onClick: () => gameSettingsStore.setGameInfoWidgetState("hidden"),
         },
         {
             value: "shown",
-            label: $_("settings.gameInfoWidget.shown"),
+            label: $t("settings.gameInfoWidget.shown"),
             active: $gameSettingsStore.showGameInfoWidget === "shown",
             dataTestId: "settings-expander-game-info-widget-shown-btn",
             onClick: () => gameSettingsStore.setGameInfoWidgetState("shown"),
         },
         {
             value: "compact",
-            label: $_("settings.gameInfoWidget.compact"),
+            label: $t("settings.gameInfoWidget.compact"),
             active: $gameSettingsStore.showGameInfoWidget === "compact",
             dataTestId: "settings-expander-game-info-widget-compact-btn",
             onClick: () => gameSettingsStore.setGameInfoWidgetState("compact"),

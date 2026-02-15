@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { base } from "$app/paths";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import NotoEmoji from "$lib/components/NotoEmoji.svelte";
     import { logService } from "$lib/services/logService.js";
@@ -55,7 +55,7 @@
     <button
         class="icon-btn"
         on:click={() => navigateTo("/rules")}
-        title={$_("mainMenu.rules")}
+        title={$t("mainMenu.rules")}
         data-testid="top-rules-btn"
     >
         <div class="icon-inner"><NotoEmoji name="memo" size="24px" /></div>
@@ -64,7 +64,7 @@
     <button
         class="icon-btn"
         on:click={() => navigateTo("/rewards")}
-        title={$_("rewards.pageTitle")}
+        title={$t("rewards.pageTitle")}
         data-testid="top-rewards-btn"
     >
         <div class="icon-inner"><NotoEmoji name="trophy" size="24px" /></div>
@@ -73,7 +73,7 @@
     <button
         class="icon-btn"
         on:click={() => navigateTo("/settings")}
-        title={$_("mainMenu.settings")}
+        title={$t("mainMenu.settings")}
         data-testid="top-settings-btn"
     >
         <div class="icon-inner"><NotoEmoji name="gear" size="24px" /></div>
@@ -83,7 +83,7 @@
         <button
             class="icon-btn"
             on:click={toggleLang}
-            title={$_("mainMenu.language")}
+            title={$t("mainMenu.language")}
             data-testid="top-language-btn"
         >
             <div class="icon-inner">
@@ -96,7 +96,7 @@
         <button
             class="icon-btn"
             on:click={toggleTheme}
-            title={$_("mainMenu.theme")}
+            title={$t("mainMenu.theme")}
             data-testid="top-theme-btn"
         >
             <div class="icon-inner">
@@ -108,7 +108,7 @@
     <button
         class="icon-btn desktop-only"
         on:click={() => navigateTo("/settings?tab=hotkeys")}
-        title={$_("mainMenu.controls")}
+        title={$t("mainMenu.controls")}
         data-testid="top-controls-btn"
     >
         <div class="icon-inner"><NotoEmoji name="keyboard" size="24px" /></div>
@@ -117,7 +117,7 @@
     <button
         class="icon-btn"
         on:click={() => navigateTo("/supporters")}
-        title={$_("mainMenu.donate")}
+        title={$t("mainMenu.donate")}
         data-testid="top-donate-btn"
     >
         <div class="icon-inner"><NotoEmoji name="coin" size="24px" /></div>
@@ -126,7 +126,7 @@
     <button
         class="icon-btn"
         on:click={onFeedback}
-        title={$_("ui.feedback.title")}
+        title={$t("ui.feedback.title")}
         data-testid="top-feedback-btn"
     >
         <div class="icon-inner">
@@ -137,7 +137,7 @@
     <button
         class="icon-btn"
         on:click={openAuthModal}
-        title={$_("mainMenu.account")}
+        title={$t("mainMenu.account")}
         data-testid="top-account-btn"
     >
         <div class="icon-inner">

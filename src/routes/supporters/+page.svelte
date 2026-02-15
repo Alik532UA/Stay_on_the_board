@@ -1,15 +1,15 @@
 <script>
   import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { base } from "$app/paths";
 </script>
 
 <div class="supporters-container">
   <div class="header-container">
     <FloatingBackButton />
-    <h1>{$_("supportersPage.title")}</h1>
+    <h1>{$t("supportersPage.title")}</h1>
   </div>
-  <p class="gratitude-text">{$_("supportersPage.gratitudeText")}</p>
+  <p class="gratitude-text">{$t("supportersPage.gratitudeText")}</p>
 
   <div class="supporters-list">
     <a
@@ -29,13 +29,13 @@
     <div class="supporter-item">MrGrom</div>
     <!-- Майбутні імена будуть додаватися сюди -->
   </div>
-        <p class="call-to-action-text" style="white-space: pre-line">{$_("supportersPage.callToAction")}</p>  <a
+        <p class="call-to-action-text" style="white-space: pre-line">{$t("supportersPage.callToAction")}</p>  <a
     href="https://send.monobank.ua/jar/8TPmFKQTCK"
     target="_blank"
     rel="noopener noreferrer"
     class="support-btn"
   >
-    {$_("supportersPage.supportButton")}
+    {$t("supportersPage.supportButton")}
   </a>
 
   <div class="qr-code-section">

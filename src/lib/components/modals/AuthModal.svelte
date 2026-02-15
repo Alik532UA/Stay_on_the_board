@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
     import { authService, userStore } from "$lib/services/authService";
     import { modalStore } from "$lib/stores/modalStore";
     import UserProfile from "$lib/components/auth/UserProfile.svelte";

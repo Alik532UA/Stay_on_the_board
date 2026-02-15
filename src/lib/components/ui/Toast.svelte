@@ -1,18 +1,22 @@
 <script lang="ts">
-    import { fade, fly } from 'svelte/transition';
-    import { _ } from 'svelte-i18n';
-    import type { Notification, NotificationType } from '$lib/types/notification';
-    import { notificationStore } from '$lib/stores/notificationStore';
-    import NotoEmoji from '../NotoEmoji.svelte';
+    import { fade, fly } from "svelte/transition";
+    import { t } from "$lib/i18n/typedI18n";
+    import type { TranslationKey } from "$lib/types/i18n";
+    import type {
+        Notification,
+        NotificationType,
+    } from "$lib/types/notification";
+    import { notificationStore } from "$lib/stores/notificationStore";
+    import NotoEmoji from "../NotoEmoji.svelte";
 
     export let notification: Notification;
 
     const icons: Record<NotificationType, string> = {
-        error: 'cross_mark',
-        warning: 'warning',
-        success: 'check_mark_button',
-        info: 'information',
-        achievement: 'trophy'
+        error: "cross_mark",
+        warning: "warning",
+        success: "check_mark_button",
+        info: "information",
+        achievement: "trophy",
     };
 
     function remove() {
@@ -20,8 +24,8 @@
     }
 </script>
 
-<div 
-    class="toast-item {notification.type}" 
+<div
+    class="toast-item {notification.type}"
     transition:fly={{ y: 20, duration: 300 }}
     role="alert"
 >
@@ -30,7 +34,10 @@
     </div>
     <div class="message">
         {#if notification.messageKey}
-            {$_(notification.messageKey, { values: notification.messageValues })}
+            {$t(
+                notification.messageKey as TranslationKey,
+                notification.messageValues,
+            )}
         {:else if notification.messageRaw}
             {notification.messageRaw}
         {/if}
@@ -57,11 +64,21 @@
         pointer-events: auto;
     }
 
-    .toast-item.error { border-left: 4px solid var(--error-color, #f44336); }
-    .toast-item.warning { border-left: 4px solid var(--warning-action-bg, #ff9800); }
-    .toast-item.success { border-left: 4px solid var(--positive-score-color, #4caf50); }
-    .toast-item.info { border-left: 4px solid var(--text-accent, #2196f3); }
-    .toast-item.achievement { border-left: 4px solid var(--text-accent, #ffeb3b); }
+    .toast-item.error {
+        border-left: 4px solid var(--error-color, #f44336);
+    }
+    .toast-item.warning {
+        border-left: 4px solid var(--warning-action-bg, #ff9800);
+    }
+    .toast-item.success {
+        border-left: 4px solid var(--positive-score-color, #4caf50);
+    }
+    .toast-item.info {
+        border-left: 4px solid var(--text-accent, #2196f3);
+    }
+    .toast-item.achievement {
+        border-left: 4px solid var(--text-accent, #ffeb3b);
+    }
 
     .icon {
         flex-shrink: 0;

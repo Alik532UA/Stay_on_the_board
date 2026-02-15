@@ -2,7 +2,7 @@
     import { onMount, onDestroy } from "svelte";
     import { roomService } from "$lib/services/roomService";
     import type { Room, OnlinePlayer } from "$lib/types/online";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
     import LobbyHeader from "./lobby/LobbyHeader.svelte";
     import LobbyPlayerList from "./lobby/LobbyPlayerList.svelte";
@@ -175,7 +175,7 @@
     {:else}
         <div class="loading-state" data-testid="lobby-loading">
             <div class="spinner"></div>
-            <p>{$_("common.loading")}</p>
+            <p>{$t("common.loading")}</p>
         </div>
     {/if}
 </div>

@@ -4,7 +4,8 @@ import hotkeyService from './hotkeyService';
 import { logService } from './logService';
 import { showArrowKeyHintModal } from './arrowKeyHintService';
 import { modalStore } from '../stores/modalStore';
-import { _ } from 'svelte-i18n';
+import { t as tStore } from '$lib/i18n/typedI18n';
+import type { TranslationKey } from '../types/i18n';
 import SimpleModalContent from '../components/modals/SimpleModalContent.svelte';
 
 let unsubscribeGameSettings: (() => void) | null = null;
@@ -13,7 +14,7 @@ let registeredGameActionHandlers: Partial<Record<KeybindingAction, (event?: Keyb
 function showKeyConflictModal(key: string, actions: KeybindingAction[]) {
     logService.action(`[gameHotkeyService] Key '${key}' has a conflict. Showing resolution modal for actions:`, actions);
 
-    const t = get(_);
+    const t = get(tStore);
 
     modalStore.showModal({
         component: SimpleModalContent,
@@ -24,7 +25,7 @@ function showKeyConflictModal(key: string, actions: KeybindingAction[]) {
             contentKey: 'modal.keyConflictContent',
             contentValues: { key },
             actions: actions.map(action => ({
-                label: t(`gameControls.${action}`),
+                label: t(`gameControls.${action}` as TranslationKey),
                 variant: 'primary',
                 onClick: () => {
                     logService.action(`[gameHotkeyService] User resolved conflict for '${key}'. Chose action: ${action}`);

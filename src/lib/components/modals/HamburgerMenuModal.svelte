@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { base } from "$app/paths";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { logService } from "$lib/services/logService.js";
     import { modalStore } from "$lib/stores/modalStore";
     import AuthModal from "$lib/components/modals/AuthModal.svelte";
@@ -43,7 +43,7 @@
 
 <div class="menu-list-centered" data-testid="menu-list">
     <GameModeButton
-        text={$_("mainMenu.virtualPlayer")}
+        text={$t("mainMenu.virtualPlayer")}
         dataTestId="menu-item-play"
         on:click={handlePlay}
     >
@@ -51,7 +51,7 @@
     </GameModeButton>
 
     <GameModeButton
-        text={$_("rewards.pageTitle")}
+        text={$t("rewards.pageTitle")}
         dataTestId="menu-item-rewards"
         on:click={() => navigateTo("/rewards")}
     >
@@ -59,7 +59,7 @@
     </GameModeButton>
 
     <GameModeButton
-        text={$_("mainMenu.rules")}
+        text={$t("mainMenu.rules")}
         dataTestId="menu-item-rules"
         on:click={() => navigateTo("/rules")}
     >
@@ -67,7 +67,7 @@
     </GameModeButton>
 
     <GameModeButton
-        text={$_("mainMenu.settings")}
+        text={$t("mainMenu.settings")}
         dataTestId="menu-item-settings"
         on:click={() => navigateTo("/settings")}
     >
@@ -75,7 +75,7 @@
     </GameModeButton>
 
     <GameModeButton
-        text={$_("mainMenu.controls")}
+        text={$t("mainMenu.controls")}
         dataTestId="menu-item-controls"
         on:click={() => navigateTo("/settings?tab=hotkeys")}
     >
@@ -83,7 +83,7 @@
     </GameModeButton>
 
     <GameModeButton
-        text={$_("mainMenu.supporters")}
+        text={$t("mainMenu.supporters")}
         dataTestId="menu-item-supporters"
         on:click={() => navigateTo("/supporters")}
     >
@@ -91,7 +91,7 @@
     </GameModeButton>
 
     <GameModeButton
-        text={$_("ui.feedback.title")}
+        text={$t("ui.feedback.title")}
         dataTestId="menu-item-feedback"
         on:click={handleFeedback}
     >
@@ -99,7 +99,7 @@
     </GameModeButton>
 
     <GameModeButton
-        text={$_("mainMenu.account")}
+        text={$t("mainMenu.account")}
         dataTestId="menu-item-account"
         on:click={openAuthModal}
     >

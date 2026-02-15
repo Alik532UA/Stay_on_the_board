@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
 
   // FIX: Import decomposed components
   import LocalBoardControls from "./LocalBoardControls.svelte";
@@ -12,7 +12,7 @@
 {#if settings}
   <div class="settings-card">
     <h2 data-testid="local-game-settings-title">
-      {$_("localGame.settingsTitle")}
+      {$t("localGame.settingsTitle")}
     </h2>
 
     <div class="settings-list">

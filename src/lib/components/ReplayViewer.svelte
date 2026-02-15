@@ -13,7 +13,7 @@
   import { isCellBlocked, getDamageClass } from "$lib/utils/boardUtils.ts";
   import { onMount } from "svelte";
   import { replayAutoPlayStore } from "$lib/stores/replayAutoPlayStore.js";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
 
   // Props
@@ -74,7 +74,7 @@
     data-testid="replay-modal-title"
     data-i18n-key="replay.title"
   >
-    {$_("replay.title")}
+    {$t("replay.title")}
   </h2>
 
   <div
@@ -155,7 +155,7 @@
         on:click={onClose}
         dataTestId="replay-close-btn"
       >
-        {$_("modal.close")}
+        {$t("modal.close")}
       </StyledButton>
     </div>
   {/if}

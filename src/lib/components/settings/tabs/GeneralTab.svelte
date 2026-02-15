@@ -6,7 +6,8 @@
   } from "$lib/stores/gameSettingsStore";
   import { logService } from "$lib/services/logService";
   import { clearCache } from "$lib/utils/cacheManager";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
+  import type { TranslationKey } from "$lib/types/i18n";
   import { locale } from "svelte-i18n";
   import { languages } from "$lib/constants";
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
@@ -24,8 +25,8 @@
   }
 
   function selectTheme(
-    style: "purple" | "green" | "blue" | "gray" | "orange" | "wood", 
-    theme: "light" | "dark"
+    style: "purple" | "green" | "blue" | "gray" | "orange" | "wood",
+    theme: "light" | "dark",
   ) {
     logService.ui(`Зміна теми: ${style}, ${theme}`);
     appSettingsStore.updateSettings({ style, theme });
@@ -54,7 +55,7 @@
   <div class="grid-column" data-testid="settings-column-appearance">
     <div class="settings-card">
       <div class="settings-group">
-        <span class="settings-label">{$_("settings.language")}</span>
+        <span class="settings-label">{$t("settings.language")}</span>
         <div class="language-selector">
           {#each languages as lang}
             <button
@@ -80,7 +81,9 @@
             >
               <NotoEmoji name="sun" size="20px" />
             </button>
-            <span class="theme-name">{$_(`mainMenu.themeName.${style}`)}</span>
+            <span class="theme-name"
+              >{$t(`mainMenu.themeName.${style}` as TranslationKey)}</span
+            >
             <button
               class="theme-btn"
               data-theme="dark"
@@ -101,7 +104,7 @@
 
       <div class="settings-option">
         <ToggleButton
-          label={$_("settings.showDifficultyWarningModal")}
+          label={$t("settings.showDifficultyWarningModal")}
           checked={gameSettings.showDifficultyWarningModal}
           on:toggle={() => toggleSetting("showDifficultyWarningModal")}
         />
@@ -111,15 +114,15 @@
         <StyledButton
           variant="menu"
           on:click={resetSettings}
-          tooltip={$_("settings.resetHint")}
+          tooltip={$t("settings.resetHint")}
         >
-          <span>{$_("settings.reset")}</span>
+          <span>{$t("settings.reset")}</span>
         </StyledButton>
         <StyledButton variant="menu" on:click={handleKeepAppearance}>
-          <span>{$_("mainMenu.clearCacheModal.keepAppearance")}</span>
+          <span>{$t("mainMenu.clearCacheModal.keepAppearance")}</span>
         </StyledButton>
         <StyledButton variant="danger" on:click={handleClearAll}>
-          <span>{$_("mainMenu.clearCacheModal.fullClear")}</span>
+          <span>{$t("mainMenu.clearCacheModal.fullClear")}</span>
         </StyledButton>
       </div>
     </div>

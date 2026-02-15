@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import ChatWidget from "$lib/components/online/ChatWidget.svelte";
     import { userProfileStore } from "$lib/services/auth/userProfileService";
     import { modalStore } from "$lib/stores/modalStore";
@@ -14,7 +14,7 @@
 
 <div class="global-chat-container">
     <div class="chat-header">
-        <h2>{$_("ui.feedback.typeGlobalChat")}</h2>
+        <h2>{$t("ui.feedback.typeGlobalChat")}</h2>
         <button class="close-btn" on:click={close}>×</button>
     </div>
 

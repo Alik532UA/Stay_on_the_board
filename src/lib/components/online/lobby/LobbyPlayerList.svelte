@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import type { OnlinePlayer } from "$lib/types/online";
     import { flip } from "svelte/animate";
     import { fly, fade } from "svelte/transition";
@@ -29,7 +29,7 @@
     <div class="section-header">
         <h3>
             <SvgIcons name="handshake" width="24" height="24" />
-            {$_("onlineMenu.players")}
+            {$t("onlineMenu.players")}
             <span class="count-badge">{players.length}/8</span>
         </h3>
     </div>
@@ -54,7 +54,7 @@
         {#if players.length < 2 && roomStatus === "waiting"}
             <div class="waiting-card" in:fade>
                 <div class="pulse-ring"></div>
-                <p>{$_("onlineMenu.lobby.waitingForPlayers")}</p>
+                <p>{$t("onlineMenu.lobby.waitingForPlayers")}</p>
             </div>
         {/if}
     </div>

@@ -4,7 +4,7 @@
     import { logService } from "$lib/services/logService";
     import { modalStore } from "$lib/stores/modalStore";
     import VoiceSettingsModal from "../../VoiceSettingsModal.svelte";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { blurOnClick } from "$lib/utils/actions";
     import { customTooltip } from "$lib/actions/customTooltip.js";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
@@ -30,7 +30,7 @@
     data-testid="settings-audio-container"
 >
     <ToggleButton
-        label={$_("gameControls.speech")}
+        label={$t("gameControls.speech")}
         checked={speechEnabled}
         on:toggle={() => userActionService.toggleSpeech()}
         dataTestId="speech-toggle"
@@ -39,7 +39,7 @@
         data-testid="settings-expander-voice-settings-btn"
         class="settings-expander__square-btn"
         use:blurOnClick
-        use:customTooltip={$_("gameControls.voiceSettingsTitle")}
+        use:customTooltip={$t("gameControls.voiceSettingsTitle")}
         on:click|stopPropagation={openVoiceSettings}
     >
         <SvgIcons name="voice-settings" />

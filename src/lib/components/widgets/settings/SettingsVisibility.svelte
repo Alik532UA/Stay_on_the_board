@@ -1,6 +1,6 @@
 <script lang="ts">
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
     import { get } from "svelte/store";
 
@@ -66,10 +66,10 @@
 <!-- FIX: Додано dataTestId для контейнера групи -->
 <ButtonGroup
     options={[
-        $_("settings.visibility.hidden"),
-        $_("settings.visibility.boardOnly"),
-        $_("settings.visibility.withPiece"),
-        $_("settings.visibility.withMoves"),
+        $t("settings.visibility.hidden"),
+        $t("settings.visibility.boardOnly"),
+        $t("settings.visibility.withPiece"),
+        $t("settings.visibility.withMoves"),
     ].map((label, i) => ({
         label,
         active: getIsActive(i, $gameSettingsStore),

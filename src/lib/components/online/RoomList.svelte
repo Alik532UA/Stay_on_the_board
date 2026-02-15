@@ -2,7 +2,8 @@
     import { onMount } from "svelte";
     import { roomService } from "$lib/services/roomService";
     import type { RoomSummary } from "$lib/types/online";
-    import { _, locale } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
+    import { locale } from "svelte-i18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import { goto } from "$app/navigation";
     import { base } from "$app/paths";
@@ -21,10 +22,10 @@
 
     function subscribe() {
         if (unsubscribe) unsubscribe();
-        
+
         isLoading = true;
         error = null;
-        
+
         try {
             unsubscribe = roomService.subscribeToPublicRooms((data) => {
                 rooms = data.rooms;
@@ -33,7 +34,7 @@
             });
         } catch (e) {
             console.error(e);
-            error = $_("onlineMenu.errors.fetchFailed");
+            error = $t("onlineMenu.errors.fetchFailed");
             isLoading = false;
         }
     }
@@ -70,7 +71,7 @@
             goto(`${base}/online/lobby/${roomId}`);
         } catch (e) {
             logService.error("[RoomList] Failed to join room", e);
-            alert($_("onlineMenu.errors.joinFailed"));
+            alert($t("onlineMenu.errors.joinFailed"));
             // loadRooms(); // Не потрібно, бо підписка сама оновить список
         } finally {
             joiningRoomId = null;
@@ -88,7 +89,7 @@
 <div class="room-list-container" data-testid="room-list-container">
     <div class="list-header">
         <div class="title-group">
-            <h3 data-testid="room-list-title">{$_("onlineMenu.title")}</h3>
+            <h3 data-testid="room-list-title">{$t("onlineMenu.title")}</h3>
             <span class="room-count">
                 {rooms.length}
                 {rooms.length === 1 ? "room" : "rooms"}
@@ -100,13 +101,13 @@
             class:loading={isLoading}
             on:click={loadRooms}
             disabled={isLoading}
-            aria-label={$_("onlineMenu.refresh")}
+            aria-label={$t("onlineMenu.refresh")}
             data-testid="refresh-rooms-btn"
         >
             <div class="icon-wrapper">
                 <SvgIcons name="clear-cache" width="20" height="20" />
             </div>
-            <span class="btn-text">{$_("onlineMenu.refresh")}</span>
+            <span class="btn-text">{$t("onlineMenu.refresh")}</span>
         </button>
     </div>
 
@@ -131,20 +132,16 @@
                     data-testid="no-rooms-message"
                     style="white-space: pre-line;"
                 >
-                    {$_("onlineMenu.noRooms", {
-                        values: {
-                            lastInfo: latestCreatedAt
-                                ? "\n" +
-                                  $_("onlineMenu.lastRoomTime", {
-                                      values: {
-                                          time: formatDateTime(
-                                              latestCreatedAt,
-                                              $locale,
-                                          ),
-                                      },
-                                  })
-                                : $_("onlineMenu.createFirst"),
-                        },
+                    {$t("onlineMenu.noRooms", {
+                        lastInfo: latestCreatedAt
+                            ? "\n" +
+                              $t("onlineMenu.lastRoomTime", {
+                                  time: formatDateTime(
+                                      latestCreatedAt,
+                                      $locale,
+                                  ),
+                              })
+                            : $t("onlineMenu.createFirst"),
                     })}
                 </p>
             </div>

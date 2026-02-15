@@ -8,7 +8,6 @@ import { get } from 'svelte/store';
 import { boardStore } from '$lib/stores/boardStore';
 import { playerStore } from '$lib/stores/playerStore';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
-import { _ } from 'svelte-i18n';
 import type { Room } from '$lib/types/online';
 import { endGameService } from '$lib/services/endGameService';
 

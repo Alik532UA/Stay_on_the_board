@@ -1,54 +1,57 @@
 <script lang="ts">
-  import { gameSettingsStore } from '$lib/stores/gameSettingsStore.js';
-  import { _ } from 'svelte-i18n';
-  import { hotkeyTooltip } from '$lib/actions/hotkeyTooltip.js';
-  import { logService } from '$lib/services/logService.js';
-  import { onMount, onDestroy } from 'svelte';
-  import hotkeyService from '$lib/services/hotkeyService';
+  import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
+  import { t } from "$lib/i18n/typedI18n";
+  import { hotkeyTooltip } from "$lib/actions/hotkeyTooltip.js";
+  import { logService } from "$lib/services/logService.js";
+  import { onMount, onDestroy } from "svelte";
+  import hotkeyService from "$lib/services/hotkeyService";
 
-  export let tid = '';
-  export let modalType: 'gameMode' | 'expertMode' = 'gameMode';
+  export let tid = "";
+  export let modalType: "gameMode" | "expertMode" = "gameMode";
   export let scope: string;
 
   let dontShowAgain = false;
   let inputEl: HTMLInputElement | null = null;
-  
 
   function handleCheckboxChange(event: Event) {
     const input = event.currentTarget as HTMLInputElement;
-    if (input && typeof input.checked === 'boolean') {
-      logService.action(`[DontShowAgainCheckbox] handleCheckboxChange called with checked: ${input.checked}`);
-      if (modalType === 'gameMode') {
+    if (input && typeof input.checked === "boolean") {
+      logService.action(
+        `[DontShowAgainCheckbox] handleCheckboxChange called with checked: ${input.checked}`,
+      );
+      if (modalType === "gameMode") {
         gameSettingsStore.updateSettings({ showGameModeModal: !input.checked });
-      } else if (modalType === 'expertMode') {
-        gameSettingsStore.updateSettings({ showDifficultyWarningModal: !input.checked });
+      } else if (modalType === "expertMode") {
+        gameSettingsStore.updateSettings({
+          showDifficultyWarningModal: !input.checked,
+        });
       }
     }
   }
 
   onMount(() => {
-    if (modalType === 'gameMode') {
+    if (modalType === "gameMode") {
       dontShowAgain = !$gameSettingsStore.showGameModeModal;
-    } else if (modalType === 'expertMode') {
+    } else if (modalType === "expertMode") {
       dontShowAgain = !$gameSettingsStore.showDifficultyWarningModal;
     }
-    logService.ui(`[DontShowAgainCheckbox] onMount. dontShowAgain is ${dontShowAgain}`);
+    logService.ui(
+      `[DontShowAgainCheckbox] onMount. dontShowAgain is ${dontShowAgain}`,
+    );
 
-    hotkeyService.register(scope, 'KeyX', () => {
-        if (inputEl) {
-          inputEl.click();
-        }
+    hotkeyService.register(scope, "KeyX", () => {
+      if (inputEl) {
+        inputEl.click();
+      }
     });
   });
-
-  
 </script>
 
 <div class="dont-show-again-checkbox">
   <label class="ios-switch-label">
     <div
       class="switch-content-wrapper"
-      use:hotkeyTooltip={{ key: 'X' }}
+      use:hotkeyTooltip={{ key: "X" }}
       data-testid={tid}
     >
       <div class="ios-switch">
@@ -60,7 +63,7 @@
         />
         <span class="slider"></span>
       </div>
-      <span>{$_('gameModes.dontShowAgain')}</span>
+      <span>{$t("gameModes.dontShowAgain")}</span>
     </div>
   </label>
 </div>
@@ -94,7 +97,9 @@
     min-width: 44px;
     min-height: 24px;
   }
-  .ios-switch input { display: none; }
+  .ios-switch input {
+    display: none;
+  }
   .slider {
     position: absolute;
     cursor: pointer;
@@ -104,7 +109,7 @@
     transition: background 0.2s;
   }
   .slider:before {
-    content: '';
+    content: "";
     position: absolute;
     left: 2px;
     top: 2px;
@@ -114,8 +119,12 @@
     border-radius: 50%;
     transition: transform 0.2s;
   }
-  input:checked + .slider { background: var(--control-selected, #4caf50); }
-  input:checked + .slider:before { transform: translateX(20px); }
+  input:checked + .slider {
+    background: var(--control-selected, #4caf50);
+  }
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
   .dont-show-again-checkbox .ios-switch {
     position: relative;
     width: 44px !important;
@@ -124,7 +133,9 @@
     min-height: 24px !important;
     display: inline-block;
   }
-  .dont-show-again-checkbox .ios-switch input { display: none; }
+  .dont-show-again-checkbox .ios-switch input {
+    display: none;
+  }
   .dont-show-again-checkbox .slider {
     position: absolute;
     cursor: pointer;
@@ -136,7 +147,7 @@
     height: 24px !important;
   }
   .dont-show-again-checkbox .slider:before {
-    content: '';
+    content: "";
     position: absolute;
     left: 2px;
     top: 2px;
@@ -146,6 +157,10 @@
     border-radius: 50%;
     transition: transform 0.2s;
   }
-  .dont-show-again-checkbox input:checked + .slider { background: var(--control-selected, #4caf50); }
-  .dont-show-again-checkbox input:checked + .slider:before { transform: translateX(20px); }
+  .dont-show-again-checkbox input:checked + .slider {
+    background: var(--control-selected, #4caf50);
+  }
+  .dont-show-again-checkbox input:checked + .slider:before {
+    transform: translateX(20px);
+  }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import VoiceSettings from "$lib/components/VoiceSettings.svelte";
   import VoiceList from "$lib/components/VoiceList.svelte";
   import { onMount, onDestroy } from "svelte";
@@ -24,7 +24,10 @@
       resizeObserver = new ResizeObserver(updateFadeState);
       resizeObserver.observe(voiceListWrapper);
       mutationObserver = new MutationObserver(updateFadeState);
-      mutationObserver.observe(voiceListWrapper, { childList: true, subtree: true });
+      mutationObserver.observe(voiceListWrapper, {
+        childList: true,
+        subtree: true,
+      });
     }
   });
 
@@ -37,13 +40,13 @@
 <div class="setup-grid">
   <div class="grid-column">
     <div class="settings-card">
-      <span class="settings-label">{$_("settings.voiceSettings")}</span>
+      <span class="settings-label">{$t("settings.voiceSettings")}</span>
       <VoiceSettings />
     </div>
   </div>
   <div class="grid-column">
     <div class="settings-card" style="height: 100%; min-height: 400px;">
-      <span class="settings-label">{$_("settings.voiceList")}</span>
+      <span class="settings-label">{$t("settings.voiceList")}</span>
       <div
         class="voice-list-wrapper"
         class:fade-bottom={showFade}

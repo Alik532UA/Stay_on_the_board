@@ -1,5 +1,6 @@
 import type { PlayerState } from "$lib/stores/playerStore";
 import type { UiState } from "$lib/stores/uiStateStore";
+import type { TranslationKey } from "$lib/types/i18n";
 
 export interface GameInfoContext {
     playerState: PlayerState;
@@ -8,7 +9,7 @@ export interface GameInfoContext {
     lastComputerMove: { direction: string; distance: number } | null;
     lastPlayerMove: { direction: string; distance: number } | null;
     isPlayerTurn: boolean;
-    translate: (key: string, values?: any) => string;
+    translate: (key: TranslationKey, values?: any) => string;
     isCompact: boolean;
     gameSettings: any;
     uiState: UiState;
@@ -43,7 +44,7 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
         lastComputerMove,
         lastPlayerMove,
         isPlayerTurn,
-        translate: _,
+        translate: t,
         isCompact,
         gameSettings,
         uiState,
@@ -58,14 +59,14 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
     const currentPlayer = playerState.players[playerState.currentPlayerIndex];
 
     if (isGameOver)
-        return { type: "SIMPLE", content: _("gameBoard.gameInfo.gameOver") };
+        return { type: "SIMPLE", content: t("gameBoard.gameInfo.gameOver") };
 
     if (isFirstMove) {
         if (uiState.intendedGameType === "online") {
             if (isPlayerTurn) {
                 return {
                     type: "SIMPLE",
-                    content: `${_("gameBoard.gameInfo.firstMove")}\n${_("gameBoard.gameInfo.yourTurnToMakeAMove")}`,
+                    content: `${t("gameBoard.gameInfo.firstMove")}\n${t("gameBoard.gameInfo.yourTurnToMakeAMove")}`,
                 };
             } else {
                 return {
@@ -76,14 +77,14 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
                             parts: [
                                 {
                                     type: "text" as const,
-                                    content: _("gameBoard.gameInfo.firstMove"),
+                                    content: t("gameBoard.gameInfo.firstMove"),
                                 },
                             ],
                         },
                         {
                             type: "line" as const,
                             parts: [
-                                { type: "text" as const, content: "Зараз ходить: " },
+                                { type: "text" as const, content: t("gameBoard.gameInfo.nowTurn") + ": " },
                                 {
                                     type: "player" as const,
                                     name: currentPlayer.name,
@@ -108,7 +109,7 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
                         parts: [
                             {
                                 type: "text" as const,
-                                content: _("gameBoard.gameInfo.firstMove"),
+                                content: t("gameBoard.gameInfo.firstMove"),
                             },
                         ],
                     },
@@ -127,7 +128,7 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
                                 type: "text" as const,
                                 content:
                                     ", " +
-                                    _(
+                                    t(
                                         "gameBoard.gameInfo.yourTurnToMakeAMove",
                                     ).toLowerCase(),
                             },
@@ -137,11 +138,11 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
             };
         }
 
-        let message = `${_("gameBoard.gameInfo.firstMove")}\n`;
+        let message = `${t("gameBoard.gameInfo.firstMove")}\n`;
         if (gameSettings.gameMode !== "beginner") {
-            message += `${_("gameBoard.gameInfo.rememberPieceLocation")}\n`;
+            message += `${t("gameBoard.gameInfo.rememberPieceLocation")}\n`;
         }
-        message += _("gameBoard.gameInfo.yourTurnToMakeAMove");
+        message += t("gameBoard.gameInfo.yourTurnToMakeAMove");
         return { type: "SIMPLE", content: message };
     }
 
@@ -150,21 +151,22 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
             /-(\w)/g,
             (_: string, c: string) => c.toUpperCase(),
         );
-        const direction = _(`gameBoard.directions.${directionKey}`);
+        const direction = t(`gameBoard.directions.${directionKey}` as TranslationKey);
         const distance = lastComputerMove.distance;
 
         if (isCompact) {
             return {
                 type: "COMPACT_COMPUTER_MOVE",
-                part1: _("gameBoard.gameInfo.computerMadeMovePart1"),
+                part1: t("gameBoard.gameInfo.computerMadeMovePart1"),
                 move: `${directionArrows[lastComputerMove.direction] || "?"}${distance}`,
-                part2: _("gameBoard.gameInfo.computerMadeMovePart2"),
+                part2: t("gameBoard.gameInfo.computerMadeMovePart2"),
             };
         }
         return {
             type: "SIMPLE",
-            content: _("gameBoard.gameInfo.computerMadeMove", {
-                values: { direction, distance },
+            content: t("gameBoard.gameInfo.computerMadeMove", {
+                direction,
+                distance,
             }),
         };
     }
@@ -174,17 +176,14 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
             (playerState.currentPlayerIndex + playerState.players.length - 1) %
             playerState.players.length;
         const previousPlayer = playerState.players[previousPlayerIndex];
-        // Note: playerState passed in context should be used consistently. 
-        // In original code: $playerStore.players was used.
-        // Let's stick to playerState.players from context.
-
         const safePreviousPlayer = playerState.players[previousPlayerIndex];
 
         const directionKey = lastPlayerMove.direction.replace(
             /-(\w)/g,
             (_: string, c: string) => c.toUpperCase(),
         );
-        const direction = _(`gameBoard.directions.${directionKey}`);
+        const direction = t(`gameBoard.directions.${directionKey}` as TranslationKey);
+
         return {
             type: "STRUCTURED",
             lines: [
@@ -192,31 +191,24 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
                     type: "line" as const,
                     parts: [
                         {
-                            type: "player" as const,
-                            name: safePreviousPlayer.name,
-                            style: getPlayerNameStyle(
-                                playerState.players,
-                                safePreviousPlayer.name,
-                            ),
-                        },
-                        {
                             type: "text" as const,
-                            content: ` зробив хід: ${direction} на ${lastPlayerMove.distance}.`,
-                        },
+                            content: t("gameBoard.gameInfo.playerMadeMove", {
+                                player: safePreviousPlayer.name,
+                                direction,
+                                distance: lastPlayerMove.distance
+                            })
+                        }
                     ],
                 },
                 {
                     type: "line" as const,
                     parts: [
                         {
-                            type: "player" as const,
-                            name: currentPlayer.name,
-                            style: getPlayerNameStyle(
-                                playerState.players,
-                                currentPlayer.name,
-                            ),
-                        },
-                        { type: "text" as const, content: " ваша черга робити хід!" },
+                            type: "text" as const,
+                            content: t("gameBoard.gameInfo.nextTurnPrompt", {
+                                player: currentPlayer.name
+                            })
+                        }
                     ],
                 },
             ],
@@ -231,7 +223,7 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
                     {
                         type: "line" as const,
                         parts: [
-                            { type: "text" as const, content: "Хід гравця: " },
+                            { type: "text" as const, content: t("gameBoard.gameInfo.playerTurnLabel") + ": " },
                             {
                                 type: "player" as const,
                                 name: currentPlayer.name,
@@ -245,7 +237,7 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
                 ],
             };
         }
-        return { type: "SIMPLE", content: _("gameBoard.gameInfo.playerTurn") };
+        return { type: "SIMPLE", content: t("gameBoard.gameInfo.playerTurn") };
     }
 
     if (!isPlayerTurn) {
@@ -256,7 +248,7 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
                     {
                         type: "line" as const,
                         parts: [
-                            { type: "text" as const, content: "Зараз ходить: " },
+                            { type: "text" as const, content: t("gameBoard.gameInfo.nowTurn") + ": " },
                             {
                                 type: "player" as const,
                                 name: currentPlayer.name,
@@ -272,9 +264,9 @@ export function createGameInfoMessage(ctx: GameInfoContext) {
         }
         return {
             type: "SIMPLE",
-            content: _("gameBoard.gameInfo.computerTurn"),
+            content: t("gameBoard.gameInfo.computerTurn"),
         };
     }
 
-    return { type: "SIMPLE", content: _("gameBoard.gameInfo.gameStarted") };
+    return { type: "SIMPLE", content: t("gameBoard.gameInfo.gameStarted") };
 }

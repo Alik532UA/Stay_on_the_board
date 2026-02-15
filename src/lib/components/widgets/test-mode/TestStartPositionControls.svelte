@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import {
         testModeStore,
         type PositionMode,
@@ -34,27 +34,27 @@
 </script>
 
 <div class="test-mode-control-group">
-    <h4 class="test-mode-group-title">{$_("testMode.startPosition")}</h4>
+    <h4 class="test-mode-group-title">{$t("testMode.startPosition")}</h4>
     <div class="test-mode-btn-group">
         <button
             class="test-mode-row-btn"
             on:click={() => setStartPositionMode("random")}
             class:active={$testModeStore.startPositionMode === "random"}
             data-testid="test-mode-start-pos-random-btn"
-            >{$_("testMode.random")}</button
+            >{$t("testMode.random")}</button
         >
         <button
             class="test-mode-row-btn"
             on:click={() => setStartPositionMode("manual")}
             class:active={$testModeStore.startPositionMode === "manual"}
             data-testid="test-mode-start-pos-manual-btn"
-            >{$_("testMode.manual")}</button
+            >{$t("testMode.manual")}</button
         >
     </div>
     {#if $testModeStore.startPositionMode === "manual"}
         <div class="test-mode-manual-coords">
             <div class="test-mode-input-group">
-                <label for="manualX">{$_("testMode.x")}</label>
+                <label for="manualX">{$t("testMode.x")}</label>
                 <input
                     id="manualX"
                     class="test-mode-input"
@@ -66,7 +66,7 @@
                 />
             </div>
             <div class="test-mode-input-group">
-                <label for="manualY">{$_("testMode.y")}</label>
+                <label for="manualY">{$t("testMode.y")}</label>
                 <input
                     id="manualY"
                     class="test-mode-input"
@@ -81,7 +81,7 @@
                 class="test-mode-square-btn"
                 on:click={setManualStartPosition}
                 data-testid="test-mode-set-start-pos-btn"
-                >{$_("testMode.set")}</button
+                >{$t("testMode.set")}</button
             >
         </div>
     {/if}

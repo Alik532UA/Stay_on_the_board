@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { modalStore } from "$lib/stores/modalStore";
     import SimpleModalContent from "../../modals/SimpleModalContent.svelte";
     import { customTooltip } from "$lib/actions/customTooltip.js";
@@ -43,25 +43,33 @@
         });
     }
 
-    function showPlayerBonusInfo(player: any) {
+    function showPlayerBonusInfo(player: Player) {
         let scoreDetails = "";
-        if (player.bonusPoints > 0) {
-            scoreDetails += `Бонус за відстань: +${player.bonusPoints}\n`;
-            scoreDetails += `Бонус за перестрибування: +0\n`;
-        } else {
-            scoreDetails += `Бонус за відстань: +0\n`;
-            scoreDetails += `Бонус за перестрибування: +0\n`;
-        }
-        scoreDetails += `Штраф за зворотній хід: -${player.penaltyPoints}\n`;
-        const totalScore = player.bonusPoints - player.penaltyPoints;
-        scoreDetails += `\nЗагальна сума балів: ${totalScore}`;
+
+        scoreDetails +=
+            $t("modal.scoreDetails.distanceBonusLabel", {
+                bonus: player.bonusPoints || 0,
+            }) + "\n";
+        scoreDetails +=
+            $t("modal.scoreDetails.jumpBonusLabel", { bonus: 0 }) + "\n";
+        scoreDetails +=
+            $t("modal.scoreDetails.reversePenaltyLabel", {
+                penalty: player.penaltyPoints || 0,
+            }) + "\n";
+
+        const totalScore =
+            (player.bonusPoints || 0) - (player.penaltyPoints || 0);
+        scoreDetails +=
+            "\n" + $t("modal.scoreDetails.totalSum", { total: totalScore });
 
         modalStore.showModal({
             component: SimpleModalContent,
             variant: "menu",
             dataTestId: `player-score-details-modal-${player.name}`,
             props: {
-                title: `Поточні бали ${player.name}`,
+                title: $t("modal.scoreDetails.title", {
+                    playerName: player.name,
+                }),
                 content: scoreDetails,
                 actions: [
                     {
@@ -82,7 +90,7 @@
     class="score-display-multiplayer"
     data-testid="multiplayer-score-container"
 >
-    <div class="score-label-multiplayer">{$_("gameBoard.scoreLabel")}</div>
+    <div class="score-label-multiplayer">{$t("gameBoard.scoreLabel")}</div>
     {#each players as player}
         <!-- FIX: Додано data-testid для рядка гравця -->
         <div class="score-row" data-testid={`score-row-${player.id}`}>
@@ -99,7 +107,7 @@
                         showPlayerBonusInfo(player)}
                     role="button"
                     tabindex="0"
-                    use:customTooltip={"Натисніть для перегляду деталей балів"}
+                    use:customTooltip={$t("gameBoard.details")}
                     data-testid={`score-value-${player.id}`}
                     >{player.score}</span
                 >
@@ -120,11 +128,11 @@
                 on:click={showPenaltyInfo}
                 on:keydown={(e) =>
                     (e.key === "Enter" || e.key === " ") && showPenaltyInfo()}
-                use:customTooltip={$_("gameBoard.penaltyHint")}
+                use:customTooltip={$t("gameBoard.penaltyHint")}
                 role="button"
                 tabindex="0"
                 data-testid="penalty-display"
-                >Штраф: -{scoreStore.penaltyPoints}</span
+                >{$t("modal.scoreDetails.penalty")}: -{scoreStore.penaltyPoints}</span
             >
         </div>
     {/if}

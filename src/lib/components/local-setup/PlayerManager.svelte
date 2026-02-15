@@ -1,6 +1,6 @@
 <script lang="ts">
   import { playerStore } from "$lib/stores/playerStore";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { get } from "svelte/store";
   import { navigationService } from "$lib/services/navigationService.js";
   import ColorPicker from "./ColorPicker.svelte";
@@ -63,7 +63,7 @@
 {#if $playerStore}
   <div class="player-manager-card">
     <h2 data-testid="player-manager-title">
-      {$_("localGame.playerManagerTitle")}
+      {$t("localGame.playerManagerTitle")}
     </h2>
 
     <div class="player-list">
@@ -78,7 +78,7 @@
           />
           <button
             class="player-type-btn"
-            use:customTooltip={$_("localGame.togglePlayerType")}
+            use:customTooltip={$t("localGame.togglePlayerType")}
             on:click={() =>
               updatePlayer(player.id, {
                 type: player.type === "human" ? "ai" : "human",
@@ -104,7 +104,7 @@
           />
           <button
             class="remove-player-btn"
-            use:customTooltip={$_("localGame.removePlayer")}
+            use:customTooltip={$t("localGame.removePlayer")}
             on:click={() => {
               logService.action(
                 `Click: "Видалити гравця: ${player.name}" (PlayerManager)`,
@@ -130,14 +130,14 @@
         disabled={$playerStore.players.length >= 8}
         data-testid="add-player-btn"
       >
-        {$_("localGame.addPlayer")}
+        {$t("localGame.addPlayer")}
       </button>
       <button
         class="start-game-btn"
         on:click={startGame}
         data-testid="start-game-btn"
       >
-        {$_("localGame.startGame")}
+        {$t("localGame.startGame")}
       </button>
     </div>
   </div>

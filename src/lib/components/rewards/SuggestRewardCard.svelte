@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { modalStore } from "$lib/stores/modalStore";
     import FeedbackModal from "$lib/components/modals/FeedbackModal.svelte";
     import { logService } from "$lib/services/logService";
@@ -29,8 +29,8 @@
         <NotoEmoji name="plus" size="40px" />
     </div>
     <div class="content">
-        <div class="title">{$_("rewards.suggestRewardTitle")}</div>
-        <div class="description">{$_("rewards.suggestRewardDescription")}</div>
+        <div class="title">{$t("rewards.suggestRewardTitle")}</div>
+        <div class="description">{$t("rewards.suggestRewardDescription")}</div>
     </div>
 </button>
 

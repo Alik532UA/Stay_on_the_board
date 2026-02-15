@@ -1,7 +1,7 @@
 <script lang="ts">
   import "$lib/css/components/modal.css";
   import { modalState, modalStore } from "$lib/stores/modalStore";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import FAQModal from "./FAQModal.svelte";
   import GameOverContent from "./modals/GameOverContent.svelte";
   import { onMount, tick, onDestroy } from "svelte";
@@ -178,13 +178,13 @@
           <FAQModal />
         {:else if typeof $modalState.content === "object" && $modalState.content && "key" in $modalState.content && "actions" in $modalState.content}
           <p class="reason">
-            {$_("modal.keyConflictContent", {
-              values: { key: $modalState.content.key as string },
+            {$t("modal.keyConflictContent", {
+              key: $modalState.content.key as string,
             })}
           </p>
         {:else if $modalState.contentKey}
           <p class="reason">
-            {$_($modalState.contentKey, { values: $modalState.content as any })}
+            {$t($modalState.contentKey as import("$lib/types/i18n").TranslationKey, $modalState.content as any)}
           </p>
         {:else if typeof $modalState.content === "string" && $modalState.content}
           <p class="reason">{$modalState.content}</p>

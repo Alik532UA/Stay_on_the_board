@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
+    import type { TranslationKey } from "$lib/types/i18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import ColorPicker from "$lib/components/local-setup/ColorPicker.svelte";
     import EditableText from "$lib/components/ui/EditableText.svelte";
@@ -108,7 +109,7 @@
                     <span
                         class="badge host"
                         data-testid="host-badge"
-                        title={$_("onlineMenu.lobby.host")}
+                        title={$t("onlineMenu.lobby.host")}
                     >
                         <SvgIcons name="trophy_bronze" width="12" height="12" />
                         HOST
@@ -128,7 +129,7 @@
             data-testid={`player-status-${player.id}`}
         >
             <SvgIcons name={status.icon} width="16" height="16" />
-            <span class="status-text">{$_(status.text)}</span>
+            <span class="status-text">{$t(status.text as TranslationKey)}</span>
         </div>
     </div>
 </div>

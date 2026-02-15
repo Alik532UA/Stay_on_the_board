@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import {
         feedbackService,
         type FeedbackType,
@@ -106,7 +106,7 @@
 </script>
 
 <div class="feedback-modal-container">
-    <h2 class="modal-title-menu">{$_("ui.feedback.title")}</h2>
+    <h2 class="modal-title-menu">{$t("ui.feedback.title")}</h2>
 
     {#if !selectedType}
         <FeedbackMenu on:select={selectType} on:globalChat={handleGlobalChat} />

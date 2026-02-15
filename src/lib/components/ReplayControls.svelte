@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import ToggleButton from "./ToggleButton.svelte";
   import StyledButton from "./ui/StyledButton.svelte";
 
@@ -49,15 +49,13 @@
       title="Next Step">»</StyledButton
     >
     <div class="step-counter" data-testid="replay-step-counter">
-      {$_("replay.step", {
-        values: { current: currentStep + 1, total: totalSteps },
-      })}
+      {$t("replay.step", { current: currentStep + 1, total: totalSteps })}
     </div>
   </div>
 
   <div class="limit-path-container">
     <ToggleButton
-      label={$_("replay.limitPath")}
+      label={$t("replay.limitPath")}
       checked={limitReplayPath}
       on:toggle={() => dispatch("toggleLimitPath")}
       dataTestId="limit-path-toggle"

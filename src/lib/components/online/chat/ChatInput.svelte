@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import { createEventDispatcher } from "svelte";
 
@@ -23,7 +23,7 @@
     <input
         type="text"
         bind:value={newMessage}
-        placeholder={$_("onlineMenu.chat.placeholder")}
+        placeholder={$t("onlineMenu.chat.placeholder")}
         on:keydown={handleKeydown}
         maxlength="100"
         data-testid="chat-input-field"

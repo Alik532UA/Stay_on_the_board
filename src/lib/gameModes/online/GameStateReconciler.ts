@@ -14,7 +14,7 @@ import { speakMove } from '$lib/services/speechService';
 import { appSettingsStore, type AppSettingsState } from '$lib/stores/appSettingsStore';
 import { logService } from '$lib/services/logService';
 import type { SyncableGameState } from '$lib/sync/gameStateSync.interface';
-import { _ } from 'svelte-i18n';
+import { t as tStore } from '$lib/i18n/typedI18n';
 import { timeService } from '$lib/services/timeService';
 
 export class GameStateReconciler {
@@ -142,7 +142,7 @@ export class GameStateReconciler {
     private updateModalButtonsState(remoteState: SyncableGameState) {
         const currentModal = get(modalStore);
         if (currentModal.isOpen && (currentModal.dataTestId === 'player-no-moves-modal' || currentModal.dataTestId === 'opponent-trapped-modal')) {
-            const t = get(_);
+            const t = get(tStore);
             const votes = remoteState.noMovesVotes || {};
             const totalPlayers = remoteState.playerState.players.length;
 
@@ -168,7 +168,7 @@ export class GameStateReconciler {
                 updated = true;
             }
 
-            const baseFinishText = t('modal.finishGameWithBonus', { values: { bonus: remoteState.noMovesClaim?.boardSize || 0 } });
+            const baseFinishText = t('modal.finishGameWithBonus', { bonus: remoteState.noMovesClaim?.boardSize || 0 });
             const finishBtnText = `${baseFinishText} (${finishCount}/${totalPlayers})`;
 
             if (newButtons[1].text !== finishBtnText) {

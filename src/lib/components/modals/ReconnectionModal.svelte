@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { onDestroy, onMount } from "svelte";
     import { roomPlayerService } from "$lib/services/room/roomPlayerService";
     import { navigationService } from "$lib/services/navigationService";
@@ -56,7 +56,7 @@
 
 <div class="reconnection-content" data-testid="reconnection-modal-content">
     <h2 class="modal-title-menu" data-testid="reconnection-title">
-        {$_("onlineMenu.waitingForPlayersList")}
+        {$t("onlineMenu.waitingForPlayersList")}
     </h2>
 
     <div class="players-list" data-testid="reconnection-players-list">
@@ -87,7 +87,7 @@
             disabled={timeRemaining > 0}
             data-testid="reconnection-kick-btn"
         >
-            {$_("onlineMenu.kickPlayer")}
+            {$t("onlineMenu.kickPlayer")}
         </button>
 
         <button
@@ -95,7 +95,7 @@
             on:click={leaveGame}
             data-testid="reconnection-leave-btn"
         >
-            {$_("onlineMenu.leaveRoom")}
+            {$t("onlineMenu.leaveRoom")}
         </button>
     </div>
 </div>

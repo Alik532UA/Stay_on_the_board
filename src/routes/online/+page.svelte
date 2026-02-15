@@ -5,7 +5,7 @@
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
   import EditableText from "$lib/components/ui/EditableText.svelte";
   import { modalStore } from "$lib/stores/modalStore";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { onMount } from "svelte";
   import { logService } from "$lib/services/logService";
   import { generateRandomPlayerName } from "$lib/utils/nameGenerator";
@@ -45,13 +45,13 @@
 <div class="online-page">
   <div class="header-container">
     <FloatingBackButton />
-    <h1>{$_("onlineMenu.title")}</h1>
+    <h1>{$t("onlineMenu.title")}</h1>
   </div>
 
   <div class="content-container">
     <div class="top-section">
       <div class="player-setup">
-        <span class="label">{$_("onlineMenu.enterNameTitle")}</span>
+        <span class="label">{$t("onlineMenu.enterNameTitle")}</span>
 
         <div class="name-editor-wrapper">
           <EditableText
@@ -59,7 +59,7 @@
             canEdit={true}
             onRandom={generateRandomPlayerName}
             on:change={handleNameChange}
-            placeholder={$_("onlineMenu.enterNamePlaceholder")}
+            placeholder={$t("onlineMenu.enterNamePlaceholder")}
             dataTestId="player-name-input"
           />
         </div>
@@ -74,7 +74,7 @@
         >
           <span class="btn-content">
             <span class="plus">+</span>
-            {$_("onlineMenu.createRoom")}
+            {$t("onlineMenu.createRoom")}
           </span>
         </StyledButton>
       </div>

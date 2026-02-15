@@ -1,7 +1,7 @@
 <script lang="ts">
   import { userActionService } from "$lib/services/userActionService";
   import { replayStore } from "$lib/stores/replayStore";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { customTooltip } from "$lib/actions/customTooltip.js";
   import { playerStore } from "$lib/stores/playerStore";
   import { scoreStore } from "$lib/stores/scoreStore";
@@ -16,7 +16,7 @@
 
   async function cashOutAndEndGame() {
     // FIX: Використовуємо voteToFinish для коректної роботи в онлайн режимі
-    await userActionService.voteToFinish("modal.gameOverReasonCashOut");
+    await userActionService.voteToFinish("modal.gameOverReasonCashOut" as const);
   }
 </script>
 
@@ -34,11 +34,11 @@
       class="cash-out-btn"
       on:click={cashOutAndEndGame}
       use:customTooltip={isMultiplayer
-        ? $_("gameBoard.cashOutLocal")
-        : $_("gameBoard.cashOutTooltip")}
+        ? $t("gameBoard.cashOutLocal")
+        : $t("gameBoard.cashOutTooltip")}
       data-testid="cash-out-btn"
     >
-      {isMultiplayer ? $_("gameBoard.cashOutLocal") : $_("gameBoard.cashOut")}
+      {isMultiplayer ? $t("gameBoard.cashOutLocal") : $t("gameBoard.cashOut")}
     </button>
   </div>
 {/if}

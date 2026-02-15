@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { authService, userStore } from "$lib/services/authService";
     import { userProfileStore } from "$lib/services/auth/userProfileService";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
@@ -46,7 +46,7 @@
     }
 </script>
 
-<h3 class="title">{$_("ui.auth.titleProfile")}</h3>
+<h3 class="title">{$t("ui.auth.titleProfile")}</h3>
 
 <div class="profile-info">
     <div class="info-row">
@@ -69,11 +69,11 @@
     <!-- MAIN PROFILE ACTIONS -->
     <div class="actions">
         <StyledButton variant="default" on:click={toggleChangePassword}>
-            {$_("ui.auth.changePasswordBtn")}
+            {$t("ui.auth.changePasswordBtn")}
         </StyledButton>
 
         <StyledButton variant="default" on:click={handleLogout}>
-            {$_("ui.auth.logoutBtn")}
+            {$t("ui.auth.logoutBtn")}
         </StyledButton>
 
         <StyledButton
@@ -81,14 +81,14 @@
             on:click={toggleDeleteAccount}
             style="margin-top: 10px;"
         >
-            {$_("ui.auth.deleteAccountBtn")}
+            {$t("ui.auth.deleteAccountBtn")}
         </StyledButton>
     </div>
 {:else if isChangePasswordMode}
     <!-- CHANGE PASSWORD VIEW -->
     <div class="change-password-zone">
         <div class="form-group">
-            <label for="new-password">{$_("ui.auth.newPasswordLabel")}</label>
+            <label for="new-password">{$t("ui.auth.newPasswordLabel")}</label>
             <input
                 id="new-password"
                 type="password"
@@ -104,20 +104,20 @@
                 disabled={isLoading || !newPassword}
             >
                 {isLoading
-                    ? $_("common.loading")
-                    : $_("ui.auth.savePasswordBtn")}
+                    ? $t("common.loading")
+                    : $t("ui.auth.savePasswordBtn")}
             </StyledButton>
             <button class="link-btn" on:click={cancelMode}>
-                {$_("ui.auth.cancelChangePasswordBtn")}
+                {$t("ui.auth.cancelChangePasswordBtn")}
             </button>
         </div>
     </div>
 {:else if isDeleteMode}
     <!-- DELETE ACCOUNT CONFIRMATION -->
     <div class="delete-zone">
-        <p class="warning-text">{$_("ui.auth.deleteWarning")}</p>
+        <p class="warning-text">{$t("ui.auth.deleteWarning")}</p>
         <div class="form-group">
-            <label for="delete-password">{$_("ui.auth.passwordLabel")}</label>
+            <label for="delete-password">{$t("ui.auth.passwordLabel")}</label>
             <input
                 id="delete-password"
                 type="password"
@@ -133,11 +133,11 @@
                 disabled={isLoading || !deletePassword}
             >
                 {isLoading
-                    ? $_("common.loading")
-                    : $_("ui.auth.confirmDeleteBtn")}
+                    ? $t("common.loading")
+                    : $t("ui.auth.confirmDeleteBtn")}
             </StyledButton>
             <button class="link-btn" on:click={cancelMode}>
-                {$_("ui.auth.cancelDeleteBtn")}
+                {$t("ui.auth.cancelDeleteBtn")}
             </button>
         </div>
     </div>

@@ -1,8 +1,8 @@
-<script>
-import { _ } from 'svelte-i18n';
+<script lang="ts">
+  import { t } from "$lib/i18n/typedI18n";
 </script>
+
 <div class="local-game">
-  <h2>{$_('localGame.title')}</h2>
+  <h2>{$t("localGame.title")}</h2>
   <!-- Додайте тут розмітку локальної гри -->
 </div>
-// New key needed: localGame.title 

@@ -2,7 +2,7 @@
   import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
   import AccordionSection from "$lib/components/AccordionSection.svelte";
   import NotoEmoji from "$lib/components/NotoEmoji.svelte";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { base } from "$app/paths";
 </script>
 
@@ -11,8 +11,8 @@
   <div class="rules-header">
     <div class="header-container">
       <div class="title-container">
-        <h1>{$_("rulesPage.title")}</h1>
-        <!-- <div class="rules-slogan">{$_('rulesPage.slogan')}</div> -->
+        <h1>{$t("rulesPage.title")}</h1>
+        <!-- <div class="rules-slogan">{$t('rulesPage.slogan')}</div> -->
       </div>
     </div>
   </div>
@@ -20,20 +20,20 @@
   <AccordionSection isOpen={true}>
     <span slot="title">
       <NotoEmoji name="trophy" size="1.2em" />
-      {$_("rulesPage.goalTitle")}
+      {$t("rulesPage.goalTitle")}
     </span>
-    <p class="rules-text">{$_("rulesPage.goalText")}</p>
+    <p class="rules-text">{$t("rulesPage.goalText")}</p>
   </AccordionSection>
 
   <AccordionSection>
     <span slot="title">
       <NotoEmoji name="gear" size="1.2em" />
-      {$_("rulesPage.moveProcessTitle")}
+      {$t("rulesPage.moveProcessTitle")}
     </span>
     <ol>
       <li>
-        <b>{$_("rulesPage.step1")}</b>
-        {$_("rulesPage.step1Text")}
+        <b>{$t("rulesPage.step1")}</b>
+        {$t("rulesPage.step1Text")}
         <div class="directions-grid-visual">
           <div class="dir-btn-visual">↖</div>
           <div class="dir-btn-visual">↑</div>
@@ -48,30 +48,30 @@
           <div class="dir-btn-visual">↘</div>
         </div>
       </li>
-      <li><b>{$_("rulesPage.step2")}</b> {$_("rulesPage.step2Text")}</li>
-      <li><b>{$_("rulesPage.step3")}</b> {$_("rulesPage.step3Text")}</li>
+      <li><b>{$t("rulesPage.step2")}</b> {$t("rulesPage.step2Text")}</li>
+      <li><b>{$t("rulesPage.step3")}</b> {$t("rulesPage.step3Text")}</li>
     </ol>
   </AccordionSection>
 
   <AccordionSection>
     <span slot="title">
       <NotoEmoji name="1st_place_medal" size="1.2em" />
-      {$_("rulesPage.winningAndLosing")}
+      {$t("rulesPage.winningAndLosing")}
     </span>
     <div class="rules-cards-row">
       <div class="rules-card rules-lose">
-        <h3>{$_("rulesPage.youLose")}</h3>
+        <h3>{$t("rulesPage.youLose")}</h3>
         <ul>
-          <li>{$_("rulesPage.lose1")}</li>
-          <li>{$_("rulesPage.lose2")}</li>
-          <li>{$_("rulesPage.lose3")}</li>
+          <li>{$t("rulesPage.lose1")}</li>
+          <li>{$t("rulesPage.lose2")}</li>
+          <li>{$t("rulesPage.lose3")}</li>
         </ul>
       </div>
       <div class="rules-card rules-win">
-        <h3>{$_("rulesPage.youWin")}</h3>
+        <h3>{$t("rulesPage.youWin")}</h3>
         <ul>
-          <li>{$_("rulesPage.win1")}</li>
-          <li>{$_("rulesPage.win2")}</li>
+          <li>{$t("rulesPage.win1")}</li>
+          <li>{$t("rulesPage.win2")}</li>
         </ul>
       </div>
     </div>
@@ -80,16 +80,16 @@
   <AccordionSection>
     <span slot="title">
       <NotoEmoji name="game_die" size="1.2em" />
-      {$_("rulesPage.gameModes")}
+      {$t("rulesPage.gameModes")}
     </span>
     <div class="rules-cards-row">
       <div class="rules-card rules-mode-normal">
-        <h3>{$_("rulesPage.normalMode")}</h3>
-        <p>{$_("rulesPage.normalModeText")}</p>
+        <h3>{$t("rulesPage.normalMode")}</h3>
+        <p>{$t("rulesPage.normalModeText")}</p>
       </div>
       <div class="rules-card rules-mode-block">
-        <h3>{$_("rulesPage.blockMode")}</h3>
-        <p>{$_("rulesPage.blockModeText")}</p>
+        <h3>{$t("rulesPage.blockMode")}</h3>
+        <p>{$t("rulesPage.blockModeText")}</p>
       </div>
     </div>
   </AccordionSection>
@@ -97,24 +97,24 @@
   <AccordionSection>
     <span slot="title">
       <NotoEmoji name="memo" size="1.2em" />
-      {$_("rulesPage.specialRules")}
+      {$t("rulesPage.specialRules")}
     </span>
     <div class="rules-card rules-no-moves">
-      <h2>{$_("rulesPage.noMovesButtonTitle")}</h2>
-      <p>{$_("rulesPage.noMovesButtonText1")}</p>
+      <h2>{$t("rulesPage.noMovesButtonTitle")}</h2>
+      <p>{$t("rulesPage.noMovesButtonText1")}</p>
       <ul>
-        <li><b>{$_("rulesPage.noMovesWin")}</b></li>
-        <li><b>{$_("rulesPage.noMovesLoss")}</b></li>
+        <li><b>{$t("rulesPage.noMovesWin")}</b></li>
+        <li><b>{$t("rulesPage.noMovesLoss")}</b></li>
       </ul>
-      <p>{$_("rulesPage.noMovesButtonText2")}</p>
+      <p>{$t("rulesPage.noMovesButtonText2")}</p>
     </div>
     <div class="rules-card rules-scoring">
-      <h2>{$_("rulesPage.scoringTitle")}</h2>
-      <p>{$_("rulesPage.scoringText")}</p>
+      <h2>{$t("rulesPage.scoringTitle")}</h2>
+      <p>{$t("rulesPage.scoringText")}</p>
       <ul>
-        <li>{$_("rulesPage.scoreNormal")}</li>
-        <li>{$_("rulesPage.scoreHidePiece")}</li>
-        <li>{$_("rulesPage.scoreHideBoard")}</li>
+        <li>{$t("rulesPage.scoreNormal")}</li>
+        <li>{$t("rulesPage.scoreHidePiece")}</li>
+        <li>{$t("rulesPage.scoreHideBoard")}</li>
       </ul>
     </div>
   </AccordionSection>
@@ -122,28 +122,28 @@
   <AccordionSection>
     <span slot="title">
       <NotoEmoji name="fire" size="1.2em" />
-      {$_("rulesPage.proModeTitle")}
+      {$t("rulesPage.proModeTitle")}
     </span>
     <div class="rules-card rules-pro-mode">
-      <p>{$_("rulesPage.proModeText")}</p>
-      <p><b>{$_("rulesPage.proModeTip")}</b></p>
+      <p>{$t("rulesPage.proModeText")}</p>
+      <p><b>{$t("rulesPage.proModeTip")}</b></p>
       <ol>
-        <li>{$_("rulesPage.proModeStep1")}</li>
-        <li>{$_("rulesPage.proModeStep2")}</li>
-        <li>{$_("rulesPage.proModeStep3")}</li>
+        <li>{$t("rulesPage.proModeStep1")}</li>
+        <li>{$t("rulesPage.proModeStep2")}</li>
+        <li>{$t("rulesPage.proModeStep3")}</li>
         <li>
-          {#each $_("rulesPage.proModeStep4").split(/<a[^>]*>|<\/a>/) as part, i}
+          {#each $t("rulesPage.proModeStep4").split(/<a[^>]*>|<\/a>/) as part, i}
             {part}
             {#if i === 0}
               <a href="{base}/controls" class="inline-link-button">
-                {$_("rulesPage.proModeStep4").match(/<a[^>]*>(.*?)<\/a>/)?.[1] || ""}
+                {$t("rulesPage.proModeStep4").match(/<a[^>]*>(.*?)<\/a>/)?.[1] || ""}
               </a>
             {/if}
           {/each}
         </li>
       </ol>
-      <p>{$_("rulesPage.proModeConclusion")}</p>
-      <p>{$_("rulesPage.proModeNextLevel")}</p>
+      <p>{$t("rulesPage.proModeConclusion")}</p>
+      <p>{$t("rulesPage.proModeNextLevel")}</p>
     </div>
   </AccordionSection>
 </div>

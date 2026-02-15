@@ -1,13 +1,13 @@
 <script>
   import Settings from '$lib/components/Settings.svelte';
   import FloatingBackButton from '$lib/components/FloatingBackButton.svelte';
-  import { _ } from 'svelte-i18n';
+  import { t } from '$lib/i18n/typedI18n';
 </script>
 
 <div class="page-container">
   <div class="header-container">
     <FloatingBackButton />
-    <h1 data-testid="settings-title">{$_('settings.title')}</h1>
+    <h1 data-testid="settings-title">{$t('settings.title')}</h1>
   </div>
 
   <Settings />

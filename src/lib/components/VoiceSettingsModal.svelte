@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from "svelte";
   import { logService } from "$lib/services/logService";
   import { modalStore } from "$lib/stores/modalStore";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import VoiceSettings from "./VoiceSettings.svelte";
   import VoiceList from "./VoiceList.svelte";
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
@@ -47,7 +47,7 @@
   data-testid="voice-settings-modal-content"
 >
   <h2 class="modal-title-menu" id="voice-settings-title">
-    {$_("voiceSettings.title")}
+    {$t("voiceSettings.title")}
   </h2>
 
   <div class="voice-settings-body">
@@ -73,7 +73,7 @@
       on:click={() => modalStore.closeModal()}
       dataTestId="voice-settings-save-footer-btn"
     >
-      {$_("common.save")}
+      {$t("common.save")}
     </StyledButton>
   </div>
 </div>

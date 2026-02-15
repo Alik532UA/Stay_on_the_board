@@ -2,7 +2,7 @@
   import { modalStore } from "$lib/stores/modalStore";
   import BoardHiddenExplanationModal from "../modals/BoardHiddenExplanationModal.svelte";
   import { uiStateStore } from "$lib/stores/uiStateStore";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
 
   function showExplanation() {
@@ -28,7 +28,7 @@
     dataTestId="why-board-hidden-btn"
     style="width: 100%;"
   >
-    {$_("newWidget.whyBoardHidden")}
+    {$t("newWidget.whyBoardHidden")}
   </StyledButton>
 
   <StyledButton
@@ -38,7 +38,7 @@
     dataTestId="i-know-why-btn"
     style="width: 100%;"
   >
-    {$_("newWidget.iKnowWhy")}
+    {$t("newWidget.iKnowWhy")}
   </StyledButton>
 </div>
 

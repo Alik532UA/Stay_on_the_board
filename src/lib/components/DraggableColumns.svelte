@@ -4,7 +4,7 @@
   import { scale } from "svelte/transition";
   import { flip } from "svelte/animate";
   import { columnStyleMode } from "$lib/stores/columnStyleStore";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { layoutUpdateStore } from "$lib/stores/layoutUpdateStore";
 
   export let columns: {
@@ -176,7 +176,7 @@
       transform: translate({dragX}px, {dragY}px) scale(1.05);
     "
   >
-    {$_("ui.dndEditInstruction")}
+    {$t("ui.dndEditInstruction")}
   </div>
 {/if}
 

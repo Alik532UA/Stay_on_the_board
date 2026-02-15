@@ -1,19 +1,20 @@
 <script lang="ts">
     import { onMount, tick } from "svelte";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
+    import type { TranslationKey } from "$lib/types/i18n";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import DontShowAgainCheckbox from "../DontShowAgainCheckbox.svelte";
 
-    export let titleKey: string = "";
+    export let titleKey: TranslationKey | "" = "";
     export let title: string = "";
     export let titleValues: Record<string, any> = {};
 
-    export let contentKey: string = "";
+    export let contentKey: TranslationKey | "" = "";
     export let content: string = "";
     export let contentValues: Record<string, any> = {};
 
     export let actions: Array<{
-        labelKey?: string;
+        labelKey?: TranslationKey;
         label?: string;
         onClick: () => void;
         variant?: "primary" | "default" | "danger" | "info" | "warning";
@@ -45,7 +46,7 @@
             data-testid={`${dataTestId}-title`}
             data-i18n-key={titleKey}
         >
-            {titleKey ? $_(titleKey, { values: titleValues }) : title}
+            {titleKey ? $t(titleKey, titleValues) : title}
         </h2>
     {/if}
 
@@ -55,7 +56,7 @@
             data-testid={`${dataTestId}-message`}
             data-i18n-key={contentKey}
         >
-            {contentKey ? $_(contentKey, { values: contentValues }) : content}
+            {contentKey ? $t(contentKey, contentValues) : content}
         </p>
     {/if}
 
@@ -80,7 +81,7 @@
                         `${dataTestId}-action-${i}`}
                     bind:buttonElement={buttonRefs[i]}
                 >
-                    {action.labelKey ? $_(action.labelKey) : action.label || ""}
+                    {action.labelKey ? $t(action.labelKey) : action.label || ""}
                 </StyledButton>
             {/each}
         </div>

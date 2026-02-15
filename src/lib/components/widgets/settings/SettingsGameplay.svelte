@@ -6,7 +6,7 @@
     import { gameModeService } from "$lib/services/gameModeService";
     import { uiStateStore } from "$lib/stores/uiStateStore";
     import { logService } from "$lib/services/logService";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
     import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
     import { get } from "svelte/store";
@@ -38,18 +38,18 @@
             variant: "menu",
             dataTestId: "competitive-mode-modal",
             props: {
-                titleKey: "modal.competitiveModeLockTitle",
-                contentKey: "modal.competitiveModeLockContent",
+                titleKey: "modal.competitiveModeLockTitle" as const,
+                contentKey: "modal.competitiveModeLockContent" as const,
                 actions: [
                     {
-                        labelKey: "modal.goToTraining",
+                        labelKey: "modal.goToTraining" as const,
                         variant: "primary",
                         isHot: true,
                         onClick: goToTrainingOnClick,
                         dataTestId: "go-to-training-btn",
                     },
                     {
-                        labelKey: "modal.stay",
+                        labelKey: "modal.stay" as const,
                         onClick: () => modalStore.closeModal(),
                         dataTestId: "stay-in-competitive-btn",
                     },
@@ -69,13 +69,13 @@
                 variant: "menu",
                 dataTestId: "expert-mode-modal",
                 props: {
-                    titleKey: "modal.expertModeTitle",
-                    contentKey: "modal.expertModeContent",
+                    titleKey: "modal.expertModeTitle" as const,
+                    contentKey: "modal.expertModeContent" as const,
                     showDontShowAgain: true,
                     dontShowAgainType: "expertMode",
                     actions: [
                         {
-                            labelKey: "modal.expertModeConfirm",
+                            labelKey: "modal.expertModeConfirm" as const,
                             variant: "primary",
                             isHot: true,
                             onClick: () => {
@@ -87,7 +87,7 @@
                             dataTestId: "expert-mode-confirm-btn",
                         },
                         {
-                            labelKey: "modal.expertModeCancel",
+                            labelKey: "modal.expertModeCancel" as const,
                             onClick: () => modalStore.closeModal(),
                             dataTestId: "expert-mode-cancel-btn",
                         },
@@ -121,7 +121,7 @@
     data-testid="auto-hide-board-container"
 >
     <ToggleButton
-        label={$_("gameModes.autoHideBoard")}
+        label={$t("gameModes.autoHideBoard")}
         checked={$gameSettingsStore.autoHideBoard}
         on:toggle={isCompetitiveMode ? () => {} : handleToggleAutoHideBoard}
         dataTestId="auto-hide-board-toggle"
@@ -140,7 +140,7 @@
     data-testid="block-mode-container"
 >
     <ToggleButton
-        label={$_("gameControls.blockMode")}
+        label={$t("gameControls.blockMode")}
         checked={$gameSettingsStore.blockModeEnabled}
         on:toggle={isCompetitiveMode
             ? () => {}
@@ -154,7 +154,7 @@
         data-testid="block-count-options-container"
     >
         <span class="settings-expander__label"
-            >{$_("gameControls.blockAfter")}</span
+            >{$t("gameControls.blockAfter")}</span
         >
         <!-- FIX: Додано dataTestId для контейнера групи -->
         <ButtonGroup

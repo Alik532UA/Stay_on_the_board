@@ -2,7 +2,7 @@
   import { gameModeStore } from "$lib/stores/gameModeStore";
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
   import { userActionService } from "$lib/services/userActionService";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import SvgIcons from "../SvgIcons.svelte";
   import { onMount, tick } from "svelte";
@@ -85,14 +85,14 @@
       data-testid="settings-expander-summary"
       class="settings-expander__summary"
       role="button"
-      aria-label={$_("gameControls.settings")}
+      aria-label={$t("gameControls.settings")}
       on:click={toggleExpander}
       on:keydown={(e) =>
         (e.key === "Enter" || e.key === " ") && toggleExpander()}
       bind:this={summaryRef}
       tabindex={0}
     >
-      {$_("gameControls.settings")}
+      {$t("gameControls.settings")}
       <span class="settings-expander__arrow" aria-hidden="true"
         ><svg viewBox="0 0 24 24" width="24" height="24"
           ><polyline

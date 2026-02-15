@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
+    import type { TranslationKey } from "$lib/types/i18n";
     import { i18nReady } from "$lib/i18n/init.js";
     import { gameEventBus } from "$lib/services/gameEventBus";
     import { logService } from "$lib/services/logService";
@@ -47,13 +48,15 @@
                 if (processingButtons[i] || isComputerMoveInProgress) return;
                 processingButtons[i] = true;
                 logService.action(
-                    `Click: "${btn.textKey ? $_(btn.textKey) : btn.text}" (Modal)`,
+                    `Click: "${btn.textKey ? $t(btn.textKey as TranslationKey) : btn.text}" (Modal)`,
                 );
                 if (btn.onClick) await btn.onClick();
                 else gameEventBus.dispatch("CloseModal");
             }}
         >
-            {$i18nReady && btn.textKey ? $_(btn.textKey) : btn.text}
+            {$i18nReady && btn.textKey
+                ? $t(btn.textKey as TranslationKey)
+                : btn.text}
         </StyledButton>
     {/each}
 

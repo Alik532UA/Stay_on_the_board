@@ -2,7 +2,7 @@
   import { gameModeStore } from "$lib/stores/gameModeStore";
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
   import { userActionService } from "$lib/services/userActionService";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
 
@@ -68,19 +68,19 @@
   // FIX: Опції тепер залежать від currentMode через аргумент функції
   $: localOptions = [
     {
-      label: $_("gameModes.observer"),
+      label: $t("gameModes.observer"),
       active: isPresetActive("observer", currentMode),
       onClick: () => handlePresetClick("observer"),
       dataTestId: "settings-game-mode-local-observer",
     },
     {
-      label: $_("gameModes.experienced"),
+      label: $t("gameModes.experienced"),
       active: isPresetActive("experienced", currentMode),
       onClick: () => handlePresetClick("experienced"),
       dataTestId: "settings-game-mode-local-experienced",
     },
     {
-      label: $_("gameModes.pro"),
+      label: $t("gameModes.pro"),
       active: isPresetActive("pro", currentMode),
       onClick: () => handlePresetClick("pro"),
       dataTestId: "settings-game-mode-local-pro",
@@ -89,25 +89,25 @@
 
   $: virtualPlayerOptions = [
     {
-      label: $_("gameModes.beginner"),
+      label: $t("gameModes.beginner"),
       active: isPresetActive("beginner", currentMode),
       onClick: () => handlePresetClick("beginner"),
       dataTestId: "settings-game-mode-virtual-player-beginner",
     },
     {
-      label: $_("gameModes.experienced"),
+      label: $t("gameModes.experienced"),
       active: isPresetActive("experienced", currentMode),
       onClick: () => handlePresetClick("experienced"),
       dataTestId: "settings-game-mode-virtual-player-experienced",
     },
     {
-      label: $_("gameModes.pro"),
+      label: $t("gameModes.pro"),
       active: isPresetActive("pro", currentMode),
       onClick: () => handlePresetClick("pro"),
       dataTestId: "settings-game-mode-virtual-player-pro",
     },
     {
-      label: $_("gameModes.timed"),
+      label: $t("gameModes.timed"),
       active: isPresetActive("timed", currentMode),
       onClick: () => handlePresetClick("timed"),
       dataTestId: "settings-game-mode-virtual-player-timed",
@@ -118,11 +118,11 @@
 <div class="game-mode-widget" data-testid="game-mode-widget">
   {#if activeMode === "online"}
     <div class="online-lock-overlay" data-testid="game-mode-widget-locked">
-      <span>{$_("gameModes.notAvailableInOnline")}</span>
+      <span>{$t("gameModes.notAvailableInOnline")}</span>
     </div>
   {/if}
 
-  <h3 class="widget-title">{$_("gameModes.title")}</h3>
+  <h3 class="widget-title">{$t("gameModes.title")}</h3>
 
   {#if activeMode === "local"}
     <ButtonGroup options={localOptions} />
@@ -135,7 +135,7 @@
     class:settings-expander-closed={!$uiStateStore.isSettingsExpanderOpen}
   >
     {#if descriptionKey}
-      {$_(descriptionKey)}
+      {$t(descriptionKey as import("$lib/types/i18n").TranslationKey)}
     {/if}
   </div>
 </div>

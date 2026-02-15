@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import NotoEmoji from "$lib/components/NotoEmoji.svelte";
 
@@ -16,7 +16,7 @@
         class="play-btn-circle"
         on:click={onPlay}
         data-testid="center-play-btn"
-        aria-label={$_("mainMenu.virtualPlayer")}
+        aria-label={$t("mainMenu.virtualPlayer")}
     >
         <div class="play-icon">
             <NotoEmoji name="crown" size="100%" />

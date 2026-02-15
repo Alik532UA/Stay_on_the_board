@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import type { FeedbackType } from "$lib/services/feedbackService";
     import { createEventDispatcher } from "svelte";
@@ -26,7 +26,7 @@
 <div class="form-container">
     {#if selectedType === "improvement" || selectedType === "bug"}
         <div class="form-group">
-            <label for="fb-page">{$_("ui.feedback.pageLabel")}</label>
+            <label for="fb-page">{$t("ui.feedback.pageLabel")}</label>
             <input
                 id="fb-page"
                 type="text"
@@ -38,7 +38,7 @@
 
     {#if selectedType === "improvement"}
         <div class="form-group">
-            <label for="fb-text">{$_("ui.feedback.improvementLabel")} *</label>
+            <label for="fb-text">{$t("ui.feedback.improvementLabel")} *</label>
             <textarea
                 id="fb-text"
                 bind:value={textContent}
@@ -50,7 +50,7 @@
 
     {#if selectedType === "reward_suggestion"}
         <div class="form-group">
-            <label for="fb-reward">{$_("ui.feedback.rewardLabel")} *</label>
+            <label for="fb-reward">{$t("ui.feedback.rewardLabel")} *</label>
             <textarea
                 id="fb-reward"
                 bind:value={textContent}
@@ -64,7 +64,7 @@
     {#if selectedType === "bug"}
         <div class="form-group">
             <label for="fb-actual"
-                >{$_("ui.feedback.actualResultLabel")} *</label
+                >{$t("ui.feedback.actualResultLabel")} *</label
             >
             <textarea
                 id="fb-actual"
@@ -75,7 +75,7 @@
         </div>
         <div class="form-group">
             <label for="fb-expected"
-                >{$_("ui.feedback.expectedResultLabel")} *</label
+                >{$t("ui.feedback.expectedResultLabel")} *</label
             >
             <textarea
                 id="fb-expected"
@@ -88,7 +88,7 @@
 
     {#if selectedType === "other"}
         <div class="form-group">
-            <label for="fb-desc">{$_("ui.feedback.descriptionLabel")} *</label>
+            <label for="fb-desc">{$t("ui.feedback.descriptionLabel")} *</label>
             <textarea
                 id="fb-desc"
                 bind:value={textContent}
@@ -105,7 +105,7 @@
             on:click={goBack}
             disabled={isSubmitting}
         >
-            ← {$_("ui.goBack")}
+            ← {$t("ui.goBack")}
         </StyledButton>
         <StyledButton
             variant="primary"
@@ -113,7 +113,7 @@
             on:click={handleSubmit}
             disabled={isSubmitting}
         >
-            {isSubmitting ? $_("common.loading") : $_("ui.feedback.submit")}
+            {isSubmitting ? $t("common.loading") : $t("ui.feedback.submit")}
         </StyledButton>
     </div>
 </div>

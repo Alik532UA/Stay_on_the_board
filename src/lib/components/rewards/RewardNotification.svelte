@@ -1,7 +1,8 @@
 <script lang="ts">
     import { notificationStore } from "$lib/stores/notificationStore";
     import NotoEmoji from "$lib/components/NotoEmoji.svelte"; // Імпорт
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
+    import type { TranslationKey } from "$lib/types/i18n";
     import { flip } from "svelte/animate";
     import { fly } from "svelte/transition";
 
@@ -24,10 +25,14 @@
             {/if}
             <div class="content">
                 {#if notification.titleKey}
-                    <div class="title">{$_(notification.titleKey)}</div>
+                    <div class="title">
+                        {$t(notification.titleKey as TranslationKey)}
+                    </div>
                 {/if}
                 {#if notification.messageKey}
-                    <div class="message">{$_(notification.messageKey)}</div>
+                    <div class="message">
+                        {$t(notification.messageKey as TranslationKey)}
+                    </div>
                 {:else if notification.messageRaw}
                     <div class="message">{notification.messageRaw}</div>
                 {/if}

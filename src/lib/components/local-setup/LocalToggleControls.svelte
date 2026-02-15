@@ -1,6 +1,6 @@
 <script lang="ts">
     import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { logService } from "$lib/services/logService.js";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
 
@@ -10,7 +10,7 @@
 <div class="settings-list-group">
     <!-- ToggleButton: Режим заблокованих клітинок -->
     <ToggleButton
-        label={$_("gameControls.blockMode")}
+        label={$t("gameControls.blockMode")}
         bind:checked={settings.blockModeEnabled}
         on:toggle={() => {
             const newCheckedState = !settings.blockModeEnabled;
@@ -26,7 +26,7 @@
 
     <!-- ToggleButton: Автоматично приховувати дошку -->
     <ToggleButton
-        label={$_("gameModes.autoHideBoard")}
+        label={$t("gameModes.autoHideBoard")}
         bind:checked={settings.autoHideBoard}
         on:toggle={() => {
             const newCheckedState = !settings.autoHideBoard;
@@ -42,7 +42,7 @@
 
     <!-- ToggleButton: Заборонити змінювати правила -->
     <ToggleButton
-        label={$_("localGame.lockSettings")}
+        label={$t("localGame.lockSettings")}
         bind:checked={settings.lockSettings}
         on:toggle={() => {
             const newCheckedState = !settings.lockSettings;

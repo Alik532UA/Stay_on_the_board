@@ -2,7 +2,7 @@
     import { columnStyleMode } from "$lib/stores/columnStyleStore";
     import { layoutStore } from "$lib/stores/layoutStore";
     import { logService } from "$lib/services/logService.js";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { blurOnClick } from "$lib/utils/actions";
     import { customTooltip } from "$lib/actions/customTooltip.js";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
@@ -13,7 +13,7 @@
     class="settings-expander__setting-item"
     data-testid="settings-layout-container"
 >
-    <span class="settings-expander__label">{$_("ui.moveMenuItems")}</span>
+    <span class="settings-expander__label">{$t("ui.moveMenuItems")}</span>
     <div
         style="display: flex; gap: 12px;"
         data-testid="settings-layout-buttons"
@@ -41,8 +41,7 @@
             class="settings-expander__square-btn"
             use:blurOnClick
             aria-label="Скинути положення меню"
-            use:customTooltip={$_("ui.resetMenuLayout") ||
-                "Скинути положення елементів меню"}
+            use:customTooltip={$t("ui.resetMenuLayout")}
             on:click={() => layoutStore.resetLayout()}
         >
             <span

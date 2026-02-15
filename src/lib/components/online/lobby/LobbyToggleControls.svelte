@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import ToggleButton from "$lib/components/ToggleButton.svelte";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import type { Room } from "$lib/types/online";
@@ -17,7 +17,7 @@
     <!-- Автоматично приховувати дошку -->
     <div class="toggle-row">
         <ToggleButton
-            label={$_("gameModes.autoHideBoard")}
+            label={$t("gameModes.autoHideBoard")}
             checked={room.settings.autoHideBoard}
             disabled={!canEditSettings}
             on:toggle={() =>
@@ -29,7 +29,7 @@
     <!-- Режим блокування -->
     <div class="toggle-row">
         <ToggleButton
-            label={$_("gameControls.blockMode")}
+            label={$t("gameControls.blockMode")}
             checked={room.settings.blockModeEnabled}
             disabled={!canEditSettings}
             on:toggle={() =>
@@ -44,7 +44,7 @@
     <!-- Заборонити зміни під час гри -->
     <div class="toggle-row">
         <ToggleButton
-            label={$_("localGame.lockSettings")}
+            label={$t("localGame.lockSettings")}
             checked={room.settings.settingsLocked}
             disabled={!canEditSettings}
             on:toggle={() =>
@@ -60,7 +60,7 @@
         <!-- Host controls as normal toggle row -->
         <div class="toggle-row" transition:slide>
             <ToggleButton
-                label={$_("onlineMenu.lobby.allowGuestSettings")}
+                label={$t("onlineMenu.lobby.allowGuestSettings")}
                 checked={room.allowGuestSettings}
                 on:toggle={() =>
                     onUpdateRoomSetting(
@@ -79,7 +79,7 @@
             data-testid="host-only-hint"
         >
             <SvgIcons name="lock" width="14" height="14" />
-            {$_("onlineMenu.lobby.hostOnlySettings")}
+            {$t("onlineMenu.lobby.hostOnlySettings")}
         </div>
     {/if}
 </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import type { Room } from "$lib/types/online";
     import type { GameSettingsState } from "$lib/stores/gameSettingsStore";
@@ -24,7 +24,7 @@
     <div class="settings-header">
         <h3>
             <SvgIcons name="editing" width="20" height="20" />
-            {$_("settings.title")}
+            {$t("settings.title")}
         </h3>
     </div>
 

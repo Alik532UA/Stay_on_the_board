@@ -19,6 +19,7 @@
   import { boardStore } from "$lib/stores/boardStore";
   import { uiStateStore } from "$lib/stores/uiStateStore";
   import BoardHiddenInfoWidget from "./BoardHiddenInfoWidget.svelte";
+  import { t } from "$lib/i18n/typedI18n";
   import StaticGridLayer from "./parts/StaticGridLayer.svelte";
   import EffectsLayer from "./parts/EffectsLayer.svelte";
   import InteractionLayer from "./parts/InteractionLayer.svelte";
@@ -69,11 +70,11 @@
       variant: "menu",
       dataTestId: "board-click-modal",
       props: {
-        titleKey: "modal.boardClickTitle",
-        contentKey: "modal.boardClickContent",
+        titleKey: "modal.boardClickTitle" as const,
+        contentKey: "modal.boardClickContent" as const,
         actions: [
           {
-            labelKey: "modal.ok",
+            labelKey: "modal.ok" as const,
             variant: "primary",
             isHot: true,
             onClick: () => modalStore.closeModal(),

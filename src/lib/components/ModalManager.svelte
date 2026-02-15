@@ -4,7 +4,9 @@
 	import { userActionService } from "$lib/services/userActionService";
 	import { get } from "svelte/store";
 	import { modalStore } from "$lib/stores/modalStore";
-	import { _, locale } from "svelte-i18n";
+	import { t as tStore } from "$lib/i18n/typedI18n";
+	import type { TranslationKey } from "$lib/types/i18n";
+	import { locale } from "svelte-i18n";
 	import { gameSettingsStore } from "$lib/stores/gameSettingsStore";
 	import { speakText } from "$lib/services/speechService";
 	import GameOverContent from "$lib/components/modals/GameOverContent.svelte";
@@ -25,7 +27,7 @@
 						: "modal.computerNoMovesContent";
 
 				if (get(gameSettingsStore).speakModalTitles) {
-					const title = get(_)(titleKey);
+					const title = get(tStore)(titleKey as TranslationKey);
 					const lang = get(locale) || "uk";
 					const voiceURI = get(gameSettingsStore).selectedVoiceURI;
 					speakText(title, lang, voiceURI, undefined);
@@ -35,7 +37,7 @@
 					component: GameOverContent,
 					variant: "menu",
 					content: {
-						reason: get(_)(contentKey),
+						reason: get(tStore)(contentKey as TranslationKey),
 						scoreDetails: scoreDetails,
 						playerScores: playerScores,
 					},
@@ -43,8 +45,8 @@
 					props: {
 						titleKey: titleKey,
 						mode: "no-moves",
-						finishText: get(_)("modal.finishGameWithBonus", {
-							values: { bonus: boardSize },
+						finishText: get(tStore)("modal.finishGameWithBonus", {
+							bonus: boardSize,
 						}),
 						onContinue: () =>
 							userActionService.handleModalAction(

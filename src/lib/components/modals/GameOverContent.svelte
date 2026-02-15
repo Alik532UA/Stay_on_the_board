@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
+  import type { TranslationKey } from "$lib/types/i18n";
   import ScoreBonusExpander from "../widgets/ScoreBonusExpander.svelte";
   import NotoEmoji from "$lib/components/NotoEmoji.svelte";
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
@@ -12,7 +13,7 @@
   export let content: any;
 
   // Props налаштувань
-  export let titleKey: string = "modal.gameOverTitle";
+  export let titleKey: TranslationKey = "modal.gameOverTitle";
   export let titleValues: any = {};
   export let mode: "game-over" | "no-moves" = "game-over";
 
@@ -61,7 +62,7 @@
     data-testid={`${dataTestId}-title`}
     data-i18n-key={titleKey}
   >
-    {$_(titleKey, { values: titleValues })}
+    {$t(titleKey, titleValues)}
   </h2>
 
   <!-- Причина (текст) -->
@@ -117,7 +118,7 @@
         data-testid="score-details-container"
       >
         <div class="score-detail-row" data-testid="base-score">
-          {$_("modal.scoreDetails.baseScore")}
+          {$t("modal.scoreDetails.baseScore")}
           <span data-testid="base-score-value"
             >{scoreDetails.baseScore ?? 0}</span
           >
@@ -134,7 +135,7 @@
 
       {#if scoreDetails.totalPenalty > 0}
         <div class="score-detail-row penalty" data-testid="total-penalty">
-          {$_("modal.scoreDetails.penalty")}
+          {$t("modal.scoreDetails.penalty")}
           <span data-testid="total-penalty-value"
             >-{scoreDetails.totalPenalty}</span
           >
@@ -145,7 +146,7 @@
         {#if isCompactScoreMode}
           <div class="final-score-compact">
             <span class="final-score-label-inline"
-              >{$_("modal.scoreDetails.finalScore")}</span
+              >{$t("modal.scoreDetails.finalScore")}</span
             >
             <span
               class="final-score-value-inline"
@@ -156,7 +157,7 @@
           </div>
         {:else}
           <div class="final-score-label">
-            {$_("modal.scoreDetails.finalScore")}
+            {$t("modal.scoreDetails.finalScore")}
           </div>
           <div class="final-score-value" data-testid="final-score-value">
             {scoreDetails.totalScore ?? 0}
@@ -177,7 +178,7 @@
           on:click={onContinue}
           dataTestId="continue-game-no-moves-btn"
         >
-          {continueText || $_("modal.continueGame")}
+          {continueText || $t("modal.continueGame")}
         </StyledButton>
       {/if}
 
@@ -187,7 +188,7 @@
           on:click={onFinish}
           dataTestId="finish-game-with-bonus-btn"
         >
-          {finishText || $_("modal.finishGameWithBonus")}
+          {finishText || $t("modal.finishGameWithBonus")}
         </StyledButton>
       {/if}
     {:else}
@@ -199,7 +200,7 @@
           on:click={onPlayAgain}
           dataTestId="play-again-btn"
         >
-          {$_("modal.playAgain")}
+          {$t("modal.playAgain")}
         </StyledButton>
       {/if}
     {/if}
@@ -211,7 +212,7 @@
         on:click={onWatchReplay}
         dataTestId="watch-replay-btn"
       >
-        {$_("modal.watchReplay")}
+        {$t("modal.watchReplay")}
       </StyledButton>
     {/if}
 
@@ -222,7 +223,7 @@
         on:click={onLeaveLobby}
         dataTestId="leave-lobby-btn"
       >
-        {$_("modal.leaveLobby")}
+        {$t("modal.leaveLobby")}
       </StyledButton>
     {/if}
 
@@ -233,7 +234,7 @@
         on:click={onMainMenu}
         dataTestId="game-over-main-menu-btn"
       >
-        {$_("modal.mainMenu")}
+        {$t("modal.mainMenu")}
       </StyledButton>
     {/if}
   </div>

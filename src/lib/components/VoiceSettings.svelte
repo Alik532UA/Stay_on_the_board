@@ -1,7 +1,7 @@
 <script lang="ts">
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
   import { uiStateStore } from "$lib/stores/uiStateStore.js";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import ToggleButton from "./ToggleButton.svelte";
   import ButtonGroup from "$lib/components/ui/ButtonGroup.svelte";
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
@@ -26,7 +26,7 @@
   // Опції для порядку озвучення
   $: orderOptions = [
     {
-      label: $_("voiceSettings.dist_dir"),
+      label: $t("voiceSettings.dist_dir"),
       active: $gameSettingsStore.speechOrder === "dist_dir",
       onClick: () => {
         logService.ui("Speech order changed to dist_dir");
@@ -35,7 +35,7 @@
       dataTestId: "speech-order-dist-dir-btn",
     },
     {
-      label: $_("voiceSettings.dir_dist"),
+      label: $t("voiceSettings.dir_dist"),
       active: $gameSettingsStore.speechOrder === "dir_dist",
       onClick: () => {
         logService.ui("Speech order changed to dir_dist");
@@ -49,7 +49,7 @@
   $: speakForOptions = isOnlineMode
     ? [
         {
-          label: $_("voiceSettings.myMove"),
+          label: $t("voiceSettings.myMove"),
           active: $gameSettingsStore.speechFor.onlineMyMove,
           onClick: () => {
             logService.ui("Speak for MY move toggled");
@@ -63,7 +63,7 @@
           dataTestId: "speech-for-my-move-btn",
         },
         {
-          label: $_("voiceSettings.opponentMove"),
+          label: $t("voiceSettings.opponentMove"),
           active: $gameSettingsStore.speechFor.onlineOpponentMove,
           onClick: () => {
             logService.ui("Speak for OPPONENT move toggled");
@@ -80,7 +80,7 @@
       ]
     : [
         {
-          label: $_("voiceSettings.player"),
+          label: $t("voiceSettings.player"),
           active: $gameSettingsStore.speechFor.player,
           onClick: () => {
             logService.ui("Speak for player toggled");
@@ -94,7 +94,7 @@
           dataTestId: "speech-for-player-btn",
         },
         {
-          label: $_("voiceSettings.computer"),
+          label: $t("voiceSettings.computer"),
           active: $gameSettingsStore.speechFor.computer,
           onClick: () => {
             logService.ui("Speak for computer toggled");
@@ -117,25 +117,25 @@
     dataTestId="voice-settings-test-voice-btn"
     style="width: 100%;"
   >
-    {$_("voiceSettings.testVoice")}
+    {$t("voiceSettings.testVoice")}
   </StyledButton>
 </div>
 
 <div class="settings-section">
-  <span class="settings-label">{$_("voiceSettings.speed")}</span>
+  <span class="settings-label">{$t("voiceSettings.speed")}</span>
   <!-- FIX: Додано dataTestId для контейнера -->
   <ButtonGroup options={speedOptions} dataTestId="voice-settings-speed-group" />
 </div>
 
 <div class="settings-section">
-  <span class="settings-label">{$_("voiceSettings.order")}</span>
+  <span class="settings-label">{$t("voiceSettings.order")}</span>
   <!-- FIX: Додано dataTestId для контейнера -->
   <ButtonGroup options={orderOptions} dataTestId="voice-settings-order-group" />
 </div>
 
 <div class="settings-section">
   <ToggleButton
-    label={$_("voiceSettings.shortSpeech")}
+    label={$t("voiceSettings.shortSpeech")}
     checked={$gameSettingsStore.shortSpeech}
     on:toggle={() => {
       logService.ui("Short speech toggled");
@@ -149,7 +149,7 @@
 
 <div class="settings-section">
   <ToggleButton
-    label={$_("voiceSettings.speakModalTitles")}
+    label={$t("voiceSettings.speakModalTitles")}
     checked={$gameSettingsStore.speakModalTitles}
     on:toggle={() => {
       logService.ui("Speak modal titles toggled");
@@ -162,7 +162,7 @@
 </div>
 
 <div class="settings-section">
-  <span class="settings-label">{$_("voiceSettings.speakFor")}</span>
+  <span class="settings-label">{$t("voiceSettings.speakFor")}</span>
   <!-- FIX: Додано dataTestId для контейнера -->
   <ButtonGroup
     options={speakForOptions}

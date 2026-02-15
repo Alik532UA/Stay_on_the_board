@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { gameSettingsStore } from "$lib/stores/gameSettingsStore.js";
   import {
@@ -6,7 +6,7 @@
     isLoading,
     initializeVoices,
   } from "$lib/stores/voiceStore";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { get } from "svelte/store";
   import { speakTestPhrase } from "$lib/services/speechService";
 
@@ -28,10 +28,7 @@
     }
   });
 
-  /**
-   * @param {string} uri
-   */
-  function selectVoice(uri) {
+  function selectVoice(uri: string) {
     gameSettingsStore.updateSettings({ selectedVoiceURI: uri });
     speakTestPhrase();
   }
@@ -40,7 +37,7 @@
 {#if $isLoading}
   <div class="loader-container">
     <div class="loading-spinner"></div>
-    <p>{$_("voiceSettings.loading")}</p>
+    <p>{$t("voiceSettings.loading")}</p>
   </div>
 {:else if $availableVoices.length > 0}
   <div class="voice-list button-group" data-testid="voice-list">
@@ -58,7 +55,7 @@
 {:else}
   <div class="no-voices-container">
     <p class="no-voices-message">
-      {$_("voiceSettings.noVoices")}
+      {$t("voiceSettings.noVoices")}
     </p>
   </div>
 {/if}

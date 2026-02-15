@@ -2,7 +2,7 @@
     import { boardStore } from "$lib/stores/boardStore";
     import { userActionService } from "$lib/services/userActionService";
     import { logService } from "$lib/services/logService";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { get } from "svelte/store";
     import Stepper from "$lib/components/ui/Stepper.svelte";
 
@@ -24,7 +24,7 @@
 </script>
 
 <div class="settings-expander__setting-item">
-    <span class="settings-expander__label">{$_("settings.boardSize")}</span>
+    <span class="settings-expander__label">{$t("settings.boardSize")}</span>
 
     <!-- Використовуємо новий компонент Stepper -->
     <Stepper

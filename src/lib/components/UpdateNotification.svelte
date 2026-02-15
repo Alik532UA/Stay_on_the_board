@@ -1,5 +1,5 @@
-<script>
-  import { _ } from "svelte-i18n";
+<script lang="ts">
+  import { t } from "$lib/i18n/typedI18n";
   import { createEventDispatcher } from "svelte";
   import StyledButton from "$lib/components/ui/StyledButton.svelte";
 
@@ -11,11 +11,11 @@
 
 <div class="update-notice">
   <div class="text-container">
-    <p class="title">{$_("updateNotification.title")}</p>
-    <p class="description">{$_("updateNotification.description")}</p>
+    <p class="title">{$t("updateNotification.title")}</p>
+    <p class="description">{$t("updateNotification.description")}</p>
   </div>
   <StyledButton variant="primary" on:click={reload} style="width: 100%;">
-    {$_("updateNotification.updateButton")}
+    {$t("updateNotification.updateButton")}
   </StyledButton>
 </div>
 

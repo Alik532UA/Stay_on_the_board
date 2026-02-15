@@ -1,5 +1,6 @@
-<script>
-  import { _ } from "svelte-i18n";
+<script lang="ts">
+  import { t } from "$lib/i18n/typedI18n";
+  import type { TranslationKey } from "$lib/types/i18n";
   import { modalStore } from "$lib/stores/modalStore";
   import { onMount, onDestroy } from "svelte";
   import { logService } from "$lib/services/logService";
@@ -7,7 +8,7 @@
 
   // Props для навігації, які передаються з GameModeModal
   export let onOk = () => modalStore.closeModal();
-  export let onRules = null;
+  export let onRules: (() => void) | null = null;
 
   onMount(() => {
     logService.modal("[FAQModal] Component has been mounted.");
@@ -17,7 +18,7 @@
     logService.modal("[FAQModal] Component is being destroyed.");
   });
 
-  const faqItems = [
+  const faqItems: Array<{ q: TranslationKey; a: TranslationKey }> = [
     { q: "faq.q1", a: "faq.a1" },
     { q: "faq.q8", a: "faq.a8" },
     { q: "faq.q7", a: "faq.a7" },
@@ -38,7 +39,7 @@
     data-testid="faq-modal-title"
     data-i18n-key="faq.title"
   >
-    {$_("faq.title")}
+    {$t("faq.title")}
   </h2>
 
   <!-- FIX: Додано data-testid="faq-list" -->
@@ -46,7 +47,7 @@
     {#each faqItems as item, i}
       <details class="faq-item" open={i === 0}>
         <summary>
-          {$_(item.q)}
+          {$t(item.q)}
           <span class="faq-arrow" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="24" height="24">
               <polyline
@@ -60,7 +61,7 @@
             </svg>
           </span>
         </summary>
-        <p>{$_(item.a)}</p>
+        <p>{$t(item.a)}</p>
       </details>
     {/each}
   </div>
@@ -72,7 +73,7 @@
       on:click={onOk}
       dataTestId="faq-modal-ok-btn"
     >
-      {$_("modal.ok")}
+      {$t("modal.ok")}
     </StyledButton>
 
     {#if onRules}
@@ -81,7 +82,7 @@
         on:click={onRules}
         dataTestId="faq-modal-rules-btn"
       >
-        {$_("rulesPage.title")}
+        {$t("rulesPage.title")}
       </StyledButton>
     {/if}
   </div>

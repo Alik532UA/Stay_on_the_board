@@ -4,7 +4,9 @@ import { gameEventBus } from './gameEventBus';
 import { roomService } from './roomService';
 import { roomPlayerService } from './room/roomPlayerService';
 import { get } from 'svelte/store';
-import { _, locale } from 'svelte-i18n';
+import { t as tStore } from '$lib/i18n/typedI18n';
+import type { TranslationKey } from '$lib/types/i18n';
+import { locale } from 'svelte-i18n';
 import { gameSettingsStore } from '$lib/stores/gameSettingsStore';
 import { speakText } from './speechService';
 import type { Player } from '$lib/models/player';
@@ -28,7 +30,7 @@ function showGameOverModal(payload: GameOverPayload) {
   let titleKey = 'modal.gameOverTitle';
   let content: GameOverModalContent = {
     reasonKey: reasonKey,
-    reason: get(_)(reasonKey, { values: reasonValues }),
+    reason: get(tStore)(reasonKey as TranslationKey, reasonValues || undefined),
     scoreDetails: finalScoreDetails
   };
 
@@ -56,7 +58,7 @@ function showGameOverModal(payload: GameOverPayload) {
     if (winners && winners.length === 1) {
       speechValues.winnerName = winners[0].name;
     }
-    const title = get(_)(titleKey, { values: speechValues });
+    const title = get(tStore)(titleKey as TranslationKey, speechValues);
     const lang = get(locale) || 'uk';
     const voiceURI = get(gameSettingsStore).selectedVoiceURI;
     speakText(title, lang, voiceURI, undefined);
@@ -90,7 +92,7 @@ function showGameOverModal(payload: GameOverPayload) {
         if (gameType === 'online') {
           const session = roomService.getSession();
           if (session.roomId && session.playerId) {
-             await roomPlayerService.leaveRoom(session.roomId, session.playerId);
+            await roomPlayerService.leaveRoom(session.roomId, session.playerId);
           }
         }
         navigationService.goToMainMenu();
@@ -98,7 +100,7 @@ function showGameOverModal(payload: GameOverPayload) {
       onLeaveLobby: gameType === 'online' ? async () => {
         const session = roomService.getSession();
         if (session.roomId && session.playerId) {
-            await roomPlayerService.leaveRoom(session.roomId, session.playerId);
+          await roomPlayerService.leaveRoom(session.roomId, session.playerId);
         }
         navigationService.goTo('/online');
       } : undefined

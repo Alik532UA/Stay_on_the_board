@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
+    import type { TranslationKey } from "$lib/types/i18n";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import type { RoomSummary } from "$lib/types/online";
     import { createEventDispatcher } from "svelte";
@@ -18,13 +19,13 @@
     <div class="card-header">
         <span class="room-name">{room.name}</span>
         <span class="status-badge {room.status}">
-            {$_(`onlineMenu.${room.status}`)}
+            {$t(`onlineMenu.${room.status}` as TranslationKey)}
         </span>
     </div>
 
     <div class="card-body">
         <div class="col">
-            <span class="info-label">{$_("onlineMenu.players")}</span>
+            <span class="info-label">{$t("onlineMenu.players")}</span>
             <div class="players-info">
                 <span class="count-text"
                     >{room.playerCount} / {room.maxPlayers}</span
@@ -53,14 +54,14 @@
                 class="full-width-btn"
             >
                 {#if joiningRoomId === room.id}
-                    {$_("common.loading")}
+                    {$t("common.loading")}
                 {:else}
-                    {$_("onlineMenu.join")}
+                    {$t("onlineMenu.join")}
                 {/if}
             </StyledButton>
         {:else}
             <div class="spectate-placeholder">
-                {$_("onlineMenu.status") === "Full" ||
+                {$t("onlineMenu.status") === "Full" ||
                 room.playerCount >= room.maxPlayers
                     ? "Full"
                     : "-"}

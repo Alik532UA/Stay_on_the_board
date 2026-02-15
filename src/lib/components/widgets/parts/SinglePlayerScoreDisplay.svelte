@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { modalStore } from "$lib/stores/modalStore";
     import SimpleModalContent from "../../modals/SimpleModalContent.svelte";
     import { customTooltip } from "$lib/actions/customTooltip.js";
@@ -53,7 +53,7 @@
 
 <div class="score-display">
     <span class="score-label-text">
-        {$_("gameBoard.scoreLabel")}:
+        {$t("gameBoard.scoreLabel")}:
     </span>
     <span
         class="score-value-clickable"
@@ -63,7 +63,7 @@
             (e.key === "Enter" || e.key === " ") && showScoreInfo()}
         role="button"
         tabindex="0"
-        use:customTooltip={$_("modal.scoreInfoTitle")}
+        use:customTooltip={$t("modal.scoreInfoTitle")}
         data-testid="score-value">{score}</span
     >
     {#if scoreStore && scoreStore.penaltyPoints > 0}
@@ -72,7 +72,7 @@
             on:click={showPenaltyInfo}
             on:keydown={(e) =>
                 (e.key === "Enter" || e.key === " ") && showPenaltyInfo()}
-            use:customTooltip={$_("gameBoard.penaltyHint")}
+            use:customTooltip={$t("gameBoard.penaltyHint")}
             role="button"
             tabindex="0"
             data-testid="penalty-display">- {scoreStore.penaltyPoints}</span

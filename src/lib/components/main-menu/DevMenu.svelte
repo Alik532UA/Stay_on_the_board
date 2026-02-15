@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { goto } from "$app/navigation";
     import { base } from "$app/paths";
     import { uiStateStore } from "$lib/stores/uiStateStore.js";
@@ -51,7 +51,7 @@
             on:click={handleDevMenuBtn}
             dataTestId="dev-menu-dnd-btn"
         >
-            {$_("mainMenu.dragAndDropTest")}
+            {$t("mainMenu.dragAndDropTest")}
         </StyledButton>
 
         <StyledButton
@@ -108,12 +108,12 @@
                 onPlayVsComputer();
                 onClose();
             }}
-            dataTestId="training-btn">{$_("mainMenu.training")}</StyledButton
+            dataTestId="training-btn">{$t("mainMenu.training")}</StyledButton
         >
         <StyledButton
             variant="menu"
             on:click={handleTimedGame}
-            dataTestId="timed-game-btn">{$_("mainMenu.timedGame")}</StyledButton
+            dataTestId="timed-game-btn">{$t("mainMenu.timedGame")}</StyledButton
         >
         <StyledButton
             variant="menu"
@@ -121,13 +121,13 @@
                 onLocalGame();
                 onClose();
             }}
-            dataTestId="local-game-btn">{$_("mainMenu.localGame")}</StyledButton
+            dataTestId="local-game-btn">{$t("mainMenu.localGame")}</StyledButton
         >
         <StyledButton
             variant="menu"
             on:click={handleOnlineGame}
             dataTestId="online-game-btn"
-            >{$_("mainMenu.playOnline")}</StyledButton
+            >{$t("mainMenu.playOnline")}</StyledButton
         >
     </div>
 </div>

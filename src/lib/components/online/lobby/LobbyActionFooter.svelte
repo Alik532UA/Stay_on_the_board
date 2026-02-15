@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import { createEventDispatcher } from "svelte";
@@ -30,9 +30,9 @@
         disabled={roomStatus !== "waiting"}
     >
         {#if isMyPlayerReady}
-            {$_("onlineMenu.lobby.notReady")}
+            {$t("onlineMenu.lobby.notReady")}
         {:else}
-            {$_("onlineMenu.lobby.ready")}
+            {$t("onlineMenu.lobby.ready")}
         {/if}
     </StyledButton>
 
@@ -54,7 +54,7 @@
                     width="20"
                     height="20"
                 />
-                {$_("onlineMenu.lobby.startGame")}
+                {$t("onlineMenu.lobby.startGame")}
             </span>
         </StyledButton>
     {/if}

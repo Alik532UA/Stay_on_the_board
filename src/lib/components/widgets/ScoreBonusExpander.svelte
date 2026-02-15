@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { slide } from 'svelte/transition';
-  import { createEventDispatcher } from 'svelte';
-  import { _ } from 'svelte-i18n';
+  import { slide } from "svelte/transition";
+  import { createEventDispatcher } from "svelte";
+  import { t } from "$lib/i18n/typedI18n";
+  import type { TranslationKey } from "$lib/types/i18n";
 
   export let bonusDetails: any;
   export let totalBonus: number;
@@ -17,45 +18,55 @@
 
   function toggle() {
     isOpen = !isOpen;
-    dispatch('toggle', { isOpen });
+    dispatch("toggle", { isOpen });
   }
 
   const bonusKeys = [
-    'sizeBonus',
-    'blockModeBonus',
-    'jumpBonus',
-    'noMovesBonus',
-    'distanceBonus',
-    'finishBonus'
+    "sizeBonus",
+    "blockModeBonus",
+    "jumpBonus",
+    "noMovesBonus",
+    "distanceBonus",
+    "finishBonus",
   ];
 
   // Use reactive statements instead of {@const}
-  $: fullText = $_('modal.scoreDetails.bonusScore', { values: { bonus: totalBonus } });
-  $: parts = fullText.split('+');
-
+  $: fullText = $t("modal.scoreDetails.bonusScore", { bonus: totalBonus });
+  $: parts = fullText.split("+");
 </script>
 
 <div class="bonus-expander" class:open={isOpen}>
-  <div 
-    class="expander-summary" 
-    on:click={toggle} 
-    on:keydown={e => (e.key === 'Enter' || e.key === ' ') && toggle()} 
-    role="button" 
-    tabindex="0" 
+  <div
+    class="expander-summary"
+    on:click={toggle}
+    on:keydown={(e) => (e.key === "Enter" || e.key === " ") && toggle()}
+    role="button"
+    tabindex="0"
     aria-expanded={isOpen}
     data-testid="bonus-expander-summary"
   >
     <span class="bonus-score-summary" data-testid="total-bonus-summary">
       {parts[0]}<span class="bonus-value">+{parts[1] || totalBonus}</span>
     </span>
-    <span class="arrow" class:open={isOpen} aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <span class="arrow" class:open={isOpen} aria-hidden="true"
+      ><svg viewBox="0 0 24 24" width="24" height="24"
+        ><polyline
+          points="6 9 12 15 18 9"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        /></svg
+      ></span
+    >
   </div>
   {#if isOpen}
     <div class="expander-content" transition:slide|local>
       {#each bonusKeys as key}
         {#if bonusDetails[key] > 0}
           <div class="score-detail-row">
-            <span>{$_(`modal.scoreDetails.${key}`)}</span>
+            <span>{$t(`modal.scoreDetails.${key}` as TranslationKey)}</span>
             <span data-testid={`${key}-value`}>+{bonusDetails[key]}</span>
           </div>
         {/if}
@@ -66,7 +77,7 @@
 
 <style>
   .bonus-expander {
-    background: rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 12px;
     margin-bottom: 20px;
     transition: background 0.2s;
@@ -93,7 +104,7 @@
   }
 
   .arrow {
-    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform: rotate(0deg);
   }
 

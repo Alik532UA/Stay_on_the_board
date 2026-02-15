@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import type { ChatMessage } from "$lib/services/roomService";
     import { afterUpdate } from "svelte";
 
@@ -38,7 +38,7 @@
 >
     {#if messages.length === 0}
         <div class="empty-chat" data-testid="chat-empty-message">
-            {$_("onlineMenu.chat.empty")}
+            {$t("onlineMenu.chat.empty")}
         </div>
     {/if}
     {#each messages as msg (msg.id)}

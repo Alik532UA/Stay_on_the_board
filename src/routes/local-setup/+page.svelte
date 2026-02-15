@@ -2,7 +2,7 @@
   import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
   import PlayerManager from "$lib/components/local-setup/PlayerManager.svelte";
   import LocalGameSettings from "$lib/components/local-setup/LocalGameSettings.svelte";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { onMount } from "svelte";
   import { gameService } from "$lib/services/gameService";
   import { getRandomUnusedColor } from "$lib/utils/playerUtils";
@@ -35,7 +35,7 @@
 <div class="page-container">
   <div class="header-container">
     <FloatingBackButton />
-    <h1 data-testid="local-setup-title">{$_("localGame.title")}</h1>
+    <h1 data-testid="local-setup-title">{$t("localGame.title")}</h1>
   </div>
 
   <div class="setup-grid">

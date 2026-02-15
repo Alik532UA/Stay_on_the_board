@@ -16,6 +16,7 @@ export interface AnimationMove {
   distance: number;
   row?: number;
   col?: number;
+  to?: { row: number; col: number };
 }
 
 export interface AnimationState {

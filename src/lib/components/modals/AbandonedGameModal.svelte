@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import { roomService } from "$lib/services/roomService";
     import { navigationService } from "$lib/services/navigationService";
@@ -47,11 +47,11 @@
 
 <div class="abandoned-game-content" data-testid="abandoned-game-content">
     <h2 class="modal-title-menu" data-testid="abandoned-game-title">
-        {$_("onlineMenu.abandonedGame.title")}
+        {$t("onlineMenu.abandonedGame.title")}
     </h2>
 
     <p class="message" data-testid="abandoned-game-message">
-        {$_("onlineMenu.abandonedGame.message")}
+        {$t("onlineMenu.abandonedGame.message")}
     </p>
 
     <div class="actions">
@@ -62,7 +62,7 @@
             dataTestId="return-to-game-btn"
             class="action-btn"
         >
-            {$_("onlineMenu.abandonedGame.return")}
+            {$t("onlineMenu.abandonedGame.return")}
         </StyledButton>
 
         <StyledButton
@@ -72,7 +72,7 @@
             dataTestId="leave-game-btn"
             class="action-btn"
         >
-            {$_("onlineMenu.abandonedGame.leave")}
+            {$t("onlineMenu.abandonedGame.leave")}
         </StyledButton>
     </div>
 </div>

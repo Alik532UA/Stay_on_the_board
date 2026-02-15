@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { roomService } from "$lib/services/roomService";
     import { modalStore } from "$lib/stores/modalStore";
     import { goto } from "$app/navigation";
@@ -46,7 +46,7 @@
             logService.error("[CreateRoomModal] Failed to create room", e);
             const msg = e.message?.includes("Timeout")
                 ? "Не вдалося з'єднатися з сервером."
-                : $_("onlineMenu.errors.createFailed");
+                : $t("onlineMenu.errors.createFailed");
             alert(msg);
         } finally {
             isCreating = false;
@@ -56,11 +56,11 @@
 
 <!-- FIX: Додано data-testid та структуру меню -->
 <div class="create-room-content" data-testid="create-room-content">
-    <h2 class="modal-title-menu">{$_("onlineMenu.createRoomTitle")}</h2>
+    <h2 class="modal-title-menu">{$t("onlineMenu.createRoomTitle")}</h2>
 
     <div class="form-group">
         <span class="label" data-testid="room-name-label"
-            >{$_("onlineMenu.roomName")}</span
+            >{$t("onlineMenu.roomName")}</span
         >
         <div class="name-editor-wrapper">
             <EditableText
@@ -68,7 +68,7 @@
                 canEdit={true}
                 onRandom={generateRandomRoomName}
                 on:change={handleRoomNameChange}
-                placeholder={$_("onlineMenu.roomNamePlaceholder")}
+                placeholder={$t("onlineMenu.roomNamePlaceholder")}
                 dataTestId="room-name-input"
             />
         </div>
@@ -81,7 +81,7 @@
                 bind:checked={isPrivate}
                 data-testid="private-room-checkbox"
             />
-            <span>{$_("onlineMenu.privateRoom")}</span>
+            <span>{$t("onlineMenu.privateRoom")}</span>
         </label>
     </div>
 
@@ -93,7 +93,7 @@
             disabled={isCreating}
             dataTestId="create-room-confirm-btn"
         >
-            {isCreating ? $_("common.loading") : $_("onlineMenu.create")}
+            {isCreating ? $t("common.loading") : $t("onlineMenu.create")}
         </StyledButton>
 
         <StyledButton
@@ -101,7 +101,7 @@
             on:click={() => modalStore.closeModal()}
             dataTestId="create-room-cancel-btn"
         >
-            {$_("onlineMenu.cancel")}
+            {$t("onlineMenu.cancel")}
         </StyledButton>
     </div>
 </div>

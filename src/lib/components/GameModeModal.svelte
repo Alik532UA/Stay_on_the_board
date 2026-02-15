@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { onMount } from "svelte";
   import hotkeyService from "$lib/services/hotkeyService";
   import { modalStore } from "$lib/stores/modalStore";
@@ -103,7 +103,7 @@
   {#if extended}
     <!-- 1. Online Game -->
     <GameModeButton
-      text={$_("mainMenu.playOnline")}
+      text={$t("mainMenu.playOnline")}
       dataTestId="online-game-btn"
       on:click={handleOnlineGame}
     >
@@ -117,7 +117,7 @@
 
   <!-- 2. Single Player Modes -->
   <GameModeButton
-    text={$_("gameModes.beginner")}
+    text={$t("gameModes.beginner")}
     dataTestId="beginner-mode-btn"
     on:click={() => selectMode("beginner")}
   >
@@ -125,7 +125,7 @@
   </GameModeButton>
 
   <GameModeButton
-    text={$_("gameModes.experienced")}
+    text={$t("gameModes.experienced")}
     dataTestId="experienced-mode-btn"
     on:click={() => selectMode("experienced")}
   >
@@ -133,7 +133,7 @@
   </GameModeButton>
 
   <GameModeButton
-    text={$_("gameModes.pro")}
+    text={$t("gameModes.pro")}
     dataTestId="pro-mode-btn"
     on:click={() => selectMode("pro")}
   >
@@ -142,7 +142,7 @@
 
   {#if extended}
     <GameModeButton
-      text={$_("mainMenu.timedGame")}
+      text={$t("mainMenu.timedGame")}
       dataTestId="timed-game-btn"
       on:click={() => selectMode("timed")}
     >
@@ -153,7 +153,7 @@
 
     <!-- 3. Local Game -->
     <GameModeButton
-      text={$_("mainMenu.localGame")}
+      text={$t("mainMenu.localGame")}
       dataTestId="local-game-btn"
       on:click={handleLocalGame}
     >

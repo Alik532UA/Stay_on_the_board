@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
+  import type { TranslationKey } from "$lib/types/i18n";
   import {
     gameSettingsStore,
     type KeybindingAction,
@@ -75,11 +76,12 @@
 
 <div class="hotkeys-tab">
   {#each actionGroups as group}
-    <h3 class="group-title">{$_(group.title)}</h3>
+    <h3 class="group-title">{$t(group.title as TranslationKey)}</h3>
     <div class="key-grid">
       {#each group.actions as action}
         <div class="key-item">
-          <span class="action-name">{$_(`controlsPage.actions.${action}`)}</span
+          <span class="action-name"
+            >{$t(`controlsPage.actions.${action}` as TranslationKey)}</span
           >
           <div class="key-buttons-container">
             {#each keybindings[action] || [] as key, i}
@@ -95,7 +97,7 @@
             {#if (keybindings[action]?.length || 0) < 8}
               {#if listeningFor?.action === action && listeningFor?.index === -1}
                 <span class="press-key-hint"
-                  >{$_("controlsPage.pressKey") || "Натисніть клавішу"}</span
+                  >{$t("controlsPage.pressKey") || "Натисніть клавішу"}</span
                 >
               {:else}
                 <button
@@ -112,10 +114,10 @@
 
   <div class="controls-footer">
     {#if conflicts.size > 0}
-      <p class="conflict-warning">{$_("controlsPage.keyConflict")}</p>
+      <p class="conflict-warning">{$t("controlsPage.keyConflict")}</p>
     {/if}
     <button class="reset-button" on:click={userActionService.resetKeybindings}>
-      {$_("controlsPage.resetToDefaults")}
+      {$t("controlsPage.resetToDefaults")}
     </button>
   </div>
 </div>

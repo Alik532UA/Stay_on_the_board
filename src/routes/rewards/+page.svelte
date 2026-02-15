@@ -6,7 +6,7 @@
     import FloatingBackButton from "$lib/components/FloatingBackButton.svelte";
     import PersonalBestSection from "$lib/components/rewards/PersonalBestSection.svelte";
     import LeaderboardSection from "$lib/components/rewards/LeaderboardSection.svelte";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { onMount, onDestroy } from "svelte";
     import hotkeyService from "$lib/services/hotkeyService";
     import type { UnlockedReward, Achievement } from "$lib/types/rewards";
@@ -64,7 +64,7 @@
 <div class="rewards-page">
     <div class="header">
         <FloatingBackButton />
-        <h1>{$_("rewards.pageTitle")}</h1>
+        <h1>{$t("rewards.pageTitle")}</h1>
         <div class="spacer"></div>
     </div>
 

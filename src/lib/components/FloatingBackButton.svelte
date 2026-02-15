@@ -1,6 +1,6 @@
 <script lang="ts">
   import { navigationService } from "$lib/services/navigationService.js";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { customTooltip } from "$lib/actions/customTooltip.js";
   import { logService } from "$lib/services/logService.js";
 
@@ -20,8 +20,8 @@
 <button
   data-testid="floating-back-btn"
   class="floating-back-btn"
-  aria-label={$_("ui.goBack") || "Повернутися назад"}
-  use:customTooltip={$_("ui.goBack") || "Повернутися назад"}
+  aria-label={$t("ui.goBack") || "Повернутися назад"}
+  use:customTooltip={$t("ui.goBack") || "Повернутися назад"}
   on:click={handleClick}
 >
   <svg

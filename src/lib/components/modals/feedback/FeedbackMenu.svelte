@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import GameModeButton from "$lib/components/game-modes/GameModeButton.svelte";
     import NotoEmoji from "$lib/components/NotoEmoji.svelte";
     import type { FeedbackType } from "$lib/services/feedbackService";
@@ -19,7 +19,7 @@
 <div class="menu-list">
     <!-- 1. Запропонувати покращення -->
     <GameModeButton
-        text={$_("ui.feedback.typeImprovement")}
+        text={$t("ui.feedback.typeImprovement")}
         dataTestId="fb-type-improvement"
         on:click={() => selectType("improvement")}
     >
@@ -30,7 +30,7 @@
 
     <!-- 2. Повідомити про проблему -->
     <GameModeButton
-        text={$_("ui.feedback.typeBug")}
+        text={$t("ui.feedback.typeBug")}
         dataTestId="fb-type-bug"
         on:click={() => selectType("bug")}
     >
@@ -39,7 +39,7 @@
 
     <!-- 3. Запропонувати нагороду -->
     <GameModeButton
-        text={$_("ui.feedback.typeReward")}
+        text={$t("ui.feedback.typeReward")}
         dataTestId="fb-type-reward"
         on:click={() => selectType("reward_suggestion")}
     >
@@ -48,7 +48,7 @@
 
     <!-- 4. Інше -->
     <GameModeButton
-        text={$_("ui.feedback.typeOther")}
+        text={$t("ui.feedback.typeOther")}
         dataTestId="fb-type-other"
         on:click={() => selectType("other")}
     >
@@ -62,7 +62,7 @@
 
     <!-- 5. Спільний чат -->
     <GameModeButton
-        text={$_("ui.feedback.typeGlobalChat")}
+        text={$t("ui.feedback.typeGlobalChat")}
         dataTestId="fb-type-global-chat"
         on:click={handleGlobalChat}
     >

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { _ } from "svelte-i18n";
+  import { t } from "$lib/i18n/typedI18n";
   import { page } from "$app/stores";
 
   // Імпорт вкладок
@@ -38,7 +38,7 @@
       on:click={() => setTab("general")}
       data-testid="settings-tab-general"
     >
-      {$_("settings.tabs.general")}
+      {$t("settings.tabs.general")}
     </button>
     <button
       class="tab-btn"
@@ -46,7 +46,7 @@
       on:click={() => setTab("voice")}
       data-testid="settings-tab-voice"
     >
-      {$_("settings.tabs.voice")}
+      {$t("settings.tabs.voice")}
     </button>
     <button
       class="tab-btn"
@@ -54,7 +54,7 @@
       on:click={() => setTab("hotkeys")}
       data-testid="settings-tab-hotkeys"
     >
-      {$_("settings.tabs.hotkeys")}
+      {$t("settings.tabs.hotkeys")}
     </button>
   </div>
 

@@ -2,7 +2,7 @@
     import { createEventDispatcher } from "svelte";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { voiceControlStore } from "$lib/stores/voiceControlStore";
 
     export let confirmDisabled: boolean = false;
@@ -15,8 +15,8 @@
 
     $: voiceButtonStyle = `box-shadow: 0 0 0 ${$voiceControlStore.volume * 20}px rgba(229, 57, 53, ${Math.min($voiceControlStore.volume * 2, 1)});`;
     $: voiceButtonTooltip = isVoiceSupported
-        ? $_("gameControls.voiceCommandTitle")
-        : $_("gameControls.voiceCommandNotSupported");
+        ? $t("gameControls.voiceCommandTitle")
+        : $t("gameControls.voiceCommandNotSupported");
 </script>
 
 <div class="action-btns">
@@ -25,12 +25,12 @@
         size="large"
         disabled={confirmDisabled || disabled}
         on:click={() => dispatch("confirm")}
-        tooltip={$_("gameControls.confirm")}
+        tooltip={$t("gameControls.confirm")}
         dataTestId="confirm-move-btn"
         style="width: 90%;"
     >
         <span slot="icon"><SvgIcons name="confirm" /></span>
-        {$_("gameControls.confirm")}
+        {$t("gameControls.confirm")}
     </StyledButton>
 
     {#if blockModeEnabled}
@@ -39,12 +39,12 @@
             size="large"
             {disabled}
             on:click={() => dispatch("noMoves")}
-            tooltip={$_("gameControls.noMovesTitle")}
+            tooltip={$t("gameControls.noMovesTitle")}
             dataTestId="no-moves-btn"
             style="width: 90%;"
         >
             <span slot="icon"><SvgIcons name="no-moves" /></span>
-            {$_("gameControls.noMovesTitle")}
+            {$t("gameControls.noMovesTitle")}
         </StyledButton>
     {/if}
 
@@ -62,7 +62,7 @@
                 : ''}"
         >
             <span slot="icon"><SvgIcons name="microphone" /></span>
-            {$_("gameControls.voiceCommand")}
+            {$t("gameControls.voiceCommand")}
         </StyledButton>
     {/if}
 </div>

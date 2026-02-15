@@ -1,5 +1,7 @@
 <script lang="ts">
-    import { _, locale } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
+    import type { TranslationKey } from "$lib/types/i18n";
+    import { locale } from "svelte-i18n";
     import type { Achievement } from "$lib/types/rewards";
     import type { UnlockedReward } from "$lib/types/rewards";
     import { formatDate } from "$lib/utils/dateUtils";
@@ -62,15 +64,17 @@
         <NotoEmoji name={achievement.icon} size="64px" />
     </div>
     <div class="content">
-        <div class="title">{$_(achievement.titleKey)}</div>
+        <div class="title">{$t(achievement.titleKey as TranslationKey)}</div>
         {#if isUnlocked || !achievement.isHidden}
-            <div class="description">{$_(achievement.descriptionKey)}</div>
+            <div class="description">
+                {$t(achievement.descriptionKey as TranslationKey)}
+            </div>
         {:else}
             <div class="description hidden-text">???</div>
         {/if}
         {#if isUnlocked}
             <div class="date">
-                {$_("rewards.unlockedOn", { values: { date: dateString } })}
+                {$t("rewards.unlockedOn", { date: dateString })}
             </div>
         {/if}
     </div>

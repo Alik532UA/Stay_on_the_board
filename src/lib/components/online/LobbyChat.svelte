@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy, afterUpdate } from "svelte";
     import { roomService, type ChatMessage } from "$lib/services/roomService";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import type { Unsubscribe } from "firebase/firestore";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import SvgIcons from "$lib/components/SvgIcons.svelte";
@@ -51,7 +51,7 @@
 <div class="chat-container">
     <div class="messages-list" bind:this={chatContainer}>
         {#if messages.length === 0}
-            <div class="empty-chat">{$_("onlineMenu.chat.empty")}</div>
+            <div class="empty-chat">{$t("onlineMenu.chat.empty")}</div>
         {/if}
         {#each messages as msg (msg.id)}
             <div class="message" class:my-message={msg.senderId === playerId}>
@@ -64,7 +64,7 @@
         <input
             type="text"
             bind:value={newMessage}
-            placeholder={$_("onlineMenu.chat.placeholder")}
+            placeholder={$t("onlineMenu.chat.placeholder")}
             on:keydown={handleKeydown}
             maxlength="100"
         />

@@ -2,7 +2,7 @@
 	import { page } from "$app/state";
 	import logo from "$lib/images/svelte-logo.svg";
 	import github from "$lib/images/github.svg";
-	import { _ } from "svelte-i18n";
+	import { t } from "$lib/i18n/typedI18n";
 	import LanguageSwitcher from "../lib/components/LanguageSwitcher.svelte";
 	import { base } from "$app/paths";
 </script>
@@ -24,14 +24,14 @@
 					? "page"
 					: undefined}
 			>
-				<a href="{base}/">{$_("header.home")}</a>
+				<a href="{base}/">{$t("header.home")}</a>
 			</li>
 			<li
 				aria-current={page.url.pathname === base + "/about"
 					? "page"
 					: undefined}
 			>
-				<a href="{base}/about">{$_("header.about")}</a>
+				<a href="{base}/about">{$t("header.about")}</a>
 			</li>
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">

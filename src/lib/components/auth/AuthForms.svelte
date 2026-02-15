@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import StyledButton from "$lib/components/ui/StyledButton.svelte";
     import { createEventDispatcher } from "svelte";
 
@@ -20,16 +20,16 @@
 </script>
 
 {#if mode === "link"}
-    <h3 class="title">{$_("ui.auth.titleSave")}</h3>
-    <p class="description">{$_("ui.auth.saveDescription")}</p>
+    <h3 class="title">{$t("ui.auth.titleSave")}</h3>
+    <p class="description">{$t("ui.auth.saveDescription")}</p>
 {:else if mode === "login"}
-    <h3 class="title">{$_("ui.auth.titleLogin")}</h3>
+    <h3 class="title">{$t("ui.auth.titleLogin")}</h3>
 {:else}
-    <h3 class="title">{$_("ui.auth.titleReset")}</h3>
+    <h3 class="title">{$t("ui.auth.titleReset")}</h3>
 {/if}
 
 <div class="form-group">
-    <label for="auth-email">{$_("ui.auth.emailLabel")}</label>
+    <label for="auth-email">{$t("ui.auth.emailLabel")}</label>
     <input
         id="auth-email"
         type="email"
@@ -41,7 +41,7 @@
 
 {#if mode !== "reset"}
     <div class="form-group">
-        <label for="auth-password">{$_("ui.auth.passwordLabel")}</label>
+        <label for="auth-password">{$t("ui.auth.passwordLabel")}</label>
         <input
             id="auth-password"
             type="password"
@@ -59,13 +59,13 @@
         disabled={isLoading}
     >
         {#if isLoading}
-            {$_("common.loading")}
+            {$t("common.loading")}
         {:else if mode === "link"}
-            {$_("ui.auth.saveBtn")}
+            {$t("ui.auth.saveBtn")}
         {:else if mode === "login"}
-            {$_("ui.auth.loginBtn")}
+            {$t("ui.auth.loginBtn")}
         {:else}
-            {$_("ui.auth.resetBtn")}
+            {$t("ui.auth.resetBtn")}
         {/if}
     </StyledButton>
 </div>
@@ -73,18 +73,18 @@
 <div class="links">
     {#if mode === "link"}
         <button class="link-btn" on:click={() => setMode("login")}>
-            {$_("ui.auth.switchLogin")}
+            {$t("ui.auth.switchLogin")}
         </button>
     {:else if mode === "login"}
         <button class="link-btn" on:click={() => setMode("link")}>
-            {$_("ui.auth.switchRegister")}
+            {$t("ui.auth.switchRegister")}
         </button>
         <button class="link-btn" on:click={() => setMode("reset")}>
-            {$_("ui.auth.forgotPassword")}
+            {$t("ui.auth.forgotPassword")}
         </button>
     {:else}
         <button class="link-btn" on:click={() => setMode("login")}>
-            {$_("ui.auth.backToLogin")}
+            {$t("ui.auth.backToLogin")}
         </button>
     {/if}
 </div>

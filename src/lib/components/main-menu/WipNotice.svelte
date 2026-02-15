@@ -1,6 +1,6 @@
 <script lang="ts">
     import { logService } from "$lib/services/logService.js";
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
     import { goto } from "$app/navigation";
     import { base } from "$app/paths";
 
@@ -29,14 +29,14 @@
             on:click={onClose}
             data-testid="wip-notice-close-btn">×</button
         >
-        <h3>{$_("mainMenu.wipNotice.title")}</h3>
-        <p>{$_("mainMenu.wipNotice.description")}</p>
+        <h3>{$t("mainMenu.wipNotice.title")}</h3>
+        <p>{$t("mainMenu.wipNotice.description")}</p>
         <button
             class="wip-donate-btn"
             on:click={handleDonate}
             data-testid="wip-notice-donate-btn"
         >
-            {$_("mainMenu.donate")}
+            {$t("mainMenu.donate")}
         </button>
     </div>
 </div>

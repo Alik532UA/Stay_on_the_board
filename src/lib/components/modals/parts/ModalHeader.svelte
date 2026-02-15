@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
+    import type { TranslationKey } from "$lib/types/i18n";
     import { i18nReady } from "$lib/i18n/init.js";
     import { gameEventBus } from "$lib/services/gameEventBus";
     import { hotkeyTooltip } from "$lib/actions/hotkeyTooltip.js";
@@ -22,10 +23,10 @@
             data-i18n-key={modalState.titleKey}
         >
             {#if $i18nReady && modalState.titleKey}
-                {$_(modalState.titleKey, {
-                    values:
-                        modalState.titleValues || (modalState.content as any),
-                })}
+                {$t(
+                    modalState.titleKey as TranslationKey,
+                    modalState.titleValues || (modalState.content as any),
+                )}
             {:else}
                 {modalState.title}
             {/if}

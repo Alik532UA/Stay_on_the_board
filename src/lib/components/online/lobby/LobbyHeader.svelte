@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { _ } from "svelte-i18n";
+    import { t } from "$lib/i18n/typedI18n";
+    import type { TranslationKey } from "$lib/types/i18n";
     import type { Room } from "$lib/types/online";
     import EditableText from "$lib/components/ui/EditableText.svelte";
     import { roomService } from "$lib/services/roomService";
@@ -33,7 +34,7 @@
     <div class="top-row">
         <div class="status-badge {room.status}" data-testid="room-status-badge">
             <span class="status-dot"></span>
-            {$_(`onlineMenu.${room.status}`)}
+            {$t(`onlineMenu.${room.status}` as TranslationKey)}
         </div>
     </div>
 
@@ -53,7 +54,7 @@
             class:copied={isCopied}
             on:click={copyRoomId}
             data-testid="copy-room-id-btn"
-            title={$_("onlineMenu.lobby.copyLink")}
+            title={$t("onlineMenu.lobby.copyLink")}
         >
             <span class="id-label">ID:</span>
             <span class="id-value">{roomId}</span>
