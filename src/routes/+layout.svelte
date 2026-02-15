@@ -6,6 +6,7 @@
 	import { onMount, onDestroy } from "svelte";
 	import { base } from "$app/paths";
 	import UpdateNotification from "$lib/components/UpdateNotification.svelte";
+	import ReloadPrompt from "$lib/components/pwa/ReloadPrompt.svelte";
 	import { clearCache } from "$lib/utils/cacheManager.js";
 	import Modal from "$lib/components/Modal.svelte";
 	import { modalStore } from "$lib/stores/modalStore";
@@ -303,6 +304,9 @@
 	{#if import.meta.env.DEV}
 		<NetworkMonitorWidget />
 	{/if}
+	
+	<!-- PWA Update Prompt -->
+	<ReloadPrompt />
 </ErrorBoundary>
 
 <style>

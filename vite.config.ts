@@ -40,12 +40,19 @@ export default defineConfig({
 			sourcemap: true
 		}),
 		VitePWA({
-			registerType: 'autoUpdate',
+			registerType: 'prompt',
 			manifest,
 			workbox: {
 				clientsClaim: true,
-				skipWaiting: true,
-				globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2,json}']
+				skipWaiting: false,
+				cleanupOutdatedCaches: true,
+				globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2,json}'],
+				navigateFallbackDenylist: [/^\/version\.json$/]
+			},
+			devOptions: {
+				enabled: true,
+				suppressWarnings: true,
+				type: 'module',
 			}
 		})
 	],
