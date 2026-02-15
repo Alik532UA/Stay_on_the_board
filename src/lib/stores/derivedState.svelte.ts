@@ -1,6 +1,6 @@
-import { boardStore } from './boardStore';
+import { boardState } from './boardState.svelte';
 import type { BoardState } from './boardStore';
-import { playerStore } from './playerStore';
+import { playerState } from './playerState.svelte';
 import type { PlayerState } from './playerStore';
 import { uiStateStore } from './uiStateStore';
 import type { UiState } from '$lib/types/uiState';
@@ -29,8 +29,6 @@ function fromStore<T>(store: Subscribable<T>, initialValue: T) {
 // Реактивні джерела
 // Стори з Runes SSoT — читаємо напряму (без bridge)
 // Стори без Runes SSoT — читаємо через fromStore (bridge)
-const board = fromStore<BoardState | null>(boardStore, null);
-const player = fromStore<PlayerState | null>(playerStore, null);
 const ui = fromStore<UiState>(uiStateStore, {} as UiState);
 const availableMovesVal = fromStore<Move[]>(availableMovesStore, []);
 
@@ -70,13 +68,13 @@ function calculateStartPosition(move: { direction: MoveDirectionType, distance: 
 export const derivedState = {
     get lastComputerMove() {
         const uiState = ui.current;
-        const playerStore = player.current;
-        const boardStore = board.current;
+        const playerStoreVal = playerState.state;
+        const boardStoreVal = boardState.state;
 
-        if (!playerStore) return null;
+        if (!playerStoreVal) return null;
 
         if (uiState?.lastMove) {
-            const p = playerStore.players[uiState.lastMove.player];
+            const p = playerStoreVal.players[uiState.lastMove.player];
             if (p?.type === 'ai' || p?.type === 'computer') {
                 return {
                     direction: uiState.lastMove.direction,
@@ -85,9 +83,9 @@ export const derivedState = {
             }
         }
 
-        if (!boardStore || boardStore.moveQueue.length === 0) return null;
-        const lastMove = boardStore.moveQueue[boardStore.moveQueue.length - 1];
-        const pMod = playerStore.players[lastMove.player - 1];
+        if (!boardStoreVal || boardStoreVal.moveQueue.length === 0) return null;
+        const lastMove = boardStoreVal.moveQueue[boardStoreVal.moveQueue.length - 1];
+        const pMod = playerStoreVal.players[lastMove.player - 1];
         if (pMod?.type === 'ai' || pMod?.type === 'computer') {
             return {
                 direction: lastMove.direction,
@@ -99,13 +97,13 @@ export const derivedState = {
 
     get lastPlayerMove() {
         const uiState = ui.current;
-        const playerStore = player.current;
-        const boardStore = board.current;
+        const playerStoreVal = playerState.state;
+        const boardStoreVal = boardState.state;
 
-        if (!playerStore) return null;
+        if (!playerStoreVal) return null;
 
         if (uiState?.lastMove) {
-            const p = playerStore.players[uiState.lastMove.player];
+            const p = playerStoreVal.players[uiState.lastMove.player];
             if (p?.type === 'human') {
                 return {
                     direction: uiState.lastMove.direction,
@@ -114,9 +112,9 @@ export const derivedState = {
             }
         }
 
-        if (!boardStore || boardStore.moveQueue.length === 0) return null;
-        const lastMove = boardStore.moveQueue[boardStore.moveQueue.length - 1];
-        const pMod = playerStore.players[lastMove.player - 1];
+        if (!boardStoreVal || boardStoreVal.moveQueue.length === 0) return null;
+        const lastMove = boardStoreVal.moveQueue[boardStoreVal.moveQueue.length - 1];
+        const pMod = playerStoreVal.players[lastMove.player - 1];
         if (pMod?.type === 'human') {
             return {
                 direction: lastMove.direction,
@@ -127,9 +125,9 @@ export const derivedState = {
     },
 
     get isPlayerTurn() {
-        if (!player.current) return false;
-        const currentPlayerIndex = player.current.currentPlayerIndex;
-        const currentPlayer = player.current.players[currentPlayerIndex];
+        if (!playerState.state) return false;
+        const currentPlayerIndex = playerState.state.currentPlayerIndex;
+        const currentPlayer = playerState.state.players[currentPlayerIndex];
 
         if (ui.current?.intendedGameType === 'online') {
             return ui.current.onlinePlayerIndex === currentPlayerIndex;
@@ -139,7 +137,7 @@ export const derivedState = {
     },
 
     get visualPosition() {
-        const boardStoreVal = board.current;
+        const boardStoreVal = boardState.state;
         const animationStoreVal = animationState.state;
 
         if (!boardStoreVal) return { row: null, col: null };
@@ -172,7 +170,7 @@ export const derivedState = {
     },
 
     get visualCellVisitCounts() {
-        const boardStoreVal = board.current;
+        const boardStoreVal = boardState.state;
         const animationStoreVal = animationState.state;
         const vPos = this.visualPosition;
 
@@ -201,7 +199,7 @@ export const derivedState = {
     },
 
     get currentPlayer() {
-        const p = player.current;
+        const p = playerState.state;
         return p ? p.players[p.currentPlayerIndex] : null;
     },
 

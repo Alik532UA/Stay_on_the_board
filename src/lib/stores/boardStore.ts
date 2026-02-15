@@ -1,8 +1,7 @@
 /**
  * @file Manages the state of the game board.
- * @description This store holds all data directly related to the board's state,
- * including its size, the grid itself, the player's position, and cell visit counts.
- * It is initialized as null and set up when a game starts.
+ * @description Bridge pattern: writable-обгортка для Svelte 4 компонентів.
+ * SSoT — boardState.svelte.ts (Runes).
  */
 // src/lib/stores/boardStore.ts
 import { logService } from '$lib/services/logService';
@@ -10,6 +9,7 @@ import { writable } from 'svelte/store';
 import { createEmptyBoard } from '$lib/utils/boardUtils';
 import type { MoveHistoryEntry } from '$lib/models/moveHistory';
 import type { MoveDirectionType } from '$lib/models/Piece';
+import { boardState } from './boardState.svelte';
 
 export interface BoardState {
   boardSize: number;
@@ -22,41 +22,38 @@ export interface BoardState {
 }
 
 function createBoardStore() {
-  const { subscribe, set, update } = writable<BoardState | null>(null);
+  const { subscribe, set: svelteSet } = writable<BoardState | null>(boardState.state);
+
+  const syncStore = () => {
+    svelteSet(boardState.state);
+  };
 
   return {
     subscribe,
-    set,
-    update,
-    reset: () => set(null),
-    // НАВІЩО: Інкапсулюємо логіку мутації безпосередньо тут
+    set: (value: BoardState | null) => {
+      boardState.state = value;
+      syncStore();
+    },
+    update: (fn: (s: BoardState | null) => BoardState | null) => {
+      boardState.update(fn);
+      syncStore();
+    },
+    reset: () => {
+      boardState.reset();
+      syncStore();
+    },
     movePlayer: (row: number, col: number) => {
-      logService.piece(`(boardStore) movePlayer to [${row}, ${col}]`);
-      update(state => {
-        if (!state) return null;
-        const newBoard = state.board.map(r => [...r]);
-        if (state.playerRow !== null && state.playerCol !== null) {
-          newBoard[state.playerRow][state.playerCol] = 0;
-        }
-        newBoard[row][col] = 1;
-        return { ...state, playerRow: row, playerCol: col, board: newBoard };
-      });
+      boardState.movePlayer(row, col);
+      syncStore();
     },
     incrementVisitCount: (row: number, col: number) => {
-      update(state => {
-        if (!state) return null;
-        const key = `${row}-${col}`;
-        const newCounts = { ...state.cellVisitCounts, [key]: (state.cellVisitCounts[key] || 0) + 1 };
-        return { ...state, cellVisitCounts: newCounts };
-      });
+      boardState.incrementVisitCount(row, col);
+      syncStore();
     },
     resetCellVisitCounts: () => {
-      update(state => {
-        if (!state) return null;
-        return { ...state, cellVisitCounts: {} };
-      });
+      boardState.resetCellVisitCounts();
+      syncStore();
     },
-    // Інші мутатори, специфічні для дошки...
   };
 }
 

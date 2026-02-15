@@ -1,5 +1,10 @@
+// src/lib/stores/gameOverStore.ts
+// Bridge pattern: writable-обгортка для Svelte 4 компонентів.
+// SSoT — gameOverState.svelte.ts (Runes).
+
 import { writable } from 'svelte/store';
 import type { Player } from '$lib/models/player';
+import { gameOverState } from './gameOverState.svelte';
 
 /**
  * Деталі фінального рахунку
@@ -47,45 +52,32 @@ export interface GameOverStoreState {
   gameResult: GameOverPayload | null;
 }
 
-/**
- * Глобальний стор для збереження стану завершення гри
- * Цей стор забезпечує персистентність даних при переходах між сторінками
- */
 const createGameOverStore = () => {
-  const { subscribe, set, update } = writable<GameOverStoreState>({
-    isGameOver: false,
-    gameResult: null,
-  });
+  const { subscribe, set: svelteSet } = writable<GameOverStoreState>(gameOverState.state);
+
+  const syncStore = () => {
+    svelteSet(gameOverState.state);
+  };
 
   return {
     subscribe,
     setGameOver: (result: GameOverPayload) => {
-      update(state => ({
-        ...state,
-        isGameOver: true,
-        gameResult: result,
-      }));
+      gameOverState.setGameOver(result);
+      syncStore();
     },
     resetGameOverState: () => {
-      update(state => ({
-        ...state,
-        isGameOver: false,
-        gameResult: null,
-      }));
+      gameOverState.resetGameOverState();
+      syncStore();
     },
     clearGameOverState: () => {
-      update(state => ({
-        ...state,
-        isGameOver: false,
-        gameResult: null,
-      }));
+      gameOverState.clearGameOverState();
+      syncStore();
     },
-    // НОВИЙ МЕТОД для відновлення стану
     restoreState: (newState: GameOverStoreState) => {
-      set(newState);
+      gameOverState.restoreState(newState);
+      syncStore();
     }
   };
 };
 
 export const gameOverStore = createGameOverStore();
-

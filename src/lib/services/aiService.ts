@@ -26,8 +26,8 @@ class AiService {
   }
 
   public async getComputerMove(
-    boardState: BoardState, 
-    playerState: PlayerState, 
+    boardState: BoardState,
+    playerState: PlayerState,
     uiState: UiState
   ): Promise<{ direction: MoveDirectionType; distance: number } | null> {
     if (!boardState || !playerState || !uiState) return null;
@@ -43,7 +43,7 @@ class AiService {
     if (this.worker) {
       return new Promise((resolve) => {
         const settings = get(gameSettingsStore);
-        
+
         const handleMessage = (e: MessageEvent) => {
           this.worker?.removeEventListener('message', handleMessage);
           logService.logicVirtualPlayer('getComputerMove (worker): отримано хід', e.data);
@@ -51,13 +51,15 @@ class AiService {
         };
 
         this.worker?.addEventListener('message', handleMessage);
-        
+
         logService.logicVirtualPlayer('getComputerMove (worker): надсилаю запит у воркер');
-        this.worker?.postMessage({
+        // FIX: Svelte 5 Runes створюють Proxy-об'єкти, які не можна клонувати для postMessage.
+        // JSON.parse(JSON.stringify()) — єдиний надійний спосіб зняти Proxy.
+        this.worker?.postMessage(JSON.parse(JSON.stringify({
           boardState,
           playerState,
           settings
-        });
+        })));
       });
     }
 
@@ -73,7 +75,7 @@ class AiService {
 
     const randomIndex = Math.floor(Math.random() * availableMoves.length);
     const randomMove = availableMoves[randomIndex];
-    
+
     return randomMove;
   }
 }

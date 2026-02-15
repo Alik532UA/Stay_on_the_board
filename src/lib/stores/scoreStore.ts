@@ -1,11 +1,11 @@
 /**
  * @file Manages the scoring and points system for the current game.
- * @description This store tracks all variables related to the player's score,
- * including penalty points, bonuses, and other metrics. It is initialized as null
- * and set up when a game starts.
+ * @description Bridge pattern: writable-обгортка для Svelte 4 компонентів.
+ * SSoT — scoreState.svelte.ts (Runes).
  */
 // src/lib/stores/scoreStore.ts
 import { writable } from 'svelte/store';
+import { scoreState } from './scoreState.svelte';
 
 export interface ScoreState {
   penaltyPoints: number;
@@ -25,17 +25,25 @@ export const initialScoreState: ScoreState = {
 };
 
 function createScoreStore() {
-  const { subscribe, set, update } = writable<ScoreState | null>(null);
+  const { subscribe, set: svelteSet } = writable<ScoreState | null>(scoreState.state);
+
+  const syncStore = () => {
+    svelteSet(scoreState.state);
+  };
 
   return {
     subscribe,
-    set,
-    update,
+    set: (value: ScoreState | null) => {
+      scoreState.state = value;
+      syncStore();
+    },
+    update: (fn: (s: ScoreState | null) => ScoreState | null) => {
+      scoreState.update(fn);
+      syncStore();
+    },
     addPenalty: (points: number) => {
-      update(state => {
-        if (!state) return null;
-        return { ...state, penaltyPoints: state.penaltyPoints + points };
-      });
+      scoreState.addPenalty(points);
+      syncStore();
     },
     // Інші мутатори для рахунку...
   };

@@ -1,11 +1,12 @@
 /**
  * @file Manages the state of the players in the game.
- * @description This store holds information about the players, such as their data (name, color)
- * and who the current player is. It is initialized as null and set up when a game starts.
+ * @description Bridge pattern: writable-обгортка для Svelte 4 компонентів.
+ * SSoT — playerState.svelte.ts (Runes).
  */
 // src/lib/stores/playerStore.ts
 import { writable } from 'svelte/store';
 import type { Player } from '$lib/models/player';
+import { playerState } from './playerState.svelte';
 
 export interface PlayerState {
   players: Player[];
@@ -13,17 +14,25 @@ export interface PlayerState {
 }
 
 function createPlayerStore() {
-  const { subscribe, set, update } = writable<PlayerState | null>(null);
+  const { subscribe, set: svelteSet } = writable<PlayerState | null>(playerState.state);
+
+  const syncStore = () => {
+    svelteSet(playerState.state);
+  };
 
   return {
     subscribe,
-    set,
-    update,
+    set: (value: PlayerState | null) => {
+      playerState.state = value;
+      syncStore();
+    },
+    update: (fn: (s: PlayerState | null) => PlayerState | null) => {
+      playerState.update(fn);
+      syncStore();
+    },
     setCurrentPlayer: (index: number) => {
-      update(state => {
-        if (!state) return null;
-        return { ...state, currentPlayerIndex: index };
-      });
+      playerState.setCurrentPlayer(index);
+      syncStore();
     },
     // Інші мутатори для гравців...
   };
