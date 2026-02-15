@@ -132,9 +132,14 @@
         <li>{$_("rulesPage.proModeStep2")}</li>
         <li>{$_("rulesPage.proModeStep3")}</li>
         <li>
-          {@html $_("rulesPage.proModeStep4", {
-            values: { controlsLink: `${base}/controls` },
-          })}
+          {#each $_("rulesPage.proModeStep4").split(/<a[^>]*>|<\/a>/) as part, i}
+            {part}
+            {#if i === 0}
+              <a href="{base}/controls" class="inline-link-button">
+                {$_("rulesPage.proModeStep4").match(/<a[^>]*>(.*?)<\/a>/)?.[1] || ""}
+              </a>
+            {/if}
+          {/each}
         </li>
       </ol>
       <p>{$_("rulesPage.proModeConclusion")}</p>

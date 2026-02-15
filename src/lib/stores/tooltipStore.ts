@@ -6,9 +6,19 @@
 import { writable } from 'svelte/store';
 import { logService } from '$lib/services/logService';
 
+export interface HotkeyData {
+    text: string;
+    singleChar: boolean;
+}
+
+export interface TooltipData {
+    title?: string;
+    hotkeys: HotkeyData[];
+}
+
 export interface TooltipState {
     isVisible: boolean;
-    content: string;
+    content: string | TooltipData;
     x: number;
     y: number;
     timeoutId: ReturnType<typeof setTimeout> | null;
@@ -39,7 +49,7 @@ function cancelScheduledShow(): void {
 export const tooltipStore = {
     subscribe,
 
-    scheduleShow: (content: string, x: number, y: number, delay: number, ownerNode: HTMLElement): void => {
+    scheduleShow: (content: string | TooltipData, x: number, y: number, delay: number, ownerNode: HTMLElement): void => {
         cancelScheduledShow();
         const timeoutId = setTimeout(() => {
             logService.tooltip('[tooltipStore] setTimeout callback. Checking owner node...', ownerNode);

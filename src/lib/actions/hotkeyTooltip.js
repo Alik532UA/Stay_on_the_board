@@ -4,15 +4,24 @@ import { get } from 'svelte/store';
 import { logService } from '$lib/services/logService.js';
 
 /**
+ * @typedef {Object} HotkeyData
+ * @property {string} text
+ * @property {boolean} singleChar
+ */
+
+/**
+ * @typedef {Object} TooltipData
+ * @property {string=} title
+ * @property {HotkeyData[]} hotkeys
+ */
+
+/**
  * @param {string[] | undefined} keys
  * @param {string=} title
- * @returns {string}
+ * @returns {TooltipData}
  */
 function formatHotkeys(keys, title) {
-  const titleHtml = title ? `<div class="tooltip-title">${title}</div>` : '';
-  if (!keys || keys.length === 0) return titleHtml;
-
-  const keyElements = (Array.isArray(keys) ? keys : []).filter(key => key).map(key => {
+  const hotkeys = (Array.isArray(keys) ? keys : []).filter(key => key).map(key => {
     let keyText = key;
     if (key.startsWith('Key')) {
       if (key === 'KeyI') {
@@ -25,13 +34,13 @@ function formatHotkeys(keys, title) {
     } else if (key.startsWith('Digit')) {
       keyText = key.substring(5);
     }
-    const className = keyText.length === 1 ? 'hotkey-kbd single-char' : 'hotkey-kbd';
-    return `<div class="hotkey-item"><span class="${className}">${keyText}</span></div>`;
-  }).join('');
+    return {
+      text: keyText,
+      singleChar: keyText.length === 1
+    };
+  });
   
-  const hotkeyHtml = `<div class="hotkey-title">HotKey</div>${keyElements}`;
-
-  return title ? `${titleHtml}<hr class="tooltip-divider">${hotkeyHtml}` : hotkeyHtml;
+  return { title, hotkeys };
 }
 
 /**
@@ -45,7 +54,8 @@ function formatHotkeys(keys, title) {
  * @param {HotkeyTooltipParam} param
  */
 export function hotkeyTooltip(node, param) {
-  let tooltipContent = '';
+  /** @type {TooltipData | string | null} */
+  let tooltipContent = null;
   const originalTitle = node.title;
   node.title = '';
 

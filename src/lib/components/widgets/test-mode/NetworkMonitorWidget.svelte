@@ -22,7 +22,14 @@
 </script>
 
 <div class="network-monitor" class:expanded>
-    <div class="header" on:click={toggle}>
+    <div 
+        class="header" 
+        on:click={toggle} 
+        on:keydown={e => (e.key === 'Enter' || e.key === ' ') && toggle()}
+        role="button"
+        tabindex="0"
+        aria-expanded={expanded}
+    >
         <span class="indicator" class:active={$networkStatsStore.lastActivity && (Date.now() - $networkStatsStore.lastActivity < 1000)}></span>
         <span class="time">{formatTime($networkStatsStore.elapsedSeconds)}</span>
         <span class="label">Net:</span>

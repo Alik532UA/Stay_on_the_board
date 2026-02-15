@@ -1,7 +1,9 @@
 <script lang="ts">
+  import type { TooltipData } from "$lib/stores/tooltipStore";
+
   export let x = 0;
   export let y = 0;
-  export let content = "";
+  export let content: string | TooltipData = "";
 
   let tooltipNode: HTMLElement;
   let adjustedX = 0;
@@ -33,6 +35,10 @@
     adjustedX = x;
     adjustedY = y;
   }
+
+  function isStructured(data: any): data is TooltipData {
+    return typeof data === "object" && data !== null && "hotkeys" in data;
+  }
 </script>
 
 <div
@@ -40,7 +46,28 @@
   style="left: {adjustedX}px; top: {adjustedY}px;"
   bind:this={tooltipNode}
 >
-  {@html content}
+  {#if isStructured(content)}
+    {#if content.title}
+      <div class="tooltip-title">{content.title}</div>
+    {/if}
+
+    {#if content.title && content.hotkeys && content.hotkeys.length > 0}
+      <hr class="tooltip-divider" />
+    {/if}
+
+    {#if content.hotkeys && content.hotkeys.length > 0}
+      <div class="hotkey-title">HotKey</div>
+      {#each content.hotkeys as hotkey}
+        <div class="hotkey-item">
+          <span class="hotkey-kbd" class:single-char={hotkey.singleChar}>
+            {hotkey.text}
+          </span>
+        </div>
+      {/each}
+    {/if}
+  {:else}
+    {content}
+  {/if}
 </div>
 
 <style>

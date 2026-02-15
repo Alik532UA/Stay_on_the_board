@@ -5,7 +5,11 @@
 </script>
 
 <div class="accordion-section" class:open={isOpen}>
-  <button class="accordion-header" on:click={() => (isOpen = !isOpen)}>
+  <button 
+    class="accordion-header" 
+    on:click={() => (isOpen = !isOpen)}
+    aria-expanded={isOpen}
+  >
     <div class="header-content">
       <h2 class="accordion-title">
         <slot name="title" />

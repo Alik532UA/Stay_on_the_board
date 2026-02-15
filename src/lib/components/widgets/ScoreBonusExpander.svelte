@@ -36,7 +36,15 @@
 </script>
 
 <div class="bonus-expander" class:open={isOpen}>
-  <div class="expander-summary" on:click={toggle} on:keydown={e => e.key === 'Enter' && toggle()} role="button" tabindex="0" data-testid="bonus-expander-summary">
+  <div 
+    class="expander-summary" 
+    on:click={toggle} 
+    on:keydown={e => (e.key === 'Enter' || e.key === ' ') && toggle()} 
+    role="button" 
+    tabindex="0" 
+    aria-expanded={isOpen}
+    data-testid="bonus-expander-summary"
+  >
     <span class="bonus-score-summary" data-testid="total-bonus-summary">
       {parts[0]}<span class="bonus-value">+{parts[1] || totalBonus}</span>
     </span>
