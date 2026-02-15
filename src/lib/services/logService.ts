@@ -1,10 +1,3 @@
-// file: src/lib/services/logService.ts
-/**
- * @file Централізований сервіс логування з групами та стилями.
- * @description Логування працює в режимі розробки або якщо увімкнено примусово.
- * Використовує localStorage для збереження конфігурації.
- */
-
 import { debugLogStore } from '../stores/debugLogStore';
 
 const isBrowser = typeof window !== 'undefined';
@@ -46,6 +39,7 @@ export const LOG_GROUPS = {
 } as const;
 
 export type LogGroup = typeof LOG_GROUPS[keyof typeof LOG_GROUPS];
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 /**
  * Тип конфігурації логування.
@@ -65,34 +59,20 @@ const defaultConfig: LogConfig = {
     [LOG_GROUPS.ANIMATION]: false,
     [LOG_GROUPS.INIT]: false,
     [LOG_GROUPS.ACTION]: false,
-    [LOG_GROUPS.GAME_MODE]: true, // Focus
+    [LOG_GROUPS.GAME_MODE]: true,
     [LOG_GROUPS.SPEECH]: false,
     [LOG_GROUPS.VOICE_CONTROL]: false,
     [LOG_GROUPS.STATE]: false,
     [LOG_GROUPS.PIECE]: false,
     [LOG_GROUPS.LOGIC_MOVE]: false,
     [LOG_GROUPS.TEST_MODE]: false,
-    [LOG_GROUPS.MODAL]: true, // Focus
-    [LOG_GROUPS.ERROR]: true, // Always on
+    [LOG_GROUPS.MODAL]: true,
+    [LOG_GROUPS.ERROR]: true,
     [LOG_GROUPS.HOTKEY]: false,
-    [LOG_GROUPS.PRESENCE]: true, // Focus
+    [LOG_GROUPS.PRESENCE]: true,
 };
 
-
 const STORAGE_KEY = 'logConfig';
-
-function formatDataForDisplay(data: unknown[]): string {
-    return data.map(item => {
-        if (typeof item === 'object' && item !== null) {
-            try {
-                return JSON.stringify(item);
-            } catch {
-                return '[Unserializable Object]';
-            }
-        }
-        return String(item);
-    }).join(' ');
-}
 
 function loadConfig(): LogConfig {
     if (!isBrowser) return defaultConfig;
@@ -102,7 +82,7 @@ function loadConfig(): LogConfig {
             return { ...defaultConfig, ...JSON.parse(savedConfig) };
         }
     } catch (e) {
-        console.error('Failed to load log config from localStorage', e);
+        // Fallback for workers or private mode
     }
     return defaultConfig;
 }
@@ -113,9 +93,6 @@ function saveConfig(config: LogConfig): void {
     }
 }
 
-/**
- * Кольори для груп логування.
- */
 const LOG_COLORS = {
     STATE: '#9C27B0',
     PIECE: '#795548',
@@ -144,110 +121,133 @@ const LOG_COLORS = {
 
 let logConfig = loadConfig();
 
-const styles: Record<LogGroup, string> = {
-    [LOG_GROUPS.STATE]: `color: ${LOG_COLORS.STATE}; font-weight: bold;`,
-    [LOG_GROUPS.PIECE]: `color: ${LOG_COLORS.PIECE}; font-weight: bold;`,
-    [LOG_GROUPS.LOGIC_GENERAL]: `color: ${LOG_COLORS.LOGIC_GENERAL};`,
-    [LOG_GROUPS.LOGIC_BOARD]: `color: ${LOG_COLORS.LOGIC_BOARD};`,
-    [LOG_GROUPS.LOGIC_WIN]: `color: ${LOG_COLORS.LOGIC_WIN}; font-weight: bold;`,
-    [LOG_GROUPS.LOGIC_MOVE]: `color: ${LOG_COLORS.LOGIC_MOVE}; font-weight: bold;`,
-    [LOG_GROUPS.LOGIC_VIRTUAL_PLAYER]: `color: ${LOG_COLORS.LOGIC_VIRTUAL_PLAYER}; font-weight: bold;`,
-    [LOG_GROUPS.LOGIC_AVAILABILITY]: `color: ${LOG_COLORS.LOGIC_AVAILABILITY}; font-weight: bold;`,
-    [LOG_GROUPS.LOGIC_TIME]: `color: ${LOG_COLORS.LOGIC_TIME}; font-weight: bold;`,
-    [LOG_GROUPS.SCORE]: `color: ${LOG_COLORS.SCORE}; font-weight: bold;`,
-    [LOG_GROUPS.UI]: `color: ${LOG_COLORS.UI}; font-weight: bold;`,
-    [LOG_GROUPS.TOOLTIP]: `color: ${LOG_COLORS.TOOLTIP}; font-weight: bold;`,
-    [LOG_GROUPS.ANIMATION]: `color: ${LOG_COLORS.ANIMATION}; font-weight: bold;`,
-    [LOG_GROUPS.INIT]: `color: ${LOG_COLORS.INIT}; font-weight: bold;`,
-    [LOG_GROUPS.GAME_MODE]: `color: ${LOG_COLORS.GAME_MODE}; font-weight: bold;`,
-    [LOG_GROUPS.ACTION]: `color: ${LOG_COLORS.ACTION}; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;`,
-    [LOG_GROUPS.SPEECH]: `color: ${LOG_COLORS.SPEECH}; font-weight: bold;`,
-    [LOG_GROUPS.VOICE_CONTROL]: `color: ${LOG_COLORS.VOICE_CONTROL}; font-weight: bold;`,
-    [LOG_GROUPS.TEST_MODE]: `color: ${LOG_COLORS.TEST_MODE}; font-weight: bold; background-color: #333; padding: 2px 4px; border-radius: 2px;`,
-    [LOG_GROUPS.MODAL]: `color: ${LOG_COLORS.MODAL}; font-weight: bold;`,
-    [LOG_GROUPS.ERROR]: `color: ${LOG_COLORS.ERROR}; font-weight: bold;`,
-    [LOG_GROUPS.HOTKEY]: `color: ${LOG_COLORS.HOTKEY}; font-style: italic;`,
-    [LOG_GROUPS.PRESENCE]: `color: ${LOG_COLORS.PRESENCE}; font-weight: bold;`,
-};
+const styles: Record<string, string> = {};
+Object.entries(LOG_COLORS).forEach(([group, color]) => {
+    styles[group.toLowerCase()] = `color: ${color}; font-weight: bold;`;
+});
 
-function log(group: LogGroup, message: string, ...data: unknown[]): void {
+// Custom style for ACTION
+styles[LOG_GROUPS.ACTION] += ' background-color: #333; padding: 2px 4px; border-radius: 2px;';
+styles[LOG_GROUPS.TEST_MODE] += ' background-color: #333; padding: 2px 4px; border-radius: 2px;';
+
+function formatDataForDisplay(data: unknown[]): string {
+    return data.map(item => {
+        if (typeof item === 'object' && item !== null) {
+            try {
+                return JSON.stringify(item);
+            } catch {
+                return '[Unserializable Object]';
+            }
+        }
+        return String(item);
+    }).join(' ');
+}
+
+/**
+ * Основна функція логування з підтримкою групування та рівнів.
+ */
+function baseLog(group: LogGroup, level: LogLevel, message: string, ...data: unknown[]): void {
     if ((isDev || isForceEnabled) && logConfig[group]) {
         const style = styles[group] || '';
+        const label = `[${group.toUpperCase()}]`;
+        
+        // Використовуємо console.groupCollapsed, якщо є додаткові дані
         if (data.length > 0) {
-            console.log(`%c[${group.toUpperCase()}]%c ${message}`, style, 'color: inherit;', ...data);
+            console.groupCollapsed(`%c${label} %c${message}`, style, 'color: inherit; font-weight: normal;');
+            console[level](...data);
+            console.groupEnd();
         } else {
-            console.log(`%c[${group.toUpperCase()}]%c ${message}`, style, 'color: inherit;');
+            console[level](`%c${label} %c${message}`, style, 'color: inherit; font-weight: normal;');
         }
-        const displayMessage = `[${group.toUpperCase()}] ${message} ${formatDataForDisplay(data)}`;
-        debugLogStore.add(displayMessage);
+
+        // Надсилаємо в debugLogStore тільки якщо ми в браузері (бо стор використовує Svelte)
+        if (isBrowser) {
+            const displayMessage = `[${group.toUpperCase()}] [${level.toUpperCase()}] ${message} ${formatDataForDisplay(data)}`;
+            debugLogStore.add(displayMessage);
+        }
     }
 }
 
 /**
- * Публічний сервіс логування.
+ * Тип для динамічного логера.
  */
-export const logService = {
-    state: (message: string, ...data: unknown[]) => log(LOG_GROUPS.STATE, message, ...data),
-    piece: (message: string, ...data: unknown[]) => log(LOG_GROUPS.PIECE, message, ...data),
-    logicMove: (message: string, ...data: unknown[]) => log(LOG_GROUPS.LOGIC_MOVE, message, ...data),
-    logicVirtualPlayer: (message: string, ...data: unknown[]) => log(LOG_GROUPS.LOGIC_VIRTUAL_PLAYER, message, ...data),
-    logicAvailability: (message: string, ...data: unknown[]) => log(LOG_GROUPS.LOGIC_AVAILABILITY, message, ...data),
-    logicTime: (message: string, ...data: unknown[]) => log(LOG_GROUPS.LOGIC_TIME, message, ...data),
-    score: (message: string, ...data: unknown[]) => log(LOG_GROUPS.SCORE, message, ...data),
-    ui: (message: string, ...data: unknown[]) => log(LOG_GROUPS.UI, message, ...data),
-    tooltip: (message: string, ...data: unknown[]) => log(LOG_GROUPS.TOOLTIP, message, ...data),
-    animation: (message: string, ...data: unknown[]) => log(LOG_GROUPS.ANIMATION, message, ...data),
-    init: (message: string, ...data: unknown[]) => log(LOG_GROUPS.INIT, message, ...data),
-    action: (message: string, ...data: unknown[]) => log(LOG_GROUPS.ACTION, message, ...data),
-    GAME_MODE: (message: string, ...data: unknown[]) => log(LOG_GROUPS.GAME_MODE, message, ...data),
-    speech: (message: string, ...data: unknown[]) => log(LOG_GROUPS.SPEECH, message, ...data),
-    voiceControl: (message: string, ...data: unknown[]) => log(LOG_GROUPS.VOICE_CONTROL, message, ...data),
-    testMode: (message: string, ...data: unknown[]) => log(LOG_GROUPS.TEST_MODE, message, ...data),
-    modal: (message: string, ...data: unknown[]) => log(LOG_GROUPS.MODAL, message, ...data),
-    error: (message: string, ...data: unknown[]) => log(LOG_GROUPS.ERROR, message, ...data),
-    hotkey: (message: string, ...data: unknown[]) => log(LOG_GROUPS.HOTKEY, message, ...data),
-    presence: (message: string, ...data: unknown[]) => log(LOG_GROUPS.PRESENCE, message, ...data),
-    info: (message: string, ...data: unknown[]) => log(LOG_GROUPS.INIT, message, ...data),
-    forceEnableLogging: (): void => {
-        if (!isForceEnabled) {
-            isForceEnabled = true;
-            console.log('Logging has been force-enabled for this session.');
-            debugLogStore.add('[INFO] Logging has been force-enabled for this session.');
-        }
-    }
+type LoggerMethods = {
+    [K in LogGroup]: (message: string, ...data: unknown[]) => void;
+} & {
+    info: (message: string, ...data: unknown[]) => void;
+    error: (message: string, ...data: unknown[]) => void;
+    forceEnableLogging: () => void;
+    setLogLevels: (newConfig: Partial<LogConfig>) => void;
 };
 
-// Глобальний контролер для розробника
-function initializeDeveloperTools(): void {
-    if (!isBrowser) return;
+/**
+ * Створення Proxy для динамічної обробки методів.
+ */
+const loggerProxy = new Proxy({} as LoggerMethods, {
+    get(target, prop: string) {
+        // Статичні методи та властивості
+        if (prop === 'forceEnableLogging') {
+            return () => {
+                if (!isForceEnabled) {
+                    isForceEnabled = true;
+                    console.log('%c[LOG_SERVICE]%c Production logging enabled.', 'font-weight: bold; color: #4CAF50;', 'color: inherit;');
+                    if (isBrowser) debugLogStore.add('[INFO] Logging has been force-enabled for this session.');
+                }
+            };
+        }
 
-    (window as unknown as Record<string, unknown>).setLogLevels = (newConfig: Partial<LogConfig>) => {
+        if (prop === 'info' || prop === 'init') {
+            return (msg: string, ...data: unknown[]) => baseLog(LOG_GROUPS.INIT, 'info', msg, ...data);
+        }
+
+        if (prop === 'error') {
+            return (msg: string, ...data: unknown[]) => baseLog(LOG_GROUPS.ERROR, 'error', msg, ...data);
+        }
+
+        // Спеціальний мапінг для існуючих методів (CamelCase -> snake_case)
+        const camelToSnake = (str: string) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+        let groupName = prop as LogGroup;
+
+        // Перевірка на CamelCase (наприклад, logicVirtualPlayer -> logic_virtual_player)
+        if (!(Object.values(LOG_GROUPS) as string[]).includes(prop)) {
+            const snakeCandidate = camelToSnake(prop) as LogGroup;
+            if ((Object.values(LOG_GROUPS) as string[]).includes(snakeCandidate)) {
+                groupName = snakeCandidate;
+            }
+        }
+
+        // Якщо група існує, повертаємо функцію логування
+        if ((Object.values(LOG_GROUPS) as string[]).includes(groupName)) {
+            const level: LogLevel = groupName === LOG_GROUPS.ERROR ? 'error' : 'info';
+            return (msg: string, ...data: unknown[]) => baseLog(groupName, level, msg, ...data);
+        }
+
+        // Fallback для невідомих властивостей
+        return undefined;
+    }
+});
+
+export const logService = loggerProxy;
+
+// Глобальний контролер для розробника (тільки в браузері)
+if (isBrowser) {
+    const globalWin = window as any;
+    
+    globalWin.setLogLevels = (newConfig: Partial<LogConfig>) => {
         logConfig = { ...logConfig, ...newConfig };
         saveConfig(logConfig);
         console.log('Log levels updated:', logConfig);
     };
 
-    (window as unknown as Record<string, unknown>).getLogConfig = () => {
-        return logConfig;
-    };
+    globalWin.getLogConfig = () => logConfig;
 
-    console.log('Log service developer tools initialized. Use window.setLogLevels({ groupName: boolean }) to configure.');
-}
-
-if (isDev || isForceEnabled) {
-    initializeDeveloperTools();
-}
-
-if (isBrowser) {
-    (window as unknown as Record<string, unknown>).enableProdLogging = () => {
-        if (isForceEnabled) {
-            console.log('Logging is already enabled.');
-            return;
-        }
+    globalWin.enableProdLogging = () => {
         localStorage.setItem('force-logging', 'true');
-        isForceEnabled = true;
-        initializeDeveloperTools();
-        console.log('Production logging enabled. Refresh the page for full effect. Use setLogLevels({ ... }) to configure.');
-        debugLogStore.add('[INFO] Production logging enabled.');
+        logService.forceEnableLogging();
+        console.log('Production logging enabled. Refresh the page for full effect.');
     };
+
+    if (isDev || isForceEnabled) {
+        console.log('%c[LOG_SERVICE]%c Developer tools initialized. Use window.setLogLevels({ groupName: boolean }) to configure.', 'font-weight: bold; color: #00BCD4;', 'color: inherit;');
+    }
 }
